@@ -68,7 +68,7 @@ SockConnFlush (
   IN SOCKET *Sock
   );
 
-SOCKET  *
+SOCKET *
 SockCreate (
   IN SOCK_INIT_DATA *SockInitData
   );

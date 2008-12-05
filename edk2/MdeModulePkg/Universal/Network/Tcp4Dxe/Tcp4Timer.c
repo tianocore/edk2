@@ -24,31 +24,67 @@ Abstract:
 
 UINT32    mTcpTick = 1000;
 
+/**
+  Connect timeout handler.
+
+  @param  Tcb      Pointer to the TCP_CB of this TCP instance.
+
+**/
 VOID
 TcpConnectTimeout (
   IN TCP_CB *Tcb
   );
 
+/**
+  Timeout handler for TCP retransmission timer.
+
+  @param  Tcb      Pointer to the TCP_CB of this TCP instance.
+
+**/
 VOID
 TcpRexmitTimeout (
   IN TCP_CB *Tcb
   );
+  
+/**
+  Timeout handler for window probe timer.
 
+  @param  Tcb      Pointer to the TCP_CB of this TCP instance.
+
+**/
 VOID
 TcpProbeTimeout (
   IN TCP_CB *Tcb
   );
 
+/**
+  Timeout handler for keepalive timer.
+
+  @param  Tcb      Pointer to the TCP_CB of this TCP instance.
+
+**/
 VOID
 TcpKeepaliveTimeout (
   IN TCP_CB *Tcb
   );
 
+/**
+  Timeout handler for FIN_WAIT_2 timer.
+
+  @param  Tcb      Pointer to the TCP_CB of this TCP instance.
+
+**/
 VOID
 TcpFinwait2Timeout (
   IN TCP_CB *Tcb
   );
 
+/**
+  Timeout handler for 2MSL timer.
+
+  @param  Tcb      Pointer to the TCP_CB of this TCP instance.
+
+**/
 VOID
 Tcp2MSLTimeout (
   IN TCP_CB *Tcb
@@ -63,13 +99,10 @@ TCP_TIMER_HANDLER mTcpTimerHandler[TCP_TIMER_NUMBER] = {
   Tcp2MSLTimeout,
 };
 
-
 /**
   Close the TCP connection.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
-
-  @return None.
 
 **/
 VOID
@@ -88,8 +121,6 @@ TcpClose (
   Connect timeout handler.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
-
-  @return None.
 
 **/
 VOID
@@ -123,8 +154,6 @@ TcpConnectTimeout (
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpRexmitTimeout (
@@ -148,7 +177,7 @@ TcpRexmitTimeout (
   Tcb->LossRecover  = Tcb->SndNxt;
 
   Tcb->LossTimes++;
-  if (Tcb->LossTimes > Tcb->MaxRexmit &&
+  if ((Tcb->LossTimes > Tcb->MaxRexmit) &&
       !TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_CONNECT)) {
 
     DEBUG ((EFI_D_ERROR, "TcpRexmitTimeout: connection closed "
@@ -167,7 +196,6 @@ TcpRexmitTimeout (
   TcpSetTimer (Tcb, TCP_TIMER_REXMIT, Tcb->Rto);
 
   Tcb->CongestState = TCP_CONGEST_LOSS;
-
   TCP_CLEAR_FLG (Tcb->CtrlFlag, TCP_CTRL_RTT_ON);
 }
 
@@ -176,8 +204,6 @@ TcpRexmitTimeout (
   Timeout handler for window probe timer.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
-
-  @return None.
 
 **/
 VOID
@@ -206,8 +232,6 @@ TcpProbeTimeout (
   Timeout handler for keepalive timer.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
-
-  @return None.
 
 **/
 VOID
@@ -240,8 +264,6 @@ TcpKeepaliveTimeout (
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpFinwait2Timeout (
@@ -260,8 +282,6 @@ TcpFinwait2Timeout (
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 Tcp2MSLTimeout (
@@ -276,13 +296,10 @@ Tcp2MSLTimeout (
 
 
 /**
-  Update the timer status and the next expire time
-  according to the timers to expire in a specific
-  future time slot.
+  Update the timer status and the next expire time according to the timers 
+  to expire in a specific future time slot.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
-
-  @return None.
 
 **/
 VOID
@@ -318,8 +335,6 @@ TcpUpdateTimer (
   @param  Timer    The index of the timer to be enabled.
   @param  TimeOut  The timeout value of this timer.
 
-  @return None.
-
 **/
 VOID
 TcpSetTimer (
@@ -341,8 +356,6 @@ TcpSetTimer (
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Timer    The index of the timer to be cleared.
 
-  @return None.
-
 **/
 VOID
 TcpClearTimer (
@@ -360,8 +373,6 @@ TcpClearTimer (
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpClearAllTimer (
@@ -377,8 +388,6 @@ TcpClearAllTimer (
   Enable the window prober timer and set the timeout value.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
-
-  @return None.
 
 **/
 VOID
@@ -409,8 +418,6 @@ TcpSetProbeTimer (
   Enable the keepalive timer and set the timeout value.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
-
-  @return None.
 
 **/
 VOID
@@ -448,8 +455,6 @@ TcpSetKeepaliveTimer (
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpBackoffRto (
@@ -481,9 +486,7 @@ TcpBackoffRto (
 /**
   Heart beat timer handler.
 
-  @param  Context  Context of the timer event, ignored.
-
-  @return None.
+  @param  Context        Context of the timer event, ignored.
 
 **/
 VOID
@@ -571,8 +574,6 @@ NextConnection:
 
   @param  Event    Timer event signaled, ignored.
   @param  Context  Context of the timer event, ignored.
-
-  @return None.
 
 **/
 VOID

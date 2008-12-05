@@ -85,7 +85,7 @@ TcpRcvWinNow (
   UINT32  OldWin;
 
   Sk = Tcb->Sk;
-  ASSERT (Sk);
+  ASSERT (Sk != NULL);
 
   OldWin    = TcpRcvWinOld (Tcb);
 
@@ -199,7 +199,7 @@ TcpDataToSend (
   UINT32  Limit;
 
   Sk = Tcb->Sk;
-  ASSERT (Sk);
+  ASSERT (Sk != NULL);
 
   //
   // TCP should NOT send data beyond the send window
@@ -284,8 +284,7 @@ SetPersistTimer:
 
 
 /**
-  Build the TCP header of the TCP segment and transmit the
-  segment by IP.
+  Build the TCP header of the TCP segment and transmit the segment by IP.
 
   @param  Tcb     Pointer to the TCP_CB of this TCP instance.
   @param  Nbuf    Pointer to the buffer containing the segment to be sent out.
@@ -306,7 +305,7 @@ TcpTransmitSegment (
   BOOLEAN   Syn;
   UINT32    DataLen;
 
-  ASSERT (Nbuf && (Nbuf->Tcp == NULL) && TcpVerifySegment (Nbuf));
+  ASSERT ((Nbuf != NULL) && (Nbuf->Tcp == NULL) && (TcpVerifySegment (Nbuf) != 0));
 
   DataLen = Nbuf->TotalSize;
 
@@ -435,7 +434,7 @@ TcpGetSegmentSndQue (
   INT32           Offset;
   INT32           CopyLen;
 
-  ASSERT (Tcb && TCP_SEQ_LEQ (Seq, Tcb->SndNxt) && (Len > 0));
+  ASSERT ((Tcb != NULL) && TCP_SEQ_LEQ (Seq, Tcb->SndNxt) && (Len > 0));
 
   //
   // Find the segment that contains the Seq.
@@ -530,7 +529,7 @@ TcpGetSegmentSndQue (
   //
   if (CopyLen != 0) {
     Data = NetbufAllocSpace (Nbuf, CopyLen, NET_BUF_TAIL);
-    ASSERT (Data);
+    ASSERT (Data != NULL);
 
     if ((INT32) NetbufCopy (Node, Offset, CopyLen, Data) != CopyLen) {
       goto OnError;
@@ -572,7 +571,7 @@ TcpGetSegmentSock (
   UINT8   *Data;
   UINT32  DataGet;
 
-  ASSERT (Tcb && Tcb->Sk);
+  ASSERT ((Tcb != NULL) && (Tcb->Sk != NULL));
 
   Nbuf = NetbufAlloc (Len + TCP_MAX_HEAD);
 
@@ -592,7 +591,7 @@ TcpGetSegmentSock (
     // copy data to the segment.
     //
     Data = NetbufAllocSpace (Nbuf, Len, NET_BUF_TAIL);
-    ASSERT (Data);
+    ASSERT (Data != NULL);
 
     DataGet = SockGetDataToSend (Tcb->Sk, 0, Len, Data);
   }
@@ -633,7 +632,7 @@ TcpGetSegment (
 {
   NET_BUF *Nbuf;
 
-  ASSERT (Tcb);
+  ASSERT (Tcb != NULL);
 
   //
   // Compare the SndNxt with the max sequence number sent.
@@ -646,7 +645,7 @@ TcpGetSegment (
     Nbuf = TcpGetSegmentSock (Tcb, Seq, Len);
   }
 
-  ASSERT (TcpVerifySegment (Nbuf));
+  ASSERT (TcpVerifySegment (Nbuf) != 0);
   return Nbuf;
 }
 
@@ -692,7 +691,7 @@ TcpRetransmit (
     return -1;
   }
 
-  ASSERT (TcpVerifySegment (Nbuf));
+  ASSERT (TcpVerifySegment (Nbuf) != 0);
 
   if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
     goto OnError;
@@ -703,7 +702,7 @@ TcpRetransmit (
   // trim TCP head because all the buffer on SndQue
   // are headless.
   //
-  ASSERT (Nbuf->Tcp);
+  ASSERT (Nbuf->Tcp != NULL);
   NetbufTrim (Nbuf, (Nbuf->Tcp->HeadLen << 2), NET_BUF_HEAD);
   Nbuf->Tcp = NULL;
 
@@ -743,7 +742,7 @@ TcpToSendData (
   TCP_SEQNO Seq;
   TCP_SEQNO End;
 
-  ASSERT (Tcb && Tcb->Sk && (Tcb->State != TCP_LISTEN));
+  ASSERT ((Tcb != NULL) && (Tcb->Sk != NULL) && (Tcb->State != TCP_LISTEN));
 
   Sent = 0;
 
@@ -807,8 +806,7 @@ SEND_AGAIN:
     //
     if ((TcpGetMaxSndNxt (Tcb) == Tcb->SndNxt) &&
         (GET_SND_DATASIZE (Tcb->Sk) == 0) &&
-        TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)
-          ) {
+        TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)) {
 
       DEBUG ((EFI_D_INFO, "TcpToSendData: send FIN "
         "to peer for TCB %p in state %d\n", Tcb, Tcb->State));
@@ -823,8 +821,8 @@ SEND_AGAIN:
   Seg->End  = End;
   Seg->Flag = Flag;
 
-  ASSERT (TcpVerifySegment (Nbuf));
-  ASSERT (TcpCheckSndQue (&Tcb->SndQue));
+  ASSERT (TcpVerifySegment (Nbuf) != 0);
+  ASSERT (TcpCheckSndQue (&Tcb->SndQue) != 0);
 
   //
   // don't send an empty segment here.
@@ -856,7 +854,7 @@ SEND_AGAIN:
   //
   // All the buffer in the SndQue is headless
   //
-  ASSERT (Nbuf->Tcp);
+  ASSERT (Nbuf->Tcp != NULL);
 
   NetbufTrim (Nbuf, (Nbuf->Tcp->HeadLen << 2), NET_BUF_HEAD);
   Nbuf->Tcp = NULL;
@@ -915,8 +913,6 @@ OnError:
 
   @param  Tcb     Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpSendAck (
@@ -949,8 +945,7 @@ TcpSendAck (
 
 
 /**
-  Send a zero probe segment. It can be used by keepalive
-  and zero window probe.
+  Send a zero probe segment. It can be used by keepalive and zero window probe.
 
   @param  Tcb     Pointer to the TCP_CB of this TCP instance.
 
@@ -996,8 +991,6 @@ TcpSendZeroProbe (
 
   @param  Tcb     Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpToSendAck (
@@ -1015,8 +1008,7 @@ TcpToSendAck (
   //
   if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW) ||
       (Tcb->DelayedAck >= 1) ||
-      (TcpNow > TcpRcvWinOld (Tcb))
-      ) {
+      (TcpNow > TcpRcvWinOld (Tcb))) {
     TcpSendAck (Tcb);
     return;
   }
@@ -1060,7 +1052,7 @@ TcpSendReset (
   //
   // Don't respond to a Reset with reset
   //
-  if (Head->Flag & TCP_FLG_RST) {
+  if ((Head->Flag & TCP_FLG_RST) != 0) {
     return 0;
   }
 

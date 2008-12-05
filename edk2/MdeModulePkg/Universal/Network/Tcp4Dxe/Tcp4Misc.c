@@ -57,8 +57,6 @@ CHAR16   *mTcpStateName[] = {
 
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
 
-  @return None
-
 **/
 VOID
 TcpInitTcbLocal (
@@ -85,7 +83,7 @@ TcpInitTcbLocal (
   Tcb->RcvWnd = GET_RCV_BUFFSIZE (Tcb->Sk);
 
   //
-  // Fisrt window size is never scaled
+  // First window size is never scaled
   //
   Tcb->RcvWndScale = 0;
 }
@@ -98,8 +96,6 @@ TcpInitTcbLocal (
   @param  Seg                   Pointer to the segment that contains the peer's
                                 intial info.
   @param  Opt                   Pointer to the options announced by the peer.
-
-  @return None
 
 **/
 VOID
@@ -183,7 +179,8 @@ TcpInitTcbPeer (
   @param  Local                 Pointer to the local (IP, Port).
   @param  Remote                Pointer to the remote (IP, Port).
 
-  @return Pointer to the TCP_CB with the least number of wildcard, if NULL no match is found.
+  @return  Pointer to the TCP_CB with the least number of wildcard, 
+           if NULL no match is found.
 
 **/
 TCP_CB *
@@ -206,8 +203,7 @@ TcpLocateListenTcb (
 
     if ((Local->Port != Node->LocalEnd.Port) ||
         !TCP_PEER_MATCH (Remote, &Node->RemoteEnd) ||
-        !TCP_PEER_MATCH (Local, &Node->LocalEnd)
-          ) {
+        !TCP_PEER_MATCH (Local, &Node->LocalEnd)) {
 
       continue;
     }
@@ -248,7 +244,7 @@ TcpLocateListenTcb (
   @param  Addr                  Pointer to the IP address needs to match.
   @param  Port                  The port number needs to match.
 
-  @return The Tcb which matches the <Addr Port> paire exists or not.
+  @return  The Tcb which matches the <Addr Port> paire exists or not.
 
 **/
 BOOLEAN
@@ -299,7 +295,7 @@ TcpFindTcbByPeer (
   @param  Syn                   Whether to search the listen sockets, if TRUE, the
                                 listen sockets are searched.
 
-  @return Pointer to the related TCP_CB, if NULL no match is found.
+  @return  Pointer to the related TCP_CB, if NULL no match is found.
 
 **/
 TCP_CB *
@@ -369,13 +365,11 @@ TcpInsertTcb (
   TCP4_PROTO_DATA  *TcpProto;
 
   ASSERT (
-    Tcb &&
-    (
-    (Tcb->State == TCP_LISTEN) ||
-    (Tcb->State == TCP_SYN_SENT) ||
-    (Tcb->State == TCP_SYN_RCVD) ||
-    (Tcb->State == TCP_CLOSED)
-    )
+    (Tcb != NULL) &&
+    ((Tcb->State == TCP_LISTEN) ||
+     (Tcb->State == TCP_SYN_SENT) ||
+     (Tcb->State == TCP_SYN_RCVD) ||
+     (Tcb->State == TCP_CLOSED))
     );
 
   if (Tcb->LocalEnd.Port == 0) {
@@ -415,7 +409,7 @@ TcpInsertTcb (
 
   @param  Tcb                   Pointer to the TCP_CB to be cloned.
 
-  @return Pointer to the new cloned TCP_CB, if NULL error condition occurred.
+  @return  Pointer to the new cloned TCP_CB, if NULL error condition occurred.
 
 **/
 TCP_CB *
@@ -459,9 +453,7 @@ TcpCloneTcb (
 /**
   Compute an ISS to be used by a new connection.
 
-  None
-
-  @return The result ISS.
+  @return  The result ISS.
 
 **/
 TCP_SEQNO
@@ -479,7 +471,7 @@ TcpGetIss (
 
   @param  Sock        Pointer to the socket to get mss
 
-  @return The mss size.
+  @return  The mss size.
 
 **/
 UINT16
@@ -491,11 +483,11 @@ TcpGetRcvMss (
   TCP4_PROTO_DATA         *TcpProto;
   EFI_IP4_PROTOCOL        *Ip;
 
-  ASSERT (Sock);
+  ASSERT (Sock != NULL);
 
   TcpProto = (TCP4_PROTO_DATA *) Sock->ProtoReserved;
   Ip       = TcpProto->TcpService->IpIo->Ip;
-  ASSERT (Ip);
+  ASSERT (Ip != NULL);
 
   Ip->GetModeData (Ip, NULL, NULL, &SnpMode);
 
@@ -508,8 +500,6 @@ TcpGetRcvMss (
 
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
   @param  State                 The state to be set.
-
-  @return None
 
 **/
 VOID
@@ -560,7 +550,7 @@ TcpSetState (
   @param  HeadSum               The checksum value of the fixed part of pseudo
                                 header.
 
-  @return The checksum value.
+  @return  The checksum value.
 
 **/
 UINT16
@@ -574,10 +564,10 @@ TcpChecksum (
   Checksum  = NetbufChecksum (Nbuf);
   Checksum  = NetAddChecksum (Checksum, HeadSum);
 
-  Checksum = NetAddChecksum (
-              Checksum,
-              HTONS ((UINT16) Nbuf->TotalSize)
-              );
+  Checksum  = NetAddChecksum (
+                Checksum,
+                HTONS ((UINT16) Nbuf->TotalSize)
+                );
 
   return (UINT16) ~Checksum;
 }
@@ -590,7 +580,7 @@ TcpChecksum (
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
   @param  Nbuf                  Pointer to the buffer contains the TCP segment.
 
-  @return Pointer to the TCP_SEG that contains the translated TCP head information.
+  @return  Pointer to the TCP_SEG that contains the translated TCP head information.
 
 **/
 TCP_SEG *
@@ -639,8 +629,6 @@ TcpFormatNetbuf (
   @param  Tcb                   Pointer to the TCP_CB of the connection to be
                                 reset.
 
-  @return None
-
 **/
 VOID
 TcpResetConnection (
@@ -685,12 +673,10 @@ TcpResetConnection (
 
 
 /**
-  Initialize an active connection,
+  Initialize an active connection.
 
   @param  Tcb                   Pointer to the TCP_CB that wants to initiate a
                                 connection.
-
-  @return None
 
 **/
 VOID
@@ -712,17 +698,15 @@ TcpOnAppConnect (
 
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpOnAppClose (
   IN TCP_CB *Tcb
   )
 {
-  ASSERT (Tcb);
+  ASSERT (Tcb != NULL);
 
-  if (!IsListEmpty (&Tcb->RcvQue) || GET_RCV_DATASIZE (Tcb->Sk)) {
+  if (!IsListEmpty (&Tcb->RcvQue) || GET_RCV_DATASIZE (Tcb->Sk) != 0) {
 
     DEBUG ((EFI_D_WARN, "TcpOnAppClose: connection reset "
       "because data is lost for TCB %p\n", Tcb));
@@ -754,8 +738,7 @@ TcpOnAppClose (
 
 
 /**
-  Check whether the application's newly delivered data
-  can be sent out.
+  Check whether the application's newly delivered data can be sent out.
 
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
 
@@ -809,7 +792,6 @@ TcpOnAppSend (
   to send a window updata ack or a delayed ack.
 
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
-
 
 **/
 INTN
@@ -877,8 +859,6 @@ TcpOnAppConsume (
 
   @param  Tcb                   Pointer to the TCP_CB of the TCP instance.
 
-  @return None.
-
 **/
 VOID
 TcpOnAppAbort (
@@ -905,7 +885,7 @@ TcpOnAppAbort (
 /**
   Set the Tdp4 variable data.
 
-  @param  Tcp4Service           Tcp4 service data.
+  @param  Tcp4Service           Pointer to Tcp4 service data.
 
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the variable.
   @retval other                 Set variable failed.
@@ -1078,9 +1058,7 @@ ON_ERROR:
 /**
   Clear the variable and free the resource.
 
-  @param  Tcp4Service           Tcp4 service data.
-
-  @return None.
+  @param  Tcp4Service           Pointer to Tcp4 service data.
 
 **/
 VOID
@@ -1102,26 +1080,19 @@ TcpClearVariableData (
   Tcp4Service->MacString = NULL;
 }
 
+/**
+  Install the device path protocol on the TCP instance.
+
+  @param  Sock             Pointer to the socket representing the TCP instance.
+
+  @retval  EFI_SUCCESS     The device path protocol is installed.
+  @retval  other           Failed to install the device path protocol.
+
+**/
 EFI_STATUS
 TcpInstallDevicePath (
   IN SOCKET *Sock
   )
-/*++
-
-Routine Description:
-
-  Install the device path protocol on the TCP instance.
-
-Arguments:
-
-  Sock - Pointer to the socket representing the TCP instance.
-
-Returns:
-
-  EFI_SUCCESS - The device path protocol is installed.
-  other       - Failed to install the device path protocol.
-
---*/
 {
   TCP4_PROTO_DATA    *TcpProto;
   TCP4_SERVICE_DATA  *TcpService;
@@ -1145,9 +1116,9 @@ Returns:
     );
 
   Sock->DevicePath = AppendDevicePathNode (
-                     Sock->ParentDevicePath,
-                     (EFI_DEVICE_PATH_PROTOCOL *) &Ip4DPathNode
-                     );
+                       Sock->ParentDevicePath,
+                       (EFI_DEVICE_PATH_PROTOCOL *) &Ip4DPathNode
+                       );
   if (Sock->DevicePath == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
