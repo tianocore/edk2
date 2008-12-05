@@ -19,7 +19,7 @@
   Reads the current value of Task Register (TR).
 
   Reads and returns the current value of TR. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of TR.
 

@@ -178,12 +178,12 @@ typedef INT64   INTN;
 #define MAX_2_BITS  0xC000000000000000ULL
 
 //
-// Maximum legal X64 address
+// Maximum legal x64 address
 //
 #define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
 
 //
-// The stack alignment required for X64
+// The stack alignment required for x64
 //
 #define CPU_STACK_ALIGNMENT   16
 

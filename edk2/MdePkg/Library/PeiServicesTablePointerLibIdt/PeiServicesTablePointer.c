@@ -1,5 +1,5 @@
 /** @file
-  PEI Services Table Pointer Library for IA-32 and X64.
+  PEI Services Table Pointer Library for IA-32 and x64.
 
   According to PI specification, the peiservice pointer is stored prior at IDT
   table in IA32 and x64 architecture.

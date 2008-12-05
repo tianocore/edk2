@@ -21,7 +21,7 @@
   Reads the current Interrupt Descriptor Table Register(GDTR) descriptor.
 
   Reads and returns the current IDTR descriptor and returns it in Idtr. This
-  function is only available on IA-32 and X64.
+  function is only available on IA-32 and x64.
 
   If Idtr is NULL, then ASSERT().
 

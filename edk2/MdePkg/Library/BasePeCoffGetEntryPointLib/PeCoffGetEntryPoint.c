@@ -204,7 +204,7 @@ PeCoffLoaderGetPdbPointer (
     case EFI_IMAGE_MACHINE_X64:
     case EFI_IMAGE_MACHINE_IPF:
       //
-      // Assume PE32+ image with X64 or IPF Machine field
+      // Assume PE32+ image with x64 or IPF Machine field
       //
       Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
       break;

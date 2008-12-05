@@ -16,7 +16,7 @@
   Executes an MWAIT instruction.
 
   Executes an MWAIT instruction with the register state specified by Eax and
-  Ecx. Returns Eax. This function is only available on IA-32 and X64.
+  Ecx. Returns Eax. This function is only available on IA-32 and x64.
 
   @param  RegisterEax The value to load into EAX or RAX before executing the MONITOR
                       instruction.

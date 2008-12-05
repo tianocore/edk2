@@ -21,7 +21,7 @@
   If Ebx is not NULL, then the value of EBX after CPUID is returned in Ebx.
   If Ecx is not NULL, then the value of ECX after CPUID is returned in Ecx.
   If Edx is not NULL, then the value of EDX after CPUID is returned in Edx.
-  This function is only available on IA-32 and X64.
+  This function is only available on IA-32 and x64.
 
   @param  Index         The 32-bit value to load into EAX prior to invoking the CPUID
                         instruction.

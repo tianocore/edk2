@@ -93,7 +93,7 @@ typedef struct {
 
 #if defined (MDE_CPU_X64)
 ///
-/// X64 context buffer used by SetJump() and LongJump()
+/// x64 context buffer used by SetJump() and LongJump()
 ///
 typedef struct {
   UINT64                            Rbx;
@@ -4879,7 +4879,7 @@ AsmPalCall (
 
 #elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 ///
-/// IA32 and X64 Specific Functions
+/// IA32 and x64 Specific Functions
 /// Byte packed structure for 16-bit Real Mode EFLAGS
 ///
 typedef union {
@@ -4906,7 +4906,7 @@ typedef union {
 ///
 /// Byte packed structure for EFLAGS/RFLAGS
 /// 32-bits on IA-32
-/// 64-bits on X64.  The upper 32-bits on X64 are reserved
+/// 64-bits on x64.  The upper 32-bits on x64 are reserved
 ///
 typedef union {
   struct {
@@ -4939,7 +4939,7 @@ typedef union {
 ///
 /// Byte packed structure for Control Register 0 (CR0)
 /// 32-bits on IA-32
-/// 64-bits on X64.  The upper 32-bits on X64 are reserved
+/// 64-bits on x64.  The upper 32-bits on x64 are reserved
 ///
 typedef union {
   struct {
@@ -4964,7 +4964,7 @@ typedef union {
 ///
 /// Byte packed structure for Control Register 4 (CR4)
 /// 32-bits on IA-32
-/// 64-bits on X64.  The upper 32-bits on X64 are reserved
+/// 64-bits on x64.  The upper 32-bits on x64 are reserved
 ///
 typedef union {
   struct {
@@ -5138,7 +5138,7 @@ typedef struct {
   If Ebx is not NULL, then the value of EBX after CPUID is returned in Ebx.
   If Ecx is not NULL, then the value of ECX after CPUID is returned in Ecx.
   If Edx is not NULL, then the value of EDX after CPUID is returned in Edx.
-  This function is only available on IA-32 and X64.
+  This function is only available on IA-32 and x64.
 
   @param  Index The 32-bit value to load into EAX prior to invoking the CPUID
                 instruction.
@@ -5244,7 +5244,7 @@ AsmEnableCache (
   No parameter checking is performed on Index, and some Index values may cause
   CPU exceptions. The caller must either guarantee that Index is valid, or the
   caller must set up exception handlers to catch the exceptions. This function
-  is only available on IA-32 and X64.
+  is only available on IA-32 and x64.
 
   @param  Index The 32-bit MSR index to read.
 
@@ -5267,7 +5267,7 @@ AsmReadMsr32 (
   the MSR is returned. No parameter checking is performed on Index or Value,
   and some of these may cause CPU exceptions. The caller must either guarantee
   that Index and Value are valid, or the caller must establish proper exception
-  handlers. This function is only available on IA-32 and X64.
+  handlers. This function is only available on IA-32 and x64.
 
   @param  Index The 32-bit MSR index to write.
   @param  Value The 32-bit value to write to the MSR.
@@ -5294,7 +5294,7 @@ AsmWriteMsr32 (
   performed on Index or OrData, and some of these may cause CPU exceptions. The
   caller must either guarantee that Index and OrData are valid, or the caller
   must establish proper exception handlers. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @param  Index   The 32-bit MSR index to write.
   @param  OrData  The value to OR with the read value from the MSR.
@@ -5321,7 +5321,7 @@ AsmMsrOr32 (
   on Index or AndData, and some of these may cause CPU exceptions. The caller
   must either guarantee that Index and AndData are valid, or the caller must
   establish proper exception handlers. This function is only available on IA-32
-  and X64.
+  and x64.
 
   @param  Index   The 32-bit MSR index to write.
   @param  AndData The value to AND with the read value from the MSR.
@@ -5350,7 +5350,7 @@ AsmMsrAnd32 (
   AndData, or OrData, and some of these may cause CPU exceptions. The caller
   must either guarantee that Index, AndData, and OrData are valid, or the
   caller must establish proper exception handlers. This function is only
-  available on IA-32 and X64.
+  available on IA-32 and x64.
 
   @param  Index   The 32-bit MSR index to write.
   @param  AndData The value to AND with the read value from the MSR.
@@ -5375,7 +5375,7 @@ AsmMsrAndThenOr32 (
   specified by the StartBit and the EndBit. The value of the bit field is
   returned. The caller must either guarantee that Index is valid, or the caller
   must set up exception handlers to catch the exceptions. This function is only
-  available on IA-32 and X64.
+  available on IA-32 and x64.
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
@@ -5408,7 +5408,7 @@ AsmMsrBitFieldRead32 (
   returned. Extra left bits in Value are stripped. The caller must either
   guarantee that Index and the data written is valid, or the caller must set up
   exception handlers to catch the exceptions. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
@@ -5444,7 +5444,7 @@ AsmMsrBitFieldWrite32 (
   written to the MSR are returned. Extra left bits in OrData are stripped. The
   caller must either guarantee that Index and the data written is valid, or
   the caller must set up exception handlers to catch the exceptions. This
-  function is only available on IA-32 and X64.
+  function is only available on IA-32 and x64.
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
@@ -5480,7 +5480,7 @@ AsmMsrBitFieldOr32 (
   MSR are returned. Extra left bits in AndData are stripped. The caller must
   either guarantee that Index and the data written is valid, or the caller must
   set up exception handlers to catch the exceptions. This function is only
-  available on IA-32 and X64.
+  available on IA-32 and x64.
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
@@ -5518,7 +5518,7 @@ AsmMsrBitFieldAnd32 (
   in both AndData and OrData are stripped. The caller must either guarantee
   that Index and the data written is valid, or the caller must set up exception
   handlers to catch the exceptions. This function is only available on IA-32
-  and X64.
+  and x64.
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
@@ -5553,7 +5553,7 @@ AsmMsrBitFieldAndThenOr32 (
   performed on Index, and some Index values may cause CPU exceptions. The
   caller must either guarantee that Index is valid, or the caller must set up
   exception handlers to catch the exceptions. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @param  Index The 32-bit MSR index to read.
 
@@ -5576,7 +5576,7 @@ AsmReadMsr64 (
   performed on Index or Value, and some of these may cause CPU exceptions. The
   caller must either guarantee that Index and Value are valid, or the caller
   must establish proper exception handlers. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @param  Index The 32-bit MSR index to write.
   @param  Value The 64-bit value to write to the MSR.
@@ -5602,7 +5602,7 @@ AsmWriteMsr64 (
   returned. No parameter checking is performed on Index or OrData, and some of
   these may cause CPU exceptions. The caller must either guarantee that Index
   and OrData are valid, or the caller must establish proper exception handlers.
-  This function is only available on IA-32 and X64.
+  This function is only available on IA-32 and x64.
 
   @param  Index   The 32-bit MSR index to write.
   @param  OrData  The value to OR with the read value from the MSR.
@@ -5628,7 +5628,7 @@ AsmMsrOr64 (
   parameter checking is performed on Index or OrData, and some of these may
   cause CPU exceptions. The caller must either guarantee that Index and OrData
   are valid, or the caller must establish proper exception handlers. This
-  function is only available on IA-32 and X64.
+  function is only available on IA-32 and x64.
 
   @param  Index   The 32-bit MSR index to write.
   @param  AndData The value to AND with the read value from the MSR.
@@ -5656,7 +5656,7 @@ AsmMsrAnd64 (
   or OrData, and some of these may cause CPU exceptions. The caller must either
   guarantee that Index, AndData, and OrData are valid, or the caller must
   establish proper exception handlers. This function is only available on IA-32
-  and X64.
+  and x64.
 
   @param  Index   The 32-bit MSR index to write.
   @param  AndData The value to AND with the read value from the MSR.
@@ -5681,7 +5681,7 @@ AsmMsrAndThenOr64 (
   StartBit and the EndBit. The value of the bit field is returned. The caller
   must either guarantee that Index is valid, or the caller must set up
   exception handlers to catch the exceptions. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
@@ -5713,7 +5713,7 @@ AsmMsrBitFieldRead64 (
   preserved. The MSR written is returned. Extra left bits in Value are
   stripped. The caller must either guarantee that Index and the data written is
   valid, or the caller must set up exception handlers to catch the exceptions.
-  This function is only available on IA-32 and X64.
+  This function is only available on IA-32 and x64.
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
@@ -5749,7 +5749,7 @@ AsmMsrBitFieldWrite64 (
   returned. Extra left bits in OrData are stripped. The caller must either
   guarantee that Index and the data written is valid, or the caller must set up
   exception handlers to catch the exceptions. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
@@ -5785,7 +5785,7 @@ AsmMsrBitFieldOr64 (
   Extra left bits in AndData are stripped. The caller must either guarantee
   that Index and the data written is valid, or the caller must set up exception
   handlers to catch the exceptions. This function is only available on IA-32
-  and X64.
+  and x64.
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
@@ -5822,7 +5822,7 @@ AsmMsrBitFieldAnd64 (
   value written to the MSR is returned. Extra left bits in both AndData and
   OrData are stripped. The caller must either guarantee that Index and the data
   written is valid, or the caller must set up exception handlers to catch the
-  exceptions. This function is only available on IA-32 and X64.
+  exceptions. This function is only available on IA-32 and x64.
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
@@ -5854,10 +5854,10 @@ AsmMsrBitFieldAndThenOr64 (
   Reads the current value of the EFLAGS register.
 
   Reads and returns the current value of the EFLAGS register. This function is
-  only available on IA-32 and X64. This returns a 32-bit value on IA-32 and a
-  64-bit value on X64.
+  only available on IA-32 and x64. This returns a 32-bit value on IA-32 and a
+  64-bit value on x64.
 
-  @return EFLAGS on IA-32 or RFLAGS on X64.
+  @return EFLAGS on IA-32 or RFLAGS on x64.
 
 **/
 UINTN
@@ -5871,8 +5871,8 @@ AsmReadEflags (
   Reads the current value of the Control Register 0 (CR0).
 
   Reads and returns the current value of CR0. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of the Control Register 0 (CR0).
 
@@ -5888,8 +5888,8 @@ AsmReadCr0 (
   Reads the current value of the Control Register 2 (CR2).
 
   Reads and returns the current value of CR2. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of the Control Register 2 (CR2).
 
@@ -5905,8 +5905,8 @@ AsmReadCr2 (
   Reads the current value of the Control Register 3 (CR3).
 
   Reads and returns the current value of CR3. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of the Control Register 3 (CR3).
 
@@ -5922,8 +5922,8 @@ AsmReadCr3 (
   Reads the current value of the Control Register 4 (CR4).
 
   Reads and returns the current value of CR4. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of the Control Register 4 (CR4).
 
@@ -5939,7 +5939,7 @@ AsmReadCr4 (
   Writes a value to Control Register 0 (CR0).
 
   Writes and returns a new value to CR0. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Cr0 The value to write to CR0.
 
@@ -5957,7 +5957,7 @@ AsmWriteCr0 (
   Writes a value to Control Register 2 (CR2).
 
   Writes and returns a new value to CR2. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Cr2 The value to write to CR2.
 
@@ -5975,7 +5975,7 @@ AsmWriteCr2 (
   Writes a value to Control Register 3 (CR3).
 
   Writes and returns a new value to CR3. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Cr3 The value to write to CR3.
 
@@ -5993,7 +5993,7 @@ AsmWriteCr3 (
   Writes a value to Control Register 4 (CR4).
 
   Writes and returns a new value to CR4. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Cr4 The value to write to CR4.
 
@@ -6011,8 +6011,8 @@ AsmWriteCr4 (
   Reads the current value of Debug Register 0 (DR0).
 
   Reads and returns the current value of DR0. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 0 (DR0).
 
@@ -6028,8 +6028,8 @@ AsmReadDr0 (
   Reads the current value of Debug Register 1 (DR1).
 
   Reads and returns the current value of DR1. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 1 (DR1).
 
@@ -6045,8 +6045,8 @@ AsmReadDr1 (
   Reads the current value of Debug Register 2 (DR2).
 
   Reads and returns the current value of DR2. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 2 (DR2).
 
@@ -6062,8 +6062,8 @@ AsmReadDr2 (
   Reads the current value of Debug Register 3 (DR3).
 
   Reads and returns the current value of DR3. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 3 (DR3).
 
@@ -6079,8 +6079,8 @@ AsmReadDr3 (
   Reads the current value of Debug Register 4 (DR4).
 
   Reads and returns the current value of DR4. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 4 (DR4).
 
@@ -6096,8 +6096,8 @@ AsmReadDr4 (
   Reads the current value of Debug Register 5 (DR5).
 
   Reads and returns the current value of DR5. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 5 (DR5).
 
@@ -6113,8 +6113,8 @@ AsmReadDr5 (
   Reads the current value of Debug Register 6 (DR6).
 
   Reads and returns the current value of DR6. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 6 (DR6).
 
@@ -6130,8 +6130,8 @@ AsmReadDr6 (
   Reads the current value of Debug Register 7 (DR7).
 
   Reads and returns the current value of DR7. This function is only available
-  on IA-32 and X64. This returns a 32-bit value on IA-32 and a 64-bit value on
-  X64.
+  on IA-32 and x64. This returns a 32-bit value on IA-32 and a 64-bit value on
+  x64.
 
   @return The value of Debug Register 7 (DR7).
 
@@ -6147,7 +6147,7 @@ AsmReadDr7 (
   Writes a value to Debug Register 0 (DR0).
 
   Writes and returns a new value to DR0. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr0 The value to write to Dr0.
 
@@ -6165,7 +6165,7 @@ AsmWriteDr0 (
   Writes a value to Debug Register 1 (DR1).
 
   Writes and returns a new value to DR1. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr1 The value to write to Dr1.
 
@@ -6183,7 +6183,7 @@ AsmWriteDr1 (
   Writes a value to Debug Register 2 (DR2).
 
   Writes and returns a new value to DR2. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr2 The value to write to Dr2.
 
@@ -6201,7 +6201,7 @@ AsmWriteDr2 (
   Writes a value to Debug Register 3 (DR3).
 
   Writes and returns a new value to DR3. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr3 The value to write to Dr3.
 
@@ -6219,7 +6219,7 @@ AsmWriteDr3 (
   Writes a value to Debug Register 4 (DR4).
 
   Writes and returns a new value to DR4. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr4 The value to write to Dr4.
 
@@ -6237,7 +6237,7 @@ AsmWriteDr4 (
   Writes a value to Debug Register 5 (DR5).
 
   Writes and returns a new value to DR5. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr5 The value to write to Dr5.
 
@@ -6255,7 +6255,7 @@ AsmWriteDr5 (
   Writes a value to Debug Register 6 (DR6).
 
   Writes and returns a new value to DR6. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr6 The value to write to Dr6.
 
@@ -6273,7 +6273,7 @@ AsmWriteDr6 (
   Writes a value to Debug Register 7 (DR7).
 
   Writes and returns a new value to DR7. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Dr7 The value to write to Dr7.
 
@@ -6291,7 +6291,7 @@ AsmWriteDr7 (
   Reads the current value of Code Segment Register (CS).
 
   Reads and returns the current value of CS. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of CS.
 
@@ -6307,7 +6307,7 @@ AsmReadCs (
   Reads the current value of Data Segment Register (DS).
 
   Reads and returns the current value of DS. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of DS.
 
@@ -6323,7 +6323,7 @@ AsmReadDs (
   Reads the current value of Extra Segment Register (ES).
 
   Reads and returns the current value of ES. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of ES.
 
@@ -6339,7 +6339,7 @@ AsmReadEs (
   Reads the current value of FS Data Segment Register (FS).
 
   Reads and returns the current value of FS. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of FS.
 
@@ -6355,7 +6355,7 @@ AsmReadFs (
   Reads the current value of GS Data Segment Register (GS).
 
   Reads and returns the current value of GS. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of GS.
 
@@ -6371,7 +6371,7 @@ AsmReadGs (
   Reads the current value of Stack Segment Register (SS).
 
   Reads and returns the current value of SS. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of SS.
 
@@ -6387,7 +6387,7 @@ AsmReadSs (
   Reads the current value of Task Register (TR).
 
   Reads and returns the current value of TR. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @return The current value of TR.
 
@@ -6403,7 +6403,7 @@ AsmReadTr (
   Reads the current Global Descriptor Table Register(GDTR) descriptor.
 
   Reads and returns the current GDTR descriptor and returns it in Gdtr. This
-  function is only available on IA-32 and X64.
+  function is only available on IA-32 and x64.
 
   If Gdtr is NULL, then ASSERT().
 
@@ -6421,7 +6421,7 @@ AsmReadGdtr (
   Writes the current Global Descriptor Table Register (GDTR) descriptor.
 
   Writes and the current GDTR descriptor specified by Gdtr. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   If Gdtr is NULL, then ASSERT().
 
@@ -6439,7 +6439,7 @@ AsmWriteGdtr (
   Reads the current Interrupt Descriptor Table Register(IDTR) descriptor.
 
   Reads and returns the current IDTR descriptor and returns it in Idtr. This
-  function is only available on IA-32 and X64.
+  function is only available on IA-32 and x64.
 
   If Idtr is NULL, then ASSERT().
 
@@ -6457,7 +6457,7 @@ AsmReadIdtr (
   Writes the current Interrupt Descriptor Table Register(IDTR) descriptor.
 
   Writes the current IDTR descriptor and returns it in Idtr. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   If Idtr is NULL, then ASSERT().
 
@@ -6475,7 +6475,7 @@ AsmWriteIdtr (
   Reads the current Local Descriptor Table Register(LDTR) selector.
 
   Reads and returns the current 16-bit LDTR descriptor value. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   @return The current selector of LDT.
 
@@ -6491,7 +6491,7 @@ AsmReadLdtr (
   Writes the current Local Descriptor Table Register (LDTR) selector.
 
   Writes and the current LDTR descriptor specified by Ldtr. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   @param  Ldtr  16-bit LDTR selector value.
 
@@ -6508,7 +6508,7 @@ AsmWriteLdtr (
 
   Saves the current floating point/SSE/SSE2 state to the buffer specified by
   Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
-  available on IA-32 and X64.
+  available on IA-32 and x64.
 
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 16-byte boundary, then ASSERT().
@@ -6528,7 +6528,7 @@ AsmFxSave (
 
   Restores the current floating point/SSE/SSE2 state from the buffer specified
   by Buffer. Buffer must be aligned on a 16-byte boundary. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 16-byte boundary, then ASSERT().
@@ -6548,7 +6548,7 @@ AsmFxRestore (
   Reads the current value of 64-bit MMX Register #0 (MM0).
 
   Reads and returns the current value of MM0. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM0.
 
@@ -6564,7 +6564,7 @@ AsmReadMm0 (
   Reads the current value of 64-bit MMX Register #1 (MM1).
 
   Reads and returns the current value of MM1. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM1.
 
@@ -6580,7 +6580,7 @@ AsmReadMm1 (
   Reads the current value of 64-bit MMX Register #2 (MM2).
 
   Reads and returns the current value of MM2. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM2.
 
@@ -6596,7 +6596,7 @@ AsmReadMm2 (
   Reads the current value of 64-bit MMX Register #3 (MM3).
 
   Reads and returns the current value of MM3. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM3.
 
@@ -6612,7 +6612,7 @@ AsmReadMm3 (
   Reads the current value of 64-bit MMX Register #4 (MM4).
 
   Reads and returns the current value of MM4. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM4.
 
@@ -6628,7 +6628,7 @@ AsmReadMm4 (
   Reads the current value of 64-bit MMX Register #5 (MM5).
 
   Reads and returns the current value of MM5. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM5.
 
@@ -6644,7 +6644,7 @@ AsmReadMm5 (
   Reads the current value of 64-bit MMX Register #6 (MM6).
 
   Reads and returns the current value of MM6. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM6.
 
@@ -6660,7 +6660,7 @@ AsmReadMm6 (
   Reads the current value of 64-bit MMX Register #7 (MM7).
 
   Reads and returns the current value of MM7. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of MM7.
 
@@ -6676,7 +6676,7 @@ AsmReadMm7 (
   Writes the current value of 64-bit MMX Register #0 (MM0).
 
   Writes the current value of MM0. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM0.
 
@@ -6692,7 +6692,7 @@ AsmWriteMm0 (
   Writes the current value of 64-bit MMX Register #1 (MM1).
 
   Writes the current value of MM1. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM1.
 
@@ -6708,7 +6708,7 @@ AsmWriteMm1 (
   Writes the current value of 64-bit MMX Register #2 (MM2).
 
   Writes the current value of MM2. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM2.
 
@@ -6724,7 +6724,7 @@ AsmWriteMm2 (
   Writes the current value of 64-bit MMX Register #3 (MM3).
 
   Writes the current value of MM3. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM3.
 
@@ -6740,7 +6740,7 @@ AsmWriteMm3 (
   Writes the current value of 64-bit MMX Register #4 (MM4).
 
   Writes the current value of MM4. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM4.
 
@@ -6756,7 +6756,7 @@ AsmWriteMm4 (
   Writes the current value of 64-bit MMX Register #5 (MM5).
 
   Writes the current value of MM5. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM5.
 
@@ -6772,7 +6772,7 @@ AsmWriteMm5 (
   Writes the current value of 64-bit MMX Register #6 (MM6).
 
   Writes the current value of MM6. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM6.
 
@@ -6788,7 +6788,7 @@ AsmWriteMm6 (
   Writes the current value of 64-bit MMX Register #7 (MM7).
 
   Writes the current value of MM7. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM7.
 
@@ -6804,7 +6804,7 @@ AsmWriteMm7 (
   Reads the current value of Time Stamp Counter (TSC).
 
   Reads and returns the current value of TSC. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @return The current value of TSC
 
@@ -6820,7 +6820,7 @@ AsmReadTsc (
   Reads the current value of a Performance Counter (PMC).
 
   Reads and returns the current value of performance counter specified by
-  Index. This function is only available on IA-32 and X64.
+  Index. This function is only available on IA-32 and x64.
 
   @param  Index The 32-bit Performance Counter index to read.
 
@@ -6838,7 +6838,7 @@ AsmReadPmc (
   Sets up a monitor buffer that is used by AsmMwait().
 
   Executes a MONITOR instruction with the register state specified by Eax, Ecx
-  and Edx. Returns Eax. This function is only available on IA-32 and X64.
+  and Edx. Returns Eax. This function is only available on IA-32 and x64.
 
   @param  Eax The value to load into EAX or RAX before executing the MONITOR
               instruction.
@@ -6863,7 +6863,7 @@ AsmMonitor (
   Executes an MWAIT instruction.
 
   Executes an MWAIT instruction with the register state specified by Eax and
-  Ecx. Returns Eax. This function is only available on IA-32 and X64.
+  Ecx. Returns Eax. This function is only available on IA-32 and x64.
 
   @param  Eax The value to load into EAX or RAX before executing the MONITOR
               instruction.
@@ -6885,7 +6885,7 @@ AsmMwait (
   Executes a WBINVD instruction.
 
   Executes a WBINVD instruction. This function is only available on IA-32 and
-  X64.
+  x64.
 
 **/
 VOID
@@ -6899,7 +6899,7 @@ AsmWbinvd (
   Executes a INVD instruction.
 
   Executes a INVD instruction. This function is only available on IA-32 and
-  X64.
+  x64.
 
 **/
 VOID
@@ -6914,7 +6914,7 @@ AsmInvd (
   coherency domain of the CPU.
 
   Flushed the cache line specified by LinearAddress, and returns LinearAddress.
-  This function is only available on IA-32 and X64.
+  This function is only available on IA-32 and x64.
 
   @param  LinearAddress The address of the cache line to flush. If the CPU is
                         in a physical addressing mode, then LinearAddress is a
@@ -7070,7 +7070,7 @@ AsmEnablePaging64 (
 
   Disables the 64-bit paging mode on the CPU and returns to 32-bit protected
   mode. This function assumes the current execution mode is 64-paging mode.
-  This function is only available on X64. After the 64-bit paging mode is
+  This function is only available on x64. After the 64-bit paging mode is
   disabled, control is transferred to the function specified by EntryPoint
   using the new stack specified by NewStack and passing in the parameters
   specified by Context1 and Context2. Context1 and Context2 are optional and

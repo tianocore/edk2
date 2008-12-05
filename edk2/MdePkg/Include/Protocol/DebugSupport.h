@@ -132,7 +132,7 @@ typedef struct {
 } EFI_SYSTEM_CONTEXT_IA32;
 
 //
-//  X64 processor exception types
+//  x64 processor exception types
 //
 #define EXCEPT_X64_DIVIDE_ERROR    0
 #define EXCEPT_X64_DEBUG           1
@@ -153,7 +153,7 @@ typedef struct {
 #define EXCEPT_X64_SIMD            19
 
 ///
-///  X64 processor context definition
+///  x64 processor context definition
 ///
 /// FXSAVE_STATE
 /// FP / MMX / XMM registers (see fxrstor instruction definition)
@@ -487,7 +487,7 @@ typedef union {
 /**                                                                 
   Registers and enables an exception callback function for the specified exception.
     
-  @param  ExceptionType         Exception types in EBC, IA-32, X64, or IPF
+  @param  ExceptionType         Exception types in EBC, IA-32, x64, or IPF
   @param  SystemContext         Exception content.
                                    
 **/
