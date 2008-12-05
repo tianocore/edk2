@@ -16,7 +16,7 @@
   Reads the current value of a Performance Counter (PMC).
 
   Reads and returns the current value of performance counter specified by
-  Index. This function is only available on IA-32 and X64.
+  Index. This function is only available on IA-32 and x64.
 
   @param  Index The 32-bit Performance Counter index to read.
 

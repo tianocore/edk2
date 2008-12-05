@@ -221,7 +221,7 @@ PeCoffLoaderRelocateImageEx (
   the entry point.
 
   This function implies the basic PE/COFF loader/relocator supports IA32, EBC,
-  & X64 images. Calling the entry point in a correct mannor is up to the
+  & x64 images. Calling the entry point in a correct mannor is up to the
   consumer of this library. This version also supports the special relocations
   for Itanium.
 

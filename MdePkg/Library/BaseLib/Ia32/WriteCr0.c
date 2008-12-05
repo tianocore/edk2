@@ -16,7 +16,7 @@
   Writes a value to Control Register 0 (CR0).
 
   Writes and returns a new value to CR0. This function is only available on
-  IA-32 and X64. This writes a 32-bit value on IA-32 and a 64-bit value on X64.
+  IA-32 and x64. This writes a 32-bit value on IA-32 and a 64-bit value on x64.
 
   @param  Value The value to write to CR0.
 

@@ -19,10 +19,10 @@
   Reads the current value of the EFLAGS register.
 
   Reads and returns the current value of the EFLAGS register. This function is
-  only available on IA-32 and X64. This returns a 32-bit value on IA-32 and a
-  64-bit value on X64.
+  only available on IA-32 and x64. This returns a 32-bit value on IA-32 and a
+  64-bit value on x64.
 
-  @return EFLAGS on IA-32 or RFLAGS on X64.
+  @return EFLAGS on IA-32 or RFLAGS on x64.
 
 **/
 UINTN

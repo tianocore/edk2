@@ -24,7 +24,7 @@
   performed on Index or Value, and some of these may cause CPU exceptions. The
   caller must either guarantee that Index and Value are valid, or the caller
   must establish proper exception handlers. This function is only available on
-  IA-32 and X64.
+  IA-32 and x64.
 
   @param  Index The 32-bit MSR index to write.
   @param  Value The 64-bit value to write to the MSR.

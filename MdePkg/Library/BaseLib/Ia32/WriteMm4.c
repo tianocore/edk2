@@ -19,7 +19,7 @@
   Writes the current value of 64-bit MMX Register #4 (MM4).
 
   Writes the current value of MM4. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM4.
 

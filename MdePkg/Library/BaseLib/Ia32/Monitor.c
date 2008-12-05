@@ -16,7 +16,7 @@
   Sets up a monitor buffer that is used by AsmMwait().
 
   Executes a MONITOR instruction with the register state specified by Eax, Ecx
-  and Edx. Returns Eax. This function is only available on IA-32 and X64.
+  and Edx. Returns Eax. This function is only available on IA-32 and x64.
 
   @param  RegisterEax The value to load into EAX or RAX before executing the MONITOR
                       instruction.

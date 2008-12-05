@@ -21,7 +21,7 @@
   Writes the current Global Descriptor Table Register (GDTR) descriptor.
 
   Writes and the current GDTR descriptor specified by Gdtr. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   If Gdtr is NULL, then ASSERT().
 

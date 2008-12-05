@@ -22,7 +22,7 @@
   performed on Index, and some Index values may cause CPU exceptions. The
   caller must either guarantee that Index is valid, or the caller must set up
   exception handlers to catch the exceptions. This function is only available
-  on IA-32 and X64.
+  on IA-32 and x64.
 
   @param  Index The 32-bit MSR index to read.
 

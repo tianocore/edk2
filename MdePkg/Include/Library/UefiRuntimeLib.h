@@ -375,7 +375,7 @@ EfiConvertPointer (
 /**
   Determines the new virtual address that is to be used on subsequent memory accesses.
 
-  For IA32, X64, and EBC, this service is a wrapper for the UEFI Runtime Service
+  For IA32, x64, and EBC, this service is a wrapper for the UEFI Runtime Service
   ConvertPointer().  See the UEFI Specification for details. 
   For IPF, this function interprets Address as a pointer to an EFI_PLABEL structure
   and both the EntryPoint and GP fields of an EFI_PLABEL are converted from physical

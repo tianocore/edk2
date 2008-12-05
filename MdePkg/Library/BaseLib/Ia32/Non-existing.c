@@ -19,7 +19,7 @@
 
   Disables the 64-bit paging mode on the CPU and returns to 32-bit protected
   mode. This function assumes the current execution mode is 64-paging mode.
-  This function is only available on X64. After the 64-bit paging mode is
+  This function is only available on x64. After the 64-bit paging mode is
   disabled, control is transferred to the function specified by EntryPoint
   using the new stack specified by NewStack and passing in the parameters
   specified by Context1 and Context2. Context1 and Context2 are optional and

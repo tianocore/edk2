@@ -579,7 +579,7 @@ InternalLongJump (
   Reads the current Global Descriptor Table Register(GDTR) descriptor.
 
   Reads and returns the current GDTR descriptor and returns it in Gdtr. This
-  function is only available on IA-32 and X64.
+  function is only available on IA-32 and x64.
 
   @param  Gdtr  Pointer to a GDTR descriptor.
 
@@ -594,7 +594,7 @@ InternalX86ReadGdtr (
   Writes the current Global Descriptor Table Register (GDTR) descriptor.
 
   Writes and the current GDTR descriptor specified by Gdtr. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   @param  Gdtr  Pointer to a GDTR descriptor.
 
@@ -609,7 +609,7 @@ InternalX86WriteGdtr (
   Reads the current Interrupt Descriptor Table Register(GDTR) descriptor.
 
   Reads and returns the current IDTR descriptor and returns it in Idtr. This
-  function is only available on IA-32 and X64.
+  function is only available on IA-32 and x64.
 
   @param  Idtr  Pointer to a IDTR descriptor.
 
@@ -624,7 +624,7 @@ InternalX86ReadIdtr (
   Writes the current Interrupt Descriptor Table Register(GDTR) descriptor.
 
   Writes the current IDTR descriptor and returns it in Idtr. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   @param  Idtr  Pointer to a IDTR descriptor.
 
@@ -640,7 +640,7 @@ InternalX86WriteIdtr (
 
   Saves the current floating point/SSE/SSE2 state to the buffer specified by
   Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
-  available on IA-32 and X64.
+  available on IA-32 and x64.
 
   @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
 
@@ -656,7 +656,7 @@ InternalX86FxSave (
 
   Restores the current floating point/SSE/SSE2 state from the buffer specified
   by Buffer. Buffer must be aligned on a 16-byte boundary. This function is
-  only available on IA-32 and X64.
+  only available on IA-32 and x64.
 
   @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
 
@@ -790,7 +790,7 @@ InternalX86EnablePaging64 (
 
   Disables the 64-bit paging mode on the CPU and returns to 32-bit protected
   mode. This function assumes the current execution mode is 64-paging mode.
-  This function is only available on X64. After the 64-bit paging mode is
+  This function is only available on x64. After the 64-bit paging mode is
   disabled, control is transferred to the function specified by EntryPoint
   using the new stack specified by NewStack and passing in the parameters
   specified by Context1 and Context2. Context1 and Context2 are optional and

@@ -1,5 +1,5 @@
 /** @file
-  Real Mode Thunk Functions for IA32 and X64.
+  Real Mode Thunk Functions for IA32 and x64.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials

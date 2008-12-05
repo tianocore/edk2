@@ -19,7 +19,7 @@
   Writes the current value of 64-bit MMX Register #6 (MM6).
 
   Writes the current value of MM6. This function is only available on IA32 and
-  X64.
+  x64.
 
   @param  Value The 64-bit value to write to MM6.
 
