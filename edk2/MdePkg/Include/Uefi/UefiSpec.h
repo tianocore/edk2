@@ -850,8 +850,6 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The image has been unloaded.
   @retval EFI_INVALID_PARAMETER ImageHandle is not a valid image handle.
-  @retval EFI_UNSUPPORTED       The image has been started, and does not support unload.
-  @return Exit code from the image's unload handler
 
 **/
 typedef
