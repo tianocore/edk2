@@ -285,7 +285,7 @@ RuntimeDriverSetVirtualAddressMap (
   // All runtime events are stored in a list in Runtime AP.
   //
   for (Link = mRuntime.EventHead.ForwardLink; Link != &mRuntime.EventHead; Link = Link->ForwardLink) {
-    RuntimeEvent = _CR (Link, EFI_RUNTIME_EVENT_ENTRY, Link);
+    RuntimeEvent = BASE_CR (Link, EFI_RUNTIME_EVENT_ENTRY, Link);
     if ((RuntimeEvent->Type & EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) == EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) {
       RuntimeEvent->NotifyFunction (
                       RuntimeEvent->Event,
@@ -298,7 +298,7 @@ RuntimeDriverSetVirtualAddressMap (
   // Relocate runtime images. All runtime images are stored in a list in Runtime AP.
   //
   for (Link = mRuntime.ImageHead.ForwardLink; Link != &mRuntime.ImageHead; Link = Link->ForwardLink) {
-    RuntimeImage = _CR (Link, EFI_RUNTIME_IMAGE_ENTRY, Link);
+    RuntimeImage = BASE_CR (Link, EFI_RUNTIME_IMAGE_ENTRY, Link);
     //
     // We don't want to relocate our selves, as we only run in physical mode.
     //

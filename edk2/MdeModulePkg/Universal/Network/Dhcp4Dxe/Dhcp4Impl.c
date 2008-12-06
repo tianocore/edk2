@@ -1637,11 +1637,11 @@ Dhcp4ParseCheckOption (
 
   if (Parse->Index <= Parse->OptionCount) {
     //
-    // Use _CR to get the memory position of EFI_DHCP4_PACKET_OPTION for
+    // Use BASE_CR to get the memory position of EFI_DHCP4_PACKET_OPTION for
     // the EFI_DHCP4_PACKET_OPTION->Data because DhcpIterateOptions only
     // pass in the point to option data.
     //
-    Parse->Option[Parse->Index - 1] = _CR (Data, EFI_DHCP4_PACKET_OPTION, Data);
+    Parse->Option[Parse->Index - 1] = BASE_CR (Data, EFI_DHCP4_PACKET_OPTION, Data);
   }
 
   return EFI_SUCCESS;

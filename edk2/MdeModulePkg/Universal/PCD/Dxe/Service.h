@@ -746,7 +746,7 @@ typedef struct {
   PCD_PROTOCOL_CALLBACK   CallbackFn;
 } CALLBACK_FN_ENTRY;
 
-#define CR_FNENTRY_FROM_LISTNODE(Record, Type, Field) _CR(Record, Type, Field)
+#define CR_FNENTRY_FROM_LISTNODE(Record, Type, Field) BASE_CR(Record, Type, Field)
 
 //
 // Internal Functions

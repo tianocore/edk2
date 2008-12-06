@@ -456,7 +456,7 @@ NotifyFwVolBlock (
       //
       // Update Fv to use a new Fvb
       //
-      FvDevice = _CR (Fv, FV_DEVICE, Fv);
+      FvDevice = BASE_CR (Fv, FV_DEVICE, Fv);
       if (FvDevice->Signature == FV2_DEVICE_SIGNATURE) {
         //
         // Only write into our device structure if it's our device structure
