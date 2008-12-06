@@ -438,9 +438,9 @@ DebugClearMemoryEnabled (
   @param  TestSignature  The 32-bit signature value to match.
 
 **/
-#define CR(Record, TYPE, Field, TestSignature)                                          \
-  (DebugAssertEnabled () && (_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
-  (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                   \
-  _CR (Record, TYPE, Field)
+#define CR(Record, TYPE, Field, TestSignature)                                                        \
+  (DebugAssertEnabled () && (BASE_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
+  (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                                 \
+  BASE_CR (Record, TYPE, Field)
     
 #endif
