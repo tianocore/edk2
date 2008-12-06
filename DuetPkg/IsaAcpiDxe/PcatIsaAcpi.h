@@ -53,7 +53,7 @@ typedef struct {
   EFI_PCI_IO_PROTOCOL    *PciIo;
 } PCAT_ISA_ACPI_DEV;
 
-#define PCAT_ISA_ACPI_DEV_FROM_THIS(a) _CR(a, PCAT_ISA_ACPI_DEV, IsaAcpi)
+#define PCAT_ISA_ACPI_DEV_FROM_THIS(a) BASE_CR(a, PCAT_ISA_ACPI_DEV, IsaAcpi)
 
 //
 // Global Variables
