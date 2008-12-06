@@ -52,7 +52,7 @@ AcquireRecordBuffer (
     Node = GetFirstNode (&mRecordsBuffer);
     RemoveEntryList (Node);
 
-    Record = _CR (Node, DATAHUB_STATUSCODE_RECORD, Node);
+    Record = BASE_CR (Node, DATAHUB_STATUSCODE_RECORD, Node);
   } else {
     if (CurrentTpl > TPL_NOTIFY) {
       //
