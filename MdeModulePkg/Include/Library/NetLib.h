@@ -277,7 +277,7 @@ NetRandomInitSeed (
 
 
 #define NET_LIST_USER_STRUCT(Entry, Type, Field)        \
-          _CR(Entry, Type, Field)
+          BASE_CR(Entry, Type, Field)
 
 #define NET_LIST_USER_STRUCT_S(Entry, Type, Field, Sig)  \
           CR(Entry, Type, Field, Sig)
@@ -877,7 +877,7 @@ typedef struct {
 
 #define NET_GET_REF(PData)      ((PData)->RefCnt++)
 #define NET_PUT_REF(PData)      ((PData)->RefCnt--)
-#define NETBUF_FROM_PROTODATA(Info) _CR((Info), NET_BUF, ProtoData)
+#define NETBUF_FROM_PROTODATA(Info) BASE_CR((Info), NET_BUF, ProtoData)
 
 #define NET_BUF_SHARED(Buf) \
   (((Buf)->RefCnt > 1) || ((Buf)->Vector->RefCnt > 1))

@@ -89,7 +89,7 @@ typedef enum {
   for(Entry = (ListHead)->ForwardLink, NextEntry = Entry->ForwardLink;\
       Entry != (ListHead); Entry = NextEntry, NextEntry = Entry->ForwardLink)
 
-#define EFI_LIST_CONTAINER(Entry, Type, Field) _CR(Entry, Type, Field)
+#define EFI_LIST_CONTAINER(Entry, Type, Field) BASE_CR(Entry, Type, Field)
 
 
 #define EHC_LOW_32BIT(Addr64)     ((UINT32)(((UINTN)(Addr64)) & 0XFFFFFFFF))
