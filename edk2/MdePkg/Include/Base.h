@@ -274,7 +274,7 @@ typedef CHAR8 *VA_LIST;
   @return  A pointer to the structure from one of it's elements.
   
 **/
-#define _CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - (CHAR8 *) &(((TYPE *) 0)->Field)))
+#define BASE_CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - (CHAR8 *) &(((TYPE *) 0)->Field)))
 
 /**
   Rounds a value up to the next boundary using a specified alignment.  
