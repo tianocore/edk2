@@ -25,8 +25,8 @@
 
   .file  "setjmp.s"
 
-#include  <asm.h>
-#include  <ia_64gen.h>
+#include  <Asm.h>
+#include  <Ia_64Gen.h>
 
 // int SetJump(struct jmp_buffer save)
 //
