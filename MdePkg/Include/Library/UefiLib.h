@@ -98,7 +98,7 @@ typedef struct {
   Macro that returns the a pointer to the next EFI_MEMORY_DESCRIPTOR in an array 
   returned from GetMemoryMap().  
 
-  @param  MemoryDescriptor  Pointer tot he current EFI_MEMORY_DESCRIPTOR.
+  @param  MemoryDescriptor  A pointer to an EFI_MEMORY_DESCRIPTOR.
 
   @param  Size              The size, in bytes, of the current EFI_MEMORY_DESCRIPTOR.
 
