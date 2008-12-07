@@ -532,7 +532,7 @@ Decode (
       //
       // Process a Pointer
       //
-      CharC       = (UINT16) (CharC - (UINT8_MAX + 1 - THRESHOLD));
+      CharC       = (UINT16) (CharC - (BIT8 - THRESHOLD));
 
       BytesRemain = CharC;
 
