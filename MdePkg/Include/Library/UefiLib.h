@@ -58,7 +58,6 @@ typedef struct {
   EFI_LOCK_STATE  Lock;
 } EFI_LOCK;
 
-
 /**
   Macro that returns the number of 100 ns units for a specified number of microseconds.
   Useful for managing EFI timer events.
@@ -70,7 +69,6 @@ typedef struct {
 
 **/
 #define EFI_TIMER_PERIOD_MICROSECONDS(Microseconds) MultU64x32((UINT64)(Microseconds), 10)
-
 
 /**
   Macro that returns the number of 100 ns units for a specified number of milliseoconds.
@@ -84,7 +82,6 @@ typedef struct {
 **/
 #define EFI_TIMER_PERIOD_MILLISECONDS(Milliseconds) MultU64x32((UINT64)(Milliseconds), 10000)
 
-
 /**
   Macro that returns the number of 100 ns units for a specified number of seoconds.
   Useful for managing EFI timer events.
@@ -97,6 +94,19 @@ typedef struct {
 **/
 #define EFI_TIMER_PERIOD_SECONDS(Seconds)           MultU64x32((UINT64)(Seconds), 10000000)
 
+/**
+  Macro that returns the a pointer to the next EFI_MEMORY_DESCRIPTOR in an array 
+  returned from GetMemoryMap().  
+
+  @param  MemoryDescriptor  Pointer tot he current EFI_MEMORY_DESCRIPTOR.
+
+  @param  Size              The size, in bytes, of the current EFI_MEMORY_DESCRIPTOR.
+
+  @return A pointer to the next EFI_MEMORY_DESCRIPTOR.
+
+**/
+#define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
+  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
 
 /**
   Retrieves a pointer to the system configuration table from the EFI System Table
