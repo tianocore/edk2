@@ -33,15 +33,13 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 
-#define VOLATILE  volatile
-
 typedef union {
-  UINT8  VOLATILE  *buf;
-  UINT8  VOLATILE  *ui8;
-  UINT16 VOLATILE  *ui16;
-  UINT32 VOLATILE  *ui32;
-  UINT64 VOLATILE  *ui64;
-  UINTN  VOLATILE  ui;
+  UINT8  volatile  *buf;
+  UINT8  volatile  *ui8;
+  UINT16 volatile  *ui16;
+  UINT32 volatile  *ui32;
+  UINT64 volatile  *ui64;
+  UINTN  volatile  ui;
 } PTR;
 
 EFI_STATUS
