@@ -111,7 +111,7 @@ typedef struct {
 **/
 typedef
 SAL_RETURN_REGS
-(EFIAPI *SAL_PROC) (
+(EFIAPI *SAL_PROC)(
   IN UINT64 FunctionId,
   IN UINT64 Arg1,
   IN UINT64 Arg2,
