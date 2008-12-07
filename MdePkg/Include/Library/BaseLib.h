@@ -3362,9 +3362,17 @@ CalculateCheckSum64 (
   );
 
 
-///
-/// Base Library CPU Functions
-///
+//
+// Base Library CPU Functions
+//
+
+/**
+  Function entry point used when a stack switch is requested with SwitchStack()
+
+  @param  Context1        Context1 parameter passed into SwitchStack().
+  @param  Context2        Context2 parameter passed into SwitchStack().
+
+**/
 typedef
 VOID
 (EFIAPI *SWITCH_STACK_ENTRY_POINT)(
