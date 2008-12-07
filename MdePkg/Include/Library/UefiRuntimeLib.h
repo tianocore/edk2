@@ -15,11 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __UEFI_RUNTIME_LIB__
 #define __UEFI_RUNTIME_LIB__
 
-
-extern const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[];
-
-extern const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[];
-
 /**
   This function allows the caller to determine if UEFI ExitBootServices() has been called.
 
