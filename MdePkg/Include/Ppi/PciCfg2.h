@@ -39,9 +39,21 @@ typedef struct _EFI_PEI_PCI_CFG2_PPI   EFI_PEI_PCI_CFG2_PPI;
 /// EFI_PEI_PCI_CFG_PPI_WIDTH
 ///
 typedef enum {
+  ///
+  ///  8-bit access
+  ///
   EfiPeiPciCfgWidthUint8  = 0,
+  ///
+  /// 16-bit access
+  ///
   EfiPeiPciCfgWidthUint16 = 1,
+  ///
+  /// 32-bit access
+  ///
   EfiPeiPciCfgWidthUint32 = 2,
+  ///
+  /// 64-bit access
+  ///
   EfiPeiPciCfgWidthUint64 = 3,
   EfiPeiPciCfgWidthMaximum
 } EFI_PEI_PCI_CFG_PPI_WIDTH;
