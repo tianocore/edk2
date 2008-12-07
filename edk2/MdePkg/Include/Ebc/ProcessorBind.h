@@ -26,33 +26,76 @@
 //
 // Native integer types
 //
+
+///
+/// 1-byte signed value
+///
 typedef char                  INT8;
+///
+/// Logical Boolean.  1-byte value containing 0 for FALSE or a 1 for TRUE.  Other
+/// values are undefined.
+///
 typedef unsigned char         BOOLEAN;
+///
+/// 1-byte unsigned value
+///
 typedef unsigned char         UINT8;
+///
+/// 1-byte Character
+///
 typedef char                  CHAR8;
-
+///
+/// 2-byte signed value
+///
 typedef short                 INT16;
+///
+/// 2-byte unsigned value
+///
 typedef unsigned short        UINT16;
+///
+/// 2-byte Character.  Unless otherwise specified all strings are stored in the
+/// UTF-16 encoding format as defined by Unicode 2.1 and ISO/IEC 10646 standards.
+///
 typedef unsigned short        CHAR16;
-
+///
+/// 4-byte signed value
+///
 typedef int                   INT32;
+///
+/// 4-byte unsigned value
+///
 typedef unsigned int          UINT32;
-
+///
+/// 8-byte signed value
+///
 typedef __int64               INT64;
+///
+/// 8-byte unsigned value
+///
 typedef unsigned __int64      UINT64;
 
 ///
+/// Signed value of native width.  (4 bytes on supported 32-bit processor instructions,
+/// 8 bytes on supported 64-bit processor instructions)
 /// "long" type scales to the processor native size with EBC compiler
 ///
 typedef long                  INTN;
+///
+/// Unsigned value of native width.  (4 bytes on supported 32-bit processor instructions,
+/// 8 bytes on supported 64-bit processor instructions)
+/// "long" type scales to the processor native size with EBC compiler
+///
 typedef unsigned long         UINTN;
 
-#define UINT8_MAX 0xff
-
 ///
+/// A value of native width with the highest bit set.
 /// Scalable macro to set the most significant bit in a natural number
 ///
 #define MAX_BIT     (1ULL << (sizeof (INTN) * 8 - 1)) 
+///
+/// A value of native width with the two highest bits set.
+/// Scalable macro to set the most 2 significant bits in a natural number
+///
 #define MAX_2_BITS  (3ULL << (sizeof (INTN) * 8 - 2))
 
 ///
@@ -89,7 +132,6 @@ typedef unsigned long         UINTN;
 
   @return The pointer to the first instruction of a function given a function pointer.
 **/
-
 #define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(UINTN)(FunctionPointer)
 
 #endif 
