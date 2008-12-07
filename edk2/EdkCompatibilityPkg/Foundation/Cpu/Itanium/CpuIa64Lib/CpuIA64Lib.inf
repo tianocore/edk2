@@ -32,6 +32,6 @@ COMPONENT_TYPE  = LIBRARY
   $(EDK_SOURCE)/Foundation/Efi
   .
   $(EDK_SOURCE)/Foundation/Cpu/Itanium/Include
-  $(EDK_SOURCE)/Foundation/include
+  $(EDK_SOURCE)/Foundation/Include
 
 [nmake.common]
