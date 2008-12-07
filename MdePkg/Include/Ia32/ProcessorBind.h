@@ -98,18 +98,54 @@
   #if _MSC_EXTENSIONS 
 
     //
-    // use Microsoft* C complier dependent interger width types 
+    // use Microsoft C complier dependent integer width types 
     //
+
+    ///
+    /// 8-byte unsigned value
+    ///
     typedef unsigned __int64    UINT64;
+    ///
+    /// 8-byte signed value
+    ///
     typedef __int64             INT64;
+    ///
+    /// 4-byte unsigned value
+    ///
     typedef unsigned __int32    UINT32;
+    ///
+    /// 4-byte signed value
+    ///
     typedef __int32             INT32;
+    ///
+    /// 2-byte unsigned value
+    ///
     typedef unsigned short      UINT16;
+    ///
+    /// 2-byte Character.  Unless otherwise specified all strings are stored in the
+    /// UTF-16 encoding format as defined by Unicode 2.1 and ISO/IEC 10646 standards.
+    ///
     typedef unsigned short      CHAR16;
+    ///
+    /// 2-byte signed value
+    ///
     typedef short               INT16;
+    ///
+    /// Logical Boolean.  1-byte value containing 0 for FALSE or a 1 for TRUE.  Other
+    /// values are undefined.
+    ///
     typedef unsigned char       BOOLEAN;
+    ///
+    /// 1-byte unsigned value
+    ///
     typedef unsigned char       UINT8;
+    ///
+    /// 1-byte Character
+    ///
     typedef char                CHAR8;
+    ///
+    /// 1-byte signed value
+    ///
     typedef char                INT8;
   #else
 
@@ -117,48 +153,131 @@
     // Assume standard IA-32 alignment. 
     // Need to check portability of long long
     //
+
+    ///
+    /// 8-byte unsigned value
+    ///
     typedef unsigned long long  UINT64;
+    ///
+    /// 8-byte signed value
+    ///
     typedef long long           INT64;
+    ///
+    /// 4-byte unsigned value
+    ///
     typedef unsigned int        UINT32;
+    ///
+    /// 4-byte signed value
+    ///
     typedef int                 INT32;
+    ///
+    /// 2-byte unsigned value
+    ///
     typedef unsigned short      UINT16;
+    ///
+    /// 2-byte Character.  Unless otherwise specified all strings are stored in the
+    /// UTF-16 encoding format as defined by Unicode 2.1 and ISO/IEC 10646 standards.
+    ///
     typedef unsigned short      CHAR16;
+    ///
+    /// 2-byte signed value
+    ///
     typedef short               INT16;
+    ///
+    /// Logical Boolean.  1-byte value containing 0 for FALSE or a 1 for TRUE.  Other
+    /// values are undefined.
+    ///
     typedef unsigned char       BOOLEAN;
+    ///
+    /// 1-byte unsigned value
+    ///
     typedef unsigned char       UINT8;
+    ///
+    /// 1-byte Character
+    ///
     typedef char                CHAR8;
+    ///
+    /// 1-byte signed value
+    ///
     typedef char                INT8;
   #endif
-
-  #define UINT8_MAX 0xff
-
 #else
   //
   // Use ANSI C 2000 stdint.h integer width declarations
   //
-  #include "stdint.h"
+  #include <stdint.h>
+
+  ///
+  /// Logical Boolean.  1-byte value containing 0 for FALSE or a 1 for TRUE.  Other
+  /// values are undefined.
+  ///
   typedef uint8_t   BOOLEAN;
+  ///
+  /// 1-byte signed value
+  ///
   typedef int8_t    INT8;
+  ///
+  /// 1-byte unsigned value
+  ///
   typedef uint8_t   UINT8;
+  ///
+  /// 2-byte signed value
+  ///
   typedef int16_t   INT16;
+  ///
+  /// 2-byte unsigned value
+  ///
   typedef uint16_t  UINT16;
+  ///
+  /// 4-byte signed value
+  ///
   typedef int32_t   INT32;
+  ///
+  /// 4-byte unsigned value
+  ///
   typedef uint32_t  UINT32;
+  ///
+  /// 8-byte signed value
+  ///
   typedef int64_t   INT64;
+  ///
+  /// 8-byte unsigned value
+  ///
   typedef uint64_t  UINT64;
+  ///
+  /// 1-byte Character
+  ///
   typedef char      CHAR8;
+  ///
+  /// 2-byte Character.  Unless otherwise specified all strings are stored in the
+  /// UTF-16 encoding format as defined by Unicode 2.1 and ISO/IEC 10646 standards.
+  ///
   typedef uint16_t  CHAR16;
 
 #endif
 
+///
+/// Unsigned value of native width.  (4 bytes on supported 32-bit processor instructions,
+/// 8 bytes on supported 64-bit processor instructions)
+///
 typedef UINT32  UINTN;
+///
+/// Signed value of native width.  (4 bytes on supported 32-bit processor instructions,
+/// 8 bytes on supported 64-bit processor instructions)
+///
 typedef INT32   INTN;
 
+//
+// Processor specific defines
+//
 
 ///
-/// Processor specific defines
+/// A value of native width with the highest bit set.
 ///
 #define MAX_BIT     0x80000000
+///
+/// A value of native width with the two highest bits set.
+///
 #define MAX_2_BITS  0xC0000000
 
 ///
@@ -178,11 +297,14 @@ typedef INT32   INTN;
 //
 #if _MSC_EXTENSIONS
   ///
-  /// Microsoft* compiler requires _EFIAPI useage, __cdecl is Microsoft* specific C.
+  /// Microsoft* compiler specific method for EFIAPI calling convension
   /// 
   #define EFIAPI __cdecl  
 #else
   #if __GNUC__
+    ///
+    /// GCC specific method for EFIAPI calling convension
+    /// 
     #define EFIAPI __attribute__((cdecl))  
   #endif  
 #endif
@@ -193,8 +315,16 @@ typedef INT32   INTN;
 //  a non standard extension
 //
 #if _MSC_EXTENSIONS
+  ///
+  /// Remove global variable from the linked image if there are no references to 
+  /// it after all compiler and linker optimizations have been performed.
+  ///
   #define GLOBAL_REMOVE_IF_UNREFERENCED __declspec(selectany)
 #else
+  ///
+  /// Remove global variable from the linked image if there are no references to 
+  /// it after all compiler and linker optimizations have been performed.
+  ///
   #define GLOBAL_REMOVE_IF_UNREFERENCED
 #endif
 
