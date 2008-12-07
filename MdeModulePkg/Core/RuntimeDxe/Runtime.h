@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/PcdLib.h>
