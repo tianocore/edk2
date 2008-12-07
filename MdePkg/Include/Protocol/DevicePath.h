@@ -77,9 +77,13 @@ typedef EFI_DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH;
 #define HARDWARE_DEVICE_PATH      0x01
 
 ///
-/// PCI Device Path
+/// PCI Device Path SubType
 ///
 #define HW_PCI_DP                 0x01
+
+///
+/// PCI Device Path
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -93,9 +97,13 @@ typedef struct {
 } PCI_DEVICE_PATH;
 
 ///
-/// PCCARD Device Path
+/// PCCARD Device Path SubType
 ///
 #define HW_PCCARD_DP              0x02
+
+///
+/// PCCARD Device Path
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
