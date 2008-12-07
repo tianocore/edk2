@@ -43,6 +43,7 @@
   PeCoffLib
   CacheMaintenanceLib
   UefiBootServicesTableLib
+  UefiLib
   UefiRuntimeServicesTableLib
   ReportStatusCodeLib
   DebugLib
