@@ -48,7 +48,6 @@ EFI_REPORT_STATUS_CODE  mPeiReportStatusCode;
 //
 // Function implementations
 //
-EFI_RUNTIMESERVICE
 EFI_STATUS
 EFIAPI
 RtPlatformReportStatusCode (
@@ -95,7 +94,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_BOOTSERVICE
 VOID
 EFIAPI
 RtPlatformInitializeStatusCode (
