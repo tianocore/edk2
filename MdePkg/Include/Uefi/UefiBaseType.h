@@ -45,7 +45,15 @@ typedef UINTN                     EFI_TPL;
 /// Logical block address.
 ///
 typedef UINT64                    EFI_LBA;
+
+///
+/// 64-bit physical memory address.
+///
 typedef UINT64                    EFI_PHYSICAL_ADDRESS;
+
+///
+/// 64-bit virtual memory address.
+///
 typedef UINT64                    EFI_VIRTUAL_ADDRESS;
 
 ///
