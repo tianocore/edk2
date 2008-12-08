@@ -24,7 +24,7 @@
   FILE_GUID                      = 254901AD-7DB7-45f8-93C8-93D579398D9F
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PciLib|PEIM SEC PEI_CORE
+  LIBRARY_CLASS                  = PciSegmentLib|PEIM SEC PEI_CORE
   PI_SPECIFICATION_VERSION       = 0x00010000
 
 
