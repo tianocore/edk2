@@ -413,13 +413,13 @@
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000|UINT32|0x00000004
   
   ## The mask is used to control DebugLib behavior
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f|UINT8|0x00000005
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0|UINT8|0x00000005
   
   ## This flag is used to control the printout of DebugLib
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0|UINT32|0x00000006
   
   ## The mask is used to control ReportStatusCodeLib behavior
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06|UINT8|0x00000007
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0|UINT8|0x00000007
   
   ## This value is used to fill a segment of memory
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF|UINT8|0x00000008
