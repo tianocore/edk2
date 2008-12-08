@@ -1,23 +1,16 @@
 /** @file
-
-Copyright (c) 2006 - 2008, Intel Corporation
+  Abstract:
+  
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  ArpImpl.c
-
-Abstract:
-
-
 **/
-
 
 #include "ArpImpl.h"
 
@@ -35,9 +28,9 @@ EFI_ARP_PROTOCOL  mEfiArpProtocolTemplate = {
 /**
   Initialize the instance context data.
 
-  @param  ArpService             Pointer to the arp service context data this
-                                 instance belongs to.
-  @param  Instance               Pointer to the instance context data.
+  @param[in]  ArpService             Pointer to the arp service context data this
+                                     instance belongs to.
+  @param[in]  Instance               Pointer to the instance context data.
 
   @return None.
 
@@ -65,7 +58,7 @@ ArpInitInstance (
 /**
   Process the Arp packets received from Mnp, the procedure conforms to RFC826.
 
-  @param  Context                Pointer to the context data registerd to the
+  @param[in]  Context            Pointer to the context data registerd to the
                                  Event.
 
   @return None.
@@ -312,9 +305,9 @@ RESTART_RECEIVE:
 /**
   Queue ArpOnFrameRcvdDpc as a DPC at TPL_CALLBACK.
 
-  @param  Event                  The Event this notify function registered to.
-  @param  Context                Pointer to the context data registerd to the
-                                 Event.
+  @param[in]  Event                  The Event this notify function registered to.
+  @param[in]  Context                Pointer to the context data registerd to the
+                                     Event.
 
   @return None.
 
@@ -334,9 +327,9 @@ ArpOnFrameRcvd (
 
 /**
   Process the already sent arp packets.
-
-  @param  Context                Pointer to the context data registerd to the
-                                 Event.
+  
+  @param[in]  Context                Pointer to the context data registerd to the
+                                     Event.
 
   @return None.
 
@@ -373,9 +366,9 @@ ArpOnFrameSentDpc (
 /**
   Request ArpOnFrameSentDpc as a DPC at TPL_CALLBACK.
 
-  @param  Event                  The Event this notify function registered to.
-  @param  Context                Pointer to the context data registerd to the
-                                 Event.
+  @param[in]  Event                  The Event this notify function registered to.
+  @param[in]  Context                Pointer to the context data registerd to the
+                                     Event.
 
   @return None.
 
@@ -397,9 +390,9 @@ ArpOnFrameSent (
 /**
   Process the arp cache olding and drive the retrying arp requests.
 
-  @param  Event                  The Event this notify function registered to.
-  @param  Context                Pointer to the context data registerd to the
-                                 Event.
+  @param[in]  Event                  The Event this notify function registered to.
+  @param[in]  Context                Pointer to the context data registerd to the
+                                     Event.
 
   @return None.
 
@@ -525,8 +518,8 @@ ArpTimerHandler (
 /**
   Match the two NET_ARP_ADDRESSes.
 
-  @param  AddressOne             Pointer to the first address to match.
-  @param  AddressTwo             Pointer to the second address to match.
+  @param[in]  AddressOne             Pointer to the first address to match.
+  @param[in]  AddressTwo             Pointer to the second address to match.
 
   @return The two addresses match or not.
 
@@ -564,12 +557,12 @@ ArpMatchAddress (
 /**
   Find the CacheEntry which matches the requirements in the specified CacheTable.
 
-  @param  CacheTable             Pointer to the arp cache table.
-  @param  StartEntry             Pointer to the start entry this search begins with
-                                 in the cache table.
-  @param  FindOpType             The search type.
-  @param  ProtocolAddress        Pointer to the protocol address to match.
-  @param  HardwareAddress        Pointer to the hardware address to match.
+  @param[in]  CacheTable             Pointer to the arp cache table.
+  @param[in]  StartEntry             Pointer to the start entry this search begins with
+                                     in the cache table.
+  @param[in]  FindOpType             The search type.
+  @param[in]  ProtocolAddress        Pointer to the protocol address to match.
+  @param[in]  HardwareAddress        Pointer to the hardware address to match.
 
   @return Pointer to the matched arp cache entry, if NULL, no match is found.
 
@@ -637,9 +630,9 @@ ArpFindNextCacheEntryInTable (
   Find the CacheEntry, using ProtocolAddress or HardwareAddress or both, as the keyword,
   in the DeniedCacheTable.
 
-  @param  ArpService             Pointer to the arp service context data.
-  @param  ProtocolAddress        Pointer to the protocol address.
-  @param  HardwareAddress        Pointer to the hardware address.
+  @param[in]  ArpService             Pointer to the arp service context data.
+  @param[in]  ProtocolAddress        Pointer to the protocol address.
+  @param[in]  HardwareAddress        Pointer to the hardware address.
 
   @return Pointer to the matched cache entry, if NULL no match is found.
 
@@ -697,7 +690,7 @@ ArpFindDeniedCacheEntry (
 /**
   Allocate a cache entry and initialize it.
 
-  @param  Instance               Pointer to the instance context data.
+  @param[in]  Instance               Pointer to the instance context data.
 
   @return Pointer to the new created cache entry.
 
@@ -764,9 +757,9 @@ ArpAllocCacheEntry (
 /**
   Turn the CacheEntry into the resolved status.
 
-  @param  CacheEntry             Pointer to the resolved cache entry.
-  @param  Instance               Pointer to the instance context data.
-  @param  UserEvent              Pointer to the UserEvent to notify.
+  @param[in]  CacheEntry             Pointer to the resolved cache entry.
+  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]  UserEvent              Pointer to the UserEvent to notify.
 
   @return The count of notifications sent to the instance.
 
@@ -826,9 +819,9 @@ ArpAddressResolved (
   Fill the addresses in the CacheEntry using the information passed in by
   HwAddr and SwAddr.
 
-  @param  CacheEntry             Pointer to the cache entry.
-  @param  HwAddr                 Pointer to the software address.
-  @param  SwAddr                 Pointer to the hardware address.
+  @param[in]  CacheEntry             Pointer to the cache entry.
+  @param[in]  HwAddr                 Pointer to the software address.
+  @param[in]  SwAddr                 Pointer to the hardware address.
 
   @return None.
 
@@ -880,9 +873,9 @@ ArpFillAddressInCacheEntry (
 /**
   Configure the instance using the ConfigData. ConfigData is already validated.
 
-  @param  Instance               Pointer to the instance context data to be
+  @param[in]  Instance           Pointer to the instance context data to be
                                  configured.
-  @param  ConfigData             Pointer to the configuration data used to
+  @param[in]  ConfigData         Pointer to the configuration data used to
                                  configure the instance.
 
   @retval EFI_SUCCESS            The instance is configured with the ConfigData.
@@ -1005,11 +998,11 @@ ArpConfigureInstance (
 /**
   Send out an arp frame using the CachEntry and the ArpOpCode.
 
-  @param  Instance               Pointer to the instance context data.
-  @param  CacheEntry             Pointer to the configuration data used to
-                                 configure the instance.
-  @param  ArpOpCode              The opcode used to send out this Arp frame, either
-                                 request or reply.
+  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]  CacheEntry             Pointer to the configuration data used to
+                                     configure the instance.
+  @param[in]  ArpOpCode              The opcode used to send out this Arp frame, either
+                                     request or reply.
 
   @return None.
 
@@ -1212,13 +1205,13 @@ CLEAN_EXIT:
   SwAddressType, AddressBuffer combination as the matching key, if Force is TRUE,
   the cache is deleted event it's a static entry.
 
-  @param  CacheTable             Pointer to the cache table to do the deletion.
-  @param  BySwAddress            Delete the cache entry by software address or by
-                                 hardware address.
-  @param  SwAddressType          The software address used to do the deletion.
-  @param  AddressBuffer          Pointer to the buffer containing the address to
-                                 match for the deletion.
-  @param  Force                  This deletion is forced or not.
+  @param[in]  CacheTable             Pointer to the cache table to do the deletion.
+  @param[in]  BySwAddress            Delete the cache entry by software address or by
+                                     hardware address.
+  @param[in]  SwAddressType          The software address used to do the deletion.
+  @param[in]  AddressBuffer          Pointer to the buffer containing the address to
+                                     match for the deletion.
+  @param[in]  Force                  This deletion is forced or not.
 
   @return The count of the deleted cache entries.
 
@@ -1301,12 +1294,12 @@ MATCHED:
 /**
   Delete cache entries in all the cache tables.
 
-  @param  Instance               Pointer to the instance context data.
-  @param  BySwAddress            Delete the cache entry by software address or by
-                                 hardware address.
-  @param  AddressBuffer          Pointer to the buffer containing the address to
-                                 match for the deletion.
-  @param  Force                  This deletion is forced or not.
+  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]  BySwAddress            Delete the cache entry by software address or by
+                                     hardware address.
+  @param[in]  AddressBuffer          Pointer to the buffer containing the address to
+                                     match for the deletion.
+  @param[in]  Force                  This deletion is forced or not.
 
   @return The count of the deleted cache entries.
 
@@ -1355,11 +1348,11 @@ ArpDeleteCacheEntry (
 /**
   Cancel the arp request.
 
-  @param  Instance               Pointer to the instance context data.
-  @param  TargetSwAddress        Pointer to the buffer containing the target
-                                 software address to match the arp request.
-  @param  UserEvent              The user event used to notify this request
-                                 cancellation.
+  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]  TargetSwAddress        Pointer to the buffer containing the target
+                                     software address to match the arp request.
+  @param[in]  UserEvent              The user event used to notify this request
+                                     cancellation.
 
   @return The count of the cancelled requests.
 
@@ -1414,18 +1407,18 @@ ArpCancelRequest (
 /**
   Find the cache entry in the cache table.
 
-  @param  Instance               Pointer to the instance context data.
-  @param  BySwAddress            Set to TRUE to look for matching software protocol
+  @param[in]  Instance           Pointer to the instance context data.
+  @param[in]  BySwAddress        Set to TRUE to look for matching software protocol
                                  addresses. Set to FALSE to look for matching
                                  hardware protocol addresses.
-  @param  AddressBuffer          Pointer to address buffer. Set to NULL to match
+  @param[in]  AddressBuffer      Pointer to address buffer. Set to NULL to match
                                  all addresses.
-  @param  EntryLength            The size of an entry in the entries buffer.
-  @param  EntryCount             The number of ARP cache entries that are found by
+  @param[out] EntryLength        The size of an entry in the entries buffer.
+  @param[out] EntryCount         The number of ARP cache entries that are found by
                                  the specified criteria.
-  @param  Entries                Pointer to the buffer that will receive the ARP
+  @param[out] Entries            Pointer to the buffer that will receive the ARP
                                  cache entries.
-  @param  Refresh                Set to TRUE to refresh the timeout value of the
+  @param[in]  Refresh            Set to TRUE to refresh the timeout value of the
                                  matching ARP cache entry.
 
   @retval EFI_SUCCESS            The requested ARP cache entries are copied into

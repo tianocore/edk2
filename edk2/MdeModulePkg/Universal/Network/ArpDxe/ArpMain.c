@@ -1,20 +1,14 @@
 /** @file
-
-Copyright (c) 2006, Intel Corporation
+  Abstract:
+  
+Copyright (c) 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  ArpMain.c
-
-Abstract:
-
 
 **/
 
@@ -23,8 +17,14 @@ Abstract:
 
 /**
   This function is used to assign a station address to the ARP cache for this instance
-  of the ARP driver. A call to this function with the ConfigData field set to NULL
-  will reset this ARP instance.
+  of the ARP driver. Each ARP instance has one station address. The EFI_ARP_PROTOCOL 
+  driver will respond to ARP requests that match this registered station address. 
+  A call to this function with the ConfigData field set to NULL will reset this 
+  ARP instance.
+  
+  Once a protocol type and station address have been assigned to this ARP instance, 
+  all the following ARP functions will use this information. Attempting to change 
+  the protocol type or station address to a configured ARP instance will result in errors.
 
   @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
   @param  ConfigData             Pointer to the EFI_ARP_CONFIG_DATA structure.
@@ -82,6 +82,17 @@ ArpConfigure (
 /**
   This function is used to insert entries into the ARP cache.
 
+  ARP cache entries are typically inserted and updated by network protocol drivers 
+  as network traffic is processed. Most ARP cache entries will time out and be 
+  deleted if the network traffic stops. ARP cache entries that were inserted 
+  by the Add() function may be static (will not time out) or dynamic (will time out).
+  Default ARP cache timeout values are not covered in most network protocol 
+  specifications (although RFC 1122 comes pretty close) and will only be 
+  discussed in general in this specification. The timeout values that are 
+  used in the EFI Sample Implementation should be used only as a guideline. 
+  Final product implementations of the EFI network stack should be tuned for 
+  their expected network environments.
+  
   @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
   @param  DenyFlag               Set to TRUE if this entry is a deny entry. Set to
                                  FALSE if this  entry is a normal entry.
@@ -269,7 +280,14 @@ UNLOCK_EXIT:
 /**
   This function searches the ARP cache for matching entries and allocates a buffer into
   which those entries are copied.
-
+  
+  The first part of the allocated buffer is EFI_ARP_FIND_DATA, following which 
+  are protocol address pairs and hardware address pairs.
+  When finding a specific protocol address (BySwAddress is TRUE and AddressBuffer 
+  is not NULL), the ARP cache timeout for the found entry is reset if Refresh is 
+  set to TRUE. If the found ARP cache entry is a permanent entry, it is not 
+  affected by Refresh.
+  
   @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
   @param  BySwAddress            Set to TRUE to look for matching software protocol
                                  addresses. Set to FALSE to look for matching
@@ -659,7 +677,13 @@ SIGNAL_USER:
 /**
   This function aborts the previous ARP request (identified by This,  TargetSwAddress
   and ResolvedEvent) that is issued by EFI_ARP_PROTOCOL.Request().
-
+  
+  If the request is in the internal ARP request queue, the request is aborted 
+  immediately and its ResolvedEvent is signaled. Only an asynchronous address 
+  request needs to be canceled. If TargeSwAddress and ResolveEvent are both 
+  NULL, all the pending asynchronous requests that have been issued by This 
+  instance will be cancelled and their corresponding events will be signaled.
+  
   @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
   @param  TargetSwAddress        Pointer to the protocol address in previous
                                  request session.
