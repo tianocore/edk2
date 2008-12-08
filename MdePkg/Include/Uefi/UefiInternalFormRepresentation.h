@@ -1362,10 +1362,12 @@ typedef struct _EFI_IFR_SPAN {
 
 //
 // Definitions for Keyboard Package
-// Section 27.3.9
 // Releated definitions are in Section of EFI_HII_DATABASE_PROTOCOL
 //
 
+///
+/// Each enumeration values maps a physical key on a keyboard.
+///
 typedef enum {    
   EfiKeyLCtrl,
   EfiKeyA0, 

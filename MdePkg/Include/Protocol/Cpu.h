@@ -24,6 +24,9 @@
 
 typedef struct _EFI_CPU_ARCH_PROTOCOL   EFI_CPU_ARCH_PROTOCOL;
 
+///
+/// The type of flush operation
+///
 typedef enum {
   EfiCpuFlushTypeWriteBackInvalidate,
   EfiCpuFlushTypeWriteBack,
@@ -31,6 +34,9 @@ typedef enum {
   EfiCpuMaxFlushType
 } EFI_CPU_FLUSH_TYPE;
 
+///
+/// The type of processor INIT.
+///
 typedef enum {
   EfiCpuInit,
   EfiCpuMaxInitType

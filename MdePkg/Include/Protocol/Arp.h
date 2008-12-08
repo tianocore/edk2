@@ -78,7 +78,7 @@ typedef struct {
   ///
   /// 16-bit protocol type number in host byte order.
   ///
-  UINT16                    SwAddressType;      ///< Host byte order
+  UINT16                    SwAddressType;
 
   ///
   /// Length in bytes of the station's protocol address to register.
@@ -91,7 +91,7 @@ typedef struct {
   /// StationAddress points to the first byte of this station's IP
   /// address stored in network byte order.
   ///
-  VOID                      *StationAddress;    ///< Network byte order
+  VOID                      *StationAddress;
 
   ///
   /// The timeout value in 100-ns units that is associated with each

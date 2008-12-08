@@ -119,6 +119,11 @@ typedef struct {
 
 } EFI_NETWORK_STATISTICS;
 
+///
+/// State of the network interface
+/// When an EFI_SIMPLE_NETWORK_PROTOCOL driver initializes a
+/// network interface, the network interface is left in the EfiSimpleNetworkStopped state.
+///
 typedef enum {
   EfiSimpleNetworkStopped,
   EfiSimpleNetworkStarted,

@@ -33,13 +33,14 @@ typedef struct _EFI_DEBUG_SUPPORT_PROTOCOL EFI_DEBUG_SUPPORT_PROTOCOL;
   }
 
 ///
-/// Debug Support definitions
+/// Processor exception to be hooked.
+/// All exception types for IA32, X64, Itanium and EBC processors are defined.
 ///
 typedef INTN  EFI_EXCEPTION_TYPE;
 
-//
-//  IA-32 processor exception types
-//
+///
+///  IA-32 processor exception types
+///
 #define EXCEPT_IA32_DIVIDE_ERROR    0
 #define EXCEPT_IA32_DEBUG           1
 #define EXCEPT_IA32_NMI             2
@@ -58,9 +59,6 @@ typedef INTN  EFI_EXCEPTION_TYPE;
 #define EXCEPT_IA32_MACHINE_CHECK   18
 #define EXCEPT_IA32_SIMD            19
 
-///
-///  IA-32 processor context definition
-///
 ///
 /// FXSAVE_STATE
 /// FP / MMX / XMM registers (see fxrstor instruction definition)
@@ -95,6 +93,9 @@ typedef struct {
   UINT8   Reserved11[14 * 16];
 } EFI_FX_SAVE_STATE_IA32;
 
+///
+///  IA-32 processor context definition
+///
 typedef struct {
   UINT32                 ExceptionData;
   EFI_FX_SAVE_STATE_IA32 FxSaveState;
@@ -131,9 +132,9 @@ typedef struct {
   UINT32                 Eax;
 } EFI_SYSTEM_CONTEXT_IA32;
 
-//
-//  x64 processor exception types
-//
+///
+///  x64 processor exception types
+///
 #define EXCEPT_X64_DIVIDE_ERROR    0
 #define EXCEPT_X64_DEBUG           1
 #define EXCEPT_X64_NMI             2
@@ -152,8 +153,6 @@ typedef struct {
 #define EXCEPT_X64_MACHINE_CHECK   18
 #define EXCEPT_X64_SIMD            19
 
-///
-///  x64 processor context definition
 ///
 /// FXSAVE_STATE
 /// FP / MMX / XMM registers (see fxrstor instruction definition)
@@ -188,6 +187,9 @@ typedef struct {
   UINT8   Reserved11[14 * 16];
 } EFI_FX_SAVE_STATE_X64;
 
+///
+///  x64 processor context definition
+///
 typedef struct {
   UINT64                ExceptionData;
   EFI_FX_SAVE_STATE_X64 FxSaveState;
@@ -233,9 +235,9 @@ typedef struct {
   UINT64                R15;
 } EFI_SYSTEM_CONTEXT_X64;
 
-//
-//  IPF processor exception types
-//
+///
+///  Itanium Processor Family Exception types
+///
 #define EXCEPT_IPF_VHTP_TRANSLATION       0
 #define EXCEPT_IPF_INSTRUCTION_TLB        1
 #define EXCEPT_IPF_DATA_TLB               2
@@ -434,20 +436,20 @@ typedef struct {
 
 } EFI_SYSTEM_CONTEXT_IPF;
 
-//
-//  EBC processor exception types
-//
+///
+///  EBC processor exception types
+///
 #define EXCEPT_EBC_UNDEFINED            0
 #define EXCEPT_EBC_DIVIDE_ERROR         1
 #define EXCEPT_EBC_DEBUG                2
 #define EXCEPT_EBC_BREAKPOINT           3
 #define EXCEPT_EBC_OVERFLOW             4
-#define EXCEPT_EBC_INVALID_OPCODE       5   // opcode out of range
+#define EXCEPT_EBC_INVALID_OPCODE       5   /// opcode out of range
 #define EXCEPT_EBC_STACK_FAULT          6
 #define EXCEPT_EBC_ALIGNMENT_CHECK      7
-#define EXCEPT_EBC_INSTRUCTION_ENCODING 8   // malformed instruction
-#define EXCEPT_EBC_BAD_BREAK            9   // BREAK 0 or undefined BREAK
-#define EXCEPT_EBC_STEP                 10  // to support debug stepping
+#define EXCEPT_EBC_INSTRUCTION_ENCODING 8   /// malformed instruction
+#define EXCEPT_EBC_BAD_BREAK            9   /// BREAK 0 or undefined BREAK
+#define EXCEPT_EBC_STEP                 10  /// to support debug stepping
 ///
 /// For coding convenience, define the maximum valid EBC exception.
 ///

@@ -33,13 +33,13 @@ typedef struct _EFI_USB2_HC_PROTOCOL EFI_USB2_HC_PROTOCOL;
 
 
 typedef struct {
-  UINT16          PortStatus;
-  UINT16          PortChangeStatus;
+  UINT16          PortStatus;        /// Contains current port status bitmap.
+  UINT16          PortChangeStatus;  /// Contains current port status change bitmap.
 } EFI_USB_PORT_STATUS;
 
-//
-// Constant value for Port Status & Port Change Status
-//
+///
+/// EFI_USB_PORT_STATUS.PortStatus bit definition 
+///
 #define USB_PORT_STAT_CONNECTION    0x0001
 #define USB_PORT_STAT_ENABLE        0x0002
 #define USB_PORT_STAT_SUSPEND       0x0004
@@ -50,6 +50,9 @@ typedef struct {
 #define USB_PORT_STAT_HIGH_SPEED    0x0400
 #define USB_PORT_STAT_OWNER         0x0800
 
+///
+/// EFI_USB_PORT_STATUS.PortChangeStatus bit definition 
+///
 #define USB_PORT_STAT_C_CONNECTION  0x0001
 #define USB_PORT_STAT_C_ENABLE      0x0002
 #define USB_PORT_STAT_C_SUSPEND     0x0004
@@ -57,9 +60,11 @@ typedef struct {
 #define USB_PORT_STAT_C_RESET       0x0010
 
 
-//
-// Usb port features
-//
+///
+/// Usb port features value
+/// Each value indicates its bit index in the port status and status change bitmaps, 
+/// if combines these two bitmaps into a 32-bit bitmap.
+///
 typedef enum {
   EfiUsbPortEnable            = 1,
   EfiUsbPortSuspend           = 2,
@@ -73,14 +78,13 @@ typedef enum {
   EfiUsbPortResetChange       = 20
 } EFI_USB_PORT_FEATURE;
 
-
-#define EFI_USB_SPEED_FULL      0x0000  // 12 Mb/s, USB 1.1 OHCI and UHCI HC.
-#define EFI_USB_SPEED_LOW       0x0001  // 1 Mb/s, USB 1.1 OHCI and UHCI HC.
-#define EFI_USB_SPEED_HIGH      0x0002  // 480 Mb/s, USB 2.0 EHCI HC.
+#define EFI_USB_SPEED_FULL      0x0000  /// 12 Mb/s, USB 1.1 OHCI and UHCI HC.
+#define EFI_USB_SPEED_LOW       0x0001  /// 1 Mb/s, USB 1.1 OHCI and UHCI HC.
+#define EFI_USB_SPEED_HIGH      0x0002  /// 480 Mb/s, USB 2.0 EHCI HC.
 
 typedef struct {
-  UINT8      TranslatorHubAddress;
-  UINT8      TranslatorPortNumber;
+  UINT8      TranslatorHubAddress; /// device address
+  UINT8      TranslatorPortNumber; /// the port number of the hub that device is connected to.
 } EFI_USB2_HC_TRANSACTION_TRANSLATOR;
 
 //
