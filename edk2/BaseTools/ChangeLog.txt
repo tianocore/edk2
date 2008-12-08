@@ -42,24 +42,26 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 ##########                 Revision number of tools source code                 ##########
     BaseTools/Bin/Win32/build.exe
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
 
     BaseTools/Bin/Win32/GenFds.exe
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
 
     BaseTools/Bin/Win32/GenDepex.exe
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/AutoGen
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/AutoGen
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/Trim.exe
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
-        r1070 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
+        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/MigrationMsa2Inf.exe
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/MigrationMsa2Inf
@@ -76,18 +78,253 @@ EDK_0000: Compatible: owner
         r767 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/fpd2dsc
 
 ==========================================================================================
+EDK_6828: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Add a feature to allow override tools option via "==" in metafile.
+        2) Remove the AutoGen.c generation for R8 module without unicode file.
+
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_6772: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Add /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT) in EBC_CC_FLAGS to ensure
+           correct R8's module entry point for EBC arch.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Conf/tools_def.template
+
+        Possible Impacts:
+           The local version of tools_def.txt must be updated with the change in
+           tools_def.template.
+
+==========================================================================================
+EDK_6762: Non-Compatible: lgao4
+
+      Class_BuildTool:
+        1) Declare entry point, constructor into AutoGen.h
+        2) Create <ModuleName>StrDefs.h to contain uni code string ID.
+
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+        2) /trunk/edk2/BaseTools/Conf/tools_def.template
+
+        Possible Impacts:
+           The local version of tools_def.txt must be updated with change in
+           tools_def.tempalte.
+
+==========================================================================================
+EDK_6671: Compatible: qwang12
+
+      Class_BuildTool:
+        1) StrGather (Build.exe) in compatible mode add a Framework Package Header
+           to replace the original ¡°ArrayLength¡± generated in the output.
+        2) VfrCompiler in compatible mode add a Framework Package Header to replace
+           the original ¡°ArrayLength¡± generated in the output.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/VfrCompile.exe
+        2) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+
+==========================================================================================
+EDK_6666: Compatible: lgao4
+
+      Class_BuildTool:
+        1) Enhance GenFv WriteFvMap function to print basic debug information
+           (entrypoint, baseaddress, .text, .data section base address)  when no
+           map can be referred.
+        2) Enhance GenFv tool to create the non PI file system firmware volume.
+        3) Update VfrComile
+           - Set the first framework var store name to ¡°Setup¡±
+           - Support DEFAULT and MANUFACTURING for framework CheckBox flags value
+
+        Code Change :
+           /trunk/edk2/BaseTools/Bin/Win32/GenFv.exe
+           /trunk/edk2/BaseTools/Bin/Win32/VfrCompile.exe
+
+==========================================================================================
+EDK_6640: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Change file line format of AutoGen files to native style.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_6613: Non-Compatible: qwang12
+
+      Class_BuildTool:
+        1) Generate data for ConfigAccess.ExtractConfig() impl
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/VfrCompile.exe
+
+==========================================================================================
+EDK_6490: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Add ImportTool.bat script
+        2) Add more error check for Trim.exe
+
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/ImportTool.bat
+        2) /trunk/edk2/BaseTools/Bin/Win32/Trim.exe
+
+==========================================================================================
+EDK_6452: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Allow the flags of tools not defined tools_def.txt
+        2) Add BUILD as internal tool to pass compatible mode of unicode to build tool.
+        3) Add support of [Depex.common.<ModuleType>] in inf file
+        4) Add more optimization, especially for architecture protocols, in GeDepex tool
+        5) Fix the generation of _gPeimRevision and _gDxeRevision global variables in
+           AutoGen.c according to new MdePkg spec.
+        6) Change the header file of DxeSmmeEntryPoint.h to UefiDriverEntryPoint.h
+           in AutoGen.c since it's no longer exist.
+        7) Fix $(PROCESSOR) macro replacement issue in [nmake] section
+
+        Code Change :
+           /trunk/edk2/BaseTools/Bin/Win32/GenDepex.exe
+           /trunk/edk2/BaseTools/Bin/Win32/GenFds.exe
+           /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_6289: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Performance improvement on startup of build.exe
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/GenFds.exe
+        2) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_6269: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Bug fixes
+        2) Improve the screen output when in quiet build mode
+        3) Add "tbuild" target in makefile in order to not created directories in
+           makefile. Instead, they will be created in build tool. This will give
+           better build performance, especially in incremental build.
+        4) Add space check in WORKSPACE and OUTPUT_DIRECTORY (in dsc file) directory
+           name and give error message if found.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_5762: Compatible: jlin16
+
+      Class_BuildTool:
+        1) Enhance the tool to build R8 module via ECP.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/GenFds.exe
+        2) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_5635: Compatible: lgao4
+
+      Class_BuildTool:
+        1) Enhance GenFv tool to print Fv Size and Length, and Get module map by
+           module pdb pointer and get module guid by module FFS guid.
+        2) And Enhance VfrCompiler to handle framework vfr file, and print more
+           debug information into .lst file.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/GenFv.exe
+        2) /trunk/edk2/BaseTools/Bin/Win32/VfrCompile.exe
+
+==========================================================================================
+EDK_5634: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Enhance the format of build_rule.txt to allow module type and arch information.
+        2) Enhance Trim to convert ASL style of include to C style of include
+        3) Enhance Trim to convert some EDK coding convention to EDK2 ECP convention
+        4) Add warning message when encountering unrecognized content in DSC/DEC/INF File
+        5) Enhance the GenDepex to ignore everything outside DEPENDENCY_STANT and DEPENDENCY_END in dxs file
+
+        Code Change :
+           /trunk/edk2/BaseTools/Bin/Win32/GenDepex.exe
+           /trunk/edk2/BaseTools/Bin/Win32/Trim.exe
+           /trunk/edk2/BaseTools/Bin/Win32/build.exe
+           /trunk/edk2/BaseTools/Conf/build_rule.template
+           /trunk/edk2/BaseTools/Conf/tools_def.template
+
+        Possible Impacts:
+           The local version tools_def.txt and build_rule.txt must be updated with
+           the changes in tools_def.template and build_rule.template respectively.
+
+==========================================================================================
+EDK_5193: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Add incremental support in GenFds
+
+        Code Change :
+          /trunk/edk2/BaseTools/Bin/Win32/GenFds.exe
+          /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_5186: Compatible: jwang36
+
+      Class_BuildTool:
+        1) Add explicit banner for pass/fail indication of build
+        2) Fix the issue which cause error message from FDF parser won't be printed out.
+        3) Fix the error message format of FDF parser
+        4) Change the exit code of build tool from always 1 to error code, if error occurred
+
+        Code Change :
+           /trunk/edk2/BaseTools/Bin/Win32/GenFds.exe
+           /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+==========================================================================================
+EDK_4971: Compatible: lgao4
+
+      Class_BuildTool:
+        1) Enhance GenFw tool to always zero .pdata section for PE32 and PE32+ image in
+           order to improve compression ratio for them.
+
+        Code Change :
+           /trunk/edk2/BaseTools/Bin/Win32/GenFw.exe
+
+==========================================================================================
+EDK_4918: Compatible: lgao4
+
+      Class_BuildTool:
+        1) Correct Error Message format for these C tools according to the Tool Design Spec.
+
+        Code Change :
+           /trunk/edk2/BaseTools/Bin/Win32/EfiLdrImage.exe
+           /trunk/edk2/BaseTools/Bin/Win32/GenFv.exe
+           /trunk/edk2/BaseTools/Bin/Win32/TianoCompress.exe
+           /trunk/edk2/BaseTools/Bin/Win32/VfrCompile.exe
+           /trunk/edk2/BaseTools/Bin/Win32/VolInfo.exe
+
+==========================================================================================
 EDK_4859: Non-Compatible: jwang36
 
       Class_BuildTool:
         1) Changed VfrCompile.exe to be UEFI HII compatible
         2) Improved R8 module build
-        3) Added binary file build 
-        4) Removed "extern int __make_me_compile_correctly" in AutoGen code for 
+        3) Added binary file build
+        4) Removed "extern int __make_me_compile_correctly" in AutoGen code for
            R9 modules, but kept for R8 modules
         5) Enfored more error check and introduced a optimization for GenDepex
         6) Added BUILD_RULE_CONF in target.txt to specify build rules file
         7) Rebuilt all Python tools with Python2.5.2
- 
+
         Code Change :
         1) build.exe
         2) VfrCompile.exe
@@ -106,10 +343,10 @@ EDK_4251: Non-Compatible: jwang36
       Class_BuildTool:
         1) Changed MYTOOLS to use Visual Studio Team Suite for IA32 and X64. IPF is still use WINDKK.
         2) Re-generated build.exe and GenFds.exe to incorporate new changes of build tools
-        3) Enabled multi-thread build mode by default (can be disabled by using "-n 0" option or changing 
+        3) Enabled multi-thread build mode by default (can be disabled by using "-n 0" option or changing
            MULTIPLE_THREAD in target.txt to Disabled)
         4) Fixed an incorrect command (no leading tab/space) generated in top level Makefile.
- 
+
         Code Change :
         1) BaseTools/Bin/Win32/GenFds.exe
         2) BaseTools/Bin/Win32/build.exe
@@ -124,50 +361,50 @@ EDK_4190: Non-Compatible: jwang36
 
       Class_BuildTool:
         1) Added support of using PCD default value from DEC/INF file if one
-				PCD is declared in INF file but not found in DSC file.
-				2) Added support of breaking build if no library instance is found for
-				a library class.
- 
+           PCD is declared in INF file but not found in DSC file.
+        2) Added support of breaking build if no library instance is found for
+           a library class.
+
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
         2) BaseTools/Bin/Win32/GenFds.exe
 
         Possible Impacts:
         1) All packages/platforms/modules, which have wrong library classes
-				declared or have no library instance for some library classes, must be
-				changed to make sure each library class declared in INF file has
-				corresponding library instance.
+           declared or have no library instance for some library classes, must be
+           changed to make sure each library class declared in INF file has
+           corresponding library instance.
 
 ==========================================================================================
 EDK_4096: Non-Compatible: jwang36
 
       Class_BuildTool:
         1) Removed the calling of vsvars32.bat in edksetup.bat, unless
-				"--nt32" switch is used.
-				2) Added MAKE command in tools_def.txt. This is used to locate where
-				the nmake.exe or make.exe is because it will not be in PATH any more.
-				3) Removed the calling of vsvars32.bat in toolsetup.bat.
-				4) Solved the hang issue of build.exe when error occurred or Ctrl+C is
-				pressed.
-				5) Passed "-v/-d/-q" command line option to GenFds.exe in makefile if
-				it's used by build.exe.
- 
+           "--nt32" switch is used.
+        2) Added MAKE command in tools_def.txt. This is used to locate where
+           the nmake.exe or make.exe is because it will not be in PATH any more.
+        3) Removed the calling of vsvars32.bat in toolsetup.bat.
+        4) Solved the hang issue of build.exe when error occurred or Ctrl+C is
+           pressed.
+        5) Passed "-v/-d/-q" command line option to GenFds.exe in makefile if
+           it's used by build.exe.
+
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
         2) BaseTools/Bin/Win32/GenFds.exe
         3) BaseTools/Conf/tools_def.template
         4) BaseTools/toolsetup.bat
-				5) edksetup.bat
+        5) edksetup.bat
 
         Possible Impacts:
         1) Nt32Pkg build needs to run vsvars32.bat before edksetup.bat or run
-				edksetup.bat with "--nt32" option, like
+           edksetup.bat with "--nt32" option, like
 
-						edksetup.bat --nt32 newbuild
+           edksetup.bat --nt32 newbuild
 
-				2) $(WORKSPACE)/Conf/tools_def.txt must be deleted before running
-				edksetup.bat because of new tools_def.template. Otherwise the
-				build.exe cannot find the nmake.exe to call.
+        2) $(WORKSPACE)/Conf/tools_def.txt must be deleted before running
+           edksetup.bat because of new tools_def.template. Otherwise the
+           build.exe cannot find the nmake.exe to call.
 
 ==========================================================================================
 EDK_3947: Compatible: jwang36
@@ -176,7 +413,7 @@ EDK_3947: Compatible: jwang36
         1) Improved spawn mode (multi-thread) build performance (build -s)
         2) Changed the error/debug/warning message format
         3) Added "--log" command line option to support storing log in file
- 
+
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
 
@@ -185,9 +422,9 @@ EDK_3947: Compatible: jwang36
 EDK_3936: Compatible: klu2
 
       Class_BuildTool:
-        1) The first parameter of PEIM's entry point in autogen.c has been changed to 
+        1) The first parameter of PEIM's entry point in autogen.c has been changed to
            EFI_PEI_FILE_HANDLE
- 
+
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
 
@@ -196,7 +433,7 @@ EDK_3926: Compatible: jlin16
 
       Class_BuildTool:
         1) Added support of Capsule generation from FDF file.
- 
+
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
         2) BaseTools/Bin/Win32/GenFds.exe
@@ -216,8 +453,8 @@ EDK_3911: Compatible: jlin16
         1) Added support of Apriori file generation from FDF file.
         2) Added support of INF that describes binary files to put binary into FV.
         3) Fixed single FV/FD generation error when specifying -i/-r option in GenFds.
-        
- 
+
+
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
         2) BaseTools/Bin/Win32/GenFds.exe
@@ -234,15 +471,15 @@ EDK_3911: Compatible: jlin16
         }
         2) To add binary file described by INF file into FV, only insert the INF statement
         into the INF statements list of that FV, like this:
-        
+
         INF RuleOverride=Test MdeModulePkg/Logo/Logo.inf
-        
+
         Specifying how to process the binary file by defining corresponding Rule like this:
         [Rule.Common.Base.Test]
          FILE FREEFORM = $(NAMED_GUID) {
            COMPRESS PI_STD {
              GUIDED {
-                RAW BIN |.bmp   
+                RAW BIN |.bmp
              }
            }
          }
@@ -256,9 +493,9 @@ EDK_3832: Non-Compatible: jwang36
         3) Changed DPATH attribute to DLL in tools_def.txt
         4) Removed SPATH attribute in tools_def.txt
         5) Added support for library instance without library class
-        6) Fixed the issue in Trim tool which zero file will be generated if the trimmed 
+        6) Fixed the issue in Trim tool which zero file will be generated if the trimmed
            file has not line directive
- 
+
         Code Change :
         1) BaseTools/Bin/Win32/build.exe
         2) BaseTools/Bin/Win32/GenFds.exe
@@ -271,7 +508,7 @@ EDK_3832: Non-Compatible: jwang36
 ==========================================================================================
 EDK_3801: Compatible: jwang36
 
-      Class_BuildConfiguration: Added makefile as dependency for "Dynamic-Library-File" to 
+      Class_BuildConfiguration: Added makefile as dependency for "Dynamic-Library-File" to
         solve the incremental build issue occurred when there's library changes
 
         Code Change :
@@ -289,7 +526,7 @@ EDK_3800: Compatible: lgao4
 EDK_3795: Compatible: htao
 
       Class_BuildTool: GenVtf tool open/write file with "r+b"/"w+b" attribute, but this cause
-                       the RO attribute of the file changed. Fix this issue by changing 
+                       the RO attribute of the file changed. Fix this issue by changing
                        "r+b"/"w+b" to "rb"/"wb".
 
         Code Change :
@@ -316,10 +553,10 @@ EDK_3789: Non-Compatible: lgao4
 
         Possible Impacts:
         1) All platform's FDF file, if any, must be changed to new format.
-          a) PCD format is changed from old PcdName to new PcdTokenSpaceGuid.PcdName, 
-             for example PcdWinNtFdBaseAddress in old FDF file will be replaced 
+          a) PCD format is changed from old PcdName to new PcdTokenSpaceGuid.PcdName,
+             for example PcdWinNtFdBaseAddress in old FDF file will be replaced
              by gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddres.
-          b) Rule format adds binary file type and file postfix name support, 
+          b) Rule format adds binary file type and file postfix name support,
              and doesn't require the full file path. Examples for Peim and AcpiTable module:
           Old Peim Rule:
           [Rule.Common.PEIM]
@@ -334,8 +571,8 @@ EDK_3789: Non-Compatible: lgao4
             FILE PEIM = $(NAMED_GUID) {
                PEI_DEPEX PEI_DEPEX Optional        |.Depex
                PE32      PE32                      |.efi
-               UI       STRING="$(MODULE_NAME)" Optional         
-               VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
+               UI       STRING="$(MODULE_NAME)" Optional
+               VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
             }
 
           Old AcpiTable Rule:
@@ -358,8 +595,8 @@ EDK_3789: Non-Compatible: lgao4
 EDK_3786: Compatible: vjeff
 
       Class_BuildConfiguration:
-        1) Redirect ICC_IA32_*_PATH from C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin 
-           to C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin. 
+        1) Redirect ICC_IA32_*_PATH from C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
+           to C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin.
         2) Add ICC X64 definition to enable ICC X64 build.
 
         Code Change :
@@ -368,7 +605,7 @@ EDK_3786: Compatible: vjeff
 ==========================================================================================
 EDK_3785: Non-Compatible: klu2
 
-      Class_BuildTool: Upgrade the format of EFI_PEIM_ENTRY_POINT to 
+      Class_BuildTool: Upgrade the format of EFI_PEIM_ENTRY_POINT to
                        EFI_PEIM_ENTRY_POINT2 according to PI specification.
 
 
@@ -402,7 +639,7 @@ EDK_3766: Non-Compatible: lgao4
         1) Conf/build_rule.template
 
         Possible Impacts:
-        1) Platform with ACPI module. Acpi module needs to set /EP preprocessor compiler option 
-        for APP_FLAGS in module inf to override the default /E option defined in tools_def.txt file. 
+        1) Platform with ACPI module. Acpi module needs to set /EP preprocessor compiler option
+        for APP_FLAGS in module inf to override the default /E option defined in tools_def.txt file.
 
 
