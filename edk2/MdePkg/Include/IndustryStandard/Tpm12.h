@@ -30,47 +30,175 @@
 //
 // Part 2, section 2.2.3: Helper redefinitions
 //
+///
+/// Indicates the conditions where it is required that authorization be presented
+///
 typedef UINT8                       TPM_AUTH_DATA_USAGE;
+///
+/// The information as to what the payload is in an encrypted structure
+///
 typedef UINT8                       TPM_PAYLOAD_TYPE;
+///
+/// The version info breakdown
+///
 typedef UINT8                       TPM_VERSION_BYTE;
+///
+/// The request or response authorization type
+///
 typedef UINT16                      TPM_TAG;
+///
+/// The protocol in use
+///
 typedef UINT16                      TPM_PROTOCOL_ID;
+///
+/// Indicates the start state
+///
 typedef UINT16                      TPM_STARTUP_TYPE;
+///
+/// The definition of the encryption scheme
+///
 typedef UINT16                      TPM_ENC_SCHEME;
+///
+/// The definition of the signature scheme
+///
 typedef UINT16                      TPM_SIG_SCHEME;
+///
+/// The definition of the migration scheme
+///
 typedef UINT16                      TPM_MIGRATE_SCHEME;
+///
+/// Sets the state of the physical presence mechanism
+///
 typedef UINT16                      TPM_PHYSICAL_PRESENCE;
+///
+/// Indicates the types of entity that are supported by the TPM
+///
 typedef UINT16                      TPM_ENTITY_TYPE;
+///
+/// Indicates the permitted usage of the key
+///
 typedef UINT16                      TPM_KEY_USAGE;
+///
+/// The type of asymmetric encrypted structure in use by the endorsement key
+///
 typedef UINT16                      TPM_EK_TYPE;
+///
+/// The tag for the structure
+///
 typedef UINT16                      TPM_STRUCTURE_TAG;
+///
+/// The platform specific spec to which the information relates to
+///
 typedef UINT16                      TPM_PLATFORM_SPECIFIC;
+///
+/// The command ordinal
+///
 typedef UINT32                      TPM_COMMAND_CODE;
+///
+/// Identifies a TPM capability area
+///
 typedef UINT32                      TPM_CAPABILITY_AREA;
+///
+/// Indicates information regarding a key
+///
 typedef UINT32                      TPM_KEY_FLAGS;
+///
+/// Indicates the type of algorithm
+///
 typedef UINT32                      TPM_ALGORITHM_ID;
+///
+/// The locality modifier
+///
 typedef UINT32                      TPM_MODIFIER_INDICATOR;
+///
+/// The actual number of a counter
+///
 typedef UINT32                      TPM_ACTUAL_COUNT;
+///
+/// Attributes that define what options are in use for a transport session
+///
 typedef UINT32                      TPM_TRANSPORT_ATTRIBUTES;
+///
+/// Handle to an authorization session
+///
 typedef UINT32                      TPM_AUTHHANDLE;
+///
+/// Index to a DIR register
+///
 typedef UINT32                      TPM_DIRINDEX;
+///
+/// The area where a key is held assigned by the TPM
+///
 typedef UINT32                      TPM_KEY_HANDLE;
+///
+/// Index to a PCR register
+///
 typedef UINT32                      TPM_PCRINDEX;
+///
+/// The return code from a function
+///
 typedef UINT32                      TPM_RESULT;
+///
+/// The types of resources that a TPM may have using internal resources
+///
 typedef UINT32                      TPM_RESOURCE_TYPE;
+///
+/// Allows for controlling of the key when loaded and how to handle TPM_Startup issues
+///
 typedef UINT32                      TPM_KEY_CONTROL;
+///
+/// The index into the NV storage area
+///
 typedef UINT32                      TPM_NV_INDEX;
+///
+/// The family ID. Families ID¡¯s are automatically assigned a sequence number by the TPM. 
+/// A trusted process can set the FamilyID value in an individual row to NULL, which 
+/// invalidates that row. The family ID resets to NULL on each change of TPM Owner.
+///
 typedef UINT32                      TPM_FAMILY_ID;
+///
+/// IA value used as a label for the most recent verification of this family. Set to zero when not in use.
+///
 typedef UINT32                      TPM_FAMILY_VERIFICATION;
+///
+/// How the TPM handles var
+///
 typedef UINT32                      TPM_STARTUP_EFFECTS;
+///
+/// The mode of a symmetric encryption
+///
 typedef UINT32                      TPM_SYM_MODE;
+///
+/// The family flags
+///
 typedef UINT32                      TPM_FAMILY_FLAGS;
+///
+/// The index value for the delegate NV table
+///
 typedef UINT32                      TPM_DELEGATE_INDEX;
+///
+/// The restrictions placed on delegation of CMK commands
+///
 typedef UINT32                      TPM_CMK_DELEGATE;
+///
+/// The ID value of a monotonic counter
+///
 typedef UINT32                      TPM_COUNT_ID;
+///
+/// A command to execute
+///
 typedef UINT32                      TPM_REDIT_COMMAND;
+///
+/// A transport session handle
+///
 typedef UINT32                      TPM_TRANSHANDLE;
+///
+/// A generic handle could be key, transport etc
+///
 typedef UINT32                      TPM_HANDLE;
+///
+/// What operation is happening
+///
 typedef UINT32                      TPM_FAMILY_OPERATION;
 
 //
@@ -302,23 +430,46 @@ typedef struct tdTPM_VERSION {
 } TPM_VERSION;
 
 
-///
-/// Part 2, section 5.4: TPM_DIGEST
-///
 #define TPM_SHA1_160_HASH_LEN       0x14
 #define TPM_SHA1BASED_NONCE_LEN     TPM_SHA1_160_HASH_LEN
 
+///
+/// Part 2, section 5.4: TPM_DIGEST
+///
 typedef struct tdTPM_DIGEST{
   UINT8                             digest[TPM_SHA1_160_HASH_LEN];
 } TPM_DIGEST;
 
+///
+/// This SHALL be the digest of the chosen identityLabel and privacyCA for a new TPM identity
+///
 typedef TPM_DIGEST                  TPM_CHOSENID_HASH;
+///
+/// This SHALL be the hash of a list of PCR indexes and PCR values that a key or data is bound to
+///
 typedef TPM_DIGEST                  TPM_COMPOSITE_HASH;
+///
+/// This SHALL be the value of a DIR register
+///
 typedef TPM_DIGEST                  TPM_DIRVALUE;
+
 typedef TPM_DIGEST                  TPM_HMAC;
+///
+/// The value inside of the PCR
+///
 typedef TPM_DIGEST                  TPM_PCRVALUE;
+///
+/// This SHALL be the value of the current internal audit state
+///
 typedef TPM_DIGEST                  TPM_AUDITDIGEST;
+///
+/// This SHALL be a random value generated by a TPM immediately after the EK is installed
+/// in that TPM, whenever an EK is installed in that TPM
+///
 typedef TPM_DIGEST                  TPM_DAA_TPM_SEED;
+///
+/// This SHALL be a random value
+///
 typedef TPM_DIGEST                  TPM_DAA_CONTEXT_SEED;
 
 ///
@@ -331,9 +482,20 @@ typedef struct tdTPM_NONCE{
 //
 // Part 2, section 5.6: TPM_AUTHDATA
 //
+///
+/// The AuthData data is the information that is saved or passed to provide proof of ownership
+/// 296 of an entity
+///
 typedef UINT8                       tdTPM_AUTHDATA[20];
+
 typedef tdTPM_AUTHDATA              TPM_AUTHDATA;
+///
+/// A secret plaintext value used in the authorization process
+///
 typedef TPM_AUTHDATA                TPM_SECRET;
+///
+/// A ciphertext (encrypted) version of AuthData data. The encryption mechanism depends on the context
+///
 typedef TPM_AUTHDATA                TPM_ENCAUTH;
 
 ///
@@ -1484,12 +1646,11 @@ typedef struct tdTPM_NV_DATA_PUBLIC {
 // Part 2, section 20: Delegate Structures
 //
 
-//
-// Part 2, section 20.2: Delegate Definitions
-//
 #define TPM_DEL_OWNER_BITS          ((UINT32)0x00000001)
 #define TPM_DEL_KEY_BITS            ((UINT32)0x00000002)
-
+///
+/// Part 2, section 20.2: Delegate Definitions
+///
 typedef struct tdTPM_DELEGATIONS {
   TPM_STRUCTURE_TAG               tag;
   UINT32                          delegateType;
@@ -1858,7 +2019,7 @@ typedef struct tdTPM_DAA_SENSITIVE {
 #define TPM_REDIR_GPIO              (0x00000001)
 
 ///
-/// TPM Command & Response Headers defined in Part 3
+/// TPM Command Headers defined in Part 3
 ///
 typedef struct tdTPM_RQU_COMMAND_HDR {
   TPM_STRUCTURE_TAG                 tag;
@@ -1866,6 +2027,9 @@ typedef struct tdTPM_RQU_COMMAND_HDR {
   TPM_COMMAND_CODE                  ordinal;
 } TPM_RQU_COMMAND_HDR;
 
+///
+/// TPM Response Headers defined in Part 3
+///
 typedef struct tdTPM_RSP_COMMAND_HDR {
   TPM_STRUCTURE_TAG                 tag;
   UINT32                            paramSize;
