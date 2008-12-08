@@ -28,9 +28,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MBR_SIZE                    512
 
 #pragma pack(1)
-//
-// MBR Partition Entry
-//
+///
+/// MBR Partition Entry
+///
 typedef struct {
   UINT8 BootIndicator;
   UINT8 StartHead;
@@ -45,7 +45,7 @@ typedef struct {
 } MBR_PARTITION_RECORD;
 
 ///
-/// MBR Partition table
+/// MBR Partition Table
 ///
 typedef struct {
   UINT8                 BootStrapCode[440];

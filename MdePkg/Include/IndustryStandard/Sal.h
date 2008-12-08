@@ -729,10 +729,14 @@ typedef struct {
 #define PCI_BUS_OEM_ID_VALID_BIT_MASK           0x200
 #define PCI_BUS_OEM_DATA_STRUCT_VALID_BIT_MASK  0x400
 
+///
+/// Designated PCI Bus identifier
+///
 typedef struct {
   UINT8 BusNumber;
   UINT8 SegmentNumber;
 } PCI_BUS_ID;
+
 ///
 /// Definition of Platform PCI Bus Error Info Record
 ///
