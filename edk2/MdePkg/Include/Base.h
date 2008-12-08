@@ -70,7 +70,7 @@ struct _LIST_ENTRY {
 #define STATIC    static
 
 ///
-/// Undclared type
+/// Undeclared type
 ///
 #define VOID      void
 
