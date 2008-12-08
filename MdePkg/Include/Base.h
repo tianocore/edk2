@@ -223,6 +223,13 @@ struct _LIST_ENTRY {
 //  }
 //
 
+/**
+  Return the size of argument that has been aligned to sizeof (UINTN).
+
+  @param  n    The parameter size is to be aligned.
+
+  @return The aligned size
+**/
 #define _INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
 
 ///

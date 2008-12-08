@@ -237,3 +237,9 @@ Possible Impacts:
 	EFI_TIMER_PERIOD_MICROSECONDS(X), EFI_TIMER_PERIOD_MILLISECONDS(X) and EFI_TIMER_PERIOD_SECONDS(X) for managing Timer Events.
 	Especailly, EFI_SCSI_STALL_SECONDS(a) is simply replaced by EFI_TIMER_PERIOD_SECONDS(a)
 
+EDK_6886:  Non-Compatible: mdkinney
+	
+	Rename _CR macro in MdePkg\Include\Base.h to BASE_CR macro aligned to MdeLib spec.
+
+Possible Impacts:
+	All source codes that depends on _CR macro must be changed to use BASE_CR.	
