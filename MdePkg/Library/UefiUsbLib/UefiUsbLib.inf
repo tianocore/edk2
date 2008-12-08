@@ -1,7 +1,8 @@
 #/** @file
 # Instance of Usb Library.
 #
-# This library provides supports for common USB functions.
+# This library instance provides most usb APIs to support the Hid requests defined in
+# Usb Hid 1.1 spec and the standard requests defined in Usb 1.1 spec.
 #
 # Copyright (c) 2006 - 2008, Intel Corporation.
 #
