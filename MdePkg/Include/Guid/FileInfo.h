@@ -1,13 +1,9 @@
 /** @file
-  SimpleFileSystem guid and data structure as defined in the UEFI 2.0 specification.
+  Provides a GUID and a data structure that can be used with EFI_FILE_PROTOCOL.SetInfo()
+  and EFI_FILE_PROTOCOL.GetInfo() to set or get generic file information.
+  This guid is defined in UEFI specification.
 
-  The SimpleFileSystem protocol is the programatic access to the FAT (12,16,32) 
-  file system specified in UEFI 2.0. It can also be used to abstract any 
-  file system other than FAT.
-
-  UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem
-
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -27,13 +23,37 @@
   }
 
 typedef struct {
+  ///
+  /// Size of the EFI_FILE_INFO structure, including the Nullterminated Unicode FileName string.
+  ///
   UINT64    Size;
+  ///
+  /// The size of the file in bytes.
+  ///
   UINT64    FileSize;
+  ///
+  /// PhysicalSize The amount of physical space the file consumes on the file system volume.
+  ///
   UINT64    PhysicalSize;
+  ///
+  /// The time the file was created.
+  ///
   EFI_TIME  CreateTime;
+  ///
+  /// The time when the file was last accessed.
+  ///
   EFI_TIME  LastAccessTime;
+  ///
+  /// The time when the file's contents were last modified.
+  ///
   EFI_TIME  ModificationTime;
+  ///
+  /// The attribute bits for the file.
+  ///
   UINT64    Attribute;
+  ///
+  /// The Null-terminated Unicode name of the file.
+  ///
   CHAR16    FileName[1];
 } EFI_FILE_INFO;
 

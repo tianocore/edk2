@@ -1,5 +1,7 @@
 /** @file
-  FileSystemVolumeLabelInfo guid and data structure as defined in the UEFI 2.0 specification.
+  Provides a GUID and a data structure that can be used with EFI_FILE_PROTOCOL.GetInfo()
+  or EFI_FILE_PROTOCOL.SetInfo() to get or set the system's volume label.
+  This guid is defined in UEFI specification.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -20,13 +22,13 @@
     0xDB47D7D3, 0xFE81, 0x11d3, {0x9A, 0x35, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D } \
   }
 
-//
-// Protocol Name defined in spec.
-//
 #define EFI_FILE_SYSTEM_VOLUME_LABEL_ID \
         EFI_FILE_SYSTEM_VOLUME_LABEL_INFO_ID_GUID
 
 typedef struct {
+  ///
+  /// The Null-terminated string that is the volume's label.
+  ///
   CHAR16  VolumeLabel[1];
 } EFI_FILE_SYSTEM_VOLUME_LABEL_INFO;
 
