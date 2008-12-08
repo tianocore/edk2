@@ -440,35 +440,27 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320|UINT32|0x101
   
   ## Status code value for indicating a watchdog timer is expired
-  # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003|UINT32|0x00000013   
 
   ## Status code value for indicating the invocation of SetVirtualAddressMap()
-  # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap|0x03101004|UINT32|0x00000014
 
   ## Status code value for indicating the start of memory test
-  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted|0x00051006|UINT32|0x00000015
 
   ## Status code value for indicating memory error in memory test
-  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError|0x00051003|UINT32|0x00000016
 
   ## Status code value for indicating the failure of console operation
-  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError|0x01040006|UINT32|0x00000017
 
   ## Status code value for indicating the failure of console reset operation
-  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset|0x01040001|UINT32|0x00000018
 
   ## Status code value for indicating the failure of console input operation
-  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError|0x01040007|UINT32|0x00000019
 
   ## Status code value for indicating the failure of console output operation
-  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError|0x01040008|UINT32|0x0000001a
 
   ## Status code value for indicating the failure of mouse operation
@@ -542,35 +534,27 @@
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024  
   
   ## Status code value for indicating the handoff from Pei phase to Dxe phase
-  # EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3031001|UINT32|0x3000100d
 
   ## Status code value for indicating one PEIM is dispatched.
-  #  value: EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_BEGIN
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch|0x3020002|UINT32|0x3000100e
 
   ## Status code value for indicating entering PeiCore
-  #  value: EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry|0x3020000|UINT32|0x3000100f
 
   ## Status code value for indicating entering DxeCore
-  # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreEntry|0x3041000|UINT32|0x30001010
 
   ## Status code value for indicating the handoff from DxeCore to Bds
-  # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreHandoffToBds|0x3041001|UINT32|0x30001011
 
   ## Status code value for indicating the exit of boot service
-  # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit|0x3100019|UINT32|0x30001012
 
   ## Status code value for indicating the begin of Dxe driver
-  # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverBegin|0x3040002|UINT32|0x30001013
 
   ## Status code value for indicating the end of Dxe driver
-  # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014
 
 [PcdsFixedAtBuild.IPF]
@@ -646,6 +630,3 @@
   
   ## This value is used to set the base address of pci express hierarchy
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
-
-
-

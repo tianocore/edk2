@@ -1,7 +1,9 @@
 /** @file
-  FileSystemInfo guid and data structure as defined in the UEFI 2.0 specification.
+  Provides a GUID and a data structure that can be used with EFI_FILE_PROTOCOL.GetInfo()
+  or EFI_FILE_PROTOCOL.SetInfo() to get or set information about the system's volume.
+  This guid is defined in UEFI specification.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -21,11 +23,29 @@
   }
 
 typedef struct {
+  ///
+  /// Size of the EFI_FILE_SYSTEM_INFO structure, including the Null-terminated Unicode VolumeLabel string.
+  ///
   UINT64  Size;
+  ///
+  /// TRUE if the volume only supports read access.
+  ///
   BOOLEAN ReadOnly;
+  ///
+  /// The number of bytes managed by the file system.
+  ///
   UINT64  VolumeSize;
+  ///
+  /// The number of available bytes for use by the file system.
+  ///
   UINT64  FreeSpace;
+  ///
+  /// The nominal block size by which files are typically grown.
+  ///
   UINT32  BlockSize;
+  ///
+  /// The Null-terminated string that is the volume's label.
+  ///
   CHAR16  VolumeLabel[1];
 } EFI_FILE_SYSTEM_INFO;
 
