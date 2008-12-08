@@ -37,7 +37,8 @@ typedef struct _EFI_SERIAL_IO_PROTOCOL EFI_SERIAL_IO_PROTOCOL;
 typedef EFI_SERIAL_IO_PROTOCOL  SERIAL_IO_INTERFACE;
 
 ///
-/// Serial IO Data structures
+/// Parity type that is computed or checked as each character is transmitted or received. If the
+/// device does not support parity, the value is the default parity value.
 ///
 typedef enum {
   DefaultParity,
@@ -48,6 +49,9 @@ typedef enum {
   SpaceParity
 } EFI_PARITY_TYPE;
 
+///
+/// Stop bits type
+///
 typedef enum {
   DefaultStopBits,
   OneStopBit,

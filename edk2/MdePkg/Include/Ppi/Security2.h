@@ -47,6 +47,15 @@ typedef struct _EFI_PEI_SECURITY2_PPI  EFI_PEI_SECURITY2_PPI;
   @param This                    Interface pointer that implements the
                                  particular EFI_PEI_SECURITY2_PPI instance.
   @param AuthenticationStatus    Authentication status of the file.
+                                 xx00 Image was not signed.
+                                 xxx1 Platform security policy override. 
+                                      Assumes same meaning as 0010 (the image was signed, the
+                                      signature was tested, and the signature passed authentication test).
+                                 0010 Image was signed, the signature was tested, 
+                                      and the signature passed authentication test.
+                                 0110 Image was signed and the signature was not tested.
+                                 1010 Image was signed, the signature was tested, 
+                                      and the signature failed the authentication test.
   @param FvHandle                Handle of the volume in which the file
                                  resides. This allows different policies
                                  depending on different firmware volumes.

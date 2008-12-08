@@ -30,8 +30,7 @@ typedef enum {
   UgaDtOutputController,
   UgaDtOutputPort,
   UgaDtOther
-}
-UGA_DEVICE_TYPE, *PUGA_DEVICE_TYPE;
+} UGA_DEVICE_TYPE, *PUGA_DEVICE_TYPE;
 
 typedef UINT32 UGA_DEVICE_ID, *PUGA_DEVICE_ID;
 
@@ -40,8 +39,7 @@ typedef struct {
   UGA_DEVICE_ID   deviceId;
   UINT32          ui32DeviceContextSize;
   UINT32          ui32SharedContextSize;
-}
-UGA_DEVICE_DATA, *PUGA_DEVICE_DATA;
+} UGA_DEVICE_DATA, *PUGA_DEVICE_DATA;
 
 typedef struct _UGA_DEVICE {
   VOID                *pvDeviceContext;
@@ -51,8 +49,7 @@ typedef struct _UGA_DEVICE {
   VOID                *pvBusIoServices;
   VOID                *pvStdIoServices;
   UGA_DEVICE_DATA     deviceData;
-}
-UGA_DEVICE, *PUGA_DEVICE;
+} UGA_DEVICE, *PUGA_DEVICE;
 
 typedef enum {
   UgaIoGetVersion             = 1,
@@ -78,8 +75,7 @@ typedef enum {
   UgaIoGetDevicePropertySize,
   UgaIoGetDeviceProperty,
   UgaIoBtPrivateInterface
-}
-UGA_IO_REQUEST_CODE, *PUGA_IO_REQUEST_CODE;
+} UGA_IO_REQUEST_CODE, *PUGA_IO_REQUEST_CODE;
 
 typedef struct {
   IN UGA_IO_REQUEST_CODE  ioRequestCode;

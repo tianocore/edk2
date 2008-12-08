@@ -29,12 +29,8 @@
     0x9576e91, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
 
-//
-// Protocol GUID defined in EFI1.1.
-// 
-
 ///
-/// Device Path information
+/// Device Path guid definition for backward-compatible with EFI1.1.
 ///
 #define DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH_PROTOCOL_GUID
 
@@ -67,7 +63,7 @@ typedef struct {
 } EFI_DEVICE_PATH_PROTOCOL;
 
 ///
-/// For backward-compatible with EFI1.1.
+/// Device Path protocol definition for backward-compatible with EFI1.1.
 /// 
 typedef EFI_DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH;
 
@@ -113,9 +109,13 @@ typedef struct {
 } PCCARD_DEVICE_PATH;
 
 ///
-/// Memory Mapped Device Path
+/// Memory Mapped Device Path SubType
 ///
 #define HW_MEMMAP_DP              0x03
+
+///
+/// Memory Mapped Device Path
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -133,11 +133,15 @@ typedef struct {
 } MEMMAP_DEVICE_PATH;
 
 ///
+/// Hardware Vendor Device Path SubType
+///
+#define HW_VENDOR_DP              0x04
+
+///
 /// The Vendor Device Path allows the creation of vendor-defined Device Paths. A vendor must
 /// allocate a Vendor GUID for a Device Path. The Vendor GUID can then be used to define the
 /// contents on the n bytes that follow in the Vendor Device Path node.
 ///
-#define HW_VENDOR_DP              0x04
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -150,9 +154,13 @@ typedef struct {
 } VENDOR_DEVICE_PATH;
 
 ///
-/// Controller Device Path
+/// Controller Device Path SubType
 ///
 #define HW_CONTROLLER_DP          0x05
+
+///
+/// Controller Device Path
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -162,12 +170,12 @@ typedef struct {
 } CONTROLLER_DEVICE_PATH;
 
 ///
-/// ACPI Device Paths
+/// ACPI Device Paths 
 ///
 #define ACPI_DEVICE_PATH          0x02
 
 ///
-/// ACPI Device Path
+/// ACPI Device Path SubType
 ///
 #define ACPI_DP                   0x01
 typedef struct {
@@ -189,7 +197,7 @@ typedef struct {
 } ACPI_HID_DEVICE_PATH;
 
 ///
-/// Expanded ACPI Device Path.
+/// Expanded ACPI Device Path SubType
 ///
 #define ACPI_EXTENDED_DP          0x02
 typedef struct {
@@ -235,13 +243,16 @@ typedef struct {
 #define PNP_EISA_ID_MASK          0xffff
 #define EISA_ID_TO_NUM(_Id)       ((_Id) >> 16)
 
+///
+/// ACPI _ADR Device Path SubType
+///
+#define ACPI_ADR_DP               0x03
 
 ///
 /// The _ADR device path is used to contain video output device attributes to support the Graphics
 /// Output Protocol. The device path can contain multiple _ADR entries if multiple video output
 /// devices are displaying the same output.
 ///
-#define ACPI_ADR_DP               0x03
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -250,9 +261,9 @@ typedef struct {
   /// least one _ADR value is required.
   ///
   UINT32                          ADR;
-  ///
-  /// This device path may optionally contain more than one _ADR entry.
-  ///
+  //
+  // This device path may optionally contain more than one _ADR entry.
+  //
 } ACPI_ADR_DEVICE_PATH;
 
 #define ACPI_ADR_DISPLAY_TYPE_OTHER             0
@@ -280,7 +291,7 @@ typedef struct {
 #define MESSAGING_DEVICE_PATH     0x03
 
 ///
-/// ATAPI Device Path
+/// ATAPI Device Path SubType
 ///
 #define MSG_ATAPI_DP              0x01
 typedef struct {
@@ -300,7 +311,7 @@ typedef struct {
 } ATAPI_DEVICE_PATH;
 
 ///
-/// SCSI Device Path
+/// SCSI Device Path SubType
 ///
 #define MSG_SCSI_DP               0x02
 typedef struct {
@@ -316,7 +327,7 @@ typedef struct {
 } SCSI_DEVICE_PATH;
 
 ///
-/// Fibre Channel
+/// Fibre Channel SubType
 ///
 #define MSG_FIBRECHANNEL_DP       0x03
 typedef struct {
@@ -336,7 +347,7 @@ typedef struct {
 } FIBRECHANNEL_DEVICE_PATH;
 
 ///
-/// 1394 Device Path
+/// 1394 Device Path SubType
 ///
 #define MSG_1394_DP               0x04
 typedef struct {
@@ -352,7 +363,7 @@ typedef struct {
 } F1394_DEVICE_PATH;
 
 ///
-/// USB Device Path
+/// USB Device Path SubType
 ///
 #define MSG_USB_DP                0x05
 typedef struct {
@@ -368,7 +379,7 @@ typedef struct {
 } USB_DEVICE_PATH;
 
 ///
-/// USB Class Device Path
+/// USB Class Device Path SubType
 ///
 #define MSG_USB_CLASS_DP          0x0f
 typedef struct {
@@ -401,10 +412,13 @@ typedef struct {
 } USB_CLASS_DEVICE_PATH;
 
 ///
-/// This device path describes a USB device using its serial number.
-/// USB WWID Device Path
+/// USB WWID Device Path SubType
 ///
 #define MSG_USB_WWID_DP           0x10
+
+///
+/// This device path describes a USB device using its serial number.
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL      Header;
   ///
@@ -429,7 +443,7 @@ typedef struct {
 } USB_WWID_DEVICE_PATH;
 
 ///
-/// Device Logical Unit
+/// Device Logical Unit SubType
 ///
 #define MSG_DEVICE_LOGICAL_UNIT_DP  0x11
 typedef struct {
@@ -441,7 +455,7 @@ typedef struct {
 } DEVICE_LOGICAL_UNIT_DEVICE_PATH;
 
 ///
-/// SATA Device Path
+/// SATA Device Path SubType
 ///
 #define MSG_SATA_DP               0x12
 typedef struct {
@@ -464,7 +478,7 @@ typedef struct {
 } SATA_DEVICE_PATH;
 
 ///
-/// I2O Device Path 
+/// I2O Device Path SubType
 ///
 #define MSG_I2O_DP                0x06
 typedef struct {
@@ -476,7 +490,7 @@ typedef struct {
 } I2O_DEVICE_PATH;
 
 ///
-/// MAC Address Device Path
+/// MAC Address Device Path SubType
 ///
 #define MSG_MAC_ADDR_DP           0x0b
 typedef struct {
@@ -492,7 +506,7 @@ typedef struct {
 } MAC_ADDR_DEVICE_PATH;
 
 ///
-/// IPv4 Device Path
+/// IPv4 Device Path SubType
 ///
 #define MSG_IPv4_DP               0x0c
 typedef struct {
@@ -525,7 +539,7 @@ typedef struct {
 } IPv4_DEVICE_PATH;
 
 ///
-/// IPv6 Device Path
+/// IPv6 Device Path SubType
 ///
 #define MSG_IPv6_DP               0x0d
 typedef struct {
@@ -558,7 +572,7 @@ typedef struct {
 } IPv6_DEVICE_PATH;
 
 ///
-/// InfiniBand Device Path
+/// InfiniBand Device Path SubType
 ///
 #define MSG_INFINIBAND_DP         0x09
 typedef struct {
@@ -599,7 +613,7 @@ typedef struct {
 #define INFINIBAND_RESOURCE_FLAG_NETWORK_PROTOCOL           0x10
 
 ///
-/// UART Device Path
+/// UART Device Path SubType
 ///
 #define MSG_UART_DP               0x0e
 typedef struct {
@@ -649,15 +663,16 @@ typedef VENDOR_DEVICE_PATH        VENDOR_DEFINED_DEVICE_PATH;
 #define DEVICE_PATH_MESSAGING_VT_100_PLUS EFI_VT_100_PLUS_GUID
 #define DEVICE_PATH_MESSAGING_VT_UTF8     EFI_VT_UTF8_GUID
 
+#define DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL   EFI_UART_DEVICE_PATH_GUID
+
 ///
 /// A new device path node is defined to declare flow control characteristics.
 /// UART Flow Control Messaging Device Path
 ///
-#define DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL   EFI_UART_DEVICE_PATH_GUID
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
-  /// DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL
+  /// DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL GUID
   ///
   EFI_GUID                        Guid;
   ///
@@ -669,14 +684,14 @@ typedef struct {
   UINT32                          FlowControlMap;
 } UART_FLOW_CONTROL_DEVICE_PATH;
 
+#define DEVICE_PATH_MESSAGING_SAS                 EFI_SAS_DEVICE_PATH_GUID
 ///
 /// Serial Attached SCSI (SAS) devices.
 ///
-#define DEVICE_PATH_MESSAGING_SAS                 EFI_SAS_DEVICE_PATH_GUID
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
-  /// DEVICE_PATH_MESSAGING_SAS
+  /// DEVICE_PATH_MESSAGING_SAS GUID
   ///
   EFI_GUID                        Guid;
   ///
@@ -702,7 +717,7 @@ typedef struct {
 } SAS_DEVICE_PATH;
 
 ///
-/// iSCSI Device Path Node (Base Information)
+/// iSCSI Device Path SubType
 ///
 #define MSG_ISCSI_DP              0x13
 typedef struct {
@@ -746,10 +761,13 @@ typedef struct {
 #define MEDIA_DEVICE_PATH         0x04
 
 ///
-/// The Hard Drive Media Device Path is used to represent a partition on a hard drive.
-/// Hard Drive Media Device Path
+/// Hard Drive Media Device Path SubType
 ///
 #define MEDIA_HARDDRIVE_DP        0x01
+
+///
+/// The Hard Drive Media Device Path is used to represent a partition on a hard drive.
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -795,10 +813,13 @@ typedef struct {
 #define SIGNATURE_TYPE_GUID       0x02
 
 ///
-/// The CD-ROM Media Device Path is used to define a system partition that exists on a CD-ROM.
-/// CD-ROM Media Device Path
+/// CD-ROM Media Device Path SubType
 ///
 #define MEDIA_CDROM_DP            0x02
+
+///
+/// The CD-ROM Media Device Path is used to define a system partition that exists on a CD-ROM.
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -815,13 +836,13 @@ typedef struct {
   UINT64                          PartitionSize;
 } CDROM_DEVICE_PATH;
 
-///
-/// Use VENDOR_DEVICE_PATH struct
-///
-#define MEDIA_VENDOR_DP           0x03
+//
+// Use VENDOR_DEVICE_PATH struct
+//
+#define MEDIA_VENDOR_DP           0x03  /// Media vendor device path subtype
 
 ///
-/// File Path Media Device Path
+/// File Path Media Device Path SubType
 ///
 #define MEDIA_FILEPATH_DP         0x04
 typedef struct {
@@ -835,11 +856,15 @@ typedef struct {
 #define SIZE_OF_FILEPATH_DEVICE_PATH  EFI_FIELD_OFFSET(FILEPATH_DEVICE_PATH,PathName)
 
 ///
+/// Media Protocol Device Path SubType
+///
+#define MEDIA_PROTOCOL_DP         0x05
+
+///
 /// The Media Protocol Device Path is used to denote the protocol that is being 
 /// used in a device path at the location of the path specified. 
 /// Many protocols are inherent to the style of device path.
 ///
-#define MEDIA_PROTOCOL_DP         0x05
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -849,10 +874,13 @@ typedef struct {
 } MEDIA_PROTOCOL_DEVICE_PATH;
 
 ///
-/// This type is used by systems implementing the UEFI PI Specification 1.0 to describe a firmware volume.
-/// PIWG Firmware Volume Device Path.
+/// PIWG Firmware Volume Device Path SubType
 ///
 #define MEDIA_PIWG_FW_VOL_DP      0x7
+
+///
+/// This device path is used by systems implementing the UEFI PI Specification 1.0 to describe a firmware volume.
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -862,10 +890,13 @@ typedef struct {
 } MEDIA_FW_VOL_DEVICE_PATH;
 
 ///
-/// This type is used by systems implementing the UEFI PI Specification 1.0 to describe a firmware file.
-/// PIWG Firmware Volume Device Path
+/// PIWG Firmware Volume Device Path SubType
 ///
 #define MEDIA_PIWG_FW_FILE_DP     0x6
+
+///
+/// This device path is used by systems implementing the UEFI PI Specification 1.0 to describe a firmware file.
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -875,11 +906,18 @@ typedef struct {
 } MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
 
 ///
-/// This Device Path is used to describe the booting of non-EFI-aware operating systems.
 /// BIOS Boot Specification Device Path
 ///
 #define BBS_DEVICE_PATH           0x05
+
+///
+/// BIOS Boot Specification Device Path SubType
+///
 #define BBS_BBS_DP                0x01
+
+///
+/// This Device Path is used to describe the booting of non-EFI-aware operating systems.
+///
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
@@ -912,7 +950,6 @@ typedef struct {
 ///
 /// Union of all possible Device Paths and pointers to Device Paths
 ///
-
 typedef union {
   EFI_DEVICE_PATH_PROTOCOL             DevPath;
   PCI_DEVICE_PATH                      Pci;

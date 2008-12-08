@@ -68,6 +68,9 @@ typedef struct {
 ///
 #define EFI_PXE_BASE_CODE_MAX_IPCNT 8
 
+///
+/// IP Receive Filter structure
+///
 typedef struct {
   UINT8           Filters;
   UINT8           IpCnt;
@@ -81,13 +84,16 @@ typedef struct {
 #define EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST 0x0008
 
 ///
-/// ARP Cache definitions
+/// ARP cache entries
 ///
 typedef struct {
   EFI_IP_ADDRESS  IpAddr;
   EFI_MAC_ADDRESS MacAddr;
 } EFI_PXE_BASE_CODE_ARP_ENTRY;
 
+///
+/// ARP route table entries
+///
 typedef struct {
   EFI_IP_ADDRESS  IpAddr;
   EFI_IP_ADDRESS  SubnetMask;
@@ -160,7 +166,7 @@ typedef struct {
 } EFI_PXE_BASE_CODE_DISCOVER_INFO;
 
 ///
-/// Mtftp() definitions
+/// TFTP opcode definitions
 ///
 typedef enum {
   EFI_PXE_BASE_CODE_TFTP_FIRST,
@@ -174,6 +180,11 @@ typedef enum {
   EFI_PXE_BASE_CODE_MTFTP_LAST
 } EFI_PXE_BASE_CODE_TFTP_OPCODE;
 
+///
+/// MTFTP information. This information is required
+/// to start or join a multicast TFTP session. It is also required to
+/// perform the "get file size" and "read directory" operations of MTFTP.
+///
 typedef struct {
   EFI_IP_ADDRESS              MCastIp;
   EFI_PXE_BASE_CODE_UDP_PORT  CPort;
@@ -183,7 +194,7 @@ typedef struct {
 } EFI_PXE_BASE_CODE_MTFTP_INFO;
 
 ///
-/// Packet definitions
+/// DHCPV4 Packet structure
 ///
 typedef struct {
   UINT8   BootpOpcode;
@@ -204,15 +215,16 @@ typedef struct {
   UINT8   DhcpOptions[56];
 } EFI_PXE_BASE_CODE_DHCPV4_PACKET;
 
+///
+/// Packet structure
+///
 typedef union {
   UINT8                           Raw[1472];
   EFI_PXE_BASE_CODE_DHCPV4_PACKET Dhcpv4;
-
-  ///
-  ///  EFI_PXE_BASE_CODE_DHCPV6_PACKET     Dhcpv6;
-  ///
+  //
+  //  EFI_PXE_BASE_CODE_DHCPV6_PACKET     Dhcpv6;
+  //
 } EFI_PXE_BASE_CODE_PACKET;
-
 
 //
 // PXE Base Code Mode structure
@@ -220,6 +232,12 @@ typedef union {
 #define EFI_PXE_BASE_CODE_MAX_ARP_ENTRIES   8
 #define EFI_PXE_BASE_CODE_MAX_ROUTE_ENTRIES 8
 
+///
+/// EFI_PXE_BASE_CODE_MODE
+/// The data values in this structure are read-only and 
+/// are updated by the code that produces the
+/// EFI_PXE_BASE_CODE_PROTOCOL functions.
+///
 typedef struct {
   BOOLEAN                       Started;
   BOOLEAN                       Ipv6Available;

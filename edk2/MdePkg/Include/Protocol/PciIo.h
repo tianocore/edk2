@@ -27,7 +27,9 @@
 typedef struct _EFI_PCI_IO_PROTOCOL  EFI_PCI_IO_PROTOCOL;
 
 ///
-/// Prototypes for the PCI I/O Protocol
+/// *******************************************************
+/// EFI_PCI_IO_PROTOCOL_WIDTH
+/// *******************************************************
 ///
 typedef enum {
   EfiPciIoWidthUint8      = 0,

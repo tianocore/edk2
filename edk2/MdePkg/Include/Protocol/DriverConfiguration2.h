@@ -26,9 +26,25 @@
 typedef struct _EFI_DRIVER_CONFIGURATION2_PROTOCOL  EFI_DRIVER_CONFIGURATION2_PROTOCOL;
 
 typedef enum {
+  ///
+  /// The controller is still in a usable state. No actions
+  /// are required before this controller can be used again.
+  ///
   EfiDriverConfigurationActionNone              = 0,
+  ///
+  /// The driver has detected that the controller is not in a
+  /// usable state, and it needs to be stopped.
+  ///
   EfiDriverConfigurationActionStopController    = 1,
+  ///
+  /// This controller needs to be stopped and restarted
+  /// before it can be used again.
+  ///
   EfiDriverConfigurationActionRestartController = 2,
+  ///
+  /// A configuration change has been made that requires the platform to be restarted before
+  /// the controller can be used again.
+  ///
   EfiDriverConfigurationActionRestartPlatform   = 3,
   EfiDriverConfigurationActionMaximum
 } EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED;

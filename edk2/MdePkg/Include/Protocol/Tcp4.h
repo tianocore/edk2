@@ -92,6 +92,9 @@ typedef struct {
   EFI_TCP4_OPTION         *ControlOption;
 } EFI_TCP4_CONFIG_DATA;
 
+///
+/// TCP4 connnection state
+///
 typedef enum {
   Tcp4StateClosed         = 0,
   Tcp4StateListen         = 1,

@@ -35,6 +35,9 @@ typedef struct _EFI_DEVICE_IO_PROTOCOL EFI_DEVICE_IO_PROTOCOL;
 /// 
 typedef EFI_DEVICE_IO_PROTOCOL  EFI_DEVICE_IO_INTERFACE;
 
+///
+/// Device IO Access Width 
+///
 typedef enum {
   IO_UINT8  = 0,
   IO_UINT16 = 1,

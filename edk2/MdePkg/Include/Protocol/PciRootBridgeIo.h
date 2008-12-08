@@ -26,6 +26,11 @@
 
 typedef struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL;
 
+///
+/// *******************************************************
+/// EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH
+/// *******************************************************
+///
 typedef enum {
   EfiPciWidthUint8,
   EfiPciWidthUint16,
@@ -42,12 +47,41 @@ typedef enum {
   EfiPciWidthMaximum
 } EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH;
 
+///
+/// *******************************************************
+/// EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION
+/// *******************************************************
+///
 typedef enum {
+  ///
+  /// A read operation from system memory by a bus master that is not capable of producing
+  /// PCI dual address cycles.
+  ///
   EfiPciOperationBusMasterRead,
+  ///
+  /// A write operation from system memory by a bus master that is not capable of producing
+  /// PCI dual address cycles.
+  ///
   EfiPciOperationBusMasterWrite,
+  ///
+  /// Provides both read and write access to system memory by both the processor and a bus
+  /// master that is not capable of producing PCI dual address cycles.
+  ///
   EfiPciOperationBusMasterCommonBuffer,
+  ///
+  /// A read operation from system memory by a bus master that is capable of producing PCI
+  /// dual address cycles.
+  ///
   EfiPciOperationBusMasterRead64,
+  ///
+  /// A write operation to system memory by a bus master that is capable of producing PCI
+  /// dual address cycles.
+  ///
   EfiPciOperationBusMasterWrite64,
+  ///
+  /// Provides both read and write access to system memory by both the processor and a bus
+  /// master that is capable of producing PCI dual address cycles.
+  ///
   EfiPciOperationBusMasterCommonBuffer64,
   EfiPciOperationMaximum
 } EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION;
