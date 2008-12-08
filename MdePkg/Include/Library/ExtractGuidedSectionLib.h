@@ -94,7 +94,7 @@ RETURN_STATUS
                             never be set by this handler.
 
   @retval  RETURN_SUCCESS            The buffer specified by InputSection was decoded.
-  @retval  RETURN_UNSPPORTED         The section specified by InputSection does not match the GUID this handler supports.
+  @retval  RETURN_UNSUPPORTED        The section specified by InputSection does not match the GUID this handler supports.
   @retval  RETURN_INVALID_PARAMETER  The section specified by InputSection can not be decoded.
 
 **/
