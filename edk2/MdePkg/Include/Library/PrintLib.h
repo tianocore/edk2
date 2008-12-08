@@ -72,11 +72,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         using this type too by making sure bits 8..15 of the argument are set to 0.
     - x
       - The argument is a hexadecimal number.  The characters used are 0..9 and 
-        A..F.  If the flag ‘L’ is not specified, then the argument is assumed 
+        A..F.  If the flag 'L' is not specified, then the argument is assumed 
         to be an int.  This does not follow ANSI C.
     - X
       - The argument is a hexadecimal number and the number is padded with 
-        zeros.  This is equivalent to a format string of “0x”.  If the flag 
+        zeros.  This is equivalent to a format string of "0X". If the flag 
         'L' is not specified, then the argument is assumed to be an int.  
         This does not follow ANSI C.
     - d
@@ -97,7 +97,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         This does not follow ANSI C.
     - t
       - The argument is a pointer to an EFI_TIME structure.  The time and 
-        date are printed in the format “mm/dd/yyyy  hh:mm”, where mm is the 
+        date are printed in the format "mm/dd/yyyy hh:mm" where mm is the 
         month zero padded, dd is the day zero padded, yyyy is the year zero 
         padded, hh is the hour zero padded, and mm is minutes zero padded.  
         This does not follow ANSI C. 
