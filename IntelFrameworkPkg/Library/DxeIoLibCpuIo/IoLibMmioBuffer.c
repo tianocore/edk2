@@ -10,6 +10,8 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+  Module Name:  IoLibMmioBuffer.c
+
 **/
 
 
@@ -68,6 +70,7 @@ MmioReadBuffer8 (
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   If Length is not aligned on a 16-bit boundary, then ASSERT().
+  
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  StartAddress    Starting address for the MMIO region to be copied from.
@@ -170,6 +173,7 @@ MmioReadBuffer32 (
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   If Length is not aligned on a 64-bit boundary, then ASSERT().
+ 
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  StartAddress    Starting address for the MMIO region to be copied from.
