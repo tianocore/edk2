@@ -248,6 +248,8 @@ IoWrite8 (
   This function must guarantee that all I/O read and write operations are
   serialized.
 
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+ 
   If 16-bit I/O port operations are not supported, then ASSERT().
 
   @param  Port  The I/O port to read.
@@ -274,6 +276,8 @@ IoRead16 (
   Writes the 16-bit I/O port specified by Port with the value specified by Value
   and returns Value. This function must guarantee that all I/O read and write
   operations are serialized.
+
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
 
   If 16-bit I/O port operations are not supported, then ASSERT().
 
@@ -303,6 +307,8 @@ IoWrite16 (
   Reads the 32-bit I/O port specified by Port. The 32-bit read value is returned.
   This function must guarantee that all I/O read and write operations are
   serialized.
+ 
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
 
   If 32-bit I/O port operations are not supported, then ASSERT().
 
@@ -330,6 +336,8 @@ IoRead32 (
   Writes the 32-bit I/O port specified by Port with the value specified by Value
   and returns Value. This function must guarantee that all I/O read and write
   operations are serialized.
+
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
 
   If 32-bit I/O port operations are not supported, then ASSERT().
 
@@ -360,6 +368,8 @@ IoWrite32 (
   This function must guarantee that all I/O read and write operations are
   serialized.
 
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
+
   If 64-bit I/O port operations are not supported, then ASSERT().
 
   @param  Port  The I/O port to read.
@@ -387,6 +397,8 @@ IoRead64 (
   and returns Value. This function must guarantee that all I/O read and write
   operations are serialized.
 
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
+ 
   If 64-bit I/O port operations are not supported, then ASSERT().
 
   @param  Port  The I/O port to write.
@@ -462,6 +474,8 @@ MmioWrite8 (
   returned. This function must guarantee that all MMIO read and write
   operations are serialized.
 
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
+ 
   If 16-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -489,6 +503,8 @@ MmioRead16 (
   by Value and returns Value. This function must guarantee that all MMIO read
   and write operations are serialized.
 
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
+ 
   If 16-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.
@@ -516,6 +532,8 @@ MmioWrite16 (
   returned. This function must guarantee that all MMIO read and write
   operations are serialized.
 
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
+  
   If 32-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -543,6 +561,8 @@ MmioRead32 (
   by Value and returns Value. This function must guarantee that all MMIO read
   and write operations are serialized.
 
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
+ 
   If 32-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.
@@ -570,6 +590,8 @@ MmioWrite32 (
   returned. This function must guarantee that all MMIO read and write
   operations are serialized.
 
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
+ 
   If 64-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -597,6 +619,8 @@ MmioRead64 (
   by Value and returns Value. This function must guarantee that all MMIO read
   and write operations are serialized.
 
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
+ 
   If 64-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.
