@@ -44,6 +44,9 @@ typedef struct {
   UINT16  Handle;
 } SMBIOS_STRUCTURE;
 
+///
+/// String Number for a Null terminated string, 00h stands for no string available.
+///
 typedef UINT8 SMBIOS_TABLE_STRING;
 
 ///
@@ -97,6 +100,9 @@ typedef struct {
   UINT16                ContainedObjectHandles[1];
 } SMBIOS_TABLE_TYPE2;
 
+///
+/// Contained Element record
+///
 typedef struct {
   UINT8                 ContainedElementType;
   UINT8                 ContainedElementMinimum;
@@ -242,6 +248,9 @@ typedef struct {
   UINT8                 DevFuncNum;
 } SMBIOS_TABLE_TYPE9;
 
+///
+/// Device Item Entry
+///
 typedef struct {
   UINT8                 DeviceType;
   SMBIOS_TABLE_STRING   DescriptionString;
@@ -282,6 +291,9 @@ typedef struct {
   SMBIOS_TABLE_STRING   CurrentLanguages;
 } SMBIOS_TABLE_TYPE13;
 
+///
+/// Group Item Entry
+///
 typedef struct {
   UINT8                 ItemType;
   UINT16                ItemHandle;
@@ -296,6 +308,9 @@ typedef struct {
   GROUP_STRUCT          Group[1];
 } SMBIOS_TABLE_TYPE14;
 
+///
+/// Event Log Type Descriptors
+///
 typedef struct {
   UINT8                 LogType;
   UINT8                 DataFormatType;
@@ -603,6 +618,9 @@ typedef struct {
   UINT16                UpperThresholdNonRecoverable;
 } SMBIOS_TABLE_TYPE36;
 
+///
+/// Memory Channel Entry
+///
 typedef struct {
   UINT8                 DeviceLoad;
   UINT16                DeviceHandle;
@@ -653,6 +671,9 @@ typedef struct {
   UINT16                InputCurrentProbeHandle;
 } SMBIOS_TABLE_TYPE39;
 
+///
+/// Additional Information Entry Format 
+///
 typedef struct {                       
   UINT8                   EntryLength; 
   UINT16                  ReferencedHandle;
