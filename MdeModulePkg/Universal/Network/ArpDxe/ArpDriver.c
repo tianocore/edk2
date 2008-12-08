@@ -1,23 +1,16 @@
 /** @file
-
-Copyright (c) 2006 - 2008, Intel Corporation
+  Abstract:
+  
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  ArpDriver.c
-
-Abstract:
-
-
 **/
-
 
 #include "ArpDriver.h"
 #include "ArpImpl.h"
@@ -35,14 +28,14 @@ EFI_DRIVER_BINDING_PROTOCOL gArpDriverBinding = {
 /**
   Create and initialize the arp service context data.
 
-  @param  ImageHandle            The image handle representing the loaded driver
-                                 image.
-  @param  ControllerHandle       The controller handle the driver binds to.
-  @param  ArpService             Pointer to the buffer containing the arp service
-                                 context data.
+  @param[in]  ImageHandle            The image handle representing the loaded driver
+                                     image.
+  @param[in]  ControllerHandle       The controller handle the driver binds to.
+  @param[in]  ArpService             Pointer to the buffer containing the arp service
+                                     context data.
 
-  @retval EFI_SUCCESS            The arp service context is initialized.
-  @retval other                  Failed to initialize the arp service context.
+  @retval EFI_SUCCESS                The arp service context is initialized.
+  @retval other                      Failed to initialize the arp service context.
 
 **/
 EFI_STATUS
@@ -193,8 +186,8 @@ ERROR_EXIT:
 /**
   Clean the arp service context data.
 
-  @param  ArpService             Pointer to the buffer containing the arp service
-                                 context data.
+  @param[in]  ArpService             Pointer to the buffer containing the arp service
+                                     context data.
 
   @return None.
 
@@ -248,18 +241,23 @@ ArpCleanService (
   }
 }
 
-
 /**
   Test to see if this driver supports ControllerHandle.
+  
+  This service is called by the EFI boot service ConnectController(). In
+  order to make drivers as small as possible, there are a few calling
+  restrictions for this service. ConnectController() must
+  follow these calling restrictions. If any other agent wishes to call
+  Supported() it must also follow these calling restrictions.
+  
+  @param[in]  This                   Protocol instance pointer.
+  @param[in]  ControllerHandle       Handle of device to test.
+  @param[in]  RemainingDevicePath    Optional parameter use to pick a specific child
+                                     device to start.
 
-  @param  This                   Protocol instance pointer.
-  @param  ControllerHandle       Handle of device to test.
-  @param  RemainingDevicePath    Optional parameter use to pick a specific child
-                                 device to start.
-
-  @retval EFI_SUCCES             This driver supports this device
-  @retval EFI_ALREADY_STARTED    This driver is already running on this device.
-  @retval other                  This driver does not support this device.
+  @retval EFI_SUCCES                 This driver supports this device
+  @retval EFI_ALREADY_STARTED        This driver is already running on this device.
+  @retval other                      This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -305,15 +303,21 @@ ArpDriverBindingSupported (
 
 /**
   Start this driver on ControllerHandle.
+  
+  This service is called by the EFI boot service ConnectController(). In order to make
+  drivers as small as possible, there are a few calling restrictions for
+  this service. ConnectController() must follow these
+  calling restrictions. If any other agent wishes to call Start() it
+  must also follow these calling restrictions.
 
-  @param  This                   Protocol instance pointer.
-  @param  ControllerHandle       Handle of device to bind driver to
-  @param  RemainingDevicePath    Optional parameter use to pick a specific child
-                                 device to start.
+  @param[in]  This                   Protocol instance pointer.
+  @param[in]  ControllerHandle       Handle of device to bind driver to.
+  @param[in]  RemainingDevicePath    Optional parameter use to pick a specific child
+                                     device to start.
 
-  @retval EFI_SUCCES             This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED    This driver is already running on ControllerHandle
-  @retval other                  This driver does not support this device
+  @retval EFI_SUCCES                 This driver is added to ControllerHandle.
+  @retval EFI_ALREADY_STARTED        This driver is already running on ControllerHandle.
+  @retval other                      This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -380,15 +384,21 @@ ERROR:
 
 /**
   Stop this driver on ControllerHandle.
+  
+  This service is called by the EFI boot service DisconnectController(). In order to
+  make drivers as small as possible, there are a few calling
+  restrictions for this service. DisconnectController()
+  must follow these calling restrictions. If any other agent wishes
+  to call Stop() it must also follow these calling restrictions.
+  
+  @param[in]  This                   Protocol instance pointer.
+  @param[in]  ControllerHandle       Handle of device to stop driver on
+  @param[in]  NumberOfChildren       Number of Handles in ChildHandleBuffer. If number
+                                     of children is zero stop the entire bus driver.
+  @param[in]  ChildHandleBuffer      List of Child Handles to Stop.
 
-  @param  This                   Protocol instance pointer.
-  @param  ControllerHandle       Handle of device to stop driver on
-  @param  NumberOfChildren       Number of Handles in ChildHandleBuffer. If number
-                                 of  children is zero stop the entire bus driver.
-  @param  ChildHandleBuffer      List of Child Handles to Stop.
-
-  @retval EFI_SUCCES             This driver is removed ControllerHandle
-  @retval other                  This driver was not removed from this device
+  @retval EFI_SUCCES                 This driver is removed ControllerHandle
+  @retval other                      This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -468,17 +478,17 @@ ArpDriverBindingStop (
 /**
   Creates a child handle with a set of I/O services.
 
-  @param  This                   Protocol instance pointer.
-  @param  ChildHandle            Pointer to the handle of the child to create. If
-                                 it is NULL, then a new handle is created. If it is
-                                 not NULL, then the I/O services are  added to the
-                                 existing child handle.
+  @param[in]  This                   Protocol instance pointer.
+  @param[in]  ChildHandle            Pointer to the handle of the child to create. If
+                                     it is NULL, then a new handle is created. If it is
+                                     not NULL, then the I/O services are  added to the
+                                     existing child handle.
 
-  @retval EFI_SUCCES             The child handle was created with the I/O
-                                 services.
-  @retval EFI_OUT_OF_RESOURCES   There are not enough resources availabe to create
-                                 the child.
-  @retval other                  The child handle was not created.
+  @retval EFI_SUCCES                 The child handle was created with the I/O
+                                     services.
+  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to create
+                                     the child.
+  @retval other                      The child handle was not created.
 
 **/
 EFI_STATUS
@@ -592,17 +602,17 @@ ERROR:
 /**
   Destroys a child handle with a set of I/O services.
 
-  @param  This                   Protocol instance pointer.
-  @param  ChildHandle            Handle of the child to destroy.
+  @param[in]  This                   Protocol instance pointer.
+  @param[in]  ChildHandle            Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The I/O services were removed from the child
-                                 handle.
-  @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
-                                  that are being removed.
-  @retval EFI_INVALID_PARAMETER  Child handle is not a valid EFI Handle.
-  @retval EFI_ACCESS_DENIED      The child handle could not be destroyed because
-                                 its  I/O services are being used.
-  @retval other                  The child handle was not destroyed.
+  @retval EFI_SUCCES                 The I/O services were removed from the child
+                                     handle.
+  @retval EFI_UNSUPPORTED            The child handle does not support the I/O services
+                                     that are being removed.
+  @retval EFI_INVALID_PARAMETER      Child handle is not a valid EFI Handle.
+  @retval EFI_ACCESS_DENIED          The child handle could not be destroyed because
+                                     its  I/O services are being used.
+  @retval other                      The child handle was not destroyed.
 
 **/
 EFI_STATUS
@@ -708,8 +718,8 @@ ArpServiceBindingDestroyChild (
   The entry point for Arp driver which installs the driver binding and component name
   protocol on its ImageHandle.
 
-  @param  ImageHandle            The image handle of the driver.
-  @param  SystemTable            The system table.
+  @param[in]  ImageHandle        The image handle of the driver.
+  @param[in]  SystemTable        The system table.
 
   @retval EFI_SUCCES             if the driver binding and component name protocols are successfully
   @retval Others                 Failed to install the protocols.
