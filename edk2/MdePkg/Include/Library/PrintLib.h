@@ -76,7 +76,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         to be an int.  This does not follow ANSI C.
     - X
       - The argument is a hexadecimal number and the number is padded with 
-        zeros.  This is equivalent to a format string of "0X". If the flag 
+        zeros.  This is equivalent to a format string of "0x". If the flag 
         'L' is not specified, then the argument is assumed to be an int.  
         This does not follow ANSI C.
     - d
