@@ -255,8 +255,8 @@ typedef struct {
 
 ///
 /// @attention
-/// EFI_IMAGE_NT_HEADERS32 and EFI_IMAGE_HEADERS64 are for use ONLY
-/// by tools.  All proper EFI code MUST use EFI_IMAGE_NT_HEADERS ONLY!!!
+/// EFI_IMAGE_NT_HEADERS32 is for use ONLY by tools.
+/// All proper EFI code MUST use EFI_IMAGE_NT_HEADERS ONLY!!!
 ///
 typedef struct {
   UINT32                      Signature;
@@ -266,6 +266,11 @@ typedef struct {
 
 #define EFI_IMAGE_SIZEOF_NT_OPTIONAL32_HEADER sizeof (EFI_IMAGE_NT_HEADERS32)
 
+///
+/// @attention
+/// EFI_IMAGE_HEADERS64 is for use ONLY by tools.
+/// All proper EFI code MUST use EFI_IMAGE_NT_HEADERS ONLY!!!
+///
 typedef struct {
   UINT32                      Signature;
   EFI_IMAGE_FILE_HEADER       FileHeader;
@@ -346,7 +351,7 @@ typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
 #define EFI_IMAGE_SUBSYSTEM_POSIX_CUI   7
 
 ///
-/// Section header format.
+/// Length of ShortName.
 ///
 #define EFI_IMAGE_SIZEOF_SHORT_NAME 8
 
