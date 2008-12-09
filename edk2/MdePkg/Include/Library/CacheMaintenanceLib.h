@@ -22,9 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Invalidates the entire instruction cache in cache coherency domain of the
   calling CPU.
 
-  Invalidates the entire instruction cache in cache coherency domain of the
-  calling CPU.
-
 **/
 VOID
 EFIAPI
