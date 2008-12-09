@@ -366,7 +366,7 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
   EFI_FILE_HANDLE                   FHandle;
   UINT16                            *FileName;
-  EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *Info;
+  EFI_FILE_SYSTEM_VOLUME_LABEL      *Info;
 
   BOOLEAN                           IsRoot;
   BOOLEAN                           IsDir;
@@ -1281,7 +1281,7 @@ EfiLibOpenRoot (
   @retval                NULL is returned if failed to get Vaolume Label Info.
 
 **/
-EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *
+EFI_FILE_SYSTEM_VOLUME_LABEL *
 EfiLibFileSystemVolumeLabelInfo (
   IN EFI_FILE_HANDLE      FHand
   );

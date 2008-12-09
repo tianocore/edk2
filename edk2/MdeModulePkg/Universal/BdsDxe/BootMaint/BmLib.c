@@ -221,19 +221,19 @@ EfiLibDeleteVariable (
   @retval                NULL is returned if failed to get Vaolume Label Info.
 
 **/
-EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *
+EFI_FILE_SYSTEM_VOLUME_LABEL *
 EfiLibFileSystemVolumeLabelInfo (
   IN EFI_FILE_HANDLE      FHand
   )
 {
   EFI_STATUS                        Status;
-  EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *Buffer;
+  EFI_FILE_SYSTEM_VOLUME_LABEL      *Buffer;
   UINTN                             BufferSize;
   //
   // Initialize for GrowBuffer loop
   //
   Buffer      = NULL;
-  BufferSize  = SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL_INFO + 200;
+  BufferSize  = SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL + 200;
 
   //
   // Call the real function
