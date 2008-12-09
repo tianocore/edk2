@@ -60,7 +60,7 @@ IsNvNeed (
                                    from the console variable ConVarName, this
                                    parameter can not be multi-instance.
 
-  @retval EFI_UNSUPPORTED          Add or remove the same device path.
+  @retval EFI_UNSUPPORTED          The added device path is same to the removed one.
   @retval EFI_SUCCESS              Success add or remove the device path from  the
                                    console variable.
 
@@ -184,7 +184,6 @@ BdsLibUpdateConsoleVariable (
   @param  ConVarName               Console related variable name, ConIn, ConOut,
                                    ErrOut.
 
-  @retval EFI_UNSUPPORTED          Request console variable does not exist.
   @retval EFI_NOT_FOUND            There is not any console devices connected
                                    success
   @retval EFI_SUCCESS              Success connect any one instance of the console
@@ -359,8 +358,7 @@ BdsLibConnectAllConsoles (
 
   @retval EFI_SUCCESS              At least one of the ConIn and ConOut device have
                                    been connected success.
-  @retval EFI_STATUS               Return the status of
-                                   BdsLibConnectConsoleVariable ().
+  @retval EFI_STATUS               Return the status of BdsLibConnectConsoleVariable ().
 
 **/
 EFI_STATUS
@@ -597,7 +595,7 @@ ConvertBmpToGopBlt (
   @param  Password        Password used to lock ConIn device.
 
   @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
-  @retval EFI_UNSUPPORTED Password not found.
+  @retval EFI_UNSUPPORTED Password not found
 
 **/
 EFI_STATUS
@@ -621,21 +619,18 @@ LockKeyboards (
 
 /**
   Use Console Control to turn off UGA based Simple Text Out consoles from going
-  to the UGA device. Put up LogoFile on every UGA device that is a console.
+  to the UGA device. Put up LogoFile on every UGA device that is a console
 
-  @param  LogoFile        File name of logo to display on the center of the screen.
+  @param[in]  LogoFile   File name of logo to display on the center of the screen.
 
   @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo displayed.
-  @retval EFI_UNSUPPORTED Logo not found.
-                          Fail to locate ConsoleControl protocol.
-                          Fail to get UgaDraw or Gop handle.
-                          Fail to switch grahic mode.
+  @retval EFI_UNSUPPORTED Logo not found
 
 **/
 EFI_STATUS
 EFIAPI
 EnableQuietBoot (
-  IN  EFI_GUID  *LogoFile   OPTIONAL
+  IN  EFI_GUID  *LogoFile
   )
 {
   EFI_STATUS                    Status;
@@ -877,8 +872,7 @@ EnableQuietBoot (
   Use Console Control to turn on UGA based Simple Text Out consoles. The UGA 
   Simple Text Out screens will now be synced up with all non UGA output devices
 
-  @retval EFI_SUCCESS          UGA devices are back in text mode and synced up.
-  @retval EFI_UNSUPPORTED      Fail to locate ConsoleControl Protocol.
+  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
 
 **/
 EFI_STATUS

@@ -72,17 +72,17 @@ BdsLibDoLegacyBoot (
 
 
 /**
-  Process the boot option follow the EFI 1.1 specification and
+  Process the boot option follow the UEFI specification and
   special treat the legacy boot option with BBS_DEVICE_PATH.
 
   @param  Option                 The boot option need to be processed
   @param  DevicePath             The device path which describe where to load the
                                  boot image or the legcy BBS device path to boot
                                  the legacy OS
-  @param  ExitDataSize           Returned directly from gBS->StartImage ()
-  @param  ExitData               Returned directly from gBS->StartImage ()
+  @param  ExitDataSize           The size of exit data.
+  @param  ExitData               Data returned when Boot image failed.
 
-  @retval EFI_SUCCESS            Status from gBS->StartImage ()
+  @retval EFI_SUCCESS            Boot from the input boot option successfully.
   @retval EFI_NOT_FOUND          If the Device Path is not found in the system
 
 **/
@@ -510,8 +510,8 @@ BdsExpandPartitionPartialDevicePathToFull (
   @param  HardDriveDevicePath    A device path which starts with a hard drive media
                                  device path.
 
-  @retval TRUE                   There is a matched device path instance FALSE
-  @retval FALSE                  There is no matched device path instance
+  @retval TRUE                   There is a matched device path instance.
+  @retval FALSE                  There is no matched device path instance.
 
 **/
 BOOLEAN
@@ -1114,13 +1114,13 @@ BdsLibEnumerateAllBootOption (
 }
 
 /**
-  Build the boot option with the handle parsed in.
+  Build the boot option with the handle parsed in
 
   @param  Handle                 The handle which present the device path to create
                                  boot option
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
-  @param  String                 Boot option name.
+  @param  String                 The description of the boot option.
 
 **/
 VOID
@@ -1178,7 +1178,7 @@ BdsLibBuildOptionFromShell (
 }
 
 /**
-  Boot from the EFI1.1 spec defined "BootNext" variable
+  Boot from the UEFI spec defined "BootNext" variable.
 
 **/
 VOID
@@ -1238,7 +1238,6 @@ BdsLibBootNext (
 
   @param  DevicePath             Device Path to a  bootable device
 
-  @retval NULL                   The device path points to an EFI bootable Media
   @retval NULL                   The media on the DevicePath is not bootable
 
 **/
@@ -1558,11 +1557,11 @@ BdsGetBootTypeFromDevicePath (
   Check whether the Device path in a boot option point to a valide bootable device,
   And if CheckMedia is true, check the device is ready to boot now.
 
-  @param DevPath        the Device path in a boot option
-  @param CheckMedia     if true, check the device is ready to boot now.
+  @param  DevPath     the Device path in a boot option
+  @param  CheckMedia  if true, check the device is ready to boot now.
 
-  @retval TRUE          the Device path  is valide
-  @retval FALSE         the Device path  is invalide .
+  @retval TRUE        the Device path  is valide
+  @retval FALSE       the Device path  is invalide .
 
 **/
 BOOLEAN
@@ -1729,7 +1728,7 @@ EFI_STATUS
 EFIAPI
 BdsLibUpdateFvFileDevicePath (
   IN  OUT EFI_DEVICE_PATH_PROTOCOL      ** DevicePath,
-  IN      EFI_GUID                      *FileGuid
+  IN  EFI_GUID                          *FileGuid
   )
 {
   EFI_DEVICE_PATH_PROTOCOL      *TempDevicePath;

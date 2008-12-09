@@ -19,15 +19,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Concatenates a formatted unicode string to allocated pool.
   The caller must free the resulting buffer.
 
-  @param  Str      Tracks the allocated pool, size in use, and  amount of pool
-                   allocated.
+  @param  Str      Tracks the allocated pool, size in use, and amount of pool allocated.
   @param  fmt      The format string
-
-  @param  ...      Variable argument list.
+  @param  ...      The data will be printed.
 
   @return Allocated buffer with the formatted string printed in it.
-          The caller must free the allocated buffer.   The buffer
-          allocation is not packed.
+          The caller must free the allocated buffer.
+          The buffer allocation is not packed.
 
 **/
 CHAR16 *
@@ -172,13 +170,10 @@ DevPathController (
 
 
 /**
-  Convert Device Path to a Unicode string for printing.
+  Convert Vendor device path to device name.
 
-  @param Str             The buffer holding the output string.
-                         This buffer contains the length of the
-                         string and the maixmum length reserved
-                         for the string buffer.
-  @param DevPath         The device path.
+  @param  Str      The buffer store device name
+  @param  DevPath  Pointer to vendor device path
 
 **/
 VOID
