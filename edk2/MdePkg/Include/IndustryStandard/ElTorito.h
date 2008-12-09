@@ -67,6 +67,9 @@ typedef union {
     CHAR8   Reserved[82];
   } Unknown;
 
+  ///
+  /// Boot Record Volume Descriptor, defined in "El Torito" Specification.
+  ///
   struct {
     UINT8   Type;            ///< Must be 0
     CHAR8   Id[5];           ///< "CD001" 
@@ -76,7 +79,10 @@ typedef union {
     UINT8   EltCatalog[4];   ///< Absolute pointer to first sector of Boot Catalog
     CHAR8   Unused2[13];     ///< Must be 0
   } BootRecordVolume;
-
+ 
+  ///
+  /// Primary Volumn Descriptor, defined in ISO 9660.
+  ///
   struct {
     UINT8   Type; 
     CHAR8   Id[5];           ///< "CD001"
@@ -102,7 +108,7 @@ typedef union {
   /// Catalog validation entry (Catalog header)
   ///
   struct {
-    UINT8   Indicator;
+    UINT8   Indicator;       ///< Must be 01
     UINT8   PlatformId;
     UINT16  Reserved;
     CHAR8   ManufacId[24];
@@ -114,12 +120,12 @@ typedef union {
   /// Initial/Default Entry or Section Entry
   ///
   struct {
-    UINT8   Indicator;
+    UINT8   Indicator;       ///< 88 = Bootable, 00 = Not Bootable
     UINT8   MediaType : 4;
-    UINT8   Reserved1 : 4;
+    UINT8   Reserved1 : 4;   ///< Must be 0
     UINT16  LoadSegment;
     UINT8   SystemType;
-    UINT8   Reserved2;
+    UINT8   Reserved2;       ///< Must be 0
     UINT16  SectorCount;
     UINT32  Lba;
   } Boot;
@@ -128,9 +134,9 @@ typedef union {
   /// Section Header Entry
   ///
   struct {
-    UINT8   Indicator;
+    UINT8   Indicator;       ///< 90 - Header, more header follw, 91 - Final Header
     UINT8   PlatformId;
-    UINT16  SectionEntries;
+    UINT16  SectionEntries;  ///< Number of section entries following this header
     CHAR8   Id[28];
   } Section;
 
