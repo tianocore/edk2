@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, and CPU architecture specific functions.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1626,7 +1626,7 @@ LRotU32 (
   @param  Operand The 32-bit operand to rotate right.
   @param  Count   The number of bits to rotate right.
 
-  @return Operand >>> Count
+  @return Operand >> Count
 
 **/
 UINT32
@@ -1894,8 +1894,6 @@ MultU64x32 (
   This function multiples the 64-bit unsigned value Multiplicand by the 64-bit
   unsigned value Multiplier and generates a 64-bit unsigned result. This 64-
   bit unsigned result is returned.
-
-  If the result overflows, then ASSERT().
 
   @param  Multiplicand  A 64-bit unsigned value.
   @param  Multiplier    A 64-bit unsigned value.
@@ -3616,6 +3614,7 @@ EFIAPI
 CpuDeadLoop (
   VOID
   );
+ 
 #if defined (MDE_CPU_IPF)
 
 /**
@@ -3745,6 +3744,8 @@ AsmWritePsr (
 
 /**
   Reads the current value of 64-bit Kernel Register #0 (KR0).
+  
+  Reads and returns the current value of KR0. 
   This function is only available on IPF.
 
   @return The current value of KR0.
@@ -3759,6 +3760,8 @@ AsmReadKr0 (
 
 /**
   Reads the current value of 64-bit Kernel Register #1 (KR1).
+
+  Reads and returns the current value of KR1. 
   This function is only available on IPF.
 
   @return The current value of KR1.
@@ -3773,6 +3776,8 @@ AsmReadKr1 (
 
 /**
   Reads the current value of 64-bit Kernel Register #2 (KR2).
+
+  Reads and returns the current value of KR2. 
   This function is only available on IPF.
 
   @return The current value of KR2.
@@ -3787,6 +3792,8 @@ AsmReadKr2 (
 
 /**
   Reads the current value of 64-bit Kernel Register #3 (KR3).
+
+  Reads and returns the current value of KR3. 
   This function is only available on IPF.
 
   @return The current value of KR3.
@@ -3801,8 +3808,10 @@ AsmReadKr3 (
 
 /**
   Reads the current value of 64-bit Kernel Register #4 (KR4).
-  This function is only available on IPF.
 
+  Reads and returns the current value of KR4. 
+  This function is only available on IPF.
+  
   @return The current value of KR4.
 
 **/
@@ -3815,6 +3824,8 @@ AsmReadKr4 (
 
 /**
   Reads the current value of 64-bit Kernel Register #5 (KR5).
+
+  Reads and returns the current value of KR5. 
   This function is only available on IPF.
 
   @return The current value of KR5.
@@ -3829,6 +3840,8 @@ AsmReadKr5 (
 
 /**
   Reads the current value of 64-bit Kernel Register #6 (KR6).
+
+  Reads and returns the current value of KR6. 
   This function is only available on IPF.
 
   @return The current value of KR6.
@@ -3843,6 +3856,8 @@ AsmReadKr6 (
 
 /**
   Reads the current value of 64-bit Kernel Register #7 (KR7).
+
+  Reads and returns the current value of KR7. 
   This function is only available on IPF.
 
   @return The current value of KR7.
@@ -3857,7 +3872,9 @@ AsmReadKr7 (
 
 /**
   Write the current value of 64-bit Kernel Register #0 (KR0).
-  This function is only available on IPF.
+  
+  Writes the current value of KR0.  The 64-bit value written to 
+  the KR0 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR0.
 
@@ -3873,7 +3890,9 @@ AsmWriteKr0 (
 
 /**
   Write the current value of 64-bit Kernel Register #1 (KR1).
-  This function is only available on IPF.
+
+  Writes the current value of KR1.  The 64-bit value written to 
+  the KR1 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR1.
 
@@ -3889,7 +3908,9 @@ AsmWriteKr1 (
 
 /**
   Write the current value of 64-bit Kernel Register #2 (KR2).
-  This function is only available on IPF.
+
+  Writes the current value of KR2.  The 64-bit value written to 
+  the KR2 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR2.
 
@@ -3905,7 +3926,9 @@ AsmWriteKr2 (
 
 /**
   Write the current value of 64-bit Kernel Register #3 (KR3).
-  This function is only available on IPF.
+
+  Writes the current value of KR3.  The 64-bit value written to 
+  the KR3 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR3.
 
@@ -3921,7 +3944,9 @@ AsmWriteKr3 (
 
 /**
   Write the current value of 64-bit Kernel Register #4 (KR4).
-  This function is only available on IPF.
+
+  Writes the current value of KR4.  The 64-bit value written to 
+  the KR4 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR4.
 
@@ -3937,7 +3962,9 @@ AsmWriteKr4 (
 
 /**
   Write the current value of 64-bit Kernel Register #5 (KR5).
-  This function is only available on IPF.
+
+  Writes the current value of KR5.  The 64-bit value written to 
+  the KR5 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR5.
 
@@ -3953,7 +3980,9 @@ AsmWriteKr5 (
 
 /**
   Write the current value of 64-bit Kernel Register #6 (KR6).
-  This function is only available on IPF.
+
+  Writes the current value of KR6.  The 64-bit value written to 
+  the KR6 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR6.
 
@@ -3969,7 +3998,9 @@ AsmWriteKr6 (
 
 /**
   Write the current value of 64-bit Kernel Register #7 (KR7).
-  This function is only available on IPF.
+
+  Writes the current value of KR7.  The 64-bit value written to 
+  the KR7 is returned. This function is only available on IPF.
 
   @param  Value   The 64-bit value to write to KR7.
 
@@ -3985,6 +4016,8 @@ AsmWriteKr7 (
 
 /**
   Reads the current value of Interval Timer Counter Register (ITC).
+  
+  Reads and returns the current value of ITC.
   This function is only available on IPF.
 
   @return The current value of ITC.
@@ -3999,6 +4032,8 @@ AsmReadItc (
 
 /**
   Reads the current value of Interval Timer Vector Register (ITV).
+  
+  Reads and returns the current value of ITV. 
   This function is only available on IPF.
 
   @return The current value of ITV.
@@ -4013,6 +4048,8 @@ AsmReadItv (
 
 /**
   Reads the current value of Interval Timer Match Register (ITM).
+  
+  Reads and returns the current value of ITM.
   This function is only available on IPF.
 
   @return The current value of ITM.
@@ -4026,6 +4063,8 @@ AsmReadItm (
 
 /**
   Writes the current value of 64-bit Interval Timer Counter Register (ITC).
+  
+  Writes the current value of ITC.  The 64-bit value written to the ITC is returned. 
   This function is only available on IPF.
 
   @param Value    The 64-bit value to write to ITC.
@@ -4042,6 +4081,8 @@ AsmWriteItc (
 
 /**
   Writes the current value of 64-bit Interval Timer Match Register (ITM).
+  
+  Writes the current value of ITM.  The 64-bit value written to the ITM is returned. 
   This function is only available on IPF.
 
   @param Value    The 64-bit value to write to ITM.
@@ -4058,6 +4099,8 @@ AsmWriteItm (
 
 /**
   Writes the current value of 64-bit Interval Timer Vector Register (ITV).
+  
+  Writes the current value of ITV.  The 64-bit value written to the ITV is returned.  
   No parameter checking is performed on Value.  All bits of Value corresponding to
   reserved fields of ITV must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4078,7 +4121,8 @@ AsmWriteItv (
 
 /**
   Reads the current value of Default Control Register (DCR).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of DCR.  This function is only available on IPF.
 
   @return The current value of DCR.
 
@@ -4092,7 +4136,8 @@ AsmReadDcr (
 
 /**
   Reads the current value of Interruption Vector Address Register (IVA).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of IVA.  This function is only available on IPF.
 
   @return The current value of IVA.
 **/
@@ -4105,7 +4150,8 @@ AsmReadIva (
 
 /**
   Reads the current value of Page Table Address Register (PTA).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of PTA.  This function is only available on IPF.
 
   @return The current value of PTA.
 
@@ -4119,6 +4165,8 @@ AsmReadPta (
 
 /**
   Writes the current value of 64-bit Default Control Register (DCR).
+  
+  Writes the current value of DCR.  The 64-bit value written to the DCR is returned. 
   No parameter checking is performed on Value.  All bits of Value corresponding to
   reserved fields of DCR must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4139,6 +4187,8 @@ AsmWriteDcr (
 
 /**
   Writes the current value of 64-bit Interruption Vector Address Register (IVA).
+  
+  Writes the current value of IVA.  The 64-bit value written to the IVA is returned.  
   The size of vector table is 32 K bytes and is 32 K bytes aligned
   the low 15 bits of Value is ignored when written.
   This function is only available on IPF.
@@ -4157,6 +4207,8 @@ AsmWriteIva (
 
 /**
   Writes the current value of 64-bit Page Table Address Register (PTA).
+  
+  Writes the current value of PTA.  The 64-bit value written to the PTA is returned. 
   No parameter checking is performed on Value.  All bits of Value corresponding to
   reserved fields of DCR must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4176,7 +4228,8 @@ AsmWritePta (
 
 /**
   Reads the current value of Local Interrupt ID Register (LID).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of LID.  This function is only available on IPF.
 
   @return The current value of LID.
 
@@ -4190,7 +4243,8 @@ AsmReadLid (
 
 /**
   Reads the current value of External Interrupt Vector Register (IVR).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of IVR.  This function is only available on IPF. 
 
   @return The current value of IVR.
 
@@ -4204,7 +4258,8 @@ AsmReadIvr (
 
 /**
   Reads the current value of Task Priority Register (TPR).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of TPR.  This function is only available on IPF. 
 
   @return The current value of TPR.
 
@@ -4218,7 +4273,8 @@ AsmReadTpr (
 
 /**
   Reads the current value of External Interrupt Request Register #0 (IRR0).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of IRR0.  This function is only available on IPF.  
 
   @return The current value of IRR0.
 
@@ -4232,7 +4288,8 @@ AsmReadIrr0 (
 
 /**
   Reads the current value of External Interrupt Request Register #1 (IRR1).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of IRR1.  This function is only available on IPF. 
 
   @return The current value of IRR1.
 
@@ -4246,7 +4303,8 @@ AsmReadIrr1 (
 
 /**
   Reads the current value of External Interrupt Request Register #2 (IRR2).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of IRR2.  This function is only available on IPF.
 
   @return The current value of IRR2.
 
@@ -4260,7 +4318,8 @@ AsmReadIrr2 (
 
 /**
   Reads the current value of External Interrupt Request Register #3 (IRR3).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of IRR3.  This function is only available on IPF.  
 
   @return The current value of IRR3.
 
@@ -4274,7 +4333,8 @@ AsmReadIrr3 (
 
 /**
   Reads the current value of Performance Monitor Vector Register (PMV).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of PMV.  This function is only available on IPF. 
 
   @return The current value of PMV.
 
@@ -4288,7 +4348,8 @@ AsmReadPmv (
 
 /**
   Reads the current value of Corrected Machine Check Vector Register (CMCV).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of CMCV.  This function is only available on IPF.
 
   @return The current value of CMCV.
 
@@ -4302,7 +4363,8 @@ AsmReadCmcv (
 
 /**
   Reads the current value of Local Redirection Register #0 (LRR0).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of LRR0.  This function is only available on IPF. 
 
   @return The current value of LRR0.
 
@@ -4316,7 +4378,8 @@ AsmReadLrr0 (
 
 /**
   Reads the current value of Local Redirection Register #1 (LRR1).
-  This function is only available on IPF.
+  
+  Reads and returns the current value of LRR1.  This function is only available on IPF.
 
   @return The current value of LRR1.
 
@@ -4330,6 +4393,8 @@ AsmReadLrr1 (
 
 /**
   Writes the current value of 64-bit Page Local Interrupt ID Register (LID).
+  
+  Writes the current value of LID.  The 64-bit value written to the LID is returned.  
   No parameter checking is performed on Value.  All bits of Value corresponding to
   reserved fields of LID must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4350,6 +4415,8 @@ AsmWriteLid (
 
 /**
   Writes the current value of 64-bit Task Priority Register (TPR).
+  
+  Writes the current value of TPR.  The 64-bit value written to the TPR is returned. 
   No parameter checking is performed on Value.  All bits of Value corresponding to
   reserved fields of TPR must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4370,6 +4437,7 @@ AsmWriteTpr (
 
 /**
   Performs a write operation on End OF External Interrupt Register (EOI).
+  
   Writes a value of 0 to the EOI Register.  This function is only available on IPF.
 
 **/
@@ -4382,6 +4450,8 @@ AsmWriteEoi (
 
 /**
   Writes the current value of 64-bit Performance Monitor Vector Register (PMV).
+  
+  Writes the current value of PMV.  The 64-bit value written to the PMV is returned.  
   No parameter checking is performed on Value.  All bits of Value corresponding
   to reserved fields of PMV must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4402,6 +4472,8 @@ AsmWritePmv (
 
 /**
   Writes the current value of 64-bit Corrected Machine Check Vector Register (CMCV).
+  
+  Writes the current value of CMCV.  The 64-bit value written to the CMCV is returned. 
   No parameter checking is performed on Value.  All bits of Value corresponding
   to reserved fields of CMCV must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4422,6 +4494,8 @@ AsmWriteCmcv (
 
 /**
   Writes the current value of 64-bit Local Redirection Register #0 (LRR0).
+  
+  Writes the current value of LRR0.  The 64-bit value written to the LRR0 is returned.  
   No parameter checking is performed on Value.  All bits of Value corresponding
   to reserved fields of LRR0 must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
@@ -4442,6 +4516,8 @@ AsmWriteLrr0 (
 
 /**
   Writes the current value of 64-bit Local Redirection Register #1 (LRR1).
+  
+  Writes the current value of LRR1.  The 64-bit value written to the LRR1 is returned. 
   No parameter checking is performed on Value.  All bits of Value corresponding
   to reserved fields of LRR1 must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must
@@ -4525,8 +4601,8 @@ AsmReadDbr (
 
   @param Index    The 8-bit Performance Monitor Configuration Register index to read.
 
-  @return The current value of Performance Monitor Configuration Register
-  specified by Index.
+  @return   The current value of Performance Monitor Configuration Register
+            specified by Index.
 
 **/
 UINT64
@@ -5159,7 +5235,7 @@ typedef struct {
   @param  Edx   Pointer to the 32-bit EDX value returned by the CPUID
                 instruction. This is an optional parameter that may be NULL.
 
-  @return Index
+  @return Index.
 
 **/
 UINT32
@@ -5202,7 +5278,7 @@ AsmCpuid (
                     instruction. This is an optional parameter that may be
                     NULL.
 
-  @return Index
+  @return Index.
 
 **/
 UINT32
@@ -5410,7 +5486,7 @@ AsmMsrBitFieldRead32 (
 /**
   Writes a bit field to an MSR.
 
-  Writes Value to a bit field in the lower 32-bits of a  64-bit MSR. The bit
+  Writes Value to a bit field in the lower 32-bits of a 64-bit MSR. The bit
   field is specified by the StartBit and the EndBit. All other bits in the
   destination MSR are preserved. The lower 32-bits of the MSR written is
   returned. The caller must either guarantee that Index and the data written 

@@ -41,7 +41,7 @@
                         instruction. This is an optional parameter that may be
                         NULL.
 
-  @return Index
+  @return Index.
 
 **/
 UINT32

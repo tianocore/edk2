@@ -603,7 +603,7 @@ InternalIsHexaDecimalDigitCharacter (
   of the Unicode string specified by String as a decimal number. The format
   of the input Unicode string String is:
 
-                    [spaces] [decimal digits].
+                  [spaces] [decimal digits].
 
   The valid decimal digit character is in the range [0-9]. The
   function will ignore the pad space, which includes spaces or
@@ -685,7 +685,7 @@ StrDecimalToUintn (
   of the Unicode string specified by String as a decimal number. The format
   of the input Unicode string String is:
 
-                   [spaces] [decimal digits].
+                  [spaces] [decimal digits].
 
   The valid decimal digit character is in the range [0-9]. The
   function will ignore the pad space, which includes spaces or
