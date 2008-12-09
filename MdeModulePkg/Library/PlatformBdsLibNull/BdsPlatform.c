@@ -18,13 +18,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // BDS Platform Functions
 //
 /**
-  Platform Bds init. Include the platform firmware vendor, revision
+  Platform Bds init. Incude the platform firmware vendor, revision
   and so crc check.
 
   @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
 
 **/
 VOID
+EFIAPI
 PlatformBdsInit (
   IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData
   )
@@ -101,17 +102,17 @@ PlatformBdsDiagnostics (
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 
-
-  @param PrivateData        The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
-  @param DriverOptionList   The header of the driver option link list
-  @param BootOptionList     The header of the boot option link list
+  @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
+  @param  DriverOptionList        The header of the driver option link list
+  @param  BootOptionList          The header of the boot option link list
 
 **/
 VOID
+EFIAPI
 PlatformBdsPolicyBehavior (
   IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData,
-  IN OUT LIST_ENTRY                  *DriverOptionList,
-  IN OUT LIST_ENTRY                  *BootOptionList
+  IN LIST_ENTRY                      *DriverOptionList,
+  IN LIST_ENTRY                      *BootOptionList
   )
 {
   return ;
@@ -119,16 +120,17 @@ PlatformBdsPolicyBehavior (
 
 /**
   Hook point after a boot attempt succeeds. We don't expect a boot option to
-  return, so the EFI 1.0 specification defines that you will default to an
+  return, so the UEFI 2.0 specification defines that you will default to an
   interactive mode and stop processing the BootOrder list in this case. This
   is alos a platform implementation and can be customized by IBV/OEM.
 
-  @param Option           Pointer to Boot Option that succeeded to boot.
+  @param  Option                  Pointer to Boot Option that succeeded to boot.
 
 **/
 VOID
+EFIAPI
 PlatformBdsBootSuccess (
-  IN  BDS_COMMON_OPTION   *Option
+  IN  BDS_COMMON_OPTION *Option
   )
 {
   return;
@@ -137,13 +139,14 @@ PlatformBdsBootSuccess (
 /**
   Hook point after a boot attempt fails.
 
-  @param Option           Pointer to Boot Option that failed to boot.
-  @param Status           Status returned from failed boot.
-  @param ExitData         Exit data returned from failed boot.
-  @param ExitDataSize     Exit data size returned from failed boot.
+  @param  Option                  Pointer to Boot Option that failed to boot.
+  @param  Status                  Status returned from failed boot.
+  @param  ExitData                Exit data returned from failed boot.
+  @param  ExitDataSize            Exit data size returned from failed boot.
 
 **/
 VOID
+EFIAPI
 PlatformBdsBootFail (
   IN  BDS_COMMON_OPTION  *Option,
   IN  EFI_STATUS         Status,
