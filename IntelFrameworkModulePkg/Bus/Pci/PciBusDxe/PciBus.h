@@ -291,4 +291,6 @@ PciBusDriverBindingStop (
   IN  EFI_HANDLE                    *ChildHandleBuffer
   );
 
+#define IS_PCI_GFX(_p)     IS_CLASS2 (_p, PCI_CLASS_DISPLAY, PCI_CLASS_DISPLAY_OTHER)
+
 #endif
