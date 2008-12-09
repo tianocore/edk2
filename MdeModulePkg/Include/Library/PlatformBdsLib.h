@@ -48,7 +48,7 @@ struct _EFI_BDS_ARCH_PROTOCOL_INSTANCE {
 };
 
 /**
-  Platform Bds init. Incude the platform firmware vendor, revision
+  Platform Bds init. Include the platform firmware vendor, revision
   and so crc check.
 
   @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
