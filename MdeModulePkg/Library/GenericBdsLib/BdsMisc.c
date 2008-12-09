@@ -631,8 +631,8 @@ BdsLibGetBootMode (
   @param  VendorGuid            GUID part of EFI variable name
   @param  VariableSize          Returns the size of the EFI variable that was read
 
-  @return Dynamically allocated memory that contains a copy of the EFI variable.
-  @return Caller is responsible freeing the buffer.
+  @return                       Dynamically allocated memory that contains a copy of the EFI variable
+                                Caller is responsible freeing the buffer.
   @retval NULL                  Variable was not read
 
 **/
@@ -745,8 +745,8 @@ BdsLibDelPartMatchInstance (
   @param  Single                A pointer to a single-instance device path data
                                 structure.
 
-  @retval TRUE                  If the Single is contained within Multi
-  @retval FALSE                 The Single is not match within Multi
+  @retval TRUE                  If the Single device path is contained within Multi device path.
+  @retval FALSE                 The Single device path is not match within Multi device path.
 
 **/
 BOOLEAN
@@ -976,12 +976,12 @@ SetupResetReminder (
 }
 
 /**
-  Get the headers (dos, image, optional header) from an image.
+  Get the headers (dos, image, optional header) from an image
 
   @param  Device                SimpleFileSystem device handle
   @param  FileName              File name for the image
   @param  DosHeader             Pointer to dos header
-  @param  Hdr                   Pointer to optional header
+  @param  Hdr                   The buffer in which to return the PE32, PE32+, or TE header.
 
   @retval EFI_SUCCESS           Successfully get the machine type.
   @retval EFI_NOT_FOUND         The file is not found.
@@ -1229,8 +1229,8 @@ BdsSetMemoryTypeInformationVariable (
 }
 
 /**
-  This routine register a function to adjust the different type memory page number just before booting
-  and save the updated info into the variable for next boot to use.
+  This routine register a function to adjust the different type memory page number
+  just before booting and save the updated info into the variable for next boot to use.
 
 **/
 VOID
