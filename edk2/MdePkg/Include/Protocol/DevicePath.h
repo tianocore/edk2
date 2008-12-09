@@ -839,7 +839,7 @@ typedef struct {
 //
 // Use VENDOR_DEVICE_PATH struct
 //
-#define MEDIA_VENDOR_DP           0x03  /// Media vendor device path subtype
+#define MEDIA_VENDOR_DP           0x03  ///< Media vendor device path subtype
 
 ///
 /// File Path Media Device Path SubType

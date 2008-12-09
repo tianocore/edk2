@@ -33,8 +33,8 @@ typedef struct _EFI_USB2_HC_PROTOCOL EFI_USB2_HC_PROTOCOL;
 
 
 typedef struct {
-  UINT16          PortStatus;        /// Contains current port status bitmap.
-  UINT16          PortChangeStatus;  /// Contains current port status change bitmap.
+  UINT16          PortStatus;        ///< Contains current port status bitmap.
+  UINT16          PortChangeStatus;  ///< Contains current port status change bitmap.
 } EFI_USB_PORT_STATUS;
 
 ///
@@ -78,13 +78,13 @@ typedef enum {
   EfiUsbPortResetChange       = 20
 } EFI_USB_PORT_FEATURE;
 
-#define EFI_USB_SPEED_FULL      0x0000  /// 12 Mb/s, USB 1.1 OHCI and UHCI HC.
-#define EFI_USB_SPEED_LOW       0x0001  /// 1 Mb/s, USB 1.1 OHCI and UHCI HC.
-#define EFI_USB_SPEED_HIGH      0x0002  /// 480 Mb/s, USB 2.0 EHCI HC.
+#define EFI_USB_SPEED_FULL      0x0000  ///< 12 Mb/s, USB 1.1 OHCI and UHCI HC.
+#define EFI_USB_SPEED_LOW       0x0001  ///< 1 Mb/s, USB 1.1 OHCI and UHCI HC.
+#define EFI_USB_SPEED_HIGH      0x0002  ///< 480 Mb/s, USB 2.0 EHCI HC.
 
 typedef struct {
-  UINT8      TranslatorHubAddress; /// device address
-  UINT8      TranslatorPortNumber; /// the port number of the hub that device is connected to.
+  UINT8      TranslatorHubAddress; ///< device address
+  UINT8      TranslatorPortNumber; ///< the port number of the hub that device is connected to.
 } EFI_USB2_HC_TRANSACTION_TRANSLATOR;
 
 //

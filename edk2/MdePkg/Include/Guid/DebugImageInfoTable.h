@@ -34,9 +34,9 @@
 #define EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL        0x01
 
 typedef struct {
-  UINT64                Signature;          /// A constant UINT64 that has the value EFI_SYSTEM_TABLE_SIGNATURE
-  EFI_PHYSICAL_ADDRESS  EfiSystemTableBase; /// The physical address of the EFI system table. 
-  UINT32                Crc32;              /// A 32-bit CRC value that is used to verify the EFI_SYSTEM_TABLE_POINTER structure is valid.
+  UINT64                Signature;          ///< A constant UINT64 that has the value EFI_SYSTEM_TABLE_SIGNATURE
+  EFI_PHYSICAL_ADDRESS  EfiSystemTableBase; ///< The physical address of the EFI system table. 
+  UINT32                Crc32;              ///< A 32-bit CRC value that is used to verify the EFI_SYSTEM_TABLE_POINTER structure is valid.
 } EFI_SYSTEM_TABLE_POINTER;
 
 typedef struct {

@@ -31,15 +31,58 @@
 typedef struct _EFI_MANAGED_NETWORK_PROTOCOL EFI_MANAGED_NETWORK_PROTOCOL;
 
 typedef struct {
+  ///
+  /// Timeout value for a UEFI one-shot timer event. A packet that has not been removed
+  /// from the MNP receive queue will be dropped if its receive timeout expires.
+  ///
   UINT32     ReceivedQueueTimeoutValue;
+  ///
+  /// Timeout value for a UEFI one-shot timer event. A packet that has not been removed
+  /// from the MNP transmit queue will be dropped if its receive timeout expires.
+  ///
   UINT32     TransmitQueueTimeoutValue;
+  ///
+  /// Ethernet type II 16-bit protocol type in host byte order. Valid
+  /// values are zero and 1,500 to 65,535.
+  ///
   UINT16     ProtocolTypeFilter;
+  ///
+  /// Set to TRUE to receive packets that are sent to the network
+  /// device MAC address. The startup default value is FALSE.
+  ///
   BOOLEAN    EnableUnicastReceive;
+  ///
+  /// Set to TRUE to receive packets that are sent to any of the
+  /// active multicast groups. The startup default value is FALSE.
+  ///
   BOOLEAN    EnableMulticastReceive;
+  ///
+  /// Set to TRUE to receive packets that are sent to the network
+  /// device broadcast address. The startup default value is FALSE.
+  ///
   BOOLEAN    EnableBroadcastReceive;
+  ///
+  /// Set to TRUE to receive packets that are sent to any MAC address.
+  /// The startup default value is FALSE.
+  ///
   BOOLEAN    EnablePromiscuousReceive;
+  ///
+  /// Set to TRUE to drop queued packets when the configuration
+  /// is changed. The startup default value is FALSE.
+  ///
   BOOLEAN    FlushQueuesOnReset;
+  ///
+  /// Set to TRUE to timestamp all packets when they are received
+  /// by the MNP. Note that timestamps may be unsupported in some
+  /// MNP implementations. The startup default value is FALSE.
+  ///
   BOOLEAN    EnableReceiveTimestamps;
+  ///
+  /// Set to TRUE to disable background polling in this MNP
+  /// instance. Note that background polling may not be supported in
+  /// all MNP implementations. The startup default value is FALSE,
+  /// unless background polling is not supported.
+  ///
   BOOLEAN    DisableBackgroundPolling;
 } EFI_MANAGED_NETWORK_CONFIG_DATA;
 
@@ -77,10 +120,26 @@ typedef struct {
 
 
 typedef struct {
+  ///
+  /// This Event will be signaled after the Status field is updated
+  /// by the MNP. The type of Event must be
+  /// EFI_NOTIFY_SIGNAL. The Task Priority Level (TPL) of
+  /// Event must be lower than or equal to TPL_CALLBACK.
+  ///
   EFI_EVENT                             Event;
+  ///
+  /// The status that is returned to the caller at the end of the operation
+  /// to indicate whether this operation completed successfully.
+  ///
   EFI_STATUS                            Status;
   union {
+    ///
+    /// When this token is used for receiving, RxData is a pointer to the EFI_MANAGED_NETWORK_RECEIVE_DATA.
+    ///
     EFI_MANAGED_NETWORK_RECEIVE_DATA    *RxData;
+    ///
+    /// When this token is used for transmitting, TxData is a pointer to the EFI_MANAGED_NETWORK_TRANSMIT_DATA.
+    ///
     EFI_MANAGED_NETWORK_TRANSMIT_DATA   *TxData;
   } Packet;
 } EFI_MANAGED_NETWORK_COMPLETION_TOKEN;

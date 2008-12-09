@@ -144,24 +144,84 @@ typedef enum {
 
 #define MAX_MCAST_FILTER_CNT                              16
 typedef struct {
+  ///
+  /// Reports the current state of the network interface.
+  ///
   UINT32          State;
+  ///
+  /// The size, in bytes, of the network interface's HW address.
+  ///
   UINT32          HwAddressSize;
+  ///
+  /// The size, in bytes, of the network interface's media header.
+  ///
   UINT32          MediaHeaderSize;
+  ///
+  /// The maximum size, in bytes, of the packets supported by the network interface.
+  ///
   UINT32          MaxPacketSize;
+  ///
+  /// The size, in bytes, of the NVRAM device attached to the network interface.
+  ///
   UINT32          NvRamSize;
+  ///
+  /// The size that must be used for all NVRAM reads and writes. The
+  /// start address for NVRAM read and write operations and the total
+  /// length of those operations, must be a multiple of this value. The
+  /// legal values for this field are 0, 1, 2, 4, and 8.
+  ///
   UINT32          NvRamAccessSize;
+  ///
+  /// The multicast receive filter settings supported by the network interface.
+  ///
   UINT32          ReceiveFilterMask;
+  ///
+  /// The current multicast receive filter settings.
+  ///
   UINT32          ReceiveFilterSetting;
+  ///
+  /// The maximum number of multicast address receive filters supported by the driver.
+  ///
   UINT32          MaxMCastFilterCount;
+  ///
+  /// The current number of multicast address receive filters.
+  ///
   UINT32          MCastFilterCount;
+  ///
+  /// Array containing the addresses of the current multicast address receive filters.
+  ///
   EFI_MAC_ADDRESS MCastFilter[MAX_MCAST_FILTER_CNT];
+  ///
+  /// The current HW MAC address for the network interface.
+  ///
   EFI_MAC_ADDRESS CurrentAddress;
+  ///
+  /// The current HW MAC address for broadcast packets.
+  ///
   EFI_MAC_ADDRESS BroadcastAddress;
+  ///
+  /// The permanent HW MAC address for the network interface.
+  ///
   EFI_MAC_ADDRESS PermanentAddress;
+  ///
+  /// The interface type of the network interface.
+  ///
   UINT8           IfType;
+  ///
+  /// TRUE if the HW MAC address can be changed.
+  ///
   BOOLEAN         MacAddressChangeable;
+  ///
+  /// TRUE if the network interface can transmit more than one packet at a time.
+  ///
   BOOLEAN         MultipleTxSupported;
+  ///
+  /// TRUE if the presence of media can be determined; otherwise FALSE.
+  ///
   BOOLEAN         MediaPresentSupported;
+  ///
+  /// TRUE if media are connected to the network interface; otherwise FALSE.
+  ///
   BOOLEAN         MediaPresent;
 } EFI_SIMPLE_NETWORK_MODE;
 

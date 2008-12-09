@@ -81,8 +81,18 @@ typedef enum {
 /// *******************************************************
 ///
 typedef enum {
+  ///
+  /// A read operation from system memory by a bus master.
+  ///
   EfiPciIoOperationBusMasterRead,
+  ///
+  /// A write operation from system memory by a bus master.
+  ///
   EfiPciIoOperationBusMasterWrite,
+  ///
+  /// Provides both read and write access to system memory by both the processor and a
+  /// bus master. The buffer is coherent from both the processor¡¯s and the bus master's point of view.
+  ///
   EfiPciIoOperationBusMasterCommonBuffer,
   EfiPciIoOperationMaximum
 } EFI_PCI_IO_PROTOCOL_OPERATION;
@@ -93,10 +103,25 @@ typedef enum {
 /// *******************************************************
 ///
 typedef enum {
+  ///
+  /// Retrieve the PCI controller¡¯s current attributes, and return them in Result.
+  ///
   EfiPciIoAttributeOperationGet,
+  ///
+  /// Set the PCI controller¡¯s current attributes to Attributes.
+  ///
   EfiPciIoAttributeOperationSet,
+  ///
+  /// Enable the attributes specified by the bits that are set in Attributes for this PCI controller.
+  ///
   EfiPciIoAttributeOperationEnable,
+  ///
+  /// Disable the attributes specified by the bits that are set in Attributes for this PCI controller.
+  ///
   EfiPciIoAttributeOperationDisable,
+  ///
+  /// Retrieve the PCI controller's supported attributes, and return them in Result.
+  ///
   EfiPciIoAttributeOperationSupported,
   EfiPciIoAttributeOperationMaximum
 } EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION;
@@ -168,7 +193,13 @@ EFI_STATUS
   );
 
 typedef struct {
+  ///
+  /// Read PCI controller registers in the PCI memory or I/O space.
+  ///
   EFI_PCI_IO_PROTOCOL_IO_MEM  Read;
+  ///
+  /// Write PCI controller registers in the PCI memory or I/O space.
+  ///
   EFI_PCI_IO_PROTOCOL_IO_MEM  Write;
 } EFI_PCI_IO_PROTOCOL_ACCESS;
 
@@ -201,7 +232,13 @@ EFI_STATUS
   );
 
 typedef struct {
+  ///
+  /// Read PCI controller registers in PCI configuration space.
+  ///
   EFI_PCI_IO_PROTOCOL_CONFIG  Read;
+  ///
+  /// Write PCI controller registers in PCI configuration space.
+  ///
   EFI_PCI_IO_PROTOCOL_CONFIG  Write;
 } EFI_PCI_IO_PROTOCOL_CONFIG_ACCESS;
 

@@ -160,9 +160,10 @@ EFI_STATUS
 );
 
 
-//
-// EFI_HII_DRAW_FLAGS
-// 
+///
+/// EFI_HII_DRAW_FLAGS describes how the image is to be drawn.
+/// These flags are defined as EFI_HII_DRAW_FLAG_***
+///
 typedef UINT32  EFI_HII_DRAW_FLAGS;
 
 #define EFI_HII_DRAW_FLAG_CLIP          0x00000001
@@ -171,7 +172,6 @@ typedef UINT32  EFI_HII_DRAW_FLAGS;
 #define EFI_HII_DRAW_FLAG_FORCE_TRANS   0x00000010
 #define EFI_HII_DRAW_FLAG_FORCE_OPAQUE  0x00000020
 #define EFI_HII_DIRECT_TO_SCREEN        0x00000080
-
 
 /**
    

@@ -28,12 +28,6 @@
 
 typedef struct _EFI_PEI_SMBUS2_PPI EFI_PEI_SMBUS2_PPI;
 
-//
-// EFI_SMBUS_DEVICE_COMMAND
-//
-typedef UINTN   EFI_SMBUS_DEVICE_COMMAND;
-
-
 /**
   Executes an SMBus operation to an SMBus controller. Returns when either 
   the command has been executed or an error is encountered in doing the operation.

@@ -23,9 +23,6 @@
 
 typedef struct _EFI_TCG_PROTOCOL EFI_TCG_PROTOCOL;
 
-//
-// Set structure alignment to 1-byte
-//
 typedef struct {
   UINT8  Major;
   UINT8  Minor;
@@ -34,13 +31,13 @@ typedef struct {
 } TCG_VERSION;
 
 typedef struct _TCG_EFI_BOOT_SERVICE_CAPABILITY {
-  UINT8          Size;                // Size of this structure
+  UINT8          Size;                /// Size of this structure
   TCG_VERSION    StructureVersion;    
   TCG_VERSION    ProtocolSpecVersion;
-  UINT8          HashAlgorithmBitmap; // Hash algorithms  
-                                      // this protocol is capable of : 01=SHA-1
-  BOOLEAN        TPMPresentFlag;      // 00h = TPM not present
-  BOOLEAN        TPMDeactivatedFlag;  // 01h = TPM currently deactivated
+  UINT8          HashAlgorithmBitmap; /// Hash algorithms  
+                                      /// this protocol is capable of : 01=SHA-1
+  BOOLEAN        TPMPresentFlag;      /// 00h = TPM not present
+  BOOLEAN        TPMDeactivatedFlag;  /// 01h = TPM currently deactivated
 } TCG_EFI_BOOT_SERVICE_CAPABILITY;
 
 typedef UINT32   TCG_ALGORITHM_ID;
