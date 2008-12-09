@@ -34,7 +34,7 @@
   @param  RegisterEdx   Pointer to the 32-bit EDX value returned by the CPUID
                         instruction. This is an optional parameter that may be NULL.
 
-  @return Index
+  @return Index.
 
 **/
 UINT32
