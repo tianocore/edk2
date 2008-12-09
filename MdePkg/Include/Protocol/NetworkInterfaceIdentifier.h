@@ -64,6 +64,15 @@ struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
 
 };
 
+///
+///*******************************************************
+/// EFI_NETWORK_INTERFACE_TYPE
+///*******************************************************
+///
+typedef enum {
+  EfiNetworkInterfaceUndi = 1
+} EFI_NETWORK_INTERFACE_TYPE;
+
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid;
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid_31;
 
