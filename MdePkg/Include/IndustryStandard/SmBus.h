@@ -41,6 +41,19 @@ typedef struct {
   UINTN SmbusDeviceAddress : 7;
 } EFI_SMBUS_DEVICE_ADDRESS;
 
+typedef struct {
+  ///
+  /// The SMBUS hardware address to which the SMBUS device is preassigned or
+  /// allocated. Type EFI_SMBUS_DEVICE_ADDRESS is defined in EFI_PEI_SMBUS2_PPI.Execute().
+  ///
+  EFI_SMBUS_DEVICE_ADDRESS  SmbusDeviceAddress;
+  ///
+  /// The SMBUS Unique Device Identifier (UDID) as defined in EFI_SMBUS_UDID.
+  /// Type EFI_SMBUS_UDID is defined in EFI_PEI_SMBUS2_PPI.ArpDevice().
+  ///
+  EFI_SMBUS_UDID            SmbusDeviceUdid;
+} EFI_SMBUS_DEVICE_MAP;
+
 ///
 /// Smbus Operations
 ///
