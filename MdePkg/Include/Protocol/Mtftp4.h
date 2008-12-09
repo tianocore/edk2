@@ -98,14 +98,41 @@ typedef struct {
 } EFI_MTFTP4_ERROR_HEADER;
 
 typedef union {
+  ///
+  /// Type of packets as defined by the MTFTPv4 packet opcodes.
+  ///
   UINT16                  OpCode;
+  ///
+  /// Read request packet header.
+  ///
   EFI_MTFTP4_REQ_HEADER   Rrq;
+  ///
+  /// Write request packet header.
+  ///
   EFI_MTFTP4_REQ_HEADER   Wrq;
+  ///
+  /// Option acknowledge packet header.
+  ///
   EFI_MTFTP4_OACK_HEADER  Oack;
+  ///
+  /// Data packet header.
+  ///
   EFI_MTFTP4_DATA_HEADER  Data;
+  ///
+  /// Acknowledgement packet header.
+  ///
   EFI_MTFTP4_ACK_HEADER   Ack;
+  ///
+  /// Data packet header with big block number.
+  ///
   EFI_MTFTP4_DATA8_HEADER Data8;
+  ///
+  /// Acknowledgement header with big block num.
+  ///
   EFI_MTFTP4_ACK8_HEADER  Ack8;
+  ///
+  /// Error packet header.
+  ///
   EFI_MTFTP4_ERROR_HEADER Error;
 } EFI_MTFTP4_PACKET;
 
@@ -477,17 +504,60 @@ struct _EFI_MTFTP4_PROTOCOL {
 };
 
 struct _EFI_MTFTP4_TOKEN {
+  ///
+  /// The status that is returned to the caller at the end of the operation
+  /// to indicate whether this operation completed successfully.
+  ///
   EFI_STATUS                  Status;
+  ///
+  /// The event that will be signaled when the operation completes. If
+  /// set to NULL, the corresponding function will wait until the read or
+  /// write operation finishes. The type of Event must be
+  /// EVT_NOTIFY_SIGNAL. The Task Priority Level (TPL) of
+  /// Event must be lower than or equal to TPL_CALLBACK.
+  ///
   EFI_EVENT                   Event;
+  ///
+  /// If not NULL, the data that will be used to override the existing configure data.
+  ///
   EFI_MTFTP4_OVERRIDE_DATA    *OverrideData;
+  ///
+  /// Pointer to the ASCIIZ file name string.
+  ///
   UINT8                       *Filename;
+  ///
+  /// Pointer to the ASCIIZ mode string. If NULL, ¡°octet¡± is used.
+  ///
   UINT8                       *ModeStr;
+  ///
+  /// Number of option/value string pairs.
+  ///
   UINT32                      OptionCount;
+  ///
+  /// Pointer to an array of option/value string pairs. Ignored if OptionCount is zero.
+  ///
   EFI_MTFTP4_OPTION           *OptionList;
+  ///
+  /// Size of the data buffer.
+  ///
   OUT UINT64                  BufferSize;
+  ///
+  /// Pointer to the data buffer. Data that is downloaded from the
+  /// MTFTPv4 server is stored here. Data that is uploaded to the
+  /// MTFTPv4 server is read from here. Ignored if BufferSize is zero.
+  ///
   OUT VOID                    *Buffer;
+  ///
+  /// Pointer to the callback function to check the contents of the received packet.
+  ///
   EFI_MTFTP4_CHECK_PACKET     CheckPacket;
+  ///
+  /// Pointer to the function to be called when a timeout occurs.
+  ///
   EFI_MTFTP4_TIMEOUT_CALLBACK TimeoutCallback;
+  ///
+  /// Pointer to the function to provide the needed packet contents.
+  ///
   EFI_MTFTP4_PACKET_NEEDED    PacketNeeded;
 };
 

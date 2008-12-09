@@ -62,8 +62,9 @@ typedef struct _EFI_HII_ROW_INFO {
 } EFI_HII_ROW_INFO;
 
 ///
-/// EFI_FONT_INFO_MASK
-/// 
+/// Font info flag. All flags (FONT, SIZE, STYLE, and COLOR) are defined.
+/// They are defined as EFI_FONT_INFO_***
+///
 typedef UINT32  EFI_FONT_INFO_MASK;
 
 #define EFI_FONT_INFO_SYS_FONT        0x00000001
@@ -87,6 +88,8 @@ typedef struct {
 } EFI_FONT_INFO;
 
 /**
+  Describes font output-related information.
+
   This structure is used for describing the way in which a string
   should be rendered in a particular font. FontInfo specifies the
   basic font information and ForegroundColor and BackgroundColor
@@ -94,34 +97,7 @@ typedef struct {
   in FontInfoMask describe where the system default should be
   supplied instead of the specified information. The flags also
   describe what options can be used to make a match between the
-  font requested and the font available. If EFI_FONT_INFO_SYS_FONT
-  is specified, then the font name in FontInfo is ignored and the
-  system font name is used. This flag cannot be used with
-  EFI_FONT_INFO_ANY_FONT. If EFI_FONT_INFO_SYS_SIZE is specified,
-  then the font height specified in FontInfo is ignored and the
-  system font height is used instead. This flag cannot be used
-  with EFI_FONT_INFO_ANY_SIZE. If EFI_FONT_INFO_SYS_STYLE is
-  specified, then the font style in FontInfo is ignored and the
-  system font style is used. This flag cannot be used with
-  EFI_FONT_INFO_ANY_STYLE. If EFI_FONT_INFO_SYS_FORE_COLOR is
-  specified, then ForegroundColor is ignored and the system
-  foreground color is used. If EFI_FONT_INFO_SYS_BACK_COLOR is
-  specified, then BackgroundColor is ignored and the system
-  background color is used. If EFI_FONT_INFO_RESIZE is specified,
-  then the system may attempt to stretch or shrink a font to meet
-  the size requested. This flag cannot be used with
-  EFI_FONT_INFO_ANY_SIZE. If EFI_FONT_INFO_RESTYLE is specified,
-  then the system may attempt to remove some of the specified
-  styles in order to meet the style requested. This flag cannot be
-  used with EFI_FONT_INFO_ANY_STYLE. If EFI_FONT_INFO_ANY_FONT is
-  specified, then the system may attempt to match with any font.
-  This flag cannot be used with EFI_FONT_INFO_SYS_FONT. If
-  EFI_FONT_INFO_ANY_SIZE is specified, then the system may attempt
-  to match with any font size. This flag cannot be used with
-  EFI_FONT_INFO_SYS_SIZE or EFI_FONT_INFO_RESIZE. If
-  EFI_FONT_INFO_ANY_STYLE is specified, then the system may
-  attempt to match with any font style. This flag cannot be used
-  with EFI_FONT_INFO_SYS_STYLE or EFI_FONT_INFO_RESTYLE.
+  font requested and the font available.
 **/
 typedef struct _EFI_FONT_DISPLAY_INFO {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL ForegroundColor;

@@ -28,18 +28,53 @@ typedef struct _EFI_SIMPLE_POINTER_PROTOCOL  EFI_SIMPLE_POINTER_PROTOCOL;
 // Data structures
 //
 typedef struct {
+  ///
+  /// The signed distance in counts that the pointer device has been moved along the x-axis.
+  ///
   INT32   RelativeMovementX;
+  ///
+  /// The signed distance in counts that the pointer device has been moved along the y-axis.
+  ///
   INT32   RelativeMovementY;
+  ///
+  /// The signed distance in counts that the pointer device has been moved along the z-axis.
+  ///
   INT32   RelativeMovementZ;
+  ///
+  /// If TRUE, then the left button of the pointer device is being
+  /// pressed. If FALSE, then the left button of the pointer device is not being pressed.
+  ///
   BOOLEAN LeftButton;
+  ///
+  /// If TRUE, then the right button of the pointer device is being
+  /// pressed. If FALSE, then the right button of the pointer device is not being pressed.
+  ///
   BOOLEAN RightButton;
 } EFI_SIMPLE_POINTER_STATE;
 
 typedef struct {
+  ///
+  /// The resolution of the pointer device on the x-axis in counts/mm.
+  /// If 0, then the pointer device does not support an x-axis.
+  ///
   UINT64  ResolutionX;
+  ///
+  /// The resolution of the pointer device on the y-axis in counts/mm.
+  /// If 0, then the pointer device does not support an x-axis.
+  ///
   UINT64  ResolutionY;
+  ///
+  /// The resolution of the pointer device on the z-axis in counts/mm.
+  /// If 0, then the pointer device does not support an x-axis.
+  ///
   UINT64  ResolutionZ;
+  ///
+  /// TRUE if a left button is present on the pointer device. Otherwise FALSE.
+  ///
   BOOLEAN LeftButton;
+  ///
+  /// TRUE if a right button is present on the pointer device. Otherwise FALSE.
+  ///
   BOOLEAN RightButton;
 } EFI_SIMPLE_POINTER_MODE;
 

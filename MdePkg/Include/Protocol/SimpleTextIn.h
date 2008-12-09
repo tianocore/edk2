@@ -25,20 +25,21 @@
     0x387477c1, 0x69c7, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
 
-///
-/// Protocol GUID defined in EFI1.1.
-/// 
-#define SIMPLE_INPUT_PROTOCOL   EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID
-
 typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL  EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
 ///
-/// Backward-compatible with EFI1.1.
+/// Protocol GUID name defined in EFI1.1.
+/// 
+#define SIMPLE_INPUT_PROTOCOL   EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID
+
+///
+/// Protocol name in EFI1.1 for backward-compatible.
 /// 
 typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL  SIMPLE_INPUT_INTERFACE;
-//
-// Data structures
-//
+
+///
+/// The keystroke information for the key that was pressed.
+///
 typedef struct {
   UINT16  ScanCode;
   CHAR16  UnicodeChar;

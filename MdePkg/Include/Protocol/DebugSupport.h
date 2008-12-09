@@ -444,12 +444,12 @@ typedef struct {
 #define EXCEPT_EBC_DEBUG                2
 #define EXCEPT_EBC_BREAKPOINT           3
 #define EXCEPT_EBC_OVERFLOW             4
-#define EXCEPT_EBC_INVALID_OPCODE       5   /// opcode out of range
+#define EXCEPT_EBC_INVALID_OPCODE       5   ///< opcode out of range
 #define EXCEPT_EBC_STACK_FAULT          6
 #define EXCEPT_EBC_ALIGNMENT_CHECK      7
-#define EXCEPT_EBC_INSTRUCTION_ENCODING 8   /// malformed instruction
-#define EXCEPT_EBC_BAD_BREAK            9   /// BREAK 0 or undefined BREAK
-#define EXCEPT_EBC_STEP                 10  /// to support debug stepping
+#define EXCEPT_EBC_INSTRUCTION_ENCODING 8   ///< malformed instruction
+#define EXCEPT_EBC_BAD_BREAK            9   ///< BREAK 0 or undefined BREAK
+#define EXCEPT_EBC_STEP                 10  ///< to support debug stepping
 ///
 /// For coding convenience, define the maximum valid EBC exception.
 ///

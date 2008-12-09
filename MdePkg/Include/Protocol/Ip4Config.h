@@ -30,10 +30,22 @@ typedef struct _EFI_IP4_CONFIG_PROTOCOL EFI_IP4_CONFIG_PROTOCOL;
          EFI_VARIABLE_RUNTIME_ACCESS)
 
 typedef struct {
+  ///
+  /// Default station IP address, stored in network byte order.
+  ///
   EFI_IPv4_ADDRESS             StationAddress;
+  ///
+  /// Default subnet mask, stored in network byte order.
+  ///
   EFI_IPv4_ADDRESS             SubnetMask;
+  ///
+  /// Number of entries in the following RouteTable. May be zero.
+  ///
   UINT32                       RouteTableSize;
-  EFI_IP4_ROUTE_TABLE          *RouteTable;    //OPTIONAL
+  ///
+  /// Default routing table data (stored in network byte order).
+  ///
+  EFI_IP4_ROUTE_TABLE          *RouteTable;
 } EFI_IP4_IPCONFIG_DATA;
 
 

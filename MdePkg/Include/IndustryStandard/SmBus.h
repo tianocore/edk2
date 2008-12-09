@@ -1,5 +1,6 @@
 /** @file
-  This file declares the SMBus definitions defined in SmBus Specifciation V2.0.
+  This file declares the SMBus definitions defined in SmBus Specifciation V2.0
+  and defined in PI1.0 specification volume 5.
 
   Copyright (c) 2007 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -34,14 +35,16 @@ typedef struct {
 /// Smbus Device Address
 ///
 typedef struct {
+  ///
+  /// The SMBUS hardware address to which the SMBUS device is preassigned or allocated.
+  ///
   UINTN SmbusDeviceAddress : 7;
 } EFI_SMBUS_DEVICE_ADDRESS;
 
 ///
 /// Smbus Operations
 ///
-typedef enum _EFI_SMBUS_OPERATION
-{
+typedef enum _EFI_SMBUS_OPERATION {
   EfiSmbusQuickRead,
   EfiSmbusQuickWrite,
   EfiSmbusReceiveByte,
@@ -55,6 +58,11 @@ typedef enum _EFI_SMBUS_OPERATION
   EfiSmbusProcessCall,
   EfiSmbusBWBRProcessCall
 } EFI_SMBUS_OPERATION;
+
+///
+/// EFI_SMBUS_DEVICE_COMMAND
+///
+typedef UINTN   EFI_SMBUS_DEVICE_COMMAND;
 
 #endif
 

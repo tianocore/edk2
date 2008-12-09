@@ -60,42 +60,38 @@ EFI_STATUS
 );
 
 
-//
-// EFI_KEY_TOGGLE_STATE
-//
+///
+/// EFI_KEY_TOGGLE_STATE. The toggle state are defined.
+/// They are EFI_TOGGLE_STATE_VALID, EFI_SCROLL_LOCK_ACTIVE
+/// EFI_NUM_LOCK_ACTIVE, EFI_CAPS_LOCK_ACTIVE
+///
 typedef UINT8 EFI_KEY_TOGGLE_STATE;
 
-/**
-  Definition of EFI_KEY_STATE
-
-  @param KeyShiftState  Reflects the currently pressed shift
-                        modifiers for the input device. The
-                        returned value is valid only if the high
-                        order bit has been set.
-
-  @param KeyToggleState Reflects the current internal state of
-                        various toggled attributes. The returned
-                        value is valid only if the high order
-                        bit has been set.
-
-**/
 typedef struct _EFI_KEY_STATE {
+  ///
+  /// Reflects the currently pressed shift
+  /// modifiers for the input device. The
+  /// returned value is valid only if the high
+  /// order bit has been set.
+  ///
   UINT32                KeyShiftState;
+  ///
+  /// Reflects the current internal state of
+  /// various toggled attributes. The returned
+  /// value is valid only if the high order
+  /// bit has been set.
+  ///
   EFI_KEY_TOGGLE_STATE  KeyToggleState;
 } EFI_KEY_STATE;
 
-/**
-  Definition of EFI_KEY_DATA.
-
-  @param Key      The EFI scan code and Unicode value returned from
-                  the input device.
-
-  @param KeyState The current state of various toggled
-                  attributes as well as input modifier values.
-
-**/
 typedef struct {
+  ///
+  /// The EFI scan code and Unicode value returned from the input device.
+  ///
   EFI_INPUT_KEY   Key;
+  ///
+  /// The current state of various toggled attributes as well as input modifier values.
+  ///
   EFI_KEY_STATE   KeyState;
 } EFI_KEY_DATA;
 
@@ -234,9 +230,9 @@ EFI_STATUS
   IN EFI_KEY_TOGGLE_STATE              *KeyToggleState
 );
 
-//
-// EFI_KEY_NOTIFY
-//
+///
+/// The function will be called when the key sequence is typed specified by KeyData.
+///
 typedef
 EFI_STATUS
 (EFIAPI *EFI_KEY_NOTIFY_FUNCTION)(

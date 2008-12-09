@@ -169,7 +169,13 @@ EFI_STATUS
   );
 
 typedef struct {
+  ///
+  /// Read PCI controller registers in the PCI root bridge memory space.
+  ///
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_IO_MEM  Read;
+  ///
+  /// Write PCI controller registers in the PCI root bridge memory space.
+  ///
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_IO_MEM  Write;
 } EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_ACCESS;
 

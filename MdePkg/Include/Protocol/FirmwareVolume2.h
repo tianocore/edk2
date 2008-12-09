@@ -418,9 +418,9 @@ EFI_STATUS
   OUT       UINT32                        *AuthenticationStatus
 );
 
-//
-// EFI_FV_WRITE_POLICY
-//
+///
+/// EFI_FV_WRITE_POLICY, two policies (unreliable write and reliable write) are defined.
+///
 typedef UINT32 EFI_FV_WRITE_POLICY;
 #define EFI_FV_UNRELIABLE_WRITE   0x00000000
 #define EFI_FV_RELIABLE_WRITE     0x00000001

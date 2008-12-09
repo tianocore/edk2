@@ -58,10 +58,8 @@
 #pragma pack (1)
 
 typedef UINT32                     TCG_EVENTTYPE;
-
-#define TCG_DIGEST                 TPM_DIGEST
-#define TCG_PCRINDEX               TPM_PCRINDEX
-
+typedef TPM_PCRINDEX               TCG_PCRINDEX;
+typedef TPM_DIGEST                 TCG_DIGEST;
 ///
 /// Event Log Entry Structure Definition
 ///

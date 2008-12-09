@@ -44,9 +44,9 @@ typedef USB_CONFIG_DESCRIPTOR     EFI_USB_CONFIG_DESCRIPTOR;
 typedef USB_INTERFACE_DESCRIPTOR  EFI_USB_INTERFACE_DESCRIPTOR;
 typedef USB_ENDPOINT_DESCRIPTOR   EFI_USB_ENDPOINT_DESCRIPTOR;
 
-//
-// USB data transfer direction
-//
+///
+/// USB data transfer direction
+///
 typedef enum {
   EfiUsbDataIn,
   EfiUsbDataOut,

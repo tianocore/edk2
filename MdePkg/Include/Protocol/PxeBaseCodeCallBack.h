@@ -25,24 +25,24 @@
     0x245dca21, 0xfb7b, 0x11d3, {0x8f, 0x01, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
 
-//
-// UEFI Revision Number Definition
-//
+///
+/// UEFI Revision Number Definition
+///
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION 0x00010000
 
-//
-// EFI 1.1 Revision Number defintion
-//
+///
+/// EFI 1.1 Revision Number defintion
+///
 #define EFI_PXE_BASE_CODE_CALLBACK_INTERFACE_REVISION  \
         EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION
 
 ///
-/// Protocol definition
+/// UEFI Protocol name
 ///
 typedef struct _EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL  EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL;
 
 ///
-/// Protocol defined in EFI1.1.
+/// EFI1.1 Protocol name
 /// 
 typedef EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL   EFI_PXE_BASE_CODE_CALLBACK;
 
