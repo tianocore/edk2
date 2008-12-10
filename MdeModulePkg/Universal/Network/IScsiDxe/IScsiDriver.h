@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _ISCSI_DRIVER_H_
 #define _ISCSI_DRIVER_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/HiiConfigAccess.h>
@@ -27,7 +27,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/IScsiInitiatorName.h>
-#include <Protocol/Ip4Config.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
 
