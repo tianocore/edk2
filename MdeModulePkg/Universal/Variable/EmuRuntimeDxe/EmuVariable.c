@@ -16,16 +16,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Variable.h"
 
-//
-// Don't use module globals after the SetVirtualAddress map is signaled
-//
+///
+/// Don't use module globals after the SetVirtualAddress map is signaled
+///
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 
-//
-// This is a temperary function which will be removed
-// when EfiAcquireLock in UefiLib can handle the
-// the call in UEFI Runtimer driver in RT phase.
-//
+
+/**
+  Acquires lock only at boot time. Simply returns at runtime.
+
+  This is a temperary function which will be removed when
+  EfiAcquireLock() in UefiLib can handle the call in UEFI
+  Runtimer driver in RT phase.
+  It calls EfiAcquireLock() at boot time, and simply returns
+  at runtime
+
+  @param  Lock         A pointer to the lock to acquire
+
+**/
 VOID
 AcquireLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
@@ -36,11 +44,18 @@ AcquireLockOnlyAtBootTime (
   }
 }
 
-//
-// This is a temperary function which will be removed
-// when EfiAcquireLock in UefiLib can handle the
-// the call in UEFI Runtimer driver in RT phase.
-//
+/**
+  Releases lock only at boot time. Simply returns at runtime.
+
+  This is a temperary function which will be removed when
+  EfiReleaseLock() in UefiLib can handle the call in UEFI
+  Runtimer driver in RT phase.
+  It calls EfiReleaseLock() at boot time, and simply returns
+  at runtime
+
+  @param  Lock         A pointer to the lock to release
+
+**/
 VOID
 ReleaseLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
@@ -51,25 +66,21 @@ ReleaseLockOnlyAtBootTime (
   }
 }
 
+/**
+  Gets pointer to the variable data.
+
+  This function gets the pointer to the variable data according
+  to the input pointer to the variable header.
+
+  @param  Variable      Pointer to the variable header.
+
+  @return Pointer to variable data
+
+**/
 UINT8 *
 GetVariableDataPtr (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the variable data.
-
-Arguments:
-
-  Variable            Pointer to the Variable Header.
-
-Returns:
-
-  UINT8*              Pointer to Variable Data
-
---*/
 {
   if (Variable->StartId != VARIABLE_DATA) {
     return NULL;
@@ -80,25 +91,21 @@ Returns:
   return (UINT8 *) ((UINTN) GET_VARIABLE_NAME_PTR (Variable) + Variable->NameSize + GET_PAD_SIZE (Variable->NameSize));
 }
 
+/**
+  Gets pointer to header of the next variable.
+
+  This function gets the pointer to the next variable header according
+  to the input point to the variable header.
+
+  @param  Variable      Pointer to header of the next variable
+
+  @return Pointer to next variable header.
+
+**/
 VARIABLE_HEADER *
 GetNextVariablePtr (
   IN  VARIABLE_HEADER   *Variable
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the next variable header.
-
-Arguments:
-
-  Variable                  Pointer to the Variable Header.
-
-Returns:
-
-  VARIABLE_HEADER*      Pointer to next variable header.
-
---*/
 {
   VARIABLE_HEADER *VarHeader;
 
@@ -119,25 +126,21 @@ Returns:
   return VarHeader;
 }
 
+/**
+  Gets pointer to the end of the variable storage area.
+
+  This function gets pointer to the end of the variable storage
+  area, according to the input variable store header.
+
+  @param  VolHeader     Pointer to the variale store header
+
+  @return Pointer to the end of the variable storage area.
+
+**/
 VARIABLE_HEADER *
 GetEndPointer (
   IN VARIABLE_STORE_HEADER       *VolHeader
   )
-/*++
-
-Routine Description:
-
-  This code gets the pointer to the last variable memory pointer byte
-
-Arguments:
-
-  Variable                  Pointer to the Variable Header.
-
-Returns:
-
-  VARIABLE_HEADER*      Pointer to last unavailable Variable Header
-
---*/
 {
   //
   // The end of variable store
@@ -145,6 +148,28 @@ Returns:
   return (VARIABLE_HEADER *) ((UINTN) VolHeader + VolHeader->Size);
 }
 
+/**
+  Finds variable in storage blocks of volatile and non-volatile storage areas.
+
+  This code finds variable in storage blocks of volatile and non-volatile storage areas.
+  If VariableName is an empty string, then we just return the first
+  qualified variable without comparing VariableName and VendorGuid.
+  Otherwise, VariableName and VendorGuid are compared.
+
+  @param  VariableName                Name of the variable to be found.
+  @param  VendorGuid                  Vendor GUID to be found.
+  @param  PtrTrack                    VARIABLE_POINTER_TRACK structure for output,
+                                      including the range searched and the target position.
+  @param  Global                      Pointer to VARIABLE_GLOBAL structure, including
+                                      base of volatile variable storage area, base of
+                                      NV variable storage area, and a lock.
+
+  @retval EFI_INVALID_PARAMETER       If VariableName is not an empty string, while
+                                      VendorGuid is NULL.
+  @retval EFI_SUCCESS                 Variable successfully found.
+  @retval EFI_NOT_FOUND               Variable not found.
+
+**/
 EFI_STATUS
 FindVariable (
   IN  CHAR16                  *VariableName,
@@ -152,26 +177,6 @@ FindVariable (
   OUT VARIABLE_POINTER_TRACK  *PtrTrack,
   IN  VARIABLE_GLOBAL         *Global
   )
-/*++
-
-Routine Description:
-
-  This code finds variable in storage blocks (Volatile or Non-Volatile)
-
-Arguments:
-
-  VariableName                Name of the variable to be found
-  VendorGuid                  Vendor GUID to be found.
-  PtrTrack                    Variable Track Pointer structure that contains
-                              Variable Information.
-                              Contains the pointer of Variable header.
-  Global                      VARIABLE_GLOBAL pointer
-
-Returns:
-
-  EFI STATUS
-
---*/
 {
   VARIABLE_HEADER       *Variable[2];
   VARIABLE_STORE_HEADER *VariableStoreHeader[2];
@@ -233,6 +238,28 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  This code finds variable in storage blocks (Volatile or Non-Volatile).
+  
+  @param  VariableName           A Null-terminated Unicode string that is the name of
+                                 the vendor's variable.
+  @param  VendorGuid             A unique identifier for the vendor.
+  @param  Attributes             If not NULL, a pointer to the memory location to return the 
+                                 attributes bitmask for the variable.
+  @param  DataSize               Size of Data found. If size is less than the
+                                 data, this value contains the required size.
+  @param  Data                   On input, the size in bytes of the return Data buffer.  
+                                 On output, the size of data returned in Data.
+  @param  Global                 Pointer to VARIABLE_GLOBAL structure
+  @param  Instance               Instance of the Firmware Volume.
+
+  @retval EFI_SUCCESS            The function completed successfully. 
+  @retval EFI_NOT_FOUND          The variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL   DataSize is too small for the result.  DataSize has 
+                                 been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER  VariableName or VendorGuid or DataSize is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 GetVariable (
@@ -244,32 +271,6 @@ GetVariable (
   IN      VARIABLE_GLOBAL   * Global,
   IN      UINT32            Instance
   )
-/*++
-
-Routine Description:
-
-  This code finds variable in storage blocks (Volatile or Non-Volatile)
-
-Arguments:
-
-  VariableName                    Name of Variable to be found
-  VendorGuid                      Variable vendor GUID
-  Attributes OPTIONAL             Attribute value of the variable found
-  DataSize                        Size of Data found. If size is less than the
-                                  data, this value contains the required size.
-  Data                            Data pointer
-  Global                          Pointer to VARIABLE_GLOBAL structure
-  Instance                        Instance of the Firmware Volume.
-
-Returns:
-
-  EFI_INVALID_PARAMETER       - Invalid parameter
-  EFI_SUCCESS                 - Find the specified variable
-  EFI_NOT_FOUND               - Not found
-  EFI_BUFFER_TO_SMALL         - DataSize is too small for the result
-
-
---*/
 {
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarDataSize;
@@ -315,6 +316,25 @@ Done:
   return Status;
 }
 
+/**
+
+  This code Finds the Next available variable.
+
+  @param  VariableNameSize       Size of the variable.
+  @param  VariableName           On input, supplies the last VariableName that was returned by GetNextVariableName().
+                                 On output, returns the Null-terminated Unicode string of the current variable.
+  @param  VendorGuid             On input, supplies the last VendorGuid that was returned by GetNextVariableName().
+                                 On output, returns the VendorGuid of the current variable.  
+  @param  Global                 Pointer to VARIABLE_GLOBAL structure.
+  @param  Instance               Instance of the Firmware Volume.
+
+  @retval EFI_SUCCESS            The function completed successfully. 
+  @retval EFI_NOT_FOUND          The next variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL   VariableNameSize is too small for the result. 
+                                 VariableNameSize has been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER  VariableNameSize or VariableName or VendorGuid is NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 GetNextVariableName (
@@ -324,25 +344,6 @@ GetNextVariableName (
   IN      VARIABLE_GLOBAL   *Global,
   IN      UINT32            Instance
   )
-/*++
-
-Routine Description:
-
-  This code Finds the Next available variable
-
-Arguments:
-
-  VariableNameSize            Size of the variable
-  VariableName                Pointer to variable name
-  VendorGuid                  Variable Vendor Guid
-  Global                      VARIABLE_GLOBAL structure pointer.
-  Instance                    FV instance
-
-Returns:
-
-  EFI STATUS
-
---*/
 {
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarNameSize;
@@ -418,6 +419,36 @@ Done:
 
 }
 
+/**
+
+  This code sets variable in storage blocks (Volatile or Non-Volatile).
+
+  @param  VariableName           A Null-terminated Unicode string that is the name of the vendor's
+                                 variable.  Each VariableName is unique for each 
+                                 VendorGuid.  VariableName must contain 1 or more 
+                                 Unicode characters.  If VariableName is an empty Unicode 
+                                 string, then EFI_INVALID_PARAMETER is returned.
+  @param  VendorGuid             A unique identifier for the vendor
+  @param  Attributes             Attributes bitmask to set for the variable
+  @param  DataSize               The size in bytes of the Data buffer.  A size of zero causes the
+                                 variable to be deleted.
+  @param  Data                   The contents for the variable
+  @param  Global                 Pointer to VARIABLE_GLOBAL structure
+  @param  VolatileOffset         The offset of last volatile variable
+  @param  NonVolatileOffset      The offset of last non-volatile variable
+  @param  Instance               Instance of the Firmware Volume.
+
+  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as 
+                                 defined by the Attributes.
+  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the 
+                                 DataSize exceeds the maximum allowed, or VariableName is an empty 
+                                 Unicode string, or VendorGuid is NULL.
+  @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the variable and its data.
+  @retval EFI_DEVICE_ERROR       The variable could not be saved due to a hardware failure.
+  @retval EFI_WRITE_PROTECTED    The variable in question is read-only or cannot be deleted.
+  @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
+
+**/
 EFI_STATUS
 EFIAPI
 SetVariable (
@@ -431,35 +462,6 @@ SetVariable (
   IN UINTN                   *NonVolatileOffset,
   IN UINT32                  Instance
   )
-/*++
-
-Routine Description:
-
-  This code sets variable in storage blocks (Volatile or Non-Volatile)
-
-Arguments:
-
-  VariableName                    Name of Variable to be found
-  VendorGuid                      Variable vendor GUID
-  Attributes                      Attribute value of the variable found
-  DataSize                        Size of Data found. If size is less than the
-                                  data, this value contains the required size.
-  Data                            Data pointer
-  Global                          Pointer to VARIABLE_GLOBAL structure
-  VolatileOffset                  The offset of last volatile variable
-  NonVolatileOffset               The offset of last non-volatile variable
-  Instance                        Instance of the Firmware Volume.
-
-Returns:
-
-  EFI_INVALID_PARAMETER           - Invalid parameter
-  EFI_SUCCESS                     - Set successfully
-  EFI_OUT_OF_RESOURCES            - Resource not enough to set variable
-  EFI_NOT_FOUND                   - Not found
-  EFI_DEVICE_ERROR                - Variable can not be saved due to hardware failure
-  EFI_WRITE_PROTECTED             - Variable is read-only
-
---*/
 {
   VARIABLE_POINTER_TRACK  Variable;
   EFI_STATUS              Status;
@@ -575,7 +577,7 @@ Returns:
     // Only variable have NV|RT attribute can be created in Runtime
     //
     if (EfiAtRuntime () &&
-        (!(Attributes & EFI_VARIABLE_RUNTIME_ACCESS) || !(Attributes & EFI_VARIABLE_NON_VOLATILE))) {
+        (((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) || ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0))) {
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }         
@@ -597,7 +599,7 @@ Returns:
   VarDataOffset = VarNameOffset + VarNameSize + GET_PAD_SIZE (VarNameSize);
   VarSize       = VarDataOffset + DataSize + GET_PAD_SIZE (DataSize);
 
-  if (Attributes & EFI_VARIABLE_NON_VOLATILE) {
+  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
     if ((UINT32) (VarSize +*NonVolatileOffset) >
           ((VARIABLE_STORE_HEADER *) ((UINTN) (Global->NonVolatileVariableBase)))->Size
           ) {
@@ -657,6 +659,28 @@ Done:
   return Status;
 }
 
+/**
+
+  This code returns information about the EFI variables.
+
+  @param  Attributes                   Attributes bitmask to specify the type of variables
+                                       on which to return information.
+  @param  MaximumVariableStorageSize   On output the maximum size of the storage space available for 
+                                       the EFI variables associated with the attributes specified.  
+  @param  RemainingVariableStorageSize Returns the remaining size of the storage space available for EFI 
+                                       variables associated with the attributes specified.
+  @param  MaximumVariableSize          Returns the maximum size of an individual EFI variable 
+                                       associated with the attributes specified.
+  @param  Global                       Pointer to VARIABLE_GLOBAL structure.
+  @param  Instance                     Instance of the Firmware Volume.
+
+  @retval EFI_SUCCESS                  Valid answer returned.
+  @retval EFI_INVALID_PARAMETER        An invalid combination of attribute bits was supplied
+  @retval EFI_UNSUPPORTED              The attribute is not supported on this platform, and the 
+                                       MaximumVariableStorageSize, RemainingVariableStorageSize, 
+                                       MaximumVariableSize are undefined.
+
+**/
 EFI_STATUS
 EFIAPI
 QueryVariableInfo (
@@ -667,33 +691,6 @@ QueryVariableInfo (
   IN  VARIABLE_GLOBAL        *Global,
   IN  UINT32                 Instance
   )
-/*++
-
-Routine Description:
-
-  This code returns information about the EFI variables.
-
-Arguments:
-
-  Attributes                      Attributes bitmask to specify the type of variables
-                                  on which to return information.
-  MaximumVariableStorageSize      Pointer to the maximum size of the storage space available
-                                  for the EFI variables associated with the attributes specified.
-  RemainingVariableStorageSize    Pointer to the remaining size of the storage space available
-                                  for EFI variables associated with the attributes specified.
-  MaximumVariableSize             Pointer to the maximum size of an individual EFI variables
-                                  associated with the attributes specified.
-  Global                          Pointer to VARIABLE_GLOBAL structure.
-  Instance                        Instance of the Firmware Volume.
-
-Returns:
-
-  EFI STATUS
-  EFI_INVALID_PARAMETER           - An invalid combination of attribute bits was supplied.
-  EFI_SUCCESS                     - Query successfully.
-  EFI_UNSUPPORTED                 - The attribute is not supported on this platform.
-
---*/
 {
   VARIABLE_HEADER        *Variable;
   VARIABLE_HEADER        *NextVariable;
@@ -714,7 +711,7 @@ Returns:
     // Make sure if runtime bit is set, boot service bit is set also.
     //
     return EFI_INVALID_PARAMETER;
-  } else if (EfiAtRuntime () && !(Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
+  } else if (EfiAtRuntime () && ((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0)) {
     //
     //   Make sure RT Attribute is set if we are in Runtime phase.
     //
@@ -790,21 +787,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Initializes variable store area.
+
+  This function allocates memory space for variable store area and initializes its attributes.
+
+  @param  VariableBase         Base of the variable store area created
+  @param  LastVariableOffset   Size of VARIABLE_STORE_HEADER
+
+**/
 EFI_STATUS
 InitializeVariableStore (
   OUT EFI_PHYSICAL_ADDRESS  *VariableBase,
   OUT UINTN                 *LastVariableOffset
   )
-/*++
-
-Routine Description:
-  This function initializes variable store
-
-Arguments:
-
-Returns:
-
---*/
 {
   VARIABLE_STORE_HEADER *VariableStore;
 
@@ -836,22 +832,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Initializes variable store area for non-volatile and volatile variable.
+
+  This function allocates and initializes memory space for global context of ESAL
+  variable service and variable store area for non-volatile and volatile variable.
+
+  @param  ImageHandle           The Image handle of this driver.
+  @param  SystemTable           The pointer of EFI_SYSTEM_TABLE.
+
+  @retval EFI_SUCCESS           Function successfully executed.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resource.
+
+**/
 EFI_STATUS
 EFIAPI
 VariableCommonInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-
-Routine Description:
-  This function does common initialization for variable services
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_STATUS  Status;
 
