@@ -176,6 +176,7 @@ ExtractGuidedSectionRegisterHandlers (
   of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers()
   is used to retrieve the OututBufferSize, ScratchSize, and Attributes values. The return status from the handler of
   type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER is returned.
+  
   If InputSection is NULL, then ASSERT().
   If OutputBufferSize is NULL, then ASSERT().
   If ScratchBufferSize is NULL, then ASSERT().
@@ -250,7 +251,8 @@ ExtractGuidedSectionGetInfo (
   decode operation is returned in AuthenticationStatus.  If the decoded buffer is identical to the data in InputSection,
   then OutputBuffer is set to point at the data in InputSection.  Otherwise, the decoded data will be placed in caller
   allocated buffer specified by OutputBuffer.    This function is responsible for computing the  EFI_AUTH_STATUS_PLATFORM_OVERRIDE
-  bit of in AuthenticationStatus.  The return status from the handler of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER is returned.  
+  bit of in AuthenticationStatus.  The return status from the handler of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER is returned. 
+   
   If InputSection is NULL, then ASSERT().
   If OutputBuffer is NULL, then ASSERT().
   If ScratchBuffer is NULL and this decode operation requires a scratch buffer, then ASSERT().
