@@ -170,7 +170,7 @@ PciRegisterForRuntimeAccess (
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
 
-  @return The value read from the PCI configuration register.
+  @return The read value from the PCI configuration register.
 
 **/
 UINT8
@@ -195,7 +195,7 @@ PciRead8 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -204,12 +204,12 @@ UINT8
 EFIAPI
 PciWrite8 (
   IN      UINTN                     Address,
-  IN      UINT8                     Data
+  IN      UINT8                     Value
   )
 {
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
 
-  return (UINT8) PeiPciLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint8, Data);
+  return (UINT8) PeiPciLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint8, Value);
 }
 
 /**
@@ -550,12 +550,12 @@ UINT16
 EFIAPI
 PciWrite16 (
   IN      UINTN                     Address,
-  IN      UINT16                    Data
+  IN      UINT16                    Value
   )
 {
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
 
-  return (UINT16) PeiPciLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint16, Data);
+  return (UINT16) PeiPciLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint16, Value);
 }
 
 /**
@@ -904,12 +904,12 @@ UINT32
 EFIAPI
 PciWrite32 (
   IN      UINTN                     Address,
-  IN      UINT32                    Data
+  IN      UINT32                    Value
   )
 {
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
 
-  return PeiPciLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint32, Data);
+  return PeiPciLibPciCfg2WriteWorker (Address, EfiPeiPciCfgWidthUint32, Value);
 }
 
 /**
@@ -1328,7 +1328,7 @@ PciReadBuffer (
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
-  @return Size
+  @return Size written to StartAddress.
 
 **/
 UINTN

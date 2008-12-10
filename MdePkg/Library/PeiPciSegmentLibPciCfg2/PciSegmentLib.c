@@ -204,7 +204,7 @@ PciSegmentRegisterForRuntimeAccess (
 UINT8
 EFIAPI
 PciSegmentRead8 (
-  IN      UINT64                    Address
+  IN UINT64                    Address
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 0);
@@ -229,8 +229,8 @@ PciSegmentRead8 (
 UINT8
 EFIAPI
 PciSegmentWrite8 (
-  IN      UINT64                    Address,
-  IN      UINT8                     Value
+  IN UINT64                    Address,
+  IN UINT8                     Value
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 0);
@@ -258,8 +258,8 @@ PciSegmentWrite8 (
 UINT8
 EFIAPI
 PciSegmentOr8 (
-  IN      UINT64                    Address,
-  IN      UINT8                     OrData
+  IN UINT64                    Address,
+  IN UINT8                     OrData
   )
 {
   return PciSegmentWrite8 (Address, (UINT8) (PciSegmentRead8 (Address) | OrData));
@@ -284,8 +284,8 @@ PciSegmentOr8 (
 UINT8
 EFIAPI
 PciSegmentAnd8 (
-  IN      UINT64                    Address,
-  IN      UINT8                     AndData
+  IN UINT64                    Address,
+  IN UINT8                     AndData
   )
 {
   return PciSegmentWrite8 (Address, (UINT8) (PciSegmentRead8 (Address) & AndData));
@@ -314,9 +314,9 @@ PciSegmentAnd8 (
 UINT8
 EFIAPI
 PciSegmentAndThenOr8 (
-  IN      UINT64                    Address,
-  IN      UINT8                     AndData,
-  IN      UINT8                     OrData
+  IN UINT64                    Address,
+  IN UINT8                     AndData,
+  IN UINT8                     OrData
   )
 {
   return PciSegmentWrite8 (Address, (UINT8) ((PciSegmentRead8 (Address) & AndData) | OrData));
@@ -346,9 +346,9 @@ PciSegmentAndThenOr8 (
 UINT8
 EFIAPI
 PciSegmentBitFieldRead8 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit
   )
 {
   return BitFieldRead8 (PciSegmentRead8 (Address), StartBit, EndBit);
@@ -380,10 +380,10 @@ PciSegmentBitFieldRead8 (
 UINT8
 EFIAPI
 PciSegmentBitFieldWrite8 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT8                     Value
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT8                     Value
   )
 {
   return PciSegmentWrite8 (
@@ -421,10 +421,10 @@ PciSegmentBitFieldWrite8 (
 UINT8
 EFIAPI
 PciSegmentBitFieldOr8 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT8                     OrData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT8                     OrData
   )
 {
   return PciSegmentWrite8 (
@@ -462,10 +462,10 @@ PciSegmentBitFieldOr8 (
 UINT8
 EFIAPI
 PciSegmentBitFieldAnd8 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT8                     AndData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT8                     AndData
   )
 {
   return PciSegmentWrite8 (
@@ -506,11 +506,11 @@ PciSegmentBitFieldAnd8 (
 UINT8
 EFIAPI
 PciSegmentBitFieldAndThenOr8 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT8                     AndData,
-  IN      UINT8                     OrData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT8                     AndData,
+  IN UINT8                     OrData
   )
 {
   return PciSegmentWrite8 (
@@ -536,7 +536,7 @@ PciSegmentBitFieldAndThenOr8 (
 UINT16
 EFIAPI
 PciSegmentRead16 (
-  IN      UINT64                    Address
+  IN UINT64                    Address
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 1);
@@ -562,8 +562,8 @@ PciSegmentRead16 (
 UINT16
 EFIAPI
 PciSegmentWrite16 (
-  IN      UINT64                    Address,
-  IN      UINT16                    Value
+  IN UINT64                    Address,
+  IN UINT16                    Value
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 1);
@@ -595,8 +595,8 @@ PciSegmentWrite16 (
 UINT16
 EFIAPI
 PciSegmentOr16 (
-  IN      UINT64                    Address,
-  IN      UINT16                    OrData
+  IN UINT64                    Address,
+  IN UINT16                    OrData
   )
 {
   return PciSegmentWrite16 (Address, (UINT16) (PciSegmentRead16 (Address) | OrData));
@@ -623,8 +623,8 @@ PciSegmentOr16 (
 UINT16
 EFIAPI
 PciSegmentAnd16 (
-  IN      UINT64                    Address,
-  IN      UINT16                    AndData
+  IN UINT64                    Address,
+  IN UINT16                    AndData
   )
 {
   return PciSegmentWrite16 (Address, (UINT16) (PciSegmentRead16 (Address) & AndData));
@@ -654,9 +654,9 @@ PciSegmentAnd16 (
 UINT16
 EFIAPI
 PciSegmentAndThenOr16 (
-  IN      UINT64                    Address,
-  IN      UINT16                    AndData,
-  IN      UINT16                    OrData
+  IN UINT64                    Address,
+  IN UINT16                    AndData,
+  IN UINT16                    OrData
   )
 {
   return PciSegmentWrite16 (Address, (UINT16) ((PciSegmentRead16 (Address) & AndData) | OrData));
@@ -687,9 +687,9 @@ PciSegmentAndThenOr16 (
 UINT16
 EFIAPI
 PciSegmentBitFieldRead16 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit
   )
 {
   return BitFieldRead16 (PciSegmentRead16 (Address), StartBit, EndBit);
@@ -722,10 +722,10 @@ PciSegmentBitFieldRead16 (
 UINT16
 EFIAPI
 PciSegmentBitFieldWrite16 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT16                    Value
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT16                    Value
   )
 {
   return PciSegmentWrite16 (
@@ -758,10 +758,10 @@ PciSegmentBitFieldWrite16 (
 UINT16
 EFIAPI
 PciSegmentBitFieldOr16 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT16                    OrData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT16                    OrData
   )
 {
   return PciSegmentWrite16 (
@@ -771,38 +771,39 @@ PciSegmentBitFieldOr16 (
 }
 
 /**
-  Reads a bit field in a 16-bit PCI configuration register, performs a bitwise
-  AND, and writes the result back to the bit field in the 16-bit register.
+  Reads a bit field in a 16-bit PCI configuration, performs a bitwise OR,
+  and writes the result back to the bit field in the 16-bit port.
 
-  Reads the 16-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData, and
-  writes the result to the 16-bit PCI configuration register specified by
-  Address. The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are
-  serialized. Extra left bits in AndData are stripped.
-
+  Reads the 16-bit PCI configuration register specified by Address,
+  performs a bitwise OR between the read result and the value specified by OrData,
+  and writes the result to the 16-bit PCI configuration register specified by Address.
+  The value written to the PCI configuration register is returned.
+  This function must guarantee that all PCI read and write operations are serialized.
+  Extra left bits in OrData are stripped.
+  
   If any reserved bits in Address are set, then ASSERT().
-  If StartBit is greater than 15, then ASSERT().
-  If EndBit is greater than 15, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
+  If StartBit is greater than 7, then ASSERT().
+  If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
 
-  @param  Address   PCI configuration register to write.
+  @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
-                    Range 0..15.
+                    The ordinal of the least significant bit in a byte is bit 0.
   @param  EndBit    The ordinal of the most significant bit in the bit field.
-                    Range 0..15.
-  @param  AndData   The value to AND with the PCI configuration register.
+                    The ordinal of the most significant bit in a byte is bit 7.
+  @param  AndData   The value to AND with the read value from the PCI configuration register.
 
-  @return The value written back to the PCI configuration register.
+  @return The value written to the PCI configuration register.
 
 **/
 UINT16
 EFIAPI
 PciSegmentBitFieldAnd16 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT16                    AndData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT16                    AndData
   )
 {
   return PciSegmentWrite16 (
@@ -843,11 +844,11 @@ PciSegmentBitFieldAnd16 (
 UINT16
 EFIAPI
 PciSegmentBitFieldAndThenOr16 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT16                    AndData,
-  IN      UINT16                    OrData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT16                    AndData,
+  IN UINT16                    OrData
   )
 {
   return PciSegmentWrite16 (
@@ -873,7 +874,7 @@ PciSegmentBitFieldAndThenOr16 (
 UINT32
 EFIAPI
 PciSegmentRead32 (
-  IN      UINT64                    Address
+  IN UINT64                    Address
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 3);
@@ -899,8 +900,8 @@ PciSegmentRead32 (
 UINT32
 EFIAPI
 PciSegmentWrite32 (
-  IN      UINT64                    Address,
-  IN      UINT32                    Value
+  IN UINT64                    Address,
+  IN UINT32                    Value
   )
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 3);
@@ -929,8 +930,8 @@ PciSegmentWrite32 (
 UINT32
 EFIAPI
 PciSegmentOr32 (
-  IN      UINT64                    Address,
-  IN      UINT32                    OrData
+  IN UINT64                    Address,
+  IN UINT32                    OrData
   )
 {
   return PciSegmentWrite32 (Address, PciSegmentRead32 (Address) | OrData);
@@ -957,8 +958,8 @@ PciSegmentOr32 (
 UINT32
 EFIAPI
 PciSegmentAnd32 (
-  IN      UINT64                    Address,
-  IN      UINT32                    AndData
+  IN UINT64                    Address,
+  IN UINT32                    AndData
   )
 {
   return PciSegmentWrite32 (Address, PciSegmentRead32 (Address) & AndData);
@@ -988,9 +989,9 @@ PciSegmentAnd32 (
 UINT32
 EFIAPI
 PciSegmentAndThenOr32 (
-  IN      UINT64                    Address,
-  IN      UINT32                    AndData,
-  IN      UINT32                    OrData
+  IN UINT64                    Address,
+  IN UINT32                    AndData,
+  IN UINT32                    OrData
   )
 {
   return PciSegmentWrite32 (Address, (PciSegmentRead32 (Address) & AndData) | OrData);
@@ -1021,9 +1022,9 @@ PciSegmentAndThenOr32 (
 UINT32
 EFIAPI
 PciSegmentBitFieldRead32 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit
   )
 {
   return BitFieldRead32 (PciSegmentRead32 (Address), StartBit, EndBit);
@@ -1056,10 +1057,10 @@ PciSegmentBitFieldRead32 (
 UINT32
 EFIAPI
 PciSegmentBitFieldWrite32 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT32                    Value
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT32                    Value
   )
 {
   return PciSegmentWrite32 (
@@ -1097,10 +1098,10 @@ PciSegmentBitFieldWrite32 (
 UINT32
 EFIAPI
 PciSegmentBitFieldOr32 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT32                    OrData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT32                    OrData
   )
 {
   return PciSegmentWrite32 (
@@ -1113,17 +1114,18 @@ PciSegmentBitFieldOr32 (
   Reads a bit field in a 32-bit PCI configuration register, performs a bitwise
   AND, and writes the result back to the bit field in the 32-bit register.
 
-  Reads the 32-bit PCI configuration register specified by Address, performs a
-  bitwise AND between the read result and the value specified by AndData, and
-  writes the result to the 32-bit PCI configuration register specified by
-  Address. The value written to the PCI configuration register is returned.
-  This function must guarantee that all PCI read and write operations are
-  serialized. Extra left bits in AndData are stripped.
-
+  
+  Reads the 32-bit PCI configuration register specified by Address, performs a bitwise
+  AND between the read result and the value specified by AndData, and writes the result
+  to the 32-bit PCI configuration register specified by Address. The value written to
+  the PCI configuration register is returned.  This function must guarantee that all PCI
+  read and write operations are serialized.  Extra left bits in AndData are stripped.
   If any reserved bits in Address are set, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1138,10 +1140,10 @@ PciSegmentBitFieldOr32 (
 UINT32
 EFIAPI
 PciSegmentBitFieldAnd32 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT32                    AndData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT32                    AndData
   )
 {
   return PciSegmentWrite32 (
@@ -1182,11 +1184,11 @@ PciSegmentBitFieldAnd32 (
 UINT32
 EFIAPI
 PciSegmentBitFieldAndThenOr32 (
-  IN      UINT64                    Address,
-  IN      UINTN                     StartBit,
-  IN      UINTN                     EndBit,
-  IN      UINT32                    AndData,
-  IN      UINT32                    OrData
+  IN UINT64                    Address,
+  IN UINTN                     StartBit,
+  IN UINTN                     EndBit,
+  IN UINT32                    AndData,
+  IN UINT32                    OrData
   )
 {
   return PciSegmentWrite32 (
@@ -1198,28 +1200,32 @@ PciSegmentBitFieldAndThenOr32 (
 /**
   Reads a range of PCI configuration registers into a caller supplied buffer.
 
-  Reads the range of PCI configuration registers specified by StartAddress
-  and Size into the buffer specified by Buffer.
-  This function only allows the PCI configuration registers from a single PCI function to be read.
-  Size is returned.
-  
-  If any reserved bits in StartAddress are set, then ASSERT().
+  Reads the range of PCI configuration registers specified by StartAddress and
+  Size into the buffer specified by Buffer. This function only allows the PCI
+  configuration registers from a single PCI function to be read. Size is
+  returned. When possible 32-bit PCI configuration read cycles are used to read
+  from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit
+  and 16-bit PCI configuration read cycles may be used at the beginning and the
+  end of the range.
+
+  If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
+                        Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer receiving the data read.
 
-  @return The parameter of Size.
+  @return Size
 
 **/
 UINTN
 EFIAPI
 PciSegmentReadBuffer (
-  IN      UINT64                    StartAddress,
-  IN      UINTN                     Size,
-  OUT     VOID                      *Buffer
+  IN  UINT64                   StartAddress,
+  IN  UINTN                    Size,
+  OUT VOID                     *Buffer
   )
 {
   UINTN                             ReturnValue;
@@ -1290,18 +1296,23 @@ PciSegmentReadBuffer (
 
 
 /**
-  Copies the data in a caller supplied buffer to a specified range of PCI configuration space.
+  Copies the data in a caller supplied buffer to a specified range of PCI
+  configuration space.
 
-  Writes the range of PCI configuration registers specified by StartAddress
-  and Size from the buffer specified by Buffer.
-  This function only allows the PCI configuration registers from a single PCI function to be written.
-  Size is returned.
-  
-  If any reserved bits in StartAddress are set, then ASSERT().
+  Writes the range of PCI configuration registers specified by StartAddress and
+  Size from the buffer specified by Buffer. This function only allows the PCI
+  configuration registers from a single PCI function to be written. Size is
+  returned. When possible 32-bit PCI configuration write cycles are used to
+  write from StartAdress to StartAddress + Size. Due to alignment restrictions,
+  8-bit and 16-bit PCI configuration write cycles may be used at the beginning
+  and the end of the range.
+
+  If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
-  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device, Function, and Register.
+  @param  StartAddress  Starting address that encodes the PCI Segment, Bus, Device,
+                        Function and Register.
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
@@ -1311,9 +1322,9 @@ PciSegmentReadBuffer (
 UINTN
 EFIAPI
 PciSegmentWriteBuffer (
-  IN      UINT64                    StartAddress,
-  IN      UINTN                     Size,
-  IN      VOID                      *Buffer
+  IN UINT64                    StartAddress,
+  IN UINTN                     Size,
+  IN VOID                      *Buffer
   )
 {
   UINTN                             ReturnValue;
