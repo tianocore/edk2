@@ -1,7 +1,7 @@
 /** @file
-  The wrap of TCP/IP Socket interface
+  The wrap of TCP/IP Socket interface.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -10,13 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  IScsiTcp4Io.c
-
-Abstract:
-  The wrap of TCP/IP Socket interface
-
 **/
 
 #include "IScsiImpl.h"
@@ -24,12 +17,8 @@ Abstract:
 /**
   The common notify function associated with various Tcp4Io events. 
 
-  @param  Event[in]   The event signaled.
-
-  @param  Contect[in] The context.
-
-  @retval None.
-
+  @param[in]  Event   The event signaled.
+  @param[in]  Context The context.
 **/
 VOID
 EFIAPI
@@ -44,18 +33,13 @@ Tcp4IoCommonNotify (
 /**
   Create a TCP socket with the specified configuration data. 
 
-  @param  Image[in]      The handle of the driver image.
-
-  @param  Controller[in] The handle of the controller.
-
-  @param  ConfigData[in] The Tcp4 configuration data.
-
-  @param  Tcp4Io[in]     The Tcp4Io.
+  @param[in]  Image      The handle of the driver image.
+  @param[in]  Controller The handle of the controller.
+  @param[in]  ConfigData The Tcp4 configuration data.
+  @param[in]  Tcp4Io     The Tcp4Io.
   
   @retval EFI_SUCCESS    The TCP socket is created and configured.
-
-  @retval Other          Failed to create the TCP socket or configure it.
-
+  @retval Others         Failed to create the TCP socket or configure it.
 **/
 EFI_STATUS
 Tcp4IoCreateSocket (
@@ -249,9 +233,6 @@ ON_ERROR:
   Destroy the socket. 
 
   @param[in]  Tcp4Io The Tcp4Io which wraps the socket to be destroyeds.
-
-  @retval     None.
-
 **/
 VOID
 Tcp4IoDestroySocket (
@@ -286,12 +267,12 @@ Tcp4IoDestroySocket (
 /**
   Connect to the other endpoint of the TCP socket.
 
-  @param  Tcp4Io[in]  The Tcp4Io wrapping the TCP socket.
-
-  @param  Timeout[in] The time to wait for connection done.
-
-  @retval None.
-
+  @param[in]  Tcp4Io  The Tcp4Io wrapping the TCP socket.
+  @param[in]  Timeout The time to wait for connection done.
+  
+  @retval EFI_SUCCESS          Connect to the other endpoint of the TCP socket successfully.
+  @retval EFI_TIMEOUT          Failed to connect to the other endpoint of the TCP socket in the                               specified time period.
+  @retval Others               Some expected error happened.
 **/
 EFI_STATUS
 Tcp4IoConnect (
@@ -325,10 +306,7 @@ Tcp4IoConnect (
 /**
   Reset the socket.
 
-  @param  Tcp4Io[in] The Tcp4Io wrapping the TCP socket.
-
-  @retval None.
-
+  @param[in]  Tcp4Io The Tcp4Io wrapping the TCP socket.
 **/
 VOID
 Tcp4IoReset (
@@ -355,14 +333,12 @@ Tcp4IoReset (
 /**
   Transmit the Packet to the other endpoint of the socket.
 
-  @param  Tcp4Io[in]           The Tcp4Io wrapping the TCP socket.
-
-  @param  Packet[in]           The packet to transmit
-
+  @param[in]   Tcp4Io          The Tcp4Io wrapping the TCP socket.
+  @param[in]   Packet          The packet to transmit.
+  
   @retval EFI_SUCCESS          The packet is trasmitted.
-
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-
+  @retval Others               Some expected error happened.
 **/
 EFI_STATUS
 Tcp4IoTransmit (
@@ -418,22 +394,17 @@ ON_EXIT:
 /**
   Receive data from the socket.
 
-  @param  Tcp4Io[in]           The Tcp4Io which wraps the socket to be destroyeds.
-
-  @param  Packet[in]           The buffer to hold the data copy from the soket rx buffer.
-
-  @param  AsyncMode[in]        Is this receive asyncronous or not.
-
-  @param  Timeout[in]          The time to wait for receiving the amount of data the Packet
+  @param[in]  Tcp4Io           The Tcp4Io which wraps the socket to be destroyed.
+  @param[in]  Packet           The buffer to hold the data copy from the soket rx buffer.
+  @param[in]  AsyncMode        Is this receive asyncronous or not.
+  @param[in]  Timeout          The time to wait for receiving the amount of data the Packet
                                can hold.
 
   @retval EFI_SUCCESS          The required amount of data is received from the socket.
-
   @retval EFI_OUT_OF_RESOURCES Failed to allocate momery.
-
   @retval EFI_TIMEOUT          Failed to receive the required amount of data in the
                                specified time period.
-
+  @retval Others               Some expected error happened.
 **/
 EFI_STATUS
 Tcp4IoReceive (
