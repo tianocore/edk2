@@ -24,9 +24,28 @@
 /// Global Coherencey Domain types - Memory type
 ///
 typedef enum {
+  ///
+  /// A memory region that is visible to the boot processor. However, there are no system
+  /// components that are currently decoding this memory region.
+  ///
   EfiGcdMemoryTypeNonExistent,
+  ///
+  /// A memory region that is visible to the boot processor. This memory region is being
+  /// decoded by a system component, but the memory region is not considered to be either
+  /// system memory or memory-mapped I/O.
+  ///
   EfiGcdMemoryTypeReserved,
+  ///
+  /// A memory region that is visible to the boot processor. A memory controller is
+  /// currently decoding this memory region and the memory controller is producing a
+  /// tested system memory region that is available to the memory services.
+  ///
   EfiGcdMemoryTypeSystemMemory,
+  ///
+  /// A memory region that is visible to the boot processor. This memory region is
+  /// currently being decoded by a component as memory-mapped I/O that can be used to
+  /// access I/O devices in the platform.
+  ///
   EfiGcdMemoryTypeMemoryMappedIo,
   EfiGcdMemoryTypeMaximum
 } EFI_GCD_MEMORY_TYPE;
@@ -35,8 +54,20 @@ typedef enum {
 /// Global Coherencey Domain types - IO type
 ///
 typedef enum {
+  ///
+  /// An I/O region that is visible to the boot processor. However, there are no system
+  /// components that are currently decoding this I/O region.
+  ///
   EfiGcdIoTypeNonExistent,
+  ///
+  /// An I/O region that is visible to the boot processor. This I/O region is currently being
+  /// decoded by a system component, but the I/O region cannot be used to access I/O devices.
+  ///
   EfiGcdIoTypeReserved,
+  ///
+  /// An I/O region that is visible to the boot processor. This I/O region is currently being
+  /// decoded by a system component that is producing I/O ports that can be used to access I/O devices.
+  ///
   EfiGcdIoTypeIo,
   EfiGcdIoTypeMaximum
 } EFI_GCD_IO_TYPE;
@@ -45,10 +76,30 @@ typedef enum {
 /// The type of allocation to perform.
 /// 
 typedef enum {
+  ///
+  /// The GCD memory space map is searched from the lowest address up to the highest address
+  /// looking for unallocated memory ranges.
+  ///
   EfiGcdAllocateAnySearchBottomUp,
+  ///
+  /// The GCD memory space map is searched from the lowest address up 
+  /// to the specified MaxAddress looking for unallocated memory ranges.
+  ///
   EfiGcdAllocateMaxAddressSearchBottomUp,
+  ///
+  /// The GCD memory space map is checked to see if the memory range starting 
+  /// at the specified Address is available.
+  ///
   EfiGcdAllocateAddress,
+  ///
+  /// The GCD memory space map is searched from the highest address down to the lowest address 
+  /// looking for unallocated memory ranges.
+  ///
   EfiGcdAllocateAnySearchTopDown,
+  ///
+  /// The GCD memory space map is searched from the specified MaxAddress 
+  /// down to the lowest address looking for unallocated memory ranges.
+  ///
   EfiGcdAllocateMaxAddressSearchTopDown,
   EfiGcdMaxAllocateType
 } EFI_GCD_ALLOCATE_TYPE;
@@ -606,6 +657,10 @@ EFI_STATUS
 #define DXE_SERVICES_REVISION   ((1<<16) | (00))
 
 typedef struct {
+  ///
+  /// The table header for the DXE Services Table.
+  /// This header contains the DXE_SERVICES_SIGNATURE and DXE_SERVICES_REVISION values.
+  ///
   EFI_TABLE_HEADER                Hdr;
 
   //

@@ -86,8 +86,17 @@ typedef UINT32 EFI_STATUS_CODE_VALUE;
 /// the structure and is Size bytes long.
 ///
 typedef struct {
+  ///
+  /// The size of the structure. This is specified to enable future expansion.
+  ///
   UINT16    HeaderSize;
+  ///
+  /// The size of the data in bytes. This does not include the size of the header structure.
+  ///
   UINT16    Size;
+  ///
+  /// The GUID defining the type of the data.
+  ///
   EFI_GUID  Type;
 } EFI_STATUS_CODE_DATA;
 

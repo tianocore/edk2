@@ -151,7 +151,7 @@ typedef UINT32                      TPM_KEY_CONTROL;
 ///
 typedef UINT32                      TPM_NV_INDEX;
 ///
-/// The family ID. Families ID¡¯s are automatically assigned a sequence number by the TPM. 
+/// The family ID. Families ID's are automatically assigned a sequence number by the TPM. 
 /// A trusted process can set the FamilyID value in an individual row to NULL, which 
 /// invalidates that row. The family ID resets to NULL on each change of TPM Owner.
 ///

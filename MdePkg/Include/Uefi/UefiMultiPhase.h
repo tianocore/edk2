@@ -21,32 +21,100 @@
 /// Enumeration of memory types introduced in UEFI.
 /// 
 typedef enum {
+  ///
+  /// Not used.
+  ///
   EfiReservedMemoryType,
+  ///
+  /// The code portions of a loaded application. 
+  /// (Note that UEFI OS loaders are UEFI applications.)
+  ///
   EfiLoaderCode,
+  ///
+  /// The data portions of a loaded application and the default data allocation
+  /// type used by an application to allocate pool memory.
+  ///
   EfiLoaderData,
+  ///
+  /// The code portions of a loaded Boot Services Driver
+  ///
   EfiBootServicesCode,
+  ///
+  /// The data portions of a loaded Boot Serves Driver, and the default data
+  /// allocation type used by a Boot Services Driver to allocate pool memory.
+  ///
   EfiBootServicesData,
+  ///
+  /// The code portions of a loaded Runtime Services Driver.
+  ///
   EfiRuntimeServicesCode,
+  ///
+  /// The data portions of a loaded Runtime Services Driver and the default
+  /// data allocation type used by a Runtime Services Driver to allocate pool memory.
+  ///
   EfiRuntimeServicesData,
+  ///
+  /// Free (unallocated) memory.
+  ///
   EfiConventionalMemory,
+  ///
+  /// Memory in which errors have been detected.
+  ///
   EfiUnusableMemory,
+  ///
+  /// Memory that holds the ACPI tables.
+  ///
   EfiACPIReclaimMemory,
+  ///
+  /// Address space reserved for use by the firmware.
+  ///
   EfiACPIMemoryNVS,
+  ///
+  /// Used by system firmware to request that a memory-mapped IO region
+  /// be mapped by the OS to a virtual address so it can be accessed by EFI runtime services.
+  ///
   EfiMemoryMappedIO,
+  ///
+  /// System memory-mapped IO region that is used to translate memory
+  /// cycles to IO cycles by the processor.
+  ///
   EfiMemoryMappedIOPortSpace,
+  ///
+  /// Address space reserved by the firmware for code that is part of the processor.
+  ///
   EfiPalCode,
   EfiMaxMemoryType
 } EFI_MEMORY_TYPE;
-
 
 ///
 /// Data structure that precedes all of the standard EFI table types.
 /// 
 typedef struct {
+  ///
+  /// A 64-bit signature that identifies the type of table that follows.
+  /// Unique signatures have been generated for the EFI System Table,
+  /// the EFI Boot Services Table, and the EFI Runtime Services Table.
+  ///
   UINT64  Signature;
+  ///
+  /// The revision of the EFI Specification to which this table
+  /// conforms. The upper 16 bits of this field contain the major
+  /// revision value, and the lower 16 bits contain the minor revision
+  /// value. The minor revision values are limited to the range of 00..99.
+  ///
   UINT32  Revision;
+  ///
+  /// The size, in bytes, of the entire table including the EFI_TABLE_HEADER.
+  ///
   UINT32  HeaderSize;
+  ///
+  /// The 32-bit CRC for the entire table. This value is computed by
+  /// setting this field to 0, and computing the 32-bit CRC for HeaderSize bytes.
+  ///
   UINT32  CRC32;
+  ///
+  /// Reserved field that must be set to 0.
+  ///
   UINT32  Reserved;
 } EFI_TABLE_HEADER;
 
@@ -104,9 +172,9 @@ typedef struct _WIN_CERTIFICATE {
 #define EFI_CERT_TYPE_RSA2048_SHA256_GUID \
   {0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf } }
 
-//
-// WIN_CERTIFICATE_UEFI_GUID.CertData
-// 
+///
+/// WIN_CERTIFICATE_UEFI_GUID.CertData
+/// 
 typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
   UINT32  HashType;
   UINT8   PublicKey[256];

@@ -27,9 +27,27 @@
 /// 
 typedef union {
   struct {
+    ///
+    /// The IntegrityCheck.Checksum.Header field is an 8-bit checksum of the file
+    /// header. The State and IntegrityCheck.Checksum.File fields are assumed
+    /// to be zero and the checksum is calculated such that the entire header sums to zero.
+    ///
     UINT8   Header;
+    ///
+    /// If the FFS_ATTRIB_CHECKSUM (see definition below) bit of the Attributes
+    /// field is set to one, the IntegrityCheck.Checksum.File field is an 8-bit
+    /// checksum of the entire file The State field and the file tail are assumed to be zero
+    /// and the checksum is calculated such that the entire file sums to zero.
+    /// If the FFS_ATTRIB_CHECKSUM bit of the Attributes field is cleared to zero,
+    /// the IntegrityCheck.Checksum.File field must be initialized with a value of
+    /// 0x55AA. The IntegrityCheck.Checksum.File field is valid any time the
+    /// EFI_FILE_DATA_VALID bit is set in the State field.
+    ///
     UINT8   File;
   } Checksum;
+  ///
+  /// This is the full 16 bits of the IntegrityCheck field.
+  ///
   UINT16    Checksum16;
 } EFI_FFS_INTEGRITY_CHECK;
 
@@ -81,11 +99,29 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 /// contents and state of the files.
 /// 
 typedef struct {
+  ///
+  /// This GUID is the file name. It is used to uniquely identify the file.
+  ///
   EFI_GUID                Name;
+  ///
+  /// Used to verify the integrity of the file.
+  ///
   EFI_FFS_INTEGRITY_CHECK IntegrityCheck;
+  ///
+  /// Identifies the type of file.
+  ///
   EFI_FV_FILETYPE         Type;
+  ///
+  /// Declares various file attribute bits.
+  ///
   EFI_FFS_FILE_ATTRIBUTES Attributes;
+  ///
+  /// The length of the file in bytes, including the FFS header.
+  ///
   UINT8                   Size[3];
+  ///
+  /// Used to track the state of the file throughout the life of the file from creation to deletion.
+  ///
   EFI_FFS_FILE_STATE      State;
 } EFI_FFS_FILE_HEADER;
 
@@ -125,8 +161,15 @@ typedef UINT8 EFI_SECTION_TYPE;
 /// Common section header
 /// 
 typedef struct {
+  ///
+  /// A 24-bit unsigned integer that contains the total size of the section in bytes, 
+  /// including the EFI_COMMON_SECTION_HEADER.
+  ///
   UINT8             Size[3];
   EFI_SECTION_TYPE  Type;
+  ///
+  /// Declares the section type.
+  ///
 } EFI_COMMON_SECTION_HEADER;
 
 ///
@@ -145,8 +188,17 @@ typedef EFI_COMMON_SECTION_HEADER EFI_COMPATIBILITY16_SECTION;
 /// section data is compressed.
 /// 
 typedef struct {
+  ///
+  /// Usual common section header. CommonHeader.Type = EFI_SECTION_COMPRESSION.
+  ///
   EFI_COMMON_SECTION_HEADER   CommonHeader;
+  ///
+  /// UINT32 that indicates the size of the section data after decompression.
+  ///
   UINT32                      UncompressedLength;
+  ///
+  /// Indicates which compression algorithm is used.
+  ///
   UINT8                       CompressionType;
 } EFI_COMPRESSION_SECTION;
 
@@ -164,7 +216,13 @@ typedef EFI_COMMON_SECTION_HEADER EFI_FIRMWARE_VOLUME_IMAGE_SECTION;
 /// Leaf section which contains a single GUID.
 /// 
 typedef struct {
+  ///
+  /// Common section header. CommonHeader.Type = EFI_SECTION_FREEFORM_SUBTYPE_GUID.
+  ///
   EFI_COMMON_SECTION_HEADER   CommonHeader;
+  ///
+  /// This GUID is defined by the creator of the file. It is a vendor-defined file type.
+  ///
   EFI_GUID                    SubTypeGuid;
 } EFI_FREEFORM_SUBTYPE_GUID_SECTION;
 
@@ -177,9 +235,21 @@ typedef struct {
 /// Leaf section which is encapsulation defined by specific GUID
 /// 
 typedef struct {
+  ///
+  /// Common section header. CommonHeader.Type = EFI_SECTION_GUID_DEFINED.
+  ///
   EFI_COMMON_SECTION_HEADER   CommonHeader;
+  ///
+  /// GUID that defines the format of the data that follows. It is a vendor-defined section type.
+  ///
   EFI_GUID                    SectionDefinitionGuid;
+  ///
+  /// Contains the offset in bytes from the beginning of the common header to the first byte of the data.
+  ///
   UINT16                      DataOffset;
+  ///
+  /// Bit field that declares some specific characteristics of the section contents.
+  ///
   UINT16                      Attributes;
 } EFI_GUID_DEFINED_SECTION;
 

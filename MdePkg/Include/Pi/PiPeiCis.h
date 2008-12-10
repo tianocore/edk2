@@ -94,8 +94,18 @@ EFI_STATUS
 /// The data structure through which a PEIM describes available services to the PEI Foundation.
 /// 
 typedef struct {
+  ///
+  /// This field is a set of flags describing the characteristics of this imported table entry.
+  /// All flags are defined as EFI_PEI_PPI_DESCRIPTOR_***, which can also be combined into one.
+  ///
   UINTN     Flags;
+  ///
+  /// The address of the EFI_GUID that names the interface.
+  ///
   EFI_GUID  *Guid;
+  ///
+  /// A pointer to the PPI. It contains the information necessary to install a service.
+  ///
   VOID      *Ppi;
 } EFI_PEI_PPI_DESCRIPTOR;
 
@@ -104,23 +114,19 @@ typedef struct {
 /// Foundation where to invoke the notification service.
 /// 
 struct _EFI_PEI_NOTIFY_DESCRIPTOR {
+  ///
+  /// Details if the type of notification is callback or dispatch.
+  ///
   UINTN                       Flags;
+  ///
+  /// The address of the EFI_GUID that names the interface.
+  ///
   EFI_GUID                    *Guid;
+  ///
+  /// Address of the notification callback function itself within the PEIM.
+  ///
   EFI_PEIM_NOTIFY_ENTRY_POINT Notify;
 };
-
-///
-/// Describes request of the module to be loaded to 
-/// the permanent memory once it is available. Unlike most of the other HOBs, 
-/// this HOB is produced and consumed during the HOB producer phase.
-/// 
-typedef struct _EFI_HOB_LOAD_PEIM {
-  EFI_HOB_GENERIC_HEADER            Header;
-  EFI_PEI_FILE_HANDLE               FileHandle;
-  EFI_PEIM_ENTRY_POINT2             EntryPoint;
-  EFI_PEIM_ENTRY_POINT2             InMemEntryPoint;
-} EFI_HOB_LOAD_PEIM;
-
 
 /**
   This service is the first one provided by the PEI Foundation.  This function 
