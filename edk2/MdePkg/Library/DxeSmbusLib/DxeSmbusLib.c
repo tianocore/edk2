@@ -68,7 +68,7 @@ SmbusLibConstructor (
   @param  Status          Return status for the executed command.
                           This is an optional parameter and may be NULL.
 
-  @return The actual number of bytes that are executed for this operation..
+  @return The actual number of bytes that are executed for this operation.
 
 **/
 UINTN

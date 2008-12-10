@@ -689,7 +689,6 @@ LookupUnicodeString (
 
 **/
 EFI_STATUS
-
 EFIAPI
 LookupUnicodeString2 (
   IN CONST CHAR8                     *Language,
