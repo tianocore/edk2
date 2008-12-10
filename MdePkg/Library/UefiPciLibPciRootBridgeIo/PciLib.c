@@ -143,8 +143,11 @@ DxePciLibPciRootBridgeIoWriteWorker (
 }
 
 /**
-  Register a PCI device so PCI configuration registers may be accessed after 
+  Registers a PCI device so PCI configuration registers may be accessed after 
   SetVirtualAddressMap().
+  
+  Registers the PCI device specified by Address so all the PCI configuration registers 
+  associated with that PCI device may be accessed after SetVirtualAddressMap() is called.
   
   If Address > 0x0FFFFFFF, then ASSERT().
 
@@ -181,7 +184,7 @@ PciRegisterForRuntimeAccess (
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
 
-  @return The value read from the PCI configuration register.
+  @return The read value from the PCI configuration register.
 
 **/
 UINT8
@@ -206,7 +209,7 @@ PciRead8 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -215,12 +218,12 @@ UINT8
 EFIAPI
 PciWrite8 (
   IN      UINTN                     Address,
-  IN      UINT8                     Data
+  IN      UINT8                     Value
   )
 {
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
 
-  return (UINT8) DxePciLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint8, Data);
+  return (UINT8) DxePciLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint8, Value);
 }
 
 /**
@@ -526,7 +529,7 @@ PciBitFieldAndThenOr8 (
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
 
-  @return The value read from the PCI configuration register.
+  @return The read value from the PCI configuration register.
 
 **/
 UINT16
@@ -552,7 +555,7 @@ PciRead16 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -561,12 +564,12 @@ UINT16
 EFIAPI
 PciWrite16 (
   IN      UINTN                     Address,
-  IN      UINT16                    Data
+  IN      UINT16                    Value
   )
 {
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
 
-  return (UINT16) DxePciLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint16, Data);
+  return (UINT16) DxePciLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint16, Value);
 }
 
 /**
@@ -880,7 +883,7 @@ PciBitFieldAndThenOr16 (
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
 
-  @return The value read from the PCI configuration register.
+  @return The read value from the PCI configuration register.
 
 **/
 UINT32
@@ -906,7 +909,7 @@ PciRead32 (
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  @param  Data    The value to write.
+  @param  Value   The value to write.
 
   @return The value written to the PCI configuration register.
 
@@ -915,12 +918,12 @@ UINT32
 EFIAPI
 PciWrite32 (
   IN      UINTN                     Address,
-  IN      UINT32                    Data
+  IN      UINT32                    Value
   )
 {
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
 
-  return DxePciLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint32, Data);
+  return DxePciLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint32, Value);
 }
 
 /**
@@ -1339,7 +1342,7 @@ PciReadBuffer (
   @param  Size          Size in bytes of the transfer.
   @param  Buffer        Pointer to a buffer containing the data to write.
 
-  @return Size
+  @return Size written to StartAddress.
 
 **/
 UINTN

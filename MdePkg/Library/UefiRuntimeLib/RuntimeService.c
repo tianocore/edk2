@@ -87,7 +87,7 @@ EFI_STATUS
 EFIAPI
 EfiGetTime (
   OUT EFI_TIME                    *Time,
-  OUT EFI_TIME_CAPABILITIES       *Capabilities   OPTIONAL
+  OUT EFI_TIME_CAPABILITIES       *Capabilities  OPTIONAL
   )
 {
   return mRT->GetTime (Time, Capabilities);
@@ -186,7 +186,7 @@ EFI_STATUS
 EFIAPI
 EfiSetWakeupTime (
   IN BOOLEAN                      Enable,
-  IN EFI_TIME                     *Time  OPTIONAL
+  IN EFI_TIME                     *Time   OPTIONAL
   )
 {
   return mRT->SetWakeupTime (Enable, Time);
@@ -226,11 +226,11 @@ EfiSetWakeupTime (
 EFI_STATUS
 EFIAPI
 EfiGetVariable (
-  IN CHAR16                       *VariableName,
-  IN EFI_GUID                     * VendorGuid,
-  OUT UINT32                      *Attributes OPTIONAL,
-  IN OUT UINTN                    *DataSize,
-  OUT VOID                        *Data
+  IN      CHAR16                   *VariableName,
+  IN      EFI_GUID                 *VendorGuid,
+  OUT     UINT32                   *Attributes OPTIONAL,
+  IN OUT  UINTN                    *DataSize,
+  OUT     VOID                     *Data
   )
 {
   return mRT->GetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
@@ -545,9 +545,9 @@ EfiSetVirtualAddressMap (
 EFI_STATUS
 EFIAPI
 EfiUpdateCapsule (
-  IN EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
-  IN UINTN                CapsuleCount,
-  IN EFI_PHYSICAL_ADDRESS ScatterGatherList OPTIONAL
+  IN EFI_CAPSULE_HEADER       **CapsuleHeaderArray,
+  IN UINTN                    CapsuleCount,
+  IN EFI_PHYSICAL_ADDRESS     ScatterGatherList OPTIONAL
   )
 {
   return mRT->UpdateCapsule (
@@ -595,10 +595,10 @@ EfiUpdateCapsule (
 EFI_STATUS
 EFIAPI
 EfiQueryCapsuleCapabilities (
-  IN EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
-  IN UINTN                CapsuleCount,
-  OUT UINT64              *MaximumCapsuleSize,
-  OUT EFI_RESET_TYPE      *ResetType
+  IN  EFI_CAPSULE_HEADER       **CapsuleHeaderArray,
+  IN  UINTN                    CapsuleCount,
+  OUT UINT64                   *MaximumCapsuleSize,
+  OUT EFI_RESET_TYPE           *ResetType
   )
 {
   return mRT->QueryCapsuleCapabilities (
@@ -647,10 +647,10 @@ EfiQueryCapsuleCapabilities (
 EFI_STATUS
 EFIAPI
 EfiQueryVariableInfo (
-  IN  UINT32      Attributes,
-  OUT UINT64      *MaximumVariableStorageSize,
-  OUT UINT64      *RemainingVariableStorageSize,
-  OUT UINT64      *MaximumVariableSize
+  IN UINT32   Attributes,
+  OUT UINT64  *MaximumVariableStorageSize,
+  OUT UINT64  *RemainingVariableStorageSize,
+  OUT UINT64  *MaximumVariableSize
   )
 {
   return mRT->QueryVariableInfo (

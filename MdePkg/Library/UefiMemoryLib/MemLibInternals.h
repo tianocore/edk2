@@ -36,38 +36,42 @@
 #include <Library/BaseLib.h>
 
 /**
-  Copy Length bytes from Source to Destination.
+  Copies a source buffer to a destination buffer, and returns the destination buffer.
 
-  @param  DestinationBuffer Target of copy
-  @param  SourceBuffer Place to copy from
-  @param  Length Number of bytes to copy
+  This function wraps the gBS->CopyMem().
 
-  @return Destination
+  @param  DestinationBuffer   Pointer to the destination buffer of the memory copy.
+  @param  SourceBuffer        Pointer to the source buffer of the memory copy.
+  @param  Length              Number of bytes to copy from SourceBuffer to DestinationBuffer.
+
+  @return DestinationBuffer.
 
 **/
 VOID *
 EFIAPI
 InternalMemCopyMem (
-  OUT     VOID                      *DestinationBuffer,
-  IN      CONST VOID                *SourceBuffer,
+  OUT     VOID                      *Destination,
+  IN      CONST VOID                *Source,
   IN      UINTN                     Length
   );
 
 /**
-  Set Buffer to Value for Size bytes.
+  Fills a target buffer with a byte value, and returns the target buffer.
 
-  @param  Buffer Memory to set.
-  @param  Length Number of bytes to set
-  @param  Value Value of the set operation.
+  This function wraps the gBS->SetMem().
 
-  @return Buffer
+  @param  Buffer    Memory to set.
+  @param  Size      Number of bytes to set.
+  @param  Value     Value of the set operation.
+
+  @return Buffer.
 
 **/
 VOID *
 EFIAPI
 InternalMemSetMem (
   OUT     VOID                      *Buffer,
-  IN      UINTN                     Length,
+  IN      UINTN                     Size,
   IN      UINT8                     Value
   );
 

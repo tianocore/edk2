@@ -192,7 +192,7 @@ ScsiTestUnitReadyCommand (
                                          SCSI I/O Protocol in the UEFI Specification
                                          for details on the possible return values.
   @param[out]     TargetStatus           The status returned by the SCSI target specified
-                                         by ScsiIo when the SCSI Request Packat was
+                                         by ScsiIo when the SCSI Request Packet was
                                          executed on the SCSI Host Controller.
                                          See the EFI SCSI I/O Protocol in the UEFI
                                          Specification for details on the possible
@@ -338,7 +338,7 @@ ScsiInquiryCommand (
                                      UEFI Specification for details on the possible
                                      return values.
   @param[out]     TargetStatus       The status returned by the SCSI target specified
-                                     by ScsiIo when the SCSI Request Packat was executed
+                                     by ScsiIo when the SCSI Request Packet was executed
                                      on the SCSI Host Controller.  See the EFI SCSI
                                      I/O Protocol in the UEFI Specification for details
                                      on the possible return values.

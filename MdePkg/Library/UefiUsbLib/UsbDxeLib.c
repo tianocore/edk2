@@ -590,7 +590,7 @@ UsbGetStatus (
 
   Retrieve the USB endpoint descriptor specified by UsbIo and EndPoint.
   If the USB endpoint descriptor can not be retrieved, then return EFI_NOT_FOUND.
-  If the endpoint descriptor is found, then clear the halt fature of this USB endpoint.
+  If the endpoint descriptor is found, then clear the halt feature of this USB endpoint.
   The status of the transfer is returned in Status.
   If UsbIo is NULL, then ASSERT().
   If Status is NULL, then ASSERT().

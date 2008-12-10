@@ -75,8 +75,8 @@ EfiCreateEventLegacyBoot (
 
 /**
   Create an EFI event in the Legacy Boot Event Group and allows
-  the caller to specify a notification function.
-
+  the caller to specify a notification function.  
+  
   This function abstracts the creation of the Legacy Boot Event.
   The Framework moved from a proprietary to UEFI 2.0 based mechanism.
   This library abstracts the caller from how this event is created to prevent
@@ -160,8 +160,8 @@ EfiCreateEventReadyToBoot (
 
 /**
   Create an EFI event in the Ready To Boot Event Group and allows
-  the caller to specify a notification function.
-
+  the caller to specify a notification function.  
+  
   This function abstracts the creation of the Ready to Boot Event.
   The Framework moved from a proprietary to UEFI 2.0 based mechanism.
   This library abstracts the caller from how this event is created to prevent
@@ -282,17 +282,17 @@ EfiSignalEventLegacyBoot (
   @retval Other             FvDevicePathNode is valid and pointer to NameGuid was returned.
 
 **/
-EFI_GUID*
+EFI_GUID *
 EFIAPI
 EfiGetNameGuidFromFwVolDevicePathNode (
-  IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvFileDevicePathNode
+  IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode
   )
 {
-  ASSERT (FvFileDevicePathNode != NULL);
+  ASSERT (FvDevicePathNode != NULL);
 
-  if (DevicePathType (&FvFileDevicePathNode->Header) == MEDIA_DEVICE_PATH &&
-      DevicePathSubType (&FvFileDevicePathNode->Header) == MEDIA_PIWG_FW_FILE_DP) {
-    return (EFI_GUID *) &FvFileDevicePathNode->FvFileName;
+  if (DevicePathType (&FvDevicePathNode->Header) == MEDIA_DEVICE_PATH &&
+      DevicePathSubType (&FvDevicePathNode->Header) == MEDIA_PIWG_FW_FILE_DP) {
+    return (EFI_GUID *) &FvDevicePathNode->FvFileName;
   }
 
   return NULL;
@@ -318,20 +318,20 @@ EfiGetNameGuidFromFwVolDevicePathNode (
 VOID
 EFIAPI
 EfiInitializeFwVolDevicepathNode (
-  IN OUT    MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFileDevicePathNode,
-  IN CONST  EFI_GUID                          *NameGuid
+  IN OUT MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode,
+  IN CONST EFI_GUID                         *NameGuid
   )
 {
-  ASSERT (FvFileDevicePathNode  != NULL);
+  ASSERT (FvDevicePathNode != NULL);
   ASSERT (NameGuid          != NULL);
 
   //
   // Use the new Device path that does not conflict with the UEFI
   //
-  FvFileDevicePathNode->Header.Type     = MEDIA_DEVICE_PATH;
-  FvFileDevicePathNode->Header.SubType  = MEDIA_PIWG_FW_FILE_DP;
-  SetDevicePathNodeLength (&FvFileDevicePathNode->Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
+  FvDevicePathNode->Header.Type     = MEDIA_DEVICE_PATH;
+  FvDevicePathNode->Header.SubType  = MEDIA_PIWG_FW_FILE_DP;
+  SetDevicePathNodeLength (&FvDevicePathNode->Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
 
-  CopyGuid (&FvFileDevicePathNode->FvFileName, NameGuid);
+  CopyGuid (&FvDevicePathNode->FvFileName, NameGuid);
 }
 
