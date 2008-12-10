@@ -104,7 +104,7 @@ RegisterHotkey (
     return EFI_INVALID_PARAMETER;
   }
 
-  KeyOptionSize = sizeof (EFI_KEY_OPTION) + GET_KEY_CODE_COUNT (KeyOption->KeyOptions.PackedValue) * sizeof (EFI_INPUT_KEY);
+  KeyOptionSize = sizeof (EFI_KEY_OPTION) + GET_KEY_CODE_COUNT (KeyOption->KeyData.PackedValue) * sizeof (EFI_INPUT_KEY);
   UpdateBootOption = FALSE;
 
   //
@@ -146,8 +146,8 @@ RegisterHotkey (
       return EFI_SUCCESS;
     }
 
-    if (KeyOption->KeyOptions.PackedValue == TempOption->KeyOptions.PackedValue) {
-      if (GET_KEY_CODE_COUNT (KeyOption->KeyOptions.PackedValue) == 0 ||
+    if (KeyOption->KeyData.PackedValue == TempOption->KeyData.PackedValue) {
+      if (GET_KEY_CODE_COUNT (KeyOption->KeyData.PackedValue) == 0 ||
           CompareMem (
             ((UINT8 *) TempOption) + sizeof (EFI_KEY_OPTION),
             ((UINT8 *) KeyOption) + sizeof (EFI_KEY_OPTION),
@@ -559,7 +559,7 @@ HotkeyInsertList (
   HotkeyLeft->Signature = BDS_HOTKEY_OPTION_SIGNATURE;
   HotkeyLeft->BootOptionNumber = KeyOption->BootOption;
 
-  KeyOptions = KeyOption->KeyOptions.PackedValue;
+  KeyOptions = KeyOption->KeyData.PackedValue;
 
   HotkeyLeft->CodeCount = (UINT8) GET_KEY_CODE_COUNT (KeyOptions);
 
