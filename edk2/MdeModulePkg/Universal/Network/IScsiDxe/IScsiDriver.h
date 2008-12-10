@@ -48,9 +48,9 @@ typedef struct _ISCSI_PRIVATE_PROTOCOL {
   UINT32  Reserved;
 } ISCSI_PRIVATE_PROTOCOL;
 
-///
-/// EFI Driver Binding Protocol for iSCSI driver.
-///
+//
+// EFI Driver Binding Protocol for iSCSI driver.
+//
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided, 
@@ -152,9 +152,9 @@ IScsiDriverBindingStop (
   IN EFI_HANDLE                   *ChildHandleBuffer
   );
 
-///
-/// EFI Component Name Protocol for IScsi driver.
-///
+//
+// EFI Component Name Protocol for IScsi driver.
+//
 
 /**
   Retrieves a Unicode string that is the user readable name of the EFI Driver.
@@ -241,9 +241,9 @@ IScsiComponentNameGetControllerName (
   OUT CHAR16                        **ControllerName
   );
   
-///
-/// EFI IScsi Initiator Name Protocol for IScsi driver.
-///
+//
+// EFI IScsi Initiator Name Protocol for IScsi driver.
+//
 
 /**
   Retrieves the current set value of iSCSI Initiator Name.
