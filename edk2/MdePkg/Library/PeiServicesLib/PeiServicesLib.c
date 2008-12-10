@@ -192,7 +192,7 @@ PeiServicesSetBootMode (
 EFI_STATUS
 EFIAPI
 PeiServicesGetHobList (
-  OUT VOID                   **HobList
+  OUT VOID                      **HobList
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
@@ -445,7 +445,7 @@ PeiServicesRegisterForShadow (
   
 **/
 EFI_STATUS
-EFIAPI
+EFIAPI 
 PeiServicesFfsGetFileInfo (
   IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
   OUT EFI_FV_FILE_INFO            *FileInfo
@@ -466,8 +466,7 @@ PeiServicesFfsGetFileInfo (
   @param VolumeHandle   The firmware volume to search FileHandle
                         Upon exit, points to the found file's
                         handle or NULL if it could not be found.
-
-  @param FileHandle     The filehandle found in volume.
+  @param FileHandle     Pointer to found file handle 
 
   @retval EFI_SUCCESS             File was found.
 

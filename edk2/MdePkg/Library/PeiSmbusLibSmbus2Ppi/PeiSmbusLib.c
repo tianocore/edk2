@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   This internal function retrieves Smbus PPI from PPI database.
 
-  @param  PeiServices   An indirect pointer to the EFI_PEI_SERVICES published by the PEI Foundation.
+  @param  VOID
 
   @return The pointer to Smbus PPI.
 
@@ -57,7 +57,7 @@ InternalGetSmbusPpi (
   @param  Status          Return status for the executed command.
                           This is an optional parameter and may be NULL.
 
-  @return The actual number of bytes that are executed for this operation..
+  @return The actual number of bytes that are executed for this operation.
 
 **/
 UINTN

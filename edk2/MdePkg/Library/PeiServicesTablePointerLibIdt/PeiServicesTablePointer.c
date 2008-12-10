@@ -22,16 +22,12 @@
 #include <Library/DebugLib.h>
 
 /**
-  
-  The function returns the pointer to PeiServicee following
-  PI1.0.
-  
-  For IA32, the four-bytes field immediately prior to new IDT
-  base addres is used to save the EFI_PEI_SERVICES**.
-  For x64, the eight-bytes field immediately prior to new IDT
-  base addres is used to save the EFI_PEI_SERVICES**
-  
-  @return  The pointer to PeiServices.
+  The function returns the pointer to PEI services.
+
+  The function returns the pointer to PEI services.
+  It will ASSERT() if the pointer to PEI services is NULL.
+
+  @retval  The pointer to PeiServices.
 
 **/
 CONST EFI_PEI_SERVICES **
@@ -50,17 +46,10 @@ GetPeiServicesTablePointer (
 }
 
 /**
+  The function set the pointer of PEI services immediately preceding the IDT table
+  according to PI specification.
   
-  The function sets the pointer to PeiServicee following
-  PI1.0.
-  
-  For IA32, the four-bytes field immediately prior to new IDT
-  base addres is used to save the EFI_PEI_SERVICES**.
-  For x64, the eight-bytes field immediately prior to new IDT
-  base addres is used to save the EFI_PEI_SERVICES**
-  
-  @param PeiServicesTablePointer  The pointer to PeiServices.
-
+  @param    PeiServicesTablePointer   The address of PeiServices pointer.
 **/
 VOID
 EFIAPI

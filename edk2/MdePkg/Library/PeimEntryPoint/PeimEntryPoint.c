@@ -26,8 +26,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                       Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
   @param  PeiServices Describes the list of possible PEI Services.
 
-  @return  Status returned by entry points of Peims.
-
+  @retval  EFI_SUCCESS   The PEIM executed normally.
+  @retval  !EFI_SUCCESS  The PEIM failed to execute normally.
 **/
 EFI_STATUS
 EFIAPI
@@ -56,20 +56,21 @@ _ModuleEntryPoint (
 
 
 /**
-  Wrapper of Peim image entry point.
+  Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().
 
   @param  FileHandle  Handle of the file being invoked. 
                       Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
   @param  PeiServices Describes the list of possible PEI Services.
 
-  @return  Status returned by entry points of Peims.
+  @retval EFI_SUCCESS  The PEIM executed normally.
+  @retval !EFI_SUCCESS The PEIM failed to execute normally.
 
 **/
 EFI_STATUS
 EFIAPI
 EfiMain (
-  IN EFI_PEI_FILE_HANDLE      FileHandle,
-  IN CONST EFI_PEI_SERVICES   **PeiServices
+  IN EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES    **PeiServices
   )
 {
   return _ModuleEntryPoint (FileHandle, PeiServices);
