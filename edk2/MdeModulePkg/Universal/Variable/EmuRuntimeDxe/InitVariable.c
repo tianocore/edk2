@@ -16,31 +16,34 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Variable.h"
 
-//
-// Don't use module globals after the SetVirtualAddress map is signaled
-//
-extern ESAL_VARIABLE_GLOBAL *mVariableModuleGlobal;
-
 EFI_EVENT   mVirtualAddressChangeEvent = NULL;
 
+/**
+
+  This code finds variable in storage blocks (Volatile or Non-Volatile).
+
+  @param VariableName               Name of Variable to be found.
+  @param VendorGuid                 Variable vendor GUID.
+  @param Attributes                 Attribute value of the variable found.
+  @param DataSize                   Size of Data found. If size is less than the
+                                    data, this value contains the required size.
+  @param Data                       Data pointer.
+                      
+  @return EFI_INVALID_PARAMETER     Invalid parameter
+  @return EFI_SUCCESS               Find the specified variable
+  @return EFI_NOT_FOUND             Not found
+  @return EFI_BUFFER_TO_SMALL       DataSize is too small for the result
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeServiceGetVariable (
   IN CHAR16        *VariableName,
-  IN EFI_GUID      * VendorGuid,
+  IN EFI_GUID      *VendorGuid,
   OUT UINT32       *Attributes OPTIONAL,
   IN OUT UINTN     *DataSize,
   OUT VOID         *Data
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   return GetVariable (
           VariableName,
@@ -53,6 +56,20 @@ Returns:
           );
 }
 
+/**
+
+  This code Finds the Next available variable.
+
+  @param VariableNameSize           Size of the variable name
+  @param VariableName               Pointer to variable name
+  @param VendorGuid                 Variable Vendor Guid
+
+  @return EFI_INVALID_PARAMETER     Invalid parameter
+  @return EFI_SUCCESS               Find the specified variable
+  @return EFI_NOT_FOUND             Not found
+  @return EFI_BUFFER_TO_SMALL       DataSize is too small for the result
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeServiceGetNextVariableName (
@@ -60,15 +77,6 @@ RuntimeServiceGetNextVariableName (
   IN OUT CHAR16    *VariableName,
   IN OUT EFI_GUID  *VendorGuid
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   return GetNextVariableName (
           VariableNameSize,
@@ -79,6 +87,24 @@ Returns:
           );
 }
 
+/**
+
+  This code sets variable in storage blocks (Volatile or Non-Volatile).
+
+  @param VariableName                     Name of Variable to be found
+  @param VendorGuid                       Variable vendor GUID
+  @param Attributes                       Attribute value of the variable found
+  @param DataSize                         Size of Data found. If size is less than the
+                                          data, this value contains the required size.
+  @param Data                             Data pointer
+
+  @return EFI_INVALID_PARAMETER           Invalid parameter
+  @return EFI_SUCCESS                     Set successfully
+  @return EFI_OUT_OF_RESOURCES            Resource not enough to set variable
+  @return EFI_NOT_FOUND                   Not found
+  @return EFI_WRITE_PROTECTED             Variable is read-only
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeServiceSetVariable (
@@ -88,15 +114,6 @@ RuntimeServiceSetVariable (
   IN UINTN         DataSize,
   IN VOID          *Data
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   return SetVariable (
           VariableName,
@@ -111,6 +128,24 @@ Returns:
           );
 }
 
+/**
+
+  This code returns information about the EFI variables.
+
+  @param Attributes                     Attributes bitmask to specify the type of variables
+                                        on which to return information.
+  @param MaximumVariableStorageSize     Pointer to the maximum size of the storage space available
+                                        for the EFI variables associated with the attributes specified.
+  @param RemainingVariableStorageSize   Pointer to the remaining size of the storage space available
+                                        for EFI variables associated with the attributes specified.
+  @param MaximumVariableSize            Pointer to the maximum size of an individual EFI variables
+                                        associated with the attributes specified.
+
+  @return EFI_INVALID_PARAMETER         An invalid combination of attribute bits was supplied.
+  @return EFI_SUCCESS                   Query successfully.
+  @return EFI_UNSUPPORTED               The attribute is not supported on this platform.
+
+**/
 EFI_STATUS
 EFIAPI
 RuntimeServiceQueryVariableInfo (
@@ -119,15 +154,6 @@ RuntimeServiceQueryVariableInfo (
   OUT UINT64                 *RemainingVariableStorageSize,
   OUT UINT64                 *MaximumVariableSize
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   return QueryVariableInfo (
           Attributes,
@@ -139,21 +165,22 @@ Returns:
           );
 }
 
+/**
+  Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
+
+  This is a notification function registered on EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+  It convers pointer to new virtual address.
+
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context.
+
+**/
 VOID
 EFIAPI
 VariableClassAddressChangeEvent (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   EfiConvertPointer (
     0x0,
@@ -166,21 +193,26 @@ Returns:
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
 }
 
+/**
+  Entry point of EmuVariable service module.
+
+  This function is the entry point of EmuVariable service module.
+  It registers all interfaces of Variable Services, initializes
+  variable store for non-volatile and volatile variables, and registers
+  notification function for EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+
+  @param  ImageHandle   The Image handle of this driver.
+  @param  SystemTable   The pointer of EFI_SYSTEM_TABLE.
+
+  @retval EFI_SUCCESS   Variable service successfully initialized.
+
+**/
 EFI_STATUS
 EFIAPI
 VariableServiceInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_HANDLE  NewHandle;
   EFI_STATUS  Status;
