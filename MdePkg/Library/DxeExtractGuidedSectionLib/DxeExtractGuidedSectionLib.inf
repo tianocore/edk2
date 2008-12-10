@@ -42,6 +42,7 @@
   MemoryAllocationLib
   BaseMemoryLib
   DebugLib
+  PcdLib
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler 
