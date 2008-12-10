@@ -1,7 +1,7 @@
 /** @file
-  The entry point of IScsi driver
+  The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,13 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  IScsiDriver.c
-
-Abstract:
-  The entry point of IScsi driver
 
 **/
 
@@ -32,28 +25,37 @@ EFI_DRIVER_BINDING_PROTOCOL gIScsiDriverBinding = {
 
 EFI_GUID                    mIScsiPrivateGuid   = ISCSI_PRIVATE_GUID;
 
+
 /**
-  Test to see if IScsi driver supports the given controller. 
+  Tests to see if this driver supports a given controller. If a child device is provided, 
+  it further tests to see if this driver supports creating a handle for the specified child device.
 
-  @param  This[in]                Protocol instance pointer.
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+                                   This parameter is ignored by device drivers, and is optional for bus drivers.
 
-  @param  ControllerHandle[in]    Handle of controller to test.
 
-  @param  RemainingDevicePath[in] Optional parameter use to pick a specific child device to start.
-
-  @retval EFI_SUCCES              This driver supports the controller.
-
-  @retval EFI_ALREADY_STARTED     This driver is already running on this device.
-
-  @retval EFI_UNSUPPORTED         This driver doesn't support the controller.
-
+  @retval EFI_SUCCESS              The device specified by ControllerHandle and
+                                   RemainingDevicePath is supported by the driver specified by This.
+  @retval EFI_ALREADY_STARTED      The device specified by ControllerHandle and
+                                   RemainingDevicePath is already being managed by the driver
+                                   specified by This.
+  @retval EFI_ACCESS_DENIED        The device specified by ControllerHandle and
+                                   RemainingDevicePath is already being managed by a different
+                                   driver or an application that requires exclusive acces.
+                                   Currently not implemented.
+  @retval EFI_UNSUPPORTED          The device specified by ControllerHandle and
+                                   RemainingDevicePath is not supported by the driver specified by This.
 **/
 EFI_STATUS
 EFIAPI
 IScsiDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS                Status;
@@ -100,25 +102,36 @@ IScsiDriverBindingSupported (
 }
 
 /**
-  Start to manage the controller. 
+  Start this driver on ControllerHandle. The Start() function is designed to be 
+  invoked from the EFI boot service ConnectController(). As a result, much of 
+  the error checking on the parameters to Start() has been moved into this 
+  common boot service. It is legal to call Start() from other locations, 
+  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE.
+  2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
+     EFI_DEVICE_PATH_PROTOCOL.
+  3. Prior to calling Start(), the Supported() function for the driver specified by This must
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
 
-  @param  This[in]                Protocol instance pointer.
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+                                   This parameter is ignored by device drivers, and is optional for bus drivers.
 
-  @param  ControllerHandle[in]    Handle of the controller.
-
-  @param  RemainingDevicePath[in] Optional parameter use to pick a specific child device to start.
-
-  @retval EFI_SUCCES              This driver supports this device.
-
-  @retval EFI_ALREADY_STARTED     This driver is already running on this device.
-
+  @retval EFI_SUCCESS              The device was started.
+  @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.
+                                   Currently not implemented.
+  @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
+  @retval Others                   The driver failded to start the device.
 **/
 EFI_STATUS
 EFIAPI
 IScsiDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS        Status;
@@ -205,18 +218,30 @@ ON_ERROR:
 }
 
 /**
-  Release the control of this controller and remove the IScsi functions.
+  Stop this driver on ControllerHandle. 
+  
+  Release the control of this controller and remove the IScsi functions. The Stop()
+  function is designed to be invoked from the EFI boot service DisconnectController(). 
+  As a result, much of the error checking on the parameters to Stop() has been moved 
+  into this common boot service. It is legal to call Stop() from other locations, 
+  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
+     same driver's Start() function.
+  2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid
+     EFI_HANDLE. In addition, all of these handles must have been created in this driver's
+     Start() function, and the Start() function must have called OpenProtocol() on
+     ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
+  
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
+                                support a bus specific I/O protocol for the driver 
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.Not used.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+                                if NumberOfChildren is 0.Not used.
 
-  @param  This[in]              Protocol instance pointer.
-
-  @param  ControllerHandle[in]  Handle of controller to stop.
-
-  @param  NumberOfChildren[in]  Not used.
-
-  @param  ChildHandleBuffer[in] Not used.
-
-  @retval EFI_SUCCES            This driver supports this device.
-
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
 **/
 EFI_STATUS
 EFIAPI
@@ -307,14 +332,12 @@ IScsiDriverBindingStop (
 }
 
 /**
-  Unload the iSCSI driver.
+  Unloads an image(the iSCSI driver).
 
-  @param  ImageHandle[in]  The handle of the driver image.
+  @param[in]  ImageHandle       Handle that identifies the image to be unloaded.
 
-  @retval EFI_SUCCESS      The driver is unloaded.
-
-  @retval EFI_DEVICE_ERROR Some unexpected error happened.
-
+  @retval EFI_SUCCESS           The image has been unloaded.
+  @retval Others                Some unexpected errors happened.
 **/
 EFI_STATUS
 EFIAPI
@@ -375,16 +398,17 @@ EfiIScsiUnload (
 }
 
 /**
-  Initialize the global variables publish the driver binding protocol.
+  This is the declaration of an EFI image entry point. This entry point is
+  the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers including
+  both device drivers and bus drivers. It initialize the global variables and 
+  publish the driver binding protocol.
 
-  @param  ImageHandle[in]  The handle of the driver image.
+  @param[in]   ImageHandle      The firmware allocated handle for the UEFI image.
+  @param[in]   SystemTable      A pointer to the EFI System Table.
 
-  @param  SystemTable[in]  The EFI system table.
-
-  @retval EFI_SUCCESS      The protocols are installed.
-
-  @retval EFI_DEVICE_ERROR Some unexpected error happened.
-
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_ACCESS_DENIED     EFI_ISCSI_INITIATOR_NAME_PROTOCOL was installed unexpectedly.
+  @retval Others                Some unexpected error happened.
 **/
 EFI_STATUS
 EFIAPI
