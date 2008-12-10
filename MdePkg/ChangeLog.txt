@@ -239,7 +239,26 @@ Possible Impacts:
 
 EDK_6886:  Non-Compatible: mdkinney
 	
-	Rename _CR macro in MdePkg\Include\Base.h to BASE_CR macro aligned to MdeLib spec.
+	Rename _CR macro defined in MdePkg/Include/Base.h to BASE_CR macro aligned to MdeLib spec.
 
 Possible Impacts:
 	All source codes that depends on _CR macro must be changed to use BASE_CR.	
+
+EDK_6935:  Non-Compatible: lgao4
+	
+	In MdePkg/Include/Guid/FileSystemVolumeLabelInfo.h file, to follow UEFI specification.
+	Rename EFI_FILE_SYSTEM_VOLUME_LABEL_INFO_ID_GUID to EFI_FILE_SYSTEM_VOLUME_LABEL_ID
+	Rename EFI_FILE_SYSTEM_VOLUME_LABEL_INFO to EFI_FILE_SYSTEM_VOLUME_LABEL.
+
+Possible Impacts:
+	All source codes that refer to EFI_FILE_SYSTEM_VOLUME_LABEL_INFO_ID_GUID or EFI_FILE_SYSTEM_VOLUME_LABEL_INFO
+	must be changed to use their definitions from UEFI specification.	
+
+EDK_6974:  Non-Compatible: lgao4
+	
+	In MdePkg/Include/Uefi/UefiSpec.h file, to follow UEFI2.1 specification.
+	Rename struct EFI_KEY_OPTION.KeyOptions to EFI_KEY_OPTION.KeyData
+
+Possible Impacts:
+	All source codes that refer to EFI_KEY_OPTION.KeyOptions
+	must be changed to use EFI_KEY_OPTION.KeyData from UEFI specification.	
