@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous definitions for IScsi driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -10,21 +10,17 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  IScsiMisc.h
-
-Abstract:
-
-  Miscellaneous definitions for IScsi driver.
-
 **/
 
 #ifndef _ISCSI_MISC_H_
 #define _ISCSI_MISC_H_
 
+#include <Library/BaseLib.h>
+
+typedef struct _ISCSI_SESSION_CONFIG_DATA ISCSI_SESSION_CONFIG_DATA;
+
 #pragma pack(1)
-typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
+typedef struct {
   BOOLEAN           Enabled;
 
   BOOLEAN           InitiatorInfoFromDhcp;
@@ -51,10 +47,10 @@ struct _ISCSI_SESSION_CONFIG_DATA {
 /**
   Calculate the prefix length of the IPv4 subnet mask.
 
-  @param  SubnetMask[in] The IPv4 subnet mask.
+  @param[in]  SubnetMask The IPv4 subnet mask.
 
-  @retval UINT8          The prefix length of the subnet mask.
-
+  @return The prefix length of the subnet mask.
+  @return 0 Some unexpected error happened.
 **/
 UINT8
 IScsiGetSubnetMaskPrefixLength (
@@ -64,14 +60,11 @@ IScsiGetSubnetMaskPrefixLength (
 /**
   Convert the hexadecimal encoded LUN string into the 64-bit LUN. 
 
-  @param  Str[in]               The hexadecimal encoded LUN string.
-
-  @param  Lun[out]              Storage to return the 64-bit LUN.
+  @param[in]   Str             The hexadecimal encoded LUN string.
+  @param[out]  Lun             Storage to return the 64-bit LUN.
 
   @retval EFI_SUCCESS           The 64-bit LUN is stored in Lun.
-
   @retval EFI_INVALID_PARAMETER The string is malformatted.
-
 **/
 EFI_STATUS
 IScsiAsciiStrToLun (
@@ -82,28 +75,22 @@ IScsiAsciiStrToLun (
 /**
   Convert the 64-bit LUN into the hexadecimal encoded LUN string.
 
-  @param  Lun[in]  The 64-bit LUN.
-
-  @param  Str[out] The storage to return the hexadecimal encoded LUN string.
-
-  @retval None.
-
+  @param[in]   Lun The 64-bit LUN.
+  @param[out]  Str The storage to return the hexadecimal encoded LUN string.
 **/
 VOID
 IScsiLunToUnicodeStr (
   IN UINT8    *Lun,
-  OUT CHAR16  *String
+  OUT CHAR16  *Str
   );
 
 /**
   Convert the ASCII string into a UNICODE string.
 
-  @param  Source[out]      The ASCII string.
+  @param[in]   Source      The ASCII string.
+  @param[out]  Destination The storage to return the UNICODE string.
 
-  @param  Destination[out] The storage to return the UNICODE string.
-
-  @retval CHAR16 *         Pointer to the UNICODE string.
-
+  @return CHAR16 *         Pointer to the UNICODE string.
 **/
 CHAR16 *
 IScsiAsciiStrToUnicodeStr (
@@ -114,12 +101,10 @@ IScsiAsciiStrToUnicodeStr (
 /**
   Convert the UNICODE string into an ASCII string.
 
-  @param  Source[in]       The UNICODE string.
+  @param[in]  Source       The UNICODE string.
+  @param[out] Destination  The storage to return the ASCII string.
 
-  @param  Destination[out] The storage to return the ASCII string.
-
-  @retval CHAR8 *          Pointer to the ASCII string.
-
+  @return CHAR8 *          Pointer to the ASCII string.
 **/
 CHAR8 *
 IScsiUnicodeStrToAsciiStr (
@@ -130,14 +115,9 @@ IScsiUnicodeStrToAsciiStr (
 /**
   Convert the mac address into a hexadecimal encoded "-" seperated string.
 
-  @param  Mac[in]  The mac address.
-
-  @param  Len[in]  Length in bytes of the mac address.
-
-  @param  Str[out] The storage to return the mac string.
-
-  @retval None.
-
+  @param[in]  Mac The mac address.
+  @param[in]  Len  Length in bytes of the mac address.
+  @param[out] Str The storage to return the mac string.
 **/
 VOID
 IScsiMacAddrToStr (
@@ -149,14 +129,11 @@ IScsiMacAddrToStr (
 /**
   Convert the decimal dotted IPv4 address into the binary IPv4 address.
 
-  @param  Str[in]               The UNICODE string.
-
-  @param  Ip[out]               The storage to return the ASCII string.
+  @param[in]   Str             The UNICODE string.
+  @param[out]  Ip              The storage to return the ASCII string.
 
   @retval EFI_SUCCESS           The binary IP address is returned in Ip.
-
   @retval EFI_INVALID_PARAMETER The IP string is malformatted.
-
 **/
 EFI_STATUS
 IScsiAsciiStrToIp (
@@ -167,19 +144,15 @@ IScsiAsciiStrToIp (
 /**
   Convert the binary encoded buffer into a hexadecimal encoded string.
 
-  @param  BinBuffer[in]        The buffer containing the binary data.
+  @param[in]       BinBuffer   The buffer containing the binary data.
+  @param[in]       BinLength   Length of the binary buffer.
+  @param[in, out]  HexStr      Pointer to the string.
+  @param[in, out]  HexLength   The length of the string.
 
-  @param  BinLength[in]        Length of the binary buffer.
-
-  @param  HexStr[in][out]      Pointer to the string.
-
-  @param  HexLength[in][out]   The length of the string.
-
-  @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string
+  @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string 
                                and the length of the string is updated.
-
   @retval EFI_BUFFER_TOO_SMALL The string is too small.
-
+  @retval EFI_INVALID_PARAMETER The IP string is malformatted.
 **/
 EFI_STATUS
 IScsiBinToHex (
@@ -192,17 +165,13 @@ IScsiBinToHex (
 /**
   Convert the hexadecimal string into a binary encoded buffer.
 
-  @param  BinBuffer[in][out]   The binary buffer.
-
-  @param  BinLength[in][out]   Length of the binary buffer.
-
-  @param  HexStr[in]           The hexadecimal string.
+  @param[in, out]  BinBuffer   The binary buffer.
+  @param[in, out]  BinLength   Length of the binary buffer.
+  @param[in]       HexStr      The hexadecimal string.
 
   @retval EFI_SUCCESS          The hexadecimal string is converted into a binary
                                encoded buffer.
-
   @retval EFI_BUFFER_TOO_SMALL The binary buffer is too small to hold the converted data.s
-
 **/
 EFI_STATUS
 IScsiHexToBin (
@@ -214,12 +183,8 @@ IScsiHexToBin (
 /**
   Generate random numbers.
 
-  @param  Rand[in][out]  The buffer to contain random numbers.
-
-  @param  RandLength[in] The length of the Rand buffer.
-
-  @retval None.
-
+  @param[in, out]  Rand       The buffer to contain random numbers.
+  @param[in]       RandLength The length of the Rand buffer.
 **/
 VOID
 IScsiGenRandom (
@@ -230,12 +195,11 @@ IScsiGenRandom (
 /**
   Create the iSCSI driver data..
 
-  @param  Image[in]      The handle of the driver image.
+  @param[in] Image      The handle of the driver image.
+  @param[in] Controller The handle of the controller.
 
-  @param  Controller[in] The handle of the controller.
-
-  @retval The iSCSI driver data created.
-
+  @return The iSCSI driver data created.
+  @return NULL Some unexpected error happened.
 **/
 ISCSI_DRIVER_DATA *
 IScsiCreateDriverData (
@@ -246,10 +210,7 @@ IScsiCreateDriverData (
 /**
   Clean the iSCSI driver data.
 
-  @param  Private[in] The iSCSI driver data.
-
-  @retval None.
-
+  @param[in]  Private The iSCSI driver data.
 **/
 VOID
 IScsiCleanDriverData (
@@ -257,15 +218,13 @@ IScsiCleanDriverData (
   );
 
 /**
-
   Get the various configuration data of this iSCSI instance.
 
-  @param  Private[in]   The iSCSI driver data.
+  @param[in]  Private   The iSCSI driver data.
 
   @retval EFI_SUCCESS   The configuration of this instance is got.
-
-  @retval EFI_NOT_FOUND This iSCSI instance is not configured yet.
-
+  @retval EFI_ABORTED   The operation was aborted.
+  @retval Others        Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiGetConfigData (
@@ -275,12 +234,12 @@ IScsiGetConfigData (
 /**
   Get the device path of the iSCSI tcp connection and update it.
 
-  @param  Private[in] The iSCSI driver data.
+  @param[in]  Private The iSCSI driver data.
 
-  @retval The updated device path.
-
+  @return The updated device path.
+  @return NULL Some unexpected error happened.
 **/
-EFI_DEVICE_PATH_PROTOCOL  *
+EFI_DEVICE_PATH_PROTOCOL *
 IScsiGetTcpConnDevicePath (
   IN ISCSI_DRIVER_DATA  *Private
   );
@@ -288,12 +247,8 @@ IScsiGetTcpConnDevicePath (
 /**
   Abort the session when the transition from BS to RT is initiated.
 
-  @param  Event[in]   The event signaled.
-
-  @param  Context[in] The iSCSI driver data.
-
-  @retval None.
-
+  @param[in]   Event  The event signaled.
+  @param[in]  Context The iSCSI driver data.
 **/
 VOID
 EFIAPI
@@ -302,6 +257,6 @@ IScsiOnExitBootService (
   IN VOID       *Context
   );
 
-extern CHAR16 NibbleToHexChar(UINT8 Nibble);
+
 
 #endif
