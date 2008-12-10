@@ -689,8 +689,27 @@ EFI_STATUS
 /// real time clock device as exposed through the EFI interfaces.
 ///
 typedef struct {
+  ///
+  /// Provides the reporting resolution of the real-time clock device in
+  /// counts per second. For a normal PC-AT CMOS RTC device, this
+  /// value would be 1 Hz, or 1, to indicate that the device only reports
+  /// the time to the resolution of 1 second.
+  ///
   UINT32    Resolution;
+  ///
+  /// Provides the timekeeping accuracy of the real-time clock in an
+  /// error rate of 1E-6 parts per million. For a clock with an accuracy
+  /// of 50 parts per million, the value in this field would be
+  /// 50,000,000.
+  ///
   UINT32    Accuracy;
+  ///
+  /// A TRUE indicates that a time set operation clears the device¡¯s
+  /// time below the Resolution reporting level. A FALSE
+  /// indicates that the state below the Resolution level of the
+  /// device is not cleared when the time is set. Normal PC-AT CMOS
+  /// RTC devices set this value to FALSE.
+  ///
   BOOLEAN   SetsToZero;
 } EFI_TIME_CAPABILITIES;
 
@@ -1527,9 +1546,22 @@ EFI_STATUS
 /// EFI Capsule Block Descriptor
 ///
 typedef struct {
+  ///
+  /// Length in bytes of the data pointed to by DataBlock/ContinuationPointer.
+  ///
   UINT64                  Length;
   union {
+    ///
+    /// Physical address of the data block. This member of the union is
+    /// used if Length is not equal to zero.
+    ///
     EFI_PHYSICAL_ADDRESS  DataBlock;
+    ///
+    /// Physical address of another block of
+    /// EFI_CAPSULE_BLOCK_DESCRIPTOR structures. This
+    /// member of the union is used if Length is equal to zero. If
+    /// ContinuationPointer is zero this entry represents the end of the list.
+    ///
     EFI_PHYSICAL_ADDRESS  ContinuationPointer;
   } Union;
 } EFI_CAPSULE_BLOCK_DESCRIPTOR;
@@ -1538,19 +1570,41 @@ typedef struct {
 /// EFI Capsule Header
 ///
 typedef struct {
+  ///
+  /// A GUID that defines the contents of a capsule.
+  ///
   EFI_GUID          CapsuleGuid;
+  ///
+  /// The size of the capsule header. This may be larger than the size of
+  /// the EFI_CAPSULE_HEADER since CapsuleGuid may imply
+  /// extended header entries
+  ///
   UINT32            HeaderSize;
+  ///
+  /// Bit-mapped list describing the capsule attributes. The Flag values
+  /// of 0x0000 ¨C 0xFFFF are defined by CapsuleGuid. Flag values
+  /// of 0x10000 ¨C 0xFFFF0000 are defined by this specification
+  ///
   UINT32            Flags;
+  ///
+  /// Size in bytes of the capsule.
+  ///
   UINT32            CapsuleImageSize;
 } EFI_CAPSULE_HEADER;
 
-//
-// The EFI System Table entry must point to an array of capsules
-// that contain the same CapsuleGuid value. The array must be
-// prefixed by a UINT32 that represents the size of the array of capsules.
-//
+///
+/// The EFI System Table entry must point to an array of capsules
+/// that contain the same CapsuleGuid value. The array must be
+/// prefixed by a UINT32 that represents the size of the array of capsules.
+///
 typedef struct {
+  ///
+  /// the size of the array of capsules.
+  ///
   UINT32   CapsuleArrayNumber;
+  ///
+  /// Point to an array of capsules that contain the same CapsuleGuid value.
+  ///
   VOID*    CapsulePtr[1];
 } EFI_CAPSULE_TABLE;
 
@@ -1929,14 +1983,40 @@ EFI_STATUS
 ///
 typedef union {
   struct {
+    ///
+    /// Indicates the revision of the EFI_KEY_OPTION structure. This revision level should be 0.
+    ///
     UINT32  Revision        : 8;
+    ///
+    /// Either the left or right Shift keys must be pressed (1) or must not be pressed (0).
+    ///
     UINT32  ShiftPressed    : 1;
+    ///
+    /// Either the left or right Control keys must be pressed (1) or must not be pressed (0).
+    ///
     UINT32  ControlPressed  : 1;
+    ///
+    /// Either the left or right Alt keys must be pressed (1) or must not be pressed (0).
+    ///
     UINT32  AltPressed      : 1;
+    ///
+    /// Either the left or right Logo keys must be pressed (1) or must not be pressed (0).
+    ///
     UINT32  LogoPressed     : 1;
+    ///
+    /// The Menu key must be pressed (1) or must not be pressed (0).
+    ///
     UINT32  MenuPressed     : 1;
+    ///
+    /// The SysReq key must be pressed (1) or must not be pressed (0).
+    ///
     UINT32  SysReqPessed    : 1;
     UINT32  Reserved        : 16;
+    ///
+    /// Specifies the actual number of entries in EFI_KEY_OPTION.Keys, from 0-3. If
+    /// zero, then only the shift state is considered. If more than one, then the boot option will
+    /// only be launched if all of the specified keys are pressed with the same shift state.
+    ///
     UINT32  InputKeyCount   : 2;
   } Options;
   UINT32  PackedValue;
@@ -1946,10 +2026,27 @@ typedef union {
 /// EFI Key Option
 ///
 typedef struct {
-  EFI_BOOT_KEY_DATA  KeyOptions;
+  ///
+  /// Specifies options about how the key will be processed.
+  ///
+  EFI_BOOT_KEY_DATA  KeyData;
+  ///
+  /// The CRC-32 which should match the CRC-32 of the entire EFI_LOAD_OPTION to
+  /// which BootOption refers. If the CRC-32s do not match this value, then this key
+  /// option is ignored.
+  ///
   UINT32             BootOptionCrc;
+  ///
+  /// The Boot#### option which will be invoked if this key is pressed and the boot option
+  /// is active (LOAD_OPTION_ACTIVE is set).
+  ///
   UINT16             BootOption;
-//EFI_INPUT_KEY      Keys[];
+  ///
+  /// The key codes to compare against those returned by the
+  /// EFI_SIMPLE_TEXT_INPUT and EFI_SIMPLE_TEXT_INPUT_EX protocols.
+  /// The number of key codes (0-3) is specified by the EFI_KEY_CODE_COUNT field in KeyOptions.
+  ///
+  //EFI_INPUT_KEY      Keys[];
 } EFI_KEY_OPTION;
 
 #define EFI_KEY_OPTION_SHIFT     0x00000001

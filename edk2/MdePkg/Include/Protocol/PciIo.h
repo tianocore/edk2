@@ -91,7 +91,7 @@ typedef enum {
   EfiPciIoOperationBusMasterWrite,
   ///
   /// Provides both read and write access to system memory by both the processor and a
-  /// bus master. The buffer is coherent from both the processor¡¯s and the bus master's point of view.
+  /// bus master. The buffer is coherent from both the processor's and the bus master's point of view.
   ///
   EfiPciIoOperationBusMasterCommonBuffer,
   EfiPciIoOperationMaximum
@@ -104,11 +104,11 @@ typedef enum {
 ///
 typedef enum {
   ///
-  /// Retrieve the PCI controller¡¯s current attributes, and return them in Result.
+  /// Retrieve the PCI controller's current attributes, and return them in Result.
   ///
   EfiPciIoAttributeOperationGet,
   ///
-  /// Set the PCI controller¡¯s current attributes to Attributes.
+  /// Set the PCI controller's current attributes to Attributes.
   ///
   EfiPciIoAttributeOperationSet,
   ///

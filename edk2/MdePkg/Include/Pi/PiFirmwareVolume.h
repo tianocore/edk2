@@ -91,7 +91,13 @@ typedef UINT32  EFI_FVB_ATTRIBUTES_2;
 
 
 typedef struct {
+  ///
+  /// The number of sequential blocks which are of the same size.
+  ///
   UINT32 NumBlocks;
+  ///
+  /// The size of the blocks.
+  ///
   UINT32 Length;
 } EFI_FV_BLOCK_MAP_ENTRY;
 
@@ -99,16 +105,53 @@ typedef struct {
 /// Describes the features and layout of the firmware volume.
 ///
 typedef struct {
+  ///
+  /// The first 16 bytes are reserved to allow for the reset vector of 
+  /// processors whose reset vector is at address 0.
+  ///
   UINT8                     ZeroVector[16];
+  ///
+  /// Declares the file system with which the firmware volume is formatted.
+  ///
   EFI_GUID                  FileSystemGuid;
+  ///
+  /// Length in bytes of the complete firmware volume, including the header.
+  ///
   UINT64                    FvLength;
+  ///
+  /// Set to EFI_FVH_SIGNATURE
+  ///
   UINT32                    Signature;
+  ///
+  /// Declares capabilities and power-on defaults for the firmware volume.
+  ///
   EFI_FVB_ATTRIBUTES_2      Attributes;
+  ///
+  /// Length in bytes of the complete firmware volume header.
+  ///
   UINT16                    HeaderLength;
+  ///
+  /// A 16-bit checksum of the firmware volume header. A valid header sums to zero.
+  ///
   UINT16                    Checksum;
+  ///
+  /// Offset, relative to the start of the header, of the extended header
+  /// (EFI_FIRMWARE_VOLUME_EXT_HEADER) or zero if there is no extended header.
+  ///
   UINT16                    ExtHeaderOffset;
+  ///
+  /// This field must always be set to zero.
+  ///
   UINT8                     Reserved[1];
+  ///
+  /// Set to 2. Future versions of this specification may define new header fields and will
+  /// increment the Revision field accordingly.
+  ///
   UINT8                     Revision;
+  ///
+  /// An array of run-length encoded FvBlockMapEntry structures. The array is
+  /// terminated with an entry of {0,0}.
+  ///
   EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
 } EFI_FIRMWARE_VOLUME_HEADER;
 
@@ -123,7 +166,13 @@ typedef struct {
 /// Extension header pointed by ExtHeaderOffset of volume header.
 /// 
 typedef struct {
+  ///
+  /// Firmware volume name.
+  ///
   EFI_GUID  FvName;
+  ///
+  /// Size of the rest of the extension header, including this structure.
+  ///
   UINT32    ExtHeaderSize;
 } EFI_FIRMWARE_VOLUME_EXT_HEADER;
 
@@ -131,7 +180,13 @@ typedef struct {
 /// Entry struture for describing FV extension header
 /// 
 typedef struct {
+  ///
+  /// Size of this header extension.
+  ///
   UINT16    ExtEntrySize;
+  ///
+  /// Type of the header.
+  ///
   UINT16    ExtEntryType;
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY;
 
@@ -140,13 +195,18 @@ typedef struct {
 /// This extension header provides a mapping between a GUID and an OEM file type.
 /// 
 typedef struct {
+  ///
+  /// Standard extension entry, with the type EFI_FV_EXT_TYPE_OEM_TYPE.
+  ///
   EFI_FIRMWARE_VOLUME_EXT_ENTRY Hdr;
+  ///
+  /// A bit mask, one bit for each file type between 0xC0 (bit 0) and 0xDF (bit 31). If a bit
+  /// is '1', then the GUID entry exists in Types. If a bit is '0' then no GUID entry exists in Types.
+  ///
   UINT32    TypeMask;
-
-  //
-  // Array of GUIDs. 
-  // Each GUID represents an OEM file type.
-  // 
+  ///
+  /// An array of GUIDs, each GUID representing an OEM file type.
+  /// 
   EFI_GUID  Types[1];
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY_OEM_TYPE;
 
