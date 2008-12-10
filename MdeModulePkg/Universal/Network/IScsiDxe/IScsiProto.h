@@ -1,7 +1,7 @@
 /** @file
   The header file of IScsi Protocol that defines many specific data structures.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  IScsiProto.h
-
-Abstract:
-
-  Protocol definitions for IScsi driver, mainly from RFC3720.
 
 **/
 
@@ -80,9 +72,9 @@ Abstract:
 
 #define ISCSI_KEY_VALUE_NONE                    "None"
 
-//
-// connection state for initiator
-//
+///
+/// connection state for initiator
+///
 typedef enum {
   CONN_STATE_FREE,
   CONN_STATE_XPT_WAIT,
@@ -94,9 +86,9 @@ typedef enum {
   CONN_STATE_IN_CLEANUP
 } CONNECTION_STATE;
 
-//
-// session state for initiator
-//
+///
+/// session state for initiator
+///
 typedef enum {
   SESSION_STATE_FREE,
   SESSION_STATE_LOGGED_IN,
@@ -174,9 +166,9 @@ typedef enum {
 
 #define ISCSI_BHS_FLAG_FINAL      0x80
 
-//
-// iSCSI Basic Header Segment
-//
+///
+/// iSCSI Basic Header Segment
+///
 typedef struct _ISCSI_BASIC_HEADER {
   UINT8   OpCode;
   UINT8   Flags;
@@ -221,9 +213,9 @@ typedef struct _ISCSI_BI_EXP_READ_DATA_LEN_AHS {
 #define ISCSI_TASK_ATTR_HOQ       0x03
 #define ISCSI_TASK_ATTR_ACA       0x04
 
-//
-// SCSI Command
-//
+///
+/// SCSI Command
+///
 typedef struct _SCSI_COMMAND {
   UINT8   OpCode;
   UINT8   Flags;
@@ -252,9 +244,9 @@ typedef struct _SCSI_COMMAND {
 #define ISCSI_SERVICE_RSP_COMMAND_COMPLETE_AT_TARGET  0x00
 #define ISCSI_SERVICE_RSP_TARGET_FAILURE              0x01
 
-//
-// SCSI Response
-//
+///
+/// SCSI Response
+///
 typedef struct _SCSI_RESPONSE {
   UINT8   OpCode;
   UINT8   Flags;
@@ -278,9 +270,9 @@ typedef struct _ISCSI_SENSE_DATA {
   UINT8   Data[2];
 } ISCSI_SENSE_DATA;
 
-//
-// iSCSI Task Managment Function Request
-//
+///
+/// iSCSI Task Managment Function Request
+///
 typedef struct _ISCSI_TMF_REQUEST {
   UINT8   OpCode;
   UINT8   Fuction;
@@ -306,9 +298,9 @@ typedef struct _ISCSI_TMF_REQUEST {
 #define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_AHTH_FAILED        6
 #define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_REJECTED           255
 
-//
-// iSCSI Task Management Function Response
-//
+///
+/// iSCSI Task Management Function Response
+///
 typedef struct _ISCSI_TMF_RESPONSE {
   UINT8   OpCode;
   UINT8   Reserved1;
@@ -325,9 +317,9 @@ typedef struct _ISCSI_TMF_RESPONSE {
   UINT32  Reserved[3];
 } ISCSI_TMF_RESPONSE;
 
-//
-// SCSI Data-Out
-//
+///
+/// SCSI Data-Out
+///
 typedef struct _ISCSI_SCSI_DATA_OUT {
   UINT8   OpCode;
   UINT8   Reserved1[3];
@@ -348,9 +340,10 @@ typedef struct _ISCSI_SCSI_DATA_OUT {
 #define SCSI_DATA_IN_PDU_FLAG_OVERFLOW      SCSI_RSP_PDU_FLAG_OVERFLOW
 #define SCSI_DATA_IN_PDU_FLAG_UNDERFLOW     SCSI_RSP_PDU_FLAG_UNDERFLOW
 #define SCSI_DATA_IN_PDU_FLAG_STATUS_VALID  0x01
-//
-// SCSI Data-In
-//
+
+///
+/// SCSI Data-In
+///
 typedef struct _ISCSI_SCSI_DATA_IN {
   UINT8   OpCode;
   UINT8   Flags;
@@ -370,9 +363,10 @@ typedef struct _ISCSI_SCSI_DATA_IN {
 } ISCSI_SCSI_DATA_IN;
 
 #define ISCSI_GET_BUFFER_OFFSET(PduHdr) NTOHL (((ISCSI_SCSI_DATA_IN *) (PduHdr))->BufferOffset)
-//
-// Ready To Transfer
-//
+
+///
+/// Ready To Transfer
+///
 typedef struct _ISCSI_READY_TO_TRANSFER {
   UINT8   OpCode;
   UINT8   Reserved1[3];
@@ -411,9 +405,9 @@ typedef struct _ISCSI_ASYNC_MESSAGE {
 #define ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT  0x80
 #define ISCSI_LOGIN_REQ_PDU_FLAG_CONTINUE 0x40
 
-//
-// Login Request
-//
+///
+/// Login Request
+///
 typedef struct _ISCSI_LOGIN_REQUEST {
   UINT8   OpCode;
   UINT8   Flags;
@@ -439,9 +433,9 @@ typedef struct _ISCSI_LOGIN_REQUEST {
 #define ISCSI_LOGIN_STATUS_INITIATOR_ERROR  2
 #define ISCSI_LOGIN_STATUS_TARGET_ERROR     3
 
-//
-// Login Response
-//
+///
+/// Login Response
+///
 typedef struct _ISCSI_LOGIN_RESPONSE {
   UINT8   OpCode;
   UINT8   Flags;
@@ -465,9 +459,9 @@ typedef struct _ISCSI_LOGIN_RESPONSE {
 #define ISCSI_LOGOUT_REASON_CLOSE_CONNECTION                1
 #define ISCSI_LOGOUT_REASON_REMOVE_CONNECTION_FOR_RECOVERY  2
 
-//
-// Logout Request
-//
+///
+/// Logout Request
+///
 typedef struct _ISCSI_LOGOUT_REQUEST {
   UINT8   OpCode;
   UINT8   ReasonCode;
@@ -488,9 +482,9 @@ typedef struct _ISCSI_LOGOUT_REQUEST {
 #define ISCSI_LOGOUT_RESPONSE_RECOVERY_NOT_SUPPORTED  2
 #define ISCSI_LOGOUT_RESPONSE_CLEANUP_FAILED          3
 
-//
-// Logout Response
-//
+///
+/// Logout Response
+///
 typedef struct _ISCSI_LOGOUT_RESPONSE {
   UINT8   OpCode;
   UINT8   Reserved1;
@@ -515,9 +509,9 @@ typedef struct _ISCSI_LOGOUT_RESPONSE {
 #define ISCSI_SNACK_REQUEST_TYPE_DATA_ACK     2
 #define ISCSI_SNACK_REQUEST_TYPE_RDATA        3
 
-//
-// SNACK Request
-//
+///
+/// SNACK Request
+///
 typedef struct _ISCSI_SNACK_REQUEST {
   UINT8   OpCode;
   UINT8   Type;
@@ -534,9 +528,9 @@ typedef struct _ISCSI_SNACK_REQUEST {
   UINT32  RunLength;
 } ISCSI_SNACK_REQUEST;
 
-//
-// Reject
-//
+///
+/// Reject
+///
 typedef struct _ISCSI_REJECT {
   UINT8   OpCode;
   UINT8   Reserved1;
@@ -554,9 +548,9 @@ typedef struct _ISCSI_REJECT {
   UINT32  Reserved5[2];
 } ISCSI_REJECT;
 
-//
-// NOP-Out
-//
+///
+/// NOP-Out
+///
 typedef struct _ISCSI_NOP_OUT {
   UINT8   OpCode;
   UINT8   Reserved1[3];
@@ -570,9 +564,9 @@ typedef struct _ISCSI_NOP_OUT {
   UINT32  Reserved2[4];
 } ISCSI_NOP_OUT;
 
-//
-// NOP-In
-//
+///
+/// NOP-In
+///
 typedef struct _ISCSI_NOP_IN {
   UINT8   OpCode;
   UINT8   Reserved1[3];
@@ -634,18 +628,11 @@ typedef struct _ISCSI_KEY_VALUE_PAIR {
   CHAR8           *Value;
 } ISCSI_KEY_VALUE_PAIR;
 
-//
-// function prototypes.
-//
 /**
   Attach the iSCSI connection to the iSCSI session. 
 
-  @param  Session[in] The iSCSI session.
-
-  @param  Conn[in]    The iSCSI connection.
-
-  @retval None.
-
+  @param[in]  Session The iSCSI session.
+  @param[in]  Conn    The iSCSI connection.
 **/
 VOID
 IScsiAttatchConnection (
@@ -656,10 +643,7 @@ IScsiAttatchConnection (
 /**
   Detach the iSCSI connection from the session it belongs to. 
 
-  @param  Conn[in] The iSCSI connection.
-
-  @retval None.
-
+  @param[in]  Conn The iSCSI connection.
 **/
 VOID
 IScsiDetatchConnection (
@@ -669,14 +653,11 @@ IScsiDetatchConnection (
 /**
   This function does the iSCSI connection login.
 
-  @param  Conn[in]           The iSCSI connection to login.
+  @param[in]  Conn           The iSCSI connection to login.
 
   @retval EFI_SUCCESS        The iSCSI connection is logged into the iSCSI target.
-
   @retval EFI_TIMEOUT        Timeout happened during the login procedure.
-
-  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
-
+  @retval Others             Some unexpected error happened.  
 **/
 EFI_STATUS
 IScsiConnLogin (
@@ -686,14 +667,12 @@ IScsiConnLogin (
 /**
   Create a TCP connection for the iSCSI session.
 
-  @param  Private[in] The iSCSI driver data.
+  @param[in]  Private The iSCSI driver data.
+  @param[in]  Session Maximum CmdSN from the target.
 
-  @param  Session[in] Maximum CmdSN from the target.
-
-  @retval The newly created iSCSI connection.
-
+  @return The newly created iSCSI connection.
 **/
-ISCSI_CONNECTION  *
+ISCSI_CONNECTION *
 IScsiCreateConnection (
   IN ISCSI_DRIVER_DATA  *Private,
   IN ISCSI_SESSION      *Session
@@ -702,10 +681,7 @@ IScsiCreateConnection (
 /**
   Destroy an iSCSI connection.
 
-  @param  Conn[in] The connection to destroy.
-
-  @retval None.
-
+  @param[in]  Conn The connection to destroy.
 **/
 VOID
 IScsiDestroyConnection (
@@ -715,14 +691,11 @@ IScsiDestroyConnection (
 /**
   Login the iSCSI session.
 
-  @param  Private[in]          The iSCSI driver data.
+  @param[in]  Private          The iSCSI driver data.
 
   @retval EFI_SUCCESS          The iSCSI session login procedure finished.
-
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-
-  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
-
+  @retval Others               Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiSessionLogin (
@@ -733,15 +706,12 @@ IScsiSessionLogin (
   Build and send the iSCSI login request to the iSCSI target according to
   the current login stage.
 
-  @param  Conn[in]             The connection in the iSCSI login phase.
+  @param[in]  Conn             The connection in the iSCSI login phase.
 
   @retval EFI_SUCCESS          The iSCSI login request PDU is built and sent on this
                                connection.
-
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-
-  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
-
+  @retval EFI_DEVICE_ERROR     Some kind of device error happened.
 **/
 EFI_STATUS
 IScsiSendLoginReq (
@@ -751,14 +721,10 @@ IScsiSendLoginReq (
 /**
   Receive and process the iSCSI login response.
 
-  @param  Conn[in]             The connection in the iSCSI login phase.
-
+  @param[in]  Conn             The connection in the iSCSI login phase.
+  
   @retval EFI_SUCCESS          The iSCSI login response PDU is received and processed.
-
-  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-
-  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
-
+  @retval Others               Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiReceiveLoginRsp (
@@ -770,19 +736,15 @@ IScsiReceiveLoginRsp (
   The DataSegmentLength and the actual size of the net buffer containing this PDU will be
   updated.
 
-  @param  Pdu[in]              The iSCSI PDU whose data segment the key-value pair will
+  @param[in]  Pdu              The iSCSI PDU whose data segment the key-value pair will
                                be added to.
-
-  @param  Key[in]              The key name string.
-
-  @param  Value[in]            The value string.
+  @param[in]  Key              The key name string.
+  @param[in]  Value            The value string.
 
   @retval EFI_SUCCESS          The key-valu pair is added to the PDU's datasegment and
                                the correspondence length fields are updated.
-
   @retval EFI_OUT_OF_RESOURCES There is not enough space in the PDU to add the key-value
                                pair.
-
 **/
 EFI_STATUS
 IScsiAddKeyValuePair (
@@ -794,10 +756,10 @@ IScsiAddKeyValuePair (
 /**
   Prepare the iSCSI login request to be sent according to the current login status.
 
-  @param  Conn[in] The connection in the iSCSI login phase.
+  @param[in]  Conn The connection in the iSCSI login phase.
 
-  @retval The pointer to the net buffer containing the iSCSI login request built.
-
+  @return The pointer to the net buffer containing the iSCSI login request built.
+  @retval Others    Some unexpected error happened.
 **/
 NET_BUF *
 IScsiPrepareLoginReq (
@@ -807,14 +769,13 @@ IScsiPrepareLoginReq (
 /**
   Process the iSCSI Login Response.
 
-  @param  Conn[in] The connection on which the iSCSI login response is received.
-
-  @param  Pdu[in]  The iSCSI login response PDU.
+  @param[in]  Conn The connection on which the iSCSI login response is received.
+  @param[in]  Pdu  The iSCSI login response PDU.
 
   @retval EFI_SUCCESS        The iSCSI login response PDU is processed and all check are passed.
-
   @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
-
+  @retval EFI_MEDIA_CHANGED  Target is redirected.
+  @retval Others             Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiProcessLoginRsp (
@@ -826,19 +787,15 @@ IScsiProcessLoginRsp (
   Updated the target information according the data received in the iSCSI
   login response with an target redirection status.
 
-  @param  Session[in]          The iSCSI session.
-
-  @param  Data[in]             The data segment which should contain the
-                               TargetAddress key-value list.
-
-  @param  Len[in]              Length of the data.
-
+  @param[in] Session          The iSCSI session.
+  @param[in] Data             The data segment which should contain the
+                              TargetAddress key-value list.
+  @param[in] Len              Length of the data.
+  
   @retval EFI_SUCCESS          The target address is updated.
-
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-
   @retval EFI_NOT_FOUND        The TargetAddress key is not found.
-
+  @retval Others               Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiUpdateTargetAddress (
@@ -850,10 +807,7 @@ IScsiUpdateTargetAddress (
 /**
   The callback function to free the net buffer list.
 
-  @param  Arg[in] The opaque parameter.
-
-  @retval None.
-
+  @param[in]  Arg The opaque parameter.
 **/
 VOID
 IScsiFreeNbufList (
@@ -866,23 +820,18 @@ IScsiFreeNbufList (
   net buffer. The digest check will be conducted in this function if needed and the digests
   will be trimmed from the PDU buffer.
 
-  @param  Conn[in]         The iSCSI connection to receive data from.
-
-  @param  Pdu[out]         The received iSCSI pdu.
-
-  @param  Context[in]      The context used to describe information on the caller provided
+  @param[in]   Conn        The iSCSI connection to receive data from.
+  @param[out]  Pdu         The received iSCSI pdu.
+  @param[in]   Context     The context used to describe information on the caller provided
                            buffer to receive data segment of the iSCSI pdu, it's optional.
+  @param[in]  HeaderDigest Whether there will be header digest received.
+  @param[in]  DataDigest   Whether there will be data digest.
+  @param[in]  TimeoutEvent The timeout event, it's optional.
 
-  @param  HeaderDigest[in] Whether there will be header digest received.
-
-  @param  DataDigest[in]   Whether there will be data digest.
-
-  @param  TimeoutEvent[in] The timeout event, it's optional.
-
-  @retval EFI_SUCCESS      An iSCSI pdu is received.
-
-  @retval EFI_TIMEOUT      Timeout happenend.
-
+  @retval EFI_SUCCESS          An iSCSI pdu is received.
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
+  @retval Others               Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiReceivePdu (
@@ -897,14 +846,12 @@ IScsiReceivePdu (
 /**
   Check and get the result of the prameter negotiation.
 
-  @param  Conn[in]           The connection in iSCSI login.
+  @param[in]  Conn          The connection in iSCSI login.
+  @param[in]  Transit       Whether need transit.
 
-  @param  Pdu[in]            The iSCSI response PDU containing the parameter list.
-
-  @retval EFI_SUCCESS        The parmeter check is passed and negotiation is finished.
-
-  @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
-
+  @retval EFI_SUCCESS          The parmeter check is passed and negotiation is finished.
+  @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
 **/
 EFI_STATUS
 IScsiCheckOpParams (
@@ -915,14 +862,10 @@ IScsiCheckOpParams (
 /**
   Fill the oprational prameters.
 
-  @param  Conn[in]             The connection in iSCSI login.
-
-  @param  Pdu[in]              The iSCSI login request PDU to fill the parameters.
+  @param[in]  Conn            The connection in iSCSI login.
+  @param[in]  Pdu             The iSCSI login request PDU to fill the parameters.
 
   @retval EFI_SUCCESS          The parmeters are filled into the iSCSI login request PDU.
-
-  @retval EFI_OUT_OF_RESOURCES There is not enough space in the PDU to hold the parameters.
-
 **/
 EFI_STATUS
 IScsiFillOpParams (
@@ -933,15 +876,12 @@ IScsiFillOpParams (
 /**
   Pad the iSCSI AHS or data segment to an integer number of 4 byte words.
 
-  @param  Pdu[in]              The iSCSI pdu which contains segments to pad.
-
-  @param  Len[in]              The length of the last semgnet in the PDU.
+  @param[in]   Pdu             The iSCSI pdu which contains segments to pad.
+  @param[in]   Len             The length of the last semgnet in the PDU.
 
   @retval EFI_SUCCESS          The segment is padded or no need to pad it.
-
   @retval EFI_OUT_OF_RESOURCES There is not enough remaining free space to add the
                                padding bytes.
-
 **/
 EFI_STATUS
 IScsiPadSegment (
@@ -952,12 +892,11 @@ IScsiPadSegment (
 /**
   Build a key-value list from the data segment.
 
-  @param  Data[in] The data segment containing the key-value pairs.
+  @param[in]  Data The data segment containing the key-value pairs.
+  @param[in]  Len  Length of the data segment.
 
-  @param  Len[in]  Length of the data segment.
-
-  @retval The key-value list.
-
+  @return The key-value list.
+  @return NULL Some unexpected error happened.
 **/
 LIST_ENTRY *
 IScsiBuildKeyValueList (
@@ -969,12 +908,10 @@ IScsiBuildKeyValueList (
   Get the value string by the key name from the key-value list. If found,
   the key-value entry will be removed from the list.
 
-  @param  KeyValueList[in] The key-value list.
+  @param[in]  KeyValueList The key-value list.
+  @param[in]  Key          The key name to find.
 
-  @param  Key[in]          The key name to find.
-
-  @retval The value string.
-
+  @return The value string.
 **/
 CHAR8 *
 IScsiGetValueByKeyFromList (
@@ -985,10 +922,7 @@ IScsiGetValueByKeyFromList (
 /**
   Free the key-value list.
 
-  @param  KeyValueList[in] The key-value list.
-  
-  @retval None.
-
+  @param[in]  KeyValueList The key-value list.
 **/
 VOID
 IScsiFreeKeyValueList (
@@ -998,14 +932,11 @@ IScsiFreeKeyValueList (
 /**
   Normalize the iSCSI name according to RFC.
 
-  @param  Name[in]           The iSCSI name.
-
-  @param  Len[in]            length of the iSCSI name.
+  @param[in]  Name          The iSCSI name.
+  @param[in]  Len           length of the iSCSI name.
 
   @retval EFI_SUCCESS        The iSCSI name is valid and normalized.
-
   @retval EFI_PROTOCOL_ERROR The iSCSI name is mal-formatted or not in the IQN format.
-
 **/
 EFI_STATUS
 IScsiNormalizeName (
@@ -1016,20 +947,17 @@ IScsiNormalizeName (
 /**
   Execute the SCSI command issued through the EXT SCSI PASS THRU protocol.
 
-  @param  PassThru[in]     The EXT SCSI PASS THRU protocol.
-
-  @param  Target[in]       The target ID.
-
-  @param  Lun[in]          The LUN.
-
-  @param  Packet[in][out]  The request packet containing IO request, SCSI command
-                           buffer and buffers to read/write.
-
-  @retval EFI_SUCCES       The SCSI command is executed and the result is updated to 
-                           the Packet.
-
-  @retval EFI_DEVICE_ERROR Some unexpected error happened.
-
+  @param[in]       PassThru  The EXT SCSI PASS THRU protocol.
+  @param[in]       Target    The target ID.
+  @param[in]       Lun       The LUN.
+  @param[in, out]  Packet    The request packet containing IO request, SCSI command
+                             buffer and buffers to read/write.
+                             
+  @retval EFI_SUCCES           The SCSI command is executed and the result is updated to 
+                               the Packet.
+  @retval EFI_DEVICE_ERROR     Some unexpected error happened.
+  @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+  @retval Others               Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiExecuteScsiCommand (
@@ -1042,12 +970,10 @@ IScsiExecuteScsiCommand (
 /**
   Reinstate the session on some error.
 
-  @param  Private[in] The iSCSI driver data.
+  @param[in]  Private The iSCSI driver data.
 
   @retval EFI_SUCCES  The session is reinstated from some error.
-
-  @retval other       Reinstatement failed.
-
+  @retval Other       Reinstatement failed.
 **/
 EFI_STATUS
 IScsiSessionReinstatement (
@@ -1057,12 +983,8 @@ IScsiSessionReinstatement (
 /**
   Initialize some session parameters before login.
 
-  @param  Session[in]  The iSCSI session.
-
-  @param  Recovery[in] Whether the request is from a fresh new start or recovery.
-
-  @retval None.
-
+  @param[in]  Session  The iSCSI session.
+  @param[in]  Recovery Whether the request is from a fresh new start or recovery.
 **/
 VOID
 IScsiSessionInit (
@@ -1074,10 +996,9 @@ IScsiSessionInit (
   Abort the iSCSI session, that is, reset all the connection and free the
   resources.
 
-  @param  Session[in] The iSCSI session.
+  @param[in]  Session The iSCSI session.
 
   @retval EFI_SUCCES  The session is aborted.
-
 **/
 EFI_STATUS
 IScsiSessionAbort (
