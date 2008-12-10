@@ -1,7 +1,7 @@
 /** @file
   Implementation for iSCSI Boot Firmware Table publication.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -10,14 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  IScsiIbft.c
-
-Abstract:
-
-  Implementation for iSCSI Boot Firmware Table publication.
-
 **/
 
 #include "IScsiImpl.h"
@@ -25,10 +17,7 @@ Abstract:
 /**
   Initialize the header of the iSCSI Boot Firmware Table.
   
-  @param  Header[in] The header of the iSCSI Boot Firmware Table.
-
-  @retval None.
-
+  @param[in]  Header The header of the iSCSI Boot Firmware Table.
 **/
 VOID
 IScsiInitIbfTableHeader (
@@ -52,13 +41,9 @@ IScsiInitIbfTableHeader (
 /**
   Initialize the control section of the iSCSI Boot Firmware Table.
   
-  @param  Table[in]       The ACPI table.
-
-  @param  HandleCount[in] The number of the handles associated with iSCSI sessions, it's
+  @param[in]  Table       The ACPI table.
+  @param[in]  HandleCount The number of the handles associated with iSCSI sessions, it's
                           equal to the number of iSCSI sessions.
-
-  @retval None.
-
 **/
 VOID
 IScsiInitControlSection (
@@ -94,15 +79,10 @@ IScsiInitControlSection (
 /**
   Add one item into the heap.
 
-  @param  Heap[in][out] On input, the current address of the heap; On output, the address of
-                        the heap after the item is added.
-
-  @param  Data[in]      The data to add into the heap.
-
-  @param  Len[in]       Length of the Data in byte.
-
-  @retval None.
-
+  @param[in, out]  Heap  On input, the current address of the heap; On output, the address of
+                         the heap after the item is added.
+  @param[in]       Data  The data to add into the heap.
+  @param[in]       Len   Length of the Data in byte.
 **/
 VOID
 IScsiAddHeapItem (
@@ -123,14 +103,9 @@ IScsiAddHeapItem (
 /**
   Fill the Initiator section of the iSCSI Boot Firmware Table.
 
-  @param  Table[in]     The ACPI table.
-
-  @param  Heap[in][out] The heap.
-
-  @param  Handle[in]    The handle associated with the iSCSI session.
-
-  @retval None.
-
+  @param[in]       Table    The ACPI table.
+  @param[in, out]  Heap     The heap.
+  @param[in]       Handle   The handle associated with the iSCSI session.
 **/
 VOID
 IScsiFillInitiatorSection (
@@ -186,12 +161,8 @@ IScsiFillInitiatorSection (
 /**
   Map the v4 IP address into v6 IP address.
 
-  @param  V4 The v4 IP address.
-
-  @param  V6 The v6 IP address.
-
-  @retval None.
-
+  @param[in]   V4 The v4 IP address.
+  @param[out]  V6 The v6 IP address.
 **/
 VOID
 IScsiMapV4ToV6Addr (
@@ -215,10 +186,10 @@ IScsiMapV4ToV6Addr (
   Get the NIC's PCI location and return it accroding to the composited
   format defined in iSCSI Boot Firmware Table.
 
-  @param  Controller[in]  The handle of the controller.
+  @param[in]  Controller  The handle of the controller.
 
-  @retval UINT16          The composited representation of the NIC PCI location.
-
+  @return UINT16          The composited representation of the NIC PCI location.
+  @retval 0               Some unexpected error happened.
 **/
 UINT16
 IScsiGetNICPciLocation (
@@ -268,10 +239,9 @@ IScsiGetNICPciLocation (
 /**
   Get the MAC address of the controller.
   
-  @param  Controller[in]    The handle of the controller.
+  @param[in]  Controller    The handle of the controller.
 
-  @retval EFI_MAC_ADDRESS * The mac address.
-
+  @return EFI_MAC_ADDRESS * The mac address.
 **/
 EFI_MAC_ADDRESS *
 IScsiGetMacAddress (
@@ -294,16 +264,10 @@ IScsiGetMacAddress (
 /**
   Fill the NIC and target sections in iSCSI Boot Firmware Table.
 
-  @param  Table[in]       The buffer of the ACPI table.
-
-  @param  Heap[in][out]   The heap buffer used to store the variable length parameters such as iSCSI name.
-
-  @param  HandleCount[in] The number of handles having iSCSI private protocol installed.
-
-  @param  Handles[in]     The handle buffer.
-
-  @retval None.
-
+  @param[in]       Table       The buffer of the ACPI table.
+  @param[in, out]  Heap        The heap buffer used to store the variable length parameters such as iSCSI name.
+  @param[in]       HandleCount Count The number of handles having iSCSI private protocol installed.
+  @param[in]       Handles     The handle buffer.
 **/
 VOID
 IScsiFillNICAndTargetSections (
@@ -469,15 +433,10 @@ IScsiFillNICAndTargetSections (
 /**
   Publish and remove the iSCSI Boot Firmware Table according to the iSCSI
   session status.
-
-  @param  None.
-
-  @retval None.
-
 **/
 VOID
 IScsiPublishIbft (
-  IN VOID
+  VOID  
   )
 {
   EFI_STATUS                                Status;
