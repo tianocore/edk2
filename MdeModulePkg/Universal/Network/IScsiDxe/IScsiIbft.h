@@ -28,11 +28,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Publish and remove the iSCSI Boot Firmware Table according to the iSCSI
   session status.
-
-  @param  None.
-
-  @retval None.
-
 **/
 VOID
 IScsiPublishIbft (
