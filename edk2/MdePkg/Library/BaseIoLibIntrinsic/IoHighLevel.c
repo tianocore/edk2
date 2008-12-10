@@ -127,8 +127,7 @@ IoAndThenOr8 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT8
@@ -314,6 +313,7 @@ IoBitFieldAndThenOr8 (
   operations are serialized.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Port    The I/O port to write.
   @param  OrData  The value to OR with the read value from the I/O port.
@@ -342,7 +342,8 @@ IoOr16 (
   are serialized.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
-
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+  
   @param  Port    The I/O port to write.
   @param  AndData The value to AND with the read value from the I/O port.
 
@@ -371,7 +372,8 @@ IoAnd16 (
   I/O read and write operations are serialized.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
-
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+  
   @param  Port    The I/O port to write.
   @param  AndData The value to AND with the read value from the I/O port.
   @param  OrData  The value to OR with the result of the AND operation.
@@ -397,6 +399,7 @@ IoAndThenOr16 (
   the StartBit and the EndBit. The value of the bit field is returned.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -407,8 +410,7 @@ IoAndThenOr16 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT16
@@ -431,6 +433,7 @@ IoBitFieldRead16 (
   left bits in Value are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -471,6 +474,7 @@ IoBitFieldWrite16 (
   operations are serialized. Extra left bits in OrData are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -511,6 +515,7 @@ IoBitFieldOr16 (
   are serialized. Extra left bits in AndData are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -553,6 +558,7 @@ IoBitFieldAnd16 (
   AndData and OrData are stripped.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -595,6 +601,7 @@ IoBitFieldAndThenOr16 (
   operations are serialized.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Port    The I/O port to write.
   @param  OrData  The value to OR with the read value from the I/O port.
@@ -623,6 +630,7 @@ IoOr32 (
   are serialized.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Port    The I/O port to write.
   @param  AndData The value to AND with the read value from the I/O port.
@@ -652,6 +660,7 @@ IoAnd32 (
   I/O read and write operations are serialized.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Port    The I/O port to write.
   @param  AndData The value to AND with the read value from the I/O port.
@@ -678,6 +687,7 @@ IoAndThenOr32 (
   the StartBit and the EndBit. The value of the bit field is returned.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -688,8 +698,7 @@ IoAndThenOr32 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT32
@@ -712,6 +721,7 @@ IoBitFieldRead32 (
   left bits in Value are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -752,6 +762,7 @@ IoBitFieldWrite32 (
   operations are serialized. Extra left bits in OrData are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -792,6 +803,7 @@ IoBitFieldOr32 (
   are serialized. Extra left bits in AndData are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -834,6 +846,7 @@ IoBitFieldAnd32 (
   AndData and OrData are stripped.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -876,6 +889,7 @@ IoBitFieldAndThenOr32 (
   operations are serialized.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Port    The I/O port to write.
   @param  OrData  The value to OR with the read value from the I/O port.
@@ -904,6 +918,7 @@ IoOr64 (
   are serialized.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Port    The I/O port to write.
   @param  AndData The value to AND with the read value from the I/O port.
@@ -933,6 +948,7 @@ IoAnd64 (
   I/O read and write operations are serialized.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Port    The I/O port to write.
   @param  AndData The value to AND with the read value from the I/O port.
@@ -959,6 +975,7 @@ IoAndThenOr64 (
   the StartBit and the EndBit. The value of the bit field is returned.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -969,8 +986,7 @@ IoAndThenOr64 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT64
@@ -993,6 +1009,7 @@ IoBitFieldRead64 (
   left bits in Value are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1033,6 +1050,7 @@ IoBitFieldWrite64 (
   operations are serialized. Extra left bits in OrData are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1073,6 +1091,7 @@ IoBitFieldOr64 (
   are serialized. Extra left bits in AndData are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1115,6 +1134,7 @@ IoBitFieldAnd64 (
   AndData and OrData are stripped.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1251,8 +1271,7 @@ MmioAndThenOr8 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..7.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT8
@@ -1440,6 +1459,7 @@ MmioBitFieldAndThenOr8 (
   all MMIO read and write operations are serialized.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  OrData  The value to OR with the read value from the MMIO register.
@@ -1468,6 +1488,7 @@ MmioOr16 (
   read and write operations are serialized.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  AndData The value to AND with the read value from the MMIO register.
@@ -1497,7 +1518,7 @@ MmioAnd16 (
   must guarantee that all MMIO read and write operations are serialized.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
-
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  AndData The value to AND with the read value from the MMIO register.
@@ -1524,6 +1545,7 @@ MmioAndThenOr16 (
   the StartBit and the EndBit. The value of the bit field is returned.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1534,8 +1556,7 @@ MmioAndThenOr16 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..15.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT16
@@ -1557,6 +1578,7 @@ MmioBitFieldRead16 (
   MMIO register are preserved. The new value of the 16-bit register is returned.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1598,6 +1620,7 @@ MmioBitFieldWrite16 (
   are stripped.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1639,6 +1662,7 @@ MmioBitFieldOr16 (
   stripped.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1681,6 +1705,7 @@ MmioBitFieldAnd16 (
   serialized. Extra left bits in both AndData and OrData are stripped.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1723,6 +1748,7 @@ MmioBitFieldAndThenOr16 (
   all MMIO read and write operations are serialized.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  OrData  The value to OR with the read value from the MMIO register.
@@ -1751,6 +1777,7 @@ MmioOr32 (
   read and write operations are serialized.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  AndData The value to AND with the read value from the MMIO register.
@@ -1780,7 +1807,7 @@ MmioAnd32 (
   must guarantee that all MMIO read and write operations are serialized.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
-
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  AndData The value to AND with the read value from the MMIO register.
@@ -1807,6 +1834,7 @@ MmioAndThenOr32 (
   the StartBit and the EndBit. The value of the bit field is returned.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1817,8 +1845,7 @@ MmioAndThenOr32 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..31.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT32
@@ -1840,6 +1867,7 @@ MmioBitFieldRead32 (
   MMIO register are preserved. The new value of the 32-bit register is returned.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1881,6 +1909,7 @@ MmioBitFieldWrite32 (
   are stripped.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1922,6 +1951,7 @@ MmioBitFieldOr32 (
   stripped.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -1964,6 +1994,7 @@ MmioBitFieldAnd32 (
   serialized. Extra left bits in both AndData and OrData are stripped.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -2006,6 +2037,7 @@ MmioBitFieldAndThenOr32 (
   all MMIO read and write operations are serialized.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  OrData  The value to OR with the read value from the MMIO register.
@@ -2034,6 +2066,7 @@ MmioOr64 (
   read and write operations are serialized.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  AndData The value to AND with the read value from the MMIO register.
@@ -2063,7 +2096,7 @@ MmioAnd64 (
   must guarantee that all MMIO read and write operations are serialized.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
-
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  AndData The value to AND with the read value from the MMIO register.
@@ -2090,6 +2123,7 @@ MmioAndThenOr64 (
   the StartBit and the EndBit. The value of the bit field is returned.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -2100,8 +2134,7 @@ MmioAndThenOr64 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
 
-  @return The value read from I/O port specified by StartBit and
-          EndBit.
+  @return The value read.
 
 **/
 UINT64
@@ -2123,6 +2156,7 @@ MmioBitFieldRead64 (
   MMIO register are preserved. The new value of the 64-bit register is returned.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -2164,6 +2198,7 @@ MmioBitFieldWrite64 (
   are stripped.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -2205,6 +2240,7 @@ MmioBitFieldOr64 (
   stripped.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
@@ -2247,6 +2283,7 @@ MmioBitFieldAnd64 (
   serialized. Extra left bits in both AndData and OrData are stripped.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().

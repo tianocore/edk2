@@ -62,7 +62,7 @@ void          _ReadWriteBarrier (void);
 
   @param  Port  The I/O port to read.
 
-  @return The value read from Port.
+  @return The value read.
 
 **/
 UINT8
@@ -115,10 +115,11 @@ IoWrite8 (
   serialized.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Port  The I/O port to read.
 
-  @return The value read from Port.
+  @return The value read.
 
 **/
 UINT16
@@ -144,7 +145,8 @@ IoRead16 (
   operations are serialized.
 
   If 16-bit I/O port operations are not supported, then ASSERT().
-
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+  
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -173,10 +175,11 @@ IoWrite16 (
   serialized.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
-
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
+  
   @param  Port  The I/O port to read.
 
-  @return The value read from Port.
+  @return The value read.
 
 **/
 UINT32
@@ -202,7 +205,8 @@ IoRead32 (
   operations are serialized.
 
   If 32-bit I/O port operations are not supported, then ASSERT().
-
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
+  
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -235,7 +239,7 @@ IoWrite32 (
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT8
@@ -262,10 +266,8 @@ MmioRead8 (
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
   
-  @return The value written to the Mmio. It equals to the input
-          Value instead of the actual value read back from the
-          Mmio.
-  
+  @return Value.
+
 **/
 UINT8
 EFIAPI
@@ -285,10 +287,11 @@ MmioWrite8 (
   operations are serialized.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT16
@@ -312,12 +315,12 @@ MmioRead16 (
   and write operations are serialized.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
   
-  @return The value read from the Mmio after wrote specified
-          Value.
+  @return Value.
 
 **/
 UINT16
@@ -339,10 +342,11 @@ MmioWrite16 (
   operations are serialized.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT32
@@ -366,13 +370,12 @@ MmioRead32 (
   and write operations are serialized.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
   
-  @return The value written to the Mmio. It equals to the input
-          Value instead of the actual value read back from the
-          Mmio.
+  @return Value.
 
 **/
 UINT32
@@ -394,10 +397,11 @@ MmioWrite32 (
   operations are serialized.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT64
@@ -421,14 +425,11 @@ MmioRead64 (
   and write operations are serialized.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
 
-  @return The value written to the Mmio. It equals to the input
-          Value instead of the actual value read back from the
-          Mmio.
-  
 **/
 UINT64
 EFIAPI

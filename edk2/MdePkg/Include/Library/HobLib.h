@@ -422,7 +422,7 @@ BuildMemoryAllocationHob (
 
   @param  Hob   A pointer to a HOB.
   
-  @return HobType
+  @return HobType.
   
 **/
 #define GET_HOB_TYPE(HobStart) \
@@ -436,7 +436,7 @@ BuildMemoryAllocationHob (
 
   @param  Hob   A pointer to a HOB.
 
-  @return HobLength
+  @return HobLength.
 
 **/
 #define GET_HOB_LENGTH(HobStart) \
@@ -479,7 +479,7 @@ BuildMemoryAllocationHob (
 
   @param   GuidHob   A pointer to a HOB.
 
-  @return  A pointer to the data buffer in a HOB
+  @return  A pointer to the data buffer in a HOB.
   
 **/
 #define GET_GUID_HOB_DATA(HobStart) \
@@ -493,7 +493,7 @@ BuildMemoryAllocationHob (
 
   @param   GuidHob   A pointer to a HOB.
 
-  @return  The size of the data buffer
+  @return  The size of the data buffer.
 **/
 #define GET_GUID_HOB_DATA_SIZE(HobStart) \
   (UINT16)(GET_HOB_LENGTH (HobStart) - sizeof (EFI_HOB_GUID_TYPE))

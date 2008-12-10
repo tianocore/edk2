@@ -35,7 +35,7 @@
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT8
@@ -58,10 +58,9 @@ MmioRead8 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
-  @return The value written to the Mmio. It equals to the input
-          Value instead of the actual value read back from the
-          Mmio.
 **/
 UINT8
 EFIAPI
@@ -81,10 +80,11 @@ MmioWrite8 (
   operations are serialized.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT16
@@ -105,13 +105,13 @@ MmioRead16 (
   and write operations are serialized.
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
-  @return The value written to the Mmio. It equals to the input
-          Value instead of the actual value read back from the
-          Mmio.
 **/
 UINT16
 EFIAPI
@@ -132,10 +132,11 @@ MmioWrite16 (
   operations are serialized.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT32
@@ -156,13 +157,13 @@ MmioRead32 (
   and write operations are serialized.
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
-  @return The value written to the Mmio. It equals to the input
-          Value instead of the actual value read back from the
-          Mmio.
 **/
 UINT32
 EFIAPI
@@ -183,10 +184,11 @@ MmioWrite32 (
   operations are serialized.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT64
@@ -207,13 +209,11 @@ MmioRead64 (
   and write operations are serialized.
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
 
-  @return The value written to the Mmio. It equals to the input
-          Value instead of the actual value read back from the
-          Mmio.
 **/
 UINT64
 EFIAPI
@@ -243,6 +243,20 @@ MmioWrite64 (
 
 **/
 __inline__
+/**
+  Reads an 8-bit I/O port.
+
+  Reads the 8-bit I/O port specified by Port. The 8-bit read value is returned.
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port  The I/O port to read.
+
+  @return The value read.
+
+**/
 UINT8
 EFIAPI
 IoRead8 (
@@ -273,6 +287,21 @@ IoRead8 (
 
 **/
 __inline__
+/**
+  Writes an 8-bit I/O port.
+
+  Writes the 8-bit I/O port specified by Port with the value specified by Value
+  and returns Value. This function must guarantee that all I/O read and write
+  operations are serialized.
+
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port  The I/O port to write.
+  @param  Value The value to write to the I/O port.
+
+  @return The value written the I/O port.
+
+**/
 UINT8
 EFIAPI
 IoWrite8 (
@@ -299,6 +328,21 @@ IoWrite8 (
 
 **/
 __inline__
+/**
+  Reads a 16-bit I/O port.
+
+  Reads the 16-bit I/O port specified by Port. The 16-bit read value is returned.
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+
+  @param  Port  The I/O port to read.
+
+  @return The value read.
+
+**/
 UINT16
 EFIAPI
 IoRead16 (
@@ -330,6 +374,22 @@ IoRead16 (
 
 **/
 __inline__
+/**
+  Writes a 16-bit I/O port.
+
+  Writes the 16-bit I/O port specified by Port with the value specified by Value
+  and returns Value. This function must guarantee that all I/O read and write
+  operations are serialized.
+
+  If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+  
+  @param  Port  The I/O port to write.
+  @param  Value The value to write to the I/O port.
+
+  @return The value written the I/O port.
+
+**/
 UINT16
 EFIAPI
 IoWrite16 (
@@ -357,6 +417,21 @@ IoWrite16 (
 
 **/
 __inline__
+/**
+  Reads a 32-bit I/O port.
+
+  Reads the 32-bit I/O port specified by Port. The 32-bit read value is returned.
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
+  
+  @param  Port  The I/O port to read.
+
+  @return The value read.
+
+**/
 UINT32
 EFIAPI
 IoRead32 (
@@ -388,11 +463,27 @@ IoRead32 (
 
 **/
 __inline__
+/**
+  Writes a 32-bit I/O port.
+
+  Writes the 32-bit I/O port specified by Port with the value specified by Value
+  and returns Value. This function must guarantee that all I/O read and write
+  operations are serialized.
+
+  If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
+  
+  @param  Port  The I/O port to write.
+  @param  Value The value to write to the I/O port.
+
+  @return The value written the I/O port.
+
+**/
 UINT32
 EFIAPI
 IoWrite32 (
   IN      UINTN                     Port,
-  IN      UINT32  Value
+  IN      UINT32                    Value
   )
 {
   ASSERT ((Port & 3) == 0);

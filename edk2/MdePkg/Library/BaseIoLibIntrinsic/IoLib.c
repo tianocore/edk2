@@ -22,10 +22,11 @@
   serialized.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Port  The I/O port to read.
 
-  @return Always return zero.
+  @return The value read.
 
 **/
 UINT64
@@ -46,11 +47,12 @@ IoRead64 (
   operations are serialized.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return Always return zero.
+  @return The value written the I/O port.
 
 **/
 UINT64
