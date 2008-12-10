@@ -31,7 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If all Length bytes of the two buffers are identical, then 0 is returned.  Otherwise, the
   value returned is the first mismatched byte in SourceBuffer subtracted from the first
   mismatched byte in DestinationBuffer.
-
+  
   If Length > 0 and DestinationBuffer is NULL, then ASSERT().
   If Length > 0 and SourceBuffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
