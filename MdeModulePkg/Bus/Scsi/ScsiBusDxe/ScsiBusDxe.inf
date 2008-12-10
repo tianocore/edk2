@@ -1,8 +1,8 @@
 #/** @file
 #  
-#    Component description file for Scsi Bus module.
-#  
-#   SCSI bus driver. This driver scans all SCSI devices and export SCSI IO protocol
+#  SCSI bus driver. This driver scans all SCSI devices and creates a device handle for
+#  each of them. After this the driver installs the Path Device Protocol and SCSI I/O Protocol on
+#  these handles.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials

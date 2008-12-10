@@ -1,8 +1,7 @@
 #/** @file
-#  
-#   Component description file for Scsi Disk module.
-#  
-#   Scsi Disk driver. This driver detected the Scsi disk media and export block io protocol
+#    
+#  Scsi Disk driver. This driver detects the Scsi disk media and installs Block I/O Protocol
+#  on the device handle that holds the SCSI I/O Portocol.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
