@@ -1,7 +1,7 @@
 /** @file
-  Challenge-Handshake Authentication Protocol (CHAP) Configuration
-
-Copyright (c) 2004 - 2008, Intel Corporation
+  This file is for Challenge-Handshake Authentication Protocol (CHAP) Configuration.
+ 
+Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -10,14 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  IScsiCHAP.c
-
-Abstract:
-
-  This file is for CHAP configuration
-
 **/
 
 #include "IScsiImpl.h"
@@ -25,6 +17,21 @@ Abstract:
 
 EFI_GUID  mIScsiCHAPAuthInfoGuid = ISCSI_CHAP_AUTH_INFO_GUID;
 
+/**
+  Initator caculates its own expected hash value. 
+  
+  @param[in]   ChapIdentifier     ISCSI CHAP identifier sent by authenticator.  
+  @param[in]   ChapSecret         ISCSI CHAP secret of the authenticator.   
+  @param[in]   SecretLength       The length of ISCSI CHAP secret.
+  @param[in]   ChapChallenge      The challenge message sent by authenticator.  
+  @param[in]   ChallengeLength    The length of ISCSI CHAP challenge message.
+  @param[out]  ChapResponse       The calculation of the expected hash value.
+  
+  @retval EFI_SUCCESS             The expected hash value was caculatedly successfully.
+  @retval EFI_PROTOCOL_ERROR      The length of the secret should be at least the 
+                                  length of the hash value for the hashing algorithm chosen.
+  @retval Others                  Some unexpected error happened.                                
+**/
 EFI_STATUS
 IScsiCHAPCalculateResponse (
   IN  UINT32  ChapIdentifier,
@@ -66,6 +73,17 @@ IScsiCHAPCalculateResponse (
   return Status;
 }
 
+/**
+  The initator checks the CHAP response replied by target against its own
+  calculation of the expected hash value. 
+  
+  @param[in]   AuthData             ISCSI CHAP authentication data. 
+  @param[in]   TargetResponse       The response from target.    
+
+  @retval EFI_SUCCESS               The response from target passed authentication.
+  @retval EFI_SECURITY_VIOLATION    The response from target was not expected value.
+  @retval Others                    Some unexpected error happened.
+**/
 EFI_STATUS
 IScsiCHAPAuthTarget (
   IN  ISCSI_CHAP_AUTH_DATA  *AuthData,
@@ -99,16 +117,13 @@ IScsiCHAPAuthTarget (
   This function checks the received iSCSI Login Response during the security
   negotiation stage.
   
-  @param  Conn[in]             The iSCSI connection.
-
-  @param  Transit[in]          The transit flag of the latest iSCSI Login Response.
+  @param[in] Conn             The iSCSI connection.
+  @param[in] Transit          The transit flag of the latest iSCSI Login Response.
 
   @retval EFI_SUCCESS          The Login Response passed the CHAP validation.
-
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-
   @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
-
+  @retval Others               Some unexpected error happend.
 **/
 EFI_STATUS
 IScsiCHAPOnRspReceived (
@@ -269,7 +284,7 @@ IScsiCHAPOnRspReceived (
     IScsiHexToBin (TargetRsp, &RspLen, Response);
 
     //
-    // Check the CHAP Name and Response replied by Target.
+    // Check the CHAP Response replied by Target.
     //
     Status = IScsiCHAPAuthTarget (AuthData, TargetRsp);
     break;
@@ -291,17 +306,13 @@ ON_EXIT:
   This function fills the CHAP authentication information into the login PDU
   during the security negotiation stage in the iSCSI connection login.
 
-  @param  Conn[in]             The iSCSI connection.
-
-  @param  Pdu[in]              The PDU to send out.
+  @param[in]  Conn             The iSCSI connection.
+  @param[in]  Pdu              The PDU to send out.
 
   @retval EFI_SUCCESS          All check passed and the phase-related CHAP
                                authentication info is filled into the iSCSI PDU.
-
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-
   @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
-
 **/
 EFI_STATUS
 IScsiCHAPToSendReq (
