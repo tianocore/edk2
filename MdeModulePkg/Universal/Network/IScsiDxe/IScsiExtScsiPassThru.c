@@ -1,7 +1,7 @@
 /** @file
-  The IScsi's EFI_EXT_SCSI_PASS_THRU_PROTOCOL driver
+  The IScsi's EFI_EXT_SCSI_PASS_THRU_PROTOCOL driver.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -10,33 +10,50 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  IScsiExtScsiPassThru.c
-
-Abstract:
-  The IScsi's EFI_EXT_SCSI_PASS_THRU_PROTOCOL driver
-
 **/
 
 #include "IScsiImpl.h"
 
 /**
-  This function sends out the SCSI command via iSCSI transport layer and returned
-  back the data received from the iSCSI target. 
+  Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel. This function   
+  supports both blocking I/O and nonblocking I/O. The blocking I/O functionality is required, and the
+  nonblocking I/O functionality is optional.                                                             
 
-  @param  This[in]        The EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in]      This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in]      Target  The Target is an array of size TARGET_MAX_BYTES and it represents
+                          the id of the SCSI device to send the SCSI Request Packet. Each
+                          transport driver may chose to utilize a subset of this size to suit the needs
+                          of transport target representation. For example, a Fibre Channel driver
+                          may use only 8 bytes (WWN) to represent an FC target.
+  @param[in]       Lun    The LUN of the SCSI device to send the SCSI Request Packet.
+  @param[in, out]  Packet A pointer to the SCSI Request Packet to send to the SCSI device
+                          specified by Target and Lun.
+  @param[in]       Event  If nonblocking I/O is not supported then Event is ignored, and blocking
+                          I/O is performed. If Event is NULL, then blocking I/O is performed. If
+                          Event is not NULL and non blocking I/O is supported, then
+                          nonblocking I/O is performed, and Event will be signaled when the
+                          SCSI Request Packet completes.
 
-  @param  Target[in]      The Target ID of device to send the SCSI Request Packet. 
-
-  @param  Lun[in]         The LUN of the device to send the SCSI Request Packet.
-
-  @param  Packet[in][out] The SCSI Request Packet to send to the device.
-
-  @param  Event[in]       The event used in non-blocking mode, it should be always NULL.
-
-  @retval EFI_STATUS
-
+  @retval EFI_SUCCESS           The SCSI Request Packet was sent by the host. For bi-directional
+                                commands, InTransferLength bytes were transferred from
+                                InDataBuffer. For write and bi-directional commands,
+                                OutTransferLength bytes were transferred by
+                                OutDataBuffer.
+  @retval EFI_BAD_BUFFER_SIZE   The SCSI Request Packet was not executed. The number of bytes that
+                                could be transferred is returned in InTransferLength. For write
+                                and bi-directional commands, OutTransferLength bytes were
+                                transferred by OutDataBuffer. Currently not implemeted.                                
+  @retval EFI_NOT_READY         The SCSI Request Packet could not be sent because there are too many
+                                SCSI Request Packets already queued. The caller may retry again later.                             
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to send the SCSI Request
+                                Packet. 
+  @retval EFI_INVALID_PARAMETER Target, Lun, or the contents of ScsiRequestPacket are invalid.
+  @retval EFI_UNSUPPORTED       The command described by the SCSI Request Packet is not supported
+                                by the host adapter. This includes the case of Bi-directional SCSI
+                                commands not supported by the implementation. The SCSI Request
+                                Packet was not sent, so no additional status information is available.
+                                Currently not implemeted.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the SCSI Request Packet to execute.                              
 **/
 EFI_STATUS
 EFIAPI
@@ -60,27 +77,29 @@ IScsiExtScsiPassThruFunction (
 }
 
 /**
-  Retrieve the list of legal Target IDs for SCSI devices on a SCSI channel.
+  Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on a SCSI channel. These       
+  can either be the list SCSI devices that are actually present on the SCSI channel, or the list of legal
+  Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the       
+  Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI    
+  channel.                                                                                               
 
-  @param  This[in]              The EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in]       This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in, out]  Target  On input, a pointer to the Target ID (an array of size
+                           TARGET_MAX_BYTES) of a SCSI device present on the SCSI channel.
+                           On output, a pointer to the Target ID (an array of
+                           TARGET_MAX_BYTES) of the next SCSI device present on a SCSI
+                           channel. An input value of 0xF(all bytes in the array are 0xF) in the
+                           Target array retrieves the Target ID of the first SCSI device present on a
+                           SCSI channel.
+  @param[in, out]  Lun     On input, a pointer to the LUN of a SCSI device present on the SCSI
+                           channel. On output, a pointer to the LUN of the next SCSI device present
+                           on a SCSI channel.
 
-  @param  Target[in][out]       On input, a pointer to the Target ID of a SCSI device present on the
-                                SCSI channel. On output, a pointer to the Target ID of the next SCSI
-                                device present on a SCSI channel. An input value of 0xFFFFFFFF retrieves
-                                the Target ID of the first SCSI device present on a SCSI channel.
-
-  @param  Lun[in][out]          On input, a pointer to the LUN of a SCSI device present on the SCSI
-                                channel. On output, a pointer to the LUN of the next SCSI device
-                                present on a SCSI channel.
-
-  @retval EFI_SUCCESS           The Target ID and Lun of the next SCSI device 
-                                on the SCSI channel was returned in Target and Lun.
-
+  @retval EFI_SUCCESS           The Target ID and LUN of the next SCSI device on the SCSI
+                                channel was returned in Target and Lun.
+  @retval EFI_INVALID_PARAMETER Target array is not all 0xF, and Target and Lun were
+                                not returned on a previous call to GetNextTargetLun().
   @retval EFI_NOT_FOUND         There are no more SCSI devices on this SCSI channel.
-
-  @retval EFI_INVALID_PARAMETER Target is not 0xFFFFFFFF,and Target and Lun were not
-                                returned on a previous call to GetNextDevice().
-
 **/
 EFI_STATUS
 EFIAPI
@@ -116,35 +135,30 @@ IScsiExtScsiPassThruGetNextTargetLun (
 }
 
 /**
-  Allocate and build a device path node for a SCSI device on a SCSI channel.
+  Used to allocate and build a device path node for a SCSI device on a SCSI channel.
 
-  @param  This[in]              Protocol instance pointer.
+  @param[in]      This        A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in]      Target      The Target is an array of size TARGET_MAX_BYTES and it specifies the
+                              Target ID of the SCSI device for which a device path node is to be
+                              allocated and built. Transport drivers may chose to utilize a subset of
+                              this size to suit the representation of targets. For example, a Fibre
+                              Channel driver may use only 8 bytes (WWN) in the array to represent a
+                              FC target.
+  @param[in]       Lun        The LUN of the SCSI device for which a device path node is to be
+                              allocated and built.
+  @param[in, out]  DevicePath A pointer to a single device path node that describes the SCSI device
+                              specified by Target and Lun. This function is responsible for
+                              allocating the buffer DevicePath with the boot service
+                              AllocatePool(). It is the caller's responsibility to free
+                              DevicePath when the caller is finished with DevicePath.
 
-  @param  Target[in]            The Target ID of the SCSI device for which
-                                a device path node is to be allocated and built.
-
-  @param  Lun[in]               The LUN of the SCSI device for which a device 
-                                path node is to be allocated and built.
-
-  @param  DevicePath[in][out]   A pointer to a single device path node that 
-                                describes the SCSI device specified by 
-                                Target and Lun. This function is responsible 
-                                for allocating the buffer DevicePath with the boot
-                                service AllocatePool().  It is the caller's 
-                                responsibility to free DevicePath when the caller
-                                is finished with DevicePath.    
-
-  @retval EFI_SUCCESS           The device path node that describes the SCSI device
-                                specified by Target and Lun was allocated and 
-                                returned in DevicePath.
-
-  @retval EFI_NOT_FOUND         The SCSI devices specified by Target and Lun does
-                                not exist on the SCSI channel.
-
-  @retval EFI_INVALID_PARAMETER DevicePath is NULL.
-
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to allocate 
+  @retval EFI_SUCCESS           The device path node that describes the SCSI device specified by
+                                Target and Lun was allocated and returned in
                                 DevicePath.
+  @retval EFI_INVALID_PARAMETER DevicePath is NULL.
+  @retval EFI_NOT_FOUND         The SCSI devices specified by Target and Lun does not exist
+                                on the SCSI channel.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to allocate DevicePath.
 
 **/
 EFI_STATUS
@@ -219,31 +233,22 @@ IScsiExtScsiPassThruBuildDevicePath (
 }
 
 /**
-  Translate a device path node to a Target ID and LUN.
+  Used to translate a device path node to a Target ID and LUN.
 
-  @param  This[in]              Protocol instance pointer.
+  @param[in]  This       A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in]  DevicePath A pointer to a single device path node that describes the SCSI device
+                         on the SCSI channel.
+  @param[out] Target     A pointer to the Target Array which represents the ID of a SCSI device
+                         on the SCSI channel.
+  @param[out]  Lun       A pointer to the LUN of a SCSI device on the SCSI channel.
 
-  @param  DevicePath[in]        A pointer to the device path node that 
-                                describes a SCSI device on the SCSI channel.
-
-  @param  Target[out]           A pointer to the Target ID of a SCSI device 
-                                on the SCSI channel. 
-
-  @param  Lun[out]              A pointer to the LUN of a SCSI device on 
-                                the SCSI channel.    
-
-  @retval EFI_SUCCESS           DevicePath was successfully translated to a 
-                                Target ID and LUN, and they were returned 
-                                in Target and Lun.
-
-  @retval EFI_INVALID_PARAMETER DevicePath/Target/Lun is NULL.
-
-  @retval EFI_UNSUPPORTED       This driver does not support the device path 
-                                node type in DevicePath.
-
-  @retval EFI_NOT_FOUND         A valid translation from DevicePath to a 
-                                Target ID and LUN does not exist.
-
+  @retval EFI_SUCCESS           DevicePath was successfully translated to a Target ID and
+                                LUN, and they were returned in Target and Lun.
+  @retval EFI_INVALID_PARAMETER DevicePath or Target or Lun is NULL.
+  @retval EFI_NOT_FOUND         A valid translation from DevicePath to a Target ID and LUN
+                                does not exist.Currently not implemented.
+  @retval EFI_UNSUPPORTED       This driver does not support the device path node type in
+                                DevicePath.
 **/
 EFI_STATUS
 EFIAPI
@@ -283,13 +288,15 @@ IScsiExtScsiPassThruGetTargetLun (
 }
 
 /**
-  Resets a SCSI channel.This operation resets all the SCSI devices connected to
-  the SCSI channel.
+  Resets a SCSI channel. This operation resets all the SCSI devices connected to the SCSI channel.
+  Currently not implemented.
+  
+  @param[in]  This A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
 
-  @param  This[in]        Protocol instance pointer.
-
-  @retval EFI_UNSUPPORTED It's not supported.
-
+  @retval EFI_SUCCESS      The SCSI channel was reset.
+  @retval EFI_DEVICE_ERROR A device error occurred while attempting to reset the SCSI channel.
+  @retval EFI_TIMEOUT      A timeout occurred while attempting to reset the SCSI channel.
+  @retval EFI_UNSUPPORTED  The SCSI channel does not support a channel reset operation.
 **/
 EFI_STATUS
 EFIAPI
@@ -301,15 +308,22 @@ IScsiExtScsiPassThruResetChannel (
 }
 
 /**
-  Resets a SCSI device that is connected to a SCSI channel.
+  Resets a SCSI logical unit that is connected to a SCSI channel. Currently not implemented.
 
-  @param  This[in]        Protocol instance pointer.
+  @param[in]  This   A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in]  Target The Target is an array of size TARGET_MAX_BYTE and it represents the
+                     target port ID of the SCSI device containing the SCSI logical unit to
+                     reset. Transport drivers may chose to utilize a subset of this array to suit
+                     the representation of their targets.
+  @param[in]  Lun    The LUN of the SCSI device to reset.
 
-  @param  Target[in]      The Target ID of the SCSI device to reset.
-
-  @param  Lun[in]         The LUN of the SCSI device to reset.
-
-  @retval EFI_UNSUPPORTED It's not supported.
+  @retval EFI_SUCCESS           The SCSI device specified by Target and Lun was reset.
+  @retval EFI_INVALID_PARAMETER Target or Lun is NULL.
+  @retval EFI_TIMEOUT           A timeout occurred while attempting to reset the SCSI device
+                                specified by Target and Lun.
+  @retval EFI_UNSUPPORTED       The SCSI channel does not support a target reset operation.
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to reset the SCSI device
+                                specified by Target and Lun.
 
 **/
 EFI_STATUS
@@ -324,25 +338,26 @@ IScsiExtScsiPassThruResetTargetLun (
 }
 
 /**
-  Retrieve the list of legal Target IDs for SCSI devices on a SCSI channel.
+  Used to retrieve the list of legal Target IDs for SCSI devices on a SCSI channel. These can either     
+  be the list SCSI devices that are actually present on the SCSI channel, or the list of legal Target IDs
+  for the SCSI channel. Regardless, the caller of this function must probe the Target ID returned to     
+  see if a SCSI device is actually present at that location on the SCSI channel.                         
 
-  @param  This[in]              Protocol instance pointer.
+  @param[in]       This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
+  @param[in, out]  Target  (TARGET_MAX_BYTES) of a SCSI device present on the SCSI channel.
+                           On output, a pointer to the Target ID (an array of
+                           TARGET_MAX_BYTES) of the next SCSI device present on a SCSI
+                           channel. An input value of 0xF(all bytes in the array are 0xF) in the
+                           Target array retrieves the Target ID of the first SCSI device present on a
+                           SCSI channel.
 
-  @param  Target[in]            On input, a pointer to the Target ID of a SCSI 
-                                device present on the SCSI channel.  On output, 
-                                a pointer to the Target ID of the next SCSI device
-                                present on a SCSI channel.  An input value of 
-                                0xFFFFFFFF retrieves the Target ID of the first 
-                                SCSI device present on a SCSI channel.
-
-  @retval EFI_SUCCESS           The Target ID and Lun of the next SCSI device 
-                                on the SCSI channel was returned in Target and Lun.
-
+  @retval EFI_SUCCESS           The Target ID of the next SCSI device on the SCSI
+                                channel was returned in Target.
+  @retval EFI_INVALID_PARAMETER Target or Lun is NULL.
+  @retval EFI_TIMEOUT           Target array is not all 0xF, and Target were not
+                                returned on a previous call to GetNextTarget().
+                                Currently not implemented.
   @retval EFI_NOT_FOUND         There are no more SCSI devices on this SCSI channel.
-
-  @retval EFI_INVALID_PARAMETER Target is not 0xFFFFFFFF,and Target and Lun were not
-                                returned on a previous call to GetNextDevice().
-
 **/
 EFI_STATUS
 EFIAPI
