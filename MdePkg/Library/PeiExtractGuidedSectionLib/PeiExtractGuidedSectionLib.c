@@ -124,7 +124,6 @@ PeiGetExtractGuidedSectionHandlerInfo (
   Sets ExtractHandlerGuidTable so it points at a callee allocated array of registered GUIDs.
   The total number of GUIDs in the array are returned. Since the array of GUIDs is callee allocated
   and caller must treat this array of GUIDs as read-only data. 
-  
   If ExtractHandlerGuidTable is NULL, then ASSERT().
 
   @param[out]  ExtractHandlerGuidTable  A pointer to the array of GUIDs that have been registered through
