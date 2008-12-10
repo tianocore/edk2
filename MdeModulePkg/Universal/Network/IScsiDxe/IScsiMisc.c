@@ -255,7 +255,6 @@ IScsiAsciiStrToUnicodeStr (
 
   @return CHAR8 *          Pointer to the ASCII string.
 **/
-**/
 CHAR8 *
 IScsiUnicodeStrToAsciiStr (
   IN  CHAR16  *Source,
