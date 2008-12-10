@@ -1,7 +1,7 @@
-/**
+/** @file
   ISci DHCP related configuration routines.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -10,14 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  IScsiDhcp.c
-
-Abstract:
-
-  IScsi DHCP related configuration routines.
-
 **/
 
 #include "IScsiImpl.h"
@@ -25,20 +17,14 @@ Abstract:
 /**
   Extract the Root Path option and get the required target information.
 
-  @param  RootPath[in]          The RootPath.
-
-  @param  Length[in]            Length of the RootPath option payload.
-
-  @param  ConfigNvData[in]      The iSCSI session configuration data read from nonvolatile device.
+  @param[in]   RootPath         The RootPath.
+  @param[in]   Length           Length of the RootPath option payload.
+  @param[in]   ConfigNvData     The iSCSI session configuration data read from nonvolatile device.
 
   @retval EFI_SUCCESS           All required information is extracted from the RootPath option.
-
   @retval EFI_NOT_FOUND         The RootPath is not an iSCSI RootPath.
-
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
-
   @retval EFI_INVALID_PARAMETER The RootPath is mal-formatted.
-
 **/
 EFI_STATUS
 IScsiDhcpExtractRootPath (
@@ -52,7 +38,7 @@ IScsiDhcpExtractRootPath (
   CHAR8                 *TmpStr;
   ISCSI_ROOT_PATH_FIELD Fields[RP_FIELD_IDX_MAX];
   ISCSI_ROOT_PATH_FIELD *Field;
-  UINT32                FieldIndex;
+  RP_FIELD_IDX          FieldIndex;
   UINT8                 Index;
 
   //
@@ -78,13 +64,13 @@ IScsiDhcpExtractRootPath (
   TmpStr[Length]  = '\0';
 
   Index           = 0;
-  FieldIndex      = 0;
+  FieldIndex      = RP_FIELD_IDX_SERVERNAME;
   ZeroMem (&Fields[0], sizeof (Fields));
 
   //
   // Extract the fields in the Root Path option string.
   //
-  for (FieldIndex = 0; (FieldIndex < RP_FIELD_IDX_MAX) && (Index < Length); FieldIndex++) {
+  for (FieldIndex = RP_FIELD_IDX_SERVERNAME; (FieldIndex < RP_FIELD_IDX_MAX) && (Index < Length); FieldIndex++) {
     if (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) {
       Fields[FieldIndex].Str = &TmpStr[Index];
     }
@@ -109,19 +95,25 @@ IScsiDhcpExtractRootPath (
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
-
-  if ((Fields[RP_FIELD_IDX_SERVERNAME].Str == NULL) ||
-      (Fields[RP_FIELD_IDX_TARGETNAME].Str == NULL) ||
-      (Fields[RP_FIELD_IDX_PROTOCOL].Len > 1)
-      ) {
-
+  
+  for (FieldIndex = RP_FIELD_IDX_SERVERNAME; FieldIndex != RP_FIELD_IDX_TARGETNAME; FieldIndex = RP_FIELD_IDX_TARGETNAME) {
+    if (Fields[FieldIndex].Str == NULL) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+  }
+  
+  FieldIndex = RP_FIELD_IDX_PROTOCOL;
+  if (Fields[RP_FIELD_IDX_PROTOCOL].Len > 1) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // Get the IP address of the target.
   //
-  Field   = &Fields[RP_FIELD_IDX_SERVERNAME];
+  FieldIndex = RP_FIELD_IDX_SERVERNAME;
+  Field   = &Fields[FieldIndex];
   Status  = IScsiAsciiStrToIp (Field->Str, &ConfigNvData->TargetIp);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
@@ -129,7 +121,8 @@ IScsiDhcpExtractRootPath (
   //
   // Check the protocol type.
   //
-  Field = &Fields[RP_FIELD_IDX_PROTOCOL];
+  FieldIndex = RP_FIELD_IDX_PROTOCOL;
+  Field = &Fields[FieldIndex];
   if ((Field->Str != NULL) && ((*(Field->Str) - '0') != EFI_IP_PROTO_TCP)) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -137,7 +130,8 @@ IScsiDhcpExtractRootPath (
   //
   // Get the port of the iSCSI target.
   //
-  Field = &Fields[RP_FIELD_IDX_PORT];
+  FieldIndex = RP_FIELD_IDX_PORT;
+  Field = &Fields[FieldIndex];
   if (Field->Str != NULL) {
     ConfigNvData->TargetPort = (UINT16) AsciiStrDecimalToUintn (Field->Str);
   } else {
@@ -146,7 +140,8 @@ IScsiDhcpExtractRootPath (
   //
   // Get the LUN.
   //
-  Field = &Fields[RP_FIELD_IDX_LUN];
+  FieldIndex = RP_FIELD_IDX_LUN;
+  Field = &Fields[FieldIndex];
   if (Field->Str != NULL) {
     Status = IScsiAsciiStrToLun (Field->Str, ConfigNvData->BootLun);
     if (EFI_ERROR (Status)) {
@@ -158,8 +153,8 @@ IScsiDhcpExtractRootPath (
   //
   // Get the target iSCSI Name.
   //
-  Field = &Fields[RP_FIELD_IDX_TARGETNAME];
-
+  FieldIndex = RP_FIELD_IDX_TARGETNAME;  
+  Field = &Fields[FieldIndex];
   if (AsciiStrLen (Field->Str) > ISCSI_NAME_MAX_SIZE - 1) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -185,23 +180,17 @@ ON_EXIT:
   The callback function registerd to the DHCP4 instance which is used to select
   the qualified DHCP OFFER.
   
-  @param  This[in]         The DHCP4 protocol.
-
-  @param  Context[in]      The context set when configuring the DHCP4 protocol.
-
-  @param  CurrentState[in] The current state of the DHCP4 protocol.
-
-  @param  Dhcp4Event[in]   The event occurs in the current state.
-
-  @param  Packet[in]       The DHCP packet that is to be sent or already received. 
-
-  @param  NewPackt[out]    The packet used to replace the above Packet.
-
-  @retval EFI_NOT_READY    The DHCP OFFER packet doesn't match our requirements.
-
+  @param[in]  This         The DHCP4 protocol.
+  @param[in]  Context      The context set when configuring the DHCP4 protocol.
+  @param[in]  CurrentState The current state of the DHCP4 protocol.
+  @param[in]  Dhcp4Event   The event occurs in the current state.
+  @param[in]  Packet       The DHCP packet that is to be sent or already received. 
+  @param[out] NewPacket    The packet used to replace the above Packet.
+  
   @retval EFI_SUCCESS      Either the DHCP OFFER is qualified or we're not intereseted
                            in the Dhcp4Event.
-
+  @retval EFI_NOT_READY    The DHCP OFFER packet doesn't match our requirements.
+  @retval Others           Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiDhcpSelectOffer (
@@ -266,18 +255,13 @@ IScsiDhcpSelectOffer (
 /**
   Parse the DHCP ACK to get the address configuration and DNS information.
 
-  @param  Dhcp4[in]             The DHCP4 protocol.
-
-  @param  ConfigData[in]        The session configuration data.
+  @param[in]   Dhcp4            The DHCP4 protocol.
+  @param[in]   ConfigData       The session configuration data.
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
-
   @retval EFI_NO_MAPPING        DHCP failed to acquire address and other information.
-
   @retval EFI_INVALID_PARAMETER The DHCP ACK's DNS option is mal-formatted.
-
   @retval EFI_DEVICE_ERROR      Some unexpected error happened.
-
 **/
 EFI_STATUS
 IScsiParseDhcpAck (
@@ -362,20 +346,13 @@ IScsiParseDhcpAck (
 /**
   Parse the DHCP ACK to get the address configuration and DNS information.
   
-  @param  Image[in]             The handle of the driver image.
-
-  @param  Controller[in]        The handle of the controller;
-
-  @param  ConfigData[in]        The session configuration data.
+  @param[in]   Image            The handle of the driver image.
+  @param[in]   Controller       The handle of the controller;
+  @param[in]   ConfigData       The session configuration data.
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
-
-  @retval EFI_NO_MAPPING        DHCP failed to acquire address and other information.
-
-  @retval EFI_INVALID_PARAMETER The DHCP ACK's DNS option is mal-formatted.
-
-  @retval EFI_DEVICE_ERROR      Some unexpected error happened.
-
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
+  @retval Others                Some unexpected error happened.
 **/
 EFI_STATUS
 IScsiDoDhcp (
