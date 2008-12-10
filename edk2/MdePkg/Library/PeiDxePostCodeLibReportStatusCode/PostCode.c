@@ -117,12 +117,12 @@ PostCodeWithDescription (
 /**
   Returns TRUE if POST Codes are enabled.
 
-  This function returns TRUE if the POST_CODE_PROPERTY_POST_CODE_ENABLED
+  This function returns TRUE if the POST_CODE_PROPERTY_POST_CODE_ENABLED 
   bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
-  @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
+  @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of 
                   PcdPostCodeProperyMask is set.
-  @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
+  @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of 
                   PcdPostCodeProperyMask is clear.
 
 **/
