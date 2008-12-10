@@ -52,21 +52,23 @@ InternalGetMemoryMapAddress (
 }
 
 /**
-  Reads a 8-bit I/O port.
+  Reads an 8-bit I/O port.
 
   Reads the 8-bit I/O port specified by Port. The 8-bit read value is returned.
   This function must guarantee that all I/O read and write operations are
   serialized.
 
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
   @param  Port  The I/O port to read.
 
-  @return The value read from Port.
+  @return The value read.
 
 **/
 UINT8
 EFIAPI
 IoRead8 (
-  IN  UINTN                  Port
+  IN      UINTN                     Port
   )
 {
   return MmioRead8 (InternalGetMemoryMapAddress (Port));
@@ -79,15 +81,18 @@ IoRead8 (
   This function must guarantee that all I/O read and write operations are
   serialized.
 
+  If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+
   @param  Port  The I/O port to read.
 
-  @return The value read from Port.
+  @return The value read.
 
 **/
 UINT16
 EFIAPI
 IoRead16 (
-  IN  UINTN                  Port
+  IN      UINTN                     Port
   )
 {
   return MmioRead16 (InternalGetMemoryMapAddress (Port));
@@ -100,15 +105,18 @@ IoRead16 (
   This function must guarantee that all I/O read and write operations are
   serialized.
 
+  If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
+  
   @param  Port  The I/O port to read.
 
-  @return The value read from Port.
+  @return The value read.
 
 **/
 UINT32
 EFIAPI
 IoRead32 (
-  IN  UINTN                  Port
+  IN      UINTN                     Port
   )
 {
   return MmioRead32 (InternalGetMemoryMapAddress (Port));
@@ -122,10 +130,11 @@ IoRead32 (
   serialized.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Port  The I/O port to read.
 
-  @return The value read from Port.
+  @return The value read.
 
 **/
 UINT64
@@ -139,28 +148,28 @@ IoRead64 (
 }
 
 /**
-  Writes a 8-bit I/O port.
+  Writes an 8-bit I/O port.
 
   Writes the 8-bit I/O port specified by Port with the value specified by Value
   and returns Value. This function must guarantee that all I/O read and write
   operations are serialized.
 
-  @param  Port  The I/O port to write.
-  @param  Data  The value to write to the I/O port.
+  If 8-bit I/O port operations are not supported, then ASSERT().
 
-  @return The value written to the I/O port. It equals to the
-          input Value instead of the actual value read back from
-          the I/O port.
+  @param  Port  The I/O port to write.
+  @param  Value The value to write to the I/O port.
+
+  @return The value written the I/O port.
 
 **/
 UINT8
 EFIAPI
 IoWrite8 (
-  IN  UINTN                  Port,
-  IN  UINT8                  Data
+  IN      UINTN                     Port,
+  IN      UINT8                     Value
   )
 {
-  return MmioWrite8 (InternalGetMemoryMapAddress (Port), Data);
+  return MmioWrite8 (InternalGetMemoryMapAddress (Port), Value);
 }
 
 /**
@@ -170,22 +179,23 @@ IoWrite8 (
   and returns Value. This function must guarantee that all I/O read and write
   operations are serialized.
 
+  If 16-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 16-bit boundary, then ASSERT().
+  
   @param  Port  The I/O port to write.
-  @param  Data  The value to write to the I/O port.
+  @param  Value The value to write to the I/O port.
 
-  @return The value written to the I/O port. It equals to the
-          input Value instead of the actual value read back from
-          the I/O port.
+  @return The value written the I/O port.
 
 **/
 UINT16
 EFIAPI
 IoWrite16 (
-  IN  UINTN                  Port,
-  IN  UINT16                 Data
+  IN      UINTN                     Port,
+  IN      UINT16                    Value
   )
 {
-  return MmioWrite16 (InternalGetMemoryMapAddress (Port), Data);
+  return MmioWrite16 (InternalGetMemoryMapAddress (Port), Value);
 }
 
 /**
@@ -195,22 +205,23 @@ IoWrite16 (
   and returns Value. This function must guarantee that all I/O read and write
   operations are serialized.
 
+  If 32-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 32-bit boundary, then ASSERT().
+  
   @param  Port  The I/O port to write.
-  @param  Data  The value to write to the I/O port.
+  @param  Value The value to write to the I/O port.
 
-  @return The value written to the I/O port. It equals to the
-          input Value instead of the actual value read back from
-          the I/O port.
+  @return The value written the I/O port.
 
 **/
 UINT32
 EFIAPI
 IoWrite32 (
-  IN  UINTN                  Port,
-  IN  UINT32                 Data
+  IN      UINTN                     Port,
+  IN      UINT32                    Value
   )
 {
-  return MmioWrite32 (InternalGetMemoryMapAddress (Port), Data);
+  return MmioWrite32 (InternalGetMemoryMapAddress (Port), Value);
 }
 
 /**
@@ -221,13 +232,12 @@ IoWrite32 (
   operations are serialized.
 
   If 64-bit I/O port operations are not supported, then ASSERT().
+  If Port is not aligned on a 64-bit boundary, then ASSERT().
 
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
-  @return The value written to the I/O port. It equals to the
-          input Value instead of the actual value read back from
-          the I/O port.
+  @return The value written the I/O port.
 
 **/
 UINT64
@@ -242,21 +252,23 @@ IoWrite64 (
 }
 
 /**
-  Reads a 8-bit MMIO register.
+  Reads an 8-bit MMIO register.
 
   Reads the 8-bit MMIO register specified by Address. The 8-bit read value is
   returned. This function must guarantee that all MMIO read and write
   operations are serialized.
 
+  If 8-bit MMIO register operations are not supported, then ASSERT().
+
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT8
 EFIAPI
 MmioRead8 (
-  IN  UINTN                  Address
+  IN      UINTN                     Address
   )
 {
   UINT8            Data;
@@ -277,15 +289,18 @@ MmioRead8 (
   returned. This function must guarantee that all MMIO read and write
   operations are serialized.
 
+  If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
+
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT16
 EFIAPI
 MmioRead16 (
-  IN  UINTN                  Address
+  IN      UINTN                     Address
   )
 {
   UINT16           Data;
@@ -311,15 +326,18 @@ MmioRead16 (
   returned. This function must guarantee that all MMIO read and write
   operations are serialized.
 
+  If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
+
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT32
 EFIAPI
 MmioRead32 (
-  IN  UINTN                  Address
+  IN      UINTN                     Address
   )
 {
   UINT32           Data;
@@ -345,15 +363,18 @@ MmioRead32 (
   returned. This function must guarantee that all MMIO read and write
   operations are serialized.
 
+  If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
+
   @param  Address The MMIO register to read.
 
-  @return The value read from Address.
+  @return The value read.
 
 **/
 UINT64
 EFIAPI
 MmioRead64 (
-  IN  UINTN                  Address
+  IN      UINTN                     Address
   )
 {
   UINT64           Data;
@@ -374,34 +395,34 @@ MmioRead64 (
 }
 
 /**
-  Writes a 8-bit MMIO register.
+  Writes an 8-bit MMIO register.
 
   Writes the 8-bit MMIO register specified by Address with the value specified
   by Value and returns Value. This function must guarantee that all MMIO read
   and write operations are serialized.
 
-  @param  Address The MMIO register to write.
-  @param  Data    The value to write to the MMIO register.
+  If 8-bit MMIO register operations are not supported, then ASSERT().
 
-  @return The value written to the Mmio. It equals to the
-          input Value instead of the actual value read back from
-          the Mmio.
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
 **/
 UINT8
 EFIAPI
 MmioWrite8 (
-  IN  UINTN                  Address,
-  IN  UINT8                  Data
+  IN      UINTN                     Address,
+  IN      UINT8                     Value
   )
 {
   Address |= BIT63;
 
   MemoryFence ();
-  *((volatile UINT8 *) Address) = Data;
+  *((volatile UINT8 *) Address) = Value;
   MemoryFence ();
 
-  return Data;
+  return Value;
 }
 
 /**
@@ -411,19 +432,20 @@ MmioWrite8 (
   by Value and returns Value. This function must guarantee that all MMIO read
   and write operations are serialized.
 
-  @param  Address The MMIO register to write.
-  @param  Data    The value to write to the MMIO register.
+  If 16-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 16-bit boundary, then ASSERT().
 
-  @return The value written to the Mmio. It equals to the
-          input Value instead of the actual value read back from
-          the Mmio.
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
 **/
 UINT16
 EFIAPI
 MmioWrite16 (
-  IN  UINTN                  Address,
-  IN  UINT16                 Data
+  IN      UINTN                     Address,
+  IN      UINT16                    Value
   )
 {
   //
@@ -434,10 +456,10 @@ MmioWrite16 (
   Address |= BIT63;
 
   MemoryFence ();
-  *((volatile UINT16 *) Address) = Data;
+  *((volatile UINT16 *) Address) = Value;
   MemoryFence ();
 
-  return Data;
+  return Value;
 }
 
 /**
@@ -447,19 +469,20 @@ MmioWrite16 (
   by Value and returns Value. This function must guarantee that all MMIO read
   and write operations are serialized.
 
-  @param  Address The MMIO register to write.
-  @param  Data    The value to write to the MMIO register.
+  If 32-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 32-bit boundary, then ASSERT().
 
-  @return The value written to the Mmio. It equals to the
-          input Value instead of the actual value read back from
-          the Mmio.
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
 **/
 UINT32
 EFIAPI
 MmioWrite32 (
-  IN  UINTN                  Address,
-  IN  UINT32                 Data
+  IN      UINTN                     Address,
+  IN      UINT32                    Value
   )
 {
   //
@@ -470,10 +493,10 @@ MmioWrite32 (
   Address |= BIT63;
 
   MemoryFence ();
-  *((volatile UINT32 *) Address) = Data;
+  *((volatile UINT32 *) Address) = Value;
   MemoryFence ();
 
-  return Data;
+  return Value;
 }
 
 /**
@@ -483,19 +506,18 @@ MmioWrite32 (
   by Value and returns Value. This function must guarantee that all MMIO read
   and write operations are serialized.
 
-  @param  Address The MMIO register to write.
-  @param  Data    The value to write to the MMIO register.
+  If 64-bit MMIO register operations are not supported, then ASSERT().
+  If Address is not aligned on a 64-bit boundary, then ASSERT().
 
-  @return The value written to the Mmio. It equals to the
-          input Value instead of the actual value read back from
-          the Mmio.
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
 
 **/
 UINT64
 EFIAPI
 MmioWrite64 (
-  IN  UINTN                  Address,
-  IN  UINT64                 Data
+  IN      UINTN                     Address,
+  IN      UINT64                    Value
   )
 {
   //
@@ -506,8 +528,8 @@ MmioWrite64 (
   Address |= BIT63;
 
   MemoryFence ();
-  *((volatile UINT64 *) Address) = Data;
+  *((volatile UINT64 *) Address) = Value;
   MemoryFence ();
 
-  return Data;
+  return Value;
 }

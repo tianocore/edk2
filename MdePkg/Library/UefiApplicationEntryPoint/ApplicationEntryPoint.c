@@ -75,7 +75,7 @@ _ModuleEntryPoint (
 
 
 /**
-  Invokes the library destructors fror all dependent libraries and terminates
+  Invokes the library destructors for all dependent libraries and terminates
   the UEFI Application. 
 
   This function calls ProcessLibraryDestructorList() and the EFI Boot Service Exit()

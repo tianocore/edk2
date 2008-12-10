@@ -407,7 +407,7 @@ UsbSetReportRequest (
   Request.Request = EFI_USB_SET_REPORT_REQUEST;
   Request.Value   = (UINT16) ((ReportType << 8) | ReportId);
   Request.Index   = Interface;
-  Request.Length  = ReportLength;
+  Request.Length  = ReportLen;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
