@@ -204,7 +204,7 @@ _ModuleEntryPoint (
   //
   if (!InSmm) {
     //
-    // Retrieve the Device Path Protocol from the DeviceHandle tha this driver was loaded from
+    // Retrieve the Device Path Protocol from the DeviceHandle from which this driver was loaded
     //
     Status = gBS->HandleProtocol (
                     LoadedImage->DeviceHandle,
