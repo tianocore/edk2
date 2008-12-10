@@ -226,6 +226,9 @@ typedef struct {
   UINT8 Reserved_15_17[3];
 } EFI_SCSI_SENSE_DATA;
 
+///
+/// SCSI Disk READ CAPACITY Data
+///
 typedef struct {
   UINT8 LastLba3;
   UINT8 LastLba2;
@@ -277,7 +280,7 @@ typedef struct {
 #define EFI_SCSI_ASC_INVALID_FIELD                (0x24)
 #define EFI_SCSI_ASC_WRITE_PROTECTED              (0x27)
 #define EFI_SCSI_ASC_MEDIA_CHANGE                 (0x28)
-#define EFI_SCSI_ASC_RESET                        (0x29)   ///<Power On Reset or Bus Reset occurred
+#define EFI_SCSI_ASC_RESET                        (0x29)   ///< Power On Reset or Bus Reset occurred
 #define EFI_SCSI_ASC_ILLEGAL_FIELD                (0x26)
 #define EFI_SCSI_ASC_NO_MEDIA                     (0x3A)
 #define EFI_SCSI_ASC_ILLEGAL_MODE_FOR_THIS_TRACK  (0x64)
