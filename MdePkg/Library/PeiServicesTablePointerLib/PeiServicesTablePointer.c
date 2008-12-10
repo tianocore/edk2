@@ -22,14 +22,15 @@
 CONST EFI_PEI_SERVICES  **gPeiServices;
 
 /**
-  The function cache the pointer of PEI services to global variable.
+  The function set the pointer of PEI services immediately preceding the IDT table
+  according to PI specification.
   
-  @param    PeiServices   The address of PeiServices pointer.
+  @param    PeiServicesTablePointer   The address of PeiServices pointer.
 **/
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  IN CONST EFI_PEI_SERVICES  ** PeiServicesTablePointer
+  IN CONST EFI_PEI_SERVICES ** PeiServicesTablePointer
   )
 {
   gPeiServices = PeiServicesTablePointer;
