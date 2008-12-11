@@ -15,17 +15,88 @@
 #include <PiDxe.h>
 
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
-GUID                 *mExtractHandlerGuidTable;
+#define EXTRACT_HANDLER_TABLE_SIZE   0x10
+
 UINT32               mNumberOfExtractHandler = 0;
+UINT32               mMaxNumberOfExtractHandler = 0;
 
-EXTRACT_GUIDED_SECTION_DECODE_HANDLER   *mExtractDecodeHandlerTable;
-EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable;
+GUID                 *mExtractHandlerGuidTable = NULL;
+EXTRACT_GUIDED_SECTION_DECODE_HANDLER   *mExtractDecodeHandlerTable = NULL;
+EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable = NULL;
 
+/**
+  Reallocates more global memory to store the registered guid and Handler list.
+
+  @retval  RETURN_SUCCESS            Reallocate more global memory space to store guid and function tables.
+  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
+**/
+RETURN_STATUS
+EFIAPI
+ReallocateExtractHandlerTable (
+  )
+{ 
+  //
+  // Reallocate memory for GuidTable
+  //
+  mExtractHandlerGuidTable = ReallocatePool (
+                               mMaxNumberOfExtractHandler * sizeof (GUID), 
+                               (mMaxNumberOfExtractHandler + EXTRACT_HANDLER_TABLE_SIZE) * sizeof (GUID), 
+                               mExtractHandlerGuidTable
+                             );
+
+  if (mExtractHandlerGuidTable == NULL) {
+    goto Done;
+  }
+
+  //
+  // Reallocate memory for Decode handler Table
+  //
+  mExtractDecodeHandlerTable = ReallocatePool (
+                               mMaxNumberOfExtractHandler * sizeof (EXTRACT_GUIDED_SECTION_DECODE_HANDLER), 
+                               (mMaxNumberOfExtractHandler + EXTRACT_HANDLER_TABLE_SIZE) * sizeof (EXTRACT_GUIDED_SECTION_DECODE_HANDLER), 
+                               mExtractDecodeHandlerTable
+                             );
+
+  if (mExtractDecodeHandlerTable == NULL) {
+    goto Done;
+  }
+
+  //
+  // Reallocate memory for GetInfo handler Table
+  //
+  mExtractGetInfoHandlerTable = ReallocatePool (
+                               mMaxNumberOfExtractHandler * sizeof (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER), 
+                               (mMaxNumberOfExtractHandler + EXTRACT_HANDLER_TABLE_SIZE) * sizeof (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER), 
+                               mExtractGetInfoHandlerTable
+                             );
+
+  if (mExtractGetInfoHandlerTable == NULL) {
+    goto Done;
+  }
+  
+  //
+  // Increase max handler number
+  //
+  mMaxNumberOfExtractHandler = mMaxNumberOfExtractHandler + EXTRACT_HANDLER_TABLE_SIZE;
+  return RETURN_SUCCESS;
+
+Done:
+  if (mExtractHandlerGuidTable != NULL) {
+    FreePool (mExtractHandlerGuidTable);
+  }
+  if (mExtractDecodeHandlerTable != NULL) {
+    FreePool (mExtractDecodeHandlerTable);
+  }
+  if (mExtractGetInfoHandlerTable != NULL) {
+    FreePool (mExtractGetInfoHandlerTable);
+  }
+  
+  return RETURN_OUT_OF_RESOURCES;
+}
 /**
   Constructor allocates the global memory to store the registered guid and Handler list.
 
@@ -42,28 +113,7 @@ DxeExtractGuidedSectionLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  //
-  // Allocate global pool space to store the registered handler and its guid value.
-  //
-  mExtractHandlerGuidTable    = (GUID *) AllocatePool (PcdGet32 (PcdMaximumGuidedExtractHandler) * sizeof (GUID));
-  if (mExtractHandlerGuidTable == NULL) {
-    return RETURN_OUT_OF_RESOURCES;
-  }
-  
-  mExtractDecodeHandlerTable  = (EXTRACT_GUIDED_SECTION_DECODE_HANDLER *) AllocatePool (PcdGet32 (PcdMaximumGuidedExtractHandler) * sizeof (EXTRACT_GUIDED_SECTION_DECODE_HANDLER));
-  if (mExtractDecodeHandlerTable == NULL) {
-    FreePool (mExtractHandlerGuidTable);
-    return RETURN_OUT_OF_RESOURCES;
-  }
-
-  mExtractGetInfoHandlerTable = (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *) AllocatePool (PcdGet32 (PcdMaximumGuidedExtractHandler) * sizeof (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER));
-  if (mExtractGetInfoHandlerTable == NULL) {
-    FreePool (mExtractHandlerGuidTable);
-    FreePool (mExtractDecodeHandlerTable);
-    return RETURN_OUT_OF_RESOURCES;
-  }
-  
-  return RETURN_SUCCESS;
+  return ReallocateExtractHandlerTable ();
 }
 
 /**
@@ -149,8 +199,10 @@ ExtractGuidedSectionRegisterHandlers (
   //
   // Check the global table is enough to contain new Handler.
   //
-  if (mNumberOfExtractHandler >= PcdGet32 (PcdMaximumGuidedExtractHandler)) {
-    return RETURN_OUT_OF_RESOURCES;
+  if (mNumberOfExtractHandler >= mMaxNumberOfExtractHandler) {
+    if (ReallocateExtractHandlerTable () != RETURN_SUCCESS) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
   }
   
   //
