@@ -132,21 +132,6 @@ FxStorSupport   PROC    C PUBLIC
 FxStorSupport   ENDP
 
 
-;------------------------------------------------------------------------------
-; DESCRIPTOR *
-; GetIdtr (
-;   void
-;   )
-;
-; Abstract: Returns physical address of IDTR
-;
-GetIdtr         PROC    C PUBLIC
-                LOCAL   IdtrBuf:FWORD
-
-                sidt    IdtrBuf
-                mov     eax, DWORD PTR IdtrBuf + 2
-                ret
-GetIdtr         ENDP
 
 
 ;------------------------------------------------------------------------------

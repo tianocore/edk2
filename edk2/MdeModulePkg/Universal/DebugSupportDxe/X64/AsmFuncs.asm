@@ -109,19 +109,6 @@ text SEGMENT
 externdef InterruptDistrubutionHub:near
 
 ;------------------------------------------------------------------------------
-;  VOID
-;  EfiWbinvd (
-;    VOID
-;    )
-;
-; Abstract: Writeback and invalidate cache
-;
-EfiWbinvd PROC    PUBLIC
-    wbinvd
-    ret
-EfiWbinvd ENDP
-
-;------------------------------------------------------------------------------
 ; BOOLEAN
 ; FxStorSupport (
 ;   void
@@ -145,25 +132,6 @@ FxStorSupport   PROC    PUBLIC
 FxStorSupport   ENDP
 
 
-;------------------------------------------------------------------------------
-; DESCRIPTOR *
-; GetIdtr (
-;   void
-;   )
-;
-; Abstract: Returns physical address of IDTR
-;
-GetIdtr         PROC    PUBLIC
-                push    rbp
-                mov     rbp, rsp
-
-                sidt    QWORD PTR [rbp - 0ah]
-                mov     rax, QWORD PTR [rbp - 8h]
-
-                mov     rsp, rbp
-                pop     rbp
-                ret
-GetIdtr         ENDP
 
 
 ;------------------------------------------------------------------------------
@@ -196,7 +164,7 @@ WriteInterruptFlag  ENDP
 ;------------------------------------------------------------------------------
 ; void
 ; Vect2Desc (
-;   DESCRIPTOR * DestDesc,  // rcx
+;   IA32_IDT_GATE_DESCRIPTOR * DestDesc,  // rcx
 ;   void (*Vector) (void)   // rdx
 ;   )
 ;
