@@ -16,10 +16,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __PEI_SERVICES_TABLE_POINTER_LIB_H__
 
 /**
-  The function returns the pointer to PEI services.
+  Retrieves the cached value of the PEI Services Table pointer.
 
-  The function returns the pointer to PEI services.
-  It will ASSERT() if the pointer to PEI services is NULL.
+  Returns the cached value of the PEI Services Table pointer in a CPU specific manner 
+  as specified in the CPU binding section of the Platform Initialization Pre-EFI 
+  Initialization Core Interface Specification.
+  
+  If the cached PEI Services Table pointer is NULL, then ASSERT().
 
   @return  The pointer to PeiServices.
 
@@ -31,8 +34,13 @@ GetPeiServicesTablePointer (
   );
 
 /**
-  The function set the pointer of PEI services immediately preceding the IDT table
-  according to PI specification.
+  Caches a pointer PEI Services Table. 
+ 
+  Caches the pointer to the PEI Services Table specified by PeiServicesTablePointer 
+  in a CPU specific manner as specified in the CPU binding section of the Platform Initialization 
+  Pre-EFI Initialization Core Interface Specification. 
+  
+  If PeiServicesTablePointer is NULL, then ASSERT().
   
   @param    PeiServicesTablePointer   The address of PeiServices pointer.
 **/
