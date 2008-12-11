@@ -15,62 +15,55 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // private header files
 //
-#include "PlDebugSupport.h"
+#include "DebugSupport.h"
 
 //
 // This the global main table to keep track of the interrupts
 //
 IDT_ENTRY   *IdtEntryTable  = NULL;
-DESCRIPTOR  NullDesc        = 0;
+IA32_IDT_GATE_DESCRIPTOR  NullDesc        = {0};
 
 /**
-  Allocate pool for a new IDT entry stub.
+  Read IDT Gate Descriptor from IDT Table.
 
-  Copy the generic stub into the new buffer and fixup the vector number
-  and jump target address.
-
-  @param  ExceptionType   This is the exception type that the new stub will be created
-                          for.
-  @param  Stub            On successful exit, *Stub contains the newly allocated entry stub.
-
-  @retval EFI_SUCCESS     Always.
+  @param  Vector            Specifies vector number.
+  @param  IdtGateDecriptor  Pointer to IDT Gate Descriptor read from IDT Table.
 
 **/
-EFI_STATUS
-CreateEntryStub (
-  IN EFI_EXCEPTION_TYPE     ExceptionType,
-  OUT VOID                  **Stub
+VOID ReadIdtGateDecriptor (
+  IN  EFI_EXCEPTION_TYPE        Vector,
+  OUT IA32_IDT_GATE_DESCRIPTOR  *IdtGateDecriptor
   )
 {
-  UINT8       *StubCopy;
+ IA32_DESCRIPTOR            IdtrValue;
+ IA32_IDT_GATE_DESCRIPTOR   *IdtTable;
 
-  StubCopy = *Stub;
+ AsmReadIdtr (&IdtrValue);
+ IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtrValue.Base;
 
-  //
-  // Fixup the stub code for this vector
-  //
-
-  // The stub code looks like this:
-  //
-  //    00000000  89 25 00000004 R  mov     AppEsp, esp             ; save stack top
-  //    00000006  BC 00008014 R     mov     esp, offset DbgStkBot   ; switch to debugger stack
-  //    0000000B  6A 00             push    0                       ; push vector number - will be modified before installed
-  //    0000000D  E9                db      0e9h                    ; jump rel32
-  //    0000000E  00000000          dd      0                       ; fixed up to relative address of CommonIdtEntry
-  //
-
-  //
-  // poke in the exception type so the second push pushes the exception type
-  //
-  StubCopy[0x0c] = (UINT8) ExceptionType;
-
-  //
-  // fixup the jump target to point to the common entry
-  //
-  *(UINT32 *) &StubCopy[0x0e] = (UINT32) CommonIdtEntry - (UINT32) &StubCopy[StubSize];
-
-  return EFI_SUCCESS;
+ CopyMem ((VOID *) IdtGateDecriptor, (VOID *) &(IdtTable)[Vector], sizeof (IA32_IDT_GATE_DESCRIPTOR));
 }
+/**
+  Write IDT Gate Descriptor into IDT Table.
+
+  @param  Vector            Specifies vector number.
+  @param  IdtGateDecriptor  Pointer to IDT Gate Descriptor written into IDT Table.
+
+**/
+VOID WriteIdtGateDecriptor (
+  EFI_EXCEPTION_TYPE        Vector,
+  IA32_IDT_GATE_DESCRIPTOR  *IdtGateDecriptor
+  )
+{
+ IA32_DESCRIPTOR            IdtrValue;
+ IA32_IDT_GATE_DESCRIPTOR   *IdtTable;
+
+ AsmReadIdtr (&IdtrValue);
+ IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtrValue.Base;
+
+ CopyMem ((VOID *) &(IdtTable)[Vector], (VOID *) IdtGateDecriptor, sizeof (IA32_IDT_GATE_DESCRIPTOR));
+}
+
 
 /**
   Creates a nes entry stub.  Then saves the current IDT entry and replaces it
@@ -98,14 +91,13 @@ HookEntry (
   Status = CreateEntryStub (ExceptionType, (VOID **) &IdtEntryTable[ExceptionType].StubEntry);
   if (Status == EFI_SUCCESS) {
     OldIntFlagState = WriteInterruptFlag (0);
-    READ_IDT (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
+    ReadIdtGateDecriptor (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
 
-    ((UINT16 *) &IdtEntryTable[ExceptionType].OrigVector)[0]  = ((UINT16 *) &IdtEntryTable[ExceptionType].OrigDesc)[0];
-    ((UINT16 *) &IdtEntryTable[ExceptionType].OrigVector)[1]  = ((UINT16 *) &IdtEntryTable[ExceptionType].OrigDesc)[3];
+    IdtEntryTable[ExceptionType].OrigVector = (DEBUG_PROC) GetProcedureEntryPoint (&(IdtEntryTable[ExceptionType].OrigDesc));
 
     Vect2Desc (&IdtEntryTable[ExceptionType].NewDesc, IdtEntryTable[ExceptionType].StubEntry);
     IdtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
-    WRITE_IDT (ExceptionType, &(IdtEntryTable[ExceptionType].NewDesc));
+    WriteIdtGateDecriptor (ExceptionType, &(IdtEntryTable[ExceptionType].NewDesc));
     WriteInterruptFlag (OldIntFlagState);
   }
 
@@ -128,69 +120,10 @@ UnhookEntry (
   BOOLEAN     OldIntFlagState;
 
   OldIntFlagState = WriteInterruptFlag (0);
-  WRITE_IDT (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
+  WriteIdtGateDecriptor (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
   WriteInterruptFlag (OldIntFlagState);
 
   return EFI_SUCCESS;
-}
-
-/**
-  This is the main worker function that manages the state of the interrupt
-  handlers.  It both installs and uninstalls interrupt handlers based on the
-  value of NewCallback.  If NewCallback is NULL, then uninstall is indicated.
-  If NewCallback is non-NULL, then install is indicated.
-
-  @param  NewCallback   If non-NULL, NewCallback specifies the new handler to register.
-                        If NULL, specifies that the previously registered handler should
-                        be uninstalled.
-  @param  ExceptionType Indicates which entry to manage.
-
-  @retval EFI_SUCCESS            Process is ok.
-  @retval EFI_INVALID_PARAMETER  Requested uninstalling a handler from a vector that has
-                                 no handler registered for it
-  @retval EFI_ALREADY_STARTED    Requested install to a vector that already has a handler registered.
-  @retval others                 Possible return values are passed through from UnHookEntry and HookEntry.
-
-**/
-EFI_STATUS
-ManageIdtEntryTable (
-  VOID (*NewCallback)(),
-  EFI_EXCEPTION_TYPE ExceptionType
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
-
-  if (!FeaturePcdGet (PcdNtEmulatorEnable)) {
-    if (COMPARE_DESCRIPTOR (&IdtEntryTable[ExceptionType].NewDesc, &NullDesc)) {
-      //
-      // we've already installed to this vector
-      //
-      if (NewCallback != NULL) {
-        //
-        // if the input handler is non-null, error
-        //
-        Status = EFI_ALREADY_STARTED;
-      } else {
-        Status = UnhookEntry (ExceptionType);
-      }
-    } else {
-      //
-      // no user handler installed on this vector
-      //
-      if (NewCallback == NULL) {
-        //
-        // if the input handler is null, error
-        //
-        Status = EFI_INVALID_PARAMETER;
-      } else {
-        Status = HookEntry (ExceptionType, NewCallback);
-      }
-    }
-  }
-
-  return Status;
 }
 
 /**
