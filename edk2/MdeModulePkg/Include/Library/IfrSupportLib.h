@@ -439,8 +439,8 @@ CreateStringOpCode (
 
     @param ConfigRequest           The Config request string. If set to NULL, all the
                                    configurable elements will be extracted from BlockNameArray.
-    @param ConfigAltResp           The returned <ConfigAltResp>.
     @param Progress                On return, points to a character in the Request.
+    @param ConfigAltResp           The returned <ConfigAltResp>.
     @param Guid                    GUID of the buffer storage.
     @param Name                    Name of the buffer storage.
     @param DriverHandle            The DriverHandle which is used to invoke HiiDatabase
@@ -452,7 +452,8 @@ CreateStringOpCode (
                                    The sequential input parameters will be number of
                                    AltCfgId and DefaultValueArray pairs. When set to 0,
                                    there will be no <AltResp>.
-
+    @param  ...                    Variable argument list.                   
+    
     retval EFI_OUT_OF_RESOURCES  Run out of memory resource.
     retval EFI_INVALID_PARAMETER ConfigAltResp is NULL.
     retval EFI_SUCCESS           Operation successful.

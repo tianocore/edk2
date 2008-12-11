@@ -55,7 +55,7 @@ PciCfg2Read (
   IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
   IN        UINT64                    Address,
   IN OUT    VOID                      *Buffer
-);
+  );
 
 /**
   Write to a given location in the PCI configuration space.
@@ -89,7 +89,7 @@ PciCfg2Write (
   IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
   IN        UINT64                    Address,
   IN OUT    VOID                      *Buffer
-);
+  );
 
 
 /**
@@ -130,7 +130,7 @@ PciCfg2Modify (
   IN        UINT64                    Address,
   IN        VOID                      *SetBits,
   IN        VOID                      *ClearBits
-);
+  );
 
 
 
@@ -218,7 +218,7 @@ PciCfg2Read (
   IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
   IN        UINT64                    Address,
   IN OUT    VOID                      *Buffer
-)
+  )
 {
   UINTN  PciLibAddress;
 
@@ -269,7 +269,7 @@ PciCfg2Write (
   IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
   IN        UINT64                    Address,
   IN OUT    VOID                      *Buffer
-)
+  )
 {
   UINTN  PciLibAddress;
 
@@ -327,7 +327,7 @@ PciCfg2Modify (
   IN        UINT64                    Address,
   IN        VOID                      *SetBits,
   IN        VOID                      *ClearBits
-)
+  )
 {
   UINTN   PciLibAddress;
   UINT16  ClearValue16;
@@ -353,7 +353,15 @@ PciCfg2Modify (
   return EFI_SUCCESS;
 }
 
+/**
+  Module's entry function. 
+  This routine will install EFI_PEI_PCI_CFG2_PPI.
+  
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
 
+  @return Whether success to install service.
+**/
 EFI_STATUS
 EFIAPI
 PeimInitializePciCfg (

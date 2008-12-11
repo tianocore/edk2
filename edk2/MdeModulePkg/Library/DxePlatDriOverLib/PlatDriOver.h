@@ -70,7 +70,7 @@ typedef struct _DEVICE_PATH_STACK_ITEM{
 } DEVICE_PATH_STACK_ITEM;
 
 /**
-  Push a controller device path into a globle device path list
+  Push a controller device path into a globle device path list.
 
   @param  DevicePath     The controller device path to push into stack
 
@@ -114,6 +114,8 @@ CheckExistInStack (
   );
 
 /**
+  Update the FV file device path if it is not valid.
+
   According to a file GUID, check a Fv file device path is valid. If it is invalid,
   try to return the valid device path.
   FV address maybe changes for memory layout adjust from time to time, use this funciton
@@ -143,6 +145,8 @@ UpdateFvFileDevicePath (
   );
 
 /**
+  Gets the data and size of a variable.
+
   Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
   buffer, and the size of the buffer. If failure return NULL.
 
@@ -165,6 +169,8 @@ GetVariableAndSize (
   );
 
 /**
+  Connect to the handle to a device on the device path.
+
   This function will create all handles associate with every device
   path node. If the handle associate with one device path node can not
   be created success, then still give one chance to do the dispatch,
