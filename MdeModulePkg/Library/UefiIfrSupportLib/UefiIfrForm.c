@@ -638,16 +638,16 @@ ConstructConfigAltResp (
     StrCat (TempStr, DescHdr + Index * 16);
     StrCat (TempStr, AltCfg[Index]);
 
-    gBS->FreePool (AltCfg[Index]);
+    FreePool (AltCfg[Index]);
   }
 
   if (NeedFreeConfigRequest) {
-    gBS->FreePool (ConfigRequest);
+    FreePool (ConfigRequest);
   }
-  gBS->FreePool (ConfigHdr);
-  gBS->FreePool (ConfigResp);
-  gBS->FreePool (DescHdr);
-  gBS->FreePool (AltCfg);
+  FreePool (ConfigHdr);
+  FreePool (ConfigResp);
+  FreePool (DescHdr);
+  FreePool (AltCfg);
 
   return EFI_SUCCESS;
 }
@@ -1088,7 +1088,7 @@ IsConfigHdrMatch (
     if (EFI_ERROR (Status) || (StrCmp (Name, StorageName) != 0)) {
       Match = FALSE;
     }
-    gBS->FreePool (Name);
+    FreePool (Name);
   }
 
   return Match;
