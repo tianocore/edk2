@@ -1475,10 +1475,6 @@ DevicePathToStr (
     //
     DevPathNode = NextDevicePathNode (DevPathNode);
   }
-  //
-  // Shrink pool used for string allocation
-  //
-  FreePool (DevPath);
 
 Done:
   NewSize = (Str.len + 1) * sizeof (CHAR16);
