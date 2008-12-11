@@ -337,6 +337,8 @@ MmioRead8 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
 **/
 UINT8
@@ -404,6 +406,8 @@ MmioRead16 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
 **/
 UINT16
@@ -474,6 +478,8 @@ MmioRead32 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
+  
+  @return Value.
 
 **/
 UINT32

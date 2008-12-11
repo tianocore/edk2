@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   The function returns the pointer to PEI services.
   It will ASSERT() if the pointer to PEI services is NULL.
 
-  @retval  The pointer to PeiServices.
+  @return  The pointer to PeiServices.
 
 **/
 CONST EFI_PEI_SERVICES **
