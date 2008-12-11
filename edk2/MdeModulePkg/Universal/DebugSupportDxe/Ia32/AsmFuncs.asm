@@ -133,34 +133,6 @@ FxStorSupport   ENDP
 
 
 
-
-;------------------------------------------------------------------------------
-; BOOLEAN
-; WriteInterruptFlag (
-;   BOOLEAN NewState
-;   )
-;
-; Abstract: Programs interrupt flag to the requested state and returns previous
-;           state.
-;
-WriteInterruptFlag  PROC C PUBLIC State:DWORD
-
-                pushfd
-                pop     eax
-                and     eax, 200h
-                shr     eax, 9
-                mov     ecx, State
-                .IF     cl == 0
-                        cli
-                .ELSE
-                        sti
-                .ENDIF
-                ret
-
-WriteInterruptFlag  ENDP
-
-
-
 ;------------------------------------------------------------------------------
 ; void
 ; Vect2Desc (

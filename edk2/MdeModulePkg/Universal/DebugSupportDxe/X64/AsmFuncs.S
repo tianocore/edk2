@@ -30,14 +30,6 @@ _StubSize:       .long   _InterruptEntryStubEnd - _InterruptEntryStub
 _FxStorSupport:
         ret
 
-.globl _GetIdtr
-_GetIdtr:
-        ret
-
-.globl _WriteInterruptFlag
-_WriteInterruptFlag:
-        ret
-
 .globl _Vect2Desc
 _Vect2Desc:
         ret

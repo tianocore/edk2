@@ -12,30 +12,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// private header files
-//
 #include "DebugSupport.h"
 
 /**
-  Get Procedure Entry Point from IDT Gate Descriptor.
+  Get Interrupt Handle from IDT Gate Descriptor.
 
   @param  IdtGateDecriptor  IDT Gate Descriptor.
 
-  @return Procedure Entry Point located in IDT Gate Descriptor.
+  @return Interrupt Handle stored in IDT Gate Descriptor.
 
 **/
-UINTN GetProcedureEntryPoint (
+UINTN
+GetInterruptHandleFromIdt (
   IN IA32_IDT_GATE_DESCRIPTOR  *IdtGateDecriptor
   )
 {
-  UINTN      ProcedureEntryPoint;
+  UINTN      InterruptHandle;
  
-  ((UINT16 *) &ProcedureEntryPoint)[0] = (UINT16) IdtGateDecriptor->Bits.OffsetLow;
-  ((UINT16 *) &ProcedureEntryPoint)[1] = (UINT16) IdtGateDecriptor->Bits.OffsetHigh;
-  ((UINT32 *) &ProcedureEntryPoint)[1] = (UINT32) IdtGateDecriptor->Bits.OffsetUpper;
+  ((UINT16 *) &InterruptHandle)[0] = (UINT16) IdtGateDecriptor->Bits.OffsetLow;
+  ((UINT16 *) &InterruptHandle)[1] = (UINT16) IdtGateDecriptor->Bits.OffsetHigh;
+  ((UINT32 *) &InterruptHandle)[1] = (UINT32) IdtGateDecriptor->Bits.OffsetUpper;
 
-  return ProcedureEntryPoint;
+  return InterruptHandle;
 }
 
 /**
@@ -48,10 +46,8 @@ UINTN GetProcedureEntryPoint (
                           for.
   @param  Stub            On successful exit, *Stub contains the newly allocated entry stub.
 
-  @retval EFI_SUCCESS     Always.
-
 **/
-EFI_STATUS
+VOID
 CreateEntryStub (
   IN EFI_EXCEPTION_TYPE     ExceptionType,
   OUT VOID                  **Stub
@@ -82,7 +78,7 @@ CreateEntryStub (
   //
   *(UINT32 *) &StubCopy[0x3] = (UINT32)((UINTN) CommonIdtEntry - (UINTN) &StubCopy[StubSize]);
 
-  return EFI_SUCCESS;
+  return;
 }
 
 /**
@@ -123,7 +119,7 @@ ManageIdtEntryTable (
       //
       Status = EFI_ALREADY_STARTED;
     } else {
-      Status = UnhookEntry (ExceptionType);
+      UnhookEntry (ExceptionType);
     }
   } else {
     //
@@ -135,7 +131,7 @@ ManageIdtEntryTable (
       //
       Status = EFI_INVALID_PARAMETER;
     } else {
-      Status = HookEntry (ExceptionType, NewCallback);
+      HookEntry (ExceptionType, NewCallback);
     }
   }
  
