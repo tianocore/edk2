@@ -334,7 +334,7 @@ AsciiVSPrint (
   @param  FormatString    Null-terminated ASCII format string.
   @param  ...             Variable argument list whose contents are accessed based on the 
                           format string specified by FormatString.
-  
+   
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.
 

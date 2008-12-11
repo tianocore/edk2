@@ -16,14 +16,15 @@
 
 
 /**
-  Performs an IA-32 specific relocation fixup.
+  Performs an Itanium-based specific relocation fixup and is a no-op on other
+  instruction sets.
 
   @param  Reloc       Pointer to the relocation record.
   @param  Fixup       Pointer to the address to fix up.
   @param  FixupData   Pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
-  @retval EFI_UNSUPPORTED Unsupported now.
+  @return Status code.
 
 **/
 RETURN_STATUS
@@ -38,14 +39,10 @@ PeCoffLoaderRelocateImageEx (
 }
 
 /**
-  Returns TRUE if the machine type of PE/COFF image is supported. Supported 
+  Returns TRUE if the machine type of PE/COFF image is supported. Supported
   does not mean the image can be executed it means the PE/COFF loader supports
   loading and relocating of the image type. It's up to the caller to support
-  the entry point. 
-
-  This function implies the basic PE/COFF loader/relocator supports IA32, EBC,
-  & x64 images. Calling the entry point in a correct mannor is up to the 
-  consumer of this library.
+  the entry point.
 
   @param  Machine   Machine type from the PE Header.
 
@@ -75,7 +72,7 @@ PeCoffLoaderImageFormatSupported (
   @param  FixupData   Pointer to a buffer to log the fixups.
   @param  Adjust      The offset to adjust the fixup.
 
-  @return Always return UNSUPPORTED.
+  @return Status code.
 
 **/
 RETURN_STATUS

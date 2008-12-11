@@ -66,7 +66,7 @@ PostCode (
   @param  Value        The 32-bit value to write to the POST card.
   @param  Description  Pointer to an ASCII string that is a description of the 
                        POST code value.  This is an optional parameter that may 
-                       be NULL. Ihis parameter is ignored in this implementation. 
+                       be NULL.
 
   @return The 32-bit value to write to the POST card.
 

@@ -100,8 +100,8 @@ BasePrintLibFillBuffer (
 **/
 UINTN
 BasePrintLibValueToString (
-  IN OUT CHAR8  *Buffer,
-  IN INT64      Value,
+  IN OUT CHAR8  *Buffer, 
+  IN INT64      Value, 
   IN UINTN      Radix
   )
 {
@@ -131,7 +131,7 @@ BasePrintLibValueToString (
   Converts the decimal number specified by Value to a Null-terminated  
   string specified by Buffer containing at most Width characters.
   If Width is 0 then a width of  MAXIMUM_VALUE_CHARACTERS is assumed.
-  The number of characters in Buffer is returned not including the Null-terminator.
+  The total number of characters placed in Buffer is returned.
   If the conversion contains more than Width characters, then only the first
   Width characters are returned, and the total number of characters 
   required to perform the conversion is returned.
@@ -141,13 +141,11 @@ BasePrintLibValueToString (
   If Width is 0, PREFIX_ZERO is ignored in Flags.
   If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and commas
   are inserted every 3rd digit starting from the right.
-  If HEX_RADIX is set in Flags, then the output buffer will be formatted in hexadecimal format.
-  If Value is < 0 and HEX_RADIX is not set in Flags, then the fist character in Buffer is a '-'.
+  If Value is < 0, then the fist character in Buffer is a '-'.
   If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored, 
   then Buffer is padded with '0' characters so the combination of the optional '-' 
   sign character, '0' characters, digit characters for Value, and the Null-terminator
   add up to Width characters.
-  If both COMMA_TYPE and HEX_RADIX are set in Flags, then ASSERT().
 
   If Buffer is NULL, then ASSERT().
   If unsupported bits are set in Flags, then ASSERT().
@@ -162,7 +160,7 @@ BasePrintLibValueToString (
                     the Null-terminator.
   @param  Increment Character increment in Buffer.
   
-  @return The number of characters in Buffer not including the Null-terminator.
+  @return Total number of characters required to perform the conversion.
 
 **/
 UINTN
@@ -792,7 +790,7 @@ BasePrintLibVSPrint (
 
   VSPrint function to process format and place the results in Buffer. Since a 
   VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
-  this is the main print working routine.
+  this is the main print working routine
 
   @param  StartOfBuffer Character buffer to print the results of the parsing
                         of Format into.
@@ -803,7 +801,7 @@ BasePrintLibVSPrint (
   @param  FormatString  Null-terminated format string.
   @param  ...           The variable argument list.
 
-  @return Number of characters printed not including the Null-terminator.
+  @return Number of characters printed.
 
 **/
 UINTN

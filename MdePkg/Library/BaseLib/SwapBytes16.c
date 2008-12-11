@@ -26,7 +26,7 @@
 
   @param  Value A 16-bit unsigned value.
 
-  @return The byte swapped value.
+  @return The byte swapped Value.
 
 **/
 UINT16
