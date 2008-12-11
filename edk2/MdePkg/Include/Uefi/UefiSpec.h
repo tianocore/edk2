@@ -704,7 +704,7 @@ typedef struct {
   ///
   UINT32    Accuracy;
   ///
-  /// A TRUE indicates that a time set operation clears the device¡¯s
+  /// A TRUE indicates that a time set operation clears the device's
   /// time below the Resolution reporting level. A FALSE
   /// indicates that the state below the Resolution level of the
   /// device is not cleared when the time is set. Normal PC-AT CMOS

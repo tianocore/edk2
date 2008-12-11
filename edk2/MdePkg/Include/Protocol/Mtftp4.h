@@ -526,7 +526,7 @@ struct _EFI_MTFTP4_TOKEN {
   ///
   UINT8                       *Filename;
   ///
-  /// Pointer to the ASCIIZ mode string. If NULL, ¡°octet¡± is used.
+  /// Pointer to the ASCIIZ mode string. If NULL, "octet" is used.
   ///
   UINT8                       *ModeStr;
   ///
