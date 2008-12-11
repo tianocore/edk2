@@ -31,25 +31,23 @@ LIST_ENTRY      mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBa
 BOOLEAN         mEnvironmentVariableRead = FALSE;
 EFI_HANDLE      mCallerImageHandle;
 
+/**
+  Platform Driver Override driver entry point, install the Platform Driver Override Protocol
 
+  @param  ImageHandle  ImageHandle of the loaded driver.
+  @param  SystemTable  Pointer to the EFI System Table.
+
+  @retval  EFI_SUCCESS               The DXE Driver, DXE Runtime Driver, DXE SMM Driver,
+                                     or UEFI Driver exited normally.
+  @retval  EFI_INCOMPATIBLE_VERSION  _gUefiDriverRevision is greater than SystemTable->Hdr.Revision.
+  @retval  Other                     Return value from ProcessModuleEntryPointList().
+**/
 EFI_STATUS
 EFIAPI
 PlatformDriverOverrideEntry (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-   Platform Driver Override driver entry point, install the Platform Driver Override Protocol
-
-Arguments:
-  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-Returns:
-  EFI_STATUS
-
---*/
 {
   mEnvironmentVariableRead = FALSE;
   mCallerImageHandle = ImageHandle;
@@ -145,11 +143,16 @@ GetDriver (
 
 
 /**
-  For the use of the ControllerHandle parameter in the GetDriverPath() and DriverLoaded() APIs
-  makes those APIs very difficult to use, so not support.
+  For the use of the ControllerHandle parameter in the GetDriverPath()
+  But this API is very difficult to use, so not support.
 
-
-
+  @param  This                   A pointer to the
+                                 EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
+  @param  ControllerHandle       The device handle of the controller to check if a
+                                 driver override exists.
+  @param  DriverImagePath        The device path for this Image.
+  
+  @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
 EFIAPI
@@ -164,11 +167,21 @@ GetDriverPath (
 
 
 /**
-  For the use of the ControllerHandle parameter in the GetDriverPath() and DriverLoaded() APIs
-  makes those APIs very difficult to use, so not support.
+  For the use of the ControllerHandle parameter in the DriverLoaded()
+  But this API is very difficult to use, so not support.
 
-
-
+  @param  This                   A pointer to the
+                                 EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
+  @param  ControllerHandle       The device handle of the controller to check if a
+                                 driver override exists.
+  @param  DriverImagePath        The device path for this Image.
+  @param  DriverImageHandle      On input, a pointer to the previous driver image
+                                 handle returned by GetDriver().  On output, a
+                                 pointer to the next driver image handle. Passing
+                                 in a NULL,  will return the first driver image
+                                 handle for ControllerHandle.
+  
+  @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
 EFIAPI

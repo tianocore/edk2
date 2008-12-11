@@ -660,7 +660,6 @@ NetLibGetMacString (
   @param  Protocol              The protocol type in the IP header.
   @param  UseDefaultAddress     Whether this instance is using default address or not.
 
-  @retval None
 **/
 VOID
 EFIAPI

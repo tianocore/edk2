@@ -336,7 +336,7 @@ GetComponentName (
 **/
 CHAR16 *
 GetImageName (
-  EFI_LOADED_IMAGE_PROTOCOL *Image
+  IN EFI_LOADED_IMAGE_PROTOCOL *Image
   )
 {
   EFI_STATUS                        Status;
@@ -347,9 +347,9 @@ GetImageName (
   UINTN                             BufferSize;
   UINT32                            AuthenticationStatus;
   EFI_GUID                          *NameGuid;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL     *FV2;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL     *Fv2;
 
-  FV2         = NULL;
+  Fv2         = NULL;
   Buffer      = NULL;
   BufferSize  = 0;
 
@@ -378,11 +378,11 @@ GetImageName (
       Status = gBS->HandleProtocol (
                     Image->DeviceHandle,
                     &gEfiFirmwareVolume2ProtocolGuid,
-                    (VOID **) &FV2
+                    (VOID **) &Fv2
                     );
       if (!EFI_ERROR (Status)) {
-        Status = FV2->ReadSection (
-                        FV2,
+        Status = Fv2->ReadSection (
+                        Fv2,
                         &FvFilePath->FvFileName,
                         EFI_SECTION_USER_INTERFACE,
                         0,
@@ -1158,12 +1158,12 @@ PlatOverMngrExtractConfig (
 /**
   This function processes the results of changes in configuration.
 
-  @param  This         Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-  @param  Request      A null-terminated Unicode string in <ConfigRequest> format.
-  @param  Progress     A pointer to a string filled in with the offset of the most
-                       recent '&' before the first failing name/value pair (or the
-                       beginning of the string if the failure is in the first
-                       name/value pair) or the terminating NULL if all was successful.
+  @param  This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param  Configuration   A null-terminated Unicode string in <ConfigRequest> format.
+  @param  Progress        A pointer to a string filled in with the offset of the most
+                          recent '&' before the first failing name/value pair (or the
+                          beginning of the string if the failure is in the first
+                          name/value pair) or the terminating NULL if all was successful.
 
   @retval EFI_SUCCESS            The Results is processed successfully.
   @retval EFI_INVALID_PARAMETER  Configuration is NULL.
