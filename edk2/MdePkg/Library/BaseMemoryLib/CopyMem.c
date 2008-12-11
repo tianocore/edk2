@@ -22,9 +22,9 @@
 /**
   Copy Length bytes from Source to Destination.
 
-  @param  Destination Target of copy
-  @param  Source      Place to copy from
-  @param  Length      Number of bytes to copy
+  @param  DestinationBuffer Target of copy
+  @param  SourceBuffer      Place to copy from
+  @param  Length            Number of bytes to copy
 
   @return Destination
 
@@ -32,8 +32,8 @@
 VOID *
 EFIAPI
 InternalMemCopyMem (
-  OUT     VOID                      *Destination,
-  IN      CONST VOID                *Source,
+  OUT     VOID                      *DestinationBuffer,
+  IN      CONST VOID                *SourceBuffer,
   IN      UINTN                     Length
   )
 {
@@ -45,18 +45,18 @@ InternalMemCopyMem (
   volatile UINT8                    *Destination8;
   CONST UINT8                       *Source8;
 
-  if (Source > Destination) {
-    Destination8 = (UINT8*)Destination;
-    Source8 = (CONST UINT8*)Source;
+  if (SourceBuffer > DestinationBuffer) {
+    Destination8 = (UINT8*)DestinationBuffer;
+    Source8 = (CONST UINT8*)SourceBuffer;
     while (Length-- != 0) {
       *(Destination8++) = *(Source8++);
     }
-  } else if (Source < Destination) {
-    Destination8 = (UINT8*)Destination + Length;
-    Source8 = (CONST UINT8*)Source + Length;
+  } else if (SourceBuffer < DestinationBuffer) {
+    Destination8 = (UINT8*)DestinationBuffer + Length;
+    Source8 = (CONST UINT8*)SourceBuffer + Length;
     while (Length-- != 0) {
       *(--Destination8) = *(--Source8);
     }
   }
-  return Destination;
+  return DestinationBuffer;
 }

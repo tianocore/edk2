@@ -195,7 +195,7 @@ PeCoffLoaderGetPeHeader (
 RETURN_STATUS
 EFIAPI
 PeCoffLoaderGetImageInfo (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT           *ImageContext
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
   RETURN_STATUS                         Status;
@@ -487,6 +487,12 @@ PeCoffLoaderImageAddress (
   ImageContext as the relocation base address.  Otherwise, use the DestinationAddress field
   of ImageContext as the relocation base address.  The caller must allocate the relocation
   fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.
+  
+  The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage, Machine, ImageType, ImageAddress, 
+  ImageSize, DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, 
+  DebugDirectoryEntryRva, EntryPoint, FixupDataSize, CodeView, PdbPointer, and FixupData of 
+  the ImageContext structure must be valid prior to invoking this service.
+    
   If ImageContext is NULL, then ASSERT().
 
   @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
@@ -725,6 +731,10 @@ PeCoffLoaderRelocateImage (
   specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
   the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
   The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
+  The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage,  Machine, ImageType, ImageAddress, ImageSize, 
+  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva 
+  fields of the ImageContext structure must be valid prior to invoking this service.
+  
   If ImageContext is NULL, then ASSERT().
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
@@ -1117,17 +1127,20 @@ PeCoffLoaderLoadImage (
 
 /**
   Reapply fixups on a fixed up PE32/PE32+ image to allow virutal calling at EFI
-  runtime.
-
+  runtime. 
+  
   PE_COFF_LOADER_IMAGE_CONTEXT.FixupData stores information needed to reapply
   the fixups with a virtual mapping.
 
 
-  @param  ImageBase          Base address of relocated image
-  @param  VirtImageBase      Virtual mapping for ImageBase
-  @param  ImageSize          Size of the image to relocate
-  @param  RelocationData     Location to place results of read
-
+  @param  ImageBase          Base address of a PE/COFF image that has been loaded 
+                             and relocated into system memory.
+  @param  VirtImageBase      The request virtual address that the PE/COFF image is to
+                             be fixed up for.
+  @param  ImageSize          The size, in bytes, of the PE/COFF image.
+  @param  RelocationData     A pointer to the relocation data that was collected when the PE/COFF 
+                             image was relocated using PeCoffLoaderRelocateImage().
+  
 **/
 VOID
 EFIAPI
@@ -1360,11 +1373,15 @@ PeCoffLoaderImageReadFromMemory (
 
 /**
   Unloads a loaded PE/COFF image from memory and releases its taken resource.
-   
+  Releases any environment specific resources that were allocated when the image 
+  specified by ImageContext was loaded using PeCoffLoaderLoadImage(). 
+ 
   For NT32 emulator, the PE/COFF image loaded by system needs to release.
   For real platform, the PE/COFF image loaded by Core doesn't needs to be unloaded, 
   this function can simply return RETURN_SUCCESS.
-
+  
+  If ImageContext is NULL, then ASSERT().
+  
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image to be unloaded.
 

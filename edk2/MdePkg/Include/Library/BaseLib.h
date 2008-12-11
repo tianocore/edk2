@@ -1817,7 +1817,7 @@ GetPowerOfTwo64 (
 
   @param  Value A 16-bit unsigned value.
 
-  @return The byte swapped value.
+  @return The byte swapped Value.
 
 **/
 UINT16
@@ -1836,7 +1836,7 @@ SwapBytes16 (
 
   @param  Value A 32-bit unsigned value.
 
-  @return The byte swapped value.
+  @return The byte swapped Value.
 
 **/
 UINT32
@@ -1855,7 +1855,7 @@ SwapBytes32 (
 
   @param  Value A 64-bit unsigned value.
 
-  @return The byte swapped value.
+  @return The byte swapped Value.
 
 **/
 UINT64

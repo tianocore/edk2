@@ -20,14 +20,24 @@
 /**
   Makes a PAL procedure call.
 
-  This is a wrapper function to make a PAL procedure call.
-  This is just a template as simple instance. It does not
-  make real PAL call. It directly reports error if called.
+  This is a wrapper function to make a PAL procedure call.  Based on the Index value,
+  this API will make static or stacked PAL call. Architected procedures may be designated
+  as required or optional.  If a PAL procedure is specified as optional, a unique return
+  code of 0xFFFFFFFFFFFFFFFF is returned in the Status field of the PAL_CALL_RETURN structure.
+  This indicates that the procedure is not present in this PAL implementation.  It is the
+  caller's responsibility to check for this return code after calling any optional PAL
+  procedure. No parameter checking is performed on the 4 input parameters, but there are
+  some common rules that the caller should follow when making a PAL call.  Any address
+  passed to PAL as buffers for return parameters must be 8-byte aligned.  Unaligned addresses
+  may cause undefined results.  For those parameters defined as reserved or some fields
+  defined as reserved must be zero filled or the invalid argument return value may be
+  returned or undefined result may occur during the execution of the procedure.
+  This function is only available on IPF.
 
-  @param  Index  The PAL procedure Index number.
-  @param  Arg2   The 2nd parameter for PAL procedure calls.
-  @param  Arg3   The 3rd parameter for PAL procedure calls.
-  @param  Arg4   The 4th parameter for PAL procedure calls.
+  @param Index  The PAL procedure Index number.
+  @param Arg2   The 2nd parameter for PAL procedure calls.
+  @param Arg3   The 3rd parameter for PAL procedure calls.
+  @param Arg4   The 4th parameter for PAL procedure calls.
 
   @return Structure returned from the PAL Call procedure, including the status and return value.
 

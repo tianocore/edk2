@@ -81,8 +81,8 @@ FillBuf (
 /**
   Get NumOfBits of bits out from mBitBuf.
 
-  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent 
-  NumOfBits of bits from source. Returns NumOfBits of bits that are 
+  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent
+  NumOfBits of bits from source. Returns NumOfBits of bits that are
   popped out.
 
   @param  Sd        The global scratch data.
@@ -115,14 +115,14 @@ GetBits (
 /**
   Creates Huffman Code mapping table according to code length array.
 
-  Creates Huffman Code mapping table for Extra Set, Char&Len Set 
+  Creates Huffman Code mapping table for Extra Set, Char&Len Set
   and Position Set according to code length array.
 
   @param  Sd        The global scratch data
   @param  NumOfChar Number of symbols in the symbol set
   @param  BitLen    Code length array
   @param  TableBits The width of the mapping table
-  @param  Table     The table to be created
+  @param  Table     The table to be created.
 
   @retval  0 OK.
   @retval  BAD_TABLE The table is corrupted.
@@ -251,7 +251,7 @@ MakeTable (
   Decodes a position value.
 
   Get a position value according to Position Huffman Table.
-  
+
   @param  Sd the global scratch data
 
   @return The position value decoded.
@@ -391,7 +391,7 @@ ReadPTLen (
 
 /**
   Reads code lengths for Char&Len Set.
-  
+
   Read in and decode the Char&Len Set Code Length Array, then
   generate the Huffman Code mapping table for the Char&Len Set.
 
@@ -482,7 +482,7 @@ ReadCLen (
 
 /**
   Decode a character/length value.
-  
+
   Read one value from mBitBuf, Get one code from mBitBuf. If it is at block boundary, generates
   Huffman code mapping table for Extra Set, Code&Len Set and
   Position Set.
@@ -561,7 +561,7 @@ DecodeC (
 
 /**
   Decode the source data and put the resulting data into the destination buffer.
- 
+
   @param  Sd The global scratch data
 
 **/

@@ -27,9 +27,6 @@
   Invalidates the entire instruction cache in cache coherency domain of the
   calling CPU.
 
-  Invalidates the entire instruction cache in cache coherency domain of the
-  calling CPU.
-
 **/
 VOID
 EFIAPI

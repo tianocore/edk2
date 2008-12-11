@@ -44,9 +44,9 @@
 RETURN_STATUS
 EFIAPI
 StartPerformanceMeasurement (
-  IN CONST VOID   *Handle,   OPTIONAL
-  IN CONST CHAR8  *Token,    OPTIONAL
-  IN CONST CHAR8  *Module,   OPTIONAL
+  IN CONST VOID   *Handle,  OPTIONAL
+  IN CONST CHAR8  *Token,   OPTIONAL
+  IN CONST CHAR8  *Module,  OPTIONAL
   IN UINT64       TimeStamp
   )
 {
