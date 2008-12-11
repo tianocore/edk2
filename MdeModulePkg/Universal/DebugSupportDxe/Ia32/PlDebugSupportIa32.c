@@ -15,23 +15,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DebugSupport.h"
 
 /**
-  Get Procedure Entry Point from IDT Gate Descriptor.
+  Get Interrupt Handle from IDT Gate Descriptor.
 
-  @param  IdtGateDecriptor  IDT Gate Descriptor.
+  @param  IdtGateDescriptor  IDT Gate Descriptor.
 
-  @return Procedure Entry Point located in IDT Gate Descriptor.
+  @return Interrupt Handle stored in IDT Gate Descriptor.
 
 **/
-UINTN GetProcedureEntryPoint (
-  IN IA32_IDT_GATE_DESCRIPTOR  *IdtGateDecriptor
+UINTN
+GetInterruptHandleFromIdt (
+  IN IA32_IDT_GATE_DESCRIPTOR  *IdtGateDescriptor
   )
 {
-  UINTN      ProcedureEntryPoint;
+  UINTN      InterruptHandle;
  
-  ((UINT16 *) &ProcedureEntryPoint)[0] = (UINT16) IdtGateDecriptor->Bits.OffsetLow;
-  ((UINT16 *) &ProcedureEntryPoint)[1] = (UINT16) IdtGateDecriptor->Bits.OffsetHigh;
+  ((UINT16 *) &InterruptHandle)[0] = (UINT16) IdtGateDescriptor->Bits.OffsetLow;
+  ((UINT16 *) &InterruptHandle)[1] = (UINT16) IdtGateDescriptor->Bits.OffsetHigh;
 
-  return ProcedureEntryPoint;
+  return InterruptHandle;
 }
 
 /**
@@ -44,10 +45,8 @@ UINTN GetProcedureEntryPoint (
                           for.
   @param  Stub            On successful exit, *Stub contains the newly allocated entry stub.
 
-  @retval EFI_SUCCESS     Always.
-
 **/
-EFI_STATUS
+VOID
 CreateEntryStub (
   IN EFI_EXCEPTION_TYPE     ExceptionType,
   OUT VOID                  **Stub
@@ -80,7 +79,7 @@ CreateEntryStub (
   //
   *(UINT32 *) &StubCopy[0x0e] = (UINT32) CommonIdtEntry - (UINT32) &StubCopy[StubSize];
 
-  return EFI_SUCCESS;
+  return ;
 }
 
 /**
@@ -94,16 +93,15 @@ CreateEntryStub (
                         be uninstalled.
   @param  ExceptionType Indicates which entry to manage.
 
-  @retval EFI_SUCCESS            Process is ok.
+  @retval EFI_SUCCESS            Installing or Uninstalling operation is ok.
   @retval EFI_INVALID_PARAMETER  Requested uninstalling a handler from a vector that has
                                  no handler registered for it
   @retval EFI_ALREADY_STARTED    Requested install to a vector that already has a handler registered.
-  @retval others                 Possible return values are passed through from UnHookEntry and HookEntry.
 
 **/
 EFI_STATUS
 ManageIdtEntryTable (
-  VOID (*NewCallback)(),
+  VOID               (*NewCallback)(),
   EFI_EXCEPTION_TYPE ExceptionType
   )
 {
@@ -122,7 +120,7 @@ ManageIdtEntryTable (
         //
         Status = EFI_ALREADY_STARTED;
       } else {
-        Status = UnhookEntry (ExceptionType);
+        UnhookEntry (ExceptionType);
       }
     } else {
       //
@@ -134,7 +132,7 @@ ManageIdtEntryTable (
         //
         Status = EFI_INVALID_PARAMETER;
       } else {
-        Status = HookEntry (ExceptionType, NewCallback);
+        HookEntry (ExceptionType, NewCallback);
       }
     }
   }

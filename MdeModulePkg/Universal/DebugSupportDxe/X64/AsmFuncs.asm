@@ -131,36 +131,6 @@ FxStorSupport   PROC    PUBLIC
                 ret
 FxStorSupport   ENDP
 
-
-
-
-;------------------------------------------------------------------------------
-; BOOLEAN
-; WriteInterruptFlag (
-;   BOOLEAN NewState // rcx
-;   )
-;
-; Abstract: Programs interrupt flag to the requested state and returns previous
-;           state.
-;
-WriteInterruptFlag  PROC PUBLIC
-
-                pushfq
-                pop     rax
-                and     rax, 200h
-                shr     rax, 9
-                cmp     rcx, 0
-                jnz     EnableIF
-                cli
-                ret
-EnableIF:
-                sti
-                ret
-
-WriteInterruptFlag  ENDP
-
-
-
 ;------------------------------------------------------------------------------
 ; void
 ; Vect2Desc (

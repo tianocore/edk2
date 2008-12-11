@@ -19,11 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 BOOLEAN  mInHandler = FALSE;
 
-typedef struct {
-  UINT64  low;
-  UINT64  high;
-} BUNDLE;
-
 //
 // number of bundles to swap in ivt
 //
@@ -49,88 +44,6 @@ UINT8     IpfContextBuf[sizeof (EFI_SYSTEM_CONTEXT_IPF) + 512];
 //
 UINT8     PatchSaveBuffer[0x400];
 UINTN     ExternalInterruptCount;
-
-/**
-  This is the worker function that uninstalls and removes all handlers.
-
-  @param  ExceptionType     Exception Type
-  @param  NewBundles        New Boundles
-  @param  NewCallback       New Callback
-
-  @retval EFI_ALEADY_STARTED Ivt already hooked.
-  @retval others             Indicates the request was not satisfied.
-  @retval EFI_SUCCESS        Successfully uninstalled.
-
-**/
-EFI_STATUS
-ManageIvtEntryTable (
-  IN  EFI_EXCEPTION_TYPE    ExceptionType,
-  IN  BUNDLE                NewBundles[4],
-  IN  VOID                  (*NewCallback) ()
-  );
-
-/**
-  Saves original IVT contents and inserts a few new bundles which are fixed up
-  to store the ExceptionType and then call the common handler.
-
-  @param  ExceptionType      Exception Type
-  @param  NewBundles         New Boundles
-  @param  NewCallback        New Callback
-
-**/
-VOID
-HookEntry (
-  IN  EFI_EXCEPTION_TYPE    ExceptionType,
-  IN  BUNDLE                NewBundles[4],
-  IN  VOID                  (*NewCallback) ()
-  );
-
-/**
-  Restores original IVT contents when unregistering a callback function.
-
-  @param  ExceptionType     Exception Type
-
-**/
-VOID
-UnhookEntry (
-  IN  EFI_EXCEPTION_TYPE    ExceptionType
-  );
-
-/**
-  Sets up cache flush and calls assembly function to chain external interrupt.
-
-  Records new callback in IvtEntryTable.
-
-  @param  NewCallback     New Callback.
-
-**/
-VOID
-ChainExternalInterrupt (
-  IN  VOID                  (*NewCallback) ()
-  );
-
-/**
-  Sets up cache flush and calls assembly function to restore external interrupt.
-  Removes registered callback from IvtEntryTable.
-
-**/
-VOID
-UnchainExternalInterrupt (
-  VOID
-  );
-
-/**
-  Given an integer number, return the physical address of the entry point in the IFT.
-
-  @param  HandlerIndex       Index of the Handler 
-  @param  EntryPoint         IFT Entrypoint
-
-**/
-VOID
-GetHandlerEntryPoint (
-  UINTN                     HandlerIndex,
-  VOID                      **EntryPoint
-  );
 
 
 /**

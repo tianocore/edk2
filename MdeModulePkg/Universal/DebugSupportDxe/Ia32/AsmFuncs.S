@@ -37,33 +37,6 @@ ASM_PFX(FxStorSupport):
         pop    %ebx
         ret
 
-.globl ASM_PFX(GetIdtr)
-ASM_PFX(GetIdtr):
-        push   %ebp
-        mov    %esp,%ebp
-        add    $0xfffffff8,%esp
-        sidtl  0xfffffffa(%ebp)
-        mov    0xfffffffc(%ebp),%eax
-        leave
-        ret
-
-.globl ASM_PFX(WriteInterruptFlag)
-ASM_PFX(WriteInterruptFlag):
-        push   %ebp
-        mov    %esp,%ebp
-        pushf
-        pop    %eax
-        and    $0x200,%eax
-        shr    $0x9,%eax
-        mov    0x8(%ebp),%ecx
-        or     %cl,%cl
-        jne    ASM_PFX(WriteInterruptFlag+0x17)
-        cli
-        jmp    ASM_PFX(WriteInterruptFlag+0x18)
-        sti
-        leave
-        ret
-
 .globl ASM_PFX(Vect2Desc)
 ASM_PFX(Vect2Desc):
         push   %ebp

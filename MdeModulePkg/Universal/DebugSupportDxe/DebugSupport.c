@@ -12,15 +12,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// private header files
-//
 #include "PlDebugSupport.h"
 
-//
-// This is a global that is the actual interface
-//
-EFI_DEBUG_SUPPORT_PROTOCOL  gDebugSupportProtocolInterface = {
+EFI_DEBUG_SUPPORT_PROTOCOL  mDebugSupportProtocolInterface = {
   EFI_ISA,
   GetMaximumProcessorIndex,
   RegisterPeriodicCallback,
@@ -30,16 +24,16 @@ EFI_DEBUG_SUPPORT_PROTOCOL  gDebugSupportProtocolInterface = {
 
 
 /**
-  Debug Port Driver entry point. 
+  Debug Support Driver entry point. 
 
-  Checks to see there's not already a DebugSupport protocol installed for 
-  the selected processor before installing protocol.
+  Checks to see if there's not already a Debug Support protocol installed for 
+  the selected processor before installing it.
 
   @param[in] ImageHandle       The firmware allocated handle for the EFI image.  
   @param[in] SystemTable       A pointer to the EFI System Table.
   
   @retval EFI_SUCCESS          The entry point is executed successfully.
-  @retval EFI_ALREADY_STARTED  DebugSupport protocol is installed already.
+  @retval EFI_ALREADY_STARTED  DebugS upport protocol is installed already.
   @retval other                Some error occurs when executing this entry point.
 
 **/
@@ -56,8 +50,6 @@ InitializeDebugSupportDriver (
   UINTN                       NumHandles;
   EFI_DEBUG_SUPPORT_PROTOCOL  *DebugSupportProtocolPtr;
 
-  //
-  //  Install Protocol Interface...
   //
   // First check to see that the debug support protocol for this processor
   // type is not already installed
@@ -81,7 +73,10 @@ InitializeDebugSupportDriver (
                       NULL,
                       EFI_OPEN_PROTOCOL_GET_PROTOCOL
                       );
-      if (Status == EFI_SUCCESS && DebugSupportProtocolPtr->Isa == EFI_ISA) {
+      if ((Status == EFI_SUCCESS) && (DebugSupportProtocolPtr->Isa == EFI_ISA)) {
+        //
+        // a Debug Support protocol has been installed for this processor
+        //
         FreePool (HandlePtr);
         Status = EFI_ALREADY_STARTED;
         goto ErrExit;
@@ -109,7 +104,7 @@ InitializeDebugSupportDriver (
   LoadedImageProtocolPtr->Unload = PlUnloadDebugSupportDriver;
 
   //
-  // Call hook for platform specific initialization
+  // Call hook for processor specific initialization 
   //
   Status = PlInitializeDebugSupportDriver ();
   ASSERT (!EFI_ERROR (Status));
@@ -118,14 +113,14 @@ InitializeDebugSupportDriver (
   }
 
   //
-  // Install DebugSupport protocol to new handle
+  // Install Debug Support protocol to new handle
   //
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (
                   &Handle,
                   &gEfiDebugSupportProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  &gDebugSupportProtocolInterface
+                  &mDebugSupportProtocolInterface
                   );
   ASSERT (!EFI_ERROR (Status));
   if (Status != EFI_SUCCESS) {

@@ -1,5 +1,5 @@
 /** @file
-  IA32 specific debug support functions
+  Generic debug support functions for IA32/x64.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -12,27 +12,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// private header files
-//
 #include "DebugSupport.h"
 
 //
 // This the global main table to keep track of the interrupts
 //
-IDT_ENTRY   *IdtEntryTable  = NULL;
+IDT_ENTRY                 *IdtEntryTable  = NULL;
 IA32_IDT_GATE_DESCRIPTOR  NullDesc        = {0};
 
 /**
   Read IDT Gate Descriptor from IDT Table.
 
   @param  Vector            Specifies vector number.
-  @param  IdtGateDecriptor  Pointer to IDT Gate Descriptor read from IDT Table.
+  @param  IdtGateDescriptor Pointer to IDT Gate Descriptor read from IDT Table.
 
 **/
-VOID ReadIdtGateDecriptor (
+VOID
+ReadIdtGateDescriptor (
   IN  EFI_EXCEPTION_TYPE        Vector,
-  OUT IA32_IDT_GATE_DESCRIPTOR  *IdtGateDecriptor
+  OUT IA32_IDT_GATE_DESCRIPTOR  *IdtGateDescriptor
   )
 {
  IA32_DESCRIPTOR            IdtrValue;
@@ -41,18 +39,20 @@ VOID ReadIdtGateDecriptor (
  AsmReadIdtr (&IdtrValue);
  IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtrValue.Base;
 
- CopyMem ((VOID *) IdtGateDecriptor, (VOID *) &(IdtTable)[Vector], sizeof (IA32_IDT_GATE_DESCRIPTOR));
+ CopyMem ((VOID *) IdtGateDescriptor, (VOID *) &(IdtTable)[Vector], sizeof (IA32_IDT_GATE_DESCRIPTOR));
 }
+
 /**
   Write IDT Gate Descriptor into IDT Table.
 
   @param  Vector            Specifies vector number.
-  @param  IdtGateDecriptor  Pointer to IDT Gate Descriptor written into IDT Table.
+  @param  IdtGateDescriptor Pointer to IDT Gate Descriptor written into IDT Table.
 
 **/
-VOID WriteIdtGateDecriptor (
+VOID
+WriteIdtGateDescriptor (
   EFI_EXCEPTION_TYPE        Vector,
-  IA32_IDT_GATE_DESCRIPTOR  *IdtGateDecriptor
+  IA32_IDT_GATE_DESCRIPTOR  *IdtGateDescriptor
   )
 {
  IA32_DESCRIPTOR            IdtrValue;
@@ -61,9 +61,8 @@ VOID WriteIdtGateDecriptor (
  AsmReadIdtr (&IdtrValue);
  IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtrValue.Base;
 
- CopyMem ((VOID *) &(IdtTable)[Vector], (VOID *) IdtGateDecriptor, sizeof (IA32_IDT_GATE_DESCRIPTOR));
+ CopyMem ((VOID *) &(IdtTable)[Vector], (VOID *) IdtGateDescriptor, sizeof (IA32_IDT_GATE_DESCRIPTOR));
 }
-
 
 /**
   Creates a nes entry stub.  Then saves the current IDT entry and replaces it
@@ -76,32 +75,35 @@ VOID WriteIdtGateDecriptor (
   @param  ExceptionType      Specifies which vector to hook.
   @param  NewCallback        A pointer to the new function to be registered.
 
-  @retval EFI_SUCCESS        Always.
-
 **/
-EFI_STATUS
+VOID
 HookEntry (
   IN EFI_EXCEPTION_TYPE            ExceptionType,
   IN VOID                         (*NewCallback) ()
   )
 {
   BOOLEAN     OldIntFlagState;
-  EFI_STATUS  Status;
 
-  Status = CreateEntryStub (ExceptionType, (VOID **) &IdtEntryTable[ExceptionType].StubEntry);
-  if (Status == EFI_SUCCESS) {
-    OldIntFlagState = WriteInterruptFlag (0);
-    ReadIdtGateDecriptor (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
+  CreateEntryStub (ExceptionType, (VOID **) &IdtEntryTable[ExceptionType].StubEntry);
+                          
+  //
+  // Disables CPU interrupts and returns the previous interrupt state
+  //
+  OldIntFlagState = SaveAndDisableInterrupts ();
 
-    IdtEntryTable[ExceptionType].OrigVector = (DEBUG_PROC) GetProcedureEntryPoint (&(IdtEntryTable[ExceptionType].OrigDesc));
+  ReadIdtGateDescriptor (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
+  IdtEntryTable[ExceptionType].OrigVector = (DEBUG_PROC) GetInterruptHandleFromIdt (&(IdtEntryTable[ExceptionType].OrigDesc));
 
-    Vect2Desc (&IdtEntryTable[ExceptionType].NewDesc, IdtEntryTable[ExceptionType].StubEntry);
-    IdtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
-    WriteIdtGateDecriptor (ExceptionType, &(IdtEntryTable[ExceptionType].NewDesc));
-    WriteInterruptFlag (OldIntFlagState);
-  }
+  Vect2Desc (&IdtEntryTable[ExceptionType].NewDesc, IdtEntryTable[ExceptionType].StubEntry);
+  IdtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
+  WriteIdtGateDescriptor (ExceptionType, &(IdtEntryTable[ExceptionType].NewDesc));
 
-  return Status;
+  //
+  // restore interrupt state
+  //
+  SetInterruptState (OldIntFlagState);
+
+  return ;
 }
 
 /**
@@ -109,31 +111,43 @@ HookEntry (
 
   @param  ExceptionType   Specifies which entry to unhook
 
-  @retval EFI_SUCCESS     Always.
-
 **/
-EFI_STATUS
+VOID
 UnhookEntry (
   IN EFI_EXCEPTION_TYPE           ExceptionType
   )
 {
   BOOLEAN     OldIntFlagState;
 
-  OldIntFlagState = WriteInterruptFlag (0);
-  WriteIdtGateDecriptor (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
-  WriteInterruptFlag (OldIntFlagState);
+  //
+  // Disables CPU interrupts and returns the previous interrupt state
+  //
+  OldIntFlagState = SaveAndDisableInterrupts ();
 
-  return EFI_SUCCESS;
+  //
+  // restore the default IDT Date Descriptor
+  //
+  WriteIdtGateDescriptor (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
+
+  //
+  // restore interrupt state
+  //
+  SetInterruptState (OldIntFlagState);
+
+  return ;
 }
 
 /**
-  This is a DebugSupport protocol member function, hard
-  coded to support only 1 processor for now.
+  Returns the maximum value that may be used for the ProcessorIndex parameter in
+  RegisterPeriodicCallback() and RegisterExceptionCallback().                   
+    
+  Hard coded to support only 1 processor for now.
 
-  @param  This                The DebugSupport instance
-  @param  MaxProcessorIndex   The maximuim supported processor index
-
-  @retval EFI_SUCCESS         Always returned with **MaxProcessorIndex set to 0.
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  MaxProcessorIndex     Pointer to a caller-allocated UINTN in which the maximum supported
+                                processor index is returned. Always 0 returned.                                     
+                                
+  @retval EFI_SUCCESS           Always returned with **MaxProcessorIndex set to 0.
 
 **/
 EFI_STATUS
@@ -144,19 +158,22 @@ GetMaximumProcessorIndex (
   )
 {
   *MaxProcessorIndex = 0;
-  return (EFI_SUCCESS);
+  return EFI_SUCCESS;
 }
 
 /**
-  DebugSupport protocol member function.
-
-  @param  This               The DebugSupport instance
-  @param  ProcessorIndex     Which processor the callback applies to.
-  @param  PeriodicCallback   Callback function
-
-  @retval EFI_SUCCESS        Indicates the callback was registered.
-  @retval others             Callback was not registered.
-
+  Registers a function to be called back periodically in interrupt context.
+    
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  ProcessorIndex        Specifies which processor the callback function applies to.
+  @param  PeriodicCallback      A pointer to a function of type PERIODIC_CALLBACK that is the main
+                                periodic entry point of the debug agent.
+                                
+  @retval EFI_SUCCESS           The function completed successfully.  
+  @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
+                                function was previously registered.                
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
+                                function. 
 **/
 EFI_STATUS
 EFIAPI
@@ -170,40 +187,45 @@ RegisterPeriodicCallback (
 }
 
 /**
-  DebugSupport protocol member function.
+  Registers a function to be called when a given processor exception occurs.
 
   This code executes in boot services context.
-
-  @param  This              The DebugSupport instance
-  @param  ProcessorIndex    Which processor the callback applies to.
-  @param  NewCallback       Callback function
-  @param  ExceptionType     Which exception to hook
-
-  @retval EFI_SUCCESS        Indicates the callback was registered.
-  @retval others             Callback was not registered.
-
+    
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  ProcessorIndex        Specifies which processor the callback function applies to.
+  @param  ExceptionCallback     A pointer to a function of type EXCEPTION_CALLBACK that is called
+                                when the processor exception specified by ExceptionType occurs.  
+  @param  ExceptionType         Specifies which processor exception to hook.                       
+                                
+  @retval EFI_SUCCESS           The function completed successfully.  
+  @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
+                                function was previously registered.                
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
+                                function.
 **/
 EFI_STATUS
 EFIAPI
 RegisterExceptionCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL *This,
   IN UINTN                      ProcessorIndex,
-  IN EFI_EXCEPTION_CALLBACK     NewCallback,
+  IN EFI_EXCEPTION_CALLBACK     ExceptionCallback,
   IN EFI_EXCEPTION_TYPE         ExceptionType
   )
 {
-  return ManageIdtEntryTable (NewCallback, ExceptionType);
+  return ManageIdtEntryTable (ExceptionCallback, ExceptionType);
 }
 
 /**
-  DebugSupport protocol member function.  Calls assembly routine to flush cache.
-
-  @param  This              The DebugSupport instance
-  @param  ProcessorIndex    Which processor the callback applies to.
-  @param  Start             Physical base of the memory range to be invalidated
-  @param  Length            mininum number of bytes in instruction cache to invalidate
-
-  @retval EFI_SUCCESS       Always returned.
+  Invalidates processor instruction cache for a memory range. Subsequent execution in this range
+  causes a fresh memory fetch to retrieve code to be executed.                                  
+    
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  ProcessorIndex        Specifies which processor's instruction cache is to be invalidated.
+  @param  Start                 Specifies the physical base of the memory range to be invalidated.                                
+  @param  Length                Specifies the minimum number of bytes in the processor's instruction
+                                cache to invalidate.                                                 
+                                
+  @retval EFI_SUCCESS           Always returned.
 
 **/
 EFI_STATUS
@@ -216,82 +238,6 @@ InvalidateInstructionCache (
   )
 {
   AsmWbinvd ();
-  return EFI_SUCCESS;
-}
-
-/**
-  Initializes driver's handler registration databas. 
-  
-  This code executes in boot services context
-  Must be public because it's referenced from DebugSupport.c
-
-  @retval  EFI_UNSUPPORTED      If IA32 processor does not support FXSTOR/FXRSTOR instructions,
-                                the context save will fail, so these processor's are not supported.
-  @retval  EFI_OUT_OF_RESOURCES Fails to allocate memory.
-  @retval  EFI_SUCCESS          Initializes successfully.
-
-**/
-EFI_STATUS
-PlInitializeDebugSupportDriver (
-  VOID
-  )
-{
-  EFI_EXCEPTION_TYPE  ExceptionType;
-
-  if (!FxStorSupport ()) {
-    return EFI_UNSUPPORTED;
-  }
-
-  IdtEntryTable = AllocateZeroPool (sizeof (IDT_ENTRY) * NUM_IDT_ENTRIES);
-  if (IdtEntryTable == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
-    IdtEntryTable[ExceptionType].StubEntry = (DEBUG_PROC) (UINTN) AllocatePool (StubSize);
-    if (IdtEntryTable[ExceptionType].StubEntry == NULL) {
-      goto ErrorCleanup;
-    }
-
-    CopyMem ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry, InterruptEntryStub, StubSize);
-  }
-  return EFI_SUCCESS;
-
-ErrorCleanup:
-
-  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
-    if (IdtEntryTable[ExceptionType].StubEntry != NULL) {
-      FreePool ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry);
-    }
-  }
-  FreePool (IdtEntryTable);
-
-  return EFI_OUT_OF_RESOURCES;
-}
-
-/**
-  This is the callback that is written to the LoadedImage protocol instance
-  on the image handle. It uninstalls all registered handlers and frees all entry
-  stub memory.
-
-  @param  ImageHandle    The firmware allocated handle for the EFI image.
-
-  @retval EFI_SUCCESS    Always.
-
-**/
-EFI_STATUS
-EFIAPI
-PlUnloadDebugSupportDriver (
-  IN EFI_HANDLE ImageHandle
-  )
-{
-  EFI_EXCEPTION_TYPE  ExceptionType;
-
-  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
-    ManageIdtEntryTable (NULL, ExceptionType);
-  }
-
-  FreePool (IdtEntryTable);
   return EFI_SUCCESS;
 }
 
@@ -318,4 +264,93 @@ InterruptDistrubutionHub (
       IdtEntryTable[ExceptionType].RegisteredCallback (ContextRecord);
     }
   }
+}
+
+/**
+  This is the callback that is written to the Loaded Image protocol instance
+  on the image handle. It uninstalls all registered handlers and frees all entry
+  stub memory.
+
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
+
+  @retval EFI_SUCCESS    Always.
+
+**/
+EFI_STATUS
+EFIAPI
+PlUnloadDebugSupportDriver (
+  IN EFI_HANDLE ImageHandle
+  )
+{
+  EFI_EXCEPTION_TYPE  ExceptionType;
+
+  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
+    ManageIdtEntryTable (NULL, ExceptionType);
+    //
+    // Free space for each Interrupt Stub precedure.
+    //
+    if (IdtEntryTable[ExceptionType].StubEntry != NULL) {
+      FreePool ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry);
+    }
+  }
+
+  FreePool (IdtEntryTable);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Initializes driver's handler registration database. 
+  
+  This code executes in boot services context.
+  Must be public because it's referenced from DebugSupport.c
+
+  @retval  EFI_UNSUPPORTED      If IA32/x64 processor does not support FXSTOR/FXRSTOR instructions,
+                                the context save will fail, so these processors are not supported.
+  @retval  EFI_OUT_OF_RESOURCES Fails to allocate memory.
+  @retval  EFI_SUCCESS          Initializes successfully.
+
+**/
+EFI_STATUS
+PlInitializeDebugSupportDriver (
+  VOID
+  )
+{
+  EFI_EXCEPTION_TYPE  ExceptionType;
+
+  //
+  // Check whether FxStor instructions are supported.
+  //
+  if (!FxStorSupport ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  IdtEntryTable = AllocateZeroPool (sizeof (IDT_ENTRY) * NUM_IDT_ENTRIES);
+  if (IdtEntryTable == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType ++) {
+    IdtEntryTable[ExceptionType].StubEntry = (DEBUG_PROC) (UINTN) AllocatePool (StubSize);
+    if (IdtEntryTable[ExceptionType].StubEntry == NULL) {
+      goto ErrorCleanup;
+    }
+    
+    //
+    // Copy Interrupt stub code.
+    //
+    CopyMem ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry, InterruptEntryStub, StubSize);
+  }
+  return EFI_SUCCESS;
+
+ErrorCleanup:
+
+  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
+    if (IdtEntryTable[ExceptionType].StubEntry != NULL) {
+      FreePool ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry);
+    }
+  }
+  FreePool (IdtEntryTable);
+
+  return EFI_OUT_OF_RESOURCES;
 }
