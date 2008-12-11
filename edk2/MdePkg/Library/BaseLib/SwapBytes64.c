@@ -24,16 +24,16 @@
   from little endian to big endian or vice versa. The byte swapped value is
   returned.
 
-  @param  Value Operand A 64-bit unsigned value.
+  @param  Value A 64-bit unsigned value.
 
-  @return The byte swapped Operand.
+  @return The byte swapped Value.
 
 **/
 UINT64
 EFIAPI
 SwapBytes64 (
-  IN      UINT64                    Operand
+  IN      UINT64                    Value
   )
 {
-  return InternalMathSwapBytes64 (Operand);
+  return InternalMathSwapBytes64 (Value);
 }

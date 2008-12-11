@@ -34,7 +34,7 @@
 VOID
 EFIAPI
 AsmFxRestore (
-  IN CONST IA32_FX_BUFFER  *Buffer
+  IN      CONST IA32_FX_BUFFER      *Buffer
   )
 {
   ASSERT (Buffer != NULL);

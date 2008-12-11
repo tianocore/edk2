@@ -61,7 +61,7 @@ GetSpinLockProperties (
 SPIN_LOCK *
 EFIAPI
 InitializeSpinLock (
-  OUT     SPIN_LOCK                 *SpinLock
+  OUT      SPIN_LOCK                 *SpinLock
   )
 {
   ASSERT (SpinLock != NULL);
@@ -352,9 +352,8 @@ InterlockedCompareExchange64 (
                         operation.
   @param  CompareValue  Pointer value used in compare operation.
   @param  ExchangeValue Pointer value used in exchange operation.
-  
-  @return The original *Value before exchange.
 
+  @return The original *Value before exchange.
 **/
 VOID *
 EFIAPI

@@ -23,8 +23,7 @@
   Checks ASSERT condition for JumpBuffer.
 
   If JumpBuffer is NULL, then ASSERT().
-  If JumpBuffer is not aligned on a BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT
-  boundary, then ASSERT().
+  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
 
   @param  JumpBuffer    A pointer to CPU context buffer.
 

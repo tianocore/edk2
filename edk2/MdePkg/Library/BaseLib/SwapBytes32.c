@@ -24,22 +24,22 @@
   from little endian to big endian or vice versa. The byte swapped value is
   returned.
 
-  @param  Value Operand A 32-bit unsigned value.
+  @param  Value A 32-bit unsigned value.
 
-  @return The byte swapped Operand.
+  @return The byte swapped Value.
 
 **/
 UINT32
 EFIAPI
 SwapBytes32 (
-  IN      UINT32                    Operand
+  IN      UINT32                    Value
   )
 {
   UINT32  LowerBytes;
   UINT32  HigherBytes;
 
-  LowerBytes  = (UINT32) SwapBytes16 ((UINT16) Operand);
-  HigherBytes = (UINT32) SwapBytes16 ((UINT16) (Operand >> 16));
+  LowerBytes  = (UINT32) SwapBytes16 ((UINT16) Value);
+  HigherBytes = (UINT32) SwapBytes16 ((UINT16) (Value >> 16));
 
   return (LowerBytes << 16 | HigherBytes);
 }
