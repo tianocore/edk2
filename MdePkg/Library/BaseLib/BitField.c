@@ -15,7 +15,7 @@
 #include "BaseLibInternals.h"
 
 /**
-  Worker function that returns a bit field from Operand
+  Worker function that returns a bit field from Operand.
 
   Returns the bitfield specified by the StartBit and the EndBit from Operand.
 
@@ -42,7 +42,7 @@ BitFieldReadUint (
 }
 
 /**
-  Worker function that reads a bit field from Operand, performs a bitwise OR, 
+  Worker function that reads a bit field from Operand, performs a bitwise OR,
   and returns the result.
 
   Performs a bitwise OR between the bit field specified by StartBit and EndBit
@@ -74,7 +74,7 @@ BitFieldOrUint (
 }
 
 /**
-  Worker function that reads a bit field from Operand, performs a bitwise AND, 
+  Worker function that reads a bit field from Operand, performs a bitwise AND,
   and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit

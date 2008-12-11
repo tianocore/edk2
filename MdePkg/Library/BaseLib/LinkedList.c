@@ -15,14 +15,14 @@
 #include "BaseLibInternals.h"
 
 /**
-  Worker function that locates the Node in the List
+  Worker function that locates the Node in the List.
 
   By searching the List, finds the location of the Node in List. At the same time,
   verifies the validity of this list.
 
   If List is NULL, then ASSERT().
   If List->ForwardLink is NULL, then ASSERT().
-  If List->BackLink is NULL, then ASSERT().
+  If List->backLink is NULL, then ASSERT().
   If Node is NULL, then ASSERT();
   If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
@@ -93,15 +93,15 @@ IsNodeInList (
 LIST_ENTRY *
 EFIAPI
 InitializeListHead (
-  IN OUT  LIST_ENTRY            *List
+  IN OUT  LIST_ENTRY                *ListHead
   )
 
 {
-  ASSERT (List != NULL);
+  ASSERT (ListHead != NULL);
 
-  List->ForwardLink = List;
-  List->BackLink = List;
-  return List;
+  ListHead->ForwardLink = ListHead;
+  ListHead->BackLink = ListHead;
+  return ListHead;
 }
 
 /**
@@ -129,20 +129,20 @@ InitializeListHead (
 LIST_ENTRY *
 EFIAPI
 InsertHeadList (
-  IN OUT  LIST_ENTRY            *List,
-  IN OUT  LIST_ENTRY            *Entry
+  IN OUT  LIST_ENTRY                *ListHead,
+  IN OUT  LIST_ENTRY                *Entry
   )
 {
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (!IsNodeInList (List, Entry));
+  ASSERT (!IsNodeInList (ListHead, Entry));
 
-  Entry->ForwardLink = List->ForwardLink;
-  Entry->BackLink = List;
+  Entry->ForwardLink = ListHead->ForwardLink;
+  Entry->BackLink = ListHead;
   Entry->ForwardLink->BackLink = Entry;
-  List->ForwardLink = Entry;
-  return List;
+  ListHead->ForwardLink = Entry;
+  return ListHead;
 }
 
 /**
@@ -170,20 +170,20 @@ InsertHeadList (
 LIST_ENTRY *
 EFIAPI
 InsertTailList (
-  IN OUT  LIST_ENTRY            *List,
-  IN OUT  LIST_ENTRY            *Entry
+  IN OUT  LIST_ENTRY                *ListHead,
+  IN OUT  LIST_ENTRY                *Entry
   )
 {
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (!IsNodeInList (List, Entry));
+  ASSERT (!IsNodeInList (ListHead, Entry));
 
-  Entry->ForwardLink = List;
-  Entry->BackLink = List->BackLink;
+  Entry->ForwardLink = ListHead;
+  Entry->BackLink = ListHead->BackLink;
   Entry->BackLink->ForwardLink = Entry;
-  List->BackLink = Entry;
-  return List;
+  ListHead->BackLink = Entry;
+  return ListHead;
 }
 
 /**
@@ -209,7 +209,7 @@ InsertTailList (
 LIST_ENTRY *
 EFIAPI
 GetFirstNode (
-  IN CONST LIST_ENTRY  *List
+  IN      CONST LIST_ENTRY          *List
   )
 {
   //
@@ -245,8 +245,8 @@ GetFirstNode (
 LIST_ENTRY *
 EFIAPI
 GetNextNode (
-  IN CONST LIST_ENTRY  *List,
-  IN CONST LIST_ENTRY  *Node
+  IN      CONST LIST_ENTRY          *List,
+  IN      CONST LIST_ENTRY          *Node
   )
 {
   //
@@ -279,15 +279,15 @@ GetNextNode (
 BOOLEAN
 EFIAPI
 IsListEmpty (
-  IN      CONST LIST_ENTRY      *List
+  IN      CONST LIST_ENTRY          *ListHead
   )
 {
   //
   // ASSERT List not too long
   //
-  ASSERT (IsNodeInList (List, List));
+  ASSERT (IsNodeInList (ListHead, ListHead));
 
-  return (BOOLEAN)(List->ForwardLink == List);
+  return (BOOLEAN)(ListHead->ForwardLink == ListHead);
 }
 
 /**
@@ -318,8 +318,8 @@ IsListEmpty (
 BOOLEAN
 EFIAPI
 IsNull (
-  IN      CONST LIST_ENTRY      *List,
-  IN      CONST LIST_ENTRY      *Node
+  IN      CONST LIST_ENTRY          *List,
+  IN      CONST LIST_ENTRY          *Node
   )
 {
   //
@@ -356,8 +356,8 @@ IsNull (
 BOOLEAN
 EFIAPI
 IsNodeAtEnd (
-  IN      CONST LIST_ENTRY      *List,
-  IN      CONST LIST_ENTRY      *Node
+  IN      CONST LIST_ENTRY          *List,
+  IN      CONST LIST_ENTRY          *Node
   )
 {
   //
@@ -389,15 +389,15 @@ IsNodeAtEnd (
 
   @param  FirstEntry  A pointer to a node in a linked list.
   @param  SecondEntry A pointer to another node in the same linked list.
-
+  
   @return SecondEntry.
 
 **/
 LIST_ENTRY *
 EFIAPI
 SwapListEntries (
-  IN OUT  LIST_ENTRY            *FirstEntry,
-  IN OUT  LIST_ENTRY            *SecondEntry
+  IN OUT  LIST_ENTRY                *FirstEntry,
+  IN OUT  LIST_ENTRY                *SecondEntry
   )
 {
   LIST_ENTRY                    *Ptr;
@@ -464,7 +464,7 @@ SwapListEntries (
 LIST_ENTRY *
 EFIAPI
 RemoveEntryList (
-  IN      CONST LIST_ENTRY      *Entry
+  IN      CONST LIST_ENTRY          *Entry
   )
 {
   ASSERT (!IsListEmpty (Entry));

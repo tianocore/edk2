@@ -41,6 +41,7 @@
                       a single parameter of type VOID * that specifies the new backing 
                       store pointer.
 
+
 **/
 VOID
 EFIAPI

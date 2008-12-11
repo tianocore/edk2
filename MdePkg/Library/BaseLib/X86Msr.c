@@ -40,7 +40,8 @@ AsmReadMsr32 (
 }
 
 /**
-  Zero-extend a 32-bit value and writes it to a Machine Specific Register(MSR).
+  Writes a 32-bit value to a Machine Specific Register(MSR), and returns the value.
+  The upper 32-bits of the MSR are set to zero.
 
   Writes the 32-bit value specified by Value to the MSR specified by Index. The
   upper 32-bits of the MSR write are set to zero. The 32-bit value written to
@@ -192,7 +193,7 @@ AsmMsrBitFieldRead32 (
 /**
   Writes a bit field to an MSR.
 
-  Writes Value to a bit field in the lower 32-bits of a  64-bit MSR. The bit
+  Writes Value to a bit field in the lower 32-bits of a 64-bit MSR. The bit
   field is specified by the StartBit and the EndBit. All other bits in the
   destination MSR are preserved. The lower 32-bits of the MSR written is
   returned. The caller must either guarantee that Index and the data written 
@@ -464,7 +465,7 @@ AsmMsrAndThenOr64 (
   @param  EndBit    The ordinal of the most significant bit in the bit field.
                     Range 0..63.
 
-  @return The value written back to the MSR.
+  @return The value read from the MSR.
 
 **/
 UINT64

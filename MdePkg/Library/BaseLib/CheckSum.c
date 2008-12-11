@@ -36,8 +36,8 @@
 UINT8
 EFIAPI
 CalculateSum8 (
-  IN      CONST UINT8        *Buffer,
-  IN      UINTN              Length
+  IN      CONST UINT8              *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT8     Sum;
@@ -75,8 +75,8 @@ CalculateSum8 (
 UINT8
 EFIAPI
 CalculateCheckSum8 (
-  IN      CONST UINT8        *Buffer,
-  IN      UINTN              Length
+  IN      CONST UINT8              *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT8     CheckSum;
@@ -111,8 +111,8 @@ CalculateCheckSum8 (
 UINT16
 EFIAPI
 CalculateSum16 (
-  IN      CONST UINT16       *Buffer,
-  IN      UINTN              Length
+  IN      CONST UINT16             *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT16    Sum;
@@ -156,8 +156,8 @@ CalculateSum16 (
 UINT16
 EFIAPI
 CalculateCheckSum16 (
-  IN      CONST UINT16         *Buffer,
-  IN      UINTN                Length
+  IN      CONST UINT16             *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT16     CheckSum;
@@ -193,8 +193,8 @@ CalculateCheckSum16 (
 UINT32
 EFIAPI
 CalculateSum32 (
-  IN      CONST UINT32         *Buffer,
-  IN      UINTN                Length
+  IN      CONST UINT32             *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT32    Sum;
@@ -238,8 +238,8 @@ CalculateSum32 (
 UINT32
 EFIAPI
 CalculateCheckSum32 (
-  IN      CONST UINT32         *Buffer,
-  IN      UINTN                Length
+  IN      CONST UINT32             *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT32     CheckSum;
@@ -275,8 +275,8 @@ CalculateCheckSum32 (
 UINT64
 EFIAPI
 CalculateSum64 (
-  IN      CONST UINT64         *Buffer,
-  IN      UINTN                Length
+  IN      CONST UINT64             *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT64    Sum;
@@ -320,8 +320,8 @@ CalculateSum64 (
 UINT64
 EFIAPI
 CalculateCheckSum64 (
-  IN      CONST UINT64         *Buffer,
-  IN      UINTN                Length
+  IN      CONST UINT64             *Buffer,
+  IN      UINTN                     Length
   )
 {
   UINT64     CheckSum;

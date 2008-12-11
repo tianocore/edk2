@@ -69,7 +69,7 @@ GetSpinLockProperties (
 SPIN_LOCK *
 EFIAPI
 InitializeSpinLock (
-  OUT     SPIN_LOCK                 *SpinLock
+  OUT      SPIN_LOCK                 *SpinLock
   )
 {
   ASSERT (SpinLock != NULL);

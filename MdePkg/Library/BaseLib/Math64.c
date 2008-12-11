@@ -68,8 +68,6 @@ InternalMathRShiftU64 (
   This function shifts the 64-bit value Operand to the right by Count bits. The
   high Count bits are set to bit 63 of Operand.  The shifted value is returned.
 
-  If Count is greater than 63, then ASSERT().
-
   @param  Operand The 64-bit operand to shift right.
   @param  Count   The number of bits to shift right.
 
@@ -161,7 +159,7 @@ InternalMathRRotU64 (
 
   @param  Operand A 64-bit unsigned value.
 
-  @return The byte swaped Operand.
+  @return The byte swapped Operand.
 
 **/
 UINT64
@@ -236,7 +234,7 @@ InternalMathMultU64x64 (
   unsigned value Divisor and generates a 64-bit unsigned quotient. This
   function returns the 64-bit unsigned quotient.
 
-   @param  Dividend  A 64-bit unsigned value.
+  @param  Dividend  A 64-bit unsigned value.
   @param  Divisor   A 32-bit unsigned value.
 
   @return Dividend / Divisor
@@ -253,8 +251,8 @@ InternalMathDivU64x32 (
 }
 
 /**
-  Divides a 64-bit unsigned integer by a 32-bit unsigned integer
-  and generates a 32-bit unsigned remainder.
+  Divides a 64-bit unsigned integer by a 32-bit unsigned integer and
+  generates a 32-bit unsigned remainder.
 
   This function divides the 64-bit unsigned value Dividend by the 32-bit
   unsigned value Divisor and generates a 32-bit remainder. This function
@@ -298,7 +296,7 @@ EFIAPI
 InternalMathDivRemU64x32 (
   IN      UINT64                    Dividend,
   IN      UINT32                    Divisor,
-  OUT     UINT32                    *Remainder  OPTIONAL
+  OUT     UINT32                    *Remainder OPTIONAL
   )
 {
   if (Remainder != NULL) {
@@ -329,7 +327,7 @@ EFIAPI
 InternalMathDivRemU64x64 (
   IN      UINT64                    Dividend,
   IN      UINT64                    Divisor,
-  OUT     UINT64                    *Remainder  OPTIONAL
+  OUT     UINT64                    *Remainder OPTIONAL
   )
 {
   if (Remainder != NULL) {
@@ -340,7 +338,7 @@ InternalMathDivRemU64x64 (
 
 /**
   Divides a 64-bit signed integer by a 64-bit signed integer and
-  generates a 64-bit signed result and a optional 64-bit signed remainder.
+  generates a 64-bit signed result and an optional 64-bit signed remainder.
 
   This function divides the 64-bit signed value Dividend by the 64-bit
   signed value Divisor and generates a 64-bit signed quotient. If Remainder

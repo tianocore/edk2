@@ -261,7 +261,7 @@ StrCmp (
 /**
   Compares up to a specified length the contents of two Null-terminated Unicode strings,
   and returns the difference between the first mismatched Unicode characters.
-
+  
   This function compares the Null-terminated Unicode string FirstString to the
   Null-terminated Unicode string SecondString. At most, Length Unicode
   characters will be compared. If Length is 0, then 0 is returned. If
@@ -451,8 +451,8 @@ StrnCat (
 CHAR16 *
 EFIAPI
 StrStr (
-  IN      CONST CHAR16                *String,
-  IN      CONST CHAR16                *SearchString
+  IN      CONST CHAR16              *String,
+  IN      CONST CHAR16              *SearchString
   )
 {
   CONST CHAR16 *FirstMatch;
@@ -632,7 +632,7 @@ InternalIsHexaDecimalDigitCharacter (
 UINTN
 EFIAPI
 StrDecimalToUintn (
-  IN      CONST CHAR16                *String
+  IN      CONST CHAR16              *String
   )
 {
   UINTN     Result;
@@ -714,7 +714,7 @@ StrDecimalToUintn (
 UINT64
 EFIAPI
 StrDecimalToUint64 (
-  IN      CONST CHAR16                *String
+  IN      CONST CHAR16              *String
   )
 {
   UINT64     Result;
@@ -796,7 +796,7 @@ StrDecimalToUint64 (
 UINTN
 EFIAPI
 StrHexToUintn (
-  IN      CONST CHAR16                *String
+  IN      CONST CHAR16              *String
   )
 {
   UINTN     Result;
@@ -886,11 +886,11 @@ StrHexToUintn (
 
   @retval Value translated from String.
 
-  **/
+**/
 UINT64
 EFIAPI
 StrHexToUint64 (
-  IN      CONST CHAR16                *String
+  IN      CONST CHAR16             *String
   )
 {
   UINT64    Result;
@@ -1027,8 +1027,8 @@ InternalAsciiIsHexaDecimalDigitCharacter (
 CHAR8 *
 EFIAPI
 UnicodeStrToAsciiStr (
-  IN      CONST CHAR16                *Source,
-  OUT     CHAR8                       *Destination
+  IN      CONST CHAR16              *Source,
+  OUT     CHAR8                     *Destination
   )
 {
   CHAR8                               *ReturnValue;
@@ -1421,7 +1421,7 @@ AsciiStriCmp (
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
   @param  Length        Maximum number of ASCII characters for compare.
-
+  
   @retval ==0       FirstString is identical to SecondString.
   @retval !=0       FirstString is not identical to SecondString.
 
@@ -1577,8 +1577,8 @@ AsciiStrnCat (
 CHAR8 *
 EFIAPI
 AsciiStrStr (
-  IN      CONST CHAR8             *String,
-  IN      CONST CHAR8             *SearchString
+  IN      CONST CHAR8               *String,
+  IN      CONST CHAR8               *SearchString
   )
 {
   CONST CHAR8 *FirstMatch;
@@ -1729,7 +1729,7 @@ AsciiStrDecimalToUintn (
 UINT64
 EFIAPI
 AsciiStrDecimalToUint64 (
-  IN      CONST CHAR8             *String
+  IN      CONST CHAR8               *String
   )
 {
   UINT64     Result;
@@ -1809,7 +1809,7 @@ AsciiStrDecimalToUint64 (
 UINTN
 EFIAPI
 AsciiStrHexToUintn (
-  IN      CONST CHAR8             *String
+  IN      CONST CHAR8               *String
   )
 {
   UINTN     Result;
@@ -1901,7 +1901,7 @@ AsciiStrHexToUintn (
 UINT64
 EFIAPI
 AsciiStrHexToUint64 (
-  IN      CONST CHAR8             *String
+  IN      CONST CHAR8                *String
   )
 {
   UINT64    Result;

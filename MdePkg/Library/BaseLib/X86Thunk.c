@@ -185,11 +185,47 @@ AsmPrepareThunk16 (
   Transfers control to a 16-bit real mode entry point and returns the results.
 
   Transfers control to a 16-bit real mode entry point and returns the results.
-  AsmPrepareThunk16() must be called with ThunkContext before this function is
-  used. This function must be called with interrupts disabled.
+  AsmPrepareThunk16() must be called with ThunkContext before this function is used.
+  This function must be called with interrupts disabled.
 
+  The register state from the RealModeState field of ThunkContext is restored just prior 
+  to calling the 16-bit real mode entry point.  This includes the EFLAGS field of RealModeState, 
+  which is used to set the interrupt state when a 16-bit real mode entry point is called.
+  Control is transferred to the 16-bit real mode entry point specified by the CS and Eip fields of RealModeState.
+  The stack is initialized to the SS and ESP fields of RealModeState.  Any parameters passed to 
+  the 16-bit real mode code must be populated by the caller at SS:ESP prior to calling this function.  
+  The 16-bit real mode entry point is invoked with a 16-bit CALL FAR instruction,
+  so when accessing stack contents, the 16-bit real mode code must account for the 16-bit segment 
+  and 16-bit offset of the return address that were pushed onto the stack. The 16-bit real mode entry 
+  point must exit with a RETF instruction. The register state is captured into RealModeState immediately 
+  after the RETF instruction is executed.
+  
+  If EFLAGS specifies interrupts enabled, or any of the 16-bit real mode code enables interrupts, 
+  or any of the 16-bit real mode code makes a SW interrupt, then the caller is responsible for making sure 
+  the IDT at address 0 is initialized to handle any HW or SW interrupts that may occur while in 16-bit real mode. 
+  
+  If EFLAGS specifies interrupts enabled, or any of the 16-bit real mode code enables interrupts, 
+  then the caller is responsible for making sure the 8259 PIC is in a state compatible with 16-bit real mode.  
+  This includes the base vectors, the interrupt masks, and the edge/level trigger mode.
+  
+  If THUNK_ATTRIBUTE_BIG_REAL_MODE is set in the ThunkAttributes field of ThunkContext, then the user code 
+  is invoked in big real mode.  Otherwise, the user code is invoked in 16-bit real mode with 64KB segment limits.
+  
+  If neither THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 nor THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL are set in 
+  ThunkAttributes, then it is assumed that the user code did not enable the A20 mask, and no attempt is made to 
+  disable the A20 mask.
+  
+  If THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 is set and THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL is clear in 
+  ThunkAttributes, then attempt to use the INT 15 service to disable the A20 mask.  If this INT 15 call fails, 
+  then attempt to disable the A20 mask by directly accessing the 8042 keyboard controller I/O ports.
+  
+  If THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 is clear and THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL is set in 
+  ThunkAttributes, then attempt to disable the A20 mask by directly accessing the 8042 keyboard controller I/O ports.
+    
   If ThunkContext is NULL, then ASSERT().
   If AsmPrepareThunk16() was not previously called with ThunkContext, then ASSERT().
+  If both THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 and THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL are set in 
+  ThunkAttributes, then ASSERT().
 
   @param  ThunkContext  A pointer to the context structure that describes the
                         16-bit real mode code to call.
@@ -225,10 +261,9 @@ AsmThunk16 (
   caller only need to perform a single 16-bit real mode thunk, then this
   service should be used. If the caller intends to make more than one 16-bit
   real mode thunk, then it is more efficient if AsmPrepareThunk16() is called
-  once and AsmThunk16() can be called for each 16-bit real mode thunk. This
-  function must be called with interrupts disabled.
+  once and AsmThunk16() can be called for each 16-bit real mode thunk.
 
-  If ThunkContext is NULL, then ASSERT().
+  See AsmPrepareThunk16() and AsmThunk16() for the detailed description and ASSERT() conditions.
 
   @param  ThunkContext  A pointer to the context structure that describes the
                         16-bit real mode code to call.
