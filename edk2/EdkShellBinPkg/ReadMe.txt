@@ -3,7 +3,7 @@ The binaries of EdkShellBinPkg are generated with EDK-Shell 1.05 release and bui
 
 The following steps can help to re-generate these binaries for customization:
 1. Check out EdkCompatibilityPkg (r5782) to $(WORKSPACE)\EdkCompatibilityPkg (svn https://edk2.tianocore.org/svn/edk2/trunk/edk2/EdkCompatibilityPkg).
-2. Check out EdkShellPkg(r5782) to $(WORKSPACE)\EdkShellPkg (svn https://efi-shell.tianocore.org/servlets/ProjectDocumentList?folderID=52&expandFolder=52&folderID=45).
+2. Check out EdkShellPkg(r5782) to $(WORKSPACE)\EdkShellPkg (svn https://edk2.tianocore.org/svn/edk2/trunk/edk2/EdkShellPkg).
    This package has an SVN extern directory from EDK Shell project. It is read-only and current revison (r30) is identical to EDK shell 1.05 release. 
 3. Update to the newest BaseTools package. (r5782 or later)
 4. Apply a hot fix ShellHotFix.patch under EdkShellPkg directory.
