@@ -18,10 +18,10 @@
 #include <Library/DebugLib.h>
 
 /**
-  The function returns the pointer to PeiServices.
+  The function returns the pointer to PEI services.
 
-  The function returns the pointer to PeiServices.
-  It will ASSERT() if the pointer to PeiServices is NULL.
+  The function returns the pointer to PEI services.
+  It will ASSERT() if the pointer to PEI services is NULL.
 
   @return  The pointer to PeiServices.
 
