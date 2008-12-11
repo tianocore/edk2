@@ -206,6 +206,17 @@ Possible Impacts:
 			Customer's module that reference SafeFreePool need to updated. Otherwise
 			a build break may occur.
 			
+EDK_6455-6460:  Non-Compatible: klu2
+    1. Clean up device path protocol header file, move device path utility macros to MdePkg\Include\DevicePathLib.h.
+    2. I remove "Efi" prefix for this utility function macro name. 
+    3. The upacked device path type is removed. Should use device path utility macro to access structure's member.
+
+Possible Impacts:
+    1. Customer's module that access device path node's structure need use DevicePathLib
+    2. Should not use unpacked type device path node, this type is retired.
+    3. If want to access private member in device path node, customer module need DuplicateDevicePath() at first to 
+       make sure node is in alignment.
+              
 EDK_6496-6519:  Non-Compatible: qhuang8
 
 	A bundle of library class/instance renames, moves and merges:
@@ -262,3 +273,4 @@ EDK_6974:  Non-Compatible: lgao4
 Possible Impacts:
 	All source codes that refer to EFI_KEY_OPTION.KeyOptions
 	must be changed to use EFI_KEY_OPTION.KeyData from UEFI specification.	
+
