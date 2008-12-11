@@ -1,5 +1,5 @@
 #/** @file
-# The DXE driver produces  protocols defined in UEFI HII 2.1 specificatin.
+# The DXE driver produces HII protocols defined in UEFI HII 2.1 specificatin.
 #
 # Copyright (c) 2007, Intel Corporation. All rights reserved.
 #
