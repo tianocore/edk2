@@ -1,7 +1,6 @@
 #/** @file
-# Component name for module HiiDatabase
+# The DXE driver produces  protocols defined in UEFI HII 2.1 specificatin.
 #
-# FIX ME!
 # Copyright (c) 2007, Intel Corporation. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials       

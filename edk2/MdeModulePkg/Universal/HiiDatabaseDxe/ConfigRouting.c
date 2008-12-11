@@ -1,4 +1,5 @@
 /** @file
+Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -8,17 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-    ConfigRouting.c
-
-Abstract:
-
-    Implementation for EFI_HII_CONFIG_ROUTING_PROTOCOL.
-
-Revision History
-
 
 **/
 
