@@ -49,4 +49,8 @@
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmBaseProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  
+[Depex]
+  gEfiSmmBaseProtocolGuid
+
 
