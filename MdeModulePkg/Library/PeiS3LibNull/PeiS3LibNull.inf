@@ -1,10 +1,9 @@
 #/** @file
 #  
-#    Graphics Library for UEFI drivers
+#  A NULL instance of S3 Library for PEIM
 #  
-#   This library provides supports for basic graphic functions.
-#  
-#  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+#  Copyright (c) 2006 - 2008, Intel Corporation.
+#
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -12,7 +11,7 @@
 #  
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 #**/
 
 [Defines]
