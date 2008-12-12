@@ -16,7 +16,7 @@
 #ifndef _TCG_SERVICE_PROTOCOL_H_
 #define _TCG_SERVICE_PROTOCOL_H_
 
-#include <Uefi/UefiTcgPlatform.h>
+#include <IndustryStandard/UefiTcgPlatform.h>
 
 #define EFI_TCG_PROTOCOL_GUID  \
   {0xf541796d, 0xa62e, 0x4954, { 0xa7, 0x75, 0x95, 0x84, 0xf6, 0x1b, 0x9c, 0xdd } } 

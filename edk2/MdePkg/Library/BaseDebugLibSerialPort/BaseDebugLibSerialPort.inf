@@ -1,7 +1,5 @@
 #/** @file
 #  Instance of Debug Library based on Serial Port Library.
-#
-#  Instance of Debug Library based on Serial Port Library.
 #  It uses Print Library to produce formatted output strings.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation.

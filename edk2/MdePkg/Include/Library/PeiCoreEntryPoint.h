@@ -91,7 +91,7 @@ EfiMain (
   The PEI Core must call this function with a NULL FileHandle value as soon as the initial PEI
   Services Table has been established.
 
-  @param  FileHandle   Handle of the file being invoked.Type EFI_PEI_FILE_HANDLE is defined in FfsFindNextFile().
+  @param  FileHandle   Handle of the file being invoked.
   @param  PeiServices  Describes the list of possible PEI Services.
 
 **/
