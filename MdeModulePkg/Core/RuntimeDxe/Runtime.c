@@ -151,7 +151,7 @@ RuntimeDriverConvertPointer (
   // If this is a null pointer, return if it's allowed
   //
   if (Address == 0) {
-    if ((DebugDisposition & EFI_OPTIONAL_POINTER) != 0) {
+    if ((DebugDisposition & EFI_OPTIONAL_PTR) != 0) {
       return EFI_SUCCESS;
     }
 
