@@ -36,8 +36,14 @@ VARIABLE_CACHE_ENTRY mVariableCache[] = {
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
+VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
 
+EFI_STATUS
+FtwVariableSpace (
+  IN EFI_PHYSICAL_ADDRESS   VariableBaseAddress,
+  IN UINT8                  *Buffer,
+  IN UINTN                  BufferSize
+  );
 
 
 /**
@@ -747,7 +753,7 @@ Reclaim (
 
   @param[in] VariableName  Name of variable
   @param[in] VendorGuid    Guid of variable
-  @param[in] Attribute     Attribue of the variable
+  @param[in] Attributes    Attribues of the variable
   @param[in] DataSize      Size of data. 0 means delete
   @param[in] Data          Variable data
 
@@ -1364,7 +1370,7 @@ RuntimeServiceSetVariable (
     // Only variable have NV|RT attribute can be created in Runtime
     //
     if (EfiAtRuntime () &&
-        (!(Attributes & EFI_VARIABLE_RUNTIME_ACCESS) || !(Attributes & EFI_VARIABLE_NON_VOLATILE))) {
+        (((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) || ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0))) {
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }         
@@ -1420,7 +1426,7 @@ RuntimeServiceSetVariable (
   // include pad size.
   //
   VarSize = VarDataOffset + DataSize + GET_PAD_SIZE (DataSize);
-  if (Attributes & EFI_VARIABLE_NON_VOLATILE) {
+  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
     //
     // Create a nonvolatile variable
     //
@@ -1655,7 +1661,7 @@ RuntimeServiceQueryVariableInfo (
     // Make sure if runtime bit is set, boot service bit is set also.
     //
     return EFI_INVALID_PARAMETER;
-  } else if (EfiAtRuntime () && !(Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
+  } else if (EfiAtRuntime () && ((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0)) {
     //
     // Make sure RT Attribute is set if we are in Runtime phase.
     //

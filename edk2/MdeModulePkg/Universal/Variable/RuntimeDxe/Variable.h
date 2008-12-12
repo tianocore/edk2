@@ -85,24 +85,4 @@ typedef struct {
   VOID        *Data;
 } VARIABLE_CACHE_ENTRY;
 
-
-//
-// Functions
-//
-
-EFI_STATUS
-EFIAPI
-VariableServiceInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  );
-
-
-EFI_STATUS
-FtwVariableSpace (
-  IN EFI_PHYSICAL_ADDRESS   VariableBaseAddress,
-  IN UINT8                  *Buffer,
-  IN UINTN                  BufferSize
-  );
-
 #endif
