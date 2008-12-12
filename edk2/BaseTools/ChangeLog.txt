@@ -42,12 +42,12 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 ##########                 Revision number of tools source code                 ##########
     BaseTools/Bin/Win32/build.exe
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
+        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
+        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
+        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
 
     BaseTools/Bin/Win32/GenFds.exe
         r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
@@ -76,6 +76,20 @@ EDK_0000: Compatible: owner
 
     BaseTools/Bin/Win32/Fpd2Dsc.exe
         r767 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/fpd2dsc
+
+==========================================================================================
+basetools_7009: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Search value of Guid/Protocol/PPI in inf file only in the same category in dec file.
+        2) Pass all files in a module's directory to StrGather for R8 modules.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+
+        Possible Impacts:
+        1) Those inf files in which the PPI/Protocol/Guid are put in incorrect
+           section will encounter build break.
 
 ==========================================================================================
 EDK_6930: Non-Compatible: jwang36
