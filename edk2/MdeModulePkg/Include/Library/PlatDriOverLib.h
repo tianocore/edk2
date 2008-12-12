@@ -222,7 +222,7 @@ DeleteDriverImage (
                                If Binding protocol is not found, it is set to NULL. 
 
   @return                      Pointer into the Binding Protocol interface
-  @retval NULL                 The paramter is not valid or the binding protocol is not found.
+  @retval NULL                 The parameter is not valid or the binding protocol is not found.
 
 **/
 EFI_DRIVER_BINDING_PROTOCOL *

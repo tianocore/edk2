@@ -2,7 +2,7 @@
 
   This file defines a group of guids to specify the different 
   encapsulation scheme for the guided section.
-  The related defintions is in UEFI GuidedSectionExtraction protocol.
+  The related definitions is in UEFI GuidedSectionExtraction protocol.
 
   Now, only one guid is defined for CRC32 encapsulation scheme.
 

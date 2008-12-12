@@ -1,6 +1,6 @@
 /** @file
 
-  Helper routine and corrsponding data struct used by USB Mouse Driver.
+  Helper routine and corresponding data struct used by USB Mouse Driver.
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

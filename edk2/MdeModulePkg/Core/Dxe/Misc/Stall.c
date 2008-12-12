@@ -46,7 +46,7 @@ CoreStall (
   //
   // Calculate the number of ticks by dividing the number of microseconds by
   // the TickPeriod.
-  // Calcullation is based on 100ns unit.
+  // Calculation is based on 100ns unit.
   //
   Counter = (UINT32) DivU64x32Remainder (
                        Microseconds * 10,

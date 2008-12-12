@@ -137,7 +137,7 @@ EFI_STATUS
   @param  GaugeDataEntry          The indirect pointer to the gauge data entry specified by LogEntryKey
                                   if the retrieval is successful.
 
-  @retval EFI_SUCCESS             The GuageDataEntry is successfuly found based on LogEntryKey.
+  @retval EFI_SUCCESS             The GuageDataEntry is successfully found based on LogEntryKey.
   @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
   @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
   @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL.
