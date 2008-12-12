@@ -28,9 +28,9 @@ USB_MASS_TRANSPORT *mUsbMassTransport[] = {
   Reset the block device. ExtendedVerification is ignored for this.
 
   @param  This                   The BLOCK IO protocol
-  @param  ExtendedVerification   Whether to execute extended verfication.
+  @param  ExtendedVerification   Whether to execute extended verification.
 
-  @retval EFI_SUCCESS            The device is successfully resetted.
+  @retval EFI_SUCCESS            The device is successfully reseted.
   @retval Others                 Failed to reset the device.
 
 **/
@@ -273,7 +273,7 @@ UsbMassFlushBlocks (
 }
 
 /**
-  Retrieve the media parameters such as disk gemotric for the
+  Retrieve the media parameters such as disk geometric for the
   device's BLOCK IO protocol.
 
   @param  UsbMass                The USB mass storage device
@@ -348,8 +348,8 @@ UsbMassInitMedia (
   @param  Context         The passing parameter.
   @param  MaxLun          Get the MaxLun if is BOT dev.
 
-  @retval EFI_SUCCESS     The initilization is successful.
-  @retval Others          Failed to initilize dev.
+  @retval EFI_SUCCESS     The initialization is successful.
+  @retval Others          Failed to initialize dev.
 
 **/
 EFI_STATUS
@@ -711,7 +711,7 @@ USBMassDriverBindingSupported (
   INTN                          Index;
 
   //
-  // Check whether the controlelr support USB_IO
+  // Check whether the controller support USB_IO
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -812,7 +812,7 @@ USBMassDriverBindingStart (
     }
   } else {
     //
-    // Open device path to perpare append Device Logic Unit node.
+    // Open device path to prepare append Device Logic Unit node.
     //
     Status = gBS->OpenProtocol (
                     Controller,

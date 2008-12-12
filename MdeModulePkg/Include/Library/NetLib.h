@@ -36,7 +36,7 @@ typedef enum {
   EFI_IP_PROTO_ICMP     = 0x01,
 
   //
-  // The address classfication
+  // The address classification
   //
   IP4_ADDR_CLASSA       = 1,
   IP4_ADDR_CLASSB,

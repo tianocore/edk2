@@ -83,7 +83,7 @@ VOID
                                   // field is valid for user
   IN EFI_NET_SESSION_DATA *NetSession, // the communication point
   IN NET_BUF              *Pkt,    // packet received
-  IN VOID                 *Context // the Context provided by user for recive data
+  IN VOID                 *Context // the Context provided by user for receive data
   );
 
 typedef

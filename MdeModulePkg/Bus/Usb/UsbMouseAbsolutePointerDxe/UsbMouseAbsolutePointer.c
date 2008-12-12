@@ -194,7 +194,7 @@ USBMouseAbsolutePointerDriverBindingSupported (
   @retval EFI_DEVICE_ERROR      This driver cannot be started due to device Error
                                 EFI_OUT_OF_RESOURCES- Can't allocate memory
                                 resources
-  @retval EFI_ALREADY_STARTED   Thios driver has been started
+  @retval EFI_ALREADY_STARTED   This driver has been started
 
 **/
 EFI_STATUS
@@ -432,7 +432,7 @@ ErrorExit:
 
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This                  Protocol instance pointer.

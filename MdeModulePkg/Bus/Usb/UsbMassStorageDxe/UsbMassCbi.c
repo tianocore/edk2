@@ -1,7 +1,7 @@
 /** @file
 
-  Implementation of the USB mass storage Control/Bulk/Interrupt transpor.
-  Notice: it is being obseleted by the standard body in favor of the BOT
+  Implementation of the USB mass storage Control/Bulk/Interrupt transport.
+  Notice: it is being obsoleted by the standard body in favor of the BOT
   (Bulk-Only Transport).
 
 Copyright (c) 2007 - 2008, Intel Corporation
