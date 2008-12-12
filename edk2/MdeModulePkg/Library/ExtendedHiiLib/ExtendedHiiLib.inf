@@ -1,10 +1,10 @@
 #/** @file
 #  
-#    Library instance for ExtendedHiiLib.
+#  Library instance for ExtendedHiiLib.
 #  
-#   This library instance implements the common HII routines which is
-#   related to HII but reference data structures that are not defined in 
-#   UEFI specification, for example HII_VENDOR_DEVICE_PATH.
+#  This library instance implements the common HII routines which is
+#  related to HII but reference data structures that are not defined in 
+#  UEFI specification, for example HII_VENDOR_DEVICE_PATH.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials

@@ -1,8 +1,9 @@
 #/** @file
 #  
-#    Memory-only library functions with no library constructor/destructor
+#  Memory-only library functions with no library constructor/destructor
 #  
-#   This module provides the performance measurement interfaces in PEI phase, it is one instance of Performance Libarary.
+#  This module provides the performance measurement interfaces in PEI phase, it is
+#  one instance of Performance Libarary.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
