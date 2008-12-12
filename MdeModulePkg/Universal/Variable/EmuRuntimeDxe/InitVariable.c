@@ -194,17 +194,15 @@ VariableClassAddressChangeEvent (
 }
 
 /**
-  Entry point of EmuVariable service module.
-
-  This function is the entry point of EmuVariable service module.
-  It registers all interfaces of Variable Services, initializes
-  variable store for non-volatile and volatile variables, and registers
+  EmuVariable Driver main entry point. The Variable driver places the 4 EFI
+  runtime services in the EFI System Table and installs arch protocols 
+  for variable read and write services being availible. It also registers
   notification function for EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
 
-  @param  ImageHandle   The Image handle of this driver.
-  @param  SystemTable   The pointer of EFI_SYSTEM_TABLE.
-
-  @retval EFI_SUCCESS   Variable service successfully initialized.
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       Variable service successfully initialized.
 
 **/
 EFI_STATUS

@@ -16,8 +16,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "Variable.h"
-#include <VariableFormat.h>
 
+/**
+  Gets firmware volume block handle by given address.
+
+  This function gets firmware volume block handle whose
+  address range contains the parameter Address.
+
+  @param  Address        Address which should be contained
+                         by returned FVB handle
+  @param  FvbHandle      Pointer to FVB handle for output
+
+  @retval EFI_SUCCESS    FVB handle successfully returned
+  @retval EFI_NOT_FOUND  Fail to find FVB handle by address
+
+**/
 EFI_STATUS
 GetFvbHandleByAddress (
   IN  EFI_PHYSICAL_ADDRESS   Address,
@@ -79,6 +92,23 @@ GetFvbHandleByAddress (
   return Status;
 }
 
+/**
+  Gets LBA of block and offset by given address.
+
+  This function gets the Logical Block Address (LBA) of firmware
+  volume block containing the given address, and the offset of
+  address on the block.
+
+  @param  Address        Address which should be contained
+                         by returned FVB handle
+  @param  Lba            Pointer to LBA for output
+  @param  Offset         Pointer to offset for output
+
+  @retval EFI_SUCCESS    LBA and offset successfully returned
+  @retval EFI_NOT_FOUND  Fail to find FVB handle by address
+  @retval EFI_ABORTED    Fail to find valid LBA and offset
+
+**/
 EFI_STATUS
 GetLbaAndOffsetByAddress (
   IN  EFI_PHYSICAL_ADDRESS   Address,
@@ -148,28 +178,28 @@ GetLbaAndOffsetByAddress (
   return EFI_ABORTED;
 }
 
+/**
+  Writes a buffer to variable storage space, in the working block.
+
+  This function writes a buffer to variable storage space into firmware
+  volume block device. The destination is specified by parameter
+  VariableBase. Fault Tolerant Write protocol is used for writing.
+
+  @param  VariableBase   Base address of variable to write
+  @param  Buffer         Point to the data buffer
+  @param  BufferSize     The number of bytes of the data Buffer
+
+  @retval EFI_SUCCESS    The function completed successfully
+  @retval EFI_NOT_FOUND  Fail to locate Fault Tolerant Write protocol
+  @retval EFI_ABORTED    The function could not complete successfully
+
+**/
 EFI_STATUS
 FtwVariableSpace (
   IN EFI_PHYSICAL_ADDRESS   VariableBase,
   IN UINT8                  *Buffer,
   IN UINTN                  BufferSize
   )
-/*++
-
-Routine Description:
-    Write a buffer to Variable space, in the working block.
-
-Arguments:
-    FvbHandle        - Indicates a handle to FVB to access variable store
-    Buffer           - Point to the input buffer
-    BufferSize       - The number of bytes of the input Buffer
-
-Returns:
-    EFI_SUCCESS            - The function completed successfully
-    EFI_ABORTED            - The function could not complete successfully
-    EFI_NOT_FOUND          - Locate FVB protocol by handle fails
-
---*/
 {
   EFI_STATUS            Status;
   EFI_HANDLE            FvbHandle;
@@ -224,7 +254,7 @@ Returns:
                               FvbHandle,
                               VarLba,         // LBA
                               VarOffset,      // Offset
-                              &FtwBufferSize, // NumBytes,
+                              &FtwBufferSize, // NumBytes
                               FtwBuffer
                               );
 

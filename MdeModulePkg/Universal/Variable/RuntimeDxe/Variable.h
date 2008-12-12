@@ -14,8 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _VARIABLE_H
-#define _VARIABLE_H
+#ifndef _VARIABLE_H_
+#define _VARIABLE_H_
 
 #include <PiDxe.h>
 #include <Protocol/VariableWrite.h>
