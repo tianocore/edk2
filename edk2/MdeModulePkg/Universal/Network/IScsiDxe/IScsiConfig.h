@@ -32,6 +32,31 @@ extern UINT8  IScsiDxeStrings[];
 
 #define ISCSI_FORM_CALLBACK_INFO_SIGNATURE  EFI_SIGNATURE_32 ('I', 'f', 'c', 'i')
 
+
+
+/**
+  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear, 
+  then this macro return a pointer to a data structure ISCSI_FORM_CALLBACK_INFO.
+
+  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set,  
+  The Signature field of the data structure ISCSI_FORM_CALLBACK_INFO 
+  is compared to TestSignature.  If the signatures match, then a pointer 
+  to the pointer to a data structure ISCSI_FORM_CALLBACK_INFO is returned.  
+  If the signatures do not match, then DebugAssert() is called with a description 
+  of "CR has a bad signature" and Callback is returned.  
+
+  If the data type ISCSI_FORM_CALLBACK_INFO_SIGNATURE does not contain the field
+  specified by Callback, then the module will not compile.
+
+  If ISCSI_FORM_CALLBACK_INFO_SIGNATURE does not contain a field called Signature, 
+  then the module will not compile.
+
+  @param  Callback       Pointer to the specified field within the data 
+                         structure ISCSI_FORM_CALLBACK_INFO.
+  @return                a pointer to the pointer to a data structure ISCSI_FORM_CALLBACK_INFO.
+  @return  Others        Some unexpected error happened.
+**/
+
 #define ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK(Callback) \
   CR ( \
   Callback, \
@@ -87,7 +112,7 @@ typedef struct _ISCSI_FORM_CALLBACK_INFO {
 
   @retval EFI_SUCCESS             The iSCSI configuration form is updated.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
-  @retval Others                  Some unexpected errors happened.
+  @retval Others                  Other errors as indicated.
 **/
 EFI_STATUS
 IScsiConfigUpdateForm (
@@ -103,11 +128,11 @@ IScsiConfigUpdateForm (
 
   @retval EFI_SUCCESS              The iSCSI configuration form is initialized.
   @retval EFI_OUT_OF_RESOURCES     Failed to allocate memory.
-  @retval Others                   Some unexpected error happened.
+  @retval Others                   Other errors as indicated.
 **/
 EFI_STATUS
 IScsiConfigFormInit (
-  IN EFI_HANDLE  DriverBindingHandle
+  VOID
   );
 
 /**

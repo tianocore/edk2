@@ -58,7 +58,7 @@ PopUpInvalidNotify (
   Update the list of iSCSI devices the iSCSI driver is controlling.
   
   @retval EFI_SUCCESS            The callback successfully handled the action.
-  @retval Others                 Some unexpected errors happened.   
+  @retval Others                 Other errors as indicated.   
 **/
 EFI_STATUS
 IScsiUpdateDeviceList (
@@ -460,7 +460,7 @@ IScsiFormRouteConfig (
   @retval EFI_UNSUPPORTED        The specified Action is not supported by the
                                  callback.Currently not implemented.
   @retval EFI_INVALID_PARAMETERS Passing in wrong parameter. 
-  @retval Others                 Some unexpected error happened. 
+  @retval Others                 Other errors as indicated. 
 **/
 EFI_STATUS
 EFIAPI
@@ -737,7 +737,7 @@ IScsiFormCallback (
 
   @retval EFI_SUCCESS             The iSCSI configuration form is updated.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
-  @retval Others                  Some unexpected errors happened.
+  @retval Others                  Other errors as indicated.
 **/
 EFI_STATUS
 IScsiConfigUpdateForm (
@@ -891,11 +891,11 @@ IScsiConfigUpdateForm (
 
   @retval EFI_SUCCESS              The iSCSI configuration form is initialized.
   @retval EFI_OUT_OF_RESOURCES     Failed to allocate memory.
-  @retval Others                   Some unexpected error happened.
+  @retval Others                   Other errors as indicated.
 **/
 EFI_STATUS
 IScsiConfigFormInit (
-  IN EFI_HANDLE  DriverBindingHandle
+  VOID
   )
 {
   EFI_STATUS                  Status;

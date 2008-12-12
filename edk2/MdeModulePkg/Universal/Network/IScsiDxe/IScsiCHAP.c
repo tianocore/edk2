@@ -30,7 +30,7 @@ EFI_GUID  mIScsiCHAPAuthInfoGuid = ISCSI_CHAP_AUTH_INFO_GUID;
   @retval EFI_SUCCESS             The expected hash value was caculatedly successfully.
   @retval EFI_PROTOCOL_ERROR      The length of the secret should be at least the 
                                   length of the hash value for the hashing algorithm chosen.
-  @retval Others                  Some unexpected error happened.                                
+  @retval Others                  Other errors as indicated.                                
 **/
 EFI_STATUS
 IScsiCHAPCalculateResponse (
@@ -82,7 +82,7 @@ IScsiCHAPCalculateResponse (
 
   @retval EFI_SUCCESS               The response from target passed authentication.
   @retval EFI_SECURITY_VIOLATION    The response from target was not expected value.
-  @retval Others                    Some unexpected error happened.
+  @retval Others                    Other errors as indicated.
 **/
 EFI_STATUS
 IScsiCHAPAuthTarget (
@@ -123,7 +123,7 @@ IScsiCHAPAuthTarget (
   @retval EFI_SUCCESS          The Login Response passed the CHAP validation.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
   @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
-  @retval Others               Some unexpected error happend.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiCHAPOnRspReceived (

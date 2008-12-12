@@ -82,7 +82,7 @@ Tcp4IoDestroySocket (
   
   @retval EFI_SUCCESS          Connect to the other endpoint of the TCP socket successfully.
   @retval EFI_TIMEOUT          Failed to connect to the other endpoint of the TCP socket in the                               specified time period.
-  @retval Others               Some expected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 Tcp4IoConnect (
@@ -108,7 +108,7 @@ Tcp4IoReset (
   
   @retval EFI_SUCCESS          The packet is trasmitted.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-  @retval Others               Some expected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 Tcp4IoTransmit (
@@ -129,7 +129,7 @@ Tcp4IoTransmit (
   @retval EFI_OUT_OF_RESOURCES Failed to allocate momery.
   @retval EFI_TIMEOUT          Failed to receive the required amount of data in the
                                specified time period.
-  @retval Others               Some expected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 Tcp4IoReceive (

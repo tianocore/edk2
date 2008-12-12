@@ -657,7 +657,7 @@ IScsiDetatchConnection (
 
   @retval EFI_SUCCESS        The iSCSI connection is logged into the iSCSI target.
   @retval EFI_TIMEOUT        Timeout happened during the login procedure.
-  @retval Others             Some unexpected error happened.  
+  @retval Others             Other errors as indicated.  
 **/
 EFI_STATUS
 IScsiConnLogin (
@@ -695,7 +695,7 @@ IScsiDestroyConnection (
 
   @retval EFI_SUCCESS          The iSCSI session login procedure finished.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiSessionLogin (
@@ -724,7 +724,7 @@ IScsiSendLoginReq (
   @param[in]  Conn             The connection in the iSCSI login phase.
   
   @retval EFI_SUCCESS          The iSCSI login response PDU is received and processed.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiReceiveLoginRsp (
@@ -759,7 +759,7 @@ IScsiAddKeyValuePair (
   @param[in]  Conn The connection in the iSCSI login phase.
 
   @return The pointer to the net buffer containing the iSCSI login request built.
-  @retval Others    Some unexpected error happened.
+  @retval Others    Other errors as indicated.
 **/
 NET_BUF *
 IScsiPrepareLoginReq (
@@ -775,7 +775,7 @@ IScsiPrepareLoginReq (
   @retval EFI_SUCCESS        The iSCSI login response PDU is processed and all check are passed.
   @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
   @retval EFI_MEDIA_CHANGED  Target is redirected.
-  @retval Others             Some unexpected error happened.
+  @retval Others             Other errors as indicated.
 **/
 EFI_STATUS
 IScsiProcessLoginRsp (
@@ -795,7 +795,7 @@ IScsiProcessLoginRsp (
   @retval EFI_SUCCESS          The target address is updated.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
   @retval EFI_NOT_FOUND        The TargetAddress key is not found.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiUpdateTargetAddress (
@@ -831,7 +831,7 @@ IScsiFreeNbufList (
   @retval EFI_SUCCESS          An iSCSI pdu is received.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
   @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiReceivePdu (
@@ -896,7 +896,7 @@ IScsiPadSegment (
   @param[in]  Len  Length of the data segment.
 
   @return The key-value list.
-  @return NULL Some unexpected error happened.
+  @retval NULL Other errors as indicated.
 **/
 LIST_ENTRY *
 IScsiBuildKeyValueList (
@@ -955,9 +955,9 @@ IScsiNormalizeName (
                              
   @retval EFI_SUCCES           The SCSI command is executed and the result is updated to 
                                the Packet.
-  @retval EFI_DEVICE_ERROR     Some unexpected error happened.
+  @retval EFI_DEVICE_ERROR     Other errors as indicated.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiExecuteScsiCommand (
@@ -983,15 +983,15 @@ IScsiSessionReinstatement (
 /**
   Initialize some session parameters before login.
 
-  @param[in]  Session  The iSCSI session.
-  @param[in]  Recovery Whether the request is from a fresh new start or recovery.
+  @param[in, out]  Session  The iSCSI session.
+  @param[in]       Recovery Whether the request is from a fresh new start or recovery.
 **/
 VOID
 IScsiSessionInit (
-  IN ISCSI_SESSION  *Session,
-  IN BOOLEAN        Recovery
+  IN OUT ISCSI_SESSION  *Session,
+  IN BOOLEAN            Recovery
   );
-
+  
 /**
   Abort the iSCSI session, that is, reset all the connection and free the
   resources.

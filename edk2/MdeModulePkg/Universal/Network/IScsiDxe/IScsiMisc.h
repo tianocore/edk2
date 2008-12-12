@@ -50,7 +50,7 @@ struct _ISCSI_SESSION_CONFIG_DATA {
   @param[in]  SubnetMask The IPv4 subnet mask.
 
   @return The prefix length of the subnet mask.
-  @return 0 Some unexpected error happened.
+  @retval 0 Other errors as indicated.
 **/
 UINT8
 IScsiGetSubnetMaskPrefixLength (
@@ -171,7 +171,7 @@ IScsiBinToHex (
 
   @retval EFI_SUCCESS          The hexadecimal string is converted into a binary
                                encoded buffer.
-  @retval EFI_BUFFER_TOO_SMALL The binary buffer is too small to hold the converted data.s
+  @retval EFI_BUFFER_TOO_SMALL The binary buffer is too small to hold the converted data.
 **/
 EFI_STATUS
 IScsiHexToBin (
@@ -199,7 +199,7 @@ IScsiGenRandom (
   @param[in] Controller The handle of the controller.
 
   @return The iSCSI driver data created.
-  @return NULL Some unexpected error happened.
+  @retval NULL Other errors as indicated.
 **/
 ISCSI_DRIVER_DATA *
 IScsiCreateDriverData (
@@ -224,7 +224,7 @@ IScsiCleanDriverData (
 
   @retval EFI_SUCCESS   The configuration of this instance is got.
   @retval EFI_ABORTED   The operation was aborted.
-  @retval Others        Some unexpected error happened.
+  @retval Others        Other errors as indicated.
 **/
 EFI_STATUS
 IScsiGetConfigData (
@@ -237,7 +237,7 @@ IScsiGetConfigData (
   @param[in]  Private The iSCSI driver data.
 
   @return The updated device path.
-  @return NULL Some unexpected error happened.
+  @retval NULL Other errors as indicated.
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 IScsiGetTcpConnDevicePath (

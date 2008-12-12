@@ -88,7 +88,7 @@ typedef struct _ISCSI_CHAP_AUTH_DATA {
   @retval EFI_SUCCESS          The Login Response passed the CHAP validation.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
   @retval EFI_PROTOCOL_ERROR   Some kind of protocol error happend.
-  @retval Others               Some unexpected error happend.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiCHAPOnRspReceived (

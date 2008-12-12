@@ -49,7 +49,7 @@ typedef struct _ISCSI_ROOT_PATH_FIELD {
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
-  @retval Others                Some unexpected error happened.
+  @retval Others                Other errors as indicated.
 **/
 EFI_STATUS
 IScsiDoDhcp (

@@ -189,7 +189,7 @@ IScsiMapV4ToV6Addr (
   @param[in]  Controller  The handle of the controller.
 
   @return UINT16          The composited representation of the NIC PCI location.
-  @retval 0               Some unexpected error happened.
+  @retval 0               Other errors as indicated.
 **/
 UINT16
 IScsiGetNICPciLocation (
