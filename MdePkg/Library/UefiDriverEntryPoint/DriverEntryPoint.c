@@ -76,8 +76,8 @@ _DriverUnloadHandler (
   then return EFI_INCOMPATIBLE_VERSION.
 
 
-  @param  ImageHandle  ImageHandle of the loaded driver.
-  @param  SystemTable  Pointer to the EFI System Table.
+  @param  ImageHandle  The image handle of the DXE Driver, DXE Runtime Driver, DXE SMM Driver, or UEFI Driver.
+  @param  SystemTable  A pointer to the EFI System Table.
 
   @retval  EFI_SUCCESS               The DXE Driver, DXE Runtime Driver, DXE SMM Driver,
                                      or UEFI Driver exited normally.
@@ -146,8 +146,8 @@ _ModuleEntryPoint (
 
   This function is required to call _ModuleEntryPoint() passing in ImageHandle, and SystemTable.
 
-  @param  ImageHandle ImageHandle of the loaded driver.
-  @param  SystemTable Pointer to the EFI System Table.
+  @param  ImageHandle  The image handle of the DXE Driver, DXE Runtime Driver, DXE SMM Driver, or UEFI Driver.
+  @param  SystemTable  A pointer to the EFI System Table.
 
   @retval  EFI_SUCCESS               The DXE Driver, DXE Runtime Driver, DXE SMM Driver,
                                      or UEFI Driver exited normally.

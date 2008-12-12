@@ -16,7 +16,6 @@
 #define __UEFI_TCG_PLATFOMR_H__
 
 #include <IndustryStandard/Tpm12.h>
-
 #include <Uefi.h>
 
 //

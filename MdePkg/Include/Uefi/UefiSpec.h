@@ -328,7 +328,6 @@ EFI_STATUS
 // ConvertPointer DebugDisposition type.
 //
 #define EFI_OPTIONAL_PTR     0x00000001
-#define EFI_OPTIONAL_POINTER EFI_OPTIONAL_PTR
 
 /**
   Determines the new virtual address that is to be used on subsequent memory accesses.
@@ -1582,8 +1581,8 @@ typedef struct {
   UINT32            HeaderSize;
   ///
   /// Bit-mapped list describing the capsule attributes. The Flag values
-  /// of 0x0000 ¨C 0xFFFF are defined by CapsuleGuid. Flag values
-  /// of 0x10000 ¨C 0xFFFF0000 are defined by this specification
+  /// of 0x0000 - 0xFFFF are defined by CapsuleGuid. Flag values
+  /// of 0x10000 - 0xFFFF0000 are defined by this specification
   ///
   UINT32            Flags;
   ///

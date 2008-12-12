@@ -20,11 +20,10 @@
 /// located in LBA 1 (i.e., the second logical block).
 ///
 #define PRIMARY_PART_HEADER_LBA 1
-
 ///
 /// EFI Partition Table Signature: "EFI PART"
 /// 
-#define EFI_PTAB_HEADER_ID      0x5452415020494645ULL
+#define EFI_PTAB_HEADER_ID      SIGNATURE_64 ('E','F','I',' ','P','A','R','T')
 
 #pragma pack(1)
 
