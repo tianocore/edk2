@@ -163,9 +163,9 @@ UsbGetReportDescriptor (
 EFI_STATUS
 EFIAPI
 UsbGetProtocolRequest (
-  IN EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN UINT8                   Interface,
-  IN UINT8                   *Protocol
+  IN  EFI_USB_IO_PROTOCOL     *UsbIo,
+  IN  UINT8                   Interface,
+  OUT UINT8                   *Protocol
   )
 {
   UINT32                  Status;
@@ -450,12 +450,12 @@ UsbSetReportRequest (
 EFI_STATUS
 EFIAPI
 UsbGetReportRequest (
-  IN EFI_USB_IO_PROTOCOL     *UsbIo,
-  IN UINT8                   Interface,
-  IN UINT8                   ReportId,
-  IN UINT8                   ReportType,
-  IN UINT16                  ReportLen,
-  IN UINT8                   *Report
+  IN  EFI_USB_IO_PROTOCOL     *UsbIo,
+  IN  UINT8                   Interface,
+  IN  UINT8                   ReportId,
+  IN  UINT8                   ReportType,
+  IN  UINT16                  ReportLen,
+  OUT UINT8                   *Report
   )
 {
   UINT32                  Status;
