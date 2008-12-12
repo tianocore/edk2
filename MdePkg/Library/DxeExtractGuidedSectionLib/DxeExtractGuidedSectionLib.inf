@@ -42,5 +42,4 @@
   MemoryAllocationLib
   BaseMemoryLib
   DebugLib
-  PcdLib
 
