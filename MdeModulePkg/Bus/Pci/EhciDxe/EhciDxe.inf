@@ -1,8 +1,12 @@
 #/** @file
-# Component name for module Ehci
+#  
+#  Component Description File For EhciDxe Module.
+# 
+#  EhciDxe driver is responsible for managing the behavior of EHCI controller. 
+#  It implements the interfaces of monitoring the status of all ports and transferring 
+#  Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
 #
-# FIX ME!
-# Copyright (c) 2006, Intel Corporation. 
+#  Copyright (c) 2006 - 2008, Intel Corporation. 
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

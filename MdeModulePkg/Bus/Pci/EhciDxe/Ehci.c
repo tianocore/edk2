@@ -47,7 +47,7 @@ gEhciDriverBinding = {
 };
 
 /**
-  Retrieves the capablility of root hub ports.
+  Retrieves the capability of root hub ports.
 
   @param  This                  This EFI_USB_HC_PROTOCOL instance.
   @param  MaxSpeed              Max speed supported by the controller.
