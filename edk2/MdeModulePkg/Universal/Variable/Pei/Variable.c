@@ -60,13 +60,13 @@ PeimInitializeVariableServices (
 
 }
 
-
 /**
-  This code gets the pointer to the first variable memory pointer byte.
 
-  @param  VarStoreHeader   Pointer to the Variable Store Header.
+  Gets the pointer to the first variable header in given variable store area.
 
-  @return VARIABLE_HEADER* pointer to last unavailable Variable Header.
+  @param VarStoreHeader  Pointer to the Variable Store Header.
+
+  @return Pointer to the first variable header
 
 **/
 VARIABLE_HEADER *
@@ -137,9 +137,9 @@ NameSizeOfVariable (
   )
 {
   if (Variable->State    == (UINT8) (-1) ||
-      Variable->DataSize == (UINT32) -1 ||
-      Variable->NameSize == (UINT32) -1 ||
-      Variable->Attributes == (UINT32) -1) {
+      Variable->DataSize == (UINT32) (-1) ||
+      Variable->NameSize == (UINT32) (-1) ||
+      Variable->Attributes == (UINT32) (-1)) {
     return 0;
   }
   return (UINTN) Variable->NameSize;
@@ -159,10 +159,10 @@ DataSizeOfVariable (
   IN  VARIABLE_HEADER   *Variable
   )
 {
-  if (Variable->State    == (UINT8)  -1 ||
-      Variable->DataSize == (UINT32) -1 ||
-      Variable->NameSize == (UINT32) -1 ||
-      Variable->Attributes == (UINT32) -1) {
+  if (Variable->State    == (UINT8)  (-1) ||
+      Variable->DataSize == (UINT32) (-1) ||
+      Variable->NameSize == (UINT32) (-1) ||
+      Variable->Attributes == (UINT32) (-1)) {
     return 0;
   }
   return (UINTN) Variable->DataSize;
