@@ -1,5 +1,4 @@
 #/** @file
-# Component description file for DxeCore Memory Allocation Library
 #
 # Memory Allocation Library instance dedicated to DXE Core.
 # The implementation borrows the DxeCore Memory Allocation services as the primitive
