@@ -1,7 +1,5 @@
 #/** @file
 #  
-#  Component description file for DxeIpl module
-#  
 #  The responsibility of this module is to load the DXE Core from a Firmware Volume.
 #  This implementation is used to load a 32-bit DXE Core.
 #  
