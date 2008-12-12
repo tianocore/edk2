@@ -337,7 +337,7 @@ IScsiDriverBindingStop (
   @param[in]  ImageHandle       Handle that identifies the image to be unloaded.
 
   @retval EFI_SUCCESS           The image has been unloaded.
-  @retval Others                Some unexpected errors happened.
+  @retval Others                Other errors as indicated.
 **/
 EFI_STATUS
 EFIAPI
@@ -408,7 +408,7 @@ EfiIScsiUnload (
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_ACCESS_DENIED     EFI_ISCSI_INITIATOR_NAME_PROTOCOL was installed unexpectedly.
-  @retval Others                Some unexpected error happened.
+  @retval Others                Other errors as indicated.
 **/
 EFI_STATUS
 EFIAPI
@@ -472,7 +472,7 @@ IScsiDriverEntryPoint (
     //
     // Initialize the configuration form of iSCSI.
     //
-    Status = IScsiConfigFormInit (gIScsiDriverBinding.DriverBindingHandle);
+    Status = IScsiConfigFormInit ();
     if (EFI_ERROR (Status)) {
       gBS->UninstallMultipleProtocolInterfaces (
             ImageHandle,

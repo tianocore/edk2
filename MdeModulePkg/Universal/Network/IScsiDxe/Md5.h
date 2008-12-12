@@ -50,7 +50,7 @@ MD5Init (
   @param[in]  DataLen The length of data.
 
   @retval EFI_SUCCESS The transform is ok.
-  @retval Others      Some unexpected errors happened.
+  @retval Others      Other errors as indicated.
 **/
 EFI_STATUS
 MD5Update (
@@ -68,7 +68,7 @@ MD5Update (
   @param[out]  HashVal The final 128-bits output.
 
   @retval EFI_SUCCESS  The transform is ok.
-  @retval Others       Some unexpected errors happened.
+  @retval Others       Other errors as indicated.
 **/
 EFI_STATUS
 MD5Final (

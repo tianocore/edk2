@@ -116,7 +116,7 @@ IScsiUpdateCmdSN (
 
   @retval EFI_SUCCESS        The iSCSI connection is logged into the iSCSI target.
   @retval EFI_TIMEOUT        Timeout happened during the login procedure.
-  @retval Others             Some unexpected error happened.  
+  @retval Others             Other errors as indicated.  
 **/
 EFI_STATUS
 IScsiConnLogin (
@@ -276,7 +276,7 @@ IScsiDestroyConnection (
 
   @retval EFI_SUCCESS          The iSCSI session login procedure finished.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiSessionLogin (
@@ -366,7 +366,7 @@ IScsiSendLoginReq (
   @param[in]  Conn             The connection in the iSCSI login phase.
   
   @retval EFI_SUCCESS          The iSCSI login response PDU is received and processed.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiReceiveLoginRsp (
@@ -472,7 +472,7 @@ IScsiAddKeyValuePair (
   @param[in]  Conn The connection in the iSCSI login phase.
 
   @return The pointer to the net buffer containing the iSCSI login request built.
-  @retval Others    Some unexpected error happened.
+  @retval Others    Other errors as indicated.
 **/
 NET_BUF *
 IScsiPrepareLoginReq (
@@ -567,7 +567,7 @@ IScsiPrepareLoginReq (
   @retval EFI_SUCCESS        The iSCSI login response PDU is processed and all check are passed.
   @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
   @retval EFI_MEDIA_CHANGED  Target is redirected.
-  @retval Others             Some unexpected error happened.
+  @retval Others             Other errors as indicated.
 **/
 EFI_STATUS
 IScsiProcessLoginRsp (
@@ -776,7 +776,7 @@ IScsiProcessLoginRsp (
   @retval EFI_SUCCESS          The target address is updated.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
   @retval EFI_NOT_FOUND        The TargetAddress key is not found.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiUpdateTargetAddress (
@@ -906,7 +906,7 @@ IScsiNbufExtFree (
   @retval EFI_SUCCESS          An iSCSI pdu is received.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
   @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiReceivePdu (
@@ -1447,7 +1447,7 @@ IScsiPadSegment (
   @param[in]  Len  Length of the data segment.
 
   @return The key-value list.
-  @return NULL Some unexpected error happened.
+  @retval NULL Other errors as indicated.
 **/
 LIST_ENTRY *
 IScsiBuildKeyValueList (
@@ -1762,7 +1762,7 @@ IScsiNewDataSegment (
   @param[in]  Tcb    The tcb assocated with this SCSI command.
 
   @return The  created iSCSI SCSI command PDU.
-  @return NULL Some unexpected error happened.
+  @retval NULL Other errors as indicated.
 **/
 NET_BUF *
 IScsiNewScsiCmdPdu (
@@ -1936,7 +1936,7 @@ ON_EXIT:
   @param[in]  Lun    The LUN.
 
   @return The net buffer wrapping the Data Out PDU.
-  @return NULL Some unexpected error happened.
+  @retval NULL Other errors as indicated.
 **/
 NET_BUF *
 IScsiNewDataOutPdu (
@@ -2023,7 +2023,7 @@ IScsiNewDataOutPdu (
   @param[in]  Lun  The LUN the data will be sent to.
 
   @return A list of net buffers with each of them wraps an iSCSI SCSI Data Out PDU.
-  @return NULL Some unexpected error happened.
+  @retval NULL Other errors as indicated.
 **/
 LIST_ENTRY *
 IScsiGenerateDataOutPduSequence (
@@ -2097,7 +2097,7 @@ ON_EXIT:
 
   @retval EFI_SUCCES           The data is sent out to the LUN.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiSendDataOutPduSequence (
@@ -2149,7 +2149,7 @@ IScsiSendDataOutPduSequence (
                                actions are taken.
   @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol errror happened.
   @retval EFI_BAD_BUFFER_SIZEE The buffer was not the proper size for the request.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiOnDataInRcvd (
@@ -2234,7 +2234,7 @@ IScsiOnDataInRcvd (
 
   @retval EFI_SUCCES         The R2T PDU is valid and the solicited data is sent out.
   @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol errror happened.
-  @retval Others             Some unexpected error happened.
+  @retval Others             Other errors as indicated.
 **/
 EFI_STATUS
 IScsiOnR2TRcvd (
@@ -2298,7 +2298,7 @@ IScsiOnR2TRcvd (
   @retval EFI_SUCCES         The Response PDU is processed.
   @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol errror happened.
   @retval EFI_BAD_BUFFER_SIZEE The buffer was not the proper size for the request.
-  @retval Others             Some unexpected error happened.
+  @retval Others             Other errors as indicated.
 **/
 EFI_STATUS
 IScsiOnScsiRspRcvd (
@@ -2441,9 +2441,9 @@ IScsiOnNopInRcvd (
                              
   @retval EFI_SUCCES           The SCSI command is executed and the result is updated to 
                                the Packet.
-  @retval EFI_DEVICE_ERROR     Some unexpected error happened.
+  @retval EFI_DEVICE_ERROR     Session state was not as required.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
-  @retval Others               Some unexpected error happened.
+  @retval Others               Other errors as indicated.
 **/
 EFI_STATUS
 IScsiExecuteScsiCommand (
@@ -2654,13 +2654,13 @@ IScsiSessionReinstatement (
 /**
   Initialize some session parameters before login.
 
-  @param[in]  Session  The iSCSI session.
-  @param[in]  Recovery Whether the request is from a fresh new start or recovery.
+  @param[in, out]  Session  The iSCSI session.
+  @param[in]       Recovery Whether the request is from a fresh new start or recovery.
 **/
 VOID
 IScsiSessionInit (
-  IN ISCSI_SESSION  *Session,
-  IN BOOLEAN        Recovery
+  IN OUT ISCSI_SESSION  *Session,
+  IN BOOLEAN            Recovery
   )
 {
   UINT32  Random;

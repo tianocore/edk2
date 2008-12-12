@@ -258,7 +258,7 @@ IScsiComponentNameGetControllerName (
   @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the result.
   @retval EFI_INVALID_PARAMETER BufferSize or Buffer is NULL.
   @retval EFI_DEVICE_ERROR      The iSCSI initiator name could not be retrieved due to a hardware error.
-  @retval Others                Some unexpected error happened.
+  @retval Others                Other errors as indicated.
 **/
 EFI_STATUS
 EFIAPI
@@ -283,7 +283,7 @@ IScsiGetInitiatorName (
   @retval EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the data.
   @retval EFI_PROTOCOL_ERROR    Input iSCSI initiator name does not adhere to RFC 3720
                                 (and other related protocols)
-  @retval Others                Some unexpected error happened.
+  @retval Others                Other errors as indicated.
 **/
 EFI_STATUS
 EFIAPI

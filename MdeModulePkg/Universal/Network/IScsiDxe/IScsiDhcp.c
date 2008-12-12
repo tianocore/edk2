@@ -96,24 +96,18 @@ IScsiDhcpExtractRootPath (
     goto ON_EXIT;
   }
   
-  for (FieldIndex = RP_FIELD_IDX_SERVERNAME; FieldIndex != RP_FIELD_IDX_TARGETNAME; FieldIndex = RP_FIELD_IDX_TARGETNAME) {
-    if (Fields[FieldIndex].Str == NULL) {
-      Status = EFI_INVALID_PARAMETER;
-      goto ON_EXIT;
-    }
-  }
-  
-  FieldIndex = RP_FIELD_IDX_PROTOCOL;
-  if (Fields[RP_FIELD_IDX_PROTOCOL].Len > 1) {
+    if ((Fields[RP_FIELD_IDX_SERVERNAME].Str == NULL) ||
+      (Fields[RP_FIELD_IDX_TARGETNAME].Str == NULL) ||
+      (Fields[RP_FIELD_IDX_PROTOCOL].Len > 1)
+      ) {
+
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
-
   //
   // Get the IP address of the target.
   //
-  FieldIndex = RP_FIELD_IDX_SERVERNAME;
-  Field   = &Fields[FieldIndex];
+  Field   = &Fields[RP_FIELD_IDX_SERVERNAME];
   Status  = IScsiAsciiStrToIp (Field->Str, &ConfigNvData->TargetIp);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
@@ -121,8 +115,7 @@ IScsiDhcpExtractRootPath (
   //
   // Check the protocol type.
   //
-  FieldIndex = RP_FIELD_IDX_PROTOCOL;
-  Field = &Fields[FieldIndex];
+  Field = &Fields[RP_FIELD_IDX_PROTOCOL];
   if ((Field->Str != NULL) && ((*(Field->Str) - '0') != EFI_IP_PROTO_TCP)) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -130,8 +123,7 @@ IScsiDhcpExtractRootPath (
   //
   // Get the port of the iSCSI target.
   //
-  FieldIndex = RP_FIELD_IDX_PORT;
-  Field = &Fields[FieldIndex];
+  Field = &Fields[RP_FIELD_IDX_PORT];
   if (Field->Str != NULL) {
     ConfigNvData->TargetPort = (UINT16) AsciiStrDecimalToUintn (Field->Str);
   } else {
@@ -140,8 +132,7 @@ IScsiDhcpExtractRootPath (
   //
   // Get the LUN.
   //
-  FieldIndex = RP_FIELD_IDX_LUN;
-  Field = &Fields[FieldIndex];
+  Field = &Fields[RP_FIELD_IDX_LUN];
   if (Field->Str != NULL) {
     Status = IScsiAsciiStrToLun (Field->Str, ConfigNvData->BootLun);
     if (EFI_ERROR (Status)) {
@@ -153,8 +144,8 @@ IScsiDhcpExtractRootPath (
   //
   // Get the target iSCSI Name.
   //
-  FieldIndex = RP_FIELD_IDX_TARGETNAME;  
-  Field = &Fields[FieldIndex];
+  Field = &Fields[RP_FIELD_IDX_TARGETNAME];
+
   if (AsciiStrLen (Field->Str) > ISCSI_NAME_MAX_SIZE - 1) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -190,7 +181,7 @@ ON_EXIT:
   @retval EFI_SUCCESS      Either the DHCP OFFER is qualified or we're not intereseted
                            in the Dhcp4Event.
   @retval EFI_NOT_READY    The DHCP OFFER packet doesn't match our requirements.
-  @retval Others           Some unexpected error happened.
+  @retval Others           Other errors as indicated.
 **/
 EFI_STATUS
 IScsiDhcpSelectOffer (
@@ -261,7 +252,7 @@ IScsiDhcpSelectOffer (
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
   @retval EFI_NO_MAPPING        DHCP failed to acquire address and other information.
   @retval EFI_INVALID_PARAMETER The DHCP ACK's DNS option is mal-formatted.
-  @retval EFI_DEVICE_ERROR      Some unexpected error happened.
+  @retval EFI_DEVICE_ERROR      Other errors as indicated.
 **/
 EFI_STATUS
 IScsiParseDhcpAck (
@@ -352,7 +343,7 @@ IScsiParseDhcpAck (
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
-  @retval Others                Some unexpected error happened.
+  @retval Others                Other errors as indicated.
 **/
 EFI_STATUS
 IScsiDoDhcp (
