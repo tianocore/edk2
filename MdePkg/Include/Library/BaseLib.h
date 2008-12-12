@@ -4959,9 +4959,9 @@ AsmPalCall (
   IN UINT64  Arg3,
   IN UINT64  Arg4
   );
+#endif
 
-
-#elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 ///
 /// IA32 and x64 Specific Functions
 /// Byte packed structure for 16-bit Real Mode EFLAGS
