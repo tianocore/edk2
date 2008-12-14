@@ -31,7 +31,7 @@
 #
 
 [Sources.common]
-  reclaim.c
+  Reclaim.c
   Variable.c
   Variable.h
 
