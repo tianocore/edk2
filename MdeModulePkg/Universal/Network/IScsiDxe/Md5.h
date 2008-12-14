@@ -32,48 +32,48 @@ typedef struct _MD5_CTX {
 /**
   Initialize four 32-bits chaining variables and use them to do the Md5 transform.
 
-  @param[in]  Md5Ctx The data structure of Md5.
+  @param[out]  Md5Ctx The data structure of Md5.
 
   @retval EFI_SUCCESS Initialization is ok.
 **/
 EFI_STATUS
 MD5Init (
-  IN MD5_CTX  *Md5Ctx
+  OUT MD5_CTX  *Md5Ctx
   );
 
 /**
   the external interface of Md5 algorithm
 
-  @param[in]  Md5Ctx  The data structure of storing the original data
-                      segment and the final result.
-  @param[in]  Data    The data wanted to be transformed.
-  @param[in]  DataLen The length of data.
+  @param[in, out]  Md5Ctx  The data structure of storing the original data
+                           segment and the final result.
+  @param[in]       Data    The data wanted to be transformed.
+  @param[in]       DataLen The length of data.
 
   @retval EFI_SUCCESS The transform is ok.
   @retval Others      Other errors as indicated.
 **/
 EFI_STATUS
 MD5Update (
-  IN  MD5_CTX  *Md5Ctx,
-  IN  VOID     *Data,
-  IN  UINTN    DataLen
+  IN  OUT MD5_CTX  *Md5Ctx,
+  IN  VOID         *Data,
+  IN  UINTN        DataLen
   );
 
 /**
   Accumulate the MD5 value of every data segment and generate the finial
   result according to MD5 algorithm.
 
-  @param[in]   Md5Ctx  The data structure of storing the original data
-                       segment and the final result.
-  @param[out]  HashVal The final 128-bits output.
+  @param[in, out]   Md5Ctx  The data structure of storing the original data
+                            segment and the final result.
+  @param[out]      HashVal  The final 128-bits output.
 
   @retval EFI_SUCCESS  The transform is ok.
   @retval Others       Other errors as indicated.
 **/
 EFI_STATUS
 MD5Final (
-  IN  MD5_CTX  *Md5Ctx,
-  OUT UINT8    *HashVal
+  IN  OUT MD5_CTX  *Md5Ctx,
+  OUT UINT8        *HashVal
   );
 
 #endif 

@@ -267,8 +267,8 @@ Tcp4IoDestroySocket (
 /**
   Connect to the other endpoint of the TCP socket.
 
-  @param[in]  Tcp4Io  The Tcp4Io wrapping the TCP socket.
-  @param[in]  Timeout The time to wait for connection done.
+  @param[in, out]  Tcp4Io    The Tcp4Io wrapping the TCP socket.
+  @param[in]       Timeout   The time to wait for connection done.
   
   @retval EFI_SUCCESS          Connect to the other endpoint of the TCP socket successfully.
   @retval EFI_TIMEOUT          Failed to connect to the other endpoint of the TCP socket in the                               specified time period.
@@ -276,8 +276,8 @@ Tcp4IoDestroySocket (
 **/
 EFI_STATUS
 Tcp4IoConnect (
-  IN TCP4_IO    *Tcp4Io,
-  IN EFI_EVENT  Timeout
+  IN OUT TCP4_IO    *Tcp4Io,
+  IN EFI_EVENT      Timeout
   )
 {
   EFI_TCP4_PROTOCOL *Tcp4;
@@ -306,11 +306,11 @@ Tcp4IoConnect (
 /**
   Reset the socket.
 
-  @param[in]  Tcp4Io The Tcp4Io wrapping the TCP socket.
+  @param[in, out]  Tcp4Io The Tcp4Io wrapping the TCP socket.
 **/
 VOID
 Tcp4IoReset (
-  IN TCP4_IO  *Tcp4Io
+  IN OUT TCP4_IO  *Tcp4Io
   )
 {
   EFI_STATUS        Status;

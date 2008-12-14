@@ -17,9 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Extract the Root Path option and get the required target information.
 
-  @param[in]   RootPath         The RootPath.
-  @param[in]   Length           Length of the RootPath option payload.
-  @param[in]   ConfigNvData     The iSCSI session configuration data read from nonvolatile device.
+  @param[in]        RootPath         The RootPath.
+  @param[in]        Length           Length of the RootPath option payload.
+  @param[in, out]   ConfigNvData     The iSCSI session configuration data read from nonvolatile device.
 
   @retval EFI_SUCCESS           All required information is extracted from the RootPath option.
   @retval EFI_NOT_FOUND         The RootPath is not an iSCSI RootPath.
@@ -28,9 +28,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 IScsiDhcpExtractRootPath (
-  IN CHAR8                        *RootPath,
-  IN UINT8                        Length,
-  IN ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData
+  IN      CHAR8                        *RootPath,
+  IN      UINT8                        Length,
+  IN OUT  ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData
   )
 {
   EFI_STATUS            Status;
@@ -246,8 +246,8 @@ IScsiDhcpSelectOffer (
 /**
   Parse the DHCP ACK to get the address configuration and DNS information.
 
-  @param[in]   Dhcp4            The DHCP4 protocol.
-  @param[in]   ConfigData       The session configuration data.
+  @param[in]       Dhcp4        The DHCP4 protocol.
+  @param[in, out]  ConfigData   The session configuration data.
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
   @retval EFI_NO_MAPPING        DHCP failed to acquire address and other information.
@@ -256,8 +256,8 @@ IScsiDhcpSelectOffer (
 **/
 EFI_STATUS
 IScsiParseDhcpAck (
-  IN EFI_DHCP4_PROTOCOL         *Dhcp4,
-  IN ISCSI_SESSION_CONFIG_DATA  *ConfigData
+  IN      EFI_DHCP4_PROTOCOL         *Dhcp4,
+  IN OUT  ISCSI_SESSION_CONFIG_DATA  *ConfigData
   )
 {
   EFI_STATUS              Status;
@@ -337,9 +337,9 @@ IScsiParseDhcpAck (
 /**
   Parse the DHCP ACK to get the address configuration and DNS information.
   
-  @param[in]   Image            The handle of the driver image.
-  @param[in]   Controller       The handle of the controller;
-  @param[in]   ConfigData       The session configuration data.
+  @param[in]       Image            The handle of the driver image.
+  @param[in]       Controller       The handle of the controller;
+  @param[in, out]  ConfigData       The session configuration data.
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
@@ -347,9 +347,9 @@ IScsiParseDhcpAck (
 **/
 EFI_STATUS
 IScsiDoDhcp (
-  IN EFI_HANDLE                 Image,
-  IN EFI_HANDLE                 Controller,
-  IN ISCSI_SESSION_CONFIG_DATA  *ConfigData
+  IN     EFI_HANDLE                 Image,
+  IN     EFI_HANDLE                 Controller,
+  IN OUT ISCSI_SESSION_CONFIG_DATA  *ConfigData
   )
 {
   EFI_HANDLE              Dhcp4Handle;

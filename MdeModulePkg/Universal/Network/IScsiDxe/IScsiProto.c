@@ -19,13 +19,13 @@ UINT32 mDataSegPad = 0;
 /**
   Attach the iSCSI connection to the iSCSI session. 
 
-  @param[in]  Session The iSCSI session.
-  @param[in]  Conn    The iSCSI connection.
+  @param[in, out]  Session The iSCSI session.
+  @param[in, out]  Conn    The iSCSI connection.
 **/
 VOID
 IScsiAttatchConnection (
-  IN ISCSI_SESSION     *Session,
-  IN ISCSI_CONNECTION  *Conn
+  IN OUT ISCSI_SESSION     *Session,
+  IN OUT ISCSI_CONNECTION  *Conn
   )
 {
   InsertTailList (&Session->Conns, &Conn->Link);
@@ -36,11 +36,11 @@ IScsiAttatchConnection (
 /**
   Detach the iSCSI connection from the session it belongs to. 
 
-  @param[in]  Conn The iSCSI connection.
+  @param[in, out]  Conn The iSCSI connection.
 **/
 VOID
 IScsiDetatchConnection (
-  IN ISCSI_CONNECTION  *Conn
+  IN OUT ISCSI_CONNECTION  *Conn
   )
 {
   RemoveEntryList (&Conn->Link);
@@ -51,8 +51,8 @@ IScsiDetatchConnection (
 /**
   Check the sequence number according to RFC3720. 
 
-  @param[in]  ExpSN   The currently expected sequence number.
-  @param[in]  NewSN  The sequence number to check.
+  @param[in, out]  ExpSN   The currently expected sequence number.
+  @param[in]       NewSN   The sequence number to check.
 
   @retval EFI_SUCCESS         The check passed and the ExpSN is increased.
   @retval EFI_NOT_READY       Response was sent due to a retransmission request.
@@ -60,8 +60,8 @@ IScsiDetatchConnection (
 **/
 EFI_STATUS
 IScsiCheckSN (
-  IN UINT32  *ExpSN,
-  IN UINT32  NewSN
+  IN OUT UINT32  *ExpSN,
+  IN UINT32      NewSN
   )
 {
   if (!ISCSI_SEQ_EQ (NewSN, *ExpSN)) {
@@ -85,15 +85,15 @@ IScsiCheckSN (
 /**
   Update the sequence numbers for the iSCSI command.
 
-  @param[in]  Session  The iSCSI session.
-  @param[in]  MaxCmdSN Maximum CmdSN from the target.
-  @param[in]  ExpCmdSN Next expected CmdSN from the target.
+  @param[in, out]  Session  The iSCSI session.
+  @param[in]       MaxCmdSN Maximum CmdSN from the target.
+  @param[in]       ExpCmdSN Next expected CmdSN from the target.
 **/
 VOID
 IScsiUpdateCmdSN (
-  IN ISCSI_SESSION  *Session,
-  IN UINT32         MaxCmdSN,
-  IN UINT32         ExpCmdSN
+  IN OUT ISCSI_SESSION  *Session,
+  IN UINT32             MaxCmdSN,
+  IN UINT32             ExpCmdSN
   )
 {
   if (ISCSI_SEQ_LT (MaxCmdSN, ExpCmdSN - 1)) {
@@ -112,7 +112,7 @@ IScsiUpdateCmdSN (
 /**
   This function does the iSCSI connection login.
 
-  @param[in]  Conn           The iSCSI connection to login.
+  @param[in, out]  Conn      The iSCSI connection to login.
 
   @retval EFI_SUCCESS        The iSCSI connection is logged into the iSCSI target.
   @retval EFI_TIMEOUT        Timeout happened during the login procedure.
@@ -120,7 +120,7 @@ IScsiUpdateCmdSN (
 **/
 EFI_STATUS
 IScsiConnLogin (
-  IN ISCSI_CONNECTION  *Conn
+  IN OUT ISCSI_CONNECTION  *Conn
   )
 {
   EFI_STATUS  Status;
@@ -164,11 +164,11 @@ IScsiConnLogin (
 /**
   Reset the iSCSI connection.
 
-  @param[in]  Conn The iSCSI connection to reset.
+  @param[in, out]  Conn The iSCSI connection to reset.
 **/
 VOID
 IScsiConnReset (
-  IN ISCSI_CONNECTION  *Conn
+  IN OUT ISCSI_CONNECTION  *Conn
   )
 {
   Tcp4IoReset (&Conn->Tcp4Io);
@@ -398,10 +398,10 @@ IScsiReceiveLoginRsp (
   The DataSegmentLength and the actual size of the net buffer containing this PDU will be
   updated.
 
-  @param[in]  Pdu              The iSCSI PDU whose data segment the key-value pair will
+  @param[in, out]  Pdu         The iSCSI PDU whose data segment the key-value pair will
                                be added to.
-  @param[in]  Key              The key name string.
-  @param[in]  Value            The value string.
+  @param[in]       Key         The key name string.
+  @param[in]       Value       The value string.
 
   @retval EFI_SUCCESS          The key-valu pair is added to the PDU's datasegment and
                                the correspondence length fields are updated.
@@ -410,7 +410,7 @@ IScsiReceiveLoginRsp (
 **/
 EFI_STATUS
 IScsiAddKeyValuePair (
-  IN NET_BUF          *Pdu,
+  IN OUT NET_BUF      *Pdu,
   IN CHAR8            *Key,
   IN CHAR8            *Value
   )
@@ -469,14 +469,14 @@ IScsiAddKeyValuePair (
 /**
   Prepare the iSCSI login request to be sent according to the current login status.
 
-  @param[in]  Conn The connection in the iSCSI login phase.
+  @param[in, out]  Conn The connection in the iSCSI login phase.
 
   @return The pointer to the net buffer containing the iSCSI login request built.
   @retval Others    Other errors as indicated.
 **/
 NET_BUF *
 IScsiPrepareLoginReq (
-  IN ISCSI_CONNECTION  *Conn
+  IN OUT ISCSI_CONNECTION  *Conn
   )
 {
   ISCSI_SESSION       *Session;
@@ -561,8 +561,8 @@ IScsiPrepareLoginReq (
 /**
   Process the iSCSI Login Response.
 
-  @param[in]  Conn The connection on which the iSCSI login response is received.
-  @param[in]  Pdu  The iSCSI login response PDU.
+  @param[in, out]  Conn The connection on which the iSCSI login response is received.
+  @param[in, out]  Pdu  The iSCSI login response PDU.
 
   @retval EFI_SUCCESS        The iSCSI login response PDU is processed and all check are passed.
   @retval EFI_PROTOCOL_ERROR Some kind of iSCSI protocol error happened.
@@ -571,8 +571,8 @@ IScsiPrepareLoginReq (
 **/
 EFI_STATUS
 IScsiProcessLoginRsp (
-  IN ISCSI_CONNECTION  *Conn,
-  IN NET_BUF           *Pdu
+  IN OUT ISCSI_CONNECTION  *Conn,
+  IN OUT NET_BUF           *Pdu
   )
 {
   EFI_STATUS            Status;
@@ -722,14 +722,14 @@ IScsiProcessLoginRsp (
     //
     // In security negotiation stage, let CHAP module handle it.
     //
-    Status = IScsiCHAPOnRspReceived (Conn, Transit);
+    Status = IScsiCHAPOnRspReceived (Conn);
     break;
 
   case ISCSI_LOGIN_OPERATIONAL_NEGOTIATION:
     //
     // Response received with negotiation resonse on iSCSI parameters, check them.
     //
-    Status = IScsiCheckOpParams (Conn, Transit);
+    Status = IScsiCheckOpParams (Conn);
     break;
 
   default:
@@ -768,10 +768,10 @@ IScsiProcessLoginRsp (
   Updated the target information according the data received in the iSCSI
   login response with an target redirection status.
 
-  @param[in] Session          The iSCSI session.
-  @param[in] Data             The data segment which should contain the
-                              TargetAddress key-value list.
-  @param[in] Len              Length of the data.
+  @param[in, out] Session      The iSCSI session.
+  @param[in]      Data         The data segment which should contain the
+                               TargetAddress key-value list.
+  @param[in]      Len          Length of the data.
   
   @retval EFI_SUCCESS          The target address is updated.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
@@ -780,9 +780,9 @@ IScsiProcessLoginRsp (
 **/
 EFI_STATUS
 IScsiUpdateTargetAddress (
-  IN ISCSI_SESSION  *Session,
-  IN CHAR8          *Data,
-  IN UINT32         Len
+  IN OUT ISCSI_SESSION  *Session,
+  IN CHAR8              *Data,
+  IN UINT32             Len
   )
 {
   LIST_ENTRY      *KeyValueList;
@@ -1091,8 +1091,7 @@ ON_EXIT:
 /**
   Check and get the result of the prameter negotiation.
 
-  @param[in]  Conn          The connection in iSCSI login.
-  @param[in]  Transit       Whether need transit.
+  @param[in, out]  Conn          The connection in iSCSI login.
 
   @retval EFI_SUCCESS          The parmeter check is passed and negotiation is finished.
   @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error happened.
@@ -1100,8 +1099,7 @@ ON_EXIT:
 **/
 EFI_STATUS
 IScsiCheckOpParams (
-  IN ISCSI_CONNECTION  *Conn,
-  IN BOOLEAN           Transit
+  IN OUT ISCSI_CONNECTION  *Conn
   )
 {
   EFI_STATUS      Status;
@@ -1346,15 +1344,15 @@ ON_ERROR:
 /**
   Fill the oprational prameters.
 
-  @param[in]  Conn            The connection in iSCSI login.
-  @param[in]  Pdu             The iSCSI login request PDU to fill the parameters.
+  @param[in]       Conn        The connection in iSCSI login.
+  @param[in, out]  Pdu         The iSCSI login request PDU to fill the parameters.
 
   @retval EFI_SUCCESS          The parmeters are filled into the iSCSI login request PDU.
 **/
 EFI_STATUS
 IScsiFillOpParams (
   IN ISCSI_CONNECTION  *Conn,
-  IN NET_BUF           *Pdu
+  IN OUT NET_BUF       *Pdu
   )
 {
   ISCSI_SESSION *Session;
@@ -1410,8 +1408,8 @@ IScsiFillOpParams (
 /**
   Pad the iSCSI AHS or data segment to an integer number of 4 byte words.
 
-  @param[in]   Pdu             The iSCSI pdu which contains segments to pad.
-  @param[in]   Len             The length of the last semgnet in the PDU.
+  @param[in, out]  Pdu         The iSCSI pdu which contains segments to pad.
+  @param[in]       Len         The length of the last semgnet in the PDU.
 
   @retval EFI_SUCCESS          The segment is padded or no need to pad it.
   @retval EFI_OUT_OF_RESOURCES There is not enough remaining free space to add the
@@ -1419,8 +1417,8 @@ IScsiFillOpParams (
 **/
 EFI_STATUS
 IScsiPadSegment (
-  IN NET_BUF  *Pdu,
-  IN UINT32   Len
+  IN OUT NET_BUF  *Pdu,
+  IN UINT32       Len
   )
 {
   UINT32  PadLen;
@@ -1511,14 +1509,14 @@ ON_ERROR:
   Get the value string by the key name from the key-value list. If found,
   the key-value entry will be removed from the list.
 
-  @param[in]  KeyValueList The key-value list.
-  @param[in]  Key          The key name to find.
+  @param[in, out]  KeyValueList  The key-value list.
+  @param[in]       Key           The key name to find.
 
   @return The value string.
 **/
 CHAR8 *
 IScsiGetValueByKeyFromList (
-  IN LIST_ENTRY      *KeyValueList,
+  IN OUT LIST_ENTRY  *KeyValueList,
   IN CHAR8           *Key
   )
 {
@@ -1569,16 +1567,16 @@ IScsiFreeKeyValueList (
 /**
   Normalize the iSCSI name according to RFC.
 
-  @param[in]  Name          The iSCSI name.
-  @param[in]  Len           length of the iSCSI name.
+  @param[in, out]  Name       The iSCSI name.
+  @param[in]       Len        length of the iSCSI name.
 
   @retval EFI_SUCCESS        The iSCSI name is valid and normalized.
   @retval EFI_PROTOCOL_ERROR The iSCSI name is mal-formatted or not in the IQN format.
 **/
 EFI_STATUS
 IScsiNormalizeName (
-  IN CHAR8  *Name,
-  IN UINTN  Len
+  IN OUT CHAR8  *Name,
+  IN UINTN      Len
   )
 {
   UINTN Index;
@@ -2621,14 +2619,14 @@ ON_EXIT:
 /**
   Reinstate the session on some error.
 
-  @param[in]  Private The iSCSI driver data.
+  @param[in, out]  Private The iSCSI driver data.
 
   @retval EFI_SUCCES  The session is reinstated from some error.
   @retval Other       Reinstatement failed.
 **/
 EFI_STATUS
 IScsiSessionReinstatement (
-  IN ISCSI_DRIVER_DATA  *Private
+  IN OUT ISCSI_DRIVER_DATA  *Private
   )
 {
   ISCSI_SESSION *Session;
@@ -2706,13 +2704,13 @@ IScsiSessionInit (
   Abort the iSCSI session, that is, reset all the connection and free the
   resources.
 
-  @param[in]  Session The iSCSI session.
+  @param[in, out]  Session The iSCSI session.
 
   @retval EFI_SUCCES  The session is aborted.
 **/
 EFI_STATUS
 IScsiSessionAbort (
-  IN ISCSI_SESSION  *Session
+  IN OUT ISCSI_SESSION  *Session
   )
 {
   ISCSI_DRIVER_DATA *Private;

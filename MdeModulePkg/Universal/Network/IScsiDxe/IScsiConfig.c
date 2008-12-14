@@ -226,13 +226,13 @@ IScsiGetConfigFormEntryByIndex (
 /**
   Convert the iSCSI configuration data into the IFR data.
 
-  @param[in]  ConfigFormEntry The iSCSI configuration form entry.
-  @param[in]  IfrNvData       The IFR nv data.
+  @param[in]   ConfigFormEntry The iSCSI configuration form entry.
+  @param[out]  IfrNvData       The IFR nv data.
 **/
 VOID
 IScsiConvertDeviceConfigDataToIfrNvData (
-  IN ISCSI_CONFIG_FORM_ENTRY  *ConfigFormEntry,
-  IN ISCSI_CONFIG_IFR_NVDATA  *IfrNvData
+  IN ISCSI_CONFIG_FORM_ENTRY      *ConfigFormEntry,
+  OUT ISCSI_CONFIG_IFR_NVDATA     *IfrNvData
   )
 {
   ISCSI_SESSION_CONFIG_NVDATA   *SessionConfigData;
@@ -466,7 +466,7 @@ EFI_STATUS
 EFIAPI
 IScsiFormCallback (
   IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
+  IN  EFI_BROWSER_ACTION                     *Action,
   IN  EFI_QUESTION_ID                        QuestionId,
   IN  UINT8                                  Type,
   IN  EFI_IFR_TYPE_VALUE                     *Value,

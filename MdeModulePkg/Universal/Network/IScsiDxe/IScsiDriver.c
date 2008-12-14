@@ -249,7 +249,7 @@ IScsiDriverBindingStop (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN UINTN                        NumberOfChildren,
-  IN EFI_HANDLE                   *ChildHandleBuffer
+  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
   EFI_HANDLE                      IScsiController;
