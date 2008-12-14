@@ -518,31 +518,31 @@ DriverCallback (
                       &PrivateData->Configuration
                       );
       CreateOneOfOpCode (
-        0x8001,                           // Question ID (or call it "key")
-        CONFIGURATION_VARSTORE_ID,        // VarStore ID
-        DYNAMIC_ONE_OF_VAR_OFFSET,        // Offset in Buffer Storage
-        STRING_TOKEN (STR_ONE_OF_PROMPT), // Question prompt text
-        STRING_TOKEN (STR_ONE_OF_HELP),   // Question help text
-        EFI_IFR_FLAG_CALLBACK,            // Question flag
-        EFI_IFR_NUMERIC_SIZE_1,           // Data type of Question Value
-        IfrOptionList,                    // Option list
-        2,                                // Number of options in Option list
-        &UpdateData                       // Container for dynamic created opcodes
+        0x8001,                                    // Question ID (or call it "key")
+        CONFIGURATION_VARSTORE_ID,                 // VarStore ID
+        (UINT16) DYNAMIC_ONE_OF_VAR_OFFSET,        // Offset in Buffer Storage
+        STRING_TOKEN (STR_ONE_OF_PROMPT),          // Question prompt text
+        STRING_TOKEN (STR_ONE_OF_HELP),            // Question help text
+        EFI_IFR_FLAG_CALLBACK,                     // Question flag
+        EFI_IFR_NUMERIC_SIZE_1,                    // Data type of Question Value
+        IfrOptionList,                             // Option list
+        2,                                         // Number of options in Option list
+        &UpdateData                                // Container for dynamic created opcodes
         );
     
       CreateOrderedListOpCode (
-        0x8002,                           // Question ID
-        CONFIGURATION_VARSTORE_ID,        // VarStore ID
-        DYNAMIC_ORDERED_LIST_VAR_OFFSET,  // Offset in Buffer Storage
-        STRING_TOKEN (STR_BOOT_OPTIONS),  // Question prompt text
-        STRING_TOKEN (STR_BOOT_OPTIONS),  // Question help text
-        EFI_IFR_FLAG_RESET_REQUIRED,      // Question flag
-        0,                                // Ordered list flag, e.g. EFI_IFR_UNIQUE_SET
-        EFI_IFR_NUMERIC_SIZE_1,           // Data type of Question value
-        5,                                // Maximum container
-        IfrOptionList,                    // Option list
-        2,                                // Number of options in Option list
-        &UpdateData                       // Container for dynamic created opcodes
+        0x8002,                                    // Question ID
+        CONFIGURATION_VARSTORE_ID,                 // VarStore ID
+        (UINT16) DYNAMIC_ORDERED_LIST_VAR_OFFSET,  // Offset in Buffer Storage
+        STRING_TOKEN (STR_BOOT_OPTIONS),           // Question prompt text
+        STRING_TOKEN (STR_BOOT_OPTIONS),           // Question help text
+        EFI_IFR_FLAG_RESET_REQUIRED,               // Question flag
+        0,                                         // Ordered list flag, e.g. EFI_IFR_UNIQUE_SET
+        EFI_IFR_NUMERIC_SIZE_1,                    // Data type of Question value
+        5,                                         // Maximum container
+        IfrOptionList,                             // Option list
+        2,                                         // Number of options in Option list
+        &UpdateData                                // Container for dynamic created opcodes
         );
     
       CreateGotoOpCode (
