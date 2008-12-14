@@ -17,11 +17,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Initialize the header of the iSCSI Boot Firmware Table.
   
-  @param[in]  Header The header of the iSCSI Boot Firmware Table.
+  @param[out]  Header The header of the iSCSI Boot Firmware Table.
 **/
 VOID
 IScsiInitIbfTableHeader (
-  IN EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Header
+  OUT EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Header
   )
 {
   ZeroMem (Header, sizeof (EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER));

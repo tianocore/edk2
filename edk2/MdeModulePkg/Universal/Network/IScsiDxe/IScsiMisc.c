@@ -298,7 +298,7 @@ IScsiAsciiStrToIp (
 
   Index = 0;
 
-  while (*Str) {
+  while (*Str != 0) {
 
     if (Index > 3) {
       return EFI_INVALID_PARAMETER;

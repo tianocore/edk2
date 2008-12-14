@@ -43,9 +43,9 @@ typedef struct _ISCSI_ROOT_PATH_FIELD {
 /**
   Parse the DHCP ACK to get the address configuration and DNS information.
   
-  @param[in]   Image            The handle of the driver image.
-  @param[in]   Controller       The handle of the controller;
-  @param[in]   ConfigData       The session configuration data.
+  @param[in]       Image            The handle of the driver image.
+  @param[in]       Controller       The handle of the controller;
+  @param[in, out]  ConfigData       The session configuration data.
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
@@ -53,9 +53,9 @@ typedef struct _ISCSI_ROOT_PATH_FIELD {
 **/
 EFI_STATUS
 IScsiDoDhcp (
-  IN EFI_HANDLE                 Image,
-  IN EFI_HANDLE                 Controller,
-  IN ISCSI_SESSION_CONFIG_DATA  *ConfigData
+  IN     EFI_HANDLE                 Image,
+  IN     EFI_HANDLE                 Controller,
+  IN OUT ISCSI_SESSION_CONFIG_DATA  *ConfigData
   );
 
 #endif

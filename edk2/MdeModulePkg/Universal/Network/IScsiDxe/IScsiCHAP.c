@@ -118,7 +118,6 @@ IScsiCHAPAuthTarget (
   negotiation stage.
   
   @param[in] Conn             The iSCSI connection.
-  @param[in] Transit          The transit flag of the latest iSCSI Login Response.
 
   @retval EFI_SUCCESS          The Login Response passed the CHAP validation.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
@@ -127,8 +126,7 @@ IScsiCHAPAuthTarget (
 **/
 EFI_STATUS
 IScsiCHAPOnRspReceived (
-  IN ISCSI_CONNECTION  *Conn,
-  IN BOOLEAN           Transit
+  IN ISCSI_CONNECTION  *Conn
   )
 {
   EFI_STATUS                Status;
@@ -306,8 +304,8 @@ ON_EXIT:
   This function fills the CHAP authentication information into the login PDU
   during the security negotiation stage in the iSCSI connection login.
 
-  @param[in]  Conn             The iSCSI connection.
-  @param[in]  Pdu              The PDU to send out.
+  @param[in]       Conn        The iSCSI connection.
+  @param[in, out]  Pdu         The PDU to send out.
 
   @retval EFI_SUCCESS          All check passed and the phase-related CHAP
                                authentication info is filled into the iSCSI PDU.
@@ -316,8 +314,8 @@ ON_EXIT:
 **/
 EFI_STATUS
 IScsiCHAPToSendReq (
-  IN ISCSI_CONNECTION  *Conn,
-  IN NET_BUF           *Pdu
+  IN      ISCSI_CONNECTION  *Conn,
+  IN OUT  NET_BUF           *Pdu
   )
 {
   EFI_STATUS                Status;

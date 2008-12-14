@@ -89,9 +89,9 @@ CONST UINT8 Md5HashPadding[] =
 **/
 UINT32 
 Tf1 (
-  UINT32 A, 
-  UINT32 B, 
-  UINT32 C
+  IN UINT32 A, 
+  IN UINT32 B, 
+  IN UINT32 C
   )
 {
   return (A & B) | (~A & C);
@@ -109,9 +109,9 @@ Tf1 (
 **/
 UINT32 
 Tf2 (
-  UINT32 A, 
-  UINT32 B, 
-  UINT32 C
+  IN UINT32 A, 
+  IN UINT32 B, 
+  IN UINT32 C
   )
 {
   return (A & C) | (B & ~C);
@@ -129,9 +129,9 @@ Tf2 (
 **/
 UINT32 
 Tf3 (
-  UINT32 A, 
-  UINT32 B, 
-  UINT32 C
+  IN UINT32 A, 
+  IN UINT32 B, 
+  IN UINT32 C
   )
 {
   return A ^ B ^ C;
@@ -149,9 +149,9 @@ Tf3 (
 **/
 UINT32 
 Tf4 (
-  UINT32 A, 
-  UINT32 B, 
-  UINT32 C
+  IN UINT32 A, 
+  IN UINT32 B, 
+  IN UINT32 C
   )
 {
   return B ^ (A | ~C);
@@ -175,11 +175,11 @@ CONST MD5_TRANSFORM_FUNC Md5_F[] = {
 /**
   Perform the MD5 transform on 64 bytes data segment.
 
-  @param[in]  Md5Ctx  It includes the data segment for Md5 transform.
+  @param[in, out]  Md5Ctx  It includes the data segment for Md5 transform.
 **/
 VOID
 MD5Transform (
-  IN MD5_CTX  *Md5Ctx
+  IN OUT MD5_CTX  *Md5Ctx
   )
 {
   UINT32  Index1;
@@ -224,14 +224,14 @@ MD5Transform (
   All of Md5 code generated for the sequential 64-bytes data segaments are be
   accumulated in MD5Final() function.
 
-  @param[in]  Md5Ctx  The data structure of storing the original data
-                      segment and the final result.
-  @param[in]  Data    The data wanted to be transformed.
-  @param[in]  DataLen The length of data.
+  @param[in, out]  Md5Ctx  The data structure of storing the original data
+                           segment and the final result.
+  @param[in]       Data    The data wanted to be transformed.
+  @param[in]       DataLen The length of data.
 **/
 VOID
 MD5UpdateBlock (
-  IN MD5_CTX      *Md5Ctx,
+  IN OUT MD5_CTX  *Md5Ctx,
   IN CONST UINT8  *Data,
   IN       UINTN  DataLen
   )
@@ -254,13 +254,13 @@ MD5UpdateBlock (
 /**
   Initialize four 32-bits chaining variables and use them to do the Md5 transform.
 
-  @param[in]  Md5Ctx The data structure of Md5.
+  @param[out]  Md5Ctx The data structure of Md5.
 
   @retval EFI_SUCCESS Initialization is ok.
 **/
 EFI_STATUS
 MD5Init (
-  IN MD5_CTX  *Md5Ctx
+  OUT MD5_CTX  *Md5Ctx
   )
 {
   ZeroMem (Md5Ctx, sizeof (*Md5Ctx));
@@ -279,19 +279,19 @@ MD5Init (
 /**
   the external interface of Md5 algorithm
 
-  @param[in]  Md5Ctx  The data structure of storing the original data
-                      segment and the final result.
-  @param[in]  Data    The data wanted to be transformed.
-  @param[in]  DataLen The length of data.
+  @param[in, out]  Md5Ctx  The data structure of storing the original data
+                           segment and the final result.
+  @param[in]       Data    The data wanted to be transformed.
+  @param[in]       DataLen The length of data.
 
   @retval EFI_SUCCESS The transform is ok.
   @retval Others      Other errors as indicated.
 **/
 EFI_STATUS
 MD5Update (
-  IN  MD5_CTX  *Md5Ctx,
-  IN  VOID     *Data,
-  IN  UINTN    DataLen
+  IN  OUT MD5_CTX  *Md5Ctx,
+  IN  VOID         *Data,
+  IN  UINTN        DataLen
   )
 {
   if (EFI_ERROR (Md5Ctx->Status)) {
@@ -307,17 +307,17 @@ MD5Update (
   Accumulate the MD5 value of every data segment and generate the finial
   result according to MD5 algorithm.
 
-  @param[in]   Md5Ctx  The data structure of storing the original data
-                       segment and the final result.
-  @param[out]  HashVal The final 128-bits output.
+  @param[in, out]   Md5Ctx  The data structure of storing the original data
+                            segment and the final result.
+  @param[out]      HashVal  The final 128-bits output.
 
   @retval EFI_SUCCESS  The transform is ok.
   @retval Others       Other errors as indicated.
 **/
 EFI_STATUS
 MD5Final (
-  IN  MD5_CTX  *Md5Ctx,
-  OUT UINT8    *HashVal
+  IN  OUT MD5_CTX  *Md5Ctx,
+  OUT UINT8        *HashVal
   )
 {
   UINTN PadLength;
