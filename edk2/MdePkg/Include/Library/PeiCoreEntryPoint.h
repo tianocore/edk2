@@ -122,7 +122,9 @@ ProcessLibraryConstructorList (
                         these SEC-hosted PPIs to its PPI database such that both the PEI
                         Foundation and any modules can leverage the associated service calls
                         and/or code in these early PPIs. 
-  @param  OldCoreData   Pointer to Original startup information.
+  @param  Context       A pointer to a private context structure defined by the PEI Core
+                        implementation. The implementation of _ModuleEntryPoint() must set
+                        this parameter is NULL to indicate that this is the first PEI phase.
 
 **/
 VOID
@@ -130,7 +132,7 @@ EFIAPI
 ProcessModuleEntryPointList (
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList,
-  IN VOID                           *OldCoreData
+  IN VOID                           *Context
   );
 
 #endif
