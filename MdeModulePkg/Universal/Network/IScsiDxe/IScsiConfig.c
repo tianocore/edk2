@@ -466,7 +466,7 @@ EFI_STATUS
 EFIAPI
 IScsiFormCallback (
   IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     *Action,
+  IN  EFI_BROWSER_ACTION                     Action,
   IN  EFI_QUESTION_ID                        QuestionId,
   IN  UINT8                                  Type,
   IN  EFI_IFR_TYPE_VALUE                     *Value,
