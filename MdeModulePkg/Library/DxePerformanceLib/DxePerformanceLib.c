@@ -1,7 +1,12 @@
 /** @file
   Performance Library
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+  This library instance provides infrastructure for DXE phase drivers to log performance
+  data. It consumes Performance Protocol published by DxeCorePerformanceLib
+  to log performance data. If Performance Protocol is not available, it does not log any
+  performance information.
+
+  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +27,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
 
+//
+// The cached performance protocol interface.
+//
 PERFORMANCE_PROTOCOL    *mPerformance = NULL;
 
 /**
@@ -165,7 +173,7 @@ EndPerformanceMeasurement (
 
   @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
                                   0, then the first performance measurement log entry is retrieved.
-                                  On exit, the key of the next performance lof entry entry.
+                                  On exit, the key of the next performance log entry.
   @param  Handle                  Pointer to environment specific context used to identify the component
                                   being measured.
   @param  Token                   Pointer to a Null-terminated ASCII string that identifies the component

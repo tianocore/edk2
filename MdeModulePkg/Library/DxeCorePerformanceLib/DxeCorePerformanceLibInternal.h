@@ -1,5 +1,8 @@
 /** @file
-  Module functions' declarations are included here.
+  Master header files for DxeCorePerformanceLib instance.
+
+  This header file holds the prototypes of the Performance Protocol published by this
+  library instance at its constructor.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -111,7 +114,7 @@ EndGauge (
   @param  GaugeDataEntry          The indirect pointer to the gauge data entry specified by LogEntryKey
                                   if the retrieval is successful.
 
-  @retval EFI_SUCCESS             The GuageDataEntry is successfuly found based on LogEntryKey.
+  @retval EFI_SUCCESS             The GuageDataEntry is successfully found based on LogEntryKey.
   @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
   @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
   @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL.

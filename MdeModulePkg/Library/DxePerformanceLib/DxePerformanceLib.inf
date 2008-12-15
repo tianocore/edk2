@@ -1,8 +1,10 @@
 #/** @file
+#  Performance library instance used in DXE phase.
 #  
-#    Component description file for Dxe Performance Library
-#  
-#   This library provides intrastructure for Dxe driver to log performance.
+#  This library instance provides infrastructure for DXE phase drivers to log performance
+#  data. It consumes Performance Protocol published by DxeCorePerformanceLib
+#  to log performance data. If Performance Protocol is not available, it does not log any
+#  performance information.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
@@ -45,7 +47,7 @@
 
 
 [Protocols]
-  gPerformanceProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+  gPerformanceProtocolGuid
 
 
 [Pcd.common]

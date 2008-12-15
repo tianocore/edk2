@@ -1,9 +1,10 @@
 #/** @file
 #  
-#  Memory-only library functions with no library constructor/destructor
+#  Performance library instance used in PEI phase.
 #  
-#  This module provides the performance measurement interfaces in PEI phase, it is
-#  one instance of Performance Libarary.
+#  This library provides the performance measurement interfaces in PEI phase, it creates
+#  and consumes GUIDed HOB for performance logging. The GUIDed HOB is passed to DXE phase
+#  so that it can be taken over by DxeCorePerformanceLib.  
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
@@ -49,7 +50,7 @@
 
 
 [Guids]
-  gPeiPerformanceHobGuid                        # SOMETIMES_CONSUMED
+  gPeiPerformanceHobGuid
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries
