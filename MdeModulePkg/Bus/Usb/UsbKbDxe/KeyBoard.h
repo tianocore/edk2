@@ -227,7 +227,7 @@ EFIAPI
 InsertKeyCode (
   IN OUT  USB_KB_BUFFER *KeyboardBuffer,
   IN      UINT8         Key,
-  IN      UINT8         Down
+  IN      BOOLEAN       Down
   );
 
 /**
