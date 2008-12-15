@@ -191,7 +191,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_ACCESS_FORM_CALLBACK)(
   IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
+  IN  EFI_BROWSER_ACTION                     *Action,
   IN  EFI_QUESTION_ID                        QuestionId,
   IN  UINT8                                  Type,
   IN  EFI_IFR_TYPE_VALUE                     *Value,
