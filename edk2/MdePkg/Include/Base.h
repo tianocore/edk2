@@ -470,7 +470,7 @@ typedef INTN RETURN_STATUS;
 #define RETURN_BUFFER_TOO_SMALL      ENCODE_ERROR (5)
 
 ///
-/// There is no data oending upon return.
+/// There is no data pending upon return.
 ///
 #define RETURN_NOT_READY             ENCODE_ERROR (6)
 
@@ -491,7 +491,7 @@ typedef INTN RETURN_STATUS;
 #define RETURN_OUT_OF_RESOURCES      ENCODE_ERROR (9)
 
 ///
-/// An inconsistancy was detected on the file system causing the 
+/// An inconsistency was detected on the file system causing the 
 /// operation to fail.
 ///
 #define RETURN_VOLUME_CORRUPTED      ENCODE_ERROR (10)
