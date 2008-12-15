@@ -51,6 +51,7 @@
   UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
   OemHookStatusCodeLib
+  DevicePathLib
 
 [Guids]
   gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
