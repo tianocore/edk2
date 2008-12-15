@@ -78,11 +78,11 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_CPU_IO_PROTOCOL_IO_MEM)(
-  IN EFI_CPU_IO_PROTOCOL                *This,
-  IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
-  IN  UINT64                            Address,
-  IN  UINTN                             Count,
-  IN  OUT VOID                          *Buffer
+  IN     EFI_CPU_IO_PROTOCOL               *This,
+  IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
+  IN     UINT64                            Address,
+  IN     UINTN                             Count,
+  IN OUT VOID                              *Buffer
   );
 
 //
