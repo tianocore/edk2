@@ -19,10 +19,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "EfiKey.h"
 
 /**
-  Uses USB I/O to check whether the device is a USB Keyboard device.
+  Uses USB I/O to check whether the device is a USB keyboard device.
 
-  @param  UsbIo    Points to a USB I/O protocol instance.
-  @retval None
+  @param  UsbIo    Pointer to a USB I/O protocol instance.
+
+  @retval TRUE     Device is a USB keyboard device.
+  @retval FALSE    Device is a not USB keyboard device.
 
 **/
 BOOLEAN
@@ -32,37 +34,43 @@ IsUSBKeyboard (
   );
 
 /**
-  Initialize USB Keyboard device and all private data structures.
+  Initialize USB keyboard device and all private data structures.
 
   @param  UsbKeyboardDevice  The USB_KB_DEV instance.
 
   @retval EFI_SUCCESS        Initialization is successful.
-  @retval EFI_DEVICE_ERROR   Configure hardware failed.
+  @retval EFI_DEVICE_ERROR   Keyboard initialization failed.
 
 **/
 EFI_STATUS
 EFIAPI
 InitUSBKeyboard (
-  IN USB_KB_DEV   *UsbKeyboardDevice
+  IN OUT USB_KB_DEV   *UsbKeyboardDevice
   );
 
 /**
-  Initialize USB Keyboard layout.
+  Initialize USB keyboard layout.
+
+  This function initializes Key Convertion Table for the USB keyboard device.
+  It first tries to retrieve layout from HII database. If failed and default
+  layout is enabled, then it just uses the default layout.
 
   @param  UsbKeyboardDevice      The USB_KB_DEV instance.
 
-  @retval EFI_SUCCESS            Initialization Success.
-  @retval Other                  Keyboard layout initial failed.
+  @retval EFI_SUCCESS            Initialization succeeded.
+  @retval EFI_NOT_READY          Keyboard layout cannot be retrieve from HII
+                                 database, and default layout is disabled.
+  @retval Other                  Fail to register event to EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID group.
 
 **/
 EFI_STATUS
 EFIAPI
 InitKeyboardLayout (
-  IN USB_KB_DEV   *UsbKeyboardDevice
+  OUT USB_KB_DEV   *UsbKeyboardDevice
   );
 
 /**
-  Destroy resources for Keyboard layout.
+  Destroy resources for keyboard layout.
 
   @param  UsbKeyboardDevice    The USB_KB_DEV instance.
 
@@ -70,11 +78,16 @@ InitKeyboardLayout (
 VOID
 EFIAPI
 ReleaseKeyboardLayoutResources (
-  IN USB_KB_DEV  *UsbKeyboardDevice
+  IN OUT USB_KB_DEV              *UsbKeyboardDevice
   );
 
 /**
-  Handler function for USB Keyboard's asynchronous interrupt transfer.
+  Handler function for USB keyboard's asynchronous interrupt transfer.
+
+  This function is the handler function for USB keyboard's asynchronous interrupt transfer
+  to manage the keyboard. It parses the USB keyboard input report, and inserts data to
+  keyboard buffer according to state of modifer keys and normal keys. Timer for repeat key
+  is also set accordingly.
 
   @param  Data             A pointer to a buffer that is filled with key data which is
                            retrieved via asynchronous interrupt transfer.
@@ -82,8 +95,8 @@ ReleaseKeyboardLayoutResources (
   @param  Context          Pointing to USB_KB_DEV instance.
   @param  Result           Indicates the result of the asynchronous interrupt transfer.
 
-  @retval EFI_SUCCESS      Handler is successful.
-  @retval EFI_DEVICE_ERROR Hardware Error
+  @retval EFI_SUCCESS      Asynchronous interrupt transfer is handled successfully.
+  @retval EFI_DEVICE_ERROR Hardware error occurs.
 
 **/
 EFI_STATUS
@@ -96,11 +109,16 @@ KeyboardHandler (
   );
 
 /**
-  Timer handler for Delayed Recovery timer.
+  Handler for Delayed Recovery event.
+
+  This function is the handler for Delayed Recovery event triggered
+  by timer.
+  After a device error occurs, the event would be triggered
+  with interval of EFI_USB_INTERRUPT_DELAY. EFI_USB_INTERRUPT_DELAY
+  is defined in USB standard for error handling.
 
   @param  Event              The Delayed Recovery event.
   @param  Context            Points to the USB_KB_DEV instance.
-
 
 **/
 VOID
@@ -111,62 +129,67 @@ USBKeyboardRecoveryHandler (
   );
 
 /**
-  Retrieves a key character after parsing the raw data in keyboard buffer.
+  Retrieves a USB keycode after parsing the raw data in keyboard buffer.
+
+  This function parses keyboard buffer. It updates state of modifier key for
+  USB_KB_DEV instancem, and returns keycode for output.
 
   @param  UsbKeyboardDevice    The USB_KB_DEV instance.
-  @param  KeyChar              Points to the Key character after key parsing.
+  @param  KeyCode              Pointer to the USB keycode for output.
 
-  @retval EFI_SUCCESS          Parse key is successful.
-  @retval EFI_NOT_READY        Device is not ready.
+  @retval EFI_SUCCESS          Keycode successfully parsed.
+  @retval EFI_NOT_READY        Keyboard buffer is not ready for a valid keycode
 
 **/
 EFI_STATUS
 EFIAPI
 USBParseKey (
   IN OUT  USB_KB_DEV  *UsbKeyboardDevice,
-  OUT     UINT8       *KeyChar
+  OUT     UINT8       *KeyCode
   );
 
 /**
-  Converts USB Keyboard code to EFI Scan Code.
+  Converts USB Keycode ranging from 0x4 to 0x65 to EFI_INPUT_KEY.
 
-  @param  UsbKeyboardDevice    The USB_KB_DEV instance.
-  @param  KeyChar              Indicates the key code that will be interpreted.
-  @param  Key                  A pointer to a buffer that is filled in with
-                               the keystroke information for the key that
-                               was pressed.
+  @param  UsbKeyboardDevice     The USB_KB_DEV instance.
+  @param  KeyCode               Indicates the key code that will be interpreted.
+  @param  Key                   A pointer to a buffer that is filled in with
+                                the keystroke information for the key that
+                                was pressed.
 
-  @retval EFI_NOT_READY        Device is not ready
-  @retval EFI_SUCCESS          Success.
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER KeyCode is not in the range of 0x4 to 0x65.
+  @retval EFI_INVALID_PARAMETER Translated EFI_INPUT_KEY has zero for both ScanCode and UnicodeChar.
+  @retval EFI_NOT_READY         KeyCode represents a dead key with EFI_NS_KEY_MODIFIER
 
 **/
 EFI_STATUS
 EFIAPI
 UsbKeyCodeToEfiInputKey (
   IN  USB_KB_DEV      *UsbKeyboardDevice,
-  IN  UINT8           KeyChar,
+  IN  UINT8           KeyCode,
   OUT EFI_INPUT_KEY   *Key
   );
 
 /**
-  Resets USB Keyboard Buffer.
+  Resets USB keyboard buffer.
 
-  @param  KeyboardBuffer     Points to the USB Keyboard Buffer.
+  @param  KeyboardBuffer     Points to the USB keyboard buffer.
 
 **/
 VOID
 EFIAPI
 InitUSBKeyBuffer (
-  IN OUT  USB_KB_BUFFER   *KeyboardBuffer
+  OUT  USB_KB_BUFFER   *KeyboardBuffer
   );
 
 /**
-  Check whether USB Keyboard buffer is empty.
+  Check whether USB keyboard buffer is empty.
 
-  @param  KeyboardBuffer     USB Keyboard Buffer.
+  @param  KeyboardBuffer     USB keyboard buffer
 
-  @retval TRUE               Key buffer is empty.
-  @retval FALSE              Key buffer is not empty.
+  @retval TRUE               Keyboard buffer is empty.
+  @retval FALSE              Keyboard buffer is not empty.
 
 **/
 BOOLEAN
@@ -176,12 +199,12 @@ IsUSBKeyboardBufferEmpty (
   );
 
 /**
-  Check whether USB Keyboard buffer is full.
+  Check whether USB keyboard buffer is full.
 
-  @param  KeyboardBuffer     USB Keyboard Buffer.
+  @param  KeyboardBuffer     USB keyboard buffer
 
-  @retval TRUE               Key buffer is full.
-  @retval FALSE              Key buffer is not full.
+  @retval TRUE               Keyboard buffer is full.
+  @retval FALSE              Keyboard buffer is not full.
 
 **/
 BOOLEAN
@@ -191,11 +214,12 @@ IsUSBKeyboardBufferFull (
   );
 
 /**
-  Inserts a key code into keyboard buffer.
+  Inserts a keycode into keyboard buffer.
 
-  @param  KeyboardBuffer     Points to the USB Keyboard Buffer.
-  @param  Key                Key code
-  @param  Down               Special key
+  @param  KeyboardBuffer     Points to the USB keyboard buffer.
+  @param  Key                Keycode to insert.
+  @param  Down               TRUE means key is pressed.
+                             FALSE means key is released.
 
 **/
 VOID
@@ -207,28 +231,33 @@ InsertKeyCode (
   );
 
 /**
-  Pops a key code off from keyboard buffer.
+  Remove a keycode from keyboard buffer and return it.
 
-  @param  KeyboardBuffer     Points to the USB Keyboard Buffer.
-  @param  UsbKey             Points to the buffer that contains a usb key code.
+  @param  KeyboardBuffer     Points to the USB keyboard buffer.
+  @param  UsbKey             Points to the buffer that contains keycode for output.
 
-  @retval EFI_SUCCESS        Success
-  @retval EFI_DEVICE_ERROR   Hardware Error
+  @retval EFI_SUCCESS        Keycode successfully removed from keyboard buffer.
+  @retval EFI_DEVICE_ERROR   Keyboard buffer is empty.
 
 **/
 EFI_STATUS
 EFIAPI
 RemoveKeyCode (
   IN OUT  USB_KB_BUFFER *KeyboardBuffer,
-  OUT     USB_KEY       *UsbKey
+     OUT  USB_KEY       *UsbKey
   );
 
 /**
-  Timer handler for Repeat Key timer.
+  Handler for Repeat Key event.
+
+  This function is the handler for Repeat Key event triggered
+  by timer.
+  After a repeatable key is pressed, the event would be triggered
+  with interval of USBKBD_REPEAT_DELAY. Once the event is triggered,
+  following trigger will come with interval of USBKBD_REPEAT_RATE.
 
   @param  Event              The Repeat Key event.
   @param  Context            Points to the USB_KB_DEV instance.
-
 
 **/
 VOID
@@ -239,7 +268,7 @@ USBKeyboardRepeatHandler (
   );
 
 /**
-  Sets USB Keyboard LED state.
+  Sets USB keyboard LED state.
 
   @param  UsbKeyboardDevice  The USB_KB_DEV instance.
 

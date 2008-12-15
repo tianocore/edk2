@@ -1,5 +1,6 @@
 /** @file
-  USB Keyboard Driver that includes the implementation of interface.
+  USB Keyboard Driver that manages USB keyboard and produces Simple Text Input
+  Protocol and Simple Text Input Ex Protocol.
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -99,8 +100,8 @@ USBKeyboardDriverBindingSupported (
   }
 
   //
-  // Use the USB I/O Protocol interface to check whether the Controller is
-  // the Keyboard controller that can be managed by this driver.
+  // Use the USB I/O Protocol interface to check whether Controller is
+  // a keyboard device that can be managed by this driver.
   //
   Status = EFI_SUCCESS;
 
@@ -119,7 +120,11 @@ USBKeyboardDriverBindingSupported (
 }
 
 /**
-  Start running driver on the controller.
+  Starts the device with this driver.
+
+  This function produces Simple Text Input Protocol and Simple Text Input Ex Protocol,
+  initializes the keyboard device, and submit Asynchronous Interrupt Transfer to manage
+  this keyboard device.
 
   @param  This                   The USB keyboard driver binding instance.
   @param  Controller             Handle of device to bind driver to.
@@ -128,7 +133,7 @@ USBKeyboardDriverBindingSupported (
 
   @retval EFI_SUCCESS            The controller is controlled by the usb keyboard driver.
   @retval EFI_UNSUPPORTED        No interrupt endpoint can be found.
-  @retval Other                  The keyboard driver cannot support this controller.
+  @retval Other                  This controller cannot be started.
 
 **/
 EFI_STATUS
@@ -201,9 +206,6 @@ USBKeyboardDriverBindingStart (
     UsbKeyboardDevice->DevicePath
     );
 
-  //
-  // Initialize UsbKeyboardDevice
-  //
   UsbKeyboardDevice->UsbIo = UsbIo;
 
   //
@@ -405,17 +407,18 @@ ErrorExit:
 
 
 /**
-  Stop handling the controller by this USB keyboard driver.
+  Stop the USB keyboard device handled by this driver.
 
   @param  This                   The USB keyboard driver binding protocol.
   @param  Controller             The controller to release.
   @param  NumberOfChildren       The number of handles in ChildHandleBuffer.
   @param  ChildHandleBuffer      The array of child handle.
 
-  @retval EFI_SUCCESS            The controller or children are stopped.
+  @retval EFI_SUCCESS            The device was stopped.
   @retval EFI_UNSUPPORTED        Simple Text In Protocol or Simple Text In Ex Protocol
                                  is not installed on Controller.
-  @retval EFI_DEVICE_ERROR       Failed to stop the driver.
+  @retval EFI_DEVICE_ERROR       The device could not be stopped due to a device error.
+  @retval Others                 Fail to uninstall protocols attached on the device.
 
 **/
 EFI_STATUS
@@ -454,9 +457,7 @@ USBKeyboardDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
-  //
-  // Get USB_KB_DEV instance.
-  //
+
   UsbKeyboardDevice = USB_KB_DEV_FROM_THIS (SimpleInput);
 
   //
@@ -520,28 +521,29 @@ USBKeyboardDriverBindingStop (
 }
 
 /**
-  Internal function to read the next keystroke from the input device.
+  Internal function to read the next keystroke from the keyboard buffer.
 
-  @param  UsbKeyboardDevice       Usb keyboard's private structure.
-  @param  KeyData                 A pointer to a buffer that is filled in with the keystroke
-                                  state data for the key that was pressed.
+  @param  UsbKeyboardDevice       USB keyboard's private structure.
+  @param  KeyData                 A pointer to buffer to hold the keystroke
+                                  data for the key that was pressed.
 
-  @return EFI_SUCCESS             The keystroke information was returned.
-  @return EFI_NOT_READY           There was no keystroke data availiable.
-  @return EFI_DEVICE_ERROR        The keystroke information was not returned due to
+  @retval EFI_SUCCESS             The keystroke information was returned.
+  @retval EFI_NOT_READY           There was no keystroke data availiable.
+  @retval EFI_DEVICE_ERROR        The keystroke information was not returned due to
                                   hardware errors.
-  @return EFI_INVALID_PARAMETER   KeyData is NULL.
+  @retval EFI_INVALID_PARAMETER   KeyData is NULL.
+  @retval Others                  Fail to translate keycode into EFI_INPUT_KEY
 
 **/
 EFI_STATUS
 EFIAPI
 USBKeyboardReadKeyStrokeWorker (
-  IN  USB_KB_DEV                        *UsbKeyboardDevice,
-  OUT EFI_KEY_DATA                      *KeyData
+  IN OUT USB_KB_DEV                 *UsbKeyboardDevice,
+     OUT EFI_KEY_DATA               *KeyData
   )
 {
   EFI_STATUS                        Status;
-  UINT8                             KeyChar;  
+  UINT8                             KeyCode;  
   LIST_ENTRY                        *Link;
   KEYBOARD_CONSOLE_IN_EX_NOTIFY     *CurrentNotify;  
   EFI_KEY_DATA                      OriginalKeyData;
@@ -551,10 +553,10 @@ USBKeyboardReadKeyStrokeWorker (
   }
 
   //
-  // If there is no saved ASCII byte, fetch it
+  // If there is no saved USB keycode, fetch it
   // by calling USBKeyboardCheckForKey().
   //
-  if (UsbKeyboardDevice->CurKeyChar == 0) {
+  if (UsbKeyboardDevice->CurKeyCode == 0) {
     Status = USBKeyboardCheckForKey (UsbKeyboardDevice);
     if (EFI_ERROR (Status)) {
       return EFI_NOT_READY;
@@ -565,15 +567,15 @@ USBKeyboardReadKeyStrokeWorker (
   KeyData->Key.ScanCode    = SCAN_NULL;
 
   //
-  // Store the key char read by USBKeyboardCheckForKey() and clear it.
+  // Store the current keycode and clear it.
   //
-  KeyChar = UsbKeyboardDevice->CurKeyChar;
-  UsbKeyboardDevice->CurKeyChar = 0;
+  KeyCode = UsbKeyboardDevice->CurKeyCode;
+  UsbKeyboardDevice->CurKeyCode = 0;
 
   //
-  // Translate saved ASCII byte into EFI_INPUT_KEY
+  // Translate saved USB keycode into EFI_INPUT_KEY
   //
-  Status = UsbKeyCodeToEfiInputKey (UsbKeyboardDevice, KeyChar, &KeyData->Key);
+  Status = UsbKeyCodeToEfiInputKey (UsbKeyboardDevice, KeyCode, &KeyData->Key);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -594,9 +596,9 @@ USBKeyboardReadKeyStrokeWorker (
   // here switch them back for notification function.
   //
   CopyMem (&OriginalKeyData, KeyData, sizeof (EFI_KEY_DATA));
-  if (UsbKeyboardDevice->CtrlOn != 0) {
+  if (UsbKeyboardDevice->CtrlOn) {
     if (OriginalKeyData.Key.UnicodeChar >= 0x01 && OriginalKeyData.Key.UnicodeChar <= 0x1A) {
-      if (UsbKeyboardDevice->CapsOn != 0) {
+      if (UsbKeyboardDevice->CapsOn) {
         OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + 'A' - 1);
       } else {
         OriginalKeyData.Key.UnicodeChar = (CHAR16)(OriginalKeyData.Key.UnicodeChar + 'a' - 1);
@@ -617,24 +619,21 @@ USBKeyboardReadKeyStrokeWorker (
   }
 
   return EFI_SUCCESS;
-  
 }
 
 /**
-  Reset USB Keyboard.
+  Reset the input device and optionaly run diagnostics
 
   There are 2 types of reset for USB keyboard.
   For non-exhaustive reset, only keyboard buffer is cleared.
   For exhaustive reset, in addition to clearance of keyboard buffer, the hardware status
   is also re-initialized.
 
-  @param  This                  The protocol instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL.
-  @param  ExtendedVerification  Indicates if exhaustive reset is used.
-                                TRUE for exhaustive reset.
-                                FALSE for non-exhaustive reset.
+  @param  This                 Protocol instance pointer.
+  @param  ExtendedVerification Driver may perform diagnostics on reset.
 
-  @retval EFI_SUCCESS           Keyboard is reset successfully.
-  @retval EFI_DEVICE_ERROR      Failed to reset keyboard.
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could not be reset.
 
 **/
 EFI_STATUS
@@ -669,7 +668,7 @@ USBKeyboardReset (
     // Clear the key buffer of this USB keyboard
     //
     InitUSBKeyBuffer (&(UsbKeyboardDevice->KeyboardBuffer));
-    UsbKeyboardDevice->CurKeyChar = 0;
+    UsbKeyboardDevice->CurKeyCode = 0;
 
     return EFI_SUCCESS;
   }
@@ -678,7 +677,7 @@ USBKeyboardReset (
   // Exhaustive reset
   //
   Status = InitUSBKeyboard (UsbKeyboardDevice);
-  UsbKeyboardDevice->CurKeyChar = 0;
+  UsbKeyboardDevice->CurKeyCode = 0;
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
@@ -688,14 +687,16 @@ USBKeyboardReset (
 
 
 /**
-  Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke() function.
+  Reads the next keystroke from the input device.
 
   @param  This                 The EFI_SIMPLE_TEXT_INPUT_PROTOCOL instance.
   @param  Key                  A pointer to a buffer that is filled in with the keystroke
                                information for the key that was pressed.
 
-  @retval EFI_SUCCESS          Read key stroke successfully.
-  @retval Other                Read key stroke failed.
+  @retval EFI_SUCCESS          The keystroke information was returned.
+  @retval EFI_NOT_READY        There was no keystroke data availiable.
+  @retval EFI_DEVICE_ERROR     The keydtroke information was not returned due to
+                               hardware errors.
 
 **/
 EFI_STATUS
@@ -719,12 +720,12 @@ USBKeyboardReadKeyStroke (
   CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
 
   return EFI_SUCCESS;
-
 }
 
 
 /**
-  Handler function for WaitForKey event.
+  Event notification function registered for EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx
+  and EFI_SIMPLE_TEXT_INPUT_PROTOCOL.WaitForKey.
 
   @param  Event        Event to be signaled when a key is pressed.
   @param  Context      Points to USB_KB_DEV instance.
@@ -741,7 +742,7 @@ USBKeyboardWaitForKey (
 
   UsbKeyboardDevice = (USB_KB_DEV *) Context;
 
-  if (UsbKeyboardDevice->CurKeyChar == 0) {
+  if (UsbKeyboardDevice->CurKeyCode == 0) {
     if (EFI_ERROR (USBKeyboardCheckForKey (UsbKeyboardDevice))) {
       //
       // If no pending key, simply return.
@@ -757,7 +758,7 @@ USBKeyboardWaitForKey (
 
 
 /**
-  Check whether there is key pending.
+  Check whether there is key pending in the keyboard buffer.
 
   @param  UsbKeyboardDevice    The USB_KB_DEV instance.
 
@@ -768,53 +769,50 @@ USBKeyboardWaitForKey (
 EFI_STATUS
 EFIAPI
 USBKeyboardCheckForKey (
-  IN  USB_KB_DEV    *UsbKeyboardDevice
+  IN OUT  USB_KB_DEV    *UsbKeyboardDevice
   )
 {
   EFI_STATUS  Status;
-  UINT8       KeyChar;
+  UINT8       KeyCode;
 
   //
-  // Fetch raw data from the USB keyboard input,
-  // and translate it into ASCII data.
+  // Fetch raw data from the USB keyboard buffer,
+  // and translate it into USB keycode.
   //
-  Status = USBParseKey (UsbKeyboardDevice, &KeyChar);
+  Status = USBParseKey (UsbKeyboardDevice, &KeyCode);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_READY;
   }
 
-  UsbKeyboardDevice->CurKeyChar = KeyChar;
+  UsbKeyboardDevice->CurKeyCode = KeyCode;
   return EFI_SUCCESS;
 }
 
 /**
   Free keyboard notify list.
 
-  @param  ListHead                The list head.
+  @param  NotifyList              The keyboard notify list to free.
 
   @retval EFI_SUCCESS             Free the notify list successfully.
-  @retval EFI_INVALID_PARAMETER   ListHead is invalid.
+  @retval EFI_INVALID_PARAMETER   NotifyList is NULL.
 
 **/
 EFI_STATUS
 EFIAPI
 KbdFreeNotifyList (
-  IN OUT LIST_ENTRY           *ListHead
+  IN OUT LIST_ENTRY           *NotifyList
   )
 {
   KEYBOARD_CONSOLE_IN_EX_NOTIFY *NotifyNode;
+  LIST_ENTRY                    *Link;
 
-  if (ListHead == NULL) {
+  if (NotifyList == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  while (!IsListEmpty (ListHead)) {
-    NotifyNode = CR (
-                   ListHead->ForwardLink, 
-                   KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
-                   NotifyEntry, 
-                   USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE
-                   );
-    RemoveEntryList (ListHead->ForwardLink);
+  while (!IsListEmpty (NotifyList)) {
+    Link = GetFirstNode (NotifyList);
+    NotifyNode = CR (Link, KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
+    RemoveEntryList (Link);
     gBS->FreePool (NotifyNode);
   }
   
@@ -822,15 +820,13 @@ KbdFreeNotifyList (
 }
 
 /**
-  Whether the pressed key matches a registered key or not.
+  Check whether the pressed key matches a registered key or not.
 
-  @param  RegsiteredData    A pointer to a buffer that is filled in with the keystroke
-                            state data for the key that was registered.
-  @param  InputData         A pointer to a buffer that is filled in with the keystroke
-                            state data for the key that was pressed.
+  @param  RegsiteredData    A pointer to keystroke data for the key that was registered.
+  @param  InputData         A pointer to keystroke data for the key that was pressed.
 
   @retval TRUE              Key pressed matches a registered key.
-  @retval FLASE             Match failed.
+  @retval FLASE             Key pressed does not matche a registered key.
 
 **/
 BOOLEAN
@@ -860,21 +856,31 @@ IsKeyRegistered (
   }     
   
   return TRUE;
-
 }
 
 //
 // Simple Text Input Ex protocol functions 
 //
 /**
-  The extension routine to reset the input device.
+  Resets the input device hardware.
 
-  @param This                     Protocol instance pointer.
-  @param ExtendedVerification     Driver may perform diagnostics on reset.
+  The Reset() function resets the input device hardware. As part
+  of initialization process, the firmware/device will make a quick
+  but reasonable attempt to verify that the device is functioning.
+  If the ExtendedVerification flag is TRUE the firmware may take
+  an extended amount of time to verify the device is operating on
+  reset. Otherwise the reset operation is to occur as quickly as
+  possible. The hardware verification process is not defined by
+  this specification and is left up to the platform firmware or
+  driver to implement.
 
-  @retval EFI_SUCCESS             The device was reset.
-  @retval EFI_DEVICE_ERROR        The device is not functioning properly and could
-                                  not be reset.
+  @param This                 A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
+
+  @param ExtendedVerification Indicates that the driver may perform a more exhaustive
+                              verification operation of the device during reset.
+
+  @retval EFI_SUCCESS         The device was reset.
+  @retval EFI_DEVICE_ERROR    The device is not functioning correctly and could not be reset.
 
 **/
 EFI_STATUS
@@ -906,16 +912,17 @@ USBKeyboardResetEx (
 }
 
 /**
-  Reads the next keystroke from the input device. The WaitForKey Event can
-  be used to test for existance of a keystroke via WaitForEvent () call.
+  Reads the next keystroke from the input device.
 
-  @param  This                    Protocol instance pointer.
-  @param  KeyData                 A pointer to a buffer that is filled in with the keystroke
-                                  state data for the key that was pressed.
+  @param  This                   Protocol instance pointer.
+  @param  KeyData                A pointer to a buffer that is filled in with the keystroke
+                                 state data for the key that was pressed.
 
-  @return EFI_SUCCESS             The keystroke information was returned successfully.
-  @retval EFI_INVALID_PARAMETER   KeyData is NULL.
-  @retval Other                   Read key stroke information failed.
+  @retval EFI_SUCCESS            The keystroke information was returned.
+  @retval EFI_NOT_READY          There was no keystroke data available.
+  @retval EFI_DEVICE_ERROR       The keystroke information was not returned due to
+                                 hardware errors.
+  @retval EFI_INVALID_PARAMETER  KeyData is NULL.
 
 **/
 EFI_STATUS
@@ -944,8 +951,10 @@ USBKeyboardReadKeyStrokeEx (
   @param  KeyToggleState          A pointer to the EFI_KEY_TOGGLE_STATE to set the
                                   state for the input device.
 
-  @retval EFI_SUCCESS             The device state was set successfully.
-  @retval EFI_UNSUPPORTED         The device does not have the ability to set its state.
+  @retval EFI_SUCCESS             The device state was set appropriately.
+  @retval EFI_DEVICE_ERROR        The device is not functioning correctly and could
+                                  not have the setting adjusted.
+  @retval EFI_UNSUPPORTED         The device does not support the ability to have its state set.
   @retval EFI_INVALID_PARAMETER   KeyToggleState is NULL.
 
 **/
@@ -973,18 +982,18 @@ USBKeyboardSetState (
   // Update the status light
   //
 
-  UsbKeyboardDevice->ScrollOn   = 0;
-  UsbKeyboardDevice->NumLockOn  = 0;
-  UsbKeyboardDevice->CapsOn     = 0;
+  UsbKeyboardDevice->ScrollOn   = FALSE;
+  UsbKeyboardDevice->NumLockOn  = FALSE;
+  UsbKeyboardDevice->CapsOn     = FALSE;
  
   if ((*KeyToggleState & EFI_SCROLL_LOCK_ACTIVE) == EFI_SCROLL_LOCK_ACTIVE) {
-    UsbKeyboardDevice->ScrollOn = 1;
+    UsbKeyboardDevice->ScrollOn = TRUE;
   }
   if ((*KeyToggleState & EFI_NUM_LOCK_ACTIVE) == EFI_NUM_LOCK_ACTIVE) {
-    UsbKeyboardDevice->NumLockOn = 1;
+    UsbKeyboardDevice->NumLockOn = TRUE;
   }
   if ((*KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == EFI_CAPS_LOCK_ACTIVE) {
-    UsbKeyboardDevice->CapsOn = 1;
+    UsbKeyboardDevice->CapsOn = TRUE;
   }
 
   SetKeyLED (UsbKeyboardDevice);
@@ -1007,7 +1016,7 @@ USBKeyboardSetState (
 
   @retval EFI_SUCCESS                 The notification function was registered successfully.
   @retval EFI_OUT_OF_RESOURCES        Unable to allocate resources for necesssary data structures.
-  @retval EFI_INVALID_PARAMETER       KeyData or NotifyHandle is NULL.
+  @retval EFI_INVALID_PARAMETER       KeyData or NotifyHandle or KeyNotificationFunction is NULL.
 
 **/
 EFI_STATUS
@@ -1088,9 +1097,8 @@ USBKeyboardRegisterKeyNotify (
   @param  NotificationHandle        The handle of the notification function being unregistered.
 
   @retval EFI_SUCCESS              The notification function was unregistered successfully.
-  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid or opening gSimpleTextInExNotifyGuid
-                                   on NotificationHandle fails.
-  @retval EFI_NOT_FOUND            Can not find the matching entry in database.
+  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid
+  @retval EFI_NOT_FOUND            Cannot find the matching entry in database.
 
 **/
 EFI_STATUS

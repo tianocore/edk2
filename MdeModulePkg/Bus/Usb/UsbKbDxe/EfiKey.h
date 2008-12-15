@@ -54,8 +54,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define REPORT_PROTOCOL     1
 
 typedef struct {
-  UINT8 Down;
-  UINT8 KeyCode;
+  BOOLEAN  Down;
+  UINT8    KeyCode;
 } USB_KEY;
 
 typedef struct {
@@ -110,31 +110,31 @@ typedef struct {
   EFI_USB_ENDPOINT_DESCRIPTOR       IntEndpointDescriptor;
 
   USB_KB_BUFFER                     KeyboardBuffer;
-  UINT8                             CtrlOn;
-  UINT8                             AltOn;
-  UINT8                             ShiftOn;
-  UINT8                             NumLockOn;
-  UINT8                             CapsOn;
-  UINT8                             ScrollOn;
+  BOOLEAN                           CtrlOn;
+  BOOLEAN                           AltOn;
+  BOOLEAN                           ShiftOn;
+  BOOLEAN                           NumLockOn;
+  BOOLEAN                           CapsOn;
+  BOOLEAN                           ScrollOn;
   UINT8                             LastKeyCodeArray[8];
-  UINT8                             CurKeyChar;
+  UINT8                             CurKeyCode;
 
   UINT8                             RepeatKey;
   EFI_EVENT                         RepeatTimer;
 
   EFI_UNICODE_STRING_TABLE          *ControllerNameTable;
   
-  UINT8                             LeftCtrlOn;
-  UINT8                             LeftAltOn;
-  UINT8                             LeftShiftOn;
-  UINT8                             LeftLogoOn;
-  UINT8                             RightCtrlOn;
-  UINT8                             RightAltOn;
-  UINT8                             RightShiftOn;
-  UINT8                             RightLogoOn;  
-  UINT8                             MenuKeyOn;
-  UINT8                             SysReqOn;
-  UINT8                             AltGrOn;
+  BOOLEAN                           LeftCtrlOn;
+  BOOLEAN                           LeftAltOn;
+  BOOLEAN                           LeftShiftOn;
+  BOOLEAN                           LeftLogoOn;
+  BOOLEAN                           RightCtrlOn;
+  BOOLEAN                           RightAltOn;
+  BOOLEAN                           RightShiftOn;
+  BOOLEAN                           RightLogoOn;  
+  BOOLEAN                           MenuKeyOn;
+  BOOLEAN                           SysReqOn;
+  BOOLEAN                           AltGrOn;
 
   EFI_KEY_STATE                     KeyState;
   //
@@ -164,24 +164,20 @@ extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 #define TEXT_INPUT_EX_USB_KB_DEV_FROM_THIS(a) \
     CR(a, USB_KB_DEV, SimpleInputEx, USB_KB_DEV_SIGNATURE)
 
-
-#define MOD_CONTROL_L           0x01
-#define MOD_CONTROL_R           0x10
-#define MOD_SHIFT_L             0x02
-#define MOD_SHIFT_R             0x20
-#define MOD_ALT_L               0x04
-#define MOD_ALT_R               0x40
-#define MOD_WIN_L               0x08
-#define MOD_WIN_R               0x80
-
-typedef struct {
-  UINT8 Mask;
-  UINT8 Key;
-} KB_MODIFIER;
-
-#define USB_KEYCODE_MAX_MAKE      0x62
-
-#define USBKBD_VALID_KEYCODE(key) ((UINT8) (key) > 3)
+//
+// According to Universal Serial Bus HID Usage Tables document ver 1.12,
+// a Boot Keyboard should support the keycode range from 0x0 to 0x65 and 0xE0 to 0xE7.
+// 0xE0 to 0xE7 are for modifier keys, and 0x0 to 0x3 are reserved for typical
+// keyboard status or keyboard errors.
+// So the number of valid non-modifier USB keycodes is 0x62, and the number of
+// valid keycodes is 0x6A.
+//
+#define NUMBER_OF_VALID_NON_MODIFIER_USB_KEYCODE      0x62
+#define NUMBER_OF_VALID_USB_KEYCODE                   0x6A
+//
+// 0x0 to 0x3 are reserved for typical keyboard status or keyboard errors.
+//
+#define USBKBD_VALID_KEYCODE(Key) ((UINT8) (Key) > 3)
 
 typedef struct {
   UINT8 NumLock : 1;
@@ -213,7 +209,11 @@ USBKeyboardDriverBindingSupported (
   );
 
 /**
-  Start running driver on the controller.
+  Starts the device with this driver.
+
+  This function produces Simple Text Input Protocol and Simple Text Input Ex Protocol,
+  initializes the keyboard device, and submit Asynchronous Interrupt Transfer to manage
+  this keyboard device.
 
   @param  This                   The USB keyboard driver binding instance.
   @param  Controller             Handle of device to bind driver to.
@@ -222,7 +222,7 @@ USBKeyboardDriverBindingSupported (
 
   @retval EFI_SUCCESS            The controller is controlled by the usb keyboard driver.
   @retval EFI_UNSUPPORTED        No interrupt endpoint can be found.
-  @retval Other                  The keyboard driver cannot support this controller.
+  @retval Other                  This controller cannot be started.
 
 **/
 EFI_STATUS
@@ -234,17 +234,18 @@ USBKeyboardDriverBindingStart (
   );
 
 /**
-  Stop handling the controller by this USB keyboard driver.
+  Stop the USB keyboard device handled by this driver.
 
   @param  This                   The USB keyboard driver binding protocol.
   @param  Controller             The controller to release.
   @param  NumberOfChildren       The number of handles in ChildHandleBuffer.
   @param  ChildHandleBuffer      The array of child handle.
 
-  @retval EFI_SUCCESS            The controller or children are stopped.
+  @retval EFI_SUCCESS            The device was stopped.
   @retval EFI_UNSUPPORTED        Simple Text In Protocol or Simple Text In Ex Protocol
                                  is not installed on Controller.
-  @retval EFI_DEVICE_ERROR       Failed to stop the driver.
+  @retval EFI_DEVICE_ERROR       The device could not be stopped due to a device error.
+  @retval Others                 Fail to uninstall protocols attached on the device.
 
 **/
 EFI_STATUS
@@ -257,23 +258,134 @@ USBKeyboardDriverBindingStop (
   );
 
 //
+// EFI Component Name Functions
+//
+/**
+  Retrieves a Unicode string that is the user readable name of the driver.
+
+  This function retrieves the user readable name of a driver in the form of a
+  Unicode string. If the driver specified by This has a user readable name in
+  the language specified by Language, then a pointer to the driver name is
+  returned in DriverName, and EFI_SUCCESS is returned. If the driver specified
+  by This does not support the language specified by Language,
+  then EFI_UNSUPPORTED is returned.
+
+  @param  This                  A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+                                EFI_COMPONENT_NAME_PROTOCOL instance.
+  @param  Language              A pointer to a Null-terminated ASCII string
+                                array indicating the language. This is the
+                                language of the driver name that the caller is
+                                requesting, and it must match one of the
+                                languages specified in SupportedLanguages. The
+                                number of languages supported by a driver is up
+                                to the driver writer. Language is specified
+                                in RFC 3066 or ISO 639-2 language code format.
+  @param  DriverName            A pointer to the Unicode string to return.
+                                This Unicode string is the name of the
+                                driver specified by This in the language
+                                specified by Language.
+
+  @retval EFI_SUCCESS           The Unicode string for the Driver specified by
+                                This and the language specified by Language was
+                                returned in DriverName.
+  @retval EFI_INVALID_PARAMETER Language is NULL.
+  @retval EFI_INVALID_PARAMETER DriverName is NULL.
+  @retval EFI_UNSUPPORTED       The driver specified by This does not support
+                                the language specified by Language.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbKeyboardComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+/**
+  Retrieves a Unicode string that is the user readable name of the controller
+  that is being managed by a driver.
+
+  This function retrieves the user readable name of the controller specified by
+  ControllerHandle and ChildHandle in the form of a Unicode string. If the
+  driver specified by This has a user readable name in the language specified by
+  Language, then a pointer to the controller name is returned in ControllerName,
+  and EFI_SUCCESS is returned.  If the driver specified by This is not currently
+  managing the controller specified by ControllerHandle and ChildHandle,
+  then EFI_UNSUPPORTED is returned.  If the driver specified by This does not
+  support the language specified by Language, then EFI_UNSUPPORTED is returned.
+
+  @param  This                  A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+                                EFI_COMPONENT_NAME_PROTOCOL instance.
+  @param  ControllerHandle      The handle of a controller that the driver
+                                specified by This is managing.  This handle
+                                specifies the controller whose name is to be
+                                returned.
+  @param  ChildHandle           The handle of the child controller to retrieve
+                                the name of.  This is an optional parameter that
+                                may be NULL.  It will be NULL for device
+                                drivers.  It will also be NULL for a bus drivers
+                                that wish to retrieve the name of the bus
+                                controller.  It will not be NULL for a bus
+                                driver that wishes to retrieve the name of a
+                                child controller.
+  @param  Language              A pointer to a Null-terminated ASCII string
+                                array indicating the language.  This is the
+                                language of the driver name that the caller is
+                                requesting, and it must match one of the
+                                languages specified in SupportedLanguages. The
+                                number of languages supported by a driver is up
+                                to the driver writer. Language is specified in
+                                RFC 3066 or ISO 639-2 language code format.
+  @param  ControllerName        A pointer to the Unicode string to return.
+                                This Unicode string is the name of the
+                                controller specified by ControllerHandle and
+                                ChildHandle in the language specified by
+                                Language from the point of view of the driver
+                                specified by This.
+
+  @retval EFI_SUCCESS           The Unicode string for the user readable name in
+                                the language specified by Language for the
+                                driver specified by This was returned in
+                                DriverName.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
+                                EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER Language is NULL.
+  @retval EFI_INVALID_PARAMETER ControllerName is NULL.
+  @retval EFI_UNSUPPORTED       The driver specified by This is not currently
+                                managing the controller specified by
+                                ControllerHandle and ChildHandle.
+  @retval EFI_UNSUPPORTED       The driver specified by This does not support
+                                the language specified by Language.
+
+**/
+EFI_STATUS
+EFIAPI
+UsbKeyboardComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
+//
 // Functions of Simple Text Input Protocol
 //
 /**
-  Reset USB Keyboard.
+  Reset the input device and optionaly run diagnostics
 
   There are 2 types of reset for USB keyboard.
   For non-exhaustive reset, only keyboard buffer is cleared.
   For exhaustive reset, in addition to clearance of keyboard buffer, the hardware status
   is also re-initialized.
 
-  @param  This                  The protocol instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL.
-  @param  ExtendedVerification  Indicates if exhaustive reset is used.
-                                TRUE for exhaustive reset.
-                                FALSE for non-exhaustive reset.
+  @param  This                 Protocol instance pointer.
+  @param  ExtendedVerification Driver may perform diagnostics on reset.
 
-  @retval EFI_SUCCESS           Keyboard is reset successfully.
-  @retval EFI_DEVICE_ERROR      Failed to reset keyboard.
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could not be reset.
 
 **/
 EFI_STATUS
@@ -284,14 +396,16 @@ USBKeyboardReset (
   );
 
 /**
-  Implements EFI_SIMPLE_TEXT_INPUT_PROTOCOL.ReadKeyStroke() function.
+  Reads the next keystroke from the input device.
 
   @param  This                 The EFI_SIMPLE_TEXT_INPUT_PROTOCOL instance.
   @param  Key                  A pointer to a buffer that is filled in with the keystroke
                                information for the key that was pressed.
 
-  @retval EFI_SUCCESS          Read key stroke successfully.
-  @retval Other                Read key stroke failed.
+  @retval EFI_SUCCESS          The keystroke information was returned.
+  @retval EFI_NOT_READY        There was no keystroke data availiable.
+  @retval EFI_DEVICE_ERROR     The keydtroke information was not returned due to
+                               hardware errors.
 
 **/
 EFI_STATUS
@@ -305,14 +419,25 @@ USBKeyboardReadKeyStroke (
 // Simple Text Input Ex protocol functions
 //
 /**
-  The extension routine to reset the input device.
+  Resets the input device hardware.
 
-  @param This                     Protocol instance pointer.
-  @param ExtendedVerification     Driver may perform diagnostics on reset.
+  The Reset() function resets the input device hardware. As part
+  of initialization process, the firmware/device will make a quick
+  but reasonable attempt to verify that the device is functioning.
+  If the ExtendedVerification flag is TRUE the firmware may take
+  an extended amount of time to verify the device is operating on
+  reset. Otherwise the reset operation is to occur as quickly as
+  possible. The hardware verification process is not defined by
+  this specification and is left up to the platform firmware or
+  driver to implement.
 
-  @retval EFI_SUCCESS             The device was reset.
-  @retval EFI_DEVICE_ERROR        The device is not functioning properly and could
-                                  not be reset.
+  @param This                 A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
+
+  @param ExtendedVerification Indicates that the driver may perform a more exhaustive
+                              verification operation of the device during reset.
+
+  @retval EFI_SUCCESS         The device was reset.
+  @retval EFI_DEVICE_ERROR    The device is not functioning correctly and could not be reset.
 
 **/
 EFI_STATUS
@@ -323,16 +448,17 @@ USBKeyboardResetEx (
   );
 
 /**
-  Reads the next keystroke from the input device. The WaitForKey Event can
-  be used to test for existance of a keystroke via WaitForEvent () call.
+  Reads the next keystroke from the input device.
 
-  @param  This                    Protocol instance pointer.
-  @param  KeyData                 A pointer to a buffer that is filled in with the keystroke
-                                  state data for the key that was pressed.
+  @param  This                   Protocol instance pointer.
+  @param  KeyData                A pointer to a buffer that is filled in with the keystroke
+                                 state data for the key that was pressed.
 
-  @return EFI_SUCCESS             The keystroke information was returned successfully.
-  @retval EFI_INVALID_PARAMETER   KeyData is NULL.
-  @retval Other                   Read key stroke information failed.
+  @retval EFI_SUCCESS            The keystroke information was returned.
+  @retval EFI_NOT_READY          There was no keystroke data available.
+  @retval EFI_DEVICE_ERROR       The keystroke information was not returned due to
+                                 hardware errors.
+  @retval EFI_INVALID_PARAMETER  KeyData is NULL.
 
 **/
 EFI_STATUS
@@ -349,8 +475,10 @@ USBKeyboardReadKeyStrokeEx (
   @param  KeyToggleState          A pointer to the EFI_KEY_TOGGLE_STATE to set the
                                   state for the input device.
 
-  @retval EFI_SUCCESS             The device state was set successfully.
-  @retval EFI_UNSUPPORTED         The device does not have the ability to set its state.
+  @retval EFI_SUCCESS             The device state was set appropriately.
+  @retval EFI_DEVICE_ERROR        The device is not functioning correctly and could
+                                  not have the setting adjusted.
+  @retval EFI_UNSUPPORTED         The device does not support the ability to have its state set.
   @retval EFI_INVALID_PARAMETER   KeyToggleState is NULL.
 
 **/
@@ -373,7 +501,7 @@ USBKeyboardSetState (
 
   @retval EFI_SUCCESS                 The notification function was registered successfully.
   @retval EFI_OUT_OF_RESOURCES        Unable to allocate resources for necesssary data structures.
-  @retval EFI_INVALID_PARAMETER       KeyData or NotifyHandle is NULL.
+  @retval EFI_INVALID_PARAMETER       KeyData or NotifyHandle or KeyNotificationFunction is NULL.
 
 **/
 EFI_STATUS
@@ -392,9 +520,8 @@ USBKeyboardRegisterKeyNotify (
   @param  NotificationHandle        The handle of the notification function being unregistered.
 
   @retval EFI_SUCCESS              The notification function was unregistered successfully.
-  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid or opening gSimpleTextInExNotifyGuid
-                                   on NotificationHandle fails.
-  @retval EFI_NOT_FOUND            Can not find the matching entry in database.
+  @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid
+  @retval EFI_NOT_FOUND            Cannot find the matching entry in database.
 
 **/
 EFI_STATUS
@@ -405,7 +532,8 @@ USBKeyboardUnregisterKeyNotify (
   );
 
 /**
-  Handler function for WaitForKey event.
+  Event notification function registered for EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx
+  and EFI_SIMPLE_TEXT_INPUT_PROTOCOL.WaitForKey.
 
   @param  Event        Event to be signaled when a key is pressed.
   @param  Context      Points to USB_KB_DEV instance.
@@ -421,20 +549,20 @@ USBKeyboardWaitForKey (
 /**
   Free keyboard notify list.
 
-  @param  ListHead                The list head.
+  @param  NotifyList              The keyboard notify list to free.
 
   @retval EFI_SUCCESS             Free the notify list successfully.
-  @retval EFI_INVALID_PARAMETER   ListHead is invalid.
+  @retval EFI_INVALID_PARAMETER   NotifyList is NULL.
 
 **/
 EFI_STATUS
 EFIAPI
 KbdFreeNotifyList (
-  IN OUT LIST_ENTRY           *ListHead
+  IN OUT LIST_ENTRY           *NotifyList
   );
 
 /**
-  Check whether there is key pending.
+  Check whether there is key pending in the keyboard buffer.
 
   @param  UsbKeyboardDevice    The USB_KB_DEV instance.
 
@@ -445,19 +573,17 @@ KbdFreeNotifyList (
 EFI_STATUS
 EFIAPI
 USBKeyboardCheckForKey (
-  IN  USB_KB_DEV    *UsbKeyboardDevice
+  IN OUT  USB_KB_DEV    *UsbKeyboardDevice
   );
 
 /**
-  Whether the pressed key matches a registered key or not.
+  Check whether the pressed key matches a registered key or not.
 
-  @param  RegsiteredData    A pointer to a buffer that is filled in with the keystroke
-                            state data for the key that was registered.
-  @param  InputData         A pointer to a buffer that is filled in with the keystroke
-                            state data for the key that was pressed.
+  @param  RegsiteredData    A pointer to keystroke data for the key that was registered.
+  @param  InputData         A pointer to keystroke data for the key that was pressed.
 
   @retval TRUE              Key pressed matches a registered key.
-  @retval FLASE             Match failed.
+  @retval FLASE             Key pressed does not matche a registered key.
 
 **/
 BOOLEAN
