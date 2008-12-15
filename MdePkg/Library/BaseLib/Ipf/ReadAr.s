@@ -15,487 +15,95 @@
 
 
 
+//---------------------------------------------------------------------------------
+//++
+// AsmReadApplicationRegister
+//
+// Reads a 64-bit application register.
+//
+// Reads and returns the application register specified by Index.
+// If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on IPF.
+//
+// Arguments :
+//
+// On Entry : The index of the application register to read.
+//
+// Return Value: The application register specified by Index.
+//
+//--
+//----------------------------------------------------------------------------------
 .text
-.type   AsmReadApplicationRegisterK0, @function
-.proc   AsmReadApplicationRegisterK0
-//
-// Reads appplication register K0.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K0
-//
-// @return The 64-bit application register K0.
-//
-AsmReadApplicationRegisterK0::
-  mov            r8 = ar.k0;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK0
-
-
-
-.text
-.type   AsmReadApplicationRegisterK1, @function
-.proc   AsmReadApplicationRegisterK1
-//
-// Reads appplication register K1.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K1
-//
-// @return The 64-bit application register K1.
-//
-AsmReadApplicationRegisterK1::
-  mov            r8 = ar.k1;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK1
-
-
-
-.text
-.type   AsmReadApplicationRegisterK2, @function
-.proc   AsmReadApplicationRegisterK2
-//
-// Reads appplication register K2.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K2
-//
-// @return The 64-bit application register K2.
-//
-AsmReadApplicationRegisterK2::
-  mov            r8 = ar.k2;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK2
-
-
-
-.text
-.type   AsmReadApplicationRegisterK3, @function
-.proc   AsmReadApplicationRegisterK3
-//
-// Reads appplication register K3.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K3
-//
-// @return The 64-bit application register K3.
-//
-AsmReadApplicationRegisterK3::
-  mov            r8 = ar.k3;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK3
-
-
-
-.text
-.type   AsmReadApplicationRegisterK4, @function
-.proc   AsmReadApplicationRegisterK4
-//
-// Reads appplication register K4.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K4
-//
-// @return The 64-bit application register K4.
-//
-AsmReadApplicationRegisterK4::
-  mov            r8 = ar.k4;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK4
-
-
-
-.text
-.type   AsmReadApplicationRegisterK5, @function
-.proc   AsmReadApplicationRegisterK5
-//
-// Reads appplication register K5.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K5
-//
-// @return The 64-bit application register K5.
-//
-AsmReadApplicationRegisterK5::
-  mov            r8 = ar.k5;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK5
-
-
-
-.text
-.type   AsmReadApplicationRegisterK6, @function
-.proc   AsmReadApplicationRegisterK6
-//
-// Reads appplication register K6.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K6
-//
-// @return The 64-bit application register K6.
-//
-AsmReadApplicationRegisterK6::
-  mov            r8 = ar.k6;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK6
-
-
-
-.text
-.type   AsmReadApplicationRegisterK7, @function
-.proc   AsmReadApplicationRegisterK7
-//
-// Reads appplication register K7.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_K7
-//
-// @return The 64-bit application register K7.
-//
-AsmReadApplicationRegisterK7::
-  mov            r8 = ar.k7;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterK7
-
-
-
-.text
-.type   AsmReadApplicationRegisterRsc, @function
-.proc   AsmReadApplicationRegisterRsc
-//
-// Reads appplication register RSC.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_RSC
-//
-// @return The 64-bit application register RSC.
-//
-AsmReadApplicationRegisterRsc::
-  mov            r8 = ar.rsc;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterRsc
-
-
-
-.text
-.type   AsmReadApplicationRegisterBsp, @function
-.proc   AsmReadApplicationRegisterBsp
-//
-// Reads appplication register BSP.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_BSP
-//
-// @return The 64-bit application register BSP.
-//
-AsmReadApplicationRegisterBsp::
-  mov            r8 = ar.bsp;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterBsp
-
-
-
-.text
-.type   AsmReadApplicationRegisterBspstore, @function
-.proc   AsmReadApplicationRegisterBspstore
-//
-// Reads appplication register BSPSTORE.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_BSPSTORE
-//
-// @return The 64-bit application register BSPSTORE.
-//
-AsmReadApplicationRegisterBspstore::
-  mov            r8 = ar.bspstore;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterBspstore
-
-
-
-.text
-.type   AsmReadApplicationRegisterRnat, @function
-.proc   AsmReadApplicationRegisterRnat
-//
-// Reads appplication register RNAT.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_RNAT
-//
-// @return The 64-bit application register RNAT.
-//
-AsmReadApplicationRegisterRnat::
-  mov            r8 = ar.rnat;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterRnat
-
-
-
-.text
-.type   AsmReadApplicationRegisterFcr, @function
-.proc   AsmReadApplicationRegisterFcr
-//
-// Reads appplication register FCR.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_FCR
-//
-// @return The 64-bit application register FCR.
-//
-AsmReadApplicationRegisterFcr::
-  mov            r8 = ar.fcr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterFcr
-
-
-
-.text
-.type   AsmReadApplicationRegisterEflag, @function
-.proc   AsmReadApplicationRegisterEflag
-//
-// Reads appplication register EFLAG.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_EFLAG
-//
-// @return The 64-bit application register EFLAG.
-//
-AsmReadApplicationRegisterEflag::
-  mov            r8 = ar.eflag;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterEflag
-
-
-
-.text
-.type   AsmReadApplicationRegisterCsd, @function
-.proc   AsmReadApplicationRegisterCsd
-//
-// Reads appplication register CSD.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_CSD
-//
-// @return The 64-bit application register CSD.
-//
-AsmReadApplicationRegisterCsd::
-  mov            r8 = ar.csd;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterCsd
-
-
-
-.text
-.type   AsmReadApplicationRegisterSsd, @function
-.proc   AsmReadApplicationRegisterSsd
-//
-// Reads appplication register SSD.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_SSD
-//
-// @return The 64-bit application register SSD.
-//
-AsmReadApplicationRegisterSsd::
-  mov            r8 = ar.ssd;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterSsd
-
-
-
-.text
-.type   AsmReadApplicationRegisterCflg, @function
-.proc   AsmReadApplicationRegisterCflg
-//
-// Reads appplication register CFLG.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_CFLG
-//
-// @return The 64-bit application register CFLG.
-//
-AsmReadApplicationRegisterCflg::
-  mov            r8 = ar.cflg;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterCflg
-
-
-
-.text
-.type   AsmReadApplicationRegisterFsr, @function
-.proc   AsmReadApplicationRegisterFsr
-//
-// Reads appplication register FSR.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_FSR
-//
-// @return The 64-bit application register FSR.
-//
-AsmReadApplicationRegisterFsr::
-  mov            r8 = ar.fsr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterFsr
-
-
-
-.text
-.type   AsmReadApplicationRegisterFir, @function
-.proc   AsmReadApplicationRegisterFir
-//
-// Reads appplication register FIR.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_FIR
-//
-// @return The 64-bit application register FIR.
-//
-AsmReadApplicationRegisterFir::
-  mov            r8 = ar.fir;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterFir
-
-
-
-.text
-.type   AsmReadApplicationRegisterFdr, @function
-.proc   AsmReadApplicationRegisterFdr
-//
-// Reads appplication register FDR.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_FDR
-//
-// @return The 64-bit application register FDR.
-//
-AsmReadApplicationRegisterFdr::
-  mov            r8 = ar.fdr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterFdr
-
-
-
-.text
-.type   AsmReadApplicationRegisterCcv, @function
-.proc   AsmReadApplicationRegisterCcv
-//
-// Reads appplication register CCV.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_CCV
-//
-// @return The 64-bit application register CCV.
-//
-AsmReadApplicationRegisterCcv::
-  mov            r8 = ar.ccv;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterCcv
-
-
-
-.text
-.type   AsmReadApplicationRegisterUnat, @function
-.proc   AsmReadApplicationRegisterUnat
-//
-// Reads appplication register UNAT.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_UNAT
-//
-// @return The 64-bit application register UNAT.
-//
-AsmReadApplicationRegisterUnat::
-  mov            r8 = ar.unat;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterUnat
-
-
-
-.text
-.type   AsmReadApplicationRegisterFpsr, @function
-.proc   AsmReadApplicationRegisterFpsr
-//
-// Reads appplication register FPSR.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_FPSR
-//
-// @return The 64-bit application register FPSR.
-//
-AsmReadApplicationRegisterFpsr::
-  mov            r8 = ar.fpsr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterFpsr
-
-
-
-.text
-.type   AsmReadApplicationRegisterItc, @function
-.proc   AsmReadApplicationRegisterItc
-//
-// Reads appplication register ITC.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_ITC
-//
-// @return The 64-bit application register ITC.
-//
-AsmReadApplicationRegisterItc::
-  mov            r8 = ar.itc;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterItc
-
-
-
-.text
-.type   AsmReadApplicationRegisterPfs, @function
-.proc   AsmReadApplicationRegisterPfs
-//
-// Reads appplication register PFS.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_PFS
-//
-// @return The 64-bit application register PFS.
-//
-AsmReadApplicationRegisterPfs::
-  mov            r8 = ar.pfs;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterPfs
-
-
-
-.text
-.type   AsmReadApplicationRegisterLc, @function
-.proc   AsmReadApplicationRegisterLc
-//
-// Reads appplication register LC.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_LC
-//
-// @return The 64-bit application register LC.
-//
-AsmReadApplicationRegisterLc::
-  mov            r8 = ar.lc;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterLc
-
-
-
-.text
-.type   AsmReadApplicationRegisterEc, @function
-.proc   AsmReadApplicationRegisterEc
-//
-// Reads appplication register EC.
-//
-// This is a worker function for AsmReadApplicationRegister()
-// when its parameter Index is IPF_APPLICATION_REGISTER_EC
-//
-// @return The 64-bit application register EC.
-//
-AsmReadApplicationRegisterEc::
-  mov            r8 = ar.ec;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadApplicationRegisterEc
-
+.type   AsmReadApplicationRegister, @function
+.proc   AsmReadApplicationRegister
+.regstk 1, 0, 0, 0
+
+AsmReadApplicationRegister::
+  //
+  // ARs are defined in the ranges 0-44 and 64-66 (with some holes).
+  // Compact this list by subtracting 16 from the top range.
+  // 0-44, 64-66 -> 0-44, 48-50
+  //
+  mov  r15=2
+  mov  r14=pr                   // save predicates
+  cmp.leu  p6,p7=64,in0         // p6 = AR# >= 64
+  ;;
+  (p7)  cmp.leu  p7,p0=48,in0   // p7 = 32 <= AR# < 64
+  (p6)  add  in0=-16,in0        // if (AR >= 64) AR# -= 16
+  ;;
+  (p7)  mov  r15=0              // if bad range (48-63)
+  ;;
+  mov  ret0=-1                  // in case of illegal AR #
+  shl  r15=r15,in0              // r15 = 0x2 << AR#
+  ;;
+  mov  pr=r15,-1
+  ;;
+  //
+  // At this point the predicates contain a bit field of the
+  // AR desired.  (The bit is the AR+1, since pr0 is always 1.)
+  //
+  .pred.rel "mutex",p1,p2,p3,p4,p5,p6,p7,p8,p17,p18,p19,p20,p22,p25,\
+        p26,p27,p28,p29,p30,p31,p33,p37,p41,p45,p49,p50,p51
+  (p1)  mov  ret0=ar.k0         // ar0
+  (p2)  mov  ret0=ar.k1         // ar1
+  (p3)  mov  ret0=ar.k2         // ar2
+  (p4)  mov  ret0=ar.k3         // ar3
+  (p5)  mov  ret0=ar.k4         // ar4
+  (p6)  mov  ret0=ar.k5         // ar5
+  (p7)  mov  ret0=ar.k6         // ar6
+  (p8)  mov  ret0=ar.k7         // ar7
+
+  (p17)  mov  ret0=ar.rsc       // ar16
+  (p18)  mov  ret0=ar.bsp       // ar17
+  (p19)  mov  ret0=ar.bspstore  // ar18
+  (p20)  mov  ret0=ar.rnat      // ar19
+
+  (p22)  mov  ret0=ar.fcr       // ar21 [iA32]
+
+  (p25)  mov  ret0=ar.eflag     // ar24 [iA32]
+  (p26)  mov  ret0=ar.csd       // ar25 [iA32]
+  (p27)  mov  ret0=ar.ssd       // ar26 [iA32]
+  (p28)  mov  ret0=ar.cflg      // ar27 [iA32]
+  (p29)  mov  ret0=ar.fsr       // ar28 [iA32]
+  (p30)  mov  ret0=ar.fir       // ar29 [iA32]
+  (p31)  mov  ret0=ar.fdr       // ar30 [iA32]
+
+  (p33)  mov  ret0=ar.ccv       // ar32
+
+  (p37)  mov  ret0=ar.unat      // ar36
+
+  (p41)  mov  ret0=ar.fpsr      // ar40
+
+  (p45)  mov  ret0=ar.itc       // ar44
+
+  //
+  // This is the translated (-16) range.
+  //
+  (p49)  mov  ret0=ar.pfs       // ar64
+  (p50)  mov  ret0=ar.lc        // ar65
+  (p51)  mov  ret0=ar.ec        // ar66
+
+  // Restore predicates and return.
+
+  mov  pr=r14,-1
+  br.ret.sptk  b0
+  .endp

@@ -575,7 +575,6 @@
   ChkStkGcc.c  | GCC 
 
 [Sources.IPF]
-  Ipf/AsmCpuMisc.s
   Ipf/AccessGp.s
   Ipf/ReadCpuid.s
   Ipf/ExecFc.s
@@ -586,6 +585,7 @@
   Ipf/AccessGcr.s
   Ipf/AccessEicr.s
   Ipf/AccessDbr.s
+  Ipf/AccessMsr.s        | INTEL
   Ipf/FlushCacheRange.s
   Ipf/InternalSwitchStack.c
   Ipf/GetInterruptState.s
@@ -595,14 +595,13 @@
   Ipf/InterlockedCompareExchange32.s
   Ipf/CpuBreakpoint.c    | INTEL
   Ipf/CpuBreakpointMsc.c | MSFT
+  Ipf/AsmCpuMisc.s       | GCC
   Ipf/Unaligned.c
   Ipf/SwitchStack.s
   Ipf/LongJmp.s
   Ipf/SetJmp.s
   Ipf/ReadCr.s
-  Ipf/ReadControlRegister.c
   Ipf/ReadAr.s
-  Ipf/ReadApplicationRegister.c
   Ipf/Ia64gen.h
   Ipf/Asm.h
   Math64.c

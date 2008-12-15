@@ -4898,6 +4898,50 @@ AsmReadApplicationRegister (
 
 
 /**
+  Reads the current value of a Machine Specific Register (MSR).
+
+  Reads and returns the current value of the Machine Specific Register specified by Index.  No
+  parameter checking is performed on Index, and if the Index value is beyond the implemented MSR
+  register range, a Reserved Register/Field fault may occur.  The caller must either guarantee that
+  Index is valid, or the caller must set up fault handlers to catch the faults.  This function is
+  only available on IPF.
+
+  @param  Index                     The 8-bit Machine Specific Register index to read.
+
+  @return The current value of the Machine Specific Register specified by Index.  
+
+**/
+UINT64
+EFIAPI
+AsmReadMsr (
+  IN UINT8   Index  
+  );
+
+
+/**
+  Writes the current value of a Machine Specific Register (MSR).
+
+  Writes Value to the Machine Specific Register specified by Index.  Value is returned.  No
+  parameter checking is performed on Index, and if the Index value is beyond the implemented MSR
+  register range, a Reserved Register/Field fault may occur.  The caller must either guarantee that
+  Index is valid, or the caller must set up fault handlers to catch the faults.  This function is
+  only available on IPF.
+
+  @param  Index                     The 8-bit Machine Specific Register index to write.
+  @param  Value                     The 64-bit value to write to the Machine Specific Register.
+
+  @return The 64-bit value to write to the Machine Specific Register.  
+
+**/
+UINT64
+EFIAPI
+AsmWriteMsr (
+  IN UINT8   Index, 
+  IN UINT64  Value  
+  );
+
+
+/**
   Determines if the CPU is currently executing in virtual, physical, or mixed mode.
 
   Determines the current execution mode of the CPU.

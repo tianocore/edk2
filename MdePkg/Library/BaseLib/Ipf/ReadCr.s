@@ -14,469 +14,89 @@
 ///
 
 
+
+//---------------------------------------------------------------------------------
+//++
+// AsmReadControlRegister
+//
+// Reads a 64-bit control register.
+//
+// Reads and returns the control register specified by Index.
+// If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on IPF.
+//
+// Arguments :
+//
+// On Entry : The index of the control register to read.
+//
+// Return Value: The control register specified by Index.
+//
+//--
+//----------------------------------------------------------------------------------
 .text
-.type   AsmReadControlRegisterDcr, @function
-.proc   AsmReadControlRegisterDcr
-//
-// Reads control register DCR.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_DCR
-//
-// @return The 64-bit control register DCR.
-//
-AsmReadControlRegisterDcr::
-  mov            r8 = cr.dcr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterDcr
-
-
-
-.text
-.type   AsmReadControlRegisterItm, @function
-.proc   AsmReadControlRegisterItm
-//
-// Reads control register ITM.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_ITM
-//
-// @return The 64-bit control register ITM.
-//
-AsmReadControlRegisterItm::
-  mov            r8 = cr.itm;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterItm
-
-
-
-.text
-.type   AsmReadControlRegisterIva, @function
-.proc   AsmReadControlRegisterIva
-//
-// Reads control register IVA.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IVA
-//
-// @return The 64-bit control register IVA.
-//
-AsmReadControlRegisterIva::
-  mov            r8 = cr.iva;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIva
-
-
-
-.text
-.type   AsmReadControlRegisterPta, @function
-.proc   AsmReadControlRegisterPta
-//
-// Reads control register PTA.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_PTA
-//
-// @return The 64-bit control register PTA.
-//
-AsmReadControlRegisterPta::
-  mov            r8 = cr.pta;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterPta
-
-
-
-.text
-.type   AsmReadControlRegisterIpsr, @function
-.proc   AsmReadControlRegisterIpsr
-//
-// Reads control register IPSR.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IPSR
-//
-// @return The 64-bit control register IPSR.
-//
-AsmReadControlRegisterIpsr::
-  mov            r8 = cr.ipsr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIpsr
-
-
-
-.text
-.type   AsmReadControlRegisterIsr, @function
-.proc   AsmReadControlRegisterIsr
-//
-// Reads control register ISR.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_ISR
-//
-// @return The 64-bit control register ISR.
-//
-AsmReadControlRegisterIsr::
-  mov            r8 = cr.isr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIsr
-
-
-
-.text
-.type   AsmReadControlRegisterIip, @function
-.proc   AsmReadControlRegisterIip
-//
-// Reads control register IIP.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IIP
-//
-// @return The 64-bit control register IIP.
-//
-AsmReadControlRegisterIip::
-  mov            r8 = cr.iip;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIip
-
-
-
-.text
-.type   AsmReadControlRegisterIfa, @function
-.proc   AsmReadControlRegisterIfa
-//
-// Reads control register IFA.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IFA
-//
-// @return The 64-bit control register IFA.
-//
-AsmReadControlRegisterIfa::
-  mov            r8 = cr.ifa;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIfa
-
-
-
-.text
-.type   AsmReadControlRegisterItir, @function
-.proc   AsmReadControlRegisterItir
-//
-// Reads control register ITIR.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_ITIR
-//
-// @return The 64-bit control register ITIR.
-//
-AsmReadControlRegisterItir::
-  mov            r8 = cr.itir;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterItir
-
-
-
-.text
-.type   AsmReadControlRegisterIipa, @function
-.proc   AsmReadControlRegisterIipa
-//
-// Reads control register IIPA.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IIPA
-//
-// @return The 64-bit control register IIPA.
-//
-AsmReadControlRegisterIipa::
-  mov            r8 = cr.iipa;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIipa
-
-
-
-.text
-.type   AsmReadControlRegisterIfs, @function
-.proc   AsmReadControlRegisterIfs
-//
-// Reads control register IFS.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IFS
-//
-// @return The 64-bit control register IFS.
-//
-AsmReadControlRegisterIfs::
-  mov            r8 = cr.ifs;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIfs
-
-
-
-.text
-.type   AsmReadControlRegisterIim, @function
-.proc   AsmReadControlRegisterIim
-//
-// Reads control register IIM.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IIM
-//
-// @return The 64-bit control register IIM.
-//
-AsmReadControlRegisterIim::
-  mov            r8 = cr.iim;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIim
-
-
-
-.text
-.type   AsmReadControlRegisterIha, @function
-.proc   AsmReadControlRegisterIha
-//
-// Reads control register IHA.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IHA
-//
-// @return The 64-bit control register IHA.
-//
-AsmReadControlRegisterIha::
-  mov            r8 = cr.iha;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIha
-
-
-
-.text
-.type   AsmReadControlRegisterLid, @function
-.proc   AsmReadControlRegisterLid
-//
-// Reads control register LID.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_LID
-//
-// @return The 64-bit control register LID.
-//
-AsmReadControlRegisterLid::
-  mov            r8 = cr.lid;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterLid
-
-
-
-.text
-.type   AsmReadControlRegisterIvr, @function
-.proc   AsmReadControlRegisterIvr
-//
-// Reads control register IVR.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IVR
-//
-// @return The 64-bit control register IVR.
-//
-AsmReadControlRegisterIvr::
-  mov            r8 = cr.ivr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIvr
-
-
-
-.text
-.type   AsmReadControlRegisterTpr, @function
-.proc   AsmReadControlRegisterTpr
-//
-// Reads control register TPR.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_TPR
-//
-// @return The 64-bit control register TPR.
-//
-AsmReadControlRegisterTpr::
-  mov            r8 = cr.tpr;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterTpr
-
-
-
-.text
-.type   AsmReadControlRegisterEoi, @function
-.proc   AsmReadControlRegisterEoi
-//
-// Reads control register EOI.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_EOI
-//
-// @return The 64-bit control register EOI.
-//
-AsmReadControlRegisterEoi::
-  mov            r8 = cr.eoi;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterEoi
-
-
-
-.text
-.type   AsmReadControlRegisterIrr0, @function
-.proc   AsmReadControlRegisterIrr0
-//
-// Reads control register IRR0.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IRR0
-//
-// @return The 64-bit control register IRR0.
-//
-AsmReadControlRegisterIrr0::
-  mov            r8 = cr.irr0;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIrr0
-
-
-
-.text
-.type   AsmReadControlRegisterIrr1, @function
-.proc   AsmReadControlRegisterIrr1
-//
-// Reads control register IRR1.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IRR1
-//
-// @return The 64-bit control register IRR1.
-//
-AsmReadControlRegisterIrr1::
-  mov            r8 = cr.irr1;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIrr1
-
-
-
-.text
-.type   AsmReadControlRegisterIrr2, @function
-.proc   AsmReadControlRegisterIrr2
-//
-// Reads control register IRR2.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IRR2
-//
-// @return The 64-bit control register IRR2.
-//
-AsmReadControlRegisterIrr2::
-  mov            r8 = cr.irr2;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIrr2
-
-
-
-.text
-.type   AsmReadControlRegisterIrr3, @function
-.proc   AsmReadControlRegisterIrr3
-//
-// Reads control register IRR3.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_IRR3
-//
-// @return The 64-bit control register IRR3.
-//
-AsmReadControlRegisterIrr3::
-  mov            r8 = cr.irr3;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterIrr3
-
-
-
-.text
-.type   AsmReadControlRegisterItv, @function
-.proc   AsmReadControlRegisterItv
-//
-// Reads control register ITV.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_ITV
-//
-// @return The 64-bit control register ITV.
-//
-AsmReadControlRegisterItv::
-  mov            r8 = cr.itv;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterItv
-
-
-
-.text
-.type   AsmReadControlRegisterPmv, @function
-.proc   AsmReadControlRegisterPmv
-//
-// Reads control register PMV.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_PMV
-//
-// @return The 64-bit control register PMV.
-//
-AsmReadControlRegisterPmv::
-  mov            r8 = cr.pmv;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterPmv
-
-
-
-.text
-.type   AsmReadControlRegisterCmcv, @function
-.proc   AsmReadControlRegisterCmcv
-//
-// Reads control register CMCV.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_CMCV
-//
-// @return The 64-bit control register CMCV.
-//
-AsmReadControlRegisterCmcv::
-  mov            r8 = cr.cmcv;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterCmcv
-
-
-
-.text
-.type   AsmReadControlRegisterLrr0, @function
-.proc   AsmReadControlRegisterLrr0
-//
-// Reads control register LRR0.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_LRR0
-//
-// @return The 64-bit control register LRR0.
-//
-AsmReadControlRegisterLrr0::
-  mov            r8 = cr.lrr0;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterLrr0
-
-
-
-.text
-.type   AsmReadControlRegisterLrr1, @function
-.proc   AsmReadControlRegisterLrr1
-//
-// Reads control register LRR1.
-//
-// This is a worker function for AsmReadControlRegister()
-// when its parameter Index is IPF_CONTROL_REGISTER_LRR1
-//
-// @return The 64-bit control register LRR1.
-//
-AsmReadControlRegisterLrr1::
-  mov            r8 = cr.lrr1;;
-  br.ret.dpnt    b0;;
-.endp   AsmReadControlRegisterLrr1
-
+.type   AsmReadControlRegister, @function
+.proc   AsmReadControlRegister
+.regstk 1, 0, 0, 0
+
+AsmReadControlRegister::
+  //
+  // CRs are defined in the ranges 0-25 and 64-81 (with some holes).
+  // Compact this list by subtracting 32 from the top range.
+  // 0-25, 64-81 -> 0-25, 32-49
+  //
+  mov  r15=2
+  mov  r14=pr                    // save predicates
+  cmp.leu  p6,p7=64,in0          // p6 = CR# >= 64
+  ;;
+  (p7)  cmp.leu  p7,p0=32,in0    // p7 = 32 <= CR# < 64
+  (p6)  add  in0=-32,in0         // if (CR >= 64) CR# -= 32
+  ;;
+  (p7)  mov  r15=0               // if bad range (32-63)
+  ;;
+  mov  ret0=-1                   // in case of illegal CR #
+  shl  r15=r15,in0               // r15 = 0x2 << CR#
+  ;;
+  mov  pr=r15,-1
+  ;;
+
+  //
+  // At this point the predicates contain a bit field of the
+  // CR desired.  (The bit is the CR+1, since pr0 is always 1.)
+  //
+  .pred.rel "mutex",p1,p2,p3,p9,p17,p18,p20,p21,p22,p23,p24,p25,p26,\
+    p33,p34,p35,p36,p37,p38,p39,p40,p41,p42,p43,p49,p50
+  (p1)  mov  ret0=cr.dcr        // cr0
+  (p2)  mov  ret0=cr.itm        // cr1
+  (p3)  mov  ret0=cr.iva        // cr2
+  (p9)  mov  ret0=cr.pta        // cr8
+  (p17)  mov  ret0=cr.ipsr      // cr16
+  (p18)  mov  ret0=cr.isr       // cr17
+  (p20)  mov  ret0=cr.iip       // cr19
+  (p21)  mov  ret0=cr.ifa       // cr20
+  (p22)  mov  ret0=cr.itir      // cr21
+  (p23)  mov  ret0=cr.iipa      // cr22
+  (p24)  mov  ret0=cr.ifs       // cr23
+  (p25)  mov  ret0=cr.iim       // cr24
+  (p26)  mov  ret0=cr.iha       // cr25
+
+  // This is the translated (-32) range.
+
+  (p33)  mov  ret0=cr.lid       // cr64
+  (p34)  mov  ret0=cr.ivr       // cr65
+  (p35)  mov  ret0=cr.tpr       // cr66
+  (p36)  mov  ret0=cr.eoi       // cr67
+  (p37)  mov  ret0=cr.irr0      // cr68
+  (p38)  mov  ret0=cr.irr1      // cr69
+  (p39)  mov  ret0=cr.irr2      // cr70
+  (p40)  mov  ret0=cr.irr3      // cr71
+  (p41)  mov  ret0=cr.itv       // cr72
+  (p42)  mov  ret0=cr.pmv       // cr73
+  (p43)  mov  ret0=cr.cmcv      // cr74
+  (p49)  mov  ret0=cr.lrr0      // cr80
+  (p50)  mov  ret0=cr.lrr1      // cr81
+  
+  //
+  // Restore predicates and return.
+  //
+  mov  pr=r14,-1
+  br.ret.sptk  b0
+  .endp
