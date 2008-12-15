@@ -14,6 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DebugSupport.h"
 
+IA32_IDT_GATE_DESCRIPTOR  NullDesc = {{0,0}};
+
 /**
   Get Interrupt Handle from IDT Gate Descriptor.
 
