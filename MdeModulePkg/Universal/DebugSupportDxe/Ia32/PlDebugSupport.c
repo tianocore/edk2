@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // This the global main table to keep track of the interrupts
 //
 IDT_ENTRY                 *IdtEntryTable  = NULL;
-IA32_IDT_GATE_DESCRIPTOR  NullDesc        = {0};
 
 /**
   Read IDT Gate Descriptor from IDT Table.
