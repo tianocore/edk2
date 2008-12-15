@@ -1,8 +1,13 @@
 #/** @file
+#  Performance library instance mainly for DxeCore usage.
 #  
-#    Component description file for DxeCore Performance Library
-#  
-#   This library provides intrastructure for DxeCore to log performance.
+#  This library provides the performance measurement interfaces and initializes performance
+#  logging for DXE phase. It first initializes its private global data structure for
+#  performance logging and saves the performance GUIDed HOB passed from PEI phase. 
+#  It initializes DXE phase performance logging by publishing the Performance Protocol,
+#  which is consumed by DxePerformanceLib to logging performance data in DXE phase.
+#  This library is mainly used by DxeCore to start performance logging to ensure that
+#  Performance Protocol is installed at the very beginning of DXE phase.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials

@@ -1,5 +1,14 @@
 /** @file
-  Support for measurement of DXE performance
+  Performance library instance mainly used by DxeCore.
+
+  This library provides the performance measurement interfaces and initializes performance
+  logging for DXE phase. It first initializes its private global data structure for
+  performance logging and saves the performance GUIDed HOB passed from PEI phase. 
+  It initializes DXE phase performance logging by publishing the Performance Protocol,
+  which is consumed by DxePerformanceLib to logging performance data in DXE phase.
+
+  This library is mainly used by DxeCore to start performance logging to ensure that
+  Performance Protocol is installed at the very beginning of DXE phase.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -17,12 +26,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 //
-// Definition for global variables.
+// The data structure to hold global performance data.
 //
 GAUGE_DATA_HEADER    *mGaugeData;
+
+//
+// The current maximum number of logging entries. If current number of 
+// entries exceeds this value, it will re-allocate a larger array and
+// migration the old data to the larger array.
+//
 UINT32               mMaxGaugeRecords;
 
+//
+// The handle to install Performance Protocol instance.
+//
 EFI_HANDLE           mHandle = NULL;
+
+//
+// Interfaces for performance protocol.
+//
 PERFORMANCE_PROTOCOL mPerformanceInterface = {
   StartGauge,
   EndGauge,
@@ -122,7 +144,7 @@ StartGauge (
   Index = mGaugeData->NumberOfEntries;
   if (Index >= mMaxGaugeRecords) {
     //
-    // Try to enlarge the scale of gauge arrary.
+    // Try to enlarge the scale of gauge array.
     //
     OldGaugeData      = mGaugeData;
     OldGaugeDataSize  = sizeof (GAUGE_DATA_HEADER) + sizeof (GAUGE_DATA_ENTRY) * mMaxGaugeRecords;
@@ -135,7 +157,7 @@ StartGauge (
       return EFI_OUT_OF_RESOURCES;
     }
     //
-    // Initialize new data arry and migrate old data one.
+    // Initialize new data array and migrate old data one.
     //
     mGaugeData = CopyMem (mGaugeData, OldGaugeData, OldGaugeDataSize);
 
@@ -224,7 +246,7 @@ EndGauge (
   @param  GaugeDataEntry          The indirect pointer to the gauge data entry specified by LogEntryKey
                                   if the retrieval is successful.
 
-  @retval EFI_SUCCESS             The GuageDataEntry is successfuly found based on LogEntryKey.
+  @retval EFI_SUCCESS             The GuageDataEntry is successfully found based on LogEntryKey.
   @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
   @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
   @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL.
@@ -450,7 +472,7 @@ EndPerformanceMeasurement (
 
   @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
                                   0, then the first performance measurement log entry is retrieved.
-                                  On exit, the key of the next performance lof entry entry.
+                                  On exit, the key of the next performance log entry.
   @param  Handle                  Pointer to environment specific context used to identify the component
                                   being measured.
   @param  Token                   Pointer to a Null-terminated ASCII string that identifies the component
