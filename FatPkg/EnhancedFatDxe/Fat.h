@@ -51,11 +51,11 @@ Revision History
 //
 // The FAT signature
 //
-#define FAT_VOLUME_SIGNATURE         EFI_SIGNATURE_32 ('f', 'a', 't', 'v')
-#define FAT_IFILE_SIGNATURE          EFI_SIGNATURE_32 ('f', 'a', 't', 'i')
-#define FAT_ODIR_SIGNATURE           EFI_SIGNATURE_32 ('f', 'a', 't', 'd')
-#define FAT_DIRENT_SIGNATURE         EFI_SIGNATURE_32 ('f', 'a', 't', 'e')
-#define FAT_OFILE_SIGNATURE          EFI_SIGNATURE_32 ('f', 'a', 't', 'o')
+#define FAT_VOLUME_SIGNATURE         SIGNATURE_32 ('f', 'a', 't', 'v')
+#define FAT_IFILE_SIGNATURE          SIGNATURE_32 ('f', 'a', 't', 'i')
+#define FAT_ODIR_SIGNATURE           SIGNATURE_32 ('f', 'a', 't', 'd')
+#define FAT_DIRENT_SIGNATURE         SIGNATURE_32 ('f', 'a', 't', 'e')
+#define FAT_OFILE_SIGNATURE          SIGNATURE_32 ('f', 'a', 't', 'o')
 
 #define ASSERT_VOLUME_LOCKED(a)      ASSERT_LOCKED (&FatFsLock)
 
