@@ -56,7 +56,7 @@ typedef struct {
 /// computes this size correctly no matter how big the VolumeLable array is declared.
 /// This is required to make the EFI_FILE_SYSTEM_INFO data structure ANSI compilant.
 ///
-#define SIZE_OF_EFI_FILE_SYSTEM_INFO  EFI_FIELD_OFFSET (EFI_FILE_SYSTEM_INFO, VolumeLabel)
+#define SIZE_OF_EFI_FILE_SYSTEM_INFO  OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)
 
 extern EFI_GUID gEfiFileSystemInfoGuid;
 

@@ -19,7 +19,7 @@
 ///
 /// The start of TPM return codes
 ///
-#define TPM_BASE                    (EFI_MAX_BIT + (EFI_MAX_BIT >> 1))
+#define TPM_BASE                    (MAX_BIT + (MAX_BIT >> 1))
 
 //
 // All structures MUST be packed on a byte boundary.
