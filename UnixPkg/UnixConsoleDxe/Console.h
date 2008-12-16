@@ -47,7 +47,7 @@ extern EFI_DRIVER_BINDING_PROTOCOL gUnixConsoleDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL gUnixConsoleComponentName;
 
 #define UNIX_SIMPLE_TEXT_PRIVATE_DATA_SIGNATURE \
-          EFI_SIGNATURE_32('U','X','s','c')
+          SIGNATURE_32('U','X','s','c')
 
 typedef struct {
   UINT64                        Signature;

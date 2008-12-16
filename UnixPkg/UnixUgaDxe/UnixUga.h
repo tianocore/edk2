@@ -41,7 +41,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL gUnixUgaComponentName;
 
 #define UNIX_UGA_CLASS_NAME       L"UnixUgaWindow"
 
-#define UGA_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('S', 'g', 'o', 'N')
+#define UGA_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('S', 'g', 'o', 'N')
 typedef struct {
   UINT64                      Signature;
 

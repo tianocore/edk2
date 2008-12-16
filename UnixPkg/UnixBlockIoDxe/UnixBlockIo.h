@@ -46,7 +46,7 @@ Abstract:
 //
 #define LANGUAGESUPPORTED "eng"
 
-#define UNIX_BLOCK_IO_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('L', 'X', 'b', 'k')
+#define UNIX_BLOCK_IO_PRIVATE_SIGNATURE SIGNATURE_32 ('L', 'X', 'b', 'k')
 typedef struct {
   UINTN                       Signature;
 
