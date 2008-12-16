@@ -52,7 +52,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // VGA Class Device Structure
 //
-#define VGA_CLASS_DEV_SIGNATURE EFI_SIGNATURE_32 ('V', 'G', 'A', 'C')
+#define VGA_CLASS_DEV_SIGNATURE SIGNATURE_32 ('V', 'G', 'A', 'C')
 
 typedef struct {
   UINTN                         Signature;

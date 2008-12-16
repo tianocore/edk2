@@ -62,7 +62,7 @@ typedef struct {
   BOOLEAN DeviceProcessed[MAX_IDE_DEVICE];
 } IDE_BUS_DRIVER_PRIVATE_DATA;
 
-#define IDE_BLK_IO_DEV_SIGNATURE  EFI_SIGNATURE_32 ('i', 'b', 'i', 'd')
+#define IDE_BLK_IO_DEV_SIGNATURE  SIGNATURE_32 ('i', 'b', 'i', 'd')
 
 typedef struct {
   UINT32                      Signature;

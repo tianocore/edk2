@@ -66,7 +66,7 @@ typedef enum {
 //
 // Driver Private Data
 //
-#define PS2_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE EFI_SIGNATURE_32 ('p', '2', 's', 't')
+#define PS2_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE SIGNATURE_32 ('p', '2', 's', 't')
 
 typedef struct {
   UINTN                               Signature;

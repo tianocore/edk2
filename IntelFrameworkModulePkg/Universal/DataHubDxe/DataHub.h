@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#define DATA_HUB_INSTANCE_SIGNATURE EFI_SIGNATURE_32 ('D', 'H', 'u', 'b')
+#define DATA_HUB_INSTANCE_SIGNATURE SIGNATURE_32 ('D', 'H', 'u', 'b')
 typedef struct {
   UINT32                Signature;
 
@@ -77,7 +77,7 @@ typedef struct {
 //  structure. Head pointer to the list is the Log member of
 //  EFI_DATA_ENTRY. Record is a copy of the data passed in.
 //
-#define EFI_DATA_ENTRY_SIGNATURE  EFI_SIGNATURE_32 ('D', 'r', 'e', 'c')
+#define EFI_DATA_ENTRY_SIGNATURE  SIGNATURE_32 ('D', 'r', 'e', 'c')
 typedef struct {
   UINT32                  Signature;
   LIST_ENTRY              Link;
@@ -94,7 +94,7 @@ typedef struct {
 // Private data to contain the filter driver Event and it's
 //  associated EFI_TPL.
 //
-#define EFI_DATA_HUB_FILTER_DRIVER_SIGNATURE  EFI_SIGNATURE_32 ('D', 'h', 'F', 'd')
+#define EFI_DATA_HUB_FILTER_DRIVER_SIGNATURE  SIGNATURE_32 ('D', 'h', 'F', 'd')
 
 typedef struct {
   UINT32          Signature;

@@ -43,7 +43,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gIsaSerialComponentName2;
 //
 // Internal Data Structures
 //
-#define SERIAL_DEV_SIGNATURE    EFI_SIGNATURE_32 ('s', 'e', 'r', 'd')
+#define SERIAL_DEV_SIGNATURE    SIGNATURE_32 ('s', 'e', 'r', 'd')
 #define SERIAL_MAX_BUFFER_SIZE  16
 #define TIMEOUT_STALL_INTERVAL  10
 

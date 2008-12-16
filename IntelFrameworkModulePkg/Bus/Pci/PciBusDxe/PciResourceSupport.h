@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_PCI_RESOURCE_SUPPORT_H
 #define _EFI_PCI_RESOURCE_SUPPORT_H
 
-#define RESERVED_RESOURCE_SIGNATURE EFI_SIGNATURE_32 ('r', 's', 'v', 'd')
+#define RESERVED_RESOURCE_SIGNATURE SIGNATURE_32 ('r', 's', 'v', 'd')
 
 typedef struct {
   UINT64        Base;
@@ -40,7 +40,7 @@ typedef enum {
   PciResUsageOptionRomProcessing
 } PCI_RESOURCE_USAGE;
 
-#define PCI_RESOURCE_SIGNATURE  EFI_SIGNATURE_32 ('p', 'c', 'r', 'c')
+#define PCI_RESOURCE_SIGNATURE  SIGNATURE_32 ('p', 'c', 'r', 'c')
 
 typedef struct {
   UINT32              Signature;
