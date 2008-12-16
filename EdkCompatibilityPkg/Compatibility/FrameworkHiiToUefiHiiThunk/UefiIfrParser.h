@@ -323,6 +323,7 @@ typedef struct {
   // by priority rules defined in GetFormsetDefaultVarstoreId (). See the function description for details.
   //
   EFI_VARSTORE_ID                 DefaultVarStoreId;
+  CHAR16                          *OriginalDefaultVarStoreName;
 
   UINTN                           NumberOfStatement;
     

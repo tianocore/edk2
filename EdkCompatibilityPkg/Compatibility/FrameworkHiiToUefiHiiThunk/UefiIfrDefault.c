@@ -24,8 +24,6 @@ extern CONST EFI_HII_IMAGE_PROTOCOL               *mHiiImageProtocol;
 extern CONST EFI_HII_STRING_PROTOCOL              *mHiiStringProtocol;
 extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
 
-CHAR16 FrameworkReservedVarstoreName[] = FRAMEWORK_RESERVED_VARSTORE_NAME;
-
 /**
   Set the data position at Offset with Width in Node->Buffer based 
   the value passed in.
@@ -442,14 +440,7 @@ UefiDefaultsToFwDefaults (
 
     if (Node->DefaultId == DefaultId) {
       Size += Node->Size;
-      if ((Node->StoreId == UefiFormSetDefaultVarStoreId) && (StrCmp (FrameworkReservedVarstoreName, Node->Name) != 0)) {
-        //    The name of default VARSTORE with a Explicit declaration statement will be updated to L"Setup" to make sure
-        //    the Framework HII Setup module will run correctly. Framework HII Setup module always assumed that default
-        //    VARSTORE to have L"Setup" as name, Formset GUID as GUID. 
-        Size += StrSize (FrameworkReservedVarstoreName);
-      } else {
-        Size += StrSize (Node->Name);
-      }
+      Size += StrSize (Node->Name);
 
       Count++;
     }
@@ -480,26 +471,20 @@ UefiDefaultsToFwDefaults (
       Size += Node->Size;
       Size += sizeof (EFI_HII_VARIABLE_PACK);      
 
-      //
-      // In UEFI, 0 is defined to be invalid for EFI_IFR_VARSTORE.VarStoreId.
-      // So the default storage of Var Store in VFR from a Framework module 
-      // should be translated to the default Varstore ID.
-      //
-      if (Node->StoreId == UefiFormSetDefaultVarStoreId && (StrCmp (FrameworkReservedVarstoreName, Node->Name) != 0)) {
-        //    The name of default VARSTORE with a Explicit declaration statement will be updated to L"Setup" to make sure
-        //    the Framework HII Setup module will run correctly. Framework HII Setup module always assumed that default
-        //    VARSTORE to have L"Setup" as name, Formset GUID as GUID. 
+      Pack->VariableNameLength = (UINT32) StrSize (Node->Name);
+
+      if (Node->StoreId == UefiFormSetDefaultVarStoreId) {
+        //
+        // The default VARSTORE in VFR from a Framework module has Varstore ID of 0.
+        //
         Pack->VariableId = 0;
-        Pack->VariableNameLength = (UINT32) StrSize (FrameworkReservedVarstoreName);
-        CopyMem ((UINT8 *) Pack + sizeof (EFI_HII_VARIABLE_PACK), FrameworkReservedVarstoreName, StrSize (FrameworkReservedVarstoreName));
-        DEBUG ((EFI_D_INFO, "VarstoreID: %x; Name: %s -> %s.\n", UefiFormSetDefaultVarStoreId, Node->Name, FrameworkReservedVarstoreName));
       } else {
         Pack->VariableId = Node->StoreId;
-        Pack->VariableNameLength = (UINT32) StrSize (Node->Name);
-        CopyMem ((UINT8 *) Pack + sizeof (EFI_HII_VARIABLE_PACK), Node->Name, StrSize (Node->Name));
       }
 
+      CopyMem ((UINT8 *) Pack + sizeof (EFI_HII_VARIABLE_PACK), Node->Name, StrSize (Node->Name));
       Size += Pack->VariableNameLength;
+
       //
       // Initialize EFI_HII_VARIABLE_PACK
       //
@@ -518,6 +503,9 @@ UefiDefaultsToFwDefaults (
       Index++;
       if (Index < Count) {
         PackList->NextVariablePack = (EFI_HII_VARIABLE_PACK_LIST *)((UINT8 *) PackList + Size);
+
+        PackList = PackList->NextVariablePack;
+        Pack     = (EFI_HII_VARIABLE_PACK *) (PackList + 1);
       }
             
     }

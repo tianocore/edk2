@@ -403,6 +403,10 @@ DestroyFormSet (
   }
 
   DestoryOneOfOptionMap (&FormSet->OneOfOptionMapListHead);
+
+  if (FormSet->OriginalDefaultVarStoreName != NULL) {
+    FreePool (FormSet->OriginalDefaultVarStoreName);
+  }
   
   FreePool (FormSet);
 }

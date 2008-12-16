@@ -150,13 +150,20 @@ GetStorageFromConfigString (
 {
   LIST_ENTRY             *StorageList;
   FORMSET_STORAGE        *Storage;
+  CHAR16                 *Name;
 
   StorageList = GetFirstNode (&FormSet->StorageListHead);
 
   while (!IsNull (&FormSet->StorageListHead, StorageList)) {
     Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
 
-    if (IsConfigHdrMatch (ConfigString, &Storage->Guid, Storage->Name)) {
+    if ((Storage->VarStoreId == FormSet->DefaultVarStoreId) && (FormSet->OriginalDefaultVarStoreName != NULL)) {
+      Name = FormSet->OriginalDefaultVarStoreName;
+    } else {
+      Name = Storage->Name;
+    }
+    
+    if (IsConfigHdrMatch (ConfigString, &Storage->Guid, Name)) {
       return Storage;
     }
 
