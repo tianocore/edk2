@@ -55,13 +55,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 //
-// VARSTORE ID of 0 for Buffer Storage Type Storage is reserved in UEFI IFR form. But VARSTORE ID
-// 0 in Framework IFR is the default VarStore ID for storage without explicit declaration. So we have
-// to reseved 0x0001 in UEFI VARSTORE ID to represetn default storage id in Framework IFR.
-// Framework VFR has to be ported or pre-processed to change the default VARSTORE to a VARSTORE
-// with ID equal to 0x0001.
+// VARSTORE ID of 0 for Buffer Storage Type Storage is defined as invalid in UEFI 2.1 HII. VARSTORE ID
+// 0 is the default VarStore ID for storage without explicit declaration in Framework HII 0.92. EDK II UEFI VFR compiler
+// in compatible mode will assign 0x0001 as UEFI VARSTORE ID to this default storage id in Framework VFR without
+// VARSTORE declaration.
+// 
+// In addition, the Name of Default VarStore is assumed to be L"Setup" for those storage without explicit VARSTORE declaration in the formset
+// by Framework HII. EDK II UEFI VFR compiler in compatible mode hard-coded L"Setup" as VARSTORE name.
 //
 #define FRAMEWORK_RESERVED_VARSTORE_ID 0x0001
+#define FRAMEWORK_RESERVED_VARSTORE_NAME L"Setup"
 
 
 #pragma pack (1)
