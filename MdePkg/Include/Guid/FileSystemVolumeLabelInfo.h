@@ -30,7 +30,7 @@ typedef struct {
 } EFI_FILE_SYSTEM_VOLUME_LABEL;
 
 #define SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL \
-        EFI_FIELD_OFFSET (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel)
+        OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel)
 
 extern EFI_GUID gEfiFileSystemVolumeLabelInfoIdGuid;
 

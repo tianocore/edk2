@@ -20,7 +20,7 @@
 #include <Library/HobLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
-#define PEI_EXTRACT_HANDLER_INFO_SIGNATURE EFI_SIGNATURE_32 ('P', 'E', 'H', 'I')
+#define PEI_EXTRACT_HANDLER_INFO_SIGNATURE SIGNATURE_32 ('P', 'E', 'H', 'I')
 
 typedef struct {
   UINT32                                  Signature;

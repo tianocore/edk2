@@ -64,7 +64,7 @@ typedef struct {
 /// computes this size correctly no matter how big the FileName array is declared.
 /// This is required to make the EFI_FILE_INFO data structure ANSI compilant.
 ///
-#define SIZE_OF_EFI_FILE_INFO EFI_FIELD_OFFSET (EFI_FILE_INFO, FileName)
+#define SIZE_OF_EFI_FILE_INFO OFFSET_OF (EFI_FILE_INFO, FileName)
 
 extern EFI_GUID gEfiFileInfoGuid;
 

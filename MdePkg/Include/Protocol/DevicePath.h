@@ -853,7 +853,7 @@ typedef struct {
   CHAR16                          PathName[1];
 } FILEPATH_DEVICE_PATH;
 
-#define SIZE_OF_FILEPATH_DEVICE_PATH  EFI_FIELD_OFFSET(FILEPATH_DEVICE_PATH,PathName)
+#define SIZE_OF_FILEPATH_DEVICE_PATH  OFFSET_OF(FILEPATH_DEVICE_PATH,PathName)
 
 ///
 /// Media Protocol Device Path SubType
