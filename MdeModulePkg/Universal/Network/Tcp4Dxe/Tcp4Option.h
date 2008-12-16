@@ -1,36 +1,29 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+    
+Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Tcp4Option.h
-
-Abstract:
-
 
 **/
 
 #ifndef _TCP4_OPTION_H_
 #define _TCP4_OPTION_H_
 
-//
-// The structure to store the parse option value.
-// ParseOption only parse the options, don't process them.
-//
-typedef struct s_TCP_OPTION {
-  UINT8   Flag;     // flag such as TCP_OPTION_RCVD_MSS
-  UINT8   WndScale; // the WndScale received
-  UINT16  Mss;      // the Mss received
-  UINT32  TSVal;    // the TSVal field in a timestamp option
-  UINT32  TSEcr;    // the TSEcr field in a timestamp option
+///
+/// The structure to store the parse option value.
+/// ParseOption only parse the options, don't process them.
+///
+typedef struct _TCP_OPTION {
+  UINT8   Flag;     ///< Flag such as TCP_OPTION_RCVD_MSS
+  UINT8   WndScale; ///< The WndScale received
+  UINT16  Mss;      ///< The Mss received
+  UINT32  TSVal;    ///< The TSVal field in a timestamp option
+  UINT32  TSEcr;    ///< The TSEcr field in a timestamp option
 } TCP_OPTION;
 
 typedef enum {
@@ -38,16 +31,16 @@ typedef enum {
   //
   // supported TCP option type and their length
   //
-  TCP_OPTION_EOP            = 0,  // End Of oPtion
-  TCP_OPTION_NOP            = 1,  // No-Option.
-  TCP_OPTION_MSS            = 2,  // Maximum Segment Size
-  TCP_OPTION_WS             = 3,  // Window scale
-  TCP_OPTION_TS             = 8,  // Timestamp
-  TCP_OPTION_MSS_LEN        = 4,  // length of MSS option
-  TCP_OPTION_WS_LEN         = 3,  // length of window scale option
-  TCP_OPTION_TS_LEN         = 10, // length of timestamp option
-  TCP_OPTION_WS_ALIGNED_LEN = 4,  // length of window scale option, aligned
-  TCP_OPTION_TS_ALIGNED_LEN = 12, // length of timestamp option, aligned
+  TCP_OPTION_EOP            = 0,  ///< End Of oPtion
+  TCP_OPTION_NOP            = 1,  ///< No-Option.
+  TCP_OPTION_MSS            = 2,  ///< Maximum Segment Size
+  TCP_OPTION_WS             = 3,  ///< Window scale
+  TCP_OPTION_TS             = 8,  ///< Timestamp
+  TCP_OPTION_MSS_LEN        = 4,  ///< Length of MSS option
+  TCP_OPTION_WS_LEN         = 3,  ///< Length of window scale option
+  TCP_OPTION_TS_LEN         = 10, ///< Length of timestamp option
+  TCP_OPTION_WS_ALIGNED_LEN = 4,  ///< Length of window scale option, aligned
+  TCP_OPTION_TS_ALIGNED_LEN = 12, ///< Length of timestamp option, aligned
 
   //
   // recommend format of timestamp window scale
@@ -71,33 +64,80 @@ typedef enum {
   TCP_OPTION_RCVD_MSS       = 0x01,
   TCP_OPTION_RCVD_WS        = 0x02,
   TCP_OPTION_RCVD_TS        = 0x04,
-  TCP_OPTION_MAX_WS         = 14,     // Maxium window scale value
-  TCP_OPTION_MAX_WIN        = 0xffff  // max window size in TCP header
+  TCP_OPTION_MAX_WS         = 14,     ///< Maxium window scale value
+  TCP_OPTION_MAX_WIN        = 0xffff  ///< Max window size in TCP header
 } TCP_OPTION_TYPE;
 
+/**
+  Compute the window scale value according to the given buffer size.
+
+  @param  Tcb     Pointer to the TCP_CB of this TCP instance.
+
+  @return  The scale value.
+
+**/
 UINT8
 TcpComputeScale (
   IN TCP_CB *Tcb
   );
 
+/**
+  Build the TCP option in three-way handshake.
+
+  @param  Tcb     Pointer to the TCP_CB of this TCP instance.
+  @param  Nbuf    Pointer to the buffer to store the options.
+
+  @return  The total length of the TCP option field.
+
+**/
 UINT16
 TcpSynBuildOption (
   IN TCP_CB  *Tcb,
-  IN NET_BUF *Buf
+  IN NET_BUF *Nbuf
   );
 
+/**
+  Build the TCP option in synchronized states.
+
+  @param  Tcb     Pointer to the TCP_CB of this TCP instance.
+  @param  Nbuf    Pointer to the buffer to store the options.
+
+  @return  The total length of the TCP option field.
+
+**/
 UINT16
 TcpBuildOption (
   IN TCP_CB  *Tcb,
-  IN NET_BUF *Buf
+  IN NET_BUF *Nbuf
   );
 
+/**
+  Parse the supported options.
+
+  @param  Tcp     Pointer to the TCP_CB of this TCP instance.
+  @param  Option  Pointer to the TCP_OPTION used to store the successfully pasrsed
+                  options.
+
+  @retval 0       The options are successfully pasrsed.
+  @retval -1      Ilegal option was found.
+
+**/
 INTN
 TcpParseOption (
   IN TCP_HEAD   *Tcp,
   IN TCP_OPTION *Option
   );
 
+/**
+  Check the segment against PAWS.
+
+  @param  Tcb     Pointer to the TCP_CB of this TCP instance.
+  @param  TSVal   The timestamp value.
+
+  @retval 1       The segment passed the PAWS check.
+  @retval 0       The segment failed to pass the PAWS check.
+
+**/
 UINT32
 TcpPawsOK (
   IN TCP_CB *Tcb,

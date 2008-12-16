@@ -1,20 +1,13 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Socket.h
-
-Abstract:
-
 
 **/
 
@@ -40,9 +33,9 @@ Abstract:
 #define SOCK_SND_BUF        0
 #define SOCK_RCV_BUF        1
 
-#define SOCK_BUFF_LOW_WATER 2 * 1024
-#define SOCK_RCV_BUFF_SIZE  8 * 1024
-#define SOCK_SND_BUFF_SIZE  8 * 1024
+#define SOCK_BUFF_LOW_WATER (2 * 1024)
+#define SOCK_RCV_BUFF_SIZE  (8 * 1024)
+#define SOCK_SND_BUFF_SIZE  (8 * 1024)
 #define SOCK_BACKLOG        5
 
 #define PROTO_RESERVED_LEN  20
@@ -70,6 +63,10 @@ Abstract:
 //
 //
 //
+
+///
+/// Socket state
+///
 typedef enum {
   SO_CLOSED       = 0,
   SO_LISTENING,
@@ -78,6 +75,9 @@ typedef enum {
   SO_DISCONNECTING
 } SOCK_STATE;
 
+///
+/// Socket configure state
+///
 typedef enum {
   SO_UNCONFIGURED       = 0,
   SO_CONFIGURED_ACTIVE,
@@ -102,21 +102,21 @@ typedef enum {
 #define SOCK_IS_NO_MAPPING(Sock) \
   ((Sock)->ConfigureState == SO_NO_MAPPING)
 
-#define SOCK_IS_CLOSED(Sock)         ((Sock)->State == SO_CLOSED)
+#define SOCK_IS_CLOSED(Sock)          ((Sock)->State == SO_CLOSED)
 
-#define SOCK_IS_LISTENING(Sock)      ((Sock)->State == SO_LISTENING)
+#define SOCK_IS_LISTENING(Sock)       ((Sock)->State == SO_LISTENING)
 
-#define SOCK_IS_CONNECTING(Sock)     ((Sock)->State == SO_CONNECTING)
+#define SOCK_IS_CONNECTING(Sock)      ((Sock)->State == SO_CONNECTING)
 
-#define SOCK_IS_CONNECTED(Sock)      ((Sock)->State == SO_CONNECTED)
+#define SOCK_IS_CONNECTED(Sock)       ((Sock)->State == SO_CONNECTED)
 
-#define SOCK_IS_DISCONNECTING(Sock)  ((Sock)->State == SO_DISCONNECTING)
+#define SOCK_IS_DISCONNECTING(Sock)   ((Sock)->State == SO_DISCONNECTING)
 
-#define SOCK_IS_NO_MORE_DATA(Sock)   (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
+#define SOCK_IS_NO_MORE_DATA(Sock)    (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
 
-#define SOCK_SIGNATURE           EFI_SIGNATURE_32 ('S', 'O', 'C', 'K')
+#define SOCK_SIGNATURE                EFI_SIGNATURE_32 ('S', 'O', 'C', 'K')
 
-#define SOCK_FROM_THIS(a)        CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
+#define SOCK_FROM_THIS(a)             CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
 
 #define SET_RCV_BUFFSIZE(Sock, Size)  ((Sock)->RcvBuffer.HighWater = (Size))
 
@@ -149,11 +149,17 @@ typedef enum {
 
 typedef struct _SOCKET SOCKET;
 
+///
+/// Socket completion token
+///
 typedef struct _SOCK_COMPLETION_TOKEN {
-  EFI_EVENT   Event;
-  EFI_STATUS  Status;
+  EFI_EVENT   Event;            ///< The event to be issued
+  EFI_STATUS  Status;           ///< The status to be issued
 } SOCK_COMPLETION_TOKEN;
 
+///
+/// The application token with data packet
+///
 typedef struct _SOCK_IO_TOKEN {
   SOCK_COMPLETION_TOKEN Token;
   union {
@@ -162,150 +168,230 @@ typedef struct _SOCK_IO_TOKEN {
   } Packet;
 } SOCK_IO_TOKEN;
 
-//
-// the request issued from socket layer to protocol layer
-//
+///
+///  The request issued from socket layer to protocol layer.  
+///
 typedef enum {
-  SOCK_ATTACH,    // attach current socket to a new PCB
-  SOCK_DETACH,    // detach current socket from the PCB
-  SOCK_CONFIGURE, // configure attached PCB
-  SOCK_FLUSH,     // flush attached PCB
-  SOCK_SND,       // need protocol to send something
-  SOCK_SNDPUSH,   // need protocol to send pushed data
-  SOCK_SNDURG,    // need protocol to send urgent data
-  SOCK_CONSUMED,  // application has retrieved data from socket
-  SOCK_CONNECT,   // need to connect to a peer
-  SOCK_CLOSE,     // need to close the protocol process
-  SOCK_ABORT,     // need to reset the protocol process
-  SOCK_POLL,      // need to poll to the protocol layer
-  SOCK_ROUTE,     // need to add a route information
-  SOCK_MODE,      // need to get the mode data of the protocol
-  SOCK_GROUP      // need to join a mcast group
+  SOCK_ATTACH,    ///< Attach current socket to a new PCB
+  SOCK_DETACH,    ///< Detach current socket from the PCB
+  SOCK_CONFIGURE, ///< Configure attached PCB
+  SOCK_FLUSH,     ///< Flush attached PCB
+  SOCK_SND,       ///< Need protocol to send something
+  SOCK_SNDPUSH,   ///< Need protocol to send pushed data
+  SOCK_SNDURG,    ///< Need protocol to send urgent data
+  SOCK_CONSUMED,  ///< Application has retrieved data from socket
+  SOCK_CONNECT,   ///< Need to connect to a peer
+  SOCK_CLOSE,     ///< Need to close the protocol process
+  SOCK_ABORT,     ///< Need to reset the protocol process
+  SOCK_POLL,      ///< Need to poll to the protocol layer
+  SOCK_ROUTE,     ///< Need to add a route information
+  SOCK_MODE,      ///< Need to get the mode data of the protocol
+  SOCK_GROUP      ///< Need to join a mcast group
 } SOCK_REQUEST;
 
-//
-// the socket type
-//
+///
+///  The socket type.
+///
 typedef enum {
-  SOCK_DGRAM, // this socket providing datagram service
-  SOCK_STREAM // this socket providing stream service
+  SOCK_DGRAM, ///< This socket providing datagram service
+  SOCK_STREAM ///< This socket providing stream service
 } SOCK_TYPE;
 
-//
-// the handler of protocol for request from socket
-//
+///
+///  The handler of protocol for request from socket.
+///
 typedef
 EFI_STATUS
 (*SOCK_PROTO_HANDLER) (
-  IN SOCKET       * Socket,  // the socket issuing the request to protocol
-  IN SOCK_REQUEST Request,   // the request issued by socket
-  IN VOID *RequestData       // the request related data
+  IN SOCKET       *Socket,      ///< The socket issuing the request to protocol
+  IN SOCK_REQUEST Request,      ///< The request issued by socket
+  IN VOID         *RequestData  ///< The request related data
   );
 
-//
-// the buffer structure of rcvd data and send data used by socket
-//
+///
+///  The buffer structure of rcvd data and send data used by socket.
+///
 typedef struct _SOCK_BUFFER {
-  UINT32        HighWater;  // the buffersize upper limit of sock_buffer
-  UINT32        LowWater;   // the low warter mark of sock_buffer
-  NET_BUF_QUEUE *DataQueue; // the queue to buffer data
+  UINT32        HighWater;  ///< The buffersize upper limit of sock_buffer
+  UINT32        LowWater;   ///< The low warter mark of sock_buffer
+  NET_BUF_QUEUE *DataQueue; ///< The queue to buffer data
 } SOCK_BUFFER;
 
 
 //
-// socket provided oprerations for low layer protocol
+// Socket provided oprerations for low layer protocol
 //
 
 //
-// socket provided operations for user interface
+// Socket provided operations for user interface
 //
+
+/**
+  Set the state of the socket.
+
+  @param  Sock                  Pointer to the socket.
+  @param  State                 The new state to be set.
+
+**/
 VOID
 SockSetState (
   IN SOCKET     *Sock,
   IN SOCK_STATE State
   );
 
-//
-// when the connection establishment process for a Sock
-// is finished low layer protocol calling this function
-// to notify socket layer
-//
+/**
+  Called by the low layer protocol to indicate the socket a connection is 
+  established. This function just changes the socket's state to SO_CONNECTED 
+  and signals the token used for connection establishment.
+
+  @param  Sock                  Pointer to the socket associated with the
+                                established connection.
+                                
+**/
 VOID
 SockConnEstablished (
   IN SOCKET *Sock
   );
 
+/**
+  Called by the low layer protocol to indicate the connection is closed; This 
+  function flushes the socket, sets the state to SO_CLOSED and signals the close 
+  token.
+
+  @param  Sock                  Pointer to the socket associated with the closed
+                                connection.
+                                
+**/
 VOID
 SockConnClosed (
   IN SOCKET *Sock
   );
 
-//
-// called by low layer protocol to trim send buffer of
-// Sock, when Count data is sent out completely
-//
+/**
+  Called by low layer protocol to indicate that some data is sent or processed; 
+  This function trims the sent data in the socket send buffer, signals the data 
+  token if proper.
+
+  @param  Sock                  Pointer to the socket.
+  @param  Count                 The length of the data processed or sent, in bytes.
+
+**/
 VOID
 SockDataSent (
-  IN SOCKET  *Sock,
-  IN UINT32  Count
+  IN SOCKET     *Sock,
+  IN UINT32     Count
   );
 
-//
-// called by low layer protocol to get Len of data from
-// socket to send and copy it in Dest
-//
+/**
+  Called by the low layer protocol to copy some data in socket send
+  buffer starting from the specific offset to a buffer provided by
+  the caller.
+
+  @param  Sock                  Pointer to the socket.
+  @param  Offset                The start point of the data to be copied.
+  @param  Len                   The length of the data to be copied.
+  @param  Dest                  Pointer to the destination to copy the data.
+
+  @return The data size copied.
+
+**/
 UINT32
 SockGetDataToSend (
-  IN SOCKET *Sock,
-  IN UINT32 Offset,
-  IN UINT32 Len,
-  IN UINT8  *Dest
+  IN SOCKET      *Sock,
+  IN UINT32      Offset,
+  IN UINT32      Len,
+  IN UINT8       *Dest
   );
 
-//
-//  called by low layer protocol to notify socket no more data can be
-//  received
-//
+/**
+  Called by the low layer protocol to indicate that there
+  will be no more data from the communication peer; This
+  function set the socket's state to SO_NO_MORE_DATA and
+  signal all queued IO tokens with the error status
+  EFI_CONNECTION_FIN.
+
+  @param  Sock                  Pointer to the socket.
+
+**/
 VOID
 SockNoMoreData (
   IN SOCKET *Sock
   );
 
-//
-// called by low layer protocol to append a NetBuffer
-// to rcv buffer of sock
-//
+/**
+  Called by the low layer protocol to deliver received data to socket layer; 
+  This function will append the data to the socket receive buffer, set ther 
+  urgent data length and then check if any receive token can be signaled.
+
+  @param  Sock                  Pointer to the socket.
+  @param  NetBuffer             Pointer to the buffer that contains the received
+                                data.
+  @param  UrgLen                The length of the urgent data in the received data.
+
+**/
 VOID
 SockDataRcvd (
   IN SOCKET    *Sock,
   IN NET_BUF   *NetBuffer,
-  IN UINT32     UrgLen
+  IN UINT32    UrgLen
   );
 
+/**
+  Get the length of the free space of the specific socket buffer.
+
+  @param  Sock                  Pointer to the socket.
+  @param  Which                 Flag to indicate which socket buffer to check,
+                                either send buffer or receive buffer.
+
+  @return The length of the free space, in bytes.
+
+**/
 UINT32
 SockGetFreeSpace (
-  IN SOCKET   *Sock,
-  IN UINT32   Which
+  IN SOCKET  *Sock,
+  IN UINT32  Which
   );
 
-SOCKET  *
+/**
+  Clone a new socket including its associated protocol control block.
+
+  @param  Sock                  Pointer to the socket to be cloned.
+
+  @return Pointer to the newly cloned socket. If NULL, error condition occurred.
+
+**/
+SOCKET *
 SockClone (
   IN SOCKET *Sock
   );
 
+/**
+  Signal the receive token with the specific error or
+  set socket error code after error is received.
+
+  @param  Sock                  Pointer to the socket.
+  @param  Error                 The error code received.
+
+**/
 VOID
 SockRcvdErr (
   IN SOCKET       *Sock,
   IN EFI_STATUS   Error
   );
 
+///
+/// Proto type of the create callback
+///
 typedef
 EFI_STATUS
 (*SOCK_CREATE_CALLBACK) (
   IN SOCKET  *This,
   IN VOID    *Context
   );
-
+  
+///
+/// Proto type of the destroy callback 
+///
 typedef
 VOID
 (*SOCK_DESTROY_CALLBACK) (
@@ -313,26 +399,26 @@ VOID
   IN VOID    *Context
   );
 
-//
-// the initialize data for create a new socket
-//
+///
+///  The initialize data for create a new socket.
+///
 typedef struct _SOCK_INIT_DATA {
   SOCK_TYPE   Type;
   SOCK_STATE  State;
 
-  SOCKET      *Parent;        // the parent of this socket
-  UINT32      BackLog;        // the connection limit for listening socket
-  UINT32      SndBufferSize;  // the high warter mark of send buffer
-  UINT32      RcvBufferSize;  // the high warter mark of receive buffer
-  VOID        *Protocol;      // the pointer to protocol function template
-                              // wanted to install on socket
+  SOCKET      *Parent;        ///< The parent of this socket
+  UINT32      BackLog;        ///< The connection limit for listening socket
+  UINT32      SndBufferSize;  ///< The high warter mark of send buffer
+  UINT32      RcvBufferSize;  ///< The high warter mark of receive buffer
+  VOID        *Protocol;      ///< The pointer to protocol function template
+                              ///< wanted to install on socket
 
   //
   // Callbacks after socket is created and before socket is to be destroyed.
   //
-  SOCK_CREATE_CALLBACK   CreateCallback;
-  SOCK_DESTROY_CALLBACK  DestroyCallback;
-  VOID                   *Context;
+  SOCK_CREATE_CALLBACK   CreateCallback;  ///< Callback after created
+  SOCK_DESTROY_CALLBACK  DestroyCallback; ///< Callback before destroied
+  VOID                   *Context;        ///< The context of the callback
 
   //
   // Opaque protocol data.
@@ -340,29 +426,30 @@ typedef struct _SOCK_INIT_DATA {
   VOID                   *ProtoData;
   UINT32                 DataSize;
 
-  SOCK_PROTO_HANDLER     ProtoHandler;
+  SOCK_PROTO_HANDLER     ProtoHandler;  ///< The handler of protocol for socket request
 
-  EFI_HANDLE   DriverBinding; // the driver binding handle
+  EFI_HANDLE   DriverBinding;           ///< The driver binding handle
 } SOCK_INIT_DATA;
 
-//
-//the union type of TCP and UDP protocol
-//
-typedef union {
-  EFI_TCP4_PROTOCOL TcpProtocol;
-  EFI_UDP4_PROTOCOL UdpProtocol;
+///
+///  The union type of TCP and UDP protocol.
+///  
+typedef union _NET_PROTOCOL {
+  EFI_TCP4_PROTOCOL TcpProtocol;   ///< Tcp protocol
+  EFI_UDP4_PROTOCOL UdpProtocol;   ///< Udp protocol
 } NET_PROTOCOL;
-//
-// the socket structure representing a network service access point
-//
+
+///
+/// The socket structure representing a network service access point
+///
 struct _SOCKET {
 
   //
-  // socket description information
+  // Socket description information
   //
-  UINT32                Signature;
-  EFI_HANDLE            SockHandle;     // the virtual handle of the socket
-  EFI_HANDLE            DriverBinding;  // socket't driver binding protocol
+  UINT32                Signature;      ///< Signature of the socket
+  EFI_HANDLE            SockHandle;     ///< The virtual handle of the socket
+  EFI_HANDLE            DriverBinding;  ///< Socket's driver binding protocol
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   LIST_ENTRY                Link;  
@@ -370,143 +457,249 @@ struct _SOCKET {
   SOCK_TYPE             Type;
   SOCK_STATE            State;
   UINT16                Flag;
-  EFI_LOCK              Lock;       // the lock of socket
-  SOCK_BUFFER           SndBuffer;  // send buffer of application's data
-  SOCK_BUFFER           RcvBuffer;  // receive buffer of received data
-  EFI_STATUS            SockError;  // the error returned by low layer protocol
+  EFI_LOCK              Lock;       ///< The lock of socket
+  SOCK_BUFFER           SndBuffer;  ///< Send buffer of application's data
+  SOCK_BUFFER           RcvBuffer;  ///< Receive buffer of received data
+  EFI_STATUS            SockError;  ///< The error returned by low layer protocol
   BOOLEAN               IsDestroyed;
 
   //
-  // fields used to manage the connection request
+  // Fields used to manage the connection request
   //
-  UINT32          BackLog;        // the limit of connection to this socket
-  UINT32          ConnCnt;        // the current count of connections to it
-  SOCKET          *Parent;        // listening parent that accept the connection
-  LIST_ENTRY      ConnectionList; // the connections maintained by this socket
+  UINT32          BackLog;        ///< the limit of connection to this socket
+  UINT32          ConnCnt;        ///< the current count of connections to it
+  SOCKET          *Parent;        ///< listening parent that accept the connection
+  LIST_ENTRY      ConnectionList; ///< the connections maintained by this socket
+  
   //
-  // the queue to buffer application's asynchronous token
+  // The queue to buffer application's asynchronous token
   //
   LIST_ENTRY      ListenTokenList;
   LIST_ENTRY      RcvTokenList;
   LIST_ENTRY      SndTokenList;
   LIST_ENTRY      ProcessingSndTokenList;
 
-  SOCK_COMPLETION_TOKEN *ConnectionToken; // app's token to signal if connected
-  SOCK_COMPLETION_TOKEN *CloseToken;      // app's token to signal if closed
+  SOCK_COMPLETION_TOKEN *ConnectionToken; ///< app's token to signal if connected
+  SOCK_COMPLETION_TOKEN *CloseToken;      ///< app's token to signal if closed
 
   //
-  // interface for low level protocol
+  // Interface for low level protocol
   //
-  SOCK_PROTO_HANDLER    ProtoHandler; // the request handler of protocol
-  UINT8 ProtoReserved[PROTO_RESERVED_LEN];  // Data fields reserved for protocol
-  NET_PROTOCOL          NetProtocol;
+  SOCK_PROTO_HANDLER    ProtoHandler;       ///< The request handler of protocol
+  UINT8 ProtoReserved[PROTO_RESERVED_LEN];  ///< Data fields reserved for protocol
+  NET_PROTOCOL          NetProtocol;        ///< TCP or UDP protocol socket used
 
   //
-  // Callbacks.
+  // Callbacks after socket is created and before socket is to be destroyed.
   //
-  SOCK_CREATE_CALLBACK   CreateCallback;
-  SOCK_DESTROY_CALLBACK  DestroyCallback;
-  VOID                   *Context;
+  SOCK_CREATE_CALLBACK   CreateCallback;    ///< Callback after created
+  SOCK_DESTROY_CALLBACK  DestroyCallback;   ///< Callback before destroied
+  VOID                   *Context;          ///< The context of the callback
 };
 
-//
-// the token structure buffered in socket layer
-//
+///
+///  The token structure buffered in socket layer.
+///
 typedef struct _SOCK_TOKEN {
-  LIST_ENTRY            TokenList;      // the entry to add in the token list
-  SOCK_COMPLETION_TOKEN *Token;         // The application's token
-  UINT32                RemainDataLen;  // unprocessed data length
-  SOCKET                *Sock;          // the poninter to the socket this token
-                                        // belongs to
+  LIST_ENTRY            TokenList;      ///< The entry to add in the token list
+  SOCK_COMPLETION_TOKEN *Token;         ///< The application's token
+  UINT32                RemainDataLen;  ///< Unprocessed data length
+  SOCKET                *Sock;          ///< The poninter to the socket this token
+                                        ///< belongs to
 } SOCK_TOKEN;
 
-//
-// reserved data to access the NET_BUF delivered by UDP driver
-//
+///
+/// Reserved data to access the NET_BUF delivered by UDP driver.
+///
 typedef struct _UDP_RSV_DATA {
   EFI_TIME              TimeStamp;
   EFI_UDP4_SESSION_DATA Session;
 } UDP_RSV_DATA;
 
-//
-// reserved data to access the NET_BUF delivered by TCP driver
-//
+///
+/// Reserved data to access the NET_BUF delivered by TCP driver.
+///
 typedef struct _TCP_RSV_DATA {
   UINT32 UrgLen;
 } TCP_RSV_DATA;
 
-//
-// call it to creat a socket and attach it to a PCB
-//
-SOCKET  *
+/**
+  Create a socket and its associated protocol control block
+  with the intial data SockInitData and protocol specific
+  data ProtoData.
+
+  @param  SockInitData         Inital data to setting the socket.
+  
+  @return Pointer to the newly created socket. If NULL, error condition occured.
+
+**/
+SOCKET *
 SockCreateChild (
   IN SOCK_INIT_DATA *SockInitData
   );
 
-//
-// call it to destroy a socket and its related PCB
-//
+/**
+  Destory the socket Sock and its associated protocol control block.
+
+  @param  Sock                 The socket to be destroyed.
+
+  @retval EFI_SUCCESS          The socket Sock is destroyed successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
+
+**/
 EFI_STATUS
 SockDestroyChild (
-  IN SOCKET *Sock
+  IN   SOCKET *Sock
   );
 
-//
-// call it to configure a socket and its related PCB
-//
+/**
+  Configure the specific socket Sock using configuration data ConfigData.
+
+  @param  Sock                 Pointer to the socket to be configured.
+  @param  ConfigData           Pointer to the configuration data.
+
+  @retval EFI_SUCCESS          The socket is configured successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket or the
+                               socket is already configured.
+
+**/
 EFI_STATUS
 SockConfigure (
   IN SOCKET *Sock,
   IN VOID   *ConfigData
   );
 
-//
-// call it to connect a socket to the peer
-//
+/**
+  Initiate a connection establishment process.
+
+  @param  Sock                 Pointer to the socket to initiate the initate the
+                               connection.
+  @param  Token                Pointer to the token used for the connection
+                               operation.
+
+  @retval EFI_SUCCESS          The connection is initialized successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket, or the
+                               socket is closed, or the socket is not configured to
+                               be an active one, or the token is already in one of
+                               this socket's lists.
+  @retval EFI_NO_MAPPING       The IP address configuration operation is not
+                               finished.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+
+**/
 EFI_STATUS
 SockConnect (
   IN SOCKET *Sock,
   IN VOID   *Token
   );
 
-//
-// call it to issue an asynchronous listen token to the socket
-//
+/**
+  Issue a listen token to get an existed connected network instance
+  or wait for a connection if there is none.
+
+  @param  Sock                 Pointer to the socket to accept connections.
+  @param  Token                The token to accept a connection.
+
+  @retval EFI_SUCCESS          Either a connection is accpeted or the Token is
+                               buffered for further acception.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket, or the
+                               socket is closed, or the socket is not configured to
+                               be a passive one, or the token is already in one of
+                               this socket's lists.
+  @retval EFI_NO_MAPPING       The IP address configuration operation is not
+                               finished.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+  @retval EFI_OUT_OF_RESOURCE  Failed to buffer the Token due to memory limit.
+
+**/
 EFI_STATUS
 SockAccept (
   IN SOCKET *Sock,
   IN VOID   *Token
   );
 
-//
-// Call it to send data using this socket
-//
+/**
+  Issue a token with data to the socket to send out.
+
+  @param  Sock                 Pointer to the socket to process the token with
+                               data.
+  @param  Token                The token with data that needs to send out.
+
+  @retval EFI_SUCCESS          The token is processed successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket, or the
+                               socket is closed, or the socket is not in a
+                               synchronized state , or the token is already in one
+                               of this socket's lists.
+  @retval EFI_NO_MAPPING       The IP address configuration operation is not
+                               finished.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+  @retval EFI_OUT_OF_RESOURCE  Failed to buffer the token due to memory limit.
+
+**/
 EFI_STATUS
 SockSend (
   IN SOCKET *Sock,
   IN VOID   *Token
   );
 
-//
-// Call it to receive data from this socket
-//
+/**
+  Issue a token to get data from the socket.
+
+  @param  Sock                 Pointer to the socket to get data from.
+  @param  Token                The token to store the received data from the
+                               socket.
+
+  @retval EFI_SUCCESS          The token is processed successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket, or the
+                               socket is closed, or the socket is not in a
+                               synchronized state , or the token is already in one
+                               of this socket's lists.
+  @retval EFI_NO_MAPPING       The IP address configuration operation is not
+                               finished.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+  @retval EFI_CONNECTION_FIN   The connection is closed and there is no more data.
+  @retval EFI_OUT_OF_RESOURCE  Failed to buffer the token due to memory limit.
+
+**/
 EFI_STATUS
 SockRcv (
   IN SOCKET *Sock,
   IN VOID   *Token
   );
 
-//
-// Call it to flush a socket
-//
+/**
+  Reset the socket and its associated protocol control block.
+
+  @param  Sock                 Pointer to the socket to be flushed.
+
+  @retval EFI_SUCCESS          The socket is flushed successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
+
+**/
 EFI_STATUS
 SockFlush (
   IN SOCKET *Sock
   );
 
-//
-// Call it to close a socket in the light of policy in Token
-//
+/**
+  Close or abort the socket associated connection.
+
+  @param  Sock                 Pointer to the socket of the connection to close or
+                               abort.
+  @param  Token                The token for close operation.
+  @param  OnAbort              TRUE for aborting the connection, FALSE to close it.
+
+  @retval EFI_SUCCESS          The close or abort operation is initialized
+                               successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket, or the
+                               socket is closed, or the socket is not in a
+                               synchronized state , or the token is already in one
+                               of this socket's lists.
+  @retval EFI_NO_MAPPING       The IP address configuration operation is not
+                               finished.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+
+**/
 EFI_STATUS
 SockClose (
   IN SOCKET  *Sock,
@@ -514,27 +707,57 @@ SockClose (
   IN BOOLEAN OnAbort
   );
 
-//
-// Call it to get the mode data of low layer protocol
-//
+/**
+  Get the mode data of the low layer protocol.
+
+  @param  Sock                 Pointer to the socket to get mode data from.
+  @param  Mode                 Pointer to the data to store the low layer mode
+                               information.
+
+  @retval EFI_SUCCESS          The mode data is got successfully.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+
+**/
 EFI_STATUS
 SockGetMode (
   IN SOCKET *Sock,
   IN VOID   *Mode
   );
 
-//
-// call it to add this socket instance into a group
-//
+/**
+  Configure the low level protocol to join a multicast group for
+  this socket's connection.
+
+  @param  Sock                 Pointer to the socket of the connection to join the
+                               specific multicast group.
+  @param  GroupInfo            Pointer to the multicast group info.
+
+  @retval EFI_SUCCESS          The configuration is done successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+
+**/
 EFI_STATUS
 SockGroup (
   IN SOCKET *Sock,
   IN VOID   *GroupInfo
   );
 
-//
-// call it to add a route entry for this socket instance
-//
+/**
+  Add or remove route information in IP route table associated
+  with this socket.
+
+  @param  Sock                 Pointer to the socket associated with the IP route
+                               table to operate on.
+  @param  RouteInfo            Pointer to the route information to be processed.
+
+  @retval EFI_SUCCESS          The route table is updated successfully.
+  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
+  @retval EFI_NO_MAPPING       The IP address configuration operation is  not
+                               finished.
+  @retval EFI_NOT_STARTED      The socket is not configured.
+
+**/
 EFI_STATUS
 SockRoute (
   IN SOCKET    *Sock,
@@ -544,11 +767,31 @@ SockRoute (
 //
 // Supporting function to operate on socket buffer
 //
+
+/**
+  Get the first buffer block in the specific socket buffer.
+
+  @param  Sockbuf               Pointer to the socket buffer.
+
+  @return Pointer to the first buffer in the queue. NULL if the queue is empty.
+
+**/
 NET_BUF *
 SockBufFirst (
   IN SOCK_BUFFER *Sockbuf
   );
 
+/**
+  Get the next buffer block in the specific socket buffer.
+
+  @param  Sockbuf               Pointer to the socket buffer.
+  @param  SockEntry             Pointer to the buffer block prior to the required
+                                one.
+
+  @return Pointer to the buffer block next to SockEntry. NULL if SockEntry is 
+          the tail or head entry.
+
+**/
 NET_BUF *
 SockBufNext (
   IN SOCK_BUFFER *Sockbuf,

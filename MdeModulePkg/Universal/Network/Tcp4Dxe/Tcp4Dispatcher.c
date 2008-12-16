@@ -1,20 +1,13 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Tcp4Dispatcher.c
-
-Abstract:
-
 
 **/
 
@@ -250,7 +243,7 @@ Tcp4FlushPcb (
 }
 
 /**
-  Attach a Tcb to the socket.
+  Attach a Pcb to the socket.
 
   @param  Sk                     Pointer to the socket of this TCP instance.
   
@@ -301,7 +294,7 @@ Tcp4AttachPcb (
 }
 
 /**
-  Detach the Tcb of the socket.
+  Detach the Pcb of the socket.
 
   @param  Sk                     Pointer to the socket of this TCP instance.
   
@@ -330,7 +323,7 @@ Tcp4DetachPcb (
 
 
 /**
-  Configure the Tcb using CfgData.
+  Configure the Pcb using CfgData.
 
   @param  Sk                     Pointer to the socket of this TCP instance.
   @param  CfgData                Pointer to the TCP configuration data.

@@ -1,22 +1,14 @@
 /** @file
+  Misc support routines for tcp.
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Tcp4Misc.c
-
-Abstract:
-
-  Misc support routines for tcp.
-
 
 **/
 
@@ -405,7 +397,7 @@ TcpInsertTcb (
 
 
 /**
-  Clone a TCP_CB from Tcb.
+  Clone a TCB_CB from Tcb.
 
   @param  Tcb                   Pointer to the TCP_CB to be cloned.
 
@@ -504,8 +496,8 @@ TcpGetRcvMss (
 **/
 VOID
 TcpSetState (
-  IN TCP_CB *Tcb,
-  IN UINT8  State
+  IN TCP_CB      *Tcb,
+  IN TCP_STATES  State
   )
 {
   DEBUG (
@@ -516,7 +508,7 @@ TcpSetState (
     mTcpStateName[State])
     );
 
-  Tcb->State = State;
+  Tcb->State = (TCP_STATES)State;
 
   switch (State) {
   case TCP_ESTABLISHED:
@@ -537,6 +529,8 @@ TcpSetState (
 
     SockConnClosed (Tcb->Sk);
 
+    break;
+  case default:
     break;
   }
 }
@@ -571,7 +565,6 @@ TcpChecksum (
 
   return (UINT16) ~Checksum;
 }
-
 
 /**
   Translate the information from the head of the received TCP
@@ -731,6 +724,8 @@ TcpOnAppClose (
   case TCP_CLOSE_WAIT:
     TcpSetState (Tcb, TCP_LAST_ACK);
     break;
+  case default:
+    break;
   }
 
   TcpToSendData (Tcb, 1);
@@ -781,6 +776,8 @@ TcpOnAppSend (
   case TCP_TIME_WAIT:
     return -1;
     break;
+  case default:
+    break;
   }
 
   return 0;
@@ -822,13 +819,13 @@ TcpOnAppConsume (
       if (TcpOld < Tcb->RcvMss) {
 
         DEBUG ((EFI_D_INFO, "TcpOnAppConsume: send a window"
-          " update for a window closed Tcb(%p)\n", Tcb));
+          " update for a window closed Tcb %p\n", Tcb));
 
         TcpSendAck (Tcb);
       } else if (Tcb->DelayedAck == 0) {
 
         DEBUG ((EFI_D_INFO, "TcpOnAppConsume: scheduled a delayed"
-          " ACK to update window for Tcb(%p)\n", Tcb));
+          " ACK to update window for Tcb %p\n", Tcb));
 
         Tcb->DelayedAck = 1;
       }

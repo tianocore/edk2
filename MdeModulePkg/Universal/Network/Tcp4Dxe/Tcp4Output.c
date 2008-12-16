@@ -1,22 +1,14 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+  TCP output process routines.
+    
+Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Tcp4Output.c
-
-Abstract:
-
-  TCP output process routines.
-
 
 **/
 
@@ -112,8 +104,7 @@ TcpRcvWinNow (
 
 
 /**
-  Compute the value to fill in the window size field
-  of the outgoing segment.
+  Compute the value to fill in the window size field of the outgoing segment.
 
   @param  Tcb     Pointer to the TCP_CB of this TCP instance.
   @param  Syn     The flag to indicate whether the outgoing segment is a SYN
@@ -808,8 +799,13 @@ SEND_AGAIN:
         (GET_SND_DATASIZE (Tcb->Sk) == 0) &&
         TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)) {
 
-      DEBUG ((EFI_D_INFO, "TcpToSendData: send FIN "
-        "to peer for TCB %p in state %d\n", Tcb, Tcb->State));
+      DEBUG (
+	  	(EFI_D_INFO, 
+	  	"TcpToSendData: send FIN "
+        "to peer for TCB %p in state %s\n", 
+        Tcb, 
+        mTcpStateName[Tcb->State])
+      );
 
       End++;
     } else {

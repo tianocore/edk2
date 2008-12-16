@@ -1,20 +1,13 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  SockImpl.c
-
-Abstract:
-
 
 **/
 
@@ -35,9 +28,9 @@ Abstract:
 **/
 UINT32
 SockTcpDataToRcv (
-  IN  SOCK_BUFFER   *SockBuffer,
-  OUT BOOLEAN       *IsOOB,
-  IN  UINT32        BufLen
+  IN     SOCK_BUFFER    *SockBuffer,
+     OUT BOOLEAN        *IsUrg,
+  IN     UINT32         BufLen
   );
   
 /**
@@ -52,8 +45,10 @@ SockProcessSndToken (
   );
 
 /**
-    
+  Supporting function for both SockImpl and SockInterface.
 
+  @param Event             The Event this notify function registered to, ignored.
+  
 **/
 VOID
 SockFreeFoo (
@@ -236,7 +231,8 @@ SockProcessRcvToken (
   //
   SockSetTcpRxData (Sock, RxData, TokenRcvdBytes, IsUrg);
 
-  SOCK_TRIM_RCV_BUFF (Sock, TokenRcvdBytes);
+  NetbufQueTrim (Sock->RcvBuffer.DataQueue, TokenRcvdBytes);
+//  SOCK_TRIM_RCV_BUFF (Sock, TokenRcvdBytes);
   SIGNAL_TOKEN (&(RcvToken->Token), EFI_SUCCESS);
 
   return TokenRcvdBytes;
@@ -417,7 +413,7 @@ SockWakeListenToken (
     RemoveEntryList (&Sock->ConnectionList);
 
     Parent->ConnCnt--;
-    DEBUG ((EFI_D_WARN, "SockWakeListenToken: accept a socket, now conncnt is %d", Parent->ConnCnt));
+    DEBUG ((EFI_D_INFO, "SockWakeListenToken: accept a socket, now conncnt is %d", Parent->ConnCnt));
 
     Sock->Parent = NULL;
   }
@@ -668,7 +664,7 @@ SockCreate (
     Parent->ConnCnt++;
 
     DEBUG (
-      (EFI_D_WARN,
+      (EFI_D_INFO,
       "SockCreate: Create a new socket and add to parent, now conncnt is %d\n",
       Parent->ConnCnt)
       );
@@ -757,7 +753,7 @@ SockDestroy (
     (Sock->Parent->ConnCnt)--;
 
     DEBUG (
-      (EFI_D_WARN,
+      (EFI_D_INFO,
       "SockDestory: Delete a unaccepted socket from parent"
       "now conncnt is %d\n",
       Sock->Parent->ConnCnt)
