@@ -100,7 +100,7 @@ typedef struct {
   UINT16                          DriveAddress;
 } IDE_BASE_REGISTERS;
 
-#define ATAPI_SCSI_PASS_THRU_DEV_SIGNATURE  EFI_SIGNATURE_32 ('a', 's', 'p', 't')
+#define ATAPI_SCSI_PASS_THRU_DEV_SIGNATURE  SIGNATURE_32 ('a', 's', 'p', 't')
 
 typedef struct {
   UINTN                            Signature;
