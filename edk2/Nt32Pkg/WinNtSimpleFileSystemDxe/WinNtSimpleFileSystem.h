@@ -28,7 +28,7 @@ Abstract:
 #define _WIN_NT_SIMPLE_FILE_SYSTEM_H_
 
 
-#define WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('N', 'T', 'f', 's')
+#define WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE SIGNATURE_32 ('N', 'T', 'f', 's')
 
 typedef struct {
   UINTN                           Signature;
@@ -46,7 +46,7 @@ typedef struct {
       WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE \
       )
 
-#define WIN_NT_EFI_FILE_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('l', 'o', 'f', 's')
+#define WIN_NT_EFI_FILE_PRIVATE_SIGNATURE SIGNATURE_32 ('l', 'o', 'f', 's')
 
 //
 // Bit definitions for EFI_TIME.Daylight

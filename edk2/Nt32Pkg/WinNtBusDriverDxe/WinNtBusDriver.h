@@ -138,7 +138,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtBusDriverComponentName2;
 //
 // WinNt Bus Controller Structure
 //
-#define WIN_NT_BUS_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('N', 'T', 'B', 'D')
+#define WIN_NT_BUS_DEVICE_SIGNATURE SIGNATURE_32 ('N', 'T', 'B', 'D')
 
 typedef struct {
   UINT64                    Signature;
@@ -148,7 +148,7 @@ typedef struct {
 //
 // WinNt Child Device Controller Structure
 //
-#define WIN_NT_IO_DEVICE_SIGNATURE  EFI_SIGNATURE_32 ('N', 'T', 'V', 'D')
+#define WIN_NT_IO_DEVICE_SIGNATURE  SIGNATURE_32 ('N', 'T', 'V', 'D')
 
 typedef struct {
   UINT64                    Signature;
