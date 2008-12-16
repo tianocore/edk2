@@ -639,7 +639,7 @@ Fv2SetInfo (
 //
 //
 //
-#define FIRMWARE_VOLUME2_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('f', 'v', '2', 't')
+#define FIRMWARE_VOLUME2_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('f', 'v', '2', 't')
 
 typedef struct {
   UINTN                          Signature;

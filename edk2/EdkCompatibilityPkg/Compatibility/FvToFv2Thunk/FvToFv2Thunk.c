@@ -203,7 +203,7 @@ FvGetNextFile (
   OUT UINTN                         *Size
   );
 
-#define FIRMWARE_VOLUME_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('f', 'v', 't', 'h')
+#define FIRMWARE_VOLUME_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('f', 'v', 't', 'h')
 
 typedef struct {
   UINTN                          Signature;

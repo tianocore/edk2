@@ -340,7 +340,7 @@ DeviceIoFreeBuffer (
   );
 
 
-#define DEVICE_IO_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('D', 'e', 'I', 'O')
+#define DEVICE_IO_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('D', 'e', 'I', 'O')
 
 typedef struct {
   UINTN                           Signature;

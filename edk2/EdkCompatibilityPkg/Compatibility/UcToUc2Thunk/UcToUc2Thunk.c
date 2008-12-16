@@ -149,7 +149,7 @@ StrToFat (
   OUT CHAR8                           *Fat
   );
 
-#define UC_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('_', 'U', 'C', '_')
+#define UC_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('_', 'U', 'C', '_')
 
 typedef struct {
   UINT32                          Signature;
