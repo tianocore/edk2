@@ -554,23 +554,23 @@ typedef INTN RETURN_STATUS;
 #define RETURN_ABORTED               ENCODE_ERROR (21)
 
 ///
-/// An ICMP error occurred during the nrtwork operation.
+/// An ICMP error occurred during the network operation.
 ///
 #define RETURN_ICMP_ERROR            ENCODE_ERROR (22)
 
 ///
-/// A TFTP error occurred during the nrtwork operation.
+/// A TFTP error occurred during the network operation.
 ///
 #define RETURN_TFTP_ERROR            ENCODE_ERROR (23)
 
 ///
-/// A protocol error occurred during the nrtwork operation.
+/// A protocol error occurred during the network operation.
 ///
 #define RETURN_PROTOCOL_ERROR        ENCODE_ERROR (24)
 
 ///
 /// A function encountered an internal version that was
-/// iuncomptible with a version requested by the caller.
+/// incompatible with a version requested by the caller.
 ///
 #define RETURN_INCOMPATIBLE_VERSION  ENCODE_ERROR (25)
 

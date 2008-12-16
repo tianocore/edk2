@@ -1,5 +1,5 @@
 /** @file
-  Mde UEFI library API implemention.
+  Mde UEFI library API implementation.
   Print to StdErr or ConOut defined in EFI_SYSTEM_TABLE
 
   Copyright (c) 2007, Intel Corporation<BR>
