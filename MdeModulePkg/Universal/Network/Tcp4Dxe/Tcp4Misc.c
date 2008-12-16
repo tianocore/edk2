@@ -530,7 +530,7 @@ TcpSetState (
     SockConnClosed (Tcb->Sk);
 
     break;
-  case default:
+  default:
     break;
   }
 }
@@ -724,7 +724,7 @@ TcpOnAppClose (
   case TCP_CLOSE_WAIT:
     TcpSetState (Tcb, TCP_LAST_ACK);
     break;
-  case default:
+  default:
     break;
   }
 
@@ -776,7 +776,7 @@ TcpOnAppSend (
   case TCP_TIME_WAIT:
     return -1;
     break;
-  case default:
+  default:
     break;
   }
 
