@@ -137,7 +137,7 @@ EFI_STATUS
 //
 //  Global data for this driver
 //
-#define SNP_NT32_DRIVER_SIGNATURE EFI_SIGNATURE_32 ('W', 'S', 'N', 'P')
+#define SNP_NT32_DRIVER_SIGNATURE SIGNATURE_32 ('W', 'S', 'N', 'P')
 
 typedef struct _SNPNT32_GLOBAL_DATA {
   UINT32                            Signature;
@@ -165,7 +165,7 @@ typedef struct _SNPNT32_GLOBAL_DATA {
 //
 //  Instance data for each fake SNP instance
 //
-#define SNP_NT32_INSTANCE_SIGNATURE EFI_SIGNATURE_32 ('w', 'S', 'N', 'P')
+#define SNP_NT32_INSTANCE_SIGNATURE SIGNATURE_32 ('w', 'S', 'N', 'P')
 
 typedef struct _SNPNT32_INSTANCE_DATA {
   UINT32                      Signature;

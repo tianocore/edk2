@@ -69,9 +69,9 @@ typedef struct {
 
 #define WIN_NT_GOP_CLASS_NAME       L"WinNtGopWindow"
 
-#define GOP_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('S', 'g', 'o', 'N')
+#define GOP_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('S', 'g', 'o', 'N')
 
-#define WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE EFI_SIGNATURE_32 ('W', 'g', 'S', 'n')
+#define WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('W', 'g', 'S', 'n')
 
 typedef struct _WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY {
   UINTN                                 Signature;

@@ -46,7 +46,7 @@ extern UINT8  CpuStrings[];
 //
 // Internal Data Structures
 //
-#define CPU_ARCH_PROT_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('c', 'a', 'p', 'd')
+#define CPU_ARCH_PROT_PRIVATE_SIGNATURE SIGNATURE_32 ('c', 'a', 'p', 'd')
 
 typedef struct {
   UINTN                 Signature;

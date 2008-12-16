@@ -58,7 +58,7 @@ typedef enum {
   EifWinNtMaxTypeDisks
 } WIN_NT_RAW_DISK_DEVICE_TYPE;
 
-#define WIN_NT_BLOCK_IO_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('N', 'T', 'b', 'k')
+#define WIN_NT_BLOCK_IO_PRIVATE_SIGNATURE SIGNATURE_32 ('N', 'T', 'b', 'k')
 typedef struct {
   UINTN                       Signature;
 

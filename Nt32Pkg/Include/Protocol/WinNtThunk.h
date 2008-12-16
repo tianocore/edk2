@@ -1099,7 +1099,7 @@ BOOL
 //
 //
 
-#define EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE EFI_SIGNATURE_32 ('N', 'T', 'T', 'T')
+#define EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE SIGNATURE_32 ('N', 'T', 'T', 'T')
 
 typedef struct {
   UINT64                              Signature;
