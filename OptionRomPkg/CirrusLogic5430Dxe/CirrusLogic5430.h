@@ -67,7 +67,7 @@ typedef struct {
 //
 // Cirrus Logic 5440 Private Data Structure
 //
-#define CIRRUS_LOGIC_5430_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('C', 'L', '5', '4')
+#define CIRRUS_LOGIC_5430_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('C', 'L', '5', '4')
 
 typedef struct {
   UINT64                                Signature;
