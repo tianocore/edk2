@@ -44,7 +44,7 @@ Abstract:
 //
 // Driver Instance Data Prototypes
 //
-#define PCAT_PCI_ROOT_BRIDGE_SIGNATURE  EFI_SIGNATURE_32('p', 'c', 'r', 'b')
+#define PCAT_PCI_ROOT_BRIDGE_SIGNATURE  SIGNATURE_32('p', 'c', 'r', 'b')
 
 typedef struct {
   UINT32                            Signature;

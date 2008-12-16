@@ -44,7 +44,7 @@ Revision History
 //
 // PCAT ISA ACPI device private data structure
 //
-#define PCAT_ISA_ACPI_DEV_SIGNATURE  EFI_SIGNATURE_32('L','P','C','D')
+#define PCAT_ISA_ACPI_DEV_SIGNATURE  SIGNATURE_32('L','P','C','D')
 
 typedef struct {
   UINTN                  Signature;

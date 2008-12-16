@@ -28,7 +28,7 @@ Abstract:
 //
 #pragma pack(push, 1)
 
-#define EFI_LEGACY_MP_TABLE_FLOATING_POINTER_SIGNATURE  EFI_SIGNATURE_32 ('_', 'M', 'P', '_')
+#define EFI_LEGACY_MP_TABLE_FLOATING_POINTER_SIGNATURE  SIGNATURE_32 ('_', 'M', 'P', '_')
 typedef struct {
   UINT32  Signature;
   UINT32  PhysicalAddress;
@@ -44,7 +44,7 @@ typedef struct {
   } FeatureByte2_5;
 } EFI_LEGACY_MP_TABLE_FLOATING_POINTER;
 
-#define EFI_LEGACY_MP_TABLE_HEADER_SIGNATURE  EFI_SIGNATURE_32 ('P', 'C', 'M', 'P')
+#define EFI_LEGACY_MP_TABLE_HEADER_SIGNATURE  SIGNATURE_32 ('P', 'C', 'M', 'P')
 typedef struct {
   UINT32  Signature;
   UINT16  BaseTableLength;

@@ -26,7 +26,7 @@ Revision History
 
 #include "PciBus.h"
 
-#define DRIVER_OVERRIDE_SIGNATURE EFI_SIGNATURE_32 ('d', 'r', 'o', 'v')
+#define DRIVER_OVERRIDE_SIGNATURE SIGNATURE_32 ('d', 'r', 'o', 'v')
 
 typedef struct {
   UINT32          Signature;

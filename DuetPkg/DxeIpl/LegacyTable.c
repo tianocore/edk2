@@ -23,8 +23,8 @@ Revision History:
 #include "Debug.h"
 
 #define ACPI_RSD_PTR      0x2052545020445352LL
-#define MPS_PTR           EFI_SIGNATURE_32('_','M','P','_')
-#define SMBIOS_PTR        EFI_SIGNATURE_32('_','S','M','_')
+#define MPS_PTR           SIGNATURE_32('_','M','P','_')
+#define SMBIOS_PTR        SIGNATURE_32('_','S','M','_')
 
 #define EBDA_BASE_ADDRESS 0x40E
 
@@ -266,7 +266,7 @@ FindAcpiPtr (
 
 #pragma pack(1)
 //#define MCFG_SIGNATURE  0x4746434D
-#define MCFG_SIGNATURE EFI_SIGNATURE_32 ('M', 'C', 'F', 'G')
+#define MCFG_SIGNATURE SIGNATURE_32 ('M', 'C', 'F', 'G')
 typedef struct {
   UINT64  BaseAddress;
   UINT16  PciSegmentGroupNumber;
@@ -275,7 +275,7 @@ typedef struct {
   UINT32  Reserved;
 } MCFG_STRUCTURE;
 
-#define FADT_SIGNATURE EFI_SIGNATURE_32 ('F', 'A', 'C', 'P')
+#define FADT_SIGNATURE SIGNATURE_32 ('F', 'A', 'C', 'P')
 typedef struct {
   DESCRIPTION_HEADER    Header;
   UINT32                FIRMWARE_CTRL;

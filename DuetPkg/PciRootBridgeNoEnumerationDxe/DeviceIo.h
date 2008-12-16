@@ -24,7 +24,7 @@ Abstract:
 
 
 
-#define DEVICE_IO_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('d', 'e', 'v', 'I')
+#define DEVICE_IO_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('d', 'e', 'v', 'I')
 
 #define MAX_COMMON_BUFFER                 0x00000000FFFFFFFF
 
