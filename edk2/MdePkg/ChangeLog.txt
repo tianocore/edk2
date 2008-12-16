@@ -274,3 +274,16 @@ Possible Impacts:
 	All source codes that refer to EFI_KEY_OPTION.KeyOptions
 	must be changed to use EFI_KEY_OPTION.KeyData from UEFI specification.	
 
+EDK_7057:  Non-Compatible: qhuang8
+	Retired the following macros defined in MdePkg/Include/Uefi/UefiBaseType.h:
+	EFI_SIGNATURE_16, EFI_SIGNATURE_32, EFI_SIGNATURE_64, EFI_FIELD_OFFSET, EFI_MAX_BIT & EFI_MAX_ADDRESS
+	
+Possible impacts:
+	All EDKII native source code needs to update to use the equivelent macros (without "EFI_" prefix except for
+	EFI_FIELD_OFFSET) defined in MdePkg\Include\Base.h and MdePkg\Include\$(ARCH)\ProcessorBinding.h:
+	EFI_SIGNATURE_16 -> SIGNATURE_16
+	EFI_SIGNATURE_32 -> SIGNATURE_32
+	EFI_SIGNATURE_64 -> SIGNATURE_64
+	EFI_FIELD_OFFSET -> OFFSET_OF
+	EFI_MAX_BIT      -> MAX_BIT
+	EFI_MAX_ADDRESS  -> MAX_ADDRESS
