@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include "IScsiCommon.h"
 #include "IScsiDriver.h"
+#include "IscsiInitiatorName.h"
+#include "ComponentName.h"
 #include "IScsiConfigNVDataStruc.h"
 #include "IScsiExtScsiPassThru.h"
 #include "IScsiProto.h"
@@ -31,7 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IScsiDhcp.h"
 #include "IScsiTcp4Io.h"
 #include "IScsiIbft.h"
-
 
 
 #define ISCSI_SESSION_SIGNATURE EFI_SIGNATURE_32 ('I', 'S', 'S', 'N')
