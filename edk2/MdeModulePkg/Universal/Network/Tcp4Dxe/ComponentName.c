@@ -1,28 +1,18 @@
 /** @file
 
-Copyright (c) 2005 - 2007, Intel Corporation
+Copyright (c) 2005 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  ComponentName.c
-
-Abstract:
-
 
 **/
 
 #include "Tcp4Main.h"
 
-//
-// EFI Component Name Functions
-//
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -33,10 +23,10 @@ Abstract:
   by This does not support the language specified by Language,
   then EFI_UNSUPPORTED is returned.
 
-  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param[in]  This              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
 
-  @param  Language[in]          A pointer to a Null-terminated ASCII string
+  @param[in]  Language          A pointer to a Null-terminated ASCII string
                                 array indicating the language. This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -45,7 +35,7 @@ Abstract:
                                 to the driver writer. Language is specified
                                 in RFC 3066 or ISO 639-2 language code format.
 
-  @param  DriverName[out]       A pointer to the Unicode string to return.
+  @param[out]  DriverName       A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 driver specified by This in the language
                                 specified by Language.
@@ -65,9 +55,9 @@ Abstract:
 EFI_STATUS
 EFIAPI
 TcpComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     CHAR8                        *Language,
+     OUT CHAR16                       **DriverName
   );
 
 
@@ -84,15 +74,15 @@ TcpComponentNameGetDriverName (
   then EFI_UNSUPPORTED is returned.  If the driver specified by This does not
   support the language specified by Language, then EFI_UNSUPPORTED is returned.
 
-  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param[in]  This              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
 
-  @param  ControllerHandle[in]  The handle of a controller that the driver
+  @param[in]  ControllerHandle  The handle of a controller that the driver
                                 specified by This is managing.  This handle
                                 specifies the controller whose name is to be
                                 returned.
 
-  @param  ChildHandle[in]       The handle of the child controller to retrieve
+  @param[in]  ChildHandle       The handle of the child controller to retrieve
                                 the name of.  This is an optional parameter that
                                 may be NULL.  It will be NULL for device
                                 drivers.  It will also be NULL for a bus drivers
@@ -101,7 +91,7 @@ TcpComponentNameGetDriverName (
                                 driver that wishes to retrieve the name of a
                                 child controller.
 
-  @param  Language[in]          A pointer to a Null-terminated ASCII string
+  @param[in]  Language          A pointer to a Null-terminated ASCII string
                                 array indicating the language.  This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -110,7 +100,7 @@ TcpComponentNameGetDriverName (
                                 to the driver writer. Language is specified in
                                 RFC 3066 or ISO 639-2 language code format.
 
-  @param  ControllerName[out]   A pointer to the Unicode string to return.
+  @param[out]  ControllerName   A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 controller specified by ControllerHandle and
                                 ChildHandle in the language specified by
@@ -142,26 +132,26 @@ TcpComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 TcpComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     EFI_HANDLE                   ControllerHandle,
+  IN     EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN     CHAR8                        *Language,
+     OUT CHAR16                       **ControllerName
   );
 
 
-//
-// EFI Component Name Protocol
-//
+///
+/// EFI Component Name Protocol
+///
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gTcp4ComponentName = {
   TcpComponentNameGetDriverName,
   TcpComponentNameGetControllerName,
   "eng"
 };
 
-//
-// EFI Component Name 2 Protocol
-//
+///
+/// EFI Component Name 2 Protocol
+///
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gTcp4ComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) TcpComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) TcpComponentNameGetControllerName,
@@ -190,10 +180,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mTcpDriverNameTable[] = {
   by This does not support the language specified by Language,
   then EFI_UNSUPPORTED is returned.
 
-  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param[in]  This              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
 
-  @param  Language[in]          A pointer to a Null-terminated ASCII string
+  @param[in]  Language          A pointer to a Null-terminated ASCII string
                                 array indicating the language. This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -202,7 +192,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mTcpDriverNameTable[] = {
                                 to the driver writer. Language is specified
                                 in RFC 3066 or ISO 639-2 language code format.
 
-  @param  DriverName[out]       A pointer to the Unicode string to return.
+  @param[out]  DriverName       A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 driver specified by This in the language
                                 specified by Language.
@@ -222,9 +212,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mTcpDriverNameTable[] = {
 EFI_STATUS
 EFIAPI
 TcpComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     CHAR8                        *Language,
+     OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -249,15 +239,15 @@ TcpComponentNameGetDriverName (
   then EFI_UNSUPPORTED is returned.  If the driver specified by This does not
   support the language specified by Language, then EFI_UNSUPPORTED is returned.
 
-  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param[in]  This              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
 
-  @param  ControllerHandle[in]  The handle of a controller that the driver
+  @param[in]  ControllerHandle  The handle of a controller that the driver
                                 specified by This is managing.  This handle
                                 specifies the controller whose name is to be
                                 returned.
 
-  @param  ChildHandle[in]       The handle of the child controller to retrieve
+  @param[in]  ChildHandle        The handle of the child controller to retrieve
                                 the name of.  This is an optional parameter that
                                 may be NULL.  It will be NULL for device
                                 drivers.  It will also be NULL for a bus drivers
@@ -266,7 +256,7 @@ TcpComponentNameGetDriverName (
                                 driver that wishes to retrieve the name of a
                                 child controller.
 
-  @param  Language[in]          A pointer to a Null-terminated ASCII string
+  @param[in]  Language          A pointer to a Null-terminated ASCII string
                                 array indicating the language.  This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -275,7 +265,7 @@ TcpComponentNameGetDriverName (
                                 to the driver writer. Language is specified in
                                 RFC 3066 or ISO 639-2 language code format.
 
-  @param  ControllerName[out]   A pointer to the Unicode string to return.
+  @param[out]  ControllerName   A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 controller specified by ControllerHandle and
                                 ChildHandle in the language specified by
@@ -307,11 +297,11 @@ TcpComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 TcpComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     EFI_HANDLE                   ControllerHandle,
+  IN     EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN     CHAR8                        *Language,
+     OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;

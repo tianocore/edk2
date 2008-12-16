@@ -1,24 +1,17 @@
 /** @file
+  Implementation of TCP4 protocol services.
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Tcp4Main.c
-
-Abstract:
-
-  Implementation of TCP4 protocol services.
-
-
 **/
+
 
 #include "Tcp4Main.h"
 
@@ -221,9 +214,9 @@ Tcp4Configure (
 /**
   Add or delete routing entries.
   
-  The Routes() function adds or deletes a route from the instance’s routing table.
+  The Routes() function adds or deletes a route from the instance's routing table.
   The most specific route is selected by comparing the SubnetAddress with the 
-  destination IP address’s arithmetical AND to the SubnetMask.
+  destination IP address's arithmetical AND to the SubnetMask.
   The default route is added with both SubnetAddress and SubnetMask set to 0.0.0.0. 
   The default route matches all destination IP addresses if there is no more specific route.
   Direct route is added with GatewayAddress set to 0.0.0.0. Packets are sent to 
@@ -231,9 +224,9 @@ Tcp4Configure (
   cache or it is on the local subnet. If the instance is configured to use default 
   address, a direct route to the local network will be added automatically.
   Each TCP instance has its own independent routing table. Instance that uses the 
-  default IP address will have a copy of the EFI_IP4_CONFIG_PROTOCOL’s routing table. 
+  default IP address will have a copy of the EFI_IP4_CONFIG_PROTOCOL's routing table. 
   The copy will be updated automatically whenever the IP driver reconfigures its 
-  instance. As a result, the previous modification to the instance’s local copy 
+  instance. As a result, the previous modification to the instance's local copy 
   will be lost. The priority of checking the route table is specific with IP 
   implementation and every IP implementation must comply with RFC 1122.
 
@@ -348,7 +341,7 @@ Tcp4Connect (
   incoming connection on the passive TCP instance. If a remote peer successfully 
   establishes a connection with this instance, a new TCP instance will be created 
   and its handle will be returned in ListenToken->NewChildHandle. The newly created 
-  instance is configured by inheriting the passive instance’s configuration and is 
+  instance is configured by inheriting the passive instance's configuration and is 
   ready for use upon return. The instance is in the Tcp4StateEstablished state.
   The ListenToken->CompletionToken.Event will be signaled when a new connection 
   is accepted, user aborts the listen or connection is reset. This function only 
@@ -617,12 +610,12 @@ Tcp4Close (
   @retval  EFI_SUCCESS             The asynchronous I/O request is aborted and Token->Event
                                    is signaled.
   @retval  EFI_INVALID_PARAMETER   This is NULL.
-  @retval  EFI_NOT_STARTED         This instance hasn’t been configured.
+  @retval  EFI_NOT_STARTED         This instance hasn's been configured.
   @retval  EFI_NO_MAPPING          When using the default address, configuration
-                                   (DHCP, BOOTP,RARP, etc.) hasn’t finished yet.
-  @retval  EFI_NOT_FOUND           The asynchronous I/O request isn’t found in the 
+                                   (DHCP, BOOTP,RARP, etc.) hasn's finished yet.
+  @retval  EFI_NOT_FOUND           The asynchronous I/O request isn's found in the 
                                    transmission or receive queue. It has either 
-                                   completed or wasn’t issued by Transmit() and Receive().
+                                   completed or wasn's issued by Transmit() and Receive().
   @retval  EFI_UNSUPPORTED         The operation is not supported in current
                                    implementation.
   

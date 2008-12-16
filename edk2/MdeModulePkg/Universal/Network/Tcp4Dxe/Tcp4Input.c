@@ -1,24 +1,17 @@
 /** @file
+  TCP input process routines.
 
-Copyright (c) 2005 - 2007, Intel Corporation
+Copyright (c) 2005 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Tcp4Input.c
-
-Abstract:
-
-  TCP input process routines.
-
-
 **/
+
 
 #include "Tcp4Main.h"
 
@@ -491,6 +484,8 @@ TcpDeliverData (
         NetbufFree (Nbuf);
         return -1;
         break;
+      case default:
+        break;
       }
 
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
@@ -773,10 +768,6 @@ TcpInput (
   Nbuf->Tcp = NULL;
 
   //
-  // TODO: add fast path process here
-  //
-
-  //
   // Process the segment in LISTEN state.
   //
   if (Tcb->State == TCP_LISTEN) {
@@ -861,14 +852,14 @@ TcpInput (
       if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
 
         DEBUG ((EFI_D_WARN, "TcpInput: connection reset by"
-          " peer for TCB%x in SYN_SENT\n", Tcb));
+          " peer for TCB %p in SYN_SENT\n", Tcb));
 
         SOCK_ERROR (Tcb->Sk, EFI_CONNECTION_RESET);
         goto DROP_CONNECTION;
       } else {
 
         DEBUG ((EFI_D_WARN, "TcpInput: discard a reset segment "
-          "because of no ACK for TCB%x in SYN_SENT\n", Tcb));
+          "because of no ACK for TCB %p in SYN_SENT\n", Tcb));
 
         goto DISCARD;
       }
@@ -985,9 +976,7 @@ TcpInput (
       SOCK_ERROR (Tcb->Sk, EFI_CONNECTION_RESET);
 
     } else {
-      //
-      // TODO: set socket error to CLOSED
-      //
+
     }
 
     goto DROP_CONNECTION;
@@ -1174,7 +1163,7 @@ TcpInput (
       }
 
       DEBUG ((EFI_D_WARN, "TcpInput: peer shrinks the"
-        " window  for connected TCB %p\n", Tcb));
+        " window for connected TCB %p\n", Tcb));
 
       if ((Tcb->CongestState == TCP_CONGEST_RECOVER) &&
           (TCP_SEQ_LT (Right, Tcb->Recover))) {
