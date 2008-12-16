@@ -42,7 +42,7 @@ Revision History:
 
 #define EFI_MAX_MEMORY_DESCRIPTORS 64
 
-#define LOADED_IMAGE_SIGNATURE     EFI_SIGNATURE_32('l','d','r','i')
+#define LOADED_IMAGE_SIGNATURE     SIGNATURE_32('l','d','r','i')
 
 typedef struct {
   UINTN                       Signature;

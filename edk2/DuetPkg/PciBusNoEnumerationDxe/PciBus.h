@@ -88,7 +88,7 @@ typedef struct {
   UINT8         Offset;
 } PCI_BAR;
 
-#define PCI_IO_DEVICE_SIGNATURE   EFI_SIGNATURE_32 ('p','c','i','o')
+#define PCI_IO_DEVICE_SIGNATURE   SIGNATURE_32 ('p','c','i','o')
 
 #define EFI_BRIDGE_IO32_DECODE_SUPPORTED        0x0001 
 #define EFI_BRIDGE_PMEM32_DECODE_SUPPORTED      0x0002 

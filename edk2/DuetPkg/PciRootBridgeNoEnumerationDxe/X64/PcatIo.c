@@ -129,7 +129,7 @@ PcatRootBridgeIoPciRW (
     // Check PciExpressBaseAddress
     //
     if ((PrivateData->PciExpressBaseAddress == 0) ||
-        (PrivateData->PciExpressBaseAddress >= EFI_MAX_ADDRESS)) {
+        (PrivateData->PciExpressBaseAddress >= MAX_ADDRESS)) {
       return EFI_UNSUPPORTED;
     } else {
       UsePciExpressAccess = TRUE;

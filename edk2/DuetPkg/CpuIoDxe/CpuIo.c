@@ -159,7 +159,7 @@ Returns:
   PTR        Destination;
   EFI_STATUS Status;
 
-  Status = CpuIoCheckParameter (Width, Address, Count, Buffer, EFI_MAX_ADDRESS);
+  Status = CpuIoCheckParameter (Width, Address, Count, Buffer, MAX_ADDRESS);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -220,7 +220,7 @@ Returns:
   PTR        Destination;
   EFI_STATUS Status;
 
-  Status = CpuIoCheckParameter (Width, Address, Count, Buffer, EFI_MAX_ADDRESS);
+  Status = CpuIoCheckParameter (Width, Address, Count, Buffer, MAX_ADDRESS);
   if (EFI_ERROR (Status)) {
     return Status;
   }

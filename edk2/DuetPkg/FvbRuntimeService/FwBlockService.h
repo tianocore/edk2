@@ -113,7 +113,7 @@ typedef struct {
 //
 #define FVB_DEVICE_FROM_THIS(a)         CR (a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
 #define FVB_EXTEND_DEVICE_FROM_THIS(a)  CR (a, EFI_FW_VOL_BLOCK_DEVICE, FvbExtension, FVB_DEVICE_SIGNATURE)
-#define FVB_DEVICE_SIGNATURE            EFI_SIGNATURE_32 ('F', 'V', 'B', 'C')
+#define FVB_DEVICE_SIGNATURE            SIGNATURE_32 ('F', 'V', 'B', 'C')
 
 typedef struct {
   MEMMAP_DEVICE_PATH        MemMapDevPath;
