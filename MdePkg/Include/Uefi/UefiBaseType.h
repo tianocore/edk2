@@ -162,18 +162,7 @@ typedef union {
 
 #define EFI_ERROR(A)              RETURN_ERROR(A)
 
-//
-// Define macros to build data structure signatures from characters.
-//
-#define EFI_SIGNATURE_16(A, B)                    SIGNATURE_16 (A, B)
-#define EFI_SIGNATURE_32(A, B, C, D)              SIGNATURE_32 (A, B, C, D)
-#define EFI_SIGNATURE_64(A, B, C, D, E, F, G, H)  SIGNATURE_64 (A, B, C, D, E, F, G, H)
-    
 
-///
-///  Returns the byte offset to a field within a structure
-///
-#define EFI_FIELD_OFFSET(TYPE,Field) ((UINTN)(&(((TYPE *) 0)->Field)))
 
 //
 // The EFI memory allocation functions work in units of EFI_PAGEs that are
@@ -187,11 +176,6 @@ typedef union {
 #define EFI_SIZE_TO_PAGES(a)  (((a) >> EFI_PAGE_SHIFT) + (((a) & EFI_PAGE_MASK) ? 1 : 0))
 
 #define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
-
-
-#define EFI_MAX_BIT               MAX_BIT
-#define EFI_MAX_ADDRESS           MAX_ADDRESS
-
 
 ///
 /// Limited buffer size for a language code recommended by RFC3066
