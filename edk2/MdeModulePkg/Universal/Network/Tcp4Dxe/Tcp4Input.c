@@ -484,7 +484,7 @@ TcpDeliverData (
         NetbufFree (Nbuf);
         return -1;
         break;
-      case default:
+      default:
         break;
       }
 
