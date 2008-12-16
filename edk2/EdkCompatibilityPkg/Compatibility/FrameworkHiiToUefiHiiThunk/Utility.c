@@ -416,9 +416,12 @@ GetFormsetDefaultVarstoreId (
   while (!IsNull (&FormSet->StorageListHead, StorageList)) {
     Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
 
-    DEBUG ((EFI_D_INFO, "FormSet %g: Found Varstore ID %x\n", &FormSet->Guid, Storage->VarStoreId));
+    DEBUG ((EFI_D_INFO, "FormSet %g: Found Varstore ID %x Name %s Size 0x%x\n", &FormSet->Guid, Storage->VarStoreId, Storage->Name, Storage->Size));
 
     if (Storage->VarStoreId == FRAMEWORK_RESERVED_VARSTORE_ID) {
+      //
+      // 1) If VarStore ID of FRAMEWORK_RESERVED_VARSTORE_ID (0x01) is found, Var Store ID is used.
+      //
       FormSet->DefaultVarStoreId = FRAMEWORK_RESERVED_VARSTORE_ID;
       break;
     }
@@ -427,6 +430,11 @@ GetFormsetDefaultVarstoreId (
   }
 
   if (FormSet->DefaultVarStoreId != FRAMEWORK_RESERVED_VARSTORE_ID) {
+    //
+    // 
+    // 2) If VarStore ID of FRAMEWORK_RESERVED_VARSTORE_ID is not found, First Var Store ID is used 
+    //   as the default Var Store ID.
+    //
     StorageList = GetFirstNode (&FormSet->StorageListHead);
     if (!IsNull (&FormSet->StorageListHead, StorageList)) {
       Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
