@@ -53,8 +53,8 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gIsaFloppyComponentName2;
 //
 // Internal Data Structures
 //
-#define FDC_BLK_IO_DEV_SIGNATURE            EFI_SIGNATURE_32 ('F', 'B', 'I', 'O')
-#define FLOPPY_CONTROLLER_CONTEXT_SIGNATURE EFI_SIGNATURE_32 ('F', 'D', 'C', 'C')
+#define FDC_BLK_IO_DEV_SIGNATURE            SIGNATURE_32 ('F', 'B', 'I', 'O')
+#define FLOPPY_CONTROLLER_CONTEXT_SIGNATURE SIGNATURE_32 ('F', 'D', 'C', 'C')
 
 typedef enum {
   FDC_DISK0   = 0,

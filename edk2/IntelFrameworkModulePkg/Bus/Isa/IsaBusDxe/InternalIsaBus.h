@@ -134,7 +134,7 @@ typedef struct {
 //
 // ISA I/O Device Structure
 //
-#define ISA_IO_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('i', 's', 'a', 'i')
+#define ISA_IO_DEVICE_SIGNATURE SIGNATURE_32 ('i', 's', 'a', 'i')
 
 typedef struct {
   UINT32                                    Signature;

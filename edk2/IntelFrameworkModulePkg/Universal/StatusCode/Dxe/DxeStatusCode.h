@@ -45,7 +45,7 @@
 #define MAX_NUMBER_DATAHUB_RECORDS                1000
 #define DATAHUB_BYTES_PER_RECORD                  EFI_STATUS_CODE_DATA_MAX_SIZE
 #define EMPTY_RECORD_TAG                          0xFF
-#define DATAHUB_STATUS_CODE_SIGNATURE             EFI_SIGNATURE_32 ('B', 'D', 'H', 'S')
+#define DATAHUB_STATUS_CODE_SIGNATURE             SIGNATURE_32 ('B', 'D', 'H', 'S')
 
 //
 // Address type of pointer.

@@ -40,7 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // PCI VGA MiniPort Device Structure
 //
-#define PCI_VGA_MINI_PORT_DEV_SIGNATURE   EFI_SIGNATURE_32('P','V','M','P')
+#define PCI_VGA_MINI_PORT_DEV_SIGNATURE   SIGNATURE_32('P','V','M','P')
 
 typedef struct {
   UINTN                         Signature;
