@@ -1,7 +1,11 @@
 #/** @file
-# Component description file for DebugSupport module.
+# This driver installs Debug Support protocol for the selected processor.
 #
-# This driver installs DebugSupport protocol for the selected processor.
+# This driver provides the capabilities for debug-agent to gain control of the machine
+# when certain types of events occur, i.e. breakpoint, processor execptions, etc. It also
+# provides debug-agent to periodically gain control during operation of the machine to
+# check for asynchronous commands form the host.
+#
 # Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials

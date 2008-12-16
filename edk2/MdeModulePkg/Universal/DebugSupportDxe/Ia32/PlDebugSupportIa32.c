@@ -1,7 +1,7 @@
 /** @file
-  IA32 specific debug support functions
+  IA32 specific functions to support Debug Support protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at

@@ -1,5 +1,5 @@
 /** @file
-  IPF specific debug support functions
+  IPF specific functions to support Debug Support protocol.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -12,9 +12,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-//
-// private header files
-//
 #include "PlDebugSupport.h"
 
 BOOLEAN  mInHandler = FALSE;
@@ -66,7 +63,9 @@ PlInitializeDebugSupportDriver (
 
 /**
   Unload handler that is called during UnloadImage() - deallocates pool memory
-  used by the driver.  Must be public because it's referenced from DebugSuport.c
+  used by the driver. 
+
+  Must be public because it's referenced from DebugSuport.c
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.
 
@@ -90,10 +89,12 @@ PlUnloadDebugSupportDriver (
 
 /**
   C routine that is called for all registered exceptions.  This is the main
-  exception dispatcher.  Must be public because it's referenced from AsmFuncs.s.
+  exception dispatcher. 
 
-  @param  ExceptionType        Exception Type
-  @param  Context              System Context
+  Must be public because it's referenced from AsmFuncs.s.
+
+  @param  ExceptionType        Specifies which processor exception.
+  @param  Context              System Context.
 **/
 VOID
 CommonHandler (
@@ -170,12 +171,11 @@ GetHandlerEntryPoint (
 /**
   This is the worker function that uninstalls and removes all handlers.
 
-  @param  ExceptionType     Exception Type
-  @param  NewBundles        New Boundles
-  @param  NewCallback       New Callback
+  @param  ExceptionType     Specifies which processor exception.
+  @param  NewBundles        New Boundles.
+  @param  NewCallback       A pointer to the new function to be registered.
 
   @retval EFI_ALEADY_STARTED Ivt already hooked.
-  @retval others             Indicates the request was not satisfied.
   @retval EFI_SUCCESS        Successfully uninstalled.
 
 **/
@@ -248,9 +248,9 @@ ManageIvtEntryTable (
   Saves original IVT contents and inserts a few new bundles which are fixed up
   to store the ExceptionType and then call the common handler.
 
-  @param  ExceptionType      Exception Type
-  @param  NewBundles         New Boundles
-  @param  NewCallback        New Callback
+  @param  ExceptionType      Specifies which processor exception.
+  @param  NewBundles         New Boundles.
+  @param  NewCallback        A pointer to the new function to be hooked.
 
 **/
 VOID
@@ -294,7 +294,7 @@ HookEntry (
 /**
   Restores original IVT contents when unregistering a callback function.
 
-  @param  ExceptionType     Exception Type
+  @param  ExceptionType     Specifies which processor exception.
 
 **/
 VOID
@@ -324,7 +324,7 @@ UnhookEntry (
 
   Records new callback in IvtEntryTable.
 
-  @param  NewCallback     New Callback
+  @param  NewCallback     A pointer to the interrupt handle.
 
 **/
 VOID
@@ -358,19 +358,17 @@ UnchainExternalInterrupt (
   IvtEntryTable[EXCEPT_IPF_EXTERNAL_INTERRUPT].RegisteredCallback = NULL;
 }
 
-//
-// The rest of the functions in this file are all member functions for the
-// DebugSupport protocol
-//
-
 /**
-  This is a DebugSupport protocol member function, hard
-  coded to support only 1 processor for now.
+  Returns the maximum value that may be used for the ProcessorIndex parameter in
+  RegisterPeriodicCallback() and RegisterExceptionCallback().                   
+    
+  Hard coded to support only 1 processor for now.
 
-  @param  This                The DebugSupport instance
-  @param  MaxProcessorIndex   The maximuim supported processor index
-
-  @retval EFI_SUCCESS         Always returned with **MaxProcessorIndex set to 0.
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  MaxProcessorIndex     Pointer to a caller-allocated UINTN in which the maximum supported
+                                processor index is returned. Always 0 returned.                                     
+                                
+  @retval EFI_SUCCESS           Always returned with **MaxProcessorIndex set to 0.
 
 **/
 EFI_STATUS
@@ -385,15 +383,18 @@ GetMaximumProcessorIndex (
 }
 
 /**
-  DebugSupport protocol member function.
-
-  @param  This               The DebugSupport instance
-  @param  ProcessorIndex     Which processor the callback applies to.
-  @param  PeriodicCallback   Callback function
-
-  @retval EFI_SUCCESS        Indicates the callback was registered.
-  @retval others             Callback was not registered.
-
+  Registers a function to be called back periodically in interrupt context.
+    
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  ProcessorIndex        Specifies which processor the callback function applies to.
+  @param  PeriodicCallback      A pointer to a function of type PERIODIC_CALLBACK that is the main
+                                periodic entry point of the debug agent.
+                                
+  @retval EFI_SUCCESS           The function completed successfully.  
+  @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
+                                function was previously registered.                
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
+                                function. 
 **/
 EFI_STATUS
 EFIAPI
@@ -407,16 +408,21 @@ RegisterPeriodicCallback (
 }
 
 /**
-  DebugSupport protocol member function.
+  Registers a function to be called when a given processor exception occurs.
 
-  @param  This              The DebugSupport instance
-  @param  ProcessorIndex    Which processor the callback applies to.
-  @param  NewCallback       Callback function
-  @param  ExceptionType     Which exception to hook
-
-  @retval EFI_SUCCESS        Indicates the callback was registered.
-  @retval others             Callback was not registered.
-
+  This code executes in boot services context.
+    
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  ProcessorIndex        Specifies which processor the callback function applies to.
+  @param  ExceptionCallback     A pointer to a function of type EXCEPTION_CALLBACK that is called
+                                when the processor exception specified by ExceptionType occurs.  
+  @param  ExceptionType         Specifies which processor exception to hook.                       
+                                
+  @retval EFI_SUCCESS           The function completed successfully.  
+  @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
+                                function was previously registered.                
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
+                                function.
 **/
 EFI_STATUS
 EFIAPI
@@ -435,14 +441,16 @@ RegisterExceptionCallback (
 }
 
 /**
-  DebugSupport protocol member function.  Calls assembly routine to flush cache.
-
-  @param  This              The DebugSupport instance
-  @param  ProcessorIndex    Which processor the callback applies to.
-  @param  Start             Physical base of the memory range to be invalidated
-  @param  Length            mininum number of bytes in instruction cache to invalidate
-
-  @retval EFI_SUCCESS       Always returned.
+  Invalidates processor instruction cache for a memory range. Subsequent execution in this range
+  causes a fresh memory fetch to retrieve code to be executed.                                  
+    
+  @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
+  @param  ProcessorIndex        Specifies which processor's instruction cache is to be invalidated.
+  @param  Start                 Specifies the physical base of the memory range to be invalidated.                                
+  @param  Length                Specifies the minimum number of bytes in the processor's instruction
+                                cache to invalidate.                                                 
+                                
+  @retval EFI_SUCCESS           Always returned.
 
 **/
 EFI_STATUS

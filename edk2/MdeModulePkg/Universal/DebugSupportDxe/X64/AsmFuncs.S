@@ -14,7 +14,6 @@
 
 .intel_syntax noprefix
 
-
 .globl ASM_PFX(OrigVector)
 .globl ASM_PFX(InterruptEntryStub)
 .globl ASM_PFX(StubSize)
@@ -146,8 +145,6 @@ ASM_PFX(InterruptEntryStub):
 .globl ASM_PFX(InterruptEntryStubEnd)
 ASM_PFX(InterruptEntryStubEnd):
 
-        ret
-
 #------------------------------------------------------------------------------
 # CommonIdtEntry
 #
@@ -199,9 +196,6 @@ ASM_PFX(InterruptEntryStubEnd):
 ##   UINT64            R8, R9, R10, R11, R12, R13, R14, R15;
 ## } SYSTEM_CONTEXT_X64;  // 64
 ASM_PFX(CommonIdtEntry):
-
-        ret
-
 ## NOTE: we save rsp here to prevent compiler put rip reference cause error AppRsp
                 push    rax
                 mov     rax, qword ptr [rsp][8]          # save vector number
@@ -274,9 +268,10 @@ ExtraPushDone:
                 mov     rax, ASM_PFX(AppRsp)
                 add     rax, 40
                 # application stack has ss, rsp, rflags, cs, & rip, so
-                # last actual application stack entry is
-                # 40 bytes into the application stack.
+                # last actual application stack entry is 40 bytes
+                # into the application stack.
                 mov     [rsp + 24], rax
+
 ## continue building context record
 ## UINT64  Gs, Fs, Es, Ds, Cs, Ss;  insure high 16 bits of each is zero
                 mov     rax, ss
@@ -361,14 +356,14 @@ ExtraPushDone:
                 # IMPORTANT!! The debug stack has been carefully constructed to
                 # insure that rsp and rdi are 16 byte aligned when we get here.
                 # They MUST be.  If they are not, a GP fault will occur.
-           #     FXSTOR_RDI
-               .byte       0x0f
-               .byte       0xae
-               .byte       0x07
+          
+                #     FXSTOR_RDI
+                fxsave      [rdi]
 
 ## UINT64  ExceptionData;
                 mov     rax, ASM_PFX(ExceptData)
                 push    rax
+
 # call to C code which will in turn call registered handler
 # pass in the vector number
                 mov     rdx, rsp
@@ -379,14 +374,16 @@ ExtraPushDone:
 # restore context...
 ## UINT64  ExceptionData;
                 add     rsp, 8
+
 ## FX_SAVE_STATE_X64 FxSaveState;
                 mov     rsi, rsp
-            #    FXRSTOR_RSI
-               .byte       0x0f
-               .byte       0xae
-               .byte       0x0e
+            
+                #    FXRSTOR_RSI
+                fxrstor     [rsi]
+
                 add     rsp, 512
-;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
+
+## UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
                 pop     rax
                 mov     dr0, rax
                 pop     rax
@@ -395,10 +392,12 @@ ExtraPushDone:
                 mov     dr2, rax
                 pop     rax
                 mov     dr3, rax
+
 ## skip restore of dr6.  We cleared dr6 during the context save.
                 add     rsp, 8
                 pop     rax
                 mov     dr7, rax
+
 ## UINT64  Cr0, Cr1, Cr2, Cr3, Cr4, Cr8;
                 pop     rax
                 mov     cr0, rax
