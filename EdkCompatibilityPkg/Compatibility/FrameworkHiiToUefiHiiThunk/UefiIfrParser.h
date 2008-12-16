@@ -44,7 +44,7 @@
 extern EFI_GUID  gTianoHiiIfrGuid;
 
 #define ONE_OF_OPTION_MAP_ENTRY_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP_ENTRY, Link, ONE_OF_OPTION_MAP_ENTRY_SIGNATURE)
-#define ONE_OF_OPTION_MAP_ENTRY_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'M', 'E')
+#define ONE_OF_OPTION_MAP_ENTRY_SIGNATURE            SIGNATURE_32 ('O', 'O', 'M', 'E')
 typedef struct {
   UINT32              Signature;
   LIST_ENTRY          Link;
@@ -57,7 +57,7 @@ typedef struct {
 
 
 #define ONE_OF_OPTION_MAP_FROM_LINK(Record) CR(Record, ONE_OF_OPTION_MAP, Link, ONE_OF_OPTION_MAP_SIGNATURE)
-#define ONE_OF_OPTION_MAP_SIGNATURE            EFI_SIGNATURE_32 ('O', 'O', 'O', 'M')
+#define ONE_OF_OPTION_MAP_SIGNATURE            SIGNATURE_32 ('O', 'O', 'O', 'M')
 typedef struct {
   UINT32            Signature;
   LIST_ENTRY        Link;       
@@ -77,9 +77,9 @@ typedef struct {
   EFI_IFR_TYPE_VALUE  Value;
 } EFI_HII_VALUE;
 
-#define NAME_VALUE_NODE_SIGNATURE  EFI_SIGNATURE_32 ('N', 'V', 'S', 'T')
+#define NAME_VALUE_NODE_SIGNATURE  SIGNATURE_32 ('N', 'V', 'S', 'T')
 
-#define FORMSET_STORAGE_SIGNATURE  EFI_SIGNATURE_32 ('F', 'S', 'T', 'G')
+#define FORMSET_STORAGE_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'G')
 
 typedef struct {
   UINTN            Signature;
@@ -101,7 +101,7 @@ typedef struct {
 
 #if 0
 
-#define EXPRESSION_OPCODE_SIGNATURE  EFI_SIGNATURE_32 ('E', 'X', 'O', 'P')
+#define EXPRESSION_OPCODE_SIGNATURE  SIGNATURE_32 ('E', 'X', 'O', 'P')
 
 typedef struct {
   UINTN             Signature;
@@ -127,7 +127,7 @@ typedef struct {
 
 #define EXPRESSION_OPCODE_FROM_LINK(a)  CR (a, EXPRESSION_OPCODE, Link, EXPRESSION_OPCODE_SIGNATURE)
 
-#define FORM_EXPRESSION_SIGNATURE  EFI_SIGNATURE_32 ('F', 'E', 'X', 'P')
+#define FORM_EXPRESSION_SIGNATURE  SIGNATURE_32 ('F', 'E', 'X', 'P')
 
 typedef struct {
   UINTN             Signature;
@@ -146,7 +146,7 @@ typedef struct {
 #define FORM_EXPRESSION_FROM_LINK(a)  CR (a, FORM_EXPRESSION, Link, FORM_EXPRESSION_SIGNATURE)
 #endif
 
-#define QUESTION_DEFAULT_SIGNATURE  EFI_SIGNATURE_32 ('Q', 'D', 'F', 'T')
+#define QUESTION_DEFAULT_SIGNATURE  SIGNATURE_32 ('Q', 'D', 'F', 'T')
 
 typedef struct {
   UINTN               Signature;
@@ -159,7 +159,7 @@ typedef struct {
 
 #define QUESTION_DEFAULT_FROM_LINK(a)  CR (a, QUESTION_DEFAULT, Link, QUESTION_DEFAULT_SIGNATURE)
 
-#define QUESTION_OPTION_SIGNATURE  EFI_SIGNATURE_32 ('Q', 'O', 'P', 'T')
+#define QUESTION_OPTION_SIGNATURE  SIGNATURE_32 ('Q', 'O', 'P', 'T')
 
 typedef struct {
   UINTN               Signature;
@@ -177,7 +177,7 @@ typedef struct {
 
 #define QUESTION_OPTION_FROM_LINK(a)  CR (a, QUESTION_OPTION, Link, QUESTION_OPTION_SIGNATURE)
 
-#define FORM_BROWSER_STATEMENT_SIGNATURE  EFI_SIGNATURE_32 ('F', 'S', 'T', 'A')
+#define FORM_BROWSER_STATEMENT_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'A')
 typedef struct {
   UINTN                 Signature;
   LIST_ENTRY            Link;
@@ -260,7 +260,7 @@ typedef struct {
 
 #define FORM_BROWSER_STATEMENT_FROM_LINK(a)  CR (a, FORM_BROWSER_STATEMENT, Link, FORM_BROWSER_STATEMENT_SIGNATURE)
 
-#define FORM_BROWSER_FORM_SIGNATURE  EFI_SIGNATURE_32 ('F', 'F', 'R', 'M')
+#define FORM_BROWSER_FORM_SIGNATURE  SIGNATURE_32 ('F', 'F', 'R', 'M')
 
 typedef struct {
   UINTN             Signature;
@@ -279,7 +279,7 @@ typedef struct {
 
 #define FORM_BROWSER_FORM_FROM_LINK(a)  CR (a, FORM_BROWSER_FORM, Link, FORM_BROWSER_FORM_SIGNATURE)
 
-#define FORMSET_DEFAULTSTORE_SIGNATURE  EFI_SIGNATURE_32 ('F', 'D', 'F', 'S')
+#define FORMSET_DEFAULTSTORE_SIGNATURE  SIGNATURE_32 ('F', 'D', 'F', 'S')
 
 typedef struct {
   UINTN            Signature;
