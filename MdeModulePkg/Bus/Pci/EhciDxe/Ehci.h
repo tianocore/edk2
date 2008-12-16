@@ -73,7 +73,7 @@ typedef enum {
   //
 #define  EHC_TPL                TPL_NOTIFY
 
-#define  USB2_HC_DEV_SIGNATURE  EFI_SIGNATURE_32 ('e', 'h', 'c', 'i')
+#define  USB2_HC_DEV_SIGNATURE  SIGNATURE_32 ('e', 'h', 'c', 'i')
 
 //
 //Iterate through the doule linked list. NOT delete safe

@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 typedef enum {
-  UHCI_ASYNC_INT_SIGNATURE = EFI_SIGNATURE_32 ('u', 'h', 'c', 'a'),
+  UHCI_ASYNC_INT_SIGNATURE = SIGNATURE_32 ('u', 'h', 'c', 'a'),
 
   //
   // The failure mask for USB transfer return status. If any of

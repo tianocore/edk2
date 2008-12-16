@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeMain.h"
 #include "Imem.h"
 
-#define POOL_FREE_SIGNATURE   EFI_SIGNATURE_32('p','f','r','0')
+#define POOL_FREE_SIGNATURE   SIGNATURE_32('p','f','r','0')
 typedef struct {
   UINT32          Signature;
   UINT32          Index;
@@ -23,7 +23,7 @@ typedef struct {
 } POOL_FREE;
 
 
-#define POOL_HEAD_SIGNATURE   EFI_SIGNATURE_32('p','h','d','0')
+#define POOL_HEAD_SIGNATURE   SIGNATURE_32('p','h','d','0')
 typedef struct {
   UINT32          Signature;
   UINT32          Size;
@@ -32,9 +32,9 @@ typedef struct {
   CHAR8           Data[1];
 } POOL_HEAD;
 
-#define SIZE_OF_POOL_HEAD EFI_FIELD_OFFSET(POOL_HEAD,Data)
+#define SIZE_OF_POOL_HEAD OFFSET_OF(POOL_HEAD,Data)
 
-#define POOL_TAIL_SIGNATURE   EFI_SIGNATURE_32('p','t','a','l')
+#define POOL_TAIL_SIGNATURE   SIGNATURE_32('p','t','a','l')
 typedef struct {
   UINT32      Signature;
   UINT32      Size;
@@ -60,7 +60,7 @@ typedef struct {
 // Globals
 //
 
-#define POOL_SIGNATURE  EFI_SIGNATURE_32('p','l','s','t')
+#define POOL_SIGNATURE  SIGNATURE_32('p','l','s','t')
 typedef struct {
     INTN             Signature;
     UINTN            Used;

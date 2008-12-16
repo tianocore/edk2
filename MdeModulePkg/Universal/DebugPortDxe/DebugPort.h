@@ -43,7 +43,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gDebugPortComponentName2;
 //
 // local type definitions
 //
-#define DEBUGPORT_DEVICE_SIGNATURE  EFI_SIGNATURE_32 ('D', 'B', 'G', 'P')
+#define DEBUGPORT_DEVICE_SIGNATURE  SIGNATURE_32 ('D', 'B', 'G', 'P')
 
 //
 // Device structure used by driver

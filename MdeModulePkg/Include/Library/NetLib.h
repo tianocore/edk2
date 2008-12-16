@@ -752,9 +752,9 @@ typedef enum {
   //
   //Various signatures
   //
-  NET_BUF_SIGNATURE    = EFI_SIGNATURE_32 ('n', 'b', 'u', 'f'),
-  NET_VECTOR_SIGNATURE = EFI_SIGNATURE_32 ('n', 'v', 'e', 'c'),
-  NET_QUE_SIGNATURE    = EFI_SIGNATURE_32 ('n', 'b', 'q', 'u'),
+  NET_BUF_SIGNATURE    = SIGNATURE_32 ('n', 'b', 'u', 'f'),
+  NET_VECTOR_SIGNATURE = SIGNATURE_32 ('n', 'v', 'e', 'c'),
+  NET_QUE_SIGNATURE    = SIGNATURE_32 ('n', 'b', 'q', 'u'),
 
 
   NET_PROTO_DATA       = 64,   // Opaque buffer for protocols

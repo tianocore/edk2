@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define GET_KEY_CODE_COUNT(KeyOptions)      (((KeyOptions) & EFI_KEY_CODE_COUNT) >> 8)
 
-#define BDS_HOTKEY_OPTION_SIGNATURE EFI_SIGNATURE_32 ('B', 'd', 'K', 'O')
+#define BDS_HOTKEY_OPTION_SIGNATURE SIGNATURE_32 ('B', 'd', 'K', 'O')
 typedef struct {
   UINTN                     Signature;
   LIST_ENTRY                Link;

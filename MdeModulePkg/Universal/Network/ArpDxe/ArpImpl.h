@@ -71,7 +71,7 @@ typedef enum {
   ByBoth         = MATCH_SW_ADDRESS | MATCH_HW_ADDRESS
 } FIND_OPTYPE;
 
-#define ARP_INSTANCE_DATA_SIGNATURE  EFI_SIGNATURE_32('A', 'R', 'P', 'I')
+#define ARP_INSTANCE_DATA_SIGNATURE  SIGNATURE_32('A', 'R', 'P', 'I')
 
 //
 //comment for macro
@@ -97,7 +97,7 @@ typedef struct {
   BOOLEAN              Destroyed;
 } ARP_INSTANCE_DATA;
 
-#define ARP_SERVICE_DATA_SIGNATURE  EFI_SIGNATURE_32('A', 'R', 'P', 'S')
+#define ARP_SERVICE_DATA_SIGNATURE  SIGNATURE_32('A', 'R', 'P', 'S')
 
 //
 //comment for macro

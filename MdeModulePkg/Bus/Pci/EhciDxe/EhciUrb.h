@@ -31,9 +31,9 @@ typedef enum {
   EHC_INT_TRANSFER_SYNC   = 0x04,
   EHC_INT_TRANSFER_ASYNC  = 0x08,
 
-  EHC_QTD_SIG             = EFI_SIGNATURE_32 ('U', 'S', 'B', 'T'),
-  EHC_QH_SIG              = EFI_SIGNATURE_32 ('U', 'S', 'B', 'H'),
-  EHC_URB_SIG             = EFI_SIGNATURE_32 ('U', 'S', 'B', 'R'),
+  EHC_QTD_SIG             = SIGNATURE_32 ('U', 'S', 'B', 'T'),
+  EHC_QH_SIG              = SIGNATURE_32 ('U', 'S', 'B', 'H'),
+  EHC_URB_SIG             = SIGNATURE_32 ('U', 'S', 'B', 'R'),
 
   //
   // Hardware related bit definitions

@@ -54,7 +54,7 @@ typedef enum {
 
 #pragma pack(1)
 
-#define VARIABLE_STORE_SIGNATURE  EFI_SIGNATURE_32 ('$', 'V', 'S', 'S')
+#define VARIABLE_STORE_SIGNATURE  SIGNATURE_32 ('$', 'V', 'S', 'S')
 
 ///
 /// Variable Store Header Format and State

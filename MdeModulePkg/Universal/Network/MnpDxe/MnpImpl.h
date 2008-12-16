@@ -40,7 +40,7 @@ Abstract:
 #define UNICAST_PACKET                MNP_RECEIVE_UNICAST
 #define BROADCAST_PACKET              MNP_RECEIVE_BROADCAST
 
-#define MNP_INSTANCE_DATA_SIGNATURE   EFI_SIGNATURE_32 ('M', 'n', 'p', 'I')
+#define MNP_INSTANCE_DATA_SIGNATURE   SIGNATURE_32 ('M', 'n', 'p', 'I')
 
 #define MNP_INSTANCE_DATA_FROM_THIS(a) \
   CR ( \

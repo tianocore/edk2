@@ -46,7 +46,7 @@ typedef struct {
   //
   UINTN Signature;
 
-#define PXE_DHCP4_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('p', 'x', 'D', '4')
+#define PXE_DHCP4_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('p', 'x', 'D', '4')
   //
   // Device handle the protocol is bound to.
   //

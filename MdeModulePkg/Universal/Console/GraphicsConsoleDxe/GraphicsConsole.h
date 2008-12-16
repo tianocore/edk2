@@ -186,7 +186,7 @@ extern EFI_NARROW_GLYPH  gUsStdNarrowGlyphData[];
 //
 // Device Structure
 //
-#define GRAPHICS_CONSOLE_DEV_SIGNATURE  EFI_SIGNATURE_32 ('g', 's', 't', 'o')
+#define GRAPHICS_CONSOLE_DEV_SIGNATURE  SIGNATURE_32 ('g', 's', 't', 'o')
 
 typedef struct {
   UINTN   Columns;

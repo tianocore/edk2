@@ -48,8 +48,8 @@ typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
 #include "Dhcp4Option.h"
 #include "Dhcp4Io.h"
 
-#define DHCP_SERVICE_SIGNATURE   EFI_SIGNATURE_32 ('D', 'H', 'C', 'P')
-#define DHCP_PROTOCOL_SIGNATURE  EFI_SIGNATURE_32 ('d', 'h', 'c', 'p')
+#define DHCP_SERVICE_SIGNATURE   SIGNATURE_32 ('D', 'H', 'C', 'P')
+#define DHCP_PROTOCOL_SIGNATURE  SIGNATURE_32 ('d', 'h', 'c', 'p')
 
 typedef enum {
   //

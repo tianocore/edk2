@@ -73,7 +73,7 @@ extern UINT8  DriverSampleStrings[];
 #define DYNAMIC_ONE_OF_VAR_OFFSET        OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOneof)
 #define DYNAMIC_ORDERED_LIST_VAR_OFFSET  OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOrderedList)
 
-#define DRIVER_SAMPLE_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('D', 'S', 'p', 's')
+#define DRIVER_SAMPLE_PRIVATE_SIGNATURE SIGNATURE_32 ('D', 'S', 'p', 's')
 
 typedef struct {
   UINTN                            Signature;

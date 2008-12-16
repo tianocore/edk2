@@ -35,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 extern UINT8 BootManagerVfrBin[];
 
-#define BOOT_MANAGER_CALLBACK_DATA_SIGNATURE  EFI_SIGNATURE_32 ('B', 'M', 'C', 'B')
+#define BOOT_MANAGER_CALLBACK_DATA_SIGNATURE  SIGNATURE_32 ('B', 'M', 'C', 'B')
 
 typedef struct {
   UINTN                           Signature;

@@ -206,7 +206,7 @@ PxeBcParseCachedDhcpPacket (
     // And do not count dhcp option header, or else will destory the serverhostname.
     //
     Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] = (EFI_DHCP4_PACKET_OPTION *) (&Offer->Dhcp4.Header.BootFileName[0] -
-                                            EFI_FIELD_OFFSET (EFI_DHCP4_PACKET_OPTION, Data[0]));
+                                            OFFSET_OF (EFI_DHCP4_PACKET_OPTION, Data[0]));
 
   }
 

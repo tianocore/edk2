@@ -120,7 +120,7 @@ typedef struct {
 } CACHE_SECTION_DATA;
 
 
-#define PEI_CORE_HANDLE_SIGNATURE  EFI_SIGNATURE_32('P','e','i','C')
+#define PEI_CORE_HANDLE_SIGNATURE  SIGNATURE_32('P','e','i','C')
 
 ///
 /// Pei Core private data structure instance

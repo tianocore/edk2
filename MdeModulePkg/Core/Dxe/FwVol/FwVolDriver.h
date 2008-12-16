@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __FW_VOL_DRIVER_H_
 
 
-#define FV2_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('_', 'F', 'V', '2')
+#define FV2_DEVICE_SIGNATURE SIGNATURE_32 ('_', 'F', 'V', '2')
 
 //
 // Used to track all non-deleted files

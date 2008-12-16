@@ -67,7 +67,7 @@ typedef struct {
   //
 } EFI_FTW_LITE_RECORD;
 
-#define FTW_LITE_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('F', 'T', 'W', 'L')
+#define FTW_LITE_DEVICE_SIGNATURE SIGNATURE_32 ('F', 'T', 'W', 'L')
 
 //
 // MACRO for Block size.

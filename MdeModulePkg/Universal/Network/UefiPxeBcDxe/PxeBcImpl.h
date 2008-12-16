@@ -52,7 +52,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #include "PxeBcMtftp.h"
 #include "PxeBcSupport.h"
 
-#define PXEBC_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('P', 'X', 'E', 'P')
+#define PXEBC_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('P', 'X', 'E', 'P')
 #define PXEBC_MTFTP_TIMEOUT           4
 #define PXEBC_MTFTP_RETRIES           6
 

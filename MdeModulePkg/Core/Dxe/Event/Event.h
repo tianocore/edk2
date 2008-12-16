@@ -23,7 +23,7 @@ extern  UINTN                   gEventPending;
 //
 // EFI_EVENT
 //
-#define EVENT_SIGNATURE         EFI_SIGNATURE_32('e','v','n','t')
+#define EVENT_SIGNATURE         SIGNATURE_32('e','v','n','t')
 typedef struct {
   UINTN                   Signature;
   UINT32                  Type;

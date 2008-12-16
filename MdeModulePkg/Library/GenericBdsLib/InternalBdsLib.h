@@ -71,7 +71,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/DxeServicesLib.h>
 
-#define PERFORMANCE_SIGNATURE   EFI_SIGNATURE_32 ('P', 'e', 'r', 'f')
+#define PERFORMANCE_SIGNATURE   SIGNATURE_32 ('P', 'e', 'r', 'f')
 #define PERF_TOKEN_SIZE         28
 #define PERF_TOKEN_LENGTH       (PERF_TOKEN_SIZE - 1)
 #define PERF_PEI_ENTRY_MAX_NUM  50

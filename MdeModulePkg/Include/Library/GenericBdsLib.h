@@ -74,7 +74,7 @@ extern EFI_HANDLE mBdsImageHandle;
 //
 // This data structure is the part of BDS_CONNECT_ENTRY that we can hard code.
 //
-#define BDS_LOAD_OPTION_SIGNATURE EFI_SIGNATURE_32 ('B', 'd', 'C', 'O')
+#define BDS_LOAD_OPTION_SIGNATURE SIGNATURE_32 ('B', 'd', 'C', 'O')
 
 typedef struct {
 
