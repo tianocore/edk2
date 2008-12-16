@@ -193,7 +193,7 @@ int
 //
 //
 
-#define EFI_UNIX_THUNK_PROTOCOL_SIGNATURE EFI_SIGNATURE_32 ('L', 'N', 'X', 'T')
+#define EFI_UNIX_THUNK_PROTOCOL_SIGNATURE SIGNATURE_32 ('L', 'N', 'X', 'T')
 
 typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UINT64                              Signature;

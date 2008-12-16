@@ -55,7 +55,7 @@ typedef struct {
   UINT8   Data[SERIAL_MAX_BUFFER_SIZE];
 } SERIAL_DEV_FIFO;
 
-#define UNIX_SERIAL_IO_PRIVATE_DATA_SIGNATURE EFI_SIGNATURE_32 ('U', 'N', 's', 'i')
+#define UNIX_SERIAL_IO_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('U', 'N', 's', 'i')
 typedef struct {
   UINT64                    Signature;
 

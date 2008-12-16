@@ -43,7 +43,7 @@ extern EFI_DRIVER_BINDING_PROTOCOL gUnixSimpleFileSystemDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL gUnixSimpleFileSystemComponentName;
 
 
-#define UNIX_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('L', 'X', 'f', 's')
+#define UNIX_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE SIGNATURE_32 ('L', 'X', 'f', 's')
 
 typedef struct {
   UINTN                           Signature;
@@ -61,7 +61,7 @@ typedef struct {
       UNIX_SIMPLE_FILE_SYSTEM_PRIVATE_SIGNATURE \
       )
 
-#define UNIX_EFI_FILE_PRIVATE_SIGNATURE EFI_SIGNATURE_32 ('l', 'o', 'f', 's')
+#define UNIX_EFI_FILE_PRIVATE_SIGNATURE SIGNATURE_32 ('l', 'o', 'f', 's')
 
 typedef struct {
   UINTN                           Signature;

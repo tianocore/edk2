@@ -127,7 +127,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gUnixBusDriverComponentName;
 //
 // Unix Bus Controller Structure
 //
-#define UNIX_BUS_DEVICE_SIGNATURE EFI_SIGNATURE_32 ('L', 'X', 'B', 'D')
+#define UNIX_BUS_DEVICE_SIGNATURE SIGNATURE_32 ('L', 'X', 'B', 'D')
 
 typedef struct {
   UINT64                    Signature;
@@ -137,7 +137,7 @@ typedef struct {
 //
 // Unix Child Device Controller Structure
 //
-#define UNIX_IO_DEVICE_SIGNATURE  EFI_SIGNATURE_32 ('L', 'X', 'V', 'D')
+#define UNIX_IO_DEVICE_SIGNATURE  SIGNATURE_32 ('L', 'X', 'V', 'D')
 
 typedef struct {
   UINT64                    Signature;
