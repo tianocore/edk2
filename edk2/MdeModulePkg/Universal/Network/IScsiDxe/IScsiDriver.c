@@ -23,7 +23,7 @@ EFI_DRIVER_BINDING_PROTOCOL gIScsiDriverBinding = {
   NULL
 };
 
-EFI_GUID                    mIScsiPrivateGuid   = ISCSI_PRIVATE_GUID;
+EFI_GUID                    gIScsiPrivateGuid   = ISCSI_PRIVATE_GUID;
 
 
 /**
@@ -63,7 +63,7 @@ IScsiDriverBindingSupported (
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &mIScsiPrivateGuid,
+                  &gIScsiPrivateGuid,
                   NULL,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -195,7 +195,7 @@ IScsiDriverBindingStart (
   //
   Status = gBS->InstallProtocolInterface (
                   &ControllerHandle,
-                  &mIScsiPrivateGuid,
+                  &gIScsiPrivateGuid,
                   EFI_NATIVE_INTERFACE,
                   &Private->IScsiIdentifier
                   );
@@ -299,7 +299,7 @@ IScsiDriverBindingStop (
 
   Status = gBS->OpenProtocol (
                   IScsiController,
-                  &mIScsiPrivateGuid,
+                  &gIScsiPrivateGuid,
                   (VOID **)&IScsiIdentifier,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -316,7 +316,7 @@ IScsiDriverBindingStop (
   //
   gBS->UninstallProtocolInterface (
         IScsiController,
-        &mIScsiPrivateGuid,
+        &gIScsiPrivateGuid,
         &Private->IScsiIdentifier
         );
 
