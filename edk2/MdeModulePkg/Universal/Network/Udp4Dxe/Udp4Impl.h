@@ -57,7 +57,7 @@ extern UINT16                          mUdp4RandomPort;
 
 #define UDP4_PORT_KNOWN       1024
 
-#define UDP4_SERVICE_DATA_SIGNATURE  EFI_SIGNATURE_32('U', 'd', 'p', '4')
+#define UDP4_SERVICE_DATA_SIGNATURE  SIGNATURE_32('U', 'd', 'p', '4')
 
 #define UDP4_SERVICE_DATA_FROM_THIS(a) \
   CR ( \
@@ -81,7 +81,7 @@ typedef struct _UDP4_SERVICE_DATA_ {
   CHAR16                        *MacString;
 } UDP4_SERVICE_DATA;
 
-#define UDP4_INSTANCE_DATA_SIGNATURE  EFI_SIGNATURE_32('U', 'd', 'p', 'I')
+#define UDP4_INSTANCE_DATA_SIGNATURE  SIGNATURE_32('U', 'd', 'p', 'I')
 
 #define UDP4_INSTANCE_DATA_FROM_THIS(a) \
   CR ( \

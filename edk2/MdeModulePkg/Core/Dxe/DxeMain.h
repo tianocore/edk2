@@ -121,7 +121,7 @@ typedef struct {
 // DXE Dispatcher Data structures
 //
 
-#define KNOWN_HANDLE_SIGNATURE  EFI_SIGNATURE_32('k','n','o','w')
+#define KNOWN_HANDLE_SIGNATURE  SIGNATURE_32('k','n','o','w')
 typedef struct {
   UINTN           Signature;
   LIST_ENTRY      Link;         // mFvHandleList
@@ -129,7 +129,7 @@ typedef struct {
 } KNOWN_HANDLE;
 
 
-#define EFI_CORE_DRIVER_ENTRY_SIGNATURE EFI_SIGNATURE_32('d','r','v','r')
+#define EFI_CORE_DRIVER_ENTRY_SIGNATURE SIGNATURE_32('d','r','v','r')
 typedef struct {
   UINTN                           Signature;
   LIST_ENTRY                      Link;             // mDriverList
@@ -162,7 +162,7 @@ typedef struct {
 //
 //The data structure of GCD memory map entry
 //
-#define EFI_GCD_MAP_SIGNATURE  EFI_SIGNATURE_32('g','c','d','m')
+#define EFI_GCD_MAP_SIGNATURE  SIGNATURE_32('g','c','d','m')
 typedef struct {
   UINTN                 Signature;
   LIST_ENTRY            Link;

@@ -82,7 +82,7 @@ typedef enum {
 //
 #define  UHCI_TPL                     TPL_NOTIFY
 
-#define  USB_HC_DEV_SIGNATURE         EFI_SIGNATURE_32 ('u', 'h', 'c', 'i')
+#define  USB_HC_DEV_SIGNATURE         SIGNATURE_32 ('u', 'h', 'c', 'i')
 
 #pragma pack(1)
 typedef struct {

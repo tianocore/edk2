@@ -126,8 +126,8 @@ typedef enum {
 //
 #define  USB_BUS_TPL               TPL_NOTIFY
 
-#define  USB_INTERFACE_SIGNATURE   EFI_SIGNATURE_32 ('U', 'S', 'B', 'I')
-#define  USB_BUS_SIGNATURE         EFI_SIGNATURE_32 ('U', 'S', 'B', 'B')
+#define  USB_INTERFACE_SIGNATURE   SIGNATURE_32 ('U', 'S', 'B', 'I')
+#define  USB_BUS_SIGNATURE         SIGNATURE_32 ('U', 'S', 'B', 'B')
 
 #define USB_BIT(a)                  ((UINTN)(1 << (a)))
 #define USB_BIT_IS_SET(Data, Bit)   ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
@@ -272,7 +272,7 @@ struct _USB_HUB_API{
 
 #define USB_US_LAND_ID   0x0409
 
-#define DEVICE_PATH_LIST_ITEM_SIGNATURE     EFI_SIGNATURE_32('d','p','l','i')
+#define DEVICE_PATH_LIST_ITEM_SIGNATURE     SIGNATURE_32('d','p','l','i')
 typedef struct _DEVICE_PATH_LIST_ITEM{
   UINTN                                 Signature;
   LIST_ENTRY                            Link;

@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ServiceBinding.h>
 #include <Library/IpIoLib.h>
 
-#define TCP4_DRIVER_SIGNATURE   EFI_SIGNATURE_32 ('T', 'C', 'P', '4')
+#define TCP4_DRIVER_SIGNATURE   SIGNATURE_32 ('T', 'C', 'P', '4')
 
 #define TCP4_PORT_KNOWN         1024
 #define TCP4_PORT_USER_RESERVED 65535

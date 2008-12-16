@@ -64,8 +64,8 @@ typedef struct {
   UINT8   BufferTail;
 } USB_KB_BUFFER;
 
-#define USB_KB_DEV_SIGNATURE  EFI_SIGNATURE_32 ('u', 'k', 'b', 'd')
-#define USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE EFI_SIGNATURE_32 ('u', 'k', 'b', 'x')
+#define USB_KB_DEV_SIGNATURE  SIGNATURE_32 ('u', 'k', 'b', 'd')
+#define USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('u', 'k', 'b', 'x')
 
 typedef struct _KEYBOARD_CONSOLE_IN_EX_NOTIFY {
   UINTN                                 Signature;
@@ -75,7 +75,7 @@ typedef struct _KEYBOARD_CONSOLE_IN_EX_NOTIFY {
   LIST_ENTRY                            NotifyEntry;
 } KEYBOARD_CONSOLE_IN_EX_NOTIFY;
 
-#define USB_NS_KEY_SIGNATURE  EFI_SIGNATURE_32 ('u', 'n', 's', 'k')
+#define USB_NS_KEY_SIGNATURE  SIGNATURE_32 ('u', 'n', 's', 'k')
 
 typedef struct {
   UINTN                         Signature;

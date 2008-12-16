@@ -85,7 +85,7 @@ BaseMemoryTest (
   //
   // Make sure we don't try and test anything above the max physical address range
   //
-  ASSERT (BeginAddress + MemoryLength < EFI_MAX_ADDRESS);
+  ASSERT (BeginAddress + MemoryLength < MAX_ADDRESS);
 
   switch (Operation) {
   case Extensive:

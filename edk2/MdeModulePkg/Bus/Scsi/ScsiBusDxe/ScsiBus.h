@@ -36,7 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Scsi.h>
 
-#define SCSI_IO_DEV_SIGNATURE EFI_SIGNATURE_32 ('s', 'c', 'i', 'o')
+#define SCSI_IO_DEV_SIGNATURE SIGNATURE_32 ('s', 'c', 'i', 'o')
 
 typedef struct _SCSI_TARGET_ID {
  union {
@@ -82,7 +82,7 @@ typedef struct _EFI_SCSI_BUS_PROTOCOL {
   UINT64  Reserved;
 } EFI_SCSI_BUS_PROTOCOL;
 
-#define SCSI_BUS_DEVICE_SIGNATURE  EFI_SIGNATURE_32 ('s', 'c', 's', 'i')
+#define SCSI_BUS_DEVICE_SIGNATURE  SIGNATURE_32 ('s', 'c', 's', 'i')
 
 
 typedef struct _SCSI_BUS_DEVICE {

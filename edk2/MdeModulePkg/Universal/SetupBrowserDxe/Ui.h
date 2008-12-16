@@ -104,8 +104,8 @@ typedef struct {
   FORM_BROWSER_STATEMENT  *Statement;
 } UI_MENU_SELECTION;
 
-#define UI_MENU_OPTION_SIGNATURE  EFI_SIGNATURE_32 ('u', 'i', 'm', 'm')
-#define UI_MENU_LIST_SIGNATURE    EFI_SIGNATURE_32 ('u', 'i', 'm', 'l')
+#define UI_MENU_OPTION_SIGNATURE  SIGNATURE_32 ('u', 'i', 'm', 'm')
+#define UI_MENU_LIST_SIGNATURE    SIGNATURE_32 ('u', 'i', 'm', 'l')
 
 typedef struct {
   UINTN                   Signature;

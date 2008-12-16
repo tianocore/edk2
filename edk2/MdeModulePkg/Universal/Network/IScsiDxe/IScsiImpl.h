@@ -35,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IScsiIbft.h"
 
 
-#define ISCSI_SESSION_SIGNATURE EFI_SIGNATURE_32 ('I', 'S', 'S', 'N')
+#define ISCSI_SESSION_SIGNATURE SIGNATURE_32 ('I', 'S', 'S', 'N')
 
 struct _ISCSI_SESSION {
   UINT32                    Signature;
@@ -79,7 +79,7 @@ struct _ISCSI_SESSION {
   UINT8                     ErrorRecoveryLevel;
 };
 
-#define ISCSI_CONNECTION_SIGNATURE  EFI_SIGNATURE_32 ('I', 'S', 'C', 'N')
+#define ISCSI_CONNECTION_SIGNATURE  SIGNATURE_32 ('I', 'S', 'C', 'N')
 
 struct _ISCSI_CONNECTION {
   UINT32            Signature;
@@ -118,7 +118,7 @@ struct _ISCSI_CONNECTION {
   ISCSI_DIGEST_TYPE DataDigest;
 };
 
-#define ISCSI_DRIVER_DATA_SIGNATURE EFI_SIGNATURE_32 ('I', 'S', 'D', 'A')
+#define ISCSI_DRIVER_DATA_SIGNATURE SIGNATURE_32 ('I', 'S', 'D', 'A')
 
 #define ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU(PassThru) \
   CR ( \

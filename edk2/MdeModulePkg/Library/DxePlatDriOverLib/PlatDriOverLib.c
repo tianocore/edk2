@@ -159,7 +159,7 @@ FreeMappingDatabase (
   // The entry which contains the mapping that Controller Device Path to a set of Driver Device Paths
   // There are often multi mapping entries in a variable.
   //
-  UINT32                         SIGNATURE;            //EFI_SIGNATURE_32('p','d','o','i')
+  UINT32                         SIGNATURE;            //SIGNATURE_32('p','d','o','i')
   UINT32                         DriverNum;
   EFI_DEVICE_PATH_PROTOCOL       ControllerDevicePath[];
   EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];

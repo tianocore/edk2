@@ -53,8 +53,8 @@ Abstract:
 
 
 typedef enum {
-  IP4_PROTOCOL_SIGNATURE = EFI_SIGNATURE_32 ('I', 'P', '4', 'P'),
-  IP4_SERVICE_SIGNATURE  = EFI_SIGNATURE_32 ('I', 'P', '4', 'S'),
+  IP4_PROTOCOL_SIGNATURE = SIGNATURE_32 ('I', 'P', '4', 'P'),
+  IP4_SERVICE_SIGNATURE  = SIGNATURE_32 ('I', 'P', '4', 'S'),
 
   //
   // The state of IP4 protocol. It starts from UNCONFIGED. if it is

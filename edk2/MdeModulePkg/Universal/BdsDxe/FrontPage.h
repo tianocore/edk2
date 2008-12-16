@@ -46,7 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     0x9e0c30bc, 0x3f06, 0x4ba6, {0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe} \
   }
 
-#define FRONT_PAGE_CALLBACK_DATA_SIGNATURE  EFI_SIGNATURE_32 ('F', 'P', 'C', 'B')
+#define FRONT_PAGE_CALLBACK_DATA_SIGNATURE  SIGNATURE_32 ('F', 'P', 'C', 'B')
 
 typedef struct {
   UINTN                           Signature;

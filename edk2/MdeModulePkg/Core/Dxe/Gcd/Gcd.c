@@ -1857,7 +1857,7 @@ CoreInitializeMemoryServices (
   // The max address must be within the physically addressible range for the processor.
   //
   MaxMemoryLength = 0;
-  MaxAddress      = EFI_MAX_ADDRESS;
+  MaxAddress      = MAX_ADDRESS;
   do {
     HighAddress = 0;
     Found       = FALSE;

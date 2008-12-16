@@ -42,7 +42,7 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gMnpDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gMnpComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gMnpComponentName2;
 
-#define MNP_SERVICE_DATA_SIGNATURE  EFI_SIGNATURE_32 ('M', 'n', 'p', 'S')
+#define MNP_SERVICE_DATA_SIGNATURE  SIGNATURE_32 ('M', 'n', 'p', 'S')
 
 typedef struct _MNP_SERVICE_DATA {
   UINT32                        Signature;

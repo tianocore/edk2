@@ -69,7 +69,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_HII_VARSTORE_NAME_VALUE        1
 #define EFI_HII_VARSTORE_EFI_VARIABLE      2
 
-#define HII_FORMSET_STORAGE_SIGNATURE           EFI_SIGNATURE_32 ('H', 'S', 'T', 'G')
+#define HII_FORMSET_STORAGE_SIGNATURE           SIGNATURE_32 ('H', 'S', 'T', 'G')
 typedef struct {
   UINTN               Signature;
   LIST_ENTRY          Entry;
@@ -89,7 +89,7 @@ typedef struct {
 //
 // String Package definitions
 //
-#define HII_STRING_PACKAGE_SIGNATURE    EFI_SIGNATURE_32 ('h','i','s','p')
+#define HII_STRING_PACKAGE_SIGNATURE    SIGNATURE_32 ('h','i','s','p')
 typedef struct _HII_STRING_PACKAGE_INSTANCE {
   UINTN                                 Signature;
   EFI_HII_STRING_PACKAGE_HDR            *StringPkgHdr;
@@ -102,7 +102,7 @@ typedef struct _HII_STRING_PACKAGE_INSTANCE {
 //
 // Form Package definitions
 //
-#define HII_IFR_PACKAGE_SIGNATURE       EFI_SIGNATURE_32 ('h','f','r','p')
+#define HII_IFR_PACKAGE_SIGNATURE       SIGNATURE_32 ('h','f','r','p')
 typedef struct _HII_IFR_PACKAGE_INSTANCE {
   UINTN                                 Signature;
   EFI_HII_PACKAGE_HEADER                FormPkgHdr;
@@ -113,7 +113,7 @@ typedef struct _HII_IFR_PACKAGE_INSTANCE {
 //
 // Simple Font Package definitions
 //
-#define HII_S_FONT_PACKAGE_SIGNATURE    EFI_SIGNATURE_32 ('h','s','f','p')
+#define HII_S_FONT_PACKAGE_SIGNATURE    SIGNATURE_32 ('h','s','f','p')
 typedef struct _HII_SIMPLE_FONT_PACKAGE_INSTANCE {
   UINTN                                 Signature;
   EFI_HII_SIMPLE_FONT_PACKAGE_HDR       *SimpleFontPkgHdr;
@@ -123,7 +123,7 @@ typedef struct _HII_SIMPLE_FONT_PACKAGE_INSTANCE {
 //
 // Font Package definitions
 //
-#define HII_FONT_PACKAGE_SIGNATURE      EFI_SIGNATURE_32 ('h','i','f','p')
+#define HII_FONT_PACKAGE_SIGNATURE      SIGNATURE_32 ('h','i','f','p')
 typedef struct _HII_FONT_PACKAGE_INSTANCE {
   UINTN                                 Signature;
   EFI_HII_FONT_PACKAGE_HDR              *FontPkgHdr;
@@ -132,7 +132,7 @@ typedef struct _HII_FONT_PACKAGE_INSTANCE {
   LIST_ENTRY                            GlyphInfoList;
 } HII_FONT_PACKAGE_INSTANCE;
 
-#define HII_GLYPH_INFO_SIGNATURE        EFI_SIGNATURE_32 ('h','g','i','s')
+#define HII_GLYPH_INFO_SIGNATURE        SIGNATURE_32 ('h','g','i','s')
 typedef struct _HII_GLYPH_INFO {
   UINTN                                 Signature;
   LIST_ENTRY                            Entry;
@@ -140,7 +140,7 @@ typedef struct _HII_GLYPH_INFO {
   EFI_HII_GLYPH_INFO                    Cell;
 } HII_GLYPH_INFO;
 
-#define HII_FONT_INFO_SIGNATURE         EFI_SIGNATURE_32 ('h','l','f','i')
+#define HII_FONT_INFO_SIGNATURE         SIGNATURE_32 ('h','l','f','i')
 typedef struct _HII_FONT_INFO {
   UINTN                                 Signature;
   LIST_ENTRY                            Entry;
@@ -148,7 +148,7 @@ typedef struct _HII_FONT_INFO {
   UINT8                                 FontId;
 } HII_FONT_INFO;
 
-#define HII_GLOBAL_FONT_INFO_SIGNATURE  EFI_SIGNATURE_32 ('h','g','f','i')
+#define HII_GLOBAL_FONT_INFO_SIGNATURE  SIGNATURE_32 ('h','g','f','i')
 typedef struct _HII_GLOBAL_FONT_INFO {
   UINTN                                 Signature;
   LIST_ENTRY                            Entry;
@@ -174,7 +174,7 @@ typedef struct _HII_IMAGE_PACKAGE_INSTANCE {
 //
 // Keyboard Layout Pacakge definitions
 //
-#define HII_KB_LAYOUT_PACKAGE_SIGNATURE EFI_SIGNATURE_32 ('h','k','l','p')
+#define HII_KB_LAYOUT_PACKAGE_SIGNATURE SIGNATURE_32 ('h','k','l','p')
 typedef struct _HII_KEYBOARD_LAYOUT_PACKAGE_INSTANCE {
   UINTN                                 Signature;
   UINT8                                 *KeyboardPkg;
@@ -184,7 +184,7 @@ typedef struct _HII_KEYBOARD_LAYOUT_PACKAGE_INSTANCE {
 //
 // Guid Package definitions
 //
-#define HII_GUID_PACKAGE_SIGNATURE      EFI_SIGNATURE_32 ('h','i','g','p')
+#define HII_GUID_PACKAGE_SIGNATURE      SIGNATURE_32 ('h','i','g','p')
 typedef struct _HII_GUID_PACKAGE_INSTANCE {
   UINTN                                 Signature;
   UINT8                                 *GuidPkg;
@@ -207,7 +207,7 @@ typedef struct _HII_DATABASE_PACKAGE_LIST_INSTANCE {
   UINT8                                 *DevicePathPkg;
 } HII_DATABASE_PACKAGE_LIST_INSTANCE;
 
-#define HII_HANDLE_SIGNATURE            EFI_SIGNATURE_32 ('h','i','h','l')
+#define HII_HANDLE_SIGNATURE            SIGNATURE_32 ('h','i','h','l')
 
 typedef struct {
   UINTN               Signature;
@@ -215,7 +215,7 @@ typedef struct {
   UINTN               Key;
 } HII_HANDLE;
 
-#define HII_DATABASE_RECORD_SIGNATURE   EFI_SIGNATURE_32 ('h','i','d','r')
+#define HII_DATABASE_RECORD_SIGNATURE   SIGNATURE_32 ('h','i','d','r')
 
 typedef struct _HII_DATABASE_RECORD {
   UINTN                                 Signature;
@@ -225,7 +225,7 @@ typedef struct _HII_DATABASE_RECORD {
   LIST_ENTRY                            DatabaseEntry;
 } HII_DATABASE_RECORD;
 
-#define HII_DATABASE_NOTIFY_SIGNATURE   EFI_SIGNATURE_32 ('h','i','d','n')
+#define HII_DATABASE_NOTIFY_SIGNATURE   SIGNATURE_32 ('h','i','d','n')
 
 typedef struct _HII_DATABASE_NOTIFY {
   UINTN                                 Signature;
@@ -237,7 +237,7 @@ typedef struct _HII_DATABASE_NOTIFY {
   LIST_ENTRY                            DatabaseNotifyEntry;
 } HII_DATABASE_NOTIFY;
 
-#define HII_DATABASE_PRIVATE_DATA_SIGNATURE EFI_SIGNATURE_32 ('H', 'i', 'D', 'p')
+#define HII_DATABASE_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('H', 'i', 'D', 'p')
 
 typedef struct _HII_DATABASE_PRIVATE_DATA {
   UINTN                                 Signature;

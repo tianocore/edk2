@@ -423,7 +423,7 @@ FlushSpareBlockToWorkingBlock (
   //   Set WorkingBlockInvalid in EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER
   //   before erase the working block.
   //
-  //  Offset = EFI_FIELD_OFFSET(EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER,
+  //  Offset = OFFSET_OF(EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER,
   //                            WorkingBlockInvalid);
   // To skip Signature and Crc: sizeof(EFI_GUID)+sizeof(UINT32).
   //
@@ -481,7 +481,7 @@ FlushSpareBlockToWorkingBlock (
   //
   // Update the VALID of the working block
   //
-  // Offset = EFI_FIELD_OFFSET(EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER,
+  // Offset = OFFSET_OF(EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER,
   //                           WorkingBlockValid);
   // Hardcode offset sizeof(EFI_GUID)+sizeof(UINT32), to skip Signature and Crc
   //

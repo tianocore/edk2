@@ -49,7 +49,7 @@ typedef enum {
 } IP4_CONFIG_STATE;
 
 #define IP4_PROTO_ICMP                 0x01
-#define IP4_CONFIG_INSTANCE_SIGNATURE  EFI_SIGNATURE_32 ('I', 'P', '4', 'C')
+#define IP4_CONFIG_INSTANCE_SIGNATURE  SIGNATURE_32 ('I', 'P', '4', 'C')
 
 typedef enum {
   DHCP_TAG_PARA_LIST            = 55,

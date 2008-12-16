@@ -30,7 +30,7 @@ typedef struct _USB_MASS_DEVICE USB_MASS_DEVICE;
 //
 #define  USB_MASS_TPL          TPL_NOTIFY
 
-#define  USB_MASS_SIGNATURE    EFI_SIGNATURE_32 ('U', 's', 'b', 'M')
+#define  USB_MASS_SIGNATURE    SIGNATURE_32 ('U', 's', 'b', 'M')
 
 
 struct _USB_MASS_DEVICE {

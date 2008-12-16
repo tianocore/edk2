@@ -59,9 +59,9 @@ typedef struct {
   EFI_INPUT_KEY Data[FIFO_MAX_NUMBER + 1];
 } EFI_KEY_FIFO;
 
-#define TERMINAL_DEV_SIGNATURE  EFI_SIGNATURE_32 ('t', 'm', 'n', 'l')
+#define TERMINAL_DEV_SIGNATURE  SIGNATURE_32 ('t', 'm', 'n', 'l')
 
-#define TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE EFI_SIGNATURE_32 ('t', 'm', 'e', 'n')
+#define TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('t', 'm', 'e', 'n')
 
 typedef struct _TERMINAL_CONSOLE_IN_EX_NOTIFY {
   UINTN                                 Signature;

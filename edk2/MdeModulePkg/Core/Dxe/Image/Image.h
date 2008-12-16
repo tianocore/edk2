@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-#define LOADED_IMAGE_PRIVATE_DATA_SIGNATURE   EFI_SIGNATURE_32('l','d','r','i')
+#define LOADED_IMAGE_PRIVATE_DATA_SIGNATURE   SIGNATURE_32('l','d','r','i')
 
 typedef struct {
     UINTN                       Signature;
@@ -65,7 +65,7 @@ typedef struct {
           CR(a, LOADED_IMAGE_PRIVATE_DATA, Info, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE)
 
 
-#define LOAD_PE32_IMAGE_PRIVATE_DATA_SIGNATURE  EFI_SIGNATURE_32('l','p','e','i')
+#define LOAD_PE32_IMAGE_PRIVATE_DATA_SIGNATURE  SIGNATURE_32('l','p','e','i')
 
 typedef struct {
     UINTN                       Signature;
@@ -81,7 +81,7 @@ typedef struct {
 //
 // Private Data Types
 //
-#define IMAGE_FILE_HANDLE_SIGNATURE       EFI_SIGNATURE_32('i','m','g','f')
+#define IMAGE_FILE_HANDLE_SIGNATURE       SIGNATURE_32('i','m','g','f')
 typedef struct {
   UINTN               Signature;
   BOOLEAN             FreeBuffer;

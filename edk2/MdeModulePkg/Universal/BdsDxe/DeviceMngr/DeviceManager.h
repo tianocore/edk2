@@ -38,7 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 extern UINT8  DeviceManagerVfrBin[];
 
-#define DEVICE_MANAGER_CALLBACK_DATA_SIGNATURE  EFI_SIGNATURE_32 ('D', 'M', 'C', 'B')
+#define DEVICE_MANAGER_CALLBACK_DATA_SIGNATURE  SIGNATURE_32 ('D', 'M', 'C', 'B')
 
 typedef struct {
   UINTN                           Signature;

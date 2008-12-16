@@ -36,7 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // MEMORY_MAP_ENTRY
 //
 
-#define MEMORY_MAP_SIGNATURE   EFI_SIGNATURE_32('m','m','a','p')
+#define MEMORY_MAP_SIGNATURE   SIGNATURE_32('m','m','a','p')
 typedef struct {
   UINTN           Signature;
   LIST_ENTRY      Link;

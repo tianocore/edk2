@@ -383,7 +383,7 @@ typedef struct {
   VM_CONTEXT        VmContext;
 } EFI_EBC_THUNK_DATA;
 
-#define EBC_PROTOCOL_PRIVATE_DATA_SIGNATURE EFI_SIGNATURE_32 ('e', 'b', 'c', 'p')
+#define EBC_PROTOCOL_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('e', 'b', 'c', 'p')
 
 
 #define EBC_PROTOCOL_PRIVATE_DATA_FROM_THIS(a) \
