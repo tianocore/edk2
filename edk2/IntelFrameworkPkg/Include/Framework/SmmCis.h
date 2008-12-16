@@ -34,7 +34,7 @@ typedef struct _EFI_SMM_CPU_IO_INTERFACE  EFI_SMM_CPU_IO_INTERFACE;
 //
 // SMM Base specification constant and types
 //
-#define SMM_SMST_SIGNATURE            EFI_SIGNATURE_32 ('S', 'M', 'S', 'T')
+#define SMM_SMST_SIGNATURE            SIGNATURE_32 ('S', 'M', 'S', 'T')
 #define EFI_SMM_SYSTEM_TABLE_REVISION (0 << 16) | (0x09)
 
 //

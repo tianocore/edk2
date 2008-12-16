@@ -45,7 +45,7 @@
 #define EFI_CAPSULE_HEADER_FLAG_SETUP 0x00000001  // supports setup changes
 
 
-#define CAPSULE_BLOCK_DESCRIPTOR_SIGNATURE  EFI_SIGNATURE_32 ('C', 'B', 'D', 'S')
+#define CAPSULE_BLOCK_DESCRIPTOR_SIGNATURE  SIGNATURE_32 ('C', 'B', 'D', 'S')
 
 //
 // An array of these describe the blocks that make up a capsule for
