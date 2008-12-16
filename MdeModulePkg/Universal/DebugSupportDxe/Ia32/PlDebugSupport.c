@@ -1,5 +1,5 @@
 /** @file
-  Generic debug support functions for IA32/x64.
+  IA32/x64 generic functions to support Debug Support protocol.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -90,11 +90,27 @@ HookEntry (
   //
   OldIntFlagState = SaveAndDisableInterrupts ();
 
+  //
+  // gets IDT Gate descriptor by index
+  //
   ReadIdtGateDescriptor (ExceptionType, &(IdtEntryTable[ExceptionType].OrigDesc));
+  //
+  // stores orignal interrupt handle 
+  //
   IdtEntryTable[ExceptionType].OrigVector = (DEBUG_PROC) GetInterruptHandleFromIdt (&(IdtEntryTable[ExceptionType].OrigDesc));
 
+  // 
+  // encodes new IDT Gate descriptor by stub entry 
+  //
   Vect2Desc (&IdtEntryTable[ExceptionType].NewDesc, IdtEntryTable[ExceptionType].StubEntry);
+  //
+  // stores NewCallback
+  //
   IdtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
+
+  //
+  // writes back new IDT Gate descriptor
+  //
   WriteIdtGateDescriptor (ExceptionType, &(IdtEntryTable[ExceptionType].NewDesc));
 
   //
@@ -214,6 +230,7 @@ RegisterExceptionCallback (
   return ManageIdtEntryTable (ExceptionCallback, ExceptionType);
 }
 
+
 /**
   Invalidates processor instruction cache for a memory range. Subsequent execution in this range
   causes a fresh memory fetch to retrieve code to be executed.                                  
@@ -244,6 +261,7 @@ InvalidateInstructionCache (
   Common piece of code that invokes the registered handlers.
 
   This code executes in exception context so no efi calls are allowed.
+  This code is called from assembly file.
 
   @param  ExceptionType     Exception type
   @param  ContextRecord     System context
