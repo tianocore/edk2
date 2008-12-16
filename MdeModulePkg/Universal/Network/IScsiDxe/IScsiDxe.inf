@@ -41,6 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   IScsiDhcp.h
   IScsiCommon.h
   IScsiCHAP.h
+  Md5.h
   IScsiTcp4Io.c
   IScsiProto.c
   IScsiMisc.c

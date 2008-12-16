@@ -41,8 +41,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL        gIScsiComponentName;
 
 extern EFI_ISCSI_INITIATOR_NAME_PROTOCOL  gIScsiInitiatorName;
 
-
-extern EFI_GUID                           mIScsiPrivateGuid;
+extern EFI_GUID                           gIScsiPrivateGuid;
 
 typedef struct _ISCSI_PRIVATE_PROTOCOL {
   UINT32  Reserved;

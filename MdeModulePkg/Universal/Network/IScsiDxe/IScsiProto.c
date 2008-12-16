@@ -971,9 +971,14 @@ IScsiReceivePdu (
   Len = ISCSI_GET_DATASEG_LEN (Header);
   if (Len == 0) {
     //
-    // No data segment.
+    // No data segment.Form the pdu from a list of pdu segments.
     //
-    goto FORM_PDU;
+    *Pdu = NetbufFromBufList (NbufList, 0, 0, IScsiFreeNbufList, NbufList);
+    if (*Pdu == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+    return Status;
   }
   //
   // Get the length of the padding bytes of the data segment.
@@ -1067,7 +1072,6 @@ IScsiReceivePdu (
     NetbufTrim (DataSeg, PadLen, NET_BUF_TAIL);
   }
 
-FORM_PDU:
   //
   // Form the pdu from a list of pdu segments.
   //

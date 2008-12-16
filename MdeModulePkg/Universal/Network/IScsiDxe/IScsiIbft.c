@@ -140,7 +140,7 @@ IScsiFillInitiatorSection (
   //
   // Get the identifier from the handle.
   //
-  Status = gBS->HandleProtocol (Handle, &mIScsiPrivateGuid, (VOID **) &IScsiIdentifier);
+  Status = gBS->HandleProtocol (Handle, &gIScsiPrivateGuid, (VOID **) &IScsiIdentifier);
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     return ;
@@ -302,7 +302,7 @@ IScsiFillNICAndTargetSections (
   SectionOffset = &Control->NIC0Offset;
 
   for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (Handles[Index], &mIScsiPrivateGuid, (VOID **)&IScsiIdentifier);
+    Status = gBS->HandleProtocol (Handles[Index], &gIScsiPrivateGuid, (VOID **)&IScsiIdentifier);
     if (EFI_ERROR (Status)) {
       ASSERT (FALSE);
       return ;
@@ -495,7 +495,7 @@ IScsiPublishIbft (
   //
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &mIScsiPrivateGuid,
+                  &gIScsiPrivateGuid,
                   NULL,
                   &HandleCount,
                   &HandleBuffer
