@@ -14,9 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "GraphicsConsole.h"
 
-
 //
-// Graphics Console Devcie Private Data template
+// Graphics Console Device Private Data template
 //
 GRAPHICS_CONSOLE_DEV    mGraphicsConsoleDevTemplate = {
   GRAPHICS_CONSOLE_DEV_SIGNATURE,
@@ -62,24 +61,24 @@ CHAR16               mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHA
 
 EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
   //
-  // B     G     R
+  // B    G    R   reserved
   //
   {0x00, 0x00, 0x00, 0x00},  // BLACK
-  {0x98, 0x00, 0x00, 0x00},  // BLUE
-  {0x00, 0x98, 0x00, 0x00},  // GREEN
-  {0x98, 0x98, 0x00, 0x00},  // CYAN
-  {0x00, 0x00, 0x98, 0x00},  // RED
+  {0x98, 0x00, 0x00, 0x00},  // LIGHTBLUE
+  {0x00, 0x98, 0x00, 0x00},  // LIGHGREEN
+  {0x98, 0x98, 0x00, 0x00},  // LIGHCYAN
+  {0x00, 0x00, 0x98, 0x00},  // LIGHRED
   {0x98, 0x00, 0x98, 0x00},  // MAGENTA
   {0x00, 0x98, 0x98, 0x00},  // BROWN
   {0x98, 0x98, 0x98, 0x00},  // LIGHTGRAY
   {0x30, 0x30, 0x30, 0x00},  // DARKGRAY - BRIGHT BLACK
-  {0xff, 0x00, 0x00, 0x00},  // LIGHTBLUE - ?
-  {0x00, 0xff, 0x00, 0x00},  // LIGHTGREEN - ?
-  {0xff, 0xff, 0x00, 0x00},  // LIGHTCYAN
-  {0x00, 0x00, 0xff, 0x00},  // LIGHTRED
-  {0xff, 0x00, 0xff, 0x00},  // LIGHTMAGENTA
-  {0x00, 0xff, 0xff, 0x00},  // LIGHTBROWN
-  {0xff, 0xff, 0xff, 0x00}  // WHITE
+  {0xff, 0x00, 0x00, 0x00},  // BLUE
+  {0x00, 0xff, 0x00, 0x00},  // LIME
+  {0xff, 0xff, 0x00, 0x00},  // CYAN
+  {0x00, 0x00, 0xff, 0x00},  // RED
+  {0xff, 0x00, 0xff, 0x00},  // FUCHSIA
+  {0x00, 0xff, 0xff, 0x00},  // YELLOW
+  {0xff, 0xff, 0xff, 0x00}   // WHITE
 };
 
 EFI_NARROW_GLYPH     mCursorGlyph = {
@@ -117,7 +116,7 @@ GetTextColors (
   );
 
 /**
-  Draw Unicode string on the Graphice Console device's screen.
+  Draw Unicode string on the Graphics Console device's screen.
 
   @param  This                  Protocol instance pointer.
   @param  UnicodeWeight         One Unicode string to be displayed.
@@ -151,9 +150,9 @@ EraseCursor (
 
 /**
   Check if the current specific mode supported the user defined resolution
-  for the Graphice Console devcie based on Graphics Output Protocol.
+  for the Graphics Console device based on Graphics Output Protocol.
 
-  If yes, set the graphic devcice's current mode to this specific mode.
+  If yes, set the graphic device's current mode to this specific mode.
   
   @param  GraphicsOutput        Graphics Output Protocol instance pointer.
   @param  HorizontalResolution  User defined horizontal resolution
@@ -162,7 +161,7 @@ EraseCursor (
 
   @retval EFI_SUCCESS       The mode is supported.
   @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
-                            devcie supported.
+                            device supported.
   @retval other             The specific mode does not support user defined 
                             resolution or failed to set the current mode to the 
                             specific mode on graphics device.
@@ -292,7 +291,7 @@ Error:
 /**
   Start this driver on Controller by opening Graphics Output protocol or 
   UGA Draw protocol, and installing Simple Text Out protocol on Controller.
-  (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
+  (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
   
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to
@@ -313,7 +312,7 @@ GraphicsConsoleControllerDriverStart (
 {
   EFI_STATUS                           Status;
   GRAPHICS_CONSOLE_DEV                 *Private;
-  UINTN                                NarrowFontSize;
+  UINT32                               NarrowFontSize;
   UINT32                               HorizontalResolution;
   UINT32                               VerticalResolution;
   UINT32                               ColorDepth;
@@ -323,11 +322,11 @@ GraphicsConsoleControllerDriverStart (
   UINTN                                Rows;
   UINT32                               ModeNumber;
   EFI_HII_SIMPLE_FONT_PACKAGE_HDR      *SimplifiedFont;
-  UINTN                                PackageLength;
+  UINT32                               PackageLength;
   EFI_HII_PACKAGE_LIST_HEADER          *PackageList;
   UINT8                                *Package;
   UINT8                                *Location;
-
+  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    *Mode;
   ModeNumber = 0;
 
   //
@@ -374,13 +373,27 @@ GraphicsConsoleControllerDriverStart (
     // Add 4 bytes to the header for entire length for HiiLibPreparePackageList use only.
     // Looks ugly. Might be updated when font tool is ready.
     //
+    //    +--------------------------------+ <-- Package
+    //    |                                |
+    //    |    PackageLength(4 bytes)      | 
+    //    |                                |
+    //    |--------------------------------| <-- SimplifiedFont
+    //    |                                |
+    //    |EFI_HII_SIMPLE_FONT_PACKAGE_HDR | 
+    //    |                                |
+    //    |--------------------------------| <-- Location
+    //    |                                |
+    //    |     gUsStdNarrowGlyphData      |
+    //    |                                |
+    //    +--------------------------------+
+    
     PackageLength   = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + NarrowFontSize + 4;
     Package = AllocateZeroPool (PackageLength);
     if (Package == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    CopyMem (Package, &PackageLength, 4);
-    SimplifiedFont = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR*) (Package + 4);
+    WriteUnaligned32((UINT32 *) Package,PackageLength);
+    SimplifiedFont = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR *) (Package + 4);
     SimplifiedFont->Header.Length        = (UINT32) (PackageLength - 4);
     SimplifiedFont->Header.Type          = EFI_HII_PACKAGE_SIMPLE_FONTS;
     SimplifiedFont->NumberOfNarrowGlyphs = (UINT16) (NarrowFontSize / sizeof (EFI_NARROW_GLYPH));
@@ -400,8 +413,8 @@ GraphicsConsoleControllerDriverStart (
     mFirstAccessFlag = FALSE;
   }
   //
-  // If the current mode information can not be retrieved, then attemp to set the default mode
-  // of 800x600, 32 bit colot, 60 Hz refresh.
+  // If the current mode information can not be retrieved, then attempt to set the default mode
+  // of 800x600, 32 bit color, 60 Hz refresh.
   //
   HorizontalResolution  = 800;
   VerticalResolution    = 600;
@@ -435,14 +448,16 @@ GraphicsConsoleControllerDriverStart (
                    &ModeNumber
                    );
     }
-
-    if (EFI_ERROR (Status) || (ModeNumber == Private->GraphicsOutput->Mode->MaxMode)) {
+    
+    Mode = Private->GraphicsOutput->Mode;
+     
+    if (EFI_ERROR (Status) || (Mode->MaxMode)) {
       //
       // Set default mode failed or device don't support default mode, then get the current mode information
       //
-      HorizontalResolution = Private->GraphicsOutput->Mode->Info->HorizontalResolution;
-      VerticalResolution = Private->GraphicsOutput->Mode->Info->VerticalResolution;
-      ModeNumber = Private->GraphicsOutput->Mode->Mode;
+      HorizontalResolution = Mode->Info->HorizontalResolution;
+      VerticalResolution = Mode->Info->VerticalResolution;
+      ModeNumber = Mode->Mode;
     }
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
@@ -629,7 +644,7 @@ Error:
 /**
   Stop this driver on Controller by removing Simple Text Out protocol 
   and closing the Graphics Output Protocol or UGA Draw protocol on Controller.
-  (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
+  (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
   
 
   @param  This              Protocol instance pointer.
@@ -719,7 +734,7 @@ GraphicsConsoleControllerDriverStop (
 
 /**
   Check if the current specific mode supported the user defined resolution
-  for the Graphice Console devcie based on Graphics Output Protocol.
+  for the Graphics Console device based on Graphics Output Protocol.
 
   If yes, set the graphic devcice's current mode to this specific mode.
   
@@ -730,7 +745,7 @@ GraphicsConsoleControllerDriverStop (
 
   @retval EFI_SUCCESS       The mode is supported.
   @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
-                            devcie supported.
+                            device supported.
   @retval other             The specific mode does not support user defined 
                             resolution or failed to set the current mode to the 
                             specific mode on graphics device.
@@ -838,7 +853,7 @@ EfiLocateHiiProtocol (
 //
 
 /**
-  Reset the text output device hardware and optionaly run diagnostics.
+  Reset the text output device hardware and optionally run diagnostics.
   
   Implements SIMPLE_TEXT_OUTPUT.Reset().
   If ExtendeVerification is TRUE, then perform dependent Graphics Console
@@ -1086,27 +1101,12 @@ GraphicsConsoleConOutOutputString (
       // Count is used to determine how many characters are used regardless of their attributes
       //
       for (Count = 0, Index = 0; (This->Mode->CursorColumn + Index) < MaxColumn; Count++, Index++) {
-        if (WString[Count] == CHAR_NULL) {
-          break;
-        }
-
-        if (WString[Count] == CHAR_BACKSPACE) {
-          break;
-        }
-
-        if (WString[Count] == CHAR_LINEFEED) {
-          break;
-        }
-
-        if (WString[Count] == CHAR_CARRIAGE_RETURN) {
-          break;
-        }
-
-        if (WString[Count] == WIDE_CHAR) {
-          break;
-        }
-
-        if (WString[Count] == NARROW_CHAR) {
+        if (WString[Count] == CHAR_NULL || 
+            WString[Count] == CHAR_BACKSPACE || 
+            WString[Count] == CHAR_LINEFEED ||
+            WString[Count] == CHAR_CARRIAGE_RETURN ||
+            WString[Count] == WIDE_CHAR ||
+            WString[Count] == NARROW_CHAR) {
           break;
         }
         //
@@ -1379,7 +1379,7 @@ GraphicsConsoleConOutSetMode (
   if (GraphicsOutput != NULL) {
     if (ModeData->GopModeNumber != GraphicsOutput->Mode->Mode) {
       //
-      // Either no graphics mode is currently set, or it is set to the wrong resolution, so set the new grapghics mode
+      // Either no graphics mode is currently set, or it is set to the wrong resolution, so set the new graphics mode
       //
       Status = GraphicsOutput->SetMode (GraphicsOutput, ModeData->GopModeNumber);
       if (EFI_ERROR (Status)) {
@@ -1418,7 +1418,7 @@ GraphicsConsoleConOutSetMode (
                         );
     if (EFI_ERROR (Status) || HorizontalResolution != ModeData->GopWidth || VerticalResolution != ModeData->GopHeight) {
       //
-      // Either no graphics mode is currently set, or it is set to the wrong resolution, so set the new grapghics mode
+      // Either no graphics mode is currently set, or it is set to the wrong resolution, so set the new graphics mode
       //
       Status = UgaDraw->SetMode (
                           UgaDraw,
@@ -1458,7 +1458,7 @@ GraphicsConsoleConOutSetMode (
   This->Mode->Mode = (INT32) ModeNumber;
 
   //
-  // Move the text cursor to the upper left hand corner of the displat and enable it
+  // Move the text cursor to the upper left hand corner of the display and enable it
   //
   This->SetCursorPosition (This, 0, 0);
 
@@ -1718,7 +1718,7 @@ GetTextColors (
 }
 
 /**
-  Draw Unicode string on the Graphice Console device's screen.
+  Draw Unicode string on the Graphics Console device's screen.
 
   @param  This                  Protocol instance pointer.
   @param  UnicodeWeight         One Unicode string to be displayed.
@@ -1778,7 +1778,7 @@ DrawUnicodeWeightAtCursorN (
 
   if (Private->GraphicsOutput != NULL) {
     //
-    // If Graphcis Output protocol exists, using HII Font protocol to draw. 
+    // If Graphics Output protocol exists, using HII Font protocol to draw. 
     //
     Blt->Image.Screen = Private->GraphicsOutput;
 
@@ -1946,7 +1946,7 @@ EraseCursor (
   //
   for (PosY = 0; PosY < EFI_GLYPH_HEIGHT; PosY++) {
     for (PosX = 0; PosX < EFI_GLYPH_WIDTH; PosX++) {
-      if ((mCursorGlyph.GlyphCol1[PosY] & (1 << PosX)) != 0) {
+      if ((mCursorGlyph.GlyphCol1[PosY] & (BIT0 << PosX)) != 0) {
         BltChar[PosY][EFI_GLYPH_WIDTH - PosX - 1].Raw ^= Foreground.Raw;
       }
     }

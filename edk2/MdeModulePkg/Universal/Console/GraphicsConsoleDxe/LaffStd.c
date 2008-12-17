@@ -273,10 +273,10 @@ EFI_NARROW_GLYPH  gUsStdNarrowGlyphData[] = {
 /**
   Returns available Unicode glyphs narrow fonts(8*19 pixels) size.
 
-  @return Narrow foun size.
+  @return Narrow font size.
 
 **/
-UINTN
+UINT32
 ReturnNarrowFontSize (
   VOID
   )
