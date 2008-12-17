@@ -97,7 +97,7 @@ InternalHiiLibPreparePackages (
   MarkerBackup = Marker;
 
   //
-  // Count the lenth of the final package list.
+  // Count the length of the final package list.
   //
   for (Index = 0; Index < NumberOfPackages; Index++) {
     CopyMem (&PackageLength, VA_ARG (Marker, VOID *), sizeof (UINT32));
@@ -108,7 +108,7 @@ InternalHiiLibPreparePackages (
   }
 
   //
-  // Include the lenght of EFI_HII_PACKAGE_END
+  // Include the length of EFI_HII_PACKAGE_END
   //
   PackageListLength += sizeof (EFI_HII_PACKAGE_HEADER);
   PackageListHeader = AllocateZeroPool (PackageListLength);
@@ -186,7 +186,7 @@ HiiLibPreparePackageList (
   GuidId,  and the variable length argument list of package pointers.
 
   Then, EFI_HII_PACKAGE_LIST will be register to the default System HII Database. The
-  Handle to the newly registered Package List is returned throught HiiHandle.
+  Handle to the newly registered Package List is returned through HiiHandle.
 
   If HiiHandle is NULL, then ASSERT.
 

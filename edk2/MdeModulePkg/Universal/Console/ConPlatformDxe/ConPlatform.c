@@ -1,5 +1,5 @@
 /** @file
-  Console Platfrom DXE Driver, install Console Device Guids and update Console
+  Console Platform DXE Driver, install Console Device Guids and update Console
   Environment Variables.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
