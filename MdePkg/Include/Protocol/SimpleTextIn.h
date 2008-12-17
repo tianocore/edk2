@@ -83,7 +83,7 @@ typedef struct {
 #define SCAN_ESC        0x0017
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param  This                 Protocol instance pointer.
   @param  ExtendedVerification Driver may perform diagnostics on reset.
@@ -101,14 +101,14 @@ EFI_STATUS
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can 
-  be used to test for existance of a keystroke via WaitForEvent () call.
+  be used to test for existence of a keystroke via WaitForEvent () call.
 
   @param  This Protocol instance pointer.
   @param  Key  Driver may perform diagnostics on reset.
 
   @retval EFI_SUCCESS      The keystroke information was returned.
-  @retval EFI_NOT_READY    There was no keystroke data availiable.
-  @retval EFI_DEVICE_ERROR The keydtroke information was not returned due to
+  @retval EFI_NOT_READY    There was no keystroke data available.
+  @retval EFI_DEVICE_ERROR The keystroke information was not returned due to
                            hardware errors.
 
 **/

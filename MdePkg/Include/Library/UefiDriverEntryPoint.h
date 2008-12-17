@@ -182,7 +182,7 @@ ProcessModuleEntryPointList (
 
   @param  ImageHandle  The image handle of the DXE Driver, DXE Runtime Driver, DXE SMM Driver, or UEFI Driver.
 
-  @retval  EFI_SUCCESS  The unoad handlers executed normally.
+  @retval  EFI_SUCCESS  The unload handlers executed normally.
   @retval  !EFI_SUCCESS The unload handlers failed to execute normally.
 
 **/
