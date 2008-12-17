@@ -1,5 +1,5 @@
 /** @file
-  Produces Simple Text Input Protocl, Simple Text Input Extended Protocol and
+  Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
@@ -62,30 +62,30 @@ TERMINAL_DEV  mTerminalDevTemplate = {
   },
   {   // SimpleTextOutputMode
     1,                                           // MaxMode
-    0,                                           // Mode?
+    0,                                           // Mode
     EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK),    // Attribute
     0,                                           // CursorColumn
     0,                                           // CursorRow
     TRUE                                         // CursorVisible
   },
-  0,
-  {
+  0,  // SerialInTimeOut
+  {   // RawFiFo
     0,
     0,
     { 0 }
   },
-  {
+  {  // UnicodeFiFo
     0,
     0,
     { 0 }
   },
-  {
+  {  // EfiKeyFiFo
     0,
     0,
     { {0} }
   },
   NULL, // ControllerNameTable
-  NULL,
+  NULL, // TwoSecondTimeOut
   INPUT_STATE_DEFAULT,
   RESET_STATE_DEFAULT,
   FALSE,
@@ -97,26 +97,11 @@ TERMINAL_DEV  mTerminalDevTemplate = {
     TerminalConInRegisterKeyNotify,
     TerminalConInUnregisterKeyNotify,
   },
-  {
+  {   // NotifyList
     NULL,
     NULL,
   }
 };
-
-
-/**
-  Free notify functions list.
-
-  @param  ListHead               The list head
-
-  @retval EFI_SUCCESS            Free the notify list successfully.
-  @retval EFI_INVALID_PARAMETER  ListHead is NULL.
-
-**/
-EFI_STATUS
-TerminalFreeNotifyList (
-  IN OUT LIST_ENTRY           *ListHead
-  );
 
 /**
   Test to see if this driver supports Controller. 
@@ -266,6 +251,7 @@ TerminalDriverBindingStart (
   UINTN                               EntryCount;
   UINTN                               Index;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     SimpleTextOutput;
 
   TerminalDevice = NULL;
   DefaultNode    = NULL;
@@ -504,50 +490,52 @@ TerminalDriverBindingStart (
   //
   // Simple Text Output Protocol
   //
-  TerminalDevice->SimpleTextOutput.Reset              = TerminalConOutReset;
-  TerminalDevice->SimpleTextOutput.OutputString       = TerminalConOutOutputString;
-  TerminalDevice->SimpleTextOutput.TestString         = TerminalConOutTestString;
-  TerminalDevice->SimpleTextOutput.QueryMode          = TerminalConOutQueryMode;
-  TerminalDevice->SimpleTextOutput.SetMode            = TerminalConOutSetMode;
-  TerminalDevice->SimpleTextOutput.SetAttribute       = TerminalConOutSetAttribute;
-  TerminalDevice->SimpleTextOutput.ClearScreen        = TerminalConOutClearScreen;
-  TerminalDevice->SimpleTextOutput.SetCursorPosition  = TerminalConOutSetCursorPosition;
-  TerminalDevice->SimpleTextOutput.EnableCursor       = TerminalConOutEnableCursor;
-  TerminalDevice->SimpleTextOutput.Mode               = &TerminalDevice->SimpleTextOutputMode;
+  SimpleTextOutput = TerminalDevice->SimpleTextOutput;
+  
+  SimpleTextOutput.Reset              = TerminalConOutReset;
+  SimpleTextOutput.OutputString       = TerminalConOutOutputString;
+  SimpleTextOutput.TestString         = TerminalConOutTestString;
+  SimpleTextOutput.QueryMode          = TerminalConOutQueryMode;
+  SimpleTextOutput.SetMode            = TerminalConOutSetMode;
+  SimpleTextOutput.SetAttribute       = TerminalConOutSetAttribute;
+  SimpleTextOutput.ClearScreen        = TerminalConOutClearScreen;
+  SimpleTextOutput.SetCursorPosition  = TerminalConOutSetCursorPosition;
+  SimpleTextOutput.EnableCursor       = TerminalConOutEnableCursor;
+  SimpleTextOutput.Mode               = &TerminalDevice->SimpleTextOutputMode;
 
   TerminalDevice->SimpleTextOutputMode.MaxMode        = 3;
   //
   // For terminal devices, cursor is always visible
   //
   TerminalDevice->SimpleTextOutputMode.CursorVisible  = TRUE;
-  Status = TerminalDevice->SimpleTextOutput.SetAttribute (
-                                                      &TerminalDevice->SimpleTextOutput,
-                                                      EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK)
-                                                      );
+  Status = SimpleTextOutput.SetAttribute (
+                                       &TerminalDevice->SimpleTextOutput,
+                                       EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK)
+                                       );
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
 
-  Status = TerminalDevice->SimpleTextOutput.Reset (
-                                              &TerminalDevice->SimpleTextOutput,
-                                              FALSE
-                                              );
+  Status = SimpleTextOutput.Reset (
+                               &TerminalDevice->SimpleTextOutput,
+                               FALSE
+                               );
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
 
-  Status = TerminalDevice->SimpleTextOutput.SetMode (
-                                              &TerminalDevice->SimpleTextOutput,
-                                              0
-                                              );
+  Status = SimpleTextOutput.SetMode (
+                                &TerminalDevice->SimpleTextOutput,
+                                0
+                                );
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
 
-  Status = TerminalDevice->SimpleTextOutput.EnableCursor (
-                                              &TerminalDevice->SimpleTextOutput,
-                                              TRUE
-                                              );
+  Status = SimpleTextOutput.EnableCursor (
+                                     &TerminalDevice->SimpleTextOutput,
+                                     TRUE
+                                     );
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
@@ -983,7 +971,7 @@ TerminalFreeNotifyList (
   Update terminal device path in Console Device Environment Variables.
 
   @param  VariableName           The Console Device Environment Variable.
-  @param  ParentDevicePath       The terminal devcie path to be updated.
+  @param  ParentDevicePath       The terminal device path to be updated.
 
   @return None.
 
@@ -1048,7 +1036,7 @@ TerminalUpdateConsoleDevVariable (
   Remove terminal device path from Console Device Environment Variables.
 
   @param  VariableName           Console Device Environment Variables.
-  @param  ParentDevicePath       The terminal devcie path to be updated.
+  @param  ParentDevicePath       The terminal device path to be updated.
 
   @return None.
 
@@ -1112,7 +1100,7 @@ TerminalRemoveConsoleDevVariable (
       SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
 
       //
-      // Compare the genterated device path to the current device path instance
+      // Compare the generated device path to the current device path instance
       //
       if (TempDevicePath != NULL) {
         if (CompareMem (Instance, TempDevicePath, InstanceSize) == 0) {
@@ -1172,8 +1160,8 @@ TerminalRemoveConsoleDevVariable (
   @param  VariableSize           Returns the size of the EFI variable that was read
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-          Caller is repsoncible freeing the buffer. If variable was not read, 
-          NULL regturned.
+          Caller is responsible freeing the buffer. If variable was not read, 
+          NULL returned.
 
 **/
 VOID *
@@ -1238,10 +1226,10 @@ TerminalGetVariableAndSize (
 }
 
 /**
-  Build termial device path according to terminal type.
+  Build terminal device path according to terminal type.
 
   @param  TerminalType           The terminal type is PC ANSI, VT100, VT100+ or VT-UTF8.
-  @param  ParentDevicePath       Parent devcie path.
+  @param  ParentDevicePath       Parent device path.
   @param  TerminalDevicePath     Returned terminal device path, if building successfully.
 
   @retval EFI_UNSUPPORTED        Terminal does not belong to the supported type.
@@ -1324,7 +1312,7 @@ InitializeRawFiFo (
   )
 {
   //
-  // Make the raw fifo empty.
+  // Make the raw FIFO empty.
   //
   TerminalDevice->RawFiFo.Head = TerminalDevice->RawFiFo.Tail;
 }
@@ -1343,7 +1331,7 @@ InitializeUnicodeFiFo (
   )
 {
   //
-  // Make the unicode fifo empty
+  // Make the unicode FIFO empty
   //
   TerminalDevice->UnicodeFiFo.Head = TerminalDevice->UnicodeFiFo.Tail;
 }
@@ -1362,7 +1350,7 @@ InitializeEfiKeyFiFo (
   )
 {
   //
-  // Make the efi key fifo empty
+  // Make the efi key FIFO empty
   //
   TerminalDevice->EfiKeyFiFo.Head = TerminalDevice->EfiKeyFiFo.Tail;
 }
@@ -1399,7 +1387,6 @@ InitializeTerminal(
              &gTerminalComponentName2
              );
   ASSERT_EFI_ERROR (Status);
-
 
   return Status;
 }

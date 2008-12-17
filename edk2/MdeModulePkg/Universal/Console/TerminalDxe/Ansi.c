@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Terminal.h"
 
 /**
-  Translate all raw data in the Raw FIFI into unicode, and insert
+  Translate all raw data in the Raw FIFO into unicode, and insert
   them into Unicode FIFO.
 
   @param TerminalDevice          The terminal device.

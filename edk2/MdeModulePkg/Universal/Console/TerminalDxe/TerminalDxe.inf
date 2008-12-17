@@ -1,9 +1,10 @@
 #/** @file
-# Component description file for Terminal module.
+# 
+#  Component description file for Terminal module.
 #
-# This driver installs Simple Text In/Out protocol for terminal devices (serial devices or hotplug devices).
-# Copyright (c) 2006 - 2008, Intel Corporation
-#
+#  This driver installs Simple Text In/Out protocol for terminal devices (serial devices or hotplug devices).
+# 
+#  Copyright (c) 2006 - 2008, Intel Corporation
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
