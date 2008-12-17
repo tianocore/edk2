@@ -38,6 +38,53 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gGraphicsConsoleComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gGraphicsConsoleComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gGraphicsConsoleDriverBinding;
+extern EFI_NARROW_GLYPH              gUsStdNarrowGlyphData[];
+
+
+//
+// User can define valid graphic resolution here
+// e.g. 640x480, 800x600, 1024x768...
+//
+#define CURRENT_HORIZONTAL_RESOLUTION  800
+#define CURRENT_VERTICAL_RESOLUTION    600
+
+typedef union {
+  EFI_NARROW_GLYPH  NarrowGlyph;
+  EFI_WIDE_GLYPH    WideGlyph;
+} GLYPH_UNION;
+
+//
+// Device Structure
+//
+#define GRAPHICS_CONSOLE_DEV_SIGNATURE  SIGNATURE_32 ('g', 's', 't', 'o')
+
+typedef struct {
+  UINTN   Columns;
+  UINTN   Rows;
+  INTN    DeltaX;
+  INTN    DeltaY;
+  UINT32  GopWidth;
+  UINT32  GopHeight;
+  UINT32  GopModeNumber;
+} GRAPHICS_CONSOLE_MODE_DATA;
+
+#define GRAPHICS_MAX_MODE 4
+
+typedef struct {
+  UINTN                            Signature;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
+  EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  SimpleTextOutput;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE      SimpleTextOutputMode;
+  GRAPHICS_CONSOLE_MODE_DATA       ModeData[GRAPHICS_MAX_MODE];
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *LineBuffer;
+  EFI_HII_HANDLE                   HiiHandle;
+} GRAPHICS_CONSOLE_DEV;
+
+#define GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS(a) \
+  CR (a, GRAPHICS_CONSOLE_DEV, SimpleTextOutput, GRAPHICS_CONSOLE_DEV_SIGNATURE)
+
 
 //
 // EFI Component Name Functions
@@ -169,64 +216,15 @@ GraphicsConsoleComponentNameGetControllerName (
   );
 
 
-//
-// User can define valid graphic resolution here
-// e.g. 640x480, 800x600, 1024x768...
-//
-#define CURRENT_HORIZONTAL_RESOLUTION  800
-#define CURRENT_VERTICAL_RESOLUTION    600
-
-typedef union {
-  EFI_NARROW_GLYPH  NarrowGlyph;
-  EFI_WIDE_GLYPH    WideGlyph;
-} GLYPH_UNION;
-
-extern EFI_NARROW_GLYPH  gUsStdNarrowGlyphData[];
-
-//
-// Device Structure
-//
-#define GRAPHICS_CONSOLE_DEV_SIGNATURE  SIGNATURE_32 ('g', 's', 't', 'o')
-
-typedef struct {
-  UINTN   Columns;
-  UINTN   Rows;
-  INTN    DeltaX;
-  INTN    DeltaY;
-  UINT32  GopWidth;
-  UINT32  GopHeight;
-  UINT32  GopModeNumber;
-} GRAPHICS_CONSOLE_MODE_DATA;
-
-#define GRAPHICS_MAX_MODE 4
-
-typedef struct {
-  UINTN                            Signature;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  SimpleTextOutput;
-  EFI_SIMPLE_TEXT_OUTPUT_MODE      SimpleTextOutputMode;
-  GRAPHICS_CONSOLE_MODE_DATA       ModeData[GRAPHICS_MAX_MODE];
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *LineBuffer;
-  EFI_HII_HANDLE                   HiiHandle;
-} GRAPHICS_CONSOLE_DEV;
-
-#define GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS(a) \
-  CR (a, GRAPHICS_CONSOLE_DEV, SimpleTextOutput, GRAPHICS_CONSOLE_DEV_SIGNATURE)
-
-//
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL   gGraphicsConsoleDriverBinding;
 
 
 /**
   Returns available Unicode glyphs narrow fonts(8*19 pixels) size.
 
-  @return Narrow foun size.
+  @return Narrow font size.
 
 **/
-UINTN
+UINT32
 ReturnNarrowFontSize (
   VOID
   );
@@ -466,7 +464,7 @@ GraphicsConsoleControllerDriverSupported (
 /**
   Start this driver on Controller by opening Graphics Output protocol or 
   UGA Draw protocol, and installing Simple Text Out protocol on Controller.
-  (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
+  (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
   
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to
@@ -488,7 +486,7 @@ GraphicsConsoleControllerDriverStart (
 /**
   Stop this driver on Controller by removing Simple Text Out protocol 
   and closing the Graphics Output Protocol or UGA Draw protocol on Controller.
-  (UGA Draw protocol could be shkipped if PcdUgaConsumeSupport is set to FALSE.)
+  (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
   
 
   @param  This              Protocol instance pointer.
