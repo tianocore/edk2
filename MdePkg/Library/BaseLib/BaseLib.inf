@@ -586,6 +586,8 @@
   Ipf/AccessEicr.s
   Ipf/AccessDbr.s
   Ipf/AccessMsr.s        | INTEL
+  Ipf/AccessMsr.s        | GCC
+  Ipf/AccessMsrDb.s      | MSFT
   Ipf/FlushCacheRange.s
   Ipf/InternalSwitchStack.c
   Ipf/GetInterruptState.s
