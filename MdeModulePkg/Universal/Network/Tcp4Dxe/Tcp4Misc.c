@@ -873,6 +873,8 @@ TcpOnAppAbort (
   case TCP_CLOSE_WAIT:
     TcpResetConnection (Tcb);
     break;
+  default:
+    break;
   }
 
   TcpSetState (Tcb, TCP_CLOSED);
