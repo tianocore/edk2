@@ -552,7 +552,7 @@ SCSIBusDriverBindingStop (
            This->DriverBindingHandle,
            Controller
            );
-    gBS->FreePool (ScsiBusDev);
+    FreePool (ScsiBusDev);
     return EFI_SUCCESS;
   }
 
@@ -624,7 +624,7 @@ SCSIBusDriverBindingStop (
                );
       }
     } else {
-      gBS->FreePool (ScsiIoDevice);
+      FreePool (ScsiIoDevice);
     }
   }
 
@@ -997,6 +997,7 @@ ScsiScanCreateDevice (
   //
   // Set Device Path
   //
+  ScsiDevicePath = NULL;
   if (ScsiIoDevice->ExtScsiSupport){
     Status = ScsiIoDevice->ExtScsiPassThru->BuildDevicePath (
                                           ScsiIoDevice->ExtScsiPassThru,
@@ -1030,10 +1031,10 @@ ScsiScanCreateDevice (
   // ScsiPassThru->BuildDevicePath() function; It is no longer used
   // after EfiAppendDevicePathNode,so free the memory it occupies.
   //
-  gBS->FreePool (ScsiDevicePath);
+  FreePool (ScsiDevicePath);
 
   if (ScsiIoDevice->DevicePath == NULL) {
-    gBS->FreePool (ScsiIoDevice);
+    FreePool (ScsiIoDevice);
     return EFI_OUT_OF_RESOURCES;
   }
 
