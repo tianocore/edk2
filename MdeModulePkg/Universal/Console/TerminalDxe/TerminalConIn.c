@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
-  be used to test for existance of a keystroke via WaitForEvent () call.
+  be used to test for existence of a keystroke via WaitForEvent () call.
 
   @param  TerminalDevice           Terminal driver private structure
   @param  KeyData                  A pointer to a buffer that is filled in with the
@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                    pressed.
 
   @retval EFI_SUCCESS              The keystroke information was returned.
-  @retval EFI_NOT_READY            There was no keystroke data availiable.
+  @retval EFI_NOT_READY            There was no keystroke data available.
   @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
                                    to hardware errors.
   @retval EFI_INVALID_PARAMETER    KeyData is NULL.
@@ -39,6 +39,7 @@ ReadKeyStrokeWorker (
 {
   EFI_STATUS                      Status;
   LIST_ENTRY                      *Link;
+  LIST_ENTRY                      *NotifyList;
   TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
 
   if (KeyData == NULL) {
@@ -66,7 +67,8 @@ ReadKeyStrokeWorker (
   //
   // Invoke notification functions if exist
   //
-  for (Link = TerminalDevice->NotifyList.ForwardLink; Link != &TerminalDevice->NotifyList; Link = Link->ForwardLink) {
+  NotifyList = &TerminalDevice->NotifyList;
+  for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList,Link); Link = GetNextNode (NotifyList,Link)) {
     CurrentNotify = CR (
                       Link,
                       TERMINAL_CONSOLE_IN_EX_NOTIFY,
@@ -177,6 +179,8 @@ TerminalConInReadKeyStroke (
 
 /**
   Check if the key already has been registered.
+  
+  If both RegsiteredData and InputData is NULL, then ASSERT().
 
   @param  RegsiteredData           A pointer to a buffer that is filled in with the
                                    keystroke state data for the key that was
@@ -237,7 +241,7 @@ TerminalConInWaitForKeyEx (
 //
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param  This                     Protocol instance pointer.
   @param  ExtendedVerification     Driver may perform diagnostics on reset.
@@ -271,7 +275,7 @@ TerminalConInResetEx (
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
-  be used to test for existance of a keystroke via WaitForEvent () call.
+  be used to test for existence of a keystroke via WaitForEvent () call.
 
   @param  This                     Protocol instance pointer.
   @param  KeyData                  A pointer to a buffer that is filled in with the
@@ -279,7 +283,7 @@ TerminalConInResetEx (
                                    pressed.
 
   @retval EFI_SUCCESS              The keystroke information was returned.
-  @retval EFI_NOT_READY            There was no keystroke data availiable.
+  @retval EFI_NOT_READY            There was no keystroke data available.
   @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
                                    to hardware errors.
   @retval EFI_INVALID_PARAMETER    KeyData is NULL.
@@ -349,7 +353,7 @@ TerminalConInSetState (
 
   @retval EFI_SUCCESS              The notification function was registered
                                    successfully.
-  @retval EFI_OUT_OF_RESOURCES     Unable to allocate resources for necesssary data
+  @retval EFI_OUT_OF_RESOURCES     Unable to allocate resources for necessary data
                                    structures.
   @retval EFI_INVALID_PARAMETER    KeyData or NotifyHandle is NULL.
 
@@ -367,6 +371,7 @@ TerminalConInRegisterKeyNotify (
   TERMINAL_DEV                    *TerminalDevice;
   TERMINAL_CONSOLE_IN_EX_NOTIFY   *NewNotify;
   LIST_ENTRY                      *Link;
+  LIST_ENTRY                      *NotifyList;
   TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
 
   if (KeyData == NULL || NotifyHandle == NULL || KeyNotificationFunction == NULL) {
@@ -378,7 +383,8 @@ TerminalConInRegisterKeyNotify (
   //
   // Return EFI_SUCCESS if the (KeyData, NotificationFunction) is already registered.
   //
-  for (Link = TerminalDevice->NotifyList.ForwardLink; Link != &TerminalDevice->NotifyList; Link = Link->ForwardLink) {
+  NotifyList = &TerminalDevice->NotifyList;
+  for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList,Link); Link = GetNextNode (NotifyList,Link)) {
     CurrentNotify = CR (
                       Link,
                       TERMINAL_CONSOLE_IN_EX_NOTIFY,
@@ -445,7 +451,8 @@ TerminalConInUnregisterKeyNotify (
   TERMINAL_DEV                    *TerminalDevice;
   LIST_ENTRY                      *Link;
   TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
-
+  LIST_ENTRY                      *NotifyList;
+  
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -464,7 +471,8 @@ TerminalConInUnregisterKeyNotify (
 
   TerminalDevice = TERMINAL_CON_IN_EX_DEV_FROM_THIS (This);
 
-  for (Link = TerminalDevice->NotifyList.ForwardLink; Link != &TerminalDevice->NotifyList; Link = Link->ForwardLink) {
+  NotifyList = &TerminalDevice->NotifyList;
+  for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList,Link); Link = GetNextNode (NotifyList,Link)) {
     CurrentNotify = CR (
                       Link,
                       TERMINAL_CONSOLE_IN_EX_NOTIFY,
@@ -568,7 +576,7 @@ TerminalConInWaitForKey (
 
   @retval EFI_SUCCESS              There is key pending.
   @retval EFI_NOT_READY            There is no key pending.
-  @retval EFI_DEVICE_ERROR         If Serial IO is not attched to serial device.
+  @retval EFI_DEVICE_ERROR         If Serial IO is not attached to serial device.
 
 **/
 EFI_STATUS
@@ -682,7 +690,7 @@ TerminalConInCheckForKey (
 /**
   Get one key out of serial buffer.
 
-  @param  SerialIo           Serial I/O protocl attached to the serial device.
+  @param  SerialIo           Serial I/O protocol attached to the serial device.
   @param  Output             The fetched key.
 
   @return EFI_NOT_READY      If serial buffer is empty.
@@ -1123,32 +1131,35 @@ UnicodeToEfiKeyFlushState (
   )
 {
   EFI_INPUT_KEY Key;
-
-  if ((TerminalDevice->InputState & INPUT_STATE_ESC) != 0) {
+  UINT32        InputState;
+  
+  InputState = TerminalDevice->InputState;
+  
+  if ((InputState & INPUT_STATE_ESC) != 0) {
     Key.ScanCode    = SCAN_ESC;
     Key.UnicodeChar = 0;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if ((TerminalDevice->InputState & INPUT_STATE_CSI) != 0) {
+  if ((InputState & INPUT_STATE_CSI) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = CSI;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if ((TerminalDevice->InputState & INPUT_STATE_LEFTOPENBRACKET) != 0) {
+  if ((InputState & INPUT_STATE_LEFTOPENBRACKET) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = LEFTOPENBRACKET;
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if ((TerminalDevice->InputState & INPUT_STATE_O) != 0) {
+  if ((InputState & INPUT_STATE_O) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = 'O';
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
   }
 
-  if ((TerminalDevice->InputState & INPUT_STATE_2) != 0) {
+  if ((InputState & INPUT_STATE_2) != 0) {
     Key.ScanCode    = SCAN_NULL;
     Key.UnicodeChar = '2';
     EfiKeyFiFoInsertOneKey (TerminalDevice, Key);
@@ -1173,7 +1184,7 @@ UnicodeToEfiKeyFlushState (
   
   The table below shows the keyboard input mappings that this function supports.
   If the ESC sequence listed in one of the columns is presented, then it is translated
-  into the coorespoding EFI Scan Code.  If a matching sequence is not found, then the raw
+  into the corresponding EFI Scan Code.  If a matching sequence is not found, then the raw
   key strokes are converted into EFI Keys.
 
   2 seconds are allowed for an ESC sequence to be completed.  If the ESC sequence is not

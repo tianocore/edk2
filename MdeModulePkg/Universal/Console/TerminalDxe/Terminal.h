@@ -265,7 +265,7 @@ TerminalConInWaitForKeyEx (
 //
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param  This                     Protocol instance pointer.
   @param  ExtendedVerification     Driver may perform diagnostics on reset.
@@ -284,7 +284,7 @@ TerminalConInResetEx (
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
-  be used to test for existance of a keystroke via WaitForEvent () call.
+  be used to test for existence of a keystroke via WaitForEvent () call.
 
   @param  This                     Protocol instance pointer.
   @param  KeyData                  A pointer to a buffer that is filled in with the
@@ -292,7 +292,7 @@ TerminalConInResetEx (
                                    pressed.
 
   @retval EFI_SUCCESS              The keystroke information was returned.
-  @retval EFI_NOT_READY            There was no keystroke data availiable.
+  @retval EFI_NOT_READY            There was no keystroke data available.
   @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
                                    to hardware errors.
   @retval EFI_INVALID_PARAMETER    KeyData is NULL.
@@ -653,6 +653,20 @@ TerminalDriverBindingStop (
   );
 
 /**
+  Free notify functions list.
+
+  @param  ListHead               The list head
+
+  @retval EFI_SUCCESS            Free the notify list successfully.
+  @retval EFI_INVALID_PARAMETER  ListHead is NULL.
+
+**/
+EFI_STATUS
+TerminalFreeNotifyList (
+                        IN OUT LIST_ENTRY           *ListHead
+                        );
+
+/**
   Retrieves a Unicode string that is the user readable name of the driver.
 
   This function retrieves the user readable name of a driver in the form of a
@@ -790,7 +804,7 @@ TerminalComponentNameGetControllerName (
 
   @retval EFI_SUCCESS              There is key pending.
   @retval EFI_NOT_READY            There is no key pending.
-  @retval EFI_DEVICE_ERROR         If Serial IO is not attched to serial device.
+  @retval EFI_DEVICE_ERROR         If Serial IO is not attached to serial device.
 
 **/
 EFI_STATUS
@@ -802,7 +816,7 @@ TerminalConInCheckForKey (
   Update terminal device path in Console Device Environment Variables.
 
   @param  VariableName           The Console Device Environment Variable.
-  @param  ParentDevicePath       The terminal devcie path to be updated.
+  @param  ParentDevicePath       The terminal device path to be updated.
 
   @return None.
 
@@ -852,7 +866,7 @@ TerminalGetVariableAndSize (
   Build termial device path according to terminal type.
 
   @param  TerminalType           The terminal type is PC ANSI, VT100, VT100+ or VT-UTF8.
-  @param  ParentDevicePath       Parent devcie path.
+  @param  ParentDevicePath       Parent device path.
   @param  TerminalDevicePath     Returned terminal device path, if building successfully.
 
   @retval EFI_UNSUPPORTED        Terminal does not belong to the supported type.
@@ -1277,9 +1291,9 @@ VTUTF8TestString (
 
   UTF8 Encoding Table
   Bits per Character | Unicode Character Range | Unicode Binary  Encoding |	UTF8 Binary Encoding
-        0-7	         |     0x0000 - 0x007F	   |     00000000 0xxxxxxx	  |   0xxxxxxx
-        8-11 	       |     0x0080 - 0x07FF	   |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
-       12-16	       |     0x0800 - 0xFFFF	   |     xxxxxxxx xxxxxxxx	  |   1110xxxx 10xxxxxx 10xxxxxx
+        0-7	         |     0x0000 - 0x007F	    |     00000000 0xxxxxxx	   |   0xxxxxxx
+        8-11 	       |     0x0080 - 0x07FF	    |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
+       12-16	        |     0x0800 - 0xFFFF	    |     xxxxxxxx xxxxxxxx	   |   1110xxxx 10xxxxxx 10xxxxxx
 
 
   @param  Unicode          Unicode character need translating.
@@ -1318,9 +1332,9 @@ GetOneValidUtf8Char (
 
   UTF8 Encoding Table
   Bits per Character | Unicode Character Range | Unicode Binary  Encoding |	UTF8 Binary Encoding
-        0-7	         |     0x0000 - 0x007F	   |     00000000 0xxxxxxx	  |   0xxxxxxx
-        8-11 	       |     0x0080 - 0x07FF	   |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
-       12-16	       |     0x0800 - 0xFFFF	   |     xxxxxxxx xxxxxxxx	  |   1110xxxx 10xxxxxx 10xxxxxx
+        0-7	         |     0x0000 - 0x007F	    |     00000000 0xxxxxxx	   |   0xxxxxxx
+        8-11 	       |     0x0080 - 0x07FF	    |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
+       12-16	        |     0x0800 - 0xFFFF	    |     xxxxxxxx xxxxxxxx	   |   1110xxxx 10xxxxxx 10xxxxxx
 
 
   @param  Utf8Char         VT-UTF8 character set needs translating.

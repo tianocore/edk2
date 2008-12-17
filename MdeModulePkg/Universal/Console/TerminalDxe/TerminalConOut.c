@@ -540,7 +540,7 @@ TerminalConOutSetAttribute (
 
   //
   // Skip outputting the command string for the same attribute
-  // It improves the terminal performance siginificantly
+  // It improves the terminal performance significantly
   //
   if (This->Mode->Attribute == (INT32) Attribute) {
     return EFI_SUCCESS;
