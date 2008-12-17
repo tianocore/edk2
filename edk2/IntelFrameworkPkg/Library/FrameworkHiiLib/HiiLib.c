@@ -104,8 +104,9 @@ InternalPreparePackages (
   The allocated structure is initialized using NumberOfPackages, Guid,
   and the variable length argument list of package pointers.
 
-  @param  NumberOfPackages The number of HII packages to prepare.
-  @param  Guid Package GUID.
+  @param  NumberOfPackages  The number of HII packages to prepare.
+  @param  Guid              Package GUID.
+  @Param  ...               The variable argument list of package pointers.
 
   @return The allocated and initialized packages.
 
@@ -145,7 +146,6 @@ PreparePackages (
   The allocated and initialized packages.
 
 **/
-
 EFI_STATUS
 EFIAPI
 HiiLibAddPackages (
