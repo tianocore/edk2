@@ -251,7 +251,7 @@ TerminalDriverBindingStart (
   UINTN                               EntryCount;
   UINTN                               Index;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     SimpleTextOutput;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     *SimpleTextOutput;
 
   TerminalDevice = NULL;
   DefaultNode    = NULL;
@@ -488,54 +488,39 @@ TerminalDriverBindingStart (
     goto ReportError;
   }
   //
-  // Simple Text Output Protocol
+  // Set Simple Text Output Protocol from template.
   //
-  SimpleTextOutput = TerminalDevice->SimpleTextOutput;
-  
-  SimpleTextOutput.Reset              = TerminalConOutReset;
-  SimpleTextOutput.OutputString       = TerminalConOutOutputString;
-  SimpleTextOutput.TestString         = TerminalConOutTestString;
-  SimpleTextOutput.QueryMode          = TerminalConOutQueryMode;
-  SimpleTextOutput.SetMode            = TerminalConOutSetMode;
-  SimpleTextOutput.SetAttribute       = TerminalConOutSetAttribute;
-  SimpleTextOutput.ClearScreen        = TerminalConOutClearScreen;
-  SimpleTextOutput.SetCursorPosition  = TerminalConOutSetCursorPosition;
-  SimpleTextOutput.EnableCursor       = TerminalConOutEnableCursor;
-  SimpleTextOutput.Mode               = &TerminalDevice->SimpleTextOutputMode;
+  SimpleTextOutput = CopyMem (
+                       &TerminalDevice->SimpleTextOutput,
+                       &mTerminalDevTemplate.SimpleTextOutput,
+                       sizeof (mTerminalDevTemplate.SimpleTextOutput)
+                       );
+  SimpleTextOutput->Mode = &TerminalDevice->SimpleTextOutputMode;
 
   TerminalDevice->SimpleTextOutputMode.MaxMode        = 3;
   //
   // For terminal devices, cursor is always visible
   //
   TerminalDevice->SimpleTextOutputMode.CursorVisible  = TRUE;
-  Status = SimpleTextOutput.SetAttribute (
-                                       &TerminalDevice->SimpleTextOutput,
-                                       EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK)
-                                       );
+  Status = TerminalConOutSetAttribute (
+             SimpleTextOutput,
+             EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK)
+             );
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
 
-  Status = SimpleTextOutput.Reset (
-                               &TerminalDevice->SimpleTextOutput,
-                               FALSE
-                               );
+  Status = TerminalConOutReset (SimpleTextOutput, FALSE);
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
 
-  Status = SimpleTextOutput.SetMode (
-                                &TerminalDevice->SimpleTextOutput,
-                                0
-                                );
+  Status = TerminalConOutSetMode (SimpleTextOutput, 0);
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
 
-  Status = SimpleTextOutput.EnableCursor (
-                                     &TerminalDevice->SimpleTextOutput,
-                                     TRUE
-                                     );
+  Status = TerminalConOutEnableCursor (SimpleTextOutput, TRUE);
   if (EFI_ERROR (Status)) {
     goto ReportError;
   }
