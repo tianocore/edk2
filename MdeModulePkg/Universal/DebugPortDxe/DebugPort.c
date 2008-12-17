@@ -203,8 +203,8 @@ DebugPortSupported (
   EFI_HANDLE                TempHandle;
 
   //
-  // Check to see that there's not a debugport protocol already published
-  // Question: Why do we prevent debugport protocol published on more one device?
+  // Check to see that there's not a debugport protocol already published,
+  // since only one standard UART serial port could be supported by this driver.
   //
   if (gBS->LocateProtocol (&gEfiDebugPortProtocolGuid, NULL, (VOID **) &DebugPortInterface) != EFI_NOT_FOUND) {
     return EFI_UNSUPPORTED;
