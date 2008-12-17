@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include "IScsiCommon.h"
 #include "IScsiDriver.h"
-#include "IscsiInitiatorName.h"
+#include "IScsiInitiatorName.h"
 #include "ComponentName.h"
 #include "IScsiConfigNVDataStruc.h"
 #include "IScsiExtScsiPassThru.h"

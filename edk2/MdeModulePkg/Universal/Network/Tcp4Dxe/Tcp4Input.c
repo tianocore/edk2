@@ -1272,6 +1272,8 @@ NO_UPDATE:
       TcpClose (Tcb);
     }
     break;
+  default:
+    break;
   }
 
   //
