@@ -229,7 +229,7 @@ ScsiDiskDriverBindingStart (
     );
 
   //
-  // Retrive device information
+  // Retrieve device information
   //
   MaxRetry = 2;
   for (Index = 0; Index < MaxRetry; Index++) {
