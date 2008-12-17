@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiConfigAccess.h>
+#include <Protocol/UgaDraw.h>
 
 
 #include <Library/BaseLib.h>
@@ -45,9 +46,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
+#include <Library/UefiLib.h>
 
 #include <Library/IfrSupportLib.h>
 #include <Library/ExtendedIfrSupportLib.h>
+#include <Library/PcdLib.h>
 
 #include <MdeModuleHii.h>
 
@@ -441,6 +444,17 @@ FwUpdateDataToUefiUpdateData (
   IN       HII_THUNK_CONTEXT                *ThunkContext,
   IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *FwUpdateData,
   OUT      EFI_HII_UPDATE_DATA              **UefiUpdateData
+  )
+;
+
+/** 
+
+  Initialize string packages in HII database.
+
+**/
+VOID
+InitSetBrowserStrings (
+  VOID
   )
 ;
 

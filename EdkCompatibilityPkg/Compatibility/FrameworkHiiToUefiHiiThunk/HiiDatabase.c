@@ -218,6 +218,8 @@ InitializeHiiDatabase (
                            );
   ASSERT_EFI_ERROR (Status);
 
+  InitSetBrowserStrings ();
+
   mBrowserThunkPrivateDataTemplate.ThunkPrivate = Private;
   Status = gBS->InstallProtocolInterface (
                   &mBrowserThunkPrivateDataTemplate.Handle,
