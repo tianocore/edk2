@@ -1,6 +1,18 @@
 #/** @file
-#  
-#    Component discription file for Bds module
+#
+#  BDSDxe module is core driver for BDS phase. 
+#  When DxeCore dispatching all DXE driver, this module will produce architecture protocol 
+#  gEfiBdsArchProtocolGuid. After DxeCore finish dispatching, DxeCore will invoke Entry
+#  interface of protocol gEfiBdsArchProtocolGuid, then BDS phase is entered.
+#
+#  Generally, this module take reposiblity to connect all necessary devices for platform boot, 
+#  these boot device path  are hold in PlatformBdsLib library instance produced by platform.
+#  For legacy boot, BDS will transfer control to legacy BIOS after legacy boot device is select.
+#  For EFI boot, BDS will load boot loader file EFI\BOOT\BOOTIA32.EFI, EFI\BOOT\BOOTX64.EFI, 
+#  EFI\BOOT\BOOTIA64.EFI file from selected boot device and transfer control to boot loader.
+#
+#  BDSDxe also maintain the UI for "Boot Manager, Boot Maintaince Manager, Device Manager" which
+#  is used for user to configure boot option or maintain hardware device.
 #  
 #  Copyright (c) 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
@@ -119,7 +131,7 @@
   gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
