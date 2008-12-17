@@ -37,6 +37,7 @@
 #
 
 [Sources.common]
+  SetupBrowser.c
   HiiHandle.c
   HiiHandle.h
   ConfigAccess.c
@@ -57,8 +58,7 @@
   HiiDatabase.c
   Utility.c
   Utility.h
-
-  SetupBrowser.c
+  Strings.uni
  
 
 [Packages]
@@ -79,6 +79,8 @@
   IfrSupportLib
   ExtendedIfrSupportLib
   PrintLib
+  UefiLib
+  PcdLib
 
 [Protocols]
   gEfiHiiImageProtocolGuid
@@ -91,6 +93,9 @@
   gEfiUnicodeCollation2ProtocolGuid
   gEfiHiiCompatibilityProtocolGuid
   gEfiFormBrowserCompatibilityProtocolGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND
