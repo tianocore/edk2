@@ -1,7 +1,8 @@
 #/** @file
-# Component description file for PCD service DXE driver.
+# PCD DXE driver manage database contains all dynamic PCD entries initialized in 
+# PEI phase, DXE phase and produce the implementation of PCD protocol.
+# PCD database structure is generated at autogen.h/autogen.c in build time.
 #
-# This DXE driver implement and produce the PCD protocol.
 # Copyright (c) 2006 - 2007, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
