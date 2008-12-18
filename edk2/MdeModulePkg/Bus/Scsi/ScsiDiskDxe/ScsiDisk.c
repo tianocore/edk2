@@ -25,6 +25,7 @@ EFI_DRIVER_BINDING_PROTOCOL gScsiDiskDriverBinding = {
   NULL
 };
 
+
 /**
   The user Entry Point for module ScsiDisk.
 
@@ -160,16 +161,10 @@ ScsiDiskDriverBindingStart (
   UINT8                 MaxRetry;
   BOOLEAN               NeedRetry;
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (SCSI_DISK_DEV),
-                  (VOID **) &ScsiDiskDevice
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  ScsiDiskDevice = (SCSI_DISK_DEV *) AllocateZeroPool (sizeof (SCSI_DISK_DEV));
+  if (ScsiDiskDevice == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
-
-  ZeroMem (ScsiDiskDevice, sizeof (SCSI_DISK_DEV));
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -180,7 +175,7 @@ ScsiDiskDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (ScsiDiskDevice);
+    FreePool (ScsiDiskDevice);
     return Status;
   }
 
@@ -207,26 +202,19 @@ ScsiDiskDriverBindingStart (
   // The Sense Data Array's initial size is 6
   //
   ScsiDiskDevice->SenseDataNumber = 6;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (EFI_SCSI_SENSE_DATA) * ScsiDiskDevice->SenseDataNumber,
-                  (VOID **) &(ScsiDiskDevice->SenseData)
-                  );
-  if (EFI_ERROR (Status)) {
+  ScsiDiskDevice->SenseData = (EFI_SCSI_SENSE_DATA *) AllocateZeroPool (
+                                 sizeof (EFI_SCSI_SENSE_DATA) * ScsiDiskDevice->SenseDataNumber
+                                 );
+  if (ScsiDiskDevice->SenseData == NULL) {
     gBS->CloseProtocol (
           Controller,
           &gEfiScsiIoProtocolGuid,
           This->DriverBindingHandle,
           Controller
           );
-    gBS->FreePool (ScsiDiskDevice);
-    return Status;
+    FreePool (ScsiDiskDevice);
+    return EFI_OUT_OF_RESOURCES;
   }
-
-  ZeroMem (
-    ScsiDiskDevice->SenseData,
-    sizeof (EFI_SCSI_SENSE_DATA) * ScsiDiskDevice->SenseDataNumber
-    );
 
   //
   // Retrieve device information
@@ -239,14 +227,14 @@ ScsiDiskDriverBindingStart (
     }
 
     if (!NeedRetry) {
-      gBS->FreePool (ScsiDiskDevice->SenseData);
+      FreePool (ScsiDiskDevice->SenseData);
       gBS->CloseProtocol (
              Controller,
              &gEfiScsiIoProtocolGuid,
              This->DriverBindingHandle,
              Controller
              );
-      gBS->FreePool (ScsiDiskDevice);
+      FreePool (ScsiDiskDevice);
       return EFI_DEVICE_ERROR;
     }
   }
@@ -265,14 +253,14 @@ ScsiDiskDriverBindingStart (
   }
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (ScsiDiskDevice->SenseData);
+    FreePool (ScsiDiskDevice->SenseData);
     gBS->CloseProtocol (
            Controller,
            &gEfiScsiIoProtocolGuid,
            This->DriverBindingHandle,
            Controller
            );
-    gBS->FreePool (ScsiDiskDevice);
+    FreePool (ScsiDiskDevice);
     return Status;
   }
 
@@ -2187,7 +2175,7 @@ ReleaseScsiDiskDeviceResources (
   }
 
   if (ScsiDiskDevice->SenseData != NULL) {
-    gBS->FreePool (ScsiDiskDevice->SenseData);
+    FreePool (ScsiDiskDevice->SenseData);
     ScsiDiskDevice->SenseData = NULL;
   }
 
@@ -2196,7 +2184,7 @@ ReleaseScsiDiskDeviceResources (
     ScsiDiskDevice->ControllerNameTable = NULL;
   }
 
-  gBS->FreePool (ScsiDiskDevice);
+  FreePool (ScsiDiskDevice);
 
   ScsiDiskDevice = NULL;
 }
