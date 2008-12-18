@@ -280,14 +280,14 @@ UsbConnectDriver (
     //
     if (UsbBusIsWantedUsbIO (UsbIf->Device->Bus, UsbIf)) {
       OldTpl            = UsbGetCurrentTpl ();
-      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", OldTpl));
+      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", (UINT32)OldTpl));
 
       gBS->RestoreTPL (TPL_CALLBACK);
 
       Status            = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
       UsbIf->IsManaged  = (BOOLEAN)!EFI_ERROR (Status);
 
-      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", UsbGetCurrentTpl()));
+      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl()));
       ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
       gBS->RaiseTPL (OldTpl);
@@ -472,14 +472,14 @@ UsbDisconnectDriver (
     // or disconnect at CALLBACK.
     //
     OldTpl           = UsbGetCurrentTpl ();
-    DEBUG ((EFI_D_INFO, "UsbDisconnectDriver: old TPL is %d\n", OldTpl));
+    DEBUG ((EFI_D_INFO, "UsbDisconnectDriver: old TPL is %d\n", (UINT32)OldTpl));
 
     gBS->RestoreTPL (TPL_CALLBACK);
 
     gBS->DisconnectController (UsbIf->Handle, NULL, NULL);
     UsbIf->IsManaged = FALSE;
 
-    DEBUG (( EFI_D_INFO, "UsbDisconnectDriver: TPL after disconnect is %d\n", UsbGetCurrentTpl()));
+    DEBUG (( EFI_D_INFO, "UsbDisconnectDriver: TPL after disconnect is %d\n", (UINT32)UsbGetCurrentTpl()));
     ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
     gBS->RaiseTPL (OldTpl);

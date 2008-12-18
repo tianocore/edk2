@@ -659,7 +659,7 @@ EhcExecTransfer (
   }
 
   if (!Finished) {
-    DEBUG ((EFI_D_ERROR, "EhcExecTransfer: transfer not finished in %dms\n", TimeOut));
+    DEBUG ((EFI_D_ERROR, "EhcExecTransfer: transfer not finished in %dms\n", (UINT32)TimeOut));
     EhcDumpQh (Urb->Qh, NULL, FALSE);
 
     Status = EFI_TIMEOUT;

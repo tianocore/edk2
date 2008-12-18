@@ -26,9 +26,9 @@ UhciDumpQh (
   IN UHCI_QH_SW    *QhSw
   )
 {
-  DEBUG ((EFI_D_INFO, "&QhSw @ 0x%x\n", QhSw));
-  DEBUG ((EFI_D_INFO, "QhSw.NextQh    - 0x%x\n", QhSw->NextQh));
-  DEBUG ((EFI_D_INFO, "QhSw.TDs       - 0x%x\n", QhSw->TDs));
+  DEBUG ((EFI_D_INFO, "&QhSw @ 0x%p\n", QhSw));
+  DEBUG ((EFI_D_INFO, "QhSw.NextQh    - 0x%p\n", QhSw->NextQh));
+  DEBUG ((EFI_D_INFO, "QhSw.TDs       - 0x%p\n", QhSw->TDs));
   DEBUG ((EFI_D_INFO, "QhSw.QhHw:\n"));
   DEBUG ((EFI_D_INFO, " Horizon  Link - %x\n", QhSw->QhHw.HorizonLink));
   DEBUG ((EFI_D_INFO, " Vertical Link - %x\n\n", QhSw->QhHw.VerticalLink));
@@ -51,10 +51,10 @@ UhciDumpTds (
   CurTdSw = TdSw;
 
   while (CurTdSw != NULL) {
-    DEBUG ((EFI_D_INFO, "TdSw @ 0x%x\n",           CurTdSw));
-    DEBUG ((EFI_D_INFO, "TdSw.NextTd   - 0x%x\n",  CurTdSw->NextTd));
+    DEBUG ((EFI_D_INFO, "TdSw @ 0x%p\n",           CurTdSw));
+    DEBUG ((EFI_D_INFO, "TdSw.NextTd   - 0x%p\n",  CurTdSw->NextTd));
     DEBUG ((EFI_D_INFO, "TdSw.DataLen  - %d\n",    CurTdSw->DataLen));
-    DEBUG ((EFI_D_INFO, "TdSw.Data     - 0x%x\n",  CurTdSw->Data));
+    DEBUG ((EFI_D_INFO, "TdSw.Data     - 0x%p\n",  CurTdSw->Data));
     DEBUG ((EFI_D_INFO, "TdHw:\n"));
     DEBUG ((EFI_D_INFO, " NextLink     - 0x%x\n",  CurTdSw->TdHw.NextLink));
     DEBUG ((EFI_D_INFO, " ActualLen    - %d\n",    CurTdSw->TdHw.ActualLen));

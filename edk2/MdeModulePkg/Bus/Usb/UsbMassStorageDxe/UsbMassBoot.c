@@ -690,7 +690,7 @@ ON_ERROR:
       (Media->LastBlock != OldMedia.LastBlock)) {
 
     OldTpl = UsbGetCurrentTpl ();
-    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL before reinstall BlockIoProtocol is %d\n", OldTpl));
+    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL before reinstall BlockIoProtocol is %d\n", (UINT32)OldTpl));
 
     gBS->RestoreTPL (TPL_CALLBACK);
 
@@ -701,7 +701,7 @@ ON_ERROR:
            &UsbMass->BlockIo
            );
 
-    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL after reinstall is %d\n", UsbGetCurrentTpl()));
+    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL after reinstall is %d\n", (UINT32)UsbGetCurrentTpl()));
     ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
     gBS->RaiseTPL (OldTpl);

@@ -87,7 +87,7 @@ EhcDumpQtd (
     DEBUG ((EFI_D_INFO, Msg));
   }
 
-  DEBUG ((EFI_D_INFO, "Queue TD @ 0x%x, data length %d\n", Qtd, Qtd->DataLen));
+  DEBUG ((EFI_D_INFO, "Queue TD @ 0x%p, data length %d\n", Qtd, (UINT32)Qtd->DataLen));
 
   QtdHw = &Qtd->QtdHw;
 
@@ -114,7 +114,7 @@ EhcDumpQtd (
   DEBUG ((EFI_D_INFO, "Data Toggle  : %d\n", QtdHw->DataToggle));
 
   for (Index = 0; Index < 5; Index++) {
-    DEBUG ((EFI_D_INFO, "Page[%d]      : 0x%x\n", Index, QtdHw->Page[Index]));
+    DEBUG ((EFI_D_INFO, "Page[%d]      : 0x%x\n", (UINT32)Index, QtdHw->Page[Index]));
   }
 }
 
@@ -145,8 +145,8 @@ EhcDumpQh (
     DEBUG ((EFI_D_INFO, Msg));
   }
 
-  DEBUG ((EFI_D_INFO, "Queue head @ 0x%p, interval %d, next qh %x\n",
-                                Qh, Qh->Interval, Qh->NextQh));
+  DEBUG ((EFI_D_INFO, "Queue head @ 0x%p, interval %ld, next qh %p\n",
+                                Qh, (UINT64)Qh->Interval, Qh->NextQh));
 
   QhHw = &Qh->QhHw;
 

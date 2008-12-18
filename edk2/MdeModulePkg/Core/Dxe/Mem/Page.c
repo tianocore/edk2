@@ -1363,7 +1363,7 @@ CoreAllocatePoolPages (
   // Convert it to boot services data
   //
   if (Start == 0) {
-    DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "AllocatePoolPages: failed to allocate %d pages\n", NumberOfPages));
+    DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "AllocatePoolPages: failed to allocate %d pages\n", (UINT32)NumberOfPages));
   } else {
     CoreConvertPages (Start, NumberOfPages, PoolType);
   }
