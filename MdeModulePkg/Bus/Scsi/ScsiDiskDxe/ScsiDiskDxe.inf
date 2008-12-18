@@ -50,7 +50,6 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
-  MemoryAllocationLib
 
 
 [Protocols]
