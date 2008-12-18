@@ -13,7 +13,6 @@
 **/
 
 #include "DxeStatusCode.h"
-#include "DebugInfo.h"
 
 EFI_SERIAL_IO_PROTOCOL *mSerialIoProtocol;
 
@@ -88,7 +87,6 @@ SerialStatusCodeReportWorker (
   UINT32          LineNumber;
   UINTN           CharCount;
   VA_LIST         Marker;
-  EFI_DEBUG_INFO  *DebugInfo;
   EFI_TPL         CurrentTpl;
 
 
@@ -130,17 +128,6 @@ SerialStatusCodeReportWorker (
                   Format, 
                   Marker
                   );
-  } else if (Data != NULL && 
-             CompareGuid (&Data->Type, &gEfiStatusCodeSpecificDataGuid) &&
-             (CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE) {
-    //
-    // Print specific data into output buffer.
-    //
-    DebugInfo = (EFI_DEBUG_INFO *) (Data + 1);
-    Marker    = (VA_LIST) (DebugInfo + 1);
-    Format    = (CHAR8 *) (((UINT64 *) Marker) + 12);
-
-    CharCount = AsciiVSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, Format, Marker);
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) {
     //
     // Print ERROR information into output buffer.
