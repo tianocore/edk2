@@ -78,7 +78,6 @@
 [Guids]
   gEfiDataHubStatusCodeRecordGuid               # SOMETIMES_CONSUMED
   gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
-  gEfiStatusCodeSpecificDataGuid                # SOMETIMES_CONSUMED
   gEfiStatusCodeDataTypeDebugGuid               # PROTOCOL ALWAYS_CONSUMED
 
 [Protocols]

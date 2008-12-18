@@ -163,9 +163,12 @@ DebugAssert (
     //
     AsciiStrCpy (Temp + AsciiStrLen (FileName) + 1, Description);
 
-    REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+    REPORT_STATUS_CODE_EX (
       (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED),
       (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_EC_ILLEGAL_SOFTWARE_STATE),
+      0,
+      NULL,
+      &gEfiStatusCodeDataTypeAssertGuid,
       AssertData,
       TotalSize
       );
