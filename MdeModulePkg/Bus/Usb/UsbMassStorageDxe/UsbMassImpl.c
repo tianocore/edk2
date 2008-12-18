@@ -961,7 +961,7 @@ USBMassDriverBindingStop (
                     );
     if (EFI_ERROR (Status)) {
       AllChildrenStopped = FALSE;
-      DEBUG ((EFI_D_ERROR, "Fail to stop No.%d multi-lun child handle when opening blockio\n", Index));
+      DEBUG ((EFI_D_ERROR, "Fail to stop No.%d multi-lun child handle when opening blockio\n", (UINT32)Index));
       continue;
     }
 
@@ -988,7 +988,7 @@ USBMassDriverBindingStop (
       // Fail to uninstall blockio and devicepath protocol, so re-open usbio by child.
       //
       AllChildrenStopped = FALSE;
-      DEBUG ((EFI_D_ERROR, "Fail to stop No.%d multi-lun child handle when uninstalling blockio and devicepath\n", Index));
+      DEBUG ((EFI_D_ERROR, "Fail to stop No.%d multi-lun child handle when uninstalling blockio and devicepath\n", (UINT32)Index));
       
       gBS->OpenProtocol (
              Controller,
@@ -1013,7 +1013,7 @@ USBMassDriverBindingStop (
     return EFI_DEVICE_ERROR;
   }
   
-  DEBUG ((EFI_D_INFO, "Success to stop all %d multi-lun children handles\n", NumberOfChildren));
+  DEBUG ((EFI_D_INFO, "Success to stop all %d multi-lun children handles\n", (UINT32)NumberOfChildren));
   return EFI_SUCCESS;
 }
 

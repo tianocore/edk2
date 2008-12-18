@@ -251,7 +251,7 @@ UsbParseInterfaceDesc (
   NumEp  = Setting->Desc.NumEndpoints;
 
   DEBUG (( EFI_D_INFO, "UsbParseInterfaceDesc: interface %d(setting %d) has %d endpoints\n",
-              Setting->Desc.InterfaceNumber, Setting->Desc.AlternateSetting, NumEp));
+              Setting->Desc.InterfaceNumber, Setting->Desc.AlternateSetting, (UINT32)NumEp));
 
   if (NumEp == 0) {
     goto ON_EXIT;
@@ -270,7 +270,7 @@ UsbParseInterfaceDesc (
     Ep = UsbCreateDesc (DescBuf + Offset, Len - Offset, USB_DESC_TYPE_ENDPOINT, &Used);
 
     if (Ep == NULL) {
-      DEBUG (( EFI_D_ERROR, "UsbParseInterfaceDesc: failed to create endpoint(index %d)\n", Index));
+      DEBUG (( EFI_D_ERROR, "UsbParseInterfaceDesc: failed to create endpoint(index %d)\n", (UINT32)Index));
       goto ON_ERROR;
     }
 
@@ -330,7 +330,7 @@ UsbParseConfigDesc (
   }
 
   DEBUG (( EFI_D_INFO, "UsbParseConfigDesc: config %d has %d interfaces\n",
-                Config->Desc.ConfigurationValue, NumIf));
+                Config->Desc.ConfigurationValue, (UINT32)NumIf));
 
   for (Index = 0; Index < NumIf; Index++) {
     Interface = AllocateZeroPool (sizeof (USB_INTERFACE_DESC));
@@ -721,7 +721,7 @@ UsbGetOneConfig (
 
   if (EFI_ERROR (Status)) {
     DEBUG (( EFI_D_ERROR, "UsbGetOneConfig: failed to get descript length(%d) %r\n",
-                Status, Desc.TotalLength));
+                Desc.TotalLength, Status));
 
     return NULL;
   }

@@ -107,10 +107,10 @@ CommonHandler (
       DEBUG ((EFI_D_INFO, "ERROR: Re-entered debugger!\n"
                                     "       ExceptionType == %X\n"
                                     "       Context       == %X\n"
-                                    "       Context.SystemContextIpf->CrIip  == %X\n"
-                                    "       Context.SystemContextIpf->CrIpsr == %X\n"
+                                    "       Context.SystemContextIpf->CrIip  == %LX\n"
+                                    "       Context.SystemContextIpf->CrIpsr == %LX\n"
                                     "       mInHandler     == %X\n",
-                                    ExceptionType, 
+                                    (INT32)ExceptionType, 
                                     Context, 
                                     Context.SystemContextIpf->CrIip,
                                     Context.SystemContextIpf->CrIpsr,

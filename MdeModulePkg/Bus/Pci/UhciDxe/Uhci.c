@@ -318,7 +318,7 @@ Uhci2GetCapability (
 
   Uhc->RootPorts = *PortNumber;
 
-  DEBUG ((EFI_D_INFO, "Uhci2GetCapability: %d ports\n", Uhc->RootPorts));
+  DEBUG ((EFI_D_INFO, "Uhci2GetCapability: %d ports\n", (UINT32)Uhc->RootPorts));
   return EFI_SUCCESS;
 }
 

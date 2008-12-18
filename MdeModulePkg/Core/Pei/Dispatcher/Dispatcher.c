@@ -447,7 +447,7 @@ PeiDispatcher (
                      && (*StackPointer == INIT_CAR_VALUE);
                      StackPointer ++);
                      
-                DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", SecCoreData->TemporaryRamSize));
+                DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
                 DEBUG ((EFI_D_INFO, "  CAR stack ever used: %d bytes.\n",
                        (SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
                       ));
@@ -497,7 +497,7 @@ PeiDispatcher (
               StackOffset            = (UINTN) NewPermenentMemoryBase - (UINTN) SecCoreData->StackBase;
               HeapOffset             = (INTN) ((UINTN) Private->PhysicalMemoryBegin + Private->StackSize - \
                                                (UINTN) SecCoreData->PeiTemporaryRamBase);
-              DEBUG ((EFI_D_INFO, "Heap Offset = 0x%X Stack Offset = 0x%X\n", HeapOffset, StackOffset));
+              DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (INT64)HeapOffset, (INT64)StackOffset));
               
               //
               // Caculate new HandOffTable and PrivateData address in permenet memory's stack
@@ -577,8 +577,8 @@ PeiDispatcher (
                                   HeapOffset
                                   );
 
-              DEBUG ((EFI_D_INFO, "Stack Hob: BaseAddress=0x%X Length=0x%X\n",
-                                  (UINTN)PrivateInMem->StackBase,
+              DEBUG ((EFI_D_INFO, "Stack Hob: BaseAddress=0x%lX Length=0x%lX\n",
+                                  PrivateInMem->StackBase,
                                   PrivateInMem->StackSize));
               BuildStackHob (PrivateInMem->StackBase, PrivateInMem->StackSize);
 

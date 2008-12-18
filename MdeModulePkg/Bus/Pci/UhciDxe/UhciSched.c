@@ -577,7 +577,7 @@ UhciExecuteTransfer (
   }
 
   if (!Finished) {
-    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution not finished for %dms\n", TimeOut));
+    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution not finished for %dms\n", (UINT32)TimeOut));
     UhciDumpQh (Qh);
     UhciDumpTds (Td);
 

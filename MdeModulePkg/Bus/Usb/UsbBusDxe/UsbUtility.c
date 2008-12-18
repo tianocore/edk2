@@ -1330,10 +1330,10 @@ UsbBusRecursivelyConnectWantedUsbIo (
         //
         // Recursively connect the wanted Usb Io handle
         //
-        DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", UsbGetCurrentTpl ()));
+        DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
         Status            = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
         UsbIf->IsManaged  = (BOOLEAN)!EFI_ERROR (Status);
-        DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", UsbGetCurrentTpl()));
+        DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl()));
       }
     }
   }
