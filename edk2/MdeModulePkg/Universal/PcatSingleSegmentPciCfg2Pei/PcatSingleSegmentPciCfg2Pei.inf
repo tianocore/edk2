@@ -47,10 +47,3 @@
 
 [Depex]
   TRUE
-
-[FixedPcd.common]
-  ##
-  #  Disable ASSERT for unalign PCI IO access according to PI Spec Volume 1
-  #  Spec has not this requirement.
-  ##
-	gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
