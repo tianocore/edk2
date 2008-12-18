@@ -46,9 +46,11 @@
   UefiBootServicesTableLib
   UefiScsiLib
   BaseMemoryLib
+  MemoryAllocationLib
   UefiLib
   UefiDriverEntryPoint
   DebugLib
+  MemoryAllocationLib
 
 
 [Protocols]
