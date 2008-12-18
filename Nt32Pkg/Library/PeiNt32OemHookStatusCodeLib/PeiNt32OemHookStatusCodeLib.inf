@@ -49,11 +49,6 @@
   PrintLib
   DebugLib
 
-
-[Guids]
-  gEfiStatusCodeSpecificDataGuid                # SOMETIMES_CONSUMED
-
-
 [Ppis]
   gPeiNtThunkPpiGuid                            # PPI ALWAYS_CONSUMED
 
