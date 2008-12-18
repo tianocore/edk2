@@ -51,9 +51,5 @@
   HobLib
   DebugLib
 
-
-[Guids]
-  gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
-
 [Protocols]
   gEfiWinNtThunkProtocolGuid                    # ALWAYS_CONSUMED
