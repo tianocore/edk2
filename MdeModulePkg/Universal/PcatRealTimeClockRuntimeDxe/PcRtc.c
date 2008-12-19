@@ -269,7 +269,7 @@ PcRtcGetTime (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-  	  //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
+      //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
       //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
       if (!EfiAtRuntime ()) {
         EfiReleaseLock (&Global->RtcLock);
@@ -388,10 +388,10 @@ PcRtcSetTime (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-  	 //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
+     //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
      //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
      if (!EfiAtRuntime ()) {
-    EfiReleaseLock (&Global->RtcLock);
+       EfiReleaseLock (&Global->RtcLock);
      }
     return Status;
   }
@@ -499,7 +499,7 @@ PcRtcGetWakeupTime (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-  	//BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
+    //BugBug: the EfiAtRuntime should be encapsulated in EfiReleaseLock or
     //        provide a new instance for EfiReleaseLock, say, RtEfiReleaseLock
     if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
