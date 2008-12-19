@@ -172,14 +172,14 @@ BdsBuildLegacyDevNameString (
   order list.
 
 
-  @param CurrentBbsEntry Pointer to current BBS table.
-  @param CurrentBbsDevPath Pointer to the Device Path Protocol instance of BBS
-  @param Index           Index of the specified entry in BBS table.
-  @param BootOrderList   On input, the original boot order list.
-                         On output, the new boot order list attached with the
-                         created node.
-  @param BootOrderListSize On input, the original size of boot order list.
-                         - On output, the size of new boot order list.
+  @param CurrentBbsEntry    Pointer to current BBS table.
+  @param CurrentBbsDevPath  Pointer to the Device Path Protocol instance of BBS
+  @param Index              Index of the specified entry in BBS table.
+  @param BootOrderList      On input, the original boot order list.
+                            On output, the new boot order list attached with the
+                            created node.
+  @param BootOrderListSize  On input, the original size of boot order list.
+                            On output, the size of new boot order list.
 
   @retval  EFI_SUCCESS             Boot Option successfully created.
   @retval  EFI_OUT_OF_RESOURCES    Fail to allocate necessary memory.
@@ -1654,10 +1654,10 @@ BdsRefreshBbsTableForBoot (
   if (BootOrder != NULL) {
     FreePool (BootOrder);
   }
-  //
-  // For debug
-  //
-  PrintBbsTable (LocalBbsTable);
 
+  DEBUG_CODE_BEGIN();
+    PrintBbsTable (LocalBbsTable);
+  DEBUG_CODE_END();
+  
   return Status;
 }

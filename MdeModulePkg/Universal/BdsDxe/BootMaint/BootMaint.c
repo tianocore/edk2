@@ -1041,8 +1041,6 @@ InitializeBM (
 
   @param CallbackData    The BMM context data.
 
-  
-
 **/
 VOID
 InitAllMenu (
@@ -1068,10 +1066,6 @@ InitAllMenu (
 /**
   Free up all Menu Option list.
 
-  
-
-  
-
 **/
 VOID
 FreeAllMenu (
@@ -1089,11 +1083,6 @@ FreeAllMenu (
 
 /**
   Intialize all the string depositories.
-
-
-  
-
-  
 
 **/
 VOID
@@ -1114,7 +1103,6 @@ InitializeStringDepository (
 
 /**
   Fetch a usable string node from the string depository and return the string token.
-
 
   @param CallbackData    The BMM context data.
   @param StringDepository  The string repository.
@@ -1164,11 +1152,6 @@ GetStringTokenFromDepository (
 /**
   Reclaim string depositories by moving the current node pointer to list head..
 
-
-   
-
-  
-
 **/
 VOID
 ReclaimStringDepository (
@@ -1187,11 +1170,6 @@ ReclaimStringDepository (
 
 /**
   Release resource for all the string depositories.
-
-
-  
-
-  
 
 **/
 VOID
