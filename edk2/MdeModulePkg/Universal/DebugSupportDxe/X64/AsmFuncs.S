@@ -296,10 +296,10 @@ ExtraPushDone:
 ## UINT64  Gdtr[2], Idtr[2];
                 push    0
                 push    0
-                sidt    qword ptr [rsp]
+                sidt    [rsp]
                 push    0
                 push    0
-                sgdt    qword ptr [rsp]
+                sgdt    [rsp]
 
 ## UINT64  Ldtr, Tr;
                 xor     rax, rax
