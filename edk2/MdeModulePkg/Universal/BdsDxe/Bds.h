@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _BDS_MODULE_H_
 #define _BDS_MODULE_H_
 
-#undef EFI_SPECIFICATION_VERSION
-#define EFI_SPECIFICATION_VERSION 0x0002000A
 #include <PiDxe.h>
 #include <MdeModuleHii.h>
 
@@ -73,16 +71,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PlatformBdsLib.h>
 
 #define EFI_BDS_ARCH_PROTOCOL_INSTANCE_FROM_THIS(_this) \
-  CR (_this, \
-      EFI_BDS_ARCH_PROTOCOL_INSTANCE, \
-      Bds, \
-      EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE \
+  CR ((_this),                                          \
+      EFI_BDS_ARCH_PROTOCOL_INSTANCE,                   \
+      Bds,                                              \
+      EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE          \
       )
 
 /**
 
   Show progress bar with title above it. It only works in Graphics mode.
-
 
   @param TitleForeground Foreground color for Title.
   @param TitleBackground Background color for Title.
@@ -112,15 +109,12 @@ PlatformBdsShowProgress (
 
   Install Boot Device Selection Protocol
 
-
   @param ImageHandle     The image handle.
   @param SystemTable     The system table.
 
   @retval  EFI_SUCEESS  BDS has finished initializing.
-                        Rerun the
-                        dispatcher and recall BDS.Entry
-  @retval  Other        Return value from AllocatePool()
-                        or gBS->InstallProtocolInterface
+                        Return the dispatcher and recall BDS.Entry
+  @retval  Other        Return status from AllocatePool() or gBS->InstallProtocolInterface
 
 **/
 EFI_STATUS
@@ -135,7 +129,7 @@ BdsInitialize (
   Service routine for BdsInstance->Entry(). Devices are connected, the
   consoles are initialized, and the boot options are tried.
 
-  @param This            - Protocol Instance structure.
+  @param This            Protocol Instance structure.
 
 **/
 VOID

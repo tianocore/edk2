@@ -1,5 +1,9 @@
 /** @file
-  The entry of the bds
+  This module produce main entry for BDS phase - BdsEntry. 
+  When this module was dispatched by DxeCore, gEfiBdsArchProtocolGuid will be installed
+  which contains interface of BdsEntry.
+  After DxeCore finish DXE phase, gEfiBdsArchProtocolGuid->BdsEntry will be invoked
+  to enter BDS phase.
 
 Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -44,15 +48,12 @@ EFI_HANDLE                      mBdsImageHandle;
 
   Install Boot Device Selection Protocol
 
-
   @param ImageHandle     The image handle.
   @param SystemTable     The system table.
 
   @retval  EFI_SUCEESS  BDS has finished initializing.
-                        Rerun the
-                        dispatcher and recall BDS.Entry
-  @retval  Other        Return value from AllocatePool()
-                        or gBS->InstallProtocolInterface
+                        Return the dispatcher and recall BDS.Entry
+  @retval  Other        Return status from AllocatePool() or gBS->InstallProtocolInterface
 
 **/
 EFI_STATUS
@@ -262,7 +263,7 @@ BdsBootDeviceSelect (
   Service routine for BdsInstance->Entry(). Devices are connected, the
   consoles are initialized, and the boot options are tried.
 
-  @param This            - Protocol Instance structure.
+  @param This             Protocol Instance structure.
 
 **/
 VOID
