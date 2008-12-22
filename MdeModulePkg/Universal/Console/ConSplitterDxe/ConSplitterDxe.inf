@@ -1,8 +1,9 @@
 #/** @file
-# Component description file for ConSplitter module.
+# This driver provides multi console supports.
 #
-# Any Handle that attatched EFI_CONSOLE_IDENTIFIER_PROTOCOL can be bound by this driver.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# This driver acts as a virtual console, takes over the console I/O control from selected 
+# standard console devices, and transmits console I/O to related console device drivers.
+# Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
