@@ -405,7 +405,7 @@ typedef INTN RETURN_STATUS;
 /**
   Produces a RETURN_STATUS code with the highest bit set. 
 
-  @param  StatusCode	The status code value to convert into a warning code.  
+  @param  StatusCode    The status code value to convert into a warning code.  
                         StatusCode must be in the range 0x00000000..0x7FFFFFFF.
 
   @return The value specified by StatusCode with the highest bit set.
@@ -416,7 +416,7 @@ typedef INTN RETURN_STATUS;
 /**
   Produces a RETURN_STATUS code with the highest bit clear. 
 
-  @param  StatusCode	The status code value to convert into a warning code.  
+  @param  StatusCode    The status code value to convert into a warning code.  
                         StatusCode must be in the range 0x00000000..0x7FFFFFFF.
 
   @return The value specified by StatusCode with the highest bit clear.
@@ -429,7 +429,7 @@ typedef INTN RETURN_STATUS;
 
   This function returns TRUE if StatusCode has the high bit set.  Otherwise FALSE is returned.  
   
-  @param  StatusCode	The status code value to evaluate.
+  @param  StatusCode    The status code value to evaluate.
 
   @retval TRUE          The high bit of StatusCode is set.
   @retval FALSE         The high bit of StatusCode is clear.
