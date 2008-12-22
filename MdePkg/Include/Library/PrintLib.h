@@ -24,12 +24,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     %[flags][width][.precision]type
 
   [flags]:
-    - -	      
+    - -       
       - The field is left justified.  If not flag is not specified, then the 
         field is right justified.
-    - space	  
+    - space   
       - Prefix a space character to a number.  Only valid for types X, x, and d.
-    - +	
+    - + 
       - Prefix a plus character to a number.  Only valid for types X, x, and d.  
         If both space and + are specified, then space is ignored.
     - 0
