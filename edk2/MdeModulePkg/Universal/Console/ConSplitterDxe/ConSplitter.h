@@ -16,21 +16,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _CON_SPLITTER_H_
 
 #include <Uefi.h>
-#include <Guid/PrimaryStandardErrorDevice.h>
-#include <Guid/PrimaryConsoleOutDevice.h>
-#include <Protocol/GraphicsOutput.h>
-#include <Guid/PrimaryConsoleInDevice.h>
-#include <Guid/GenericPlatformVariable.h>
+
+#include <Protocol/DevicePath.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/DriverBinding.h>
+#include <Protocol/ConsoleControl.h>
 #include <Protocol/SimplePointer.h>
 #include <Protocol/AbsolutePointer.h>
 #include <Protocol/SimpleTextOut.h>
-#include <Guid/ConsoleInDevice.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
-#include <Protocol/ConsoleControl.h>
+#include <Protocol/GraphicsOutput.h>
+#include <Protocol/UgaDraw.h>
+
+#include <Guid/PrimaryStandardErrorDevice.h>
+#include <Guid/PrimaryConsoleOutDevice.h>
+#include <Guid/PrimaryConsoleInDevice.h>
+#include <Guid/GenericPlatformVariable.h>
+#include <Guid/ConsoleInDevice.h>
 #include <Guid/StandardErrorDevice.h>
 #include <Guid/ConsoleOutDevice.h>
-#include <Protocol/UgaDraw.h>
+
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -63,8 +69,10 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
 
 extern EFI_GUID                     gSimpleTextInExNotifyGuid;
 
+//
 // These definitions were in the old Hii protocol, but are not in the new UEFI
 // version. So they are defined locally.
+//
 #define UNICODE_NARROW_CHAR   0xFFF0
 #define UNICODE_WIDE_CHAR     0xFFF1
 
@@ -88,13 +96,12 @@ typedef struct {
   UINTN Rows;
 } TEXT_OUT_SPLITTER_QUERY_DATA;
 
-//
-// Private data for the EFI_SIMPLE_TEXT_INPUT_PROTOCOL splitter
-//
-#define TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('T', 'i', 'S', 'p')
 
-#define TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE SIGNATURE_32 ('T', 'i', 'S', 'n')
+#define TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE    SIGNATURE_32 ('T', 'i', 'S', 'n')
 
+//
+// Private data for Text In Ex Splitter Notify
+//
 typedef struct _TEXT_IN_EX_SPLITTER_NOTIFY {
   UINTN                                 Signature;
   EFI_HANDLE                            *NotifyHandleList;
@@ -104,6 +111,18 @@ typedef struct _TEXT_IN_EX_SPLITTER_NOTIFY {
   LIST_ENTRY                            NotifyEntry;
 } TEXT_IN_EX_SPLITTER_NOTIFY;
 
+#define TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS(a)  \
+  CR ((a),                                       \
+      TEXT_IN_EX_SPLITTER_NOTIFY,                \
+      NotifyEntry,                               \
+      TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE       \
+      )
+
+#define TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('T', 'i', 'S', 'p')
+
+//
+// Private data for the Console In splitter
+//
 typedef struct {
   UINT64                             Signature;
   EFI_HANDLE                         VirtualHandle;
@@ -144,35 +163,33 @@ typedef struct {
 } TEXT_IN_SPLITTER_PRIVATE_DATA;
 
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
-  CR ((a),                                            \
+  CR ((a),                                          \
       TEXT_IN_SPLITTER_PRIVATE_DATA,                \
       TextIn,                                       \
       TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE       \
       )
 
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_SIMPLE_POINTER_THIS(a) \
-  CR ((a),                                                          \
+  CR ((a),                                                        \
       TEXT_IN_SPLITTER_PRIVATE_DATA,                              \
       SimplePointer,                                              \
       TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE                     \
       )
 #define TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR (a, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA, \
-      TextInEx, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE \
+  CR (a,                                              \
+      TEXT_IN_SPLITTER_PRIVATE_DATA,                  \
+      TextInEx,                                       \
+      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE         \
       )
 
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_ABSOLUTE_POINTER_THIS(a) \
-  CR (a, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA, \
-      AbsolutePointer, \
-      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE \
+  CR (a,                                                            \
+      TEXT_IN_SPLITTER_PRIVATE_DATA,                                \
+      AbsolutePointer,                                              \
+      TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE                       \
       )
 
-//
-// Private data for the EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL splitter
-//
+
 #define TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'o', 'S', 'p')
 
 typedef struct {
@@ -182,6 +199,9 @@ typedef struct {
   BOOLEAN                          TextOutEnabled;
 } TEXT_OUT_AND_GOP_DATA;
 
+//
+// Private data for the Console Out splitter
+//
 typedef struct {
   UINT64                                Signature;
   EFI_HANDLE                            VirtualHandle;
@@ -221,28 +241,28 @@ typedef struct {
 } TEXT_OUT_SPLITTER_PRIVATE_DATA;
 
 #define TEXT_OUT_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR ((a),                                            \
+  CR ((a),                                          \
       TEXT_OUT_SPLITTER_PRIVATE_DATA,               \
       TextOut,                                      \
       TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE      \
       )
 
 #define GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
-  CR ((a),                                                    \
+  CR ((a),                                                  \
       TEXT_OUT_SPLITTER_PRIVATE_DATA,                       \
       GraphicsOutput,                                       \
       TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE              \
       )
 
 #define UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR ((a),                                            \
+  CR ((a),                                          \
       TEXT_OUT_SPLITTER_PRIVATE_DATA,               \
       UgaDraw,                                      \
       TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE      \
       )
 
 #define CONSOLE_CONTROL_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
-  CR ((a),                                                    \
+  CR ((a),                                                  \
       TEXT_OUT_SPLITTER_PRIVATE_DATA,                       \
       ConsoleControl,                                       \
       TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE              \
@@ -281,19 +301,19 @@ ConSplitterDriverEntry (
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
-  @retval EFI_SUCCESS              Console Input Devcie's private data has been constructed.
+  @retval EFI_SUCCESS              Text Input Devcie's private data has been constructed.
   @retval other                    Failed to construct private data.
 
 **/
 EFI_STATUS
 ConSplitterTextInConstructor (
-  TEXT_IN_SPLITTER_PRIVATE_DATA       *Private
+  TEXT_IN_SPLITTER_PRIVATE_DATA       *ConInPrivate
   );
 
 /**
   Construct console output devices' private data.
 
-  @param  ConOutPrivate            A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
+  @param  ConOutPrivate            A pointer to the TEXT_OUT_SPLITTER_PRIVATE_DATA
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
@@ -302,7 +322,7 @@ ConSplitterTextInConstructor (
 **/
 EFI_STATUS
 ConSplitterTextOutConstructor (
-  TEXT_OUT_SPLITTER_PRIVATE_DATA      *Private
+  TEXT_OUT_SPLITTER_PRIVATE_DATA      *ConOutPrivate
   );
 
 //
@@ -310,9 +330,9 @@ ConSplitterTextOutConstructor (
 //
 
 /**
-  Test to see if Console In Device could be supported on the ControllerHandle. 
+  Test to see if Console In Device could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -330,9 +350,9 @@ ConSplitterConInDriverBindingSupported (
   );
 
 /**
-  Test to see if Simple Pointer protocol could be supported on the ControllerHandle. 
+  Test to see if Simple Pointer protocol could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -350,9 +370,9 @@ ConSplitterSimplePointerDriverBindingSupported (
   );
 
 /**
-  Test to see if Console Out Device could be supported on the ControllerHandle. 
+  Test to see if Console Out Device could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -370,9 +390,9 @@ ConSplitterConOutDriverBindingSupported (
   );
 
 /**
-  Test to see if Standard Error Device could be supported on the ControllerHandle. 
+  Test to see if Standard Error Device could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -392,7 +412,7 @@ ConSplitterStdErrDriverBindingSupported (
 /**
   Start Console In Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -412,7 +432,7 @@ ConSplitterConInDriverBindingStart (
 /**
   Start Simple Pointer Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -432,7 +452,7 @@ ConSplitterSimplePointerDriverBindingStart (
 /**
   Start Console Out Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -452,7 +472,7 @@ ConSplitterConOutDriverBindingStart (
 /**
   Start Standard Error Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -472,7 +492,7 @@ ConSplitterStdErrDriverBindingStart (
 /**
   Stop Console In ConSplitter on ControllerHandle by closing Console In Devcice GUID.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -495,7 +515,7 @@ ConSplitterConInDriverBindingStop (
   Stop Simple Pointer protocol ConSplitter on ControllerHandle by closing
   Simple Pointer protocol.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -515,9 +535,9 @@ ConSplitterSimplePointerDriverBindingStop (
   );
 
 /**
-  Stop Console Out ConSplitter on ControllerHandle by closing Console Out Devcice GUID.
+  Stop Console Out ConSplitter on device handle by closing Console Out Devcice GUID.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -539,7 +559,7 @@ ConSplitterConOutDriverBindingStop (
 /**
   Stop Standard Error ConSplitter on ControllerHandle by closing Standard Error GUID.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -560,9 +580,9 @@ ConSplitterStdErrDriverBindingStop (
 
 
 /**
-  Test to see if Absolute Pointer protocol could be supported on the ControllerHandle. 
+  Test to see if Absolute Pointer protocol could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -582,7 +602,7 @@ ConSplitterAbsolutePointerDriverBindingSupported (
 /**
   Start Absolute Pointer Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -603,7 +623,7 @@ ConSplitterAbsolutePointerDriverBindingStart (
   Stop Absolute Pointer protocol ConSplitter on ControllerHandle by closing
   Absolute Pointer protocol.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -639,7 +659,7 @@ ConSplitterAbsolutePointerAddDevice (
   );
 
 /**
-  Remove Absolute Pointer Device in Consplitter Absolute Pointer list.
+  Remove Absolute Pointer Device from Consplitter Absolute Pointer list.
 
   @param  Private                  Text In Splitter pointer.
   @param  AbsolutePointer          Absolute Pointer protocol pointer.
@@ -709,8 +729,6 @@ ConSplitterAbsolutePointerGetState (
 
   @param  Event                    The Event assoicated with callback.
   @param  Context                  Context registered when Event was created.
-
-  @return None
 
 **/
 VOID
@@ -1153,12 +1171,12 @@ ConSplitterStdErrComponentNameGetControllerName (
 **/
 EFI_STATUS
 ConSplitterTextInAddDevice (
-  IN  TEXT_IN_SPLITTER_PRIVATE_DATA      *Private,
-  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *TextIn
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA   *Private,
+  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *TextIn
   );
 
 /**
-  Remove Simple Text Device in Consplitter Absolute Pointer list.
+  Remove Text Input Device from Consplitter Text Input list.
 
   @param  Private                  Text In Splitter pointer.
   @param  TextIn                   Simple Text protocol pointer.
@@ -1169,8 +1187,8 @@ ConSplitterTextInAddDevice (
 **/
 EFI_STATUS
 ConSplitterTextInDeleteDevice (
-  IN  TEXT_IN_SPLITTER_PRIVATE_DATA      *Private,
-  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *TextIn
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA   *Private,
+  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *TextIn
   );
 
 //
@@ -1194,7 +1212,7 @@ ConSplitterSimplePointerAddDevice (
   );
 
 /**
-  Remove Simple Pointer Device in Consplitter Absolute Pointer list.
+  Remove Simple Pointer Device from Consplitter Simple Pointer list.
 
   @param  Private                  Text In Splitter pointer.
   @param  SimplePointer            Simple Pointer protocol pointer.
@@ -1267,8 +1285,8 @@ ConSplitterTextOutDeleteDevice (
 EFI_STATUS
 EFIAPI
 ConSplitterTextInReset (
-  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *This,
-  IN  BOOLEAN                            ExtendedVerification
+  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  IN  BOOLEAN                         ExtendedVerification
   );
 
 /**
@@ -1288,15 +1306,15 @@ ConSplitterTextInReset (
 EFI_STATUS
 EFIAPI
 ConSplitterTextInReadKeyStroke (
-  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *This,
-  OUT EFI_INPUT_KEY                      *Key
+  IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  OUT EFI_INPUT_KEY                   *Key
   );
 
 /**
   Add Text Input Ex Device in Consplitter Text Input Ex list.
 
   @param  Private                  Text In Splitter pointer.
-  @param  TextInEx                 Simple Text Ex Input protocol pointer.
+  @param  TextInEx                 Simple Text Input Ex Input protocol pointer.
 
   @retval EFI_SUCCESS              Text Input Ex Device added successfully.
   @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
@@ -1309,13 +1327,13 @@ ConSplitterTextInExAddDevice (
   );
 
 /**
-  Remove Simple Text Ex Device in Consplitter Absolute Pointer list.
+  Remove Text Ex Device from Consplitter Text Input Ex list.
 
   @param  Private                  Text In Splitter pointer.
   @param  TextInEx                 Simple Text Ex protocol pointer.
 
-  @retval EFI_SUCCESS              Simple Text Ex Device removed successfully.
-  @retval EFI_NOT_FOUND            No Simple Text Ex Device found.
+  @retval EFI_SUCCESS              Simple Text Input Ex Device removed successfully.
+  @retval EFI_NOT_FOUND            No Simple Text Input Ex Device found.
 
 **/
 EFI_STATUS
@@ -1454,8 +1472,6 @@ ConSplitterTextInUnregisterKeyNotify (
   @param  Event                    The Event assoicated with callback.
   @param  Context                  Context registered when Event was created.
 
-  @return None
-
 **/
 VOID
 EFIAPI
@@ -1466,8 +1482,6 @@ ConSplitterTextInWaitForKey (
 /**
   Return TRUE if StdIn is locked. The ConIn device on the virtual handle is
   the only device locked.
-
-  NONE
 
   @retval TRUE                     StdIn locked
   @retval FALSE                    StdIn working normally
@@ -1486,9 +1500,6 @@ ConSpliterConssoleControlStdInLocked (
   @param  Event                  The Event this notify function registered to.
   @param  Context                Pointer to the context data registerd to the
                                  Event.
-
-  @return None
-
 **/
 VOID
 EFIAPI
@@ -1585,8 +1596,6 @@ ConSplitterSimplePointerGetState (
 
   @param  Event                    The Event assoicated with callback.
   @param  Context                  Context registered when Event was created.
-
-  @return None
 
 **/
 VOID
@@ -1809,12 +1818,12 @@ ConSplitterTextOutEnableCursor (
   bytes. Copy the current data in Buffer to the new version of Buffer
   and free the old version of buffer.
 
-  @param  SizeOfCount              Size of element in array
-  @param  Count                    Current number of elements in array
+  @param  SizeOfCount              Size of element in array.
+  @param  Count                    Current number of elements in array.
   @param  Buffer                   Bigger version of passed in Buffer with all the
-                                   data
+                                   data.
 
-  @retval EFI_SUCCESS              Buffer size has grown
+  @retval EFI_SUCCESS              Buffer size has grown.
   @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
@@ -1832,7 +1841,7 @@ ConSplitterGrowBuffer (
 
   @param  This                    Protocol instance pointer.
   @param  Mode                    Are we in text of grahics mode.
-  @param  GopExists               TRUE if GOP Spliter has found a GOP/UGA device
+  @param  GopUgaExists            TRUE if Console Spliter has found a GOP or UGA device
   @param  StdInLocked             TRUE if StdIn device is keyboard locked
 
   @retval EFI_SUCCESS             Mode information returned.
@@ -1844,7 +1853,7 @@ EFIAPI
 ConSpliterConsoleControlGetMode (
   IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE *Mode,
-  OUT BOOLEAN                         *GopExists,
+  OUT BOOLEAN                         *GopUgaExists,
   OUT BOOLEAN                         *StdInLocked
   );
 
@@ -1888,9 +1897,9 @@ ConSpliterConsoleControlSetMode (
 EFI_STATUS
 EFIAPI
 ConSpliterGraphicsOutputQueryMode (
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-  IN  UINT32                            ModeNumber,
-  OUT UINTN                              *SizeOfInfo,
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL          *This,
+  IN  UINT32                                ModeNumber,
+  OUT UINTN                                 *SizeOfInfo,
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
   );
 
@@ -2080,7 +2089,7 @@ ConSpliterUgaDrawSetMode (
   @param  DestinationX            X coordinate of destination for the BltBuffer.
   @param  DestinationY            Y coordinate of destination for the BltBuffer.
   @param  Width                   Width of rectangle in BltBuffer in pixels.
-  @param  Height                  Hight of rectangle in BltBuffer in pixels. 
+  @param  Height                  Hight of rectangle in BltBuffer in pixels.
   @param  Delta                   OPTIONAL.
 
   @retval EFI_SUCCESS             The Blt operation completed.

@@ -1,6 +1,7 @@
 /** @file
-  Console Splitter Driver. Any Handle that attatched
-  EFI_CONSOLE_IDENTIFIER_PROTOCOL can be bound by this driver.
+  Console Splitter Driver. Any Handle that attatched console I/O protocols
+  (Console In device, Console Out device, Console Error device, Simple Pointer
+  protocol, Absolute Pointer protocol) can be bound by this driver.
 
   So far it works like any other driver by opening a SimpleTextIn and/or
   SimpleTextOut protocol with EFI_OPEN_PROTOCOL_BY_DRIVER attributes. The big
@@ -8,13 +9,12 @@
   handle, or construct a child handle like a standard device or bus driver.
   This driver produces three virtual handles as children, one for console input
   splitter, one for console output splitter and one for error output splitter.
-  EFI_CONSOLE_SPLIT_PROTOCOL will be attatched onto each virtual handle to
-  identify the splitter type.
+  These 3 virtual handles would be installed on gST.
 
-  Each virtual handle, that supports both the EFI_CONSOLE_SPLIT_PROTOCOL
-  and Console I/O protocol, will be produced in the driver entry point.
-  The virtual handle are added on driver entry and never removed.
-  Such design ensures sytem function well during none console device situation.
+  Each virtual handle, that supports the Console I/O protocol, will be produced
+  in the driver entry point. The virtual handle are added on driver entry and 
+  never removed. Such design ensures sytem function well during none console 
+  device situation.
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -30,9 +30,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "ConSplitter.h"
 
 //
-// Template for Text In Splitter
+// Text In Splitter Private Data template
 //
-TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
+GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE,
   (EFI_HANDLE) NULL,
   {
@@ -84,13 +84,13 @@ TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   },
 
   {
-    0,       //AbsoluteMinX
-    0,       //AbsoluteMinY
-    0,       //AbsoluteMinZ
-    0x10000, //AbsoluteMaxX
-    0x10000, //AbsoluteMaxY
-    0x10000, //AbsoluteMaxZ
-    0        //Attributes
+    0,       // AbsoluteMinX
+    0,       // AbsoluteMinY
+    0,       // AbsoluteMinZ
+    0x10000, // AbsoluteMaxX
+    0x10000, // AbsoluteMaxY
+    0x10000, // AbsoluteMaxZ
+    0        // Attributes
   },
   0,
   (EFI_ABSOLUTE_POINTER_PROTOCOL **) NULL,
@@ -117,8 +117,9 @@ TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   FALSE
 };
 
+
 //
-// Template for Uga Draw Protocol
+// Uga Draw Protocol Private Data template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UGA_DRAW_PROTOCOL mUgaDrawProtocolTemplate = {
   ConSpliterUgaDrawGetMode,
@@ -127,7 +128,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UGA_DRAW_PROTOCOL mUgaDrawProtocolTemplate = {
 };
 
 //
-// Template for Graphics Output Protocol
+// Graphics Output Protocol Private Data template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_PROTOCOL mGraphicsOutputProtocolTemplate = {
   ConSpliterGraphicsOutputQueryMode,
@@ -136,10 +137,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_PROTOCOL mGraphicsOutputProtoc
   NULL
 };
 
+
 //
-// Template for Text Out Splitter
+// Text Out Splitter Private Data template
 //
-TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
+GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE,
   (EFI_HANDLE) NULL,
   {
@@ -204,9 +206,9 @@ TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
 };
 
 //
-// Template for Standard Error Text Out Splitter
+// Standard Error Text Out Splitter Data Template
 //
-TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
+GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
   TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE,
   (EFI_HANDLE) NULL,
   {
@@ -283,30 +285,6 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConInDriverBinding = {
 };
 
 //
-// Driver binding instance for Simple Pointer protocol
-//
-EFI_DRIVER_BINDING_PROTOCOL           gConSplitterSimplePointerDriverBinding = {
-  ConSplitterSimplePointerDriverBindingSupported,
-  ConSplitterSimplePointerDriverBindingStart,
-  ConSplitterSimplePointerDriverBindingStop,
-  0xa,
-  NULL,
-  NULL
-};
-
-//
-// Driver binding instance for Absolute Pointer protocol
-//
-EFI_DRIVER_BINDING_PROTOCOL           gConSplitterAbsolutePointerDriverBinding = {
-  ConSplitterAbsolutePointerDriverBindingSupported,
-  ConSplitterAbsolutePointerDriverBindingStart,
-  ConSplitterAbsolutePointerDriverBindingStop,
-  0xa,
-  NULL,
-  NULL
-};
-
-//
 // Driver binding instance for Console Out device
 //
 EFI_DRIVER_BINDING_PROTOCOL           gConSplitterConOutDriverBinding = {
@@ -330,8 +308,32 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterStdErrDriverBinding = {
   NULL
 };
 
+//
+// Driver binding instance for Simple Pointer protocol
+//
+EFI_DRIVER_BINDING_PROTOCOL           gConSplitterSimplePointerDriverBinding = {
+  ConSplitterSimplePointerDriverBindingSupported,
+  ConSplitterSimplePointerDriverBindingStart,
+  ConSplitterSimplePointerDriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
+
+//
+// Driver binding instance for Absolute Pointer protocol
+//
+EFI_DRIVER_BINDING_PROTOCOL           gConSplitterAbsolutePointerDriverBinding = {
+  ConSplitterAbsolutePointerDriverBindingSupported,
+  ConSplitterAbsolutePointerDriverBindingStart,
+  ConSplitterAbsolutePointerDriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
+
 /**
-  The user Entry Point for module ConSplitter. The user code starts with this function.
+  The Entry Point for module ConSplitter. The user code starts with this function.
 
   Installs driver module protocols and. Creates virtual device handles for ConIn,
   ConOut, and StdErr. Installs Simple Text In protocol, Simple Text In Ex protocol,
@@ -407,9 +409,12 @@ ConSplitterDriverEntry(
              );
   ASSERT_EFI_ERROR (Status);
 
-
+  //
+  // One of Either Graphics Output protocol and UGA Draw protocol must be supported.
+  //
   ASSERT (FeaturePcdGet (PcdConOutGopSupport) ||
           FeaturePcdGet (PcdConOutUgaSupport));
+
   //
   // The driver creates virtual handles for ConIn, ConOut, and StdErr.
   // The virtual handles will always exist even if no console exist in the
@@ -451,6 +456,7 @@ ConSplitterDriverEntry(
     if (!EFI_ERROR (Status)) {
       //
       // Update the EFI System Table with new virtual console
+      // and update the pointer to Simple Text Input protocol.
       //
       gST->ConsoleInHandle  = mConIn.VirtualHandle;
       gST->ConIn            = &mConIn.TextIn;
@@ -463,7 +469,8 @@ ConSplitterDriverEntry(
   if (!EFI_ERROR (Status)) {
     if (!FeaturePcdGet (PcdConOutGopSupport)) {
       //
-      // In EFI mode, UGA Draw protocol is installed
+      // If Graphics Outpurt protocol not supported, UGA Draw protocol is installed 
+      // on the virtual handle.
       //
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &mConOut.VirtualHandle,
@@ -479,7 +486,8 @@ ConSplitterDriverEntry(
                       );
     } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
       //
-      // In UEFI mode, Graphics Output Protocol is installed on virtual handle.
+      // If UGA Draw protocol not supported, Graphics Output Protocol is installed
+      // on virtual handle.
       //
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &mConOut.VirtualHandle,
@@ -495,8 +503,8 @@ ConSplitterDriverEntry(
                       );
     } else {
       //
-      // In EFI and UEFI comptible mode, Graphics Output Protocol and UGA are
-      // installed on virtual handle.
+      // Boot Graphics Output protocol and UGA Draw protocol are supported,
+      // both they will be installed on virtual handle.
       //
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &mConOut.VirtualHandle,
@@ -517,6 +525,7 @@ ConSplitterDriverEntry(
     if (!EFI_ERROR (Status)) {
       //
       // Update the EFI System Table with new virtual console
+      // and Update the pointer to Text Output protocol.
       //
       gST->ConsoleOutHandle = mConOut.VirtualHandle;
       gST->ConOut           = &mConOut.TextOut;
@@ -537,7 +546,6 @@ ConSplitterDriverEntry(
 
 }
 
-
 /**
   Construct console input devices' private data.
 
@@ -557,7 +565,7 @@ ConSplitterTextInConstructor (
   EFI_STATUS  Status;
 
   //
-  // Initilize console input splitter's private data.
+  // Allocate buffer for Simple Text Input device  
   //
   Status = ConSplitterGrowBuffer (
             sizeof (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *),
@@ -578,7 +586,9 @@ ConSplitterTextInConstructor (
                   &ConInPrivate->LockEvent
                   );
   ASSERT_EFI_ERROR (Status);
-
+  //
+  // Create Event to wait for a key 
+  //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
@@ -589,7 +599,7 @@ ConSplitterTextInConstructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Buffer for Simple Text Input Ex Protocol
+  // Allocate buffer for Simple Text Input Ex device  
   //
   Status = ConSplitterGrowBuffer (
              sizeof (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *),
@@ -599,7 +609,9 @@ ConSplitterTextInConstructor (
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-
+  //
+  // Create Event to wait for a key Ex
+  //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
@@ -611,11 +623,10 @@ ConSplitterTextInConstructor (
 
   InitializeListHead (&ConInPrivate->NotifyList);
 
-  //
-  // Allocate Buffer and Create Event for Absolute Pointer and Simple Pointer Protocols
-  //
   ConInPrivate->AbsolutePointer.Mode = &ConInPrivate->AbsolutePointerMode;
-
+  //
+  // Allocate buffer for Absolute Pointer device  
+  //
   Status = ConSplitterGrowBuffer (
             sizeof (EFI_ABSOLUTE_POINTER_PROTOCOL *),
             &ConInPrivate->AbsolutePointerListCount,
@@ -624,7 +635,9 @@ ConSplitterTextInConstructor (
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-
+  //
+  // Create Event to wait for device input for Absolute pointer device
+  //
   Status = gBS->CreateEvent (
             EVT_NOTIFY_WAIT,
             TPL_NOTIFY,
@@ -635,7 +648,9 @@ ConSplitterTextInConstructor (
   ASSERT_EFI_ERROR (Status);
 
   ConInPrivate->SimplePointer.Mode = &ConInPrivate->SimplePointerMode;
-
+  //
+  // Allocate buffer for Simple Pointer device  
+  //
   Status = ConSplitterGrowBuffer (
             sizeof (EFI_SIMPLE_POINTER_PROTOCOL *),
             &ConInPrivate->PointerListCount,
@@ -644,7 +659,9 @@ ConSplitterTextInConstructor (
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-
+  //
+  // Create Event to wait for device input for Simple pointer device
+  //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
@@ -659,7 +676,7 @@ ConSplitterTextInConstructor (
 /**
   Construct console output devices' private data.
 
-  @param  ConOutPrivate            A pointer to the TEXT_IN_SPLITTER_PRIVATE_DATA
+  @param  ConOutPrivate            A pointer to the TEXT_OUT_SPLITTER_PRIVATE_DATA
                                    structure.
 
   @retval EFI_OUT_OF_RESOURCES     Out of resources.
@@ -680,7 +697,6 @@ ConSplitterTextOutConstructor (
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
     CopyMem (&ConOutPrivate->UgaDraw, &mUgaDrawProtocolTemplate, sizeof (EFI_UGA_DRAW_PROTOCOL));
   }
-
   if (FeaturePcdGet (PcdConOutGopSupport)) {
     CopyMem (&ConOutPrivate->GraphicsOutput, &mGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
   }
@@ -695,7 +711,9 @@ ConSplitterTextOutConstructor (
   // so put current mode back to init state.
   //
   ConOutPrivate->TextOutMode.Mode = 0xFF;
-
+  //
+  // Allocate buffer for Console Out device  
+  //
   Status = ConSplitterGrowBuffer (
             sizeof (TEXT_OUT_AND_GOP_DATA),
             &ConOutPrivate->TextOutListCount,
@@ -704,7 +722,9 @@ ConSplitterTextOutConstructor (
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-
+  //
+  // Allocate buffer for Text Out query data
+  //
   Status = ConSplitterGrowBuffer (
             sizeof (TEXT_OUT_SPLITTER_QUERY_DATA),
             &ConOutPrivate->TextOutQueryDataCount,
@@ -713,6 +733,7 @@ ConSplitterTextOutConstructor (
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   // Setup the DevNullTextOut console to 80 x 25
   //
@@ -722,7 +743,7 @@ ConSplitterTextOutConstructor (
 
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
     //
-    // Setup the DevNullUgaDraw to 800 x 600 x 32 bits per pixel
+    // Setup the DevNullUgaDraw to 800 x 600 x 32 bits per pixel, 60Hz.
     //
     ConSpliterUgaDrawSetMode (&ConOutPrivate->UgaDraw, 800, 600, 32, 60);
   }
@@ -772,14 +793,15 @@ ConSplitterTextOutConstructor (
 
 
 /**
-  Test to see if the specified protocol could be supported on the ControllerHandle. 
+  Test to see if the specified protocol could be supported on the specified device. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol pointer.
   @param  ControllerHandle    Handle of device to test.
-  @param  Guid                The specified protocol guid.
+  @param  Guid                The specified protocol.
 
   @retval EFI_SUCCESS         The specified protocol is supported on this device.
-  @retval other               The specified protocol is not supported on this device.
+  @retval EFI_UNSUPPORTED     The specified protocol attempts to be installed on virtul handle.
+  @retval other               Failed to open specified protocol on this device.
 
 **/
 EFI_STATUS
@@ -795,19 +817,15 @@ ConSplitterSupported (
   //
   // Make sure the Console Splitter does not attempt to attach to itself
   //
-  if (ControllerHandle == mConIn.VirtualHandle) {
+  if (ControllerHandle == mConIn.VirtualHandle  ||
+      ControllerHandle == mConOut.VirtualHandle ||
+      ControllerHandle == mStdErr.VirtualHandle 
+      ) {
     return EFI_UNSUPPORTED;
   }
 
-  if (ControllerHandle == mConOut.VirtualHandle) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if (ControllerHandle == mStdErr.VirtualHandle) {
-    return EFI_UNSUPPORTED;
-  }
   //
-  // Check to see whether the handle has the ConsoleInDevice GUID on it
+  // Check to see whether the specific protocol could be opened BY_DRIVER
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -833,9 +851,9 @@ ConSplitterSupported (
 }
 
 /**
-  Test to see if Console In Device could be supported on the ControllerHandle. 
+  Test to see if Console In Device could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -860,9 +878,9 @@ ConSplitterConInDriverBindingSupported (
 }
 
 /**
-  Test to see if Simple Pointer protocol could be supported on the ControllerHandle. 
+  Test to see if Simple Pointer protocol could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -886,11 +904,10 @@ ConSplitterSimplePointerDriverBindingSupported (
           );
 }
 
-
 /**
-  Test to see if Absolute Pointer protocol could be supported on the ControllerHandle. 
+  Test to see if Absolute Pointer protocol could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -916,9 +933,9 @@ ConSplitterAbsolutePointerDriverBindingSupported (
 
 
 /**
-  Test to see if Console Out Device could be supported on the ControllerHandle. 
+  Test to see if Console Out Device could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -943,9 +960,9 @@ ConSplitterConOutDriverBindingSupported (
 }
 
 /**
-  Test to see if Standard Error Device could be supported on the ControllerHandle. 
+  Test to see if Standard Error Device could be supported on the Controller. 
 
-  @param  This                Protocol instance pointer.
+  @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
@@ -974,7 +991,7 @@ ConSplitterStdErrDriverBindingSupported (
   Start ConSplitter on devcie handle by opening Console Device Guid on device handle 
   and the console virtual handle. And Get the console interface on controller handle.
   
-  @param  This                      Protocol instance pointer.
+  @param  This                      Driver Binding protocol instance pointer.
   @param  ControllerHandle          Handle of device.
   @param  ConSplitterVirtualHandle  Console virtual Handle.
   @param  DeviceGuid                The specified Console Device, such as ConInDev,
@@ -1001,7 +1018,7 @@ ConSplitterStart (
   VOID        *Instance;
 
   //
-  // Check to see whether the ControllerHandle has the InterfaceGuid on it.
+  // Check to see whether the ControllerHandle has the DeviceGuid on it.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -1014,7 +1031,10 @@ ConSplitterStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
+ 
+  //
+  // Create virtual handle and open DeviceGuid on the virtul handle.
+  //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   DeviceGuid,
@@ -1024,10 +1044,13 @@ ConSplitterStart (
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Err;
   }
 
-  return gBS->OpenProtocol (
+  //
+  // Open InterfaceGuid on the virtul handle.
+  //
+  Status =  gBS->OpenProtocol (
                 ControllerHandle,
                 InterfaceGuid,
                 Interface,
@@ -1035,13 +1058,40 @@ ConSplitterStart (
                 ConSplitterVirtualHandle,
                 EFI_OPEN_PROTOCOL_GET_PROTOCOL
                 );
+
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // close the DeviceGuid on ConSplitter VirtualHandle.
+  //
+  gBS->CloseProtocol (
+        ControllerHandle,
+        DeviceGuid,
+        This->DriverBindingHandle,
+        ConSplitterVirtualHandle
+        );
+
+Err:
+  //
+  // close the DeviceGuid on ControllerHandle.
+  //
+  gBS->CloseProtocol (
+        ControllerHandle,
+        DeviceGuid,
+        This->DriverBindingHandle,
+        ControllerHandle
+        );
+
+  return Status;
 }
 
 
 /**
   Start Console In Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -1109,7 +1159,7 @@ ConSplitterConInDriverBindingStart (
 /**
   Start Simple Pointer Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -1155,7 +1205,7 @@ ConSplitterSimplePointerDriverBindingStart (
 /**
   Start Absolute Pointer Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -1202,7 +1252,7 @@ ConSplitterAbsolutePointerDriverBindingStart (
 /**
   Start Console Out Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -1302,7 +1352,7 @@ ConSplitterConOutDriverBindingStart (
 /**
   Start Standard Error Consplitter on device handle. 
   
-  @param  This                 Protocol instance pointer.
+  @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
@@ -1435,7 +1485,7 @@ ConSplitterStop (
 /**
   Stop Console In ConSplitter on ControllerHandle by closing Console In Devcice GUID.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -1507,7 +1557,7 @@ ConSplitterConInDriverBindingStop (
   Stop Simple Pointer protocol ConSplitter on ControllerHandle by closing
   Simple Pointer protocol.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -1559,7 +1609,7 @@ ConSplitterSimplePointerDriverBindingStop (
   Stop Absolute Pointer protocol ConSplitter on ControllerHandle by closing
   Absolute Pointer protocol.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -1610,7 +1660,7 @@ ConSplitterAbsolutePointerDriverBindingStop (
 /**
   Stop Console Out ConSplitter on device handle by closing Console Out Devcice GUID.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -1661,7 +1711,7 @@ ConSplitterConOutDriverBindingStop (
 /**
   Stop Standard Error ConSplitter on ControllerHandle by closing Standard Error GUID.
 
-  @param  This              Protocol instance pointer.
+  @param  This              Driver Binding protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
@@ -1733,12 +1783,12 @@ ConSplitterStdErrDriverBindingStop (
   bytes. Copy the current data in Buffer to the new version of Buffer
   and free the old version of buffer.
 
-  @param  SizeOfCount              Size of element in array
-  @param  Count                    Current number of elements in array
+  @param  SizeOfCount              Size of element in array.
+  @param  Count                    Current number of elements in array.
   @param  Buffer                   Bigger version of passed in Buffer with all the
-                                   data
+                                   data.
 
-  @retval EFI_SUCCESS              Buffer size has grown
+  @retval EFI_SUCCESS              Buffer size has grown.
   @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
 
 **/
@@ -1789,7 +1839,7 @@ ConSplitterTextInAddDevice (
   EFI_STATUS  Status;
 
   //
-  // If the Text In List is full, enlarge it by calling growbuffer().
+  // If the Text In List is full, enlarge it by calling ConSplitterGrowBuffer().
   //
   if (Private->CurrentNumberOfConsoles >= Private->TextInListCount) {
     Status = ConSplitterGrowBuffer (
@@ -1808,7 +1858,7 @@ ConSplitterTextInAddDevice (
   Private->CurrentNumberOfConsoles++;
 
   //
-  // Extra CheckEvent added to reduce the double CheckEvent() in UI.c
+  // Extra CheckEvent added to reduce the double CheckEvent().
   //
   gBS->CheckEvent (TextIn->WaitForKey);
 
@@ -1817,7 +1867,7 @@ ConSplitterTextInAddDevice (
 
 
 /**
-  Remove Simple Text Device in Consplitter Absolute Pointer list.
+  Remove Text Input Device from Consplitter Text Input list.
 
   @param  Private                  Text In Splitter pointer.
   @param  TextIn                   Simple Text protocol pointer.
@@ -1855,7 +1905,7 @@ ConSplitterTextInDeleteDevice (
   Add Text Input Ex Device in Consplitter Text Input Ex list.
 
   @param  Private                  Text In Splitter pointer.
-  @param  TextInEx                 Simple Text Ex Input protocol pointer.
+  @param  TextInEx                 Simple Text Input Ex Input protocol pointer.
 
   @retval EFI_SUCCESS              Text Input Ex Device added successfully.
   @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
@@ -1870,7 +1920,7 @@ ConSplitterTextInExAddDevice (
   EFI_STATUS  Status;
 
   //
-  // If the TextInEx List is full, enlarge it by calling growbuffer().
+  // If the Text Input Ex List is full, enlarge it by calling ConSplitterGrowBuffer().
   //
   if (Private->CurrentNumberOfExConsoles >= Private->TextInExListCount) {
     Status = ConSplitterGrowBuffer (
@@ -1883,13 +1933,13 @@ ConSplitterTextInExAddDevice (
     }
   }
   //
-  // Add the new text-in device data structure into the Text In List.
+  // Add the new text-in device data structure into the Text Input Ex List.
   //
   Private->TextInExList[Private->CurrentNumberOfExConsoles] = TextInEx;
   Private->CurrentNumberOfExConsoles++;
 
   //
-  // Extra CheckEvent added to reduce the double CheckEvent() in UI.c
+  // Extra CheckEvent added to reduce the double CheckEvent().
   //
   gBS->CheckEvent (TextInEx->WaitForKeyEx);
 
@@ -1897,13 +1947,13 @@ ConSplitterTextInExAddDevice (
 }
 
 /**
-  Remove Simple Text Ex Device in Consplitter Absolute Pointer list.
+  Remove Text Ex Device from Consplitter Text Input Ex list.
 
   @param  Private                  Text In Splitter pointer.
   @param  TextInEx                 Simple Text Ex protocol pointer.
 
-  @retval EFI_SUCCESS              Simple Text Ex Device removed successfully.
-  @retval EFI_NOT_FOUND            No Simple Text Ex Device found.
+  @retval EFI_SUCCESS              Simple Text Input Ex Device removed successfully.
+  @retval EFI_NOT_FOUND            No Simple Text Input Ex Device found.
 
 **/
 EFI_STATUS
@@ -1914,7 +1964,7 @@ ConSplitterTextInExDeleteDevice (
 {
   UINTN Index;
   //
-  // Remove the specified text-in device data structure from the Text In List,
+  // Remove the specified text-in device data structure from the Text Input Ex List,
   // and rearrange the remaining data structures in the Text In List.
   //
   for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
@@ -1951,7 +2001,7 @@ ConSplitterSimplePointerAddDevice (
   EFI_STATUS  Status;
 
   //
-  // If the Text In List is full, enlarge it by calling growbuffer().
+  // If the Simple Pointer List is full, enlarge it by calling ConSplitterGrowBuffer().
   //
   if (Private->CurrentNumberOfPointers >= Private->PointerListCount) {
     Status = ConSplitterGrowBuffer (
@@ -1964,16 +2014,17 @@ ConSplitterSimplePointerAddDevice (
     }
   }
   //
-  // Add the new text-in device data structure into the Text In List.
+  // Add the new text-in device data structure into the Simple Pointer List.
   //
   Private->PointerList[Private->CurrentNumberOfPointers] = SimplePointer;
   Private->CurrentNumberOfPointers++;
+
   return EFI_SUCCESS;
 }
 
 
 /**
-  Remove Simple Pointer Device in Consplitter Absolute Pointer list.
+  Remove Simple Pointer Device from Consplitter Simple Pointer list.
 
   @param  Private                  Text In Splitter pointer.
   @param  SimplePointer            Simple Pointer protocol pointer.
@@ -1990,7 +2041,7 @@ ConSplitterSimplePointerDeleteDevice (
 {
   UINTN Index;
   //
-  // Remove the specified text-in device data structure from the Text In List,
+  // Remove the specified text-in device data structure from the Simple Pointer List,
   // and rearrange the remaining data structures in the Text In List.
   //
   for (Index = 0; Index < Private->CurrentNumberOfPointers; Index++) {
@@ -2027,7 +2078,7 @@ ConSplitterAbsolutePointerAddDevice (
   EFI_STATUS  Status;
 
   //
-  // If the Absolute Pointer List is full, enlarge it by calling growbuffer().
+  // If the Absolute Pointer List is full, enlarge it by calling ConSplitterGrowBuffer().
   //
   if (Private->CurrentNumberOfAbsolutePointers >= Private->AbsolutePointerListCount) {
     Status = ConSplitterGrowBuffer (
@@ -2040,16 +2091,17 @@ ConSplitterAbsolutePointerAddDevice (
     }
   }
   //
-  // Add the new text-in device data structure into the Text In List.
+  // Add the new text-in device data structure into the Absolute Pointer List.
   //
   Private->AbsolutePointerList[Private->CurrentNumberOfAbsolutePointers] = AbsolutePointer;
   Private->CurrentNumberOfAbsolutePointers++;
+
   return EFI_SUCCESS;
 }
 
 
 /**
-  Remove Absolute Pointer Device in Consplitter Absolute Pointer list.
+  Remove Absolute Pointer Device from Consplitter Absolute Pointer list.
 
   @param  Private                  Text In Splitter pointer.
   @param  AbsolutePointer          Absolute Pointer protocol pointer.
@@ -2066,8 +2118,8 @@ ConSplitterAbsolutePointerDeleteDevice (
 {
   UINTN Index;
   //
-  // Remove the specified text-in device data structure from the Text In List,
-  // and rearrange the remaining data structures in the Text In List.
+  // Remove the specified text-in device data structure from the Absolute Pointer List,
+  // and rearrange the remaining data structures from the Absolute Pointer List.
   //
   for (Index = 0; Index < Private->CurrentNumberOfAbsolutePointers; Index++) {
     if (Private->AbsolutePointerList[Index] == AbsolutePointer) {
@@ -2085,6 +2137,8 @@ ConSplitterAbsolutePointerDeleteDevice (
 
 /**
   Reallocate Text Out mode map.
+
+  Allocate new buffer and copy original buffer into the new buffer.
 
   @param  Private                  Consplitter Text Out pointer.
 
@@ -2107,9 +2161,12 @@ ConSplitterGrowMapTable (
 
   NewSize           = Private->TextOutListCount * sizeof (INT32);
   OldTextOutModeMap = Private->TextOutModeMap;
-  TotalSize         = NewSize * Private->TextOutQueryDataCount;
+  TotalSize         = NewSize * (Private->TextOutQueryDataCount);
 
-  TextOutModeMap    = AllocateZeroPool (TotalSize);
+  //
+  // Allocate new buffer for Text Out List.
+  //
+  TextOutModeMap    = AllocatePool (TotalSize);
   if (TextOutModeMap == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -2159,7 +2216,7 @@ ConSplitterGrowMapTable (
 
 
 /**
-  Add the device's output mode to console splitter's mode list.
+  Add new device's output mode to console splitter's mode list.
 
   @param  Private               Text Out Splitter pointer
   @param  TextOut               Simple Text Output protocol pointer.
@@ -2243,24 +2300,25 @@ ConSplitterAddOutputMode (
   @param TextOutModeMap  Current text out mode map, begin with the mode 80x25
   @param NewlyAddedMap   New text out mode map, begin with the mode 80x25
   @param MapStepSize     Mode step size for one console device
-  @param NewMapStepSize  Mode step size for one console device
-  @param MaxMode         Current max text mode
-  @param CurrentMode     Current text mode
+  @param NewMapStepSize  New Mode step size for one console device
+  @param MaxMode         IN: Current max text mode, OUT: Updated max text mode.
+  @param CurrentMode     IN: Current text mode,     OUT: Updated current text mode.
 
 **/
 VOID
 ConSplitterGetIntersection (
-  IN  INT32                           *TextOutModeMap,
-  IN  INT32                           *NewlyAddedMap,
-  IN  UINTN                           MapStepSize,
-  IN  UINTN                           NewMapStepSize,
-  OUT INT32                           *MaxMode,
-  OUT INT32                           *CurrentMode
+  IN     INT32                        *TextOutModeMap,
+  IN     INT32                        *NewlyAddedMap,
+  IN     UINTN                        MapStepSize,
+  IN     UINTN                        NewMapStepSize,
+  IN OUT INT32                        *MaxMode,
+  IN OUT INT32                        *CurrentMode
   )
 {
   INT32 Index;
   INT32 *CurrentMapEntry;
   INT32 *NextMapEntry;
+  INT32 *NewMapEntry;
   INT32 CurrentMaxMode;
   INT32 Mode;
 
@@ -2271,14 +2329,14 @@ ConSplitterGetIntersection (
   //
   Index           = 2;
   CurrentMapEntry = &TextOutModeMap[MapStepSize * 2];
-  NextMapEntry    = &TextOutModeMap[MapStepSize * 2];
-  NewlyAddedMap   = &NewlyAddedMap[NewMapStepSize * 2];
+  NextMapEntry    = CurrentMapEntry;
+  NewMapEntry     = &NewlyAddedMap[NewMapStepSize * 2];
 
   CurrentMaxMode  = *MaxMode;
   Mode            = *CurrentMode;
 
   while (Index < CurrentMaxMode) {
-    if (*NewlyAddedMap == -1) {
+    if (*NewMapEntry == -1) {
       //
       // This mode is not supported any more. Remove it. Special care
       // must be taken as this remove will also affect current mode;
@@ -2298,7 +2356,7 @@ ConSplitterGetIntersection (
     }
 
     CurrentMapEntry += MapStepSize;
-    NewlyAddedMap += NewMapStepSize;
+    NewMapEntry     += NewMapStepSize;
     Index++;
   }
 
@@ -2307,15 +2365,12 @@ ConSplitterGetIntersection (
   return ;
 }
 
-
 /**
   Add the device's output mode to console splitter's mode list.
 
   @param  Private               Text Out Splitter pointer.
   @param  TextOut               Simple Text Output protocol pointer.
   
-  @return None
-
 **/
 VOID
 ConSplitterSyncOutputMode (
@@ -2350,8 +2405,13 @@ ConSplitterSyncOutputMode (
   MapTable  = TextOutModeMap + Private->CurrentNumberOfConsoles;
   while (Mode < TextOut->Mode->MaxMode) {
     Status = TextOut->QueryMode (TextOut, Mode, &Columns, &Rows);
+
     if (EFI_ERROR(Status)) {
       if (Mode == 1) {
+        //
+        // If mode 1 (80x50) is not supported, make sure mode 1 in TextOutQueryData
+        // is clear to 0x0.
+        //
         MapTable[StepSize] = Mode;
         TextOutQueryData[Mode].Columns = 0;
         TextOutQueryData[Mode].Rows = 0;
@@ -2369,10 +2429,8 @@ ConSplitterSyncOutputMode (
         MapTable[Index * StepSize] = Mode;
         break;
       }
-
       Index++;
     }
-
     Mode++;
   }
   //
@@ -2530,6 +2588,7 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
     &(mConOut.TextOutMode.MaxMode),
     &(mConOut.TextOutMode.Mode)
     );
+
   if (mConOut.TextOutMode.Mode < 0) {
     mConOut.TextOut.SetMode (&(mConOut.TextOut), 0);
   }
@@ -2542,6 +2601,7 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
     &(mStdErr.TextOutMode.MaxMode),
     &(mStdErr.TextOutMode.Mode)
     );
+
   if (mStdErr.TextOutMode.Mode < 0) {
     mStdErr.TextOut.SetMode (&(mStdErr.TextOut), 0);
   }
@@ -2554,7 +2614,7 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
 
 
 /**
-  Add GOP or UGA output mode into Consplitter Text Out list.
+  Add display (GOP or UGA) output modes into Consplitter Text Out list.
 
   @param  Private               Text Out Splitter pointer.
   @param  GraphicsOutput        Graphics Output protocol pointer.
@@ -2565,7 +2625,7 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
 
 **/
 EFI_STATUS
-ConSplitterAddGraphicsOutputMode (
+ConSplitterAddDisplayOutputMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
   IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
@@ -2621,7 +2681,7 @@ ConSplitterAddGraphicsOutputMode (
         //
         // Allocate resource for the private mode buffer
         //
-        ModeBuffer = AllocatePool (GraphicsOutput->Mode->SizeOfInfo * GraphicsOutput->Mode->MaxMode);
+        ModeBuffer = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION) * GraphicsOutput->Mode->MaxMode);
         if (ModeBuffer == NULL) {
           return EFI_OUT_OF_RESOURCES;
         }
@@ -2633,10 +2693,14 @@ ConSplitterAddGraphicsOutputMode (
         //
         Mode = ModeBuffer;
         for (Index = 0; Index < GraphicsOutput->Mode->MaxMode; Index++) {
+          //
+          // The Info buffer would be allocated by callee
+          //
           Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) Index, &SizeOfInfo, &Info);
           if (EFI_ERROR (Status)) {
             return Status;
           }
+          ASSERT ( SizeOfInfo <= sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
           CopyMem (Mode, Info, SizeOfInfo);
           Mode++;
           FreePool (Info);
@@ -2656,12 +2720,19 @@ ConSplitterAddGraphicsOutputMode (
         Match = FALSE;
 
         for (NumberIndex = 0; NumberIndex < GraphicsOutput->Mode->MaxMode; NumberIndex++) {
+          //
+          // The Info buffer would be allocated by callee
+          //
           Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) NumberIndex, &SizeOfInfo, &Info);
           if (EFI_ERROR (Status)) {
             return Status;
           }
           if ((Info->HorizontalResolution == Mode->HorizontalResolution) &&
               (Info->VerticalResolution == Mode->VerticalResolution)) {
+            //
+            // If GOP device supports one mode in current mode buffer, 
+            // it will be added into matched mode buffer
+            //
             Match = TRUE;
             FreePool (Info);
             break;
@@ -2671,7 +2742,10 @@ ConSplitterAddGraphicsOutputMode (
 
         if (Match) {
           AlreadyExist = FALSE;
-
+          
+          //
+          // Check if GOP mode has been in the mode buffer, ModeBuffer = MatchedMode at begin.
+          //
           for (Info = ModeBuffer; Info < MatchedMode; Info++) {
             if ((Info->HorizontalResolution == Mode->HorizontalResolution) &&
                 (Info->VerticalResolution == Mode->VerticalResolution)) {
@@ -2795,11 +2869,10 @@ Done:
   // Graphics console can ensure all GOP devices have the same mode which can be taken as current mode.
   //
   Status = Private->GraphicsOutput.SetMode (&Private->GraphicsOutput, (UINT32) CurrentIndex);
-
-  //
-  // If user defined mode is not valid for UGA, set to the default mode 800x600.
-  //
   if (EFI_ERROR(Status)) {
+    //
+    // If user defined mode is not valid for display device, set to the default mode 800x600.
+    //
     (Private->GraphicsOutputModeBuffer[0]).HorizontalResolution = 800;
     (Private->GraphicsOutputModeBuffer[0]).VerticalResolution   = 600;
     Status = Private->GraphicsOutput.SetMode (&Private->GraphicsOutput, 0);
@@ -2815,8 +2888,6 @@ Done:
   set to user defined console mode.
 
   @param  Private            Consplitter Text Out pointer.
-
-  @return None
 
 **/
 VOID
@@ -2942,7 +3013,7 @@ ConSplitterTextOutAddDevice (
   CurrentNumOfConsoles  = Private->CurrentNumberOfConsoles;
 
   //
-  // If the Text Out List is full, enlarge it by calling growbuffer().
+  // If the Text Out List is full, enlarge it by calling ConSplitterGrowBuffer().
   //
   while (CurrentNumOfConsoles >= Private->TextOutListCount) {
     Status = ConSplitterGrowBuffer (
@@ -3007,7 +3078,7 @@ ConSplitterTextOutAddDevice (
   //
   if (FeaturePcdGet (PcdConOutGopSupport)) {
     if ((GraphicsOutput != NULL) || (UgaDraw != NULL)) {
-      ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
+      ConSplitterAddDisplayOutputMode (Private, GraphicsOutput, UgaDraw);
     }
   }
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
@@ -3265,12 +3336,9 @@ ConSplitterTextInPrivateReadKeyStroke (
   return EFI_NOT_READY;
 }
 
-
 /**
   Return TRUE if StdIn is locked. The ConIn device on the virtual handle is
   the only device locked.
-
-  NONE
 
   @retval TRUE                     StdIn locked
   @retval FALSE                    StdIn working normally
@@ -3294,9 +3362,6 @@ ConSpliterConssoleControlStdInLocked (
   @param  Event                  The Event this notify function registered to.
   @param  Context                Pointer to the context data registerd to the
                                  Event.
-
-  @return None
-
 **/
 VOID
 EFIAPI
@@ -3456,8 +3521,6 @@ ConSplitterTextInReadKeyStroke (
 
   @param  Event                    The Event assoicated with callback.
   @param  Context                  Context registered when Event was created.
-
-  @return None
 
 **/
 VOID
@@ -3760,12 +3823,7 @@ ConSplitterTextInRegisterKeyNotify (
   // Return EFI_SUCCESS if the (KeyData, NotificationFunction) is already registered.
   //
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
-    CurrentNotify = CR (
-                      Link,
-                      TEXT_IN_EX_SPLITTER_NOTIFY,
-                      NotifyEntry,
-                      TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE
-                      );
+    CurrentNotify = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
     if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
         *NotifyHandle = CurrentNotify->NotifyHandle;
@@ -3881,7 +3939,7 @@ ConSplitterTextInUnregisterKeyNotify (
   }
 
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
-    CurrentNotify = CR (Link, TEXT_IN_EX_SPLITTER_NOTIFY, NotifyEntry, TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE);
+    CurrentNotify = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
     if (CurrentNotify->NotifyHandle == NotificationHandle) {
       for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
         Status = Private->TextInExList[Index]->UnregisterKeyNotify (
@@ -4081,8 +4139,6 @@ ConSplitterSimplePointerGetState (
   @param  Event                    The Event assoicated with callback.
   @param  Context                  Context registered when Event was created.
 
-  @return None
-
 **/
 VOID
 EFIAPI
@@ -4260,8 +4316,6 @@ ConSplitterAbsolutePointerGetState (
 
   @param  Event                    The Event assoicated with callback.
   @param  Context                  Context registered when Event was created.
-
-  @return None
 
 **/
 VOID

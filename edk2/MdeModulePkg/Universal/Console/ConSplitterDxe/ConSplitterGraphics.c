@@ -1465,7 +1465,7 @@ DevNullTextOutSetMode (
   if (Private->TextOutModeMap != NULL) {
     CurrentMode = *(Private->TextOutModeMap + Private->TextOutListCount * ModeNumber);
   } else {
-    CurrentMode = (INT32)(ModeNumber);
+    CurrentMode = (INT32) (ModeNumber);
   }
   Mode    = &(Private->TextOutQueryData[CurrentMode]);
   Row     = Mode->Rows;
