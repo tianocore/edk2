@@ -58,7 +58,7 @@
   PeiServicesLib
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid                # PPI ALWAYS_CONSUMED
+  gEfiPeiReadOnlyVariable2PpiGuid                # PPI_ALWAYS_PRODUCED
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
