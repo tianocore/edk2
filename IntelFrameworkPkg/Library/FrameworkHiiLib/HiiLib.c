@@ -32,16 +32,16 @@ EFI_HII_PROTOCOL *mHii = NULL;
   instance.
   If protocol of gEfiHiiProtocolGuid is not installed, then ASSERT().
   
-  @param ImageHandle  The image handle of driver module who use this library 
-                      instance.
-  @param SystemTable  Pointer to the EFI System Table.
-  @retval EFI_SUCCESS library constuctor always success.
+  @param  ImageHandle  The image handle of driver module who use this library 
+                       instance.
+  @param  SystemTable  Pointer to the EFI System Table.
+  @retval EFI_SUCCESS  library constuctor always success.
 **/
 EFI_STATUS
 EFIAPI
 FrameworkHiiLibConstructor (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN     EFI_HANDLE                      ImageHandle,
+  IN     EFI_SYSTEM_TABLE                *SystemTable
   )
 {
   EFI_STATUS Status;
@@ -71,9 +71,9 @@ FrameworkHiiLibConstructor (
 **/
 EFI_HII_PACKAGES *
 InternalPreparePackages (
-  IN UINTN           NumberOfPackages,
-  IN CONST EFI_GUID  *Guid OPTIONAL,
-  VA_LIST            Marker
+  IN     UINTN                           NumberOfPackages,
+  IN     CONST EFI_GUID                  *Guid OPTIONAL,
+  IN     VA_LIST                         Marker
   )
 {
   EFI_HII_PACKAGES  *HiiPackages;
@@ -109,13 +109,12 @@ InternalPreparePackages (
   @Param  ...               The variable argument list of package pointers.
 
   @return The allocated and initialized packages.
-
 **/
 EFI_HII_PACKAGES *
 EFIAPI
 PreparePackages (
-  IN UINTN           NumberOfPackages,
-  IN CONST EFI_GUID  *Guid OPTIONAL,
+  IN     UINTN                           NumberOfPackages,
+  IN     CONST EFI_GUID                  *Guid OPTIONAL,
   ...
   )
 {
@@ -144,15 +143,14 @@ PreparePackages (
 
   @return
   The allocated and initialized packages.
-
 **/
 EFI_STATUS
 EFIAPI
 HiiLibAddPackages (
-  IN       UINTN               NumberOfPackages,
-  IN CONST EFI_GUID            *GuidId,
-  IN       EFI_HANDLE          DriverHandle, OPTIONAL
-  OUT      EFI_HII_HANDLE      *HiiHandle, OPTIONAL
+  IN     UINTN                           NumberOfPackages,
+  IN     CONST EFI_GUID                  *GuidId,
+  IN     EFI_HANDLE                      DriverHandle, OPTIONAL
+     OUT EFI_HII_HANDLE                  *HiiHandle, OPTIONAL
   ...
   )
 {
@@ -185,16 +183,15 @@ HiiLibAddPackages (
   If HiiHandle is NULL, then ASSERT.
   If HiiHandle is not a valid EFI_HII_HANDLE in the default HII database, then ASSERT.
 
-  @param  HiiHandle                The handle that was previously registered to the data base that is requested for removal.
-                                             List later.
+  @param  HiiHandle              The handle that was previously registered to the data base that is requested for removal.
+                                 List later.
 
   @return  VOID
-
 **/
 VOID
 EFIAPI
 HiiLibRemovePackages (
-  IN      EFI_HII_HANDLE      HiiHandle
+  IN     EFI_HII_HANDLE                  HiiHandle
   )
 {
   EFI_STATUS Status;
@@ -223,9 +220,9 @@ HiiLibRemovePackages (
 EFI_STATUS
 EFIAPI
 HiiLibNewString (
-  IN  EFI_HII_HANDLE                  PackageList,
-  OUT EFI_STRING_ID                   *StringId,
-  IN  CONST EFI_STRING                String
+  IN     EFI_HII_HANDLE                  PackageList,
+     OUT EFI_STRING_ID                   *StringId,
+  IN     CONST EFI_STRING                String
   )
 {
   FRAMEWORK_EFI_HII_HANDLE  FrameworkHiiHandle;
@@ -262,9 +259,9 @@ HiiLibNewString (
 EFI_STATUS
 EFIAPI
 HiiLibGetStringFromToken (
-  IN  EFI_GUID                        *ProducerGuid,
-  IN  EFI_STRING_ID                   StringId,
-  OUT EFI_STRING                      *String
+  IN     EFI_GUID                        *ProducerGuid,
+  IN     EFI_STRING_ID                   StringId,
+     OUT EFI_STRING                      *String
   )
 {
   return EFI_SUCCESS;  
@@ -290,9 +287,9 @@ HiiLibGetStringFromToken (
 EFI_STATUS
 EFIAPI
 HiiLibGetStringFromHandle (
-  IN  EFI_HII_HANDLE                  PackageList,
-  IN  EFI_STRING_ID                   StringId,
-  OUT EFI_STRING                      *String
+  IN     EFI_HII_HANDLE                  PackageList,
+  IN     EFI_STRING_ID                   StringId,
+     OUT EFI_STRING                      *String
   )
 {
   return EFI_SUCCESS;
@@ -311,7 +308,7 @@ HiiLibGetStringFromHandle (
 EFI_STATUS
 EFIAPI
 HiiLibCreateHiiDriverHandle (
-  OUT EFI_HANDLE               *DriverHandle
+  OUT EFI_HANDLE                         *DriverHandle
   )
 {
   //
