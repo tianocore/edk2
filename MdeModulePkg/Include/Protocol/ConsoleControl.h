@@ -71,6 +71,12 @@ EFI_STATUS
 
 /**
   Store the password, enable state variable and arm the periodic timer.
+  If Password is NULL unlock the password state variable and set the event
+  timer. If the Password is too big return an error. If the Password is valid
+  Copy the Password and enable state variable and then arm the periodic timer
+
+  @param  This                     Console Control protocol pointer.
+  @param  Password                 The password input.
 
   @retval EFI_SUCCESS              Lock the StdIn device successfully.
   @retval EFI_INVALID_PARAMETER    Password is NULL
@@ -81,7 +87,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_CONSOLE_CONTROL_PROTOCOL_LOCK_STD_IN)(
   IN  EFI_CONSOLE_CONTROL_PROTOCOL      *This,
-  IN CHAR16                             *Password
+  IN  CHAR16                            *Password
   );
 
 struct _EFI_CONSOLE_CONTROL_PROTOCOL {
