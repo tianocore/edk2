@@ -128,18 +128,18 @@ BOOLEAN
 
   @param  Controller            The controller that has the UDP service binding
                                 protocol installed.
-  @param  ImageHandle           The image handle for the driver.
+  @param  Image                 The image handle for the driver.
   @param  Configure             The function to configure the created UDP child
   @param  Context               The opaque parameter for the Configure funtion.
 
-  @return A point to just created UDP IO port or NULL if failed.
+  @return A point to just created UDP IO port or NULL if some error happened.
 
 **/
 UDP_IO_PORT *
 EFIAPI
 UdpIoCreatePort (
   IN  EFI_HANDLE            Controller,
-  IN  EFI_HANDLE            ImageHandle,
+  IN  EFI_HANDLE            Image,
   IN  UDP_IO_CONFIG         Configure,
   IN  VOID                  *Context
   );
@@ -165,8 +165,6 @@ UdpIoFreePort (
   UDP child.
 
   @param  UdpIo                 UDP IO port to clean up.
-
-  @return None
 
 **/
 VOID
@@ -207,8 +205,6 @@ UdpIoSendDatagram (
 
   @param  UdpIo                 The UDP IO port to cancel the packet from
   @param  Packet                The packet to cancel
-
-  @return None
 
 **/
 VOID
