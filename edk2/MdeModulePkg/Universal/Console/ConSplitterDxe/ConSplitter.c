@@ -3434,9 +3434,8 @@ ConSpliterConsoleControlLockStdInEvent (
 
 
 /**
-  If Password is NULL unlock the password state variable and set the event
-  timer. If the Password is too big return an error. If the Password is valid
-  Copy the Password and enable state variable and then arm the periodic timer
+  If Password is NULL or the Password is too big, then return an error. If the 
+  Password is valid, then store the password, lock StdIn and arm the periodic timer.
 
   @param  This                     Console Control protocol pointer.
   @param  Password                 The password input.

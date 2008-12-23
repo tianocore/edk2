@@ -30,8 +30,8 @@ typedef enum {
 
 /**
   Return the current video mode information. Also returns info about existence
-  of Graphics Output devices or UGA Draw devices in system, and whether the Std In device is locked. 
-  GopUgaExists and StdInLocked parameters are optional.
+  of Graphics Output devices or UGA Draw devices in system, and whether the Std
+  In device is locked. GopUgaExists and StdInLocked parameters are optional.
 
   @param  This                    Protocol instance pointer.
   @param  Mode                    Current video mode.
@@ -52,7 +52,8 @@ EFI_STATUS
   );
 
 /**
-  Set the current video mode to either text or graphics. 
+  Set the current video mode to either text or graphics. Graphics is
+  for Quiet Boot.
 
   @param  This                    Protocol instance pointer.
   @param  Mode                    Video mode is to be set.
@@ -70,17 +71,15 @@ EFI_STATUS
   );
 
 /**
-  Store the password, enable state variable and arm the periodic timer.
-  If Password is NULL unlock the password state variable and set the event
-  timer. If the Password is too big return an error. If the Password is valid
-  Copy the Password and enable state variable and then arm the periodic timer
+  If Password is NULL or the Password is too big, then return an error. If the 
+  Password is valid, then store the password, lock StdIn and arm the periodic timer.
 
   @param  This                     Console Control protocol pointer.
   @param  Password                 The password input.
 
-  @retval EFI_SUCCESS              Lock the StdIn device successfully.
+  @retval EFI_SUCCESS              Lock the StdIn device
   @retval EFI_INVALID_PARAMETER    Password is NULL
-  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the big password fails
+  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the password fails
 
 **/
 typedef

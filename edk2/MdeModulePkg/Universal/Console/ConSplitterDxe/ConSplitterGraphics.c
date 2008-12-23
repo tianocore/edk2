@@ -25,16 +25,17 @@ CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
 /**
   Return the current video mode information. Also returns info about existence
-  of Graphics Output devices or UGA Draw devices in system, and if the Std In device is locked. All the
-  arguments are optional and only returned if a non NULL pointer is passed in.
+  of Graphics Output devices or UGA Draw devices in system, and whether the Std
+  In device is locked. GopUgaExists and StdInLocked parameters are optional, and
+  only returned if a non NULL pointer is passed in.
 
   @param  This                    Protocol instance pointer.
-  @param  Mode                    Are we in text of grahics mode.
-  @param  GopUgaExists            TRUE if Console Spliter has found a GOP or UGA device
+  @param  Mode                    Current video mode.
+  @param  GopExists               TRUE if GOP Spliter has found a GOP/UGA device
   @param  StdInLocked             TRUE if StdIn device is keyboard locked
 
-  @retval EFI_SUCCESS             Mode information returned.
-  @retval EFI_INVALID_PARAMETER   Invalid parameters.
+  @retval EFI_SUCCESS             Video mode information is returned.
+  @retval EFI_INVALID_PARAMETER   Invalid parameters if Mode == NULL.
 
 **/
 EFI_STATUS
