@@ -170,25 +170,24 @@ typedef struct {
   return the invalid length 33, which is IP4_MASK_NUM.
   NetMask is in the host byte order.
 
-  @param  NetMask               The netmask to get the length from
+  @param[in]  NetMask              The netmask to get the length from.
 
-  @return The length of the netmask, IP4_MASK_NUM if the mask isn't
-  @return supported.
-
+  @return The length of the netmask, IP4_MASK_NUM if the mask isn't.
+  
 **/
 INTN
 EFIAPI
 NetGetMaskLength (
-  IN IP4_ADDR               Mask
+  IN IP4_ADDR               NetMask
   );
 
 /**
   Return the class of the address, such as class a, b, c.
   Addr is in host byte order.
 
-  @param  Addr                  The address to get the class from
+  @param[in]   Addr                  The address to get the class from.
 
-  @return IP address class, such as IP4_ADDR_CLASSA
+  @return IP address class, such as IP4_ADDR_CLASSA.
 
 **/
 INTN
@@ -202,13 +201,14 @@ NetGetIpClass (
   the netmask. If NetMask is zero, use the IP address's class to
   get the default mask.
 
-  @param  Ip                    The IP to check againist
-  @param  NetMask               The mask of the IP
+  @param[in]  Ip                    The IP to check against.
+  @param[in]  NetMask               The mask of the IP.
 
-  @return TRUE if IP is a valid unicast address on the network, otherwise FALSE
+  @return TRUE if IP is a valid unicast address on the network, otherwise FALSE.
 
 **/
 BOOLEAN
+EFIAPI
 Ip4IsUnicast (
   IN IP4_ADDR               Ip,
   IN IP4_ADDR               NetMask
@@ -233,7 +233,7 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
   Extract a UINT32 from a byte stream, then convert it to host
   byte order. Use this function to avoid alignment error.
 
-  @param  Buf                   The buffer to extract the UINT32.
+  @param[in]  Buf                 The buffer to extract the UINT32.
 
   @return The UINT32 extracted.
 
@@ -248,23 +248,19 @@ NetGetUint32 (
   Put a UINT32 to the byte stream. Convert it from host byte order
   to network byte order before putting.
 
-  @param  Buf                   The buffer to put the UINT32
-  @param  Data                  The data to put
-
-  @return None
-
+  @param[in, out]  Buf          The buffer to put the UINT32.
+  @param[in]      Data          The data to put.
+  
 **/
 VOID
 EFIAPI
 NetPutUint32 (
-  IN UINT8                  *Buf,
-  IN UINT32                 Data
+  IN OUT UINT8                 *Buf,
+  IN     UINT32                Data
   );
 
 /**
   Initialize a random seed using current time.
-
-  None
 
   @return The random seed initialized with current time.
 
@@ -311,9 +307,9 @@ NetRandomInitSeed (
 
 
 /**
-  Remove the first entry on the list
+  Remove the first entry on the list.
 
-  @param  Head                  The list header
+  @param[in, out]  Head                  The list header.
 
   @return The entry that is removed from the list, NULL if the list is empty.
 
@@ -321,13 +317,13 @@ NetRandomInitSeed (
 LIST_ENTRY *
 EFIAPI
 NetListRemoveHead (
-  LIST_ENTRY            *Head
+  IN OUT LIST_ENTRY            *Head
   );
 
 /**
-  Remove the last entry on the list
+  Remove the last entry on the list.
 
-  @param  Head                  The list head
+  @param[in, out]  Head                  The list head.
 
   @return The entry that is removed from the list, NULL if the list is empty.
 
@@ -335,39 +331,35 @@ NetListRemoveHead (
 LIST_ENTRY *
 EFIAPI
 NetListRemoveTail (
-  LIST_ENTRY            *Head
+  IN OUT LIST_ENTRY            *Head
   );
 
 /**
   Insert the NewEntry after the PrevEntry.
 
-  @param  PrevEntry             The previous entry to insert after
-  @param  NewEntry              The new entry to insert
-
-  @return None
+  @param[in, out]  PrevEntry             The previous entry to insert after.
+  @param[in, out]  NewEntry              The new entry to insert.
 
 **/
 VOID
 EFIAPI
 NetListInsertAfter (
-  IN LIST_ENTRY         *PrevEntry,
-  IN LIST_ENTRY         *NewEntry
+  IN OUT LIST_ENTRY         *PrevEntry,
+  IN OUT LIST_ENTRY         *NewEntry
   );
 
 /**
   Insert the NewEntry before the PostEntry.
 
-  @param  PostEntry             The entry to insert before
-  @param  NewEntry              The new entry to insert
-
-  @return None
+  @param[in, out]  PostEntry             The entry to insert before.
+  @param[in, out]  NewEntry              The new entry to insert.
 
 **/
 VOID
 EFIAPI
 NetListInsertBefore (
-  IN LIST_ENTRY         *PostEntry,
-  IN LIST_ENTRY         *NewEntry
+  IN OUT LIST_ENTRY     *PostEntry,
+  IN OUT LIST_ENTRY     *NewEntry
   );
 
 
@@ -392,35 +384,31 @@ typedef struct {
 /**
   Initialize the netmap. Netmap is a reposity to keep the <Key, Value> pairs.
 
-  @param  Map                   The netmap to initialize
-
-  @return None
+  @param[in, out]  Map                   The netmap to initialize.
 
 **/
 VOID
 EFIAPI
 NetMapInit (
-  IN NET_MAP                *Map
+  IN OUT NET_MAP                *Map
   );
 
 /**
   To clean up the netmap, that is, release allocated memories.
 
-  @param  Map                   The netmap to clean up.
-
-  @return None
+  @param[in, out]  Map                   The netmap to clean up.
 
 **/
 VOID
 EFIAPI
 NetMapClean (
-  IN NET_MAP                *Map
+  IN OUT NET_MAP            *Map
   );
 
 /**
-  Test whether the netmap is empty
+  Test whether the netmap is empty.
 
-  @param  Map                   The net map to test
+  @param[in]  Map                   The net map to test.
 
   @return TRUE if the netmap is empty, otherwise FALSE.
 
@@ -434,7 +422,7 @@ NetMapIsEmpty (
 /**
   Return the number of the <Key, Value> pairs in the netmap.
 
-  @param  Map                   The netmap to get the entry number
+  @param[in]  Map                   The netmap to get the entry number.
 
   @return The entry number in the netmap.
 
@@ -448,18 +436,18 @@ NetMapGetCount (
 /**
   Allocate an item to save the <Key, Value> pair to the head of the netmap.
 
-  @param  Map                   The netmap to insert into
-  @param  Key                   The user's key
-  @param  Value                 The user's value for the key
+  @param[in, out]  Map                   The netmap to insert into.
+  @param[in]       Key                   The user's key.
+  @param[in]       Value                 The user's value for the key.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the item
-  @retval EFI_SUCCESS           The item is inserted to the head
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the item.
+  @retval EFI_SUCCESS           The item is inserted to the head.
 
 **/
 EFI_STATUS
 EFIAPI
 NetMapInsertHead (
-  IN NET_MAP                *Map,
+  IN OUT NET_MAP            *Map,
   IN VOID                   *Key,
   IN VOID                   *Value    OPTIONAL
   );
@@ -467,32 +455,32 @@ NetMapInsertHead (
 /**
   Allocate an item to save the <Key, Value> pair to the tail of the netmap.
 
-  @param  Map                   The netmap to insert into
-  @param  Key                   The user's key
-  @param  Value                 The user's value for the key
+  @param[in, out]  Map                   The netmap to insert into.
+  @param[in]       Key                   The user's key.
+  @param[in]       Value                 The user's value for the key.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the item
-  @retval EFI_SUCCESS           The item is inserted to the tail
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the item.
+  @retval EFI_SUCCESS           The item is inserted to the tail.
 
 **/
 EFI_STATUS
 EFIAPI
 NetMapInsertTail (
-  IN NET_MAP                *Map,
+  IN OUT NET_MAP            *Map,
   IN VOID                   *Key,
   IN VOID                   *Value    OPTIONAL
   );
 
 /**
-  Find the key in the netmap
+  Find the key in the netmap.
 
-  @param  Map                   The netmap to search within
-  @param  Key                   The key to search
+  @param[in]  Map                   The netmap to search within.
+  @param[in]  Key                   The key to search.
 
   @return The point to the item contains the Key, or NULL if Key isn't in the map.
 
 **/
-NET_MAP_ITEM  *
+NET_MAP_ITEM *
 EFIAPI
 NetMapFindKey (
   IN  NET_MAP               *Map,
@@ -500,53 +488,53 @@ NetMapFindKey (
   );
 
 /**
-  Remove the item from the netmap
+  Remove the item from the netmap.
 
-  @param  Map                   The netmap to remove the item from
-  @param  Item                  The item to remove
-  @param  Value                 The variable to receive the value if not NULL
+  @param[in, out]  Map                   The netmap to remove the item from.
+  @param[in, out]  Item                  The item to remove.
+  @param[out]      Value                 The variable to receive the value if not NULL.
 
-  @return The key of the removed item.
+  @return                                The key of the removed item.
 
 **/
 VOID *
 EFIAPI
 NetMapRemoveItem (
-  IN  NET_MAP               *Map,
-  IN  NET_MAP_ITEM          *Item,
-  OUT VOID                  **Value   OPTIONAL
+  IN  OUT NET_MAP             *Map,
+  IN  OUT NET_MAP_ITEM        *Item,
+  OUT VOID                    **Value           OPTIONAL
   );
 
 /**
   Remove the first entry on the netmap.
 
-  @param  Map                   The netmap to remove the head from
-  @param  Value                 The variable to receive the value if not NULL
+  @param[in, out]  Map                   The netmap to remove the head from.
+  @param[out]      Value                 The variable to receive the value if not NULL.
 
-  @return The key of the item removed
+  @return                                The key of the item removed.
 
 **/
 VOID *
 EFIAPI
 NetMapRemoveHead (
-  IN  NET_MAP               *Map,
-  OUT VOID                  **Value   OPTIONAL
+  IN OUT NET_MAP            *Map,
+  OUT VOID                  **Value         OPTIONAL
   );
 
 /**
   Remove the last entry on the netmap.
 
-  @param  Map                   The netmap to remove the tail from
-  @param  Value                 The variable to receive the value if not NULL
+  @param[in, out]  Map                   The netmap to remove the tail from.
+  @param[out]      Value                 The variable to receive the value if not NULL.
 
-  @return The key of the item removed
+  @return                                The key of the item removed.
 
 **/
 VOID *
 EFIAPI
 NetMapRemoveTail (
-  IN  NET_MAP               *Map,
-  OUT VOID                  **Value OPTIONAL
+  IN OUT NET_MAP            *Map,
+  OUT VOID                  **Value       OPTIONAL
   );
 
 typedef
@@ -563,11 +551,13 @@ EFI_STATUS
   from the loop. It returns the CallBack's last return value. This
   function is delete safe for the current item.
 
-  @param  Map                   The Map to iterate through
-  @param  CallBack              The callback function to call for each item.
-  @param  Arg                   The opaque parameter to the callback
+  @param[in]  Map                   The Map to iterate through.
+  @param[in]  CallBack              The callback function to call for each item.
+  @param[in]  Arg                   The opaque parameter to the callback.
 
-  @return It returns the CallBack's last return value.
+  @retval EFI_SUCCESS            There is no item in the netmap or CallBack for each item
+                                 return EFI_SUCCESS.
+  @retval Others                 It returns the CallBack's last return value.
 
 **/
 EFI_STATUS
@@ -575,7 +565,7 @@ EFIAPI
 NetMapIterate (
   IN NET_MAP                *Map,
   IN NET_MAP_CALLBACK       CallBack,
-  IN VOID                   *Arg      OPTIONAL
+  IN VOID                   *Arg
   );
 
 
@@ -585,10 +575,10 @@ NetMapIterate (
 /**
   Create a child of the service that is identified by ServiceBindingGuid.
 
-  @param  ControllerHandle      The controller which has the service installed.
-  @param  ImageHandle           The image handle used to open service.
-  @param  ServiceBindingGuid    The service's Guid.
-  @param  ChildHandle           The handle to receive the create child
+  @param[in]       Controller            The controller which has the service installed.
+  @param[in]       Image                 The image handle used to open service.
+  @param[in]       ServiceBindingGuid    The service's Guid.
+  @param[in, out]  ChildHandle           The handle to receive the create child
 
   @retval EFI_SUCCESS           The child is successfully created.
   @retval Others                Failed to create the child.
@@ -597,19 +587,19 @@ NetMapIterate (
 EFI_STATUS
 EFIAPI
 NetLibCreateServiceChild (
-  IN  EFI_HANDLE            ControllerHandle,
-  IN  EFI_HANDLE            ImageHandle,
+  IN  EFI_HANDLE            Controller,
+  IN  EFI_HANDLE            Image,
   IN  EFI_GUID              *ServiceBindingGuid,
-  OUT EFI_HANDLE            *ChildHandle
+  IN  OUT EFI_HANDLE        *ChildHandle
   );
 
 /**
   Destory a child of the service that is identified by ServiceBindingGuid.
 
-  @param  ControllerHandle      The controller which has the service installed.
-  @param  ImageHandle           The image handle used to open service.
-  @param  ServiceBindingGuid    The service's Guid.
-  @param  ChildHandle           The child to destory
+  @param[in]   Controller            The controller which has the service installed.
+  @param[in]   Image                 The image handle used to open service.
+  @param[in]   ServiceBindingGuid    The service's Guid.
+  @param[in]   ChildHandle           The child to destory
 
   @retval EFI_SUCCESS           The child is successfully destoried.
   @retval Others                Failed to destory the child.
@@ -618,8 +608,8 @@ NetLibCreateServiceChild (
 EFI_STATUS
 EFIAPI
 NetLibDestroyServiceChild (
-  IN  EFI_HANDLE            ControllerHandle,
-  IN  EFI_HANDLE            ImageHandle,
+  IN  EFI_HANDLE            Controller,
+  IN  EFI_HANDLE            Image,
   IN  EFI_GUID              *ServiceBindingGuid,
   IN  EFI_HANDLE            ChildHandle
   );
@@ -629,36 +619,37 @@ NetLibDestroyServiceChild (
   SnpHandle to a unicode string. Callers are responsible for freeing the
   string storage.
 
-  @param  SnpHandle             The handle where the simple network protocol is
-                                installed on.
-  @param  ImageHandle           The image handle used to act as the agent handle to
-                                get the simple network protocol.
-  @param  MacString             The pointer to store the address of the string
-                                representation of  the mac address.
-
+  @param[in]   SnpHandle             The handle where the simple network protocol is
+                                     installed on.
+  @param[in]   ImageHandle           The image handle used to act as the agent handle to
+                                     get the simple network protocol.
+  @param[out]  MacString             The pointer to store the address of the string
+                                     representation of  the mac address.
+  
+  @retval EFI_SUCCESS           Convert the mac address a unicode string successfully.
   @retval EFI_OUT_OF_RESOURCES  There are not enough memory resource.
-  @retval other                 Failed to open the simple network protocol.
+  @retval Others                Failed to open the simple network protocol.
 
 **/
 EFI_STATUS
 EFIAPI
 NetLibGetMacString (
-  IN           EFI_HANDLE  SnpHandle,
-  IN           EFI_HANDLE  ImageHandle,
-  IN OUT       CHAR16      **MacString
+  IN  EFI_HANDLE            SnpHandle,
+  IN  EFI_HANDLE            ImageHandle,
+  OUT CHAR16                **MacString
   );
 
 /**
   Create an IPv4 device path node.
 
-  @param  Node                  Pointer to the IPv4 device path node.
-  @param  Controller            The handle where the NIC IP4 config protocol resides.
-  @param  LocalIp               The local IPv4 address.
-  @param  LocalPort             The local port.
-  @param  RemoteIp              The remote IPv4 address.
-  @param  RemotePort            The remote port.
-  @param  Protocol              The protocol type in the IP header.
-  @param  UseDefaultAddress     Whether this instance is using default address or not.
+  @param[in, out]  Node                  Pointer to the IPv4 device path node.
+  @param[in]       Controller            The handle where the NIC IP4 config protocol resides.
+  @param[in]       LocalIp               The local IPv4 address.
+  @param[in]       LocalPort             The local port.
+  @param[in]       RemoteIp              The remote IPv4 address.
+  @param[in]       RemotePort            The remote port.
+  @param[in]       Protocol              The protocol type in the IP header.
+  @param[in]       UseDefaultAddress     Whether this instance is using default address or not.
 
 **/
 VOID
@@ -684,10 +675,10 @@ NetLibCreateIPv4DPathNode (
   IP opens these handle BY_DRIVER, use that info, we can get the
   UNDI/SNP handle.
 
-  @param  Controller            Then protocol handle to check
-  @param  ProtocolGuid          The protocol that is related with the handle.
+  @param[in]  Controller            Then protocol handle to check.
+  @param[in]  ProtocolGuid          The protocol that is related with the handle.
 
-  @return The UNDI/SNP handle or NULL.
+  @return The UNDI/SNP handle or NULL for errors.
 
 **/
 EFI_HANDLE
@@ -700,14 +691,14 @@ NetLibGetNicHandle (
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.
 
-  @param DpcTpl           The EFI_TPL that the DPC should be invoked.
-  @param DpcProcedure     Pointer to the DPC's function.
-  @param DpcContext       Pointer to the DPC's context.  Passed to DpcProcedure
-                          when DpcProcedure is invoked.
+  @param[in]  DpcTpl           The EFI_TPL that the DPC should be invoked.
+  @param[in]  DpcProcedure     Pointer to the DPC's function.
+  @param[in]  DpcContext       Pointer to the DPC's context.  Passed to DpcProcedure
+                               when DpcProcedure is invoked.
 
   @retval  EFI_SUCCESS              The DPC was queued.
-  @retval  EFI_INVALID_PARAMETER    DpcTpl is not a valid EFI_TPL.
-                                    DpcProcedure is NULL.
+  @retval  EFI_INVALID_PARAMETER    DpcTpl is not a valid EFI_TPL, or DpcProcedure
+                                    is NULL.
   @retval  EFI_OUT_OF_RESOURCES     There are not enough resources available to
                                     add the DPC to the queue.
 
@@ -721,7 +712,10 @@ NetLibQueueDpc (
   );
 
 /**
-  Add a Deferred Procedure Call to the end of the DPC queue.
+  Dispatch the queue of DPCs. ALL DPCs that have been queued with a DpcTpl
+  value greater than or equal to the current TPL are invoked in the order that
+  they were queued.  DPCs with higher DpcTpl values are invoked before DPCs with
+  lower DpcTpl values.
 
   @retval  EFI_SUCCESS              One or more DPCs were invoked.
   @retval  EFI_NOT_FOUND            No DPCs were invoked.
@@ -736,7 +730,7 @@ NetLibDispatchDpc (
 /**
   This is the default unload handle for all the network drivers.
 
-  @param  ImageHandle           The drivers' driver image.
+  @param[in]  ImageHandle       The drivers' driver image.
 
   @retval EFI_SUCCESS           The image is unloaded.
   @retval Others                Failed to unload the image.
@@ -897,9 +891,9 @@ typedef struct {
   Allocate a single block NET_BUF. Upon allocation, all the
   free space is in the tail room.
 
-  @param  Len                   The length of the block.
+  @param[in]  Len              The length of the block.
 
-  @retval *                     Pointer to the allocated NET_BUF. If NULL  the
+  @return                       Pointer to the allocated NET_BUF. If NULL  the
                                 allocation failed due to resource limit.
 
 **/
@@ -912,9 +906,7 @@ NetbufAlloc (
 /**
   Free the buffer and its associated NET_VECTOR.
 
-  @param  Nbuf                  Pointer to the NET_BUF to be freed.
-
-  @return None.
+  @param[in]  Nbuf                  Pointer to the NET_BUF to be freed.
 
 **/
 VOID
@@ -929,11 +921,11 @@ NetbufFree (
   returns the fragment that contains the byte which is used mainly by
   the buffer implementation itself.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Offset                The index or offset of the byte
-  @param  Index                 Index of the fragment that contains the block
+  @param[in]   Nbuf                  Pointer to the net buffer.
+  @param[in]   Offset                The index or offset of the byte.
+  @param[out]  Index                 Index of the fragment that contains the block.
 
-  @retval *                     Pointer to the nth byte of data in the net buffer.
+  @return *                     Pointer to the nth byte of data in the net buffer.
                                 If NULL, there is no such data in the net buffer.
 
 **/
@@ -942,15 +934,16 @@ EFIAPI
 NetbufGetByte (
   IN  NET_BUF               *Nbuf,
   IN  UINT32                Offset,
-  OUT UINT32                *Index      OPTIONAL
+  OUT UINT32                *Index  OPTIONAL
   );
 
 /**
   Create a copy of NET_BUF that share the associated NET_DATA.
 
-  @param  Nbuf                  Pointer to the net buffer to be cloned.
+  @param[in]  Nbuf              Pointer to the net buffer to be cloned.
 
-  @retval *                     Pointer to the cloned net buffer.
+  @return                       Pointer to the cloned net buffer.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF  *
@@ -963,19 +956,20 @@ NetbufClone (
   Create a duplicated copy of Nbuf, data is copied. Also leave some
   head space before the data.
 
-  @param  Nbuf                  Pointer to the net buffer to be cloned.
-  @param  Duplicate             Pointer to the net buffer to duplicate to, if NULL
-                                a new net  buffer is allocated.
-  @param  HeadSpace             Length of the head space to reserve
+  @param[in]       Nbuf                  Pointer to the net buffer to be cloned.
+  @param[in, out]  Duplicate             Pointer to the net buffer to duplicate to, if NULL
+                                         a new net  buffer is allocated.
+  @param[in]      HeadSpace              Length of the head space to reserve.
 
-  @retval *                     Pointer to the duplicated net buffer.
+  @return                       Pointer to the duplicated net buffer.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF  *
 EFIAPI
 NetbufDuplicate (
   IN NET_BUF                *Nbuf,
-  IN NET_BUF                *Duplicate    OPTIONAL,
+  IN OUT NET_BUF            *Duplicate        OPTIONAL,
   IN UINT32                 HeadSpace
   );
 
@@ -985,14 +979,15 @@ NetbufDuplicate (
   created but the associated data in NET_VECTOR is shared.
   This function exists to do IP packet fragmentation.
 
-  @param  Nbuf                  Pointer to the net buffer to be cloned.
-  @param  Offset                Starting point of the data to be included in new
-                                buffer.
-  @param  Len                   How many data to include in new data
-  @param  HeadSpace             How many bytes of head space to reserve for
-                                protocol header
+  @param[in]  Nbuf                  Pointer to the net buffer to be cloned.
+  @param[in]  Offset                Starting point of the data to be included in new
+                                    buffer.
+  @param[in]  Len                   How many data to include in new data.
+  @param[in]  HeadSpace             How many bytes of head space to reserve for
+                                    protocol header.
 
-  @retval *                     Pointer to the cloned net buffer.
+  @return                       Pointer to the cloned net buffer.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF  *
@@ -1013,35 +1008,33 @@ NetbufGetFragment (
   of an empty NET_BUF not built from the external. But
   it should be enough for the network stack.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Len                   The length of buffer to be reserverd.
-
-  @return None.
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Len                   The length of buffer to be reserverd.
 
 **/
 VOID
 EFIAPI
 NetbufReserve (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT32                 Len
   );
 
 /**
   Allocate some space from the header or tail of the buffer.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Len                   The length of the buffer to be allocated.
-  @param  FromHead              The flag to indicate whether reserve the data from
-                                head or tail. TRUE for from head, and FALSE for
-                                from tail.
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Len                   The length of the buffer to be allocated.
+  @param [in]      FromHead              The flag to indicate whether reserve the data from
+                                         head or tail. TRUE for from head, and FALSE for
+                                         from tail.
 
-  @retval *                     Pointer to the first byte of the allocated buffer.
+  @return                       Pointer to the first byte of the allocated buffer.
 
 **/
 UINT8  *
 EFIAPI
 NetbufAllocSpace (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT32                 Len,
   IN BOOLEAN                FromHead
   );
@@ -1049,18 +1042,18 @@ NetbufAllocSpace (
 /**
   Trim some data from the header or tail of the buffer.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Len                   The length of the data to be trimmed.
-  @param  FromHead              The flag to indicate whether trim data from head or
-                                tail. TRUE for from head, and FALSE for from tail.
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Len                   The length of the data to be trimmed.
+  @param[in]      FromHead               The flag to indicate whether trim data from head or
+                                         tail. TRUE for from head, and FALSE for from tail.
 
-  @retval UINTN                 Length of the actually trimmed data.
+  @return    Length of the actually trimmed data.
 
 **/
 UINT32
 EFIAPI
 NetbufTrim (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT32                 Len,
   IN BOOLEAN                FromHead
   );
@@ -1068,10 +1061,10 @@ NetbufTrim (
 /**
   Copy the data from the specific offset to the destination.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Offset                The sequence number of the first byte to copy.
-  @param  Len                   Length of the data to copy.
-  @param  Dest                  The destination of the data to copy to.
+  @param[in]   Nbuf                  Pointer to the net buffer.
+  @param[in]   Offset                The sequence number of the first byte to copy.
+  @param[in]   Len                   Length of the data to copy.
+  @param[in]   Dest                  The destination of the data to copy to.
 
   @retval UINTN                 The length of the copied data.
 
@@ -1088,17 +1081,17 @@ NetbufCopy (
 /**
   Build a NET_BUF from external blocks.
 
-  @param  ExtFragment           Pointer to the data block.
-  @param  ExtNum                The number of the data block.
-  @param  HeadSpace             The head space to be reserved.
-  @param  HeadLen               The length of the protocol header, This function
-                                will pull that number of data into a linear block.
-  @param  ExtFree               Pointer to the caller provided free function.
-  @param  Arg                   The argument passed to ExtFree when ExtFree is
-                                called.
+  @param[in]  ExtFragment           Pointer to the data block.
+  @param[in]  ExtNum                The number of the data block.
+  @param[in]  HeadSpace             The head space to be reserved.
+  @param[in]  HeadLen               The length of the protocol header, This function
+                                    will pull that number of data into a linear block.
+  @param[in]  ExtFree               Pointer to the caller provided free function.
+  @param[in]  Arg                   The argument passed to ExtFree when ExtFree is
+                                    called.
 
-  @retval *                     Pointer to the net buffer built from the data
-                                blocks.
+  @return                    Pointer to the net buffer built from the data blocks.
+                             If NULL, the allocation failed due to resource limit.
 
 **/
 NET_BUF  *
@@ -1116,11 +1109,11 @@ NetbufFromExt (
   Build a fragment table to contain the fragments in the
   buffer. This is the opposite of the NetbufFromExt.
 
-  @param  Nbuf                  Point to the net buffer
-  @param  ExtFragment           Pointer to the data block.
-  @param  ExtNum                The number of the data block.
+  @param[in]       Nbuf                  Point to the net buffer.
+  @param[in, out]  ExtFragment           Pointer to the data block.
+  @param[in, out]  ExtNum                The number of the data block.
 
-  @retval EFI_BUFFER_TOO_SMALL  The number of non-empty block is bigger than ExtNum
+  @retval EFI_BUFFER_TOO_SMALL  The number of non-empty block is bigger than ExtNum.
   @retval EFI_SUCCESS           Fragment table built.
 
 **/
@@ -1128,22 +1121,22 @@ EFI_STATUS
 EFIAPI
 NetbufBuildExt (
   IN NET_BUF                *Nbuf,
-  IN NET_FRAGMENT           *ExtFragment,
-  IN UINT32                 *ExtNum
+  IN OUT NET_FRAGMENT       *ExtFragment,
+  IN OUT UINT32             *ExtNum
   );
 
 /**
   Build a NET_BUF from a list of NET_BUF.
 
-  @param  BufList               A List of NET_BUF.
-  @param  HeadSpace             The head space to be reserved.
-  @param  HeaderLen             The length of the protocol header, This function
-                                will pull that number of data into a linear block.
-  @param  ExtFree               Pointer to the caller provided free function.
-  @param  Arg                   The argument passed to ExtFree when ExtFree is
-                                called.
+  @param[in]   BufList               A List of NET_BUF.
+  @param[in]   HeadSpace             The head space to be reserved.
+  @param[in]   HeaderLen             The length of the protocol header, This function
+                                     will pull that number of data into a linear block.
+  @param[in]   ExtFree               Pointer to the caller provided free function.
+  @param[in]   Arg                   The argument passed to ExtFree when ExtFree is
+                                     called.
 
-  @retval *                     Pointer to the net buffer built from the data
+  @return                       Pointer to the net buffer built from the data
                                 blocks.
 
 **/
@@ -1154,43 +1147,38 @@ NetbufFromBufList (
   IN UINT32                 HeadSpace,
   IN UINT32                 HeaderLen,
   IN NET_VECTOR_EXT_FREE    ExtFree,
-  IN VOID                   *Arg                OPTIONAL
+  IN VOID                   *Arg              OPTIONAL
   );
 
 /**
   Free a list of net buffers.
 
-  @param  Head                  Pointer to the head of linked net buffers.
-
-  @return None.
+  @param[in, out]  Head              Pointer to the head of linked net buffers.
 
 **/
 VOID
 EFIAPI
 NetbufFreeList (
-  IN LIST_ENTRY             *Head
+  IN OUT LIST_ENTRY         *Head
   );
 
 /**
   Initiate the net buffer queue.
 
-  @param  NbufQue               Pointer to the net buffer queue to be initiated.
-
-  @return None.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue to be initiated.
 
 **/
 VOID
 EFIAPI
 NetbufQueInit (
-  IN NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE          *NbufQue
   );
 
 /**
   Allocate an initialized net buffer queue.
 
-  None.
-
-  @retval *                     Pointer to the allocated net buffer queue.
+  @return                       Pointer to the allocated net buffer queue.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF_QUEUE  *
@@ -1202,9 +1190,7 @@ NetbufQueAlloc (
 /**
   Free a net buffer queue.
 
-  @param  NbufQue               Poitner to the net buffer queue to be freed.
-
-  @return None.
+  @param[in]  NbufQue               Poitner to the net buffer queue to be freed.
 
 **/
 VOID
@@ -1216,43 +1202,43 @@ NetbufQueFree (
 /**
   Remove a net buffer from head in the specific queue.
 
-  @param  NbufQue               Pointer to the net buffer queue.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue.
 
-  @retval *                     Pointer to the net buffer removed from the specific
+  @return                       Pointer to the net buffer removed from the specific
+                                queue. If NULL, there is no net buffer in the specific
                                 queue.
 
 **/
 NET_BUF  *
 EFIAPI
 NetbufQueRemove (
-  IN NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE          *NbufQue
   );
 
 /**
   Append a buffer to the end of the queue.
 
-  @param  NbufQue               Pointer to the net buffer queue.
-  @param  Nbuf                  Pointer to the net buffer to be appended.
-
-  @return None.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue.
+  @param[in, out]  Nbuf                  Pointer to the net buffer to be appended.
 
 **/
 VOID
 EFIAPI
 NetbufQueAppend (
-  IN NET_BUF_QUEUE          *NbufQue,
-  IN NET_BUF                *Nbuf
+  IN OUT NET_BUF_QUEUE          *NbufQue,
+  IN OUT NET_BUF                *Nbuf
   );
 
 /**
   Copy some data from the buffer queue to the destination.
 
-  @param  NbufQue               Pointer to the net buffer queue.
-  @param  Offset                The sequence number of the first byte to copy.
-  @param  Len                   Length of the data to copy.
-  @param  Dest                  The destination of the data to copy to.
+  @param[in]   NbufQue               Pointer to the net buffer queue.
+  @param[in]   Offset                The sequence number of the first byte to copy.
+  @param[in]   Len                   Length of the data to copy.
+  @param[out]  Dest                  The destination of the data to copy to.
 
-  @retval UINTN                 The length of the copied data.
+  @return       The length of the copied data. If 0, then the length is zero or offset 
+                suppress the total size of net buffer.
 
 **/
 UINT32
@@ -1261,23 +1247,23 @@ NetbufQueCopy (
   IN NET_BUF_QUEUE          *NbufQue,
   IN UINT32                 Offset,
   IN UINT32                 Len,
-  IN UINT8                  *Dest
+  OUT UINT8                 *Dest
   );
 
 /**
   Trim some data from the queue header, release the buffer if
   whole buffer is trimmed.
 
-  @param  NbufQue               Pointer to the net buffer queue.
-  @param  Len                   Length of the data to trim.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue.
+  @param[in]       Len                   Length of the data to trim.
 
-  @retval UINTN                 The length of the data trimmed.
+  @return   The length of the data trimmed, or 0 if length of the data to trim is zero.
 
 **/
 UINT32
 EFIAPI
 NetbufQueTrim (
-  IN NET_BUF_QUEUE          *NbufQue,
+  IN OUT NET_BUF_QUEUE      *NbufQue,
   IN UINT32                 Len
   );
 
@@ -1285,24 +1271,22 @@ NetbufQueTrim (
 /**
   Flush the net buffer queue.
 
-  @param  NbufQue               Pointer to the queue to be flushed.
-
-  @return None.
+  @param[in, out]  NbufQue               Pointer to the queue to be flushed.
 
 **/
 VOID
 EFIAPI
 NetbufQueFlush (
-  IN NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE          *NbufQue
   );
 
 /**
   Compute checksum for a bulk of data.
 
-  @param  Bulk                  Pointer to the data.
-  @param  Len                   Length of the data, in bytes.
+  @param[in]   Bulk                  Pointer to the data.
+  @param[in]   Len                   Length of the data, in bytes.
 
-  @retval UINT16                The computed checksum.
+  @return    The computed checksum.
 
 **/
 UINT16
@@ -1315,10 +1299,10 @@ NetblockChecksum (
 /**
   Add two checksums.
 
-  @param  Checksum1             The first checksum to be added.
-  @param  Checksum2             The second checksum to be added.
+  @param[in]   Checksum1             The first checksum to be added.
+  @param[in]   Checksum2             The second checksum to be added.
 
-  @retval UINT16                The new checksum.
+  @return         The new checksum.
 
 **/
 UINT16
@@ -1331,9 +1315,9 @@ NetAddChecksum (
 /**
   Compute the checksum for a NET_BUF.
 
-  @param  Nbuf                  Pointer to the net buffer.
+  @param[in]   Nbuf                  Pointer to the net buffer.
 
-  @retval UINT16                The computed checksum.
+  @return    The computed checksum.
 
 **/
 UINT16
@@ -1347,12 +1331,12 @@ NetbufChecksum (
   Src, Dst are in network byte order. and Len is
   in host byte order.
 
-  @param  Src                   The source address of the packet.
-  @param  Dst                   The destination address of the packet.
-  @param  Proto                 The protocol type of the packet.
-  @param  Len                   The length of the packet.
+  @param[in]   Src                   The source address of the packet.
+  @param[in]   Dst                   The destination address of the packet.
+  @param[in]   Proto                 The protocol type of the packet.
+  @param[in]   Len                   The length of the packet.
 
-  @retval UINT16                The computed checksum.
+  @return   The computed checksum.
 
 **/
 UINT16
