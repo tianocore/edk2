@@ -1,4 +1,3 @@
-
 /** @file
   This file defines the encoding for the VFR (Visual Form Representation) language.
   Framework IFR is primarily consumed by the EFI presentation engine, and produced by EFI
@@ -246,7 +245,7 @@ typedef struct {
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER Header;
   UINT16            QuestionId;   // The ID designating what the question is about...sucked in from a #define, likely in the form of a variable name
-  UINT8             Width;        // The Size of the Data being saved -- BUGBUG -- remove someday
+  UINT8             Width;        // The Size of the Data being saved  @bug -- remove someday
   STRING_REF        Prompt;       // The String Token for the Prompt
   STRING_REF        Help;         // The string Token for the context-help
   UINT8             Flags;        // This is included solely for purposes of interactive/dynamic support.
@@ -259,7 +258,7 @@ typedef struct {
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER Header;
   UINT16            QuestionId;   // The ID designating what the question is about...sucked in from a #define, likely in the form of a variable name
-  UINT8             Width;        // The Size of the Data being saved -- BUGBUG -- remove someday
+  UINT8             Width;        // The Size of the Data being saved  @bug -- remove someday
   STRING_REF        Prompt;       // The String Token for the Prompt
   STRING_REF        Help;         // The string Token for the context-help
   UINT8             Flags;        // This is included solely for purposes of interactive/dynamic support.
