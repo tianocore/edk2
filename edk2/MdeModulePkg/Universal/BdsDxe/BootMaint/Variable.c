@@ -384,8 +384,7 @@ Var_UpdateAllConsoleOption (
                          to be processed.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
-                         for detail return information.
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 
 **/
 EFI_STATUS
@@ -937,10 +936,9 @@ Var_UpdateBootNext (
 
   @param CallbackData    The BMM context data.
 
-  @retval EFI_SUCCESS    The function complete successfully.
-  @retval EFI_SUCCESS    Not enough memory to complete the function.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
-                         for detail return information.
+  @retval EFI_SUCCESS             The function complete successfully.
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to complete the function.
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 
 **/
 EFI_STATUS

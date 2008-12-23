@@ -1,5 +1,5 @@
 /** @file
-  Boot Maintainence Main File
+  The functions for Boot Maintainence Main menu.
 
 Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -59,14 +59,12 @@ FreeAllMenu (
 /**
   Create string tokens for a menu from its help strings and display strings
 
+  @param CallbackData       The BMM context data.
+  @param HiiHandle          Hii Handle of the package to be updated.
+  @param MenuOption         The Menu whose string tokens need to be created
 
-  @param CallbackData    The BMM context data.
-  @param HiiHandle       Hii Handle of the package to be updated.
-  @param MenuOption      The Menu whose string tokens need to be created
-
-  @retval  EFI_SUCCESS      string tokens created successfully
+  @retval  EFI_SUCCESS      String tokens created successfully
   @retval  others           contain some errors
-
 **/
 EFI_STATUS
 CreateMenuStringToken (
@@ -137,7 +135,7 @@ BootMaintExtractConfig (
   BMM_CALLBACK_DATA  *Private;
 
   if (Request == NULL) {
-    return EFI_NOT_FOUND;
+    return EFI_INVALID_PARAMETER;
   }
 
   Private = BMM_CALLBACK_DATA_FROM_THIS (This);
@@ -161,29 +159,29 @@ BootMaintExtractConfig (
   This function processes the results of changes in configuration.
 
 
-  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-  @param Action          - Specifies the type of action taken by the browser.
-  @param QuestionId      - A unique value which is sent to the original exporting driver
-                         so that it can identify the type of data to expect.
-  @param Type            - The type of value for the question.
-  @param Value           - A pointer to the data being sent to the original exporting driver.
-  @param ActionRequest   - On return, points to the action requested by the callback function.
+  @param This               Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action             Specifies the type of action taken by the browser.
+  @param QuestionId         A unique value which is sent to the original exporting driver
+                            so that it can identify the type of data to expect.
+  @param Type               The type of value for the question.
+  @param Value              A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest      On return, points to the action requested by the callback function.
 
-  @retval  EFI_SUCCESS           The callback successfully handled the action.
-  @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
-  @retval  EFI_DEVICE_ERROR      The variable could not be saved.
-  @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
-
+  @retval EFI_SUCCESS           The callback successfully handled the action.
+  @retval EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
+  @retval EFI_DEVICE_ERROR      The variable could not be saved.
+  @retval EFI_UNSUPPORTED       The specified Action is not supported by the callback.
+  @retval EFI_INVALID_PARAMETER The parameter of Value or ActionRequest is invalid.
 **/
 EFI_STATUS
 EFIAPI
 BootMaintCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL         *This,
+  IN        EFI_BROWSER_ACTION                     Action,
+  IN        EFI_QUESTION_ID                        QuestionId,
+  IN        UINT8                                  Type,
+  IN        EFI_IFR_TYPE_VALUE                     *Value,
+  OUT       EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
   BMM_CALLBACK_DATA *Private;
@@ -1104,8 +1102,8 @@ InitializeStringDepository (
 /**
   Fetch a usable string node from the string depository and return the string token.
 
-  @param CallbackData    The BMM context data.
-  @param StringDepository  The string repository.
+  @param CallbackData       The BMM context data.
+  @param StringDepository   The string repository.
 
   @retval  EFI_STRING_ID           String token.
 
@@ -1205,9 +1203,6 @@ CleanUpStringDepository (
 
 /**
   Start boot maintenance manager
-
-
-  
 
   @retval EFI_SUCCESS If BMM is invoked successfully.
   @return Other value if BMM return unsuccessfully.
@@ -1317,7 +1312,7 @@ FormSetDispatcher (
   Deletete the Boot Option from EFI Variable. The Boot Order Arrray
   is also updated.
 
-  @param OptionNumber    EDES_TODO: Add parameter description
+  @param OptionNumber    The number of Boot option want to be deleted.
   @param BootOrder       The Boot Order array.
   @param BootOrderSize   The size of the Boot Order Array.
 
@@ -1342,6 +1337,7 @@ BdsDeleteBootOption (
 
   UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", OptionNumber);
   Status = EfiLibDeleteVariable (BootOption, &gEfiGlobalVariableGuid);
+  
   //
   // adjust boot order array
   //
