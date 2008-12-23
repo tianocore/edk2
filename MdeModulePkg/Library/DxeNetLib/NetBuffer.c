@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+  Network library.
+  
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,18 +9,9 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  NetBuffer.c
-
-Abstract:
-
-
-
 **/
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>
@@ -34,10 +26,10 @@ Abstract:
   has the BlockOpNum's NET_BLOCK_OP, and its associated NET_VECTOR has the
   BlockNum's NET_BLOCK.
 
-  @param  BlockNum              The number of NET_BLOCK in the Vector of net buffer
-  @param  BlockOpNum            The number of NET_BLOCK_OP in the net buffer
+  @param[in]  BlockNum              The number of NET_BLOCK in the Vector of net buffer
+  @param[in]  BlockOpNum            The number of NET_BLOCK_OP in the net buffer
 
-  @retval *                     Pointer to the allocated NET_BUF. If NULL  the
+  @return                       Pointer to the allocated NET_BUF. If NULL, the
                                 allocation failed due to resource limit.
 
 **/
@@ -92,9 +84,9 @@ FreeNbuf:
   Allocate a single block NET_BUF. Upon allocation, all the
   free space is in the tail room.
 
-  @param  Len                   The length of the block.
+  @param[in]  Len              The length of the block.
 
-  @retval *                     Pointer to the allocated NET_BUF. If NULL  the
+  @return                       Pointer to the allocated NET_BUF. If NULL  the
                                 allocation failed due to resource limit.
 
 **/
@@ -144,11 +136,9 @@ FreeNBuf:
 
 
 /**
-  Free the vector
+  Free the vector.
 
-  @param  Vector                Pointer to the NET_VECTOR to be freed.
-
-  @return None.
+  @param[in]  Vector                Pointer to the NET_VECTOR to be freed.
 
 **/
 VOID
@@ -195,9 +185,7 @@ NetbufFreeVector (
 /**
   Free the buffer and its associated NET_VECTOR.
 
-  @param  Nbuf                  Pointer to the NET_BUF to be freed.
-
-  @return None.
+  @param[in]  Nbuf                  Pointer to the NET_BUF to be freed.
 
 **/
 VOID
@@ -225,9 +213,10 @@ NetbufFree (
 /**
   Create a copy of NET_BUF that share the associated NET_DATA.
 
-  @param  Nbuf                  Pointer to the net buffer to be cloned.
+  @param[in]  Nbuf              Pointer to the net buffer to be cloned.
 
-  @retval *                     Pointer to the cloned net buffer.
+  @return                       Pointer to the cloned net buffer.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF  *
@@ -270,19 +259,20 @@ NetbufClone (
   Create a duplicated copy of Nbuf, data is copied. Also leave some
   head space before the data.
 
-  @param  Nbuf                  Pointer to the net buffer to be cloned.
-  @param  Duplicate             Pointer to the net buffer to duplicate to, if NULL
-                                a new net  buffer is allocated.
-  @param  HeadSpace             Length of the head space to reserve
+  @param[in]       Nbuf                  Pointer to the net buffer to be cloned.
+  @param[in, out]  Duplicate             Pointer to the net buffer to duplicate to, if NULL
+                                         a new net  buffer is allocated.
+  @param[in]      HeadSpace              Length of the head space to reserve.
 
-  @retval *                     Pointer to the duplicated net buffer.
+  @return                       Pointer to the duplicated net buffer.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF  *
 EFIAPI
 NetbufDuplicate (
   IN NET_BUF                *Nbuf,
-  IN NET_BUF                *Duplicate        OPTIONAL,
+  IN OUT NET_BUF            *Duplicate        OPTIONAL,
   IN UINT32                 HeadSpace
   )
 {
@@ -315,15 +305,13 @@ NetbufDuplicate (
 /**
   Free a list of net buffers.
 
-  @param  Head                  Pointer to the head of linked net buffers.
-
-  @return None.
+  @param[in, out]  Head              Pointer to the head of linked net buffers.
 
 **/
 VOID
 EFIAPI
 NetbufFreeList (
-  IN LIST_ENTRY             *Head
+  IN OUT LIST_ENTRY         *Head
   )
 {
   LIST_ENTRY                *Entry;
@@ -350,11 +338,11 @@ NetbufFreeList (
   returns the fragment that contains the byte which is used mainly by
   the buffer implementation itself.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Offset                The index or offset of the byte
-  @param  Index                 Index of the fragment that contains the block
+  @param[in]   Nbuf                  Pointer to the net buffer.
+  @param[in]   Offset                The index or offset of the byte.
+  @param[out]  Index                 Index of the fragment that contains the block.
 
-  @retval *                     Pointer to the nth byte of data in the net buffer.
+  @return *                     Pointer to the nth byte of data in the net buffer.
                                 If NULL, there is no such data in the net buffer.
 
 **/
@@ -404,18 +392,16 @@ NetbufGetByte (
   are set to the bulk's head and tail respectively. So, this
   function alone can't be used by NetbufAlloc.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Bulk                  Pointer to the data.
-  @param  Len                   Length of the bulk data.
-  @param  Index                 The data block index in the net buffer the bulk
-                                data should belong to.
-
-  @return None.
-
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Bulk                  Pointer to the data.
+  @param[in]       Len                   Length of the bulk data.
+  @param[in]       Index                 The data block index in the net buffer the bulk
+                                         data should belong to.
+                                
 **/
 VOID
 NetbufSetBlock (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT8                  *Bulk,
   IN UINT32                 Len,
   IN UINT32                 Index
@@ -446,18 +432,16 @@ NetbufSetBlock (
   structure is left untouched. Some times, there is no 1:1 relationship
   between NET_BLOCK and NET_BLOCK_OP. For example, that in NetbufGetFragment.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Bulk                  Pointer to the data.
-  @param  Len                   Length of the bulk data.
-  @param  Index                 The data block index in the net buffer the bulk
-                                data should belong to.
-
-  @return None.
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Bulk                  Pointer to the data.
+  @param[in]       Len                   Length of the bulk data.
+  @param[in]       Index                 The data block index in the net buffer the bulk
+                                         data should belong to.
 
 **/
 VOID
 NetbufSetBlockOp (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT8                  *Bulk,
   IN UINT32                 Len,
   IN UINT32                 Index
@@ -483,9 +467,7 @@ NetbufSetBlockOp (
   need to create a new NET_VECTOR. But, we want to avoid data copy by sharing
   the old NET_VECTOR.
 
-  @param  Arg                   Point to the old NET_VECTOR
-
-  @return NONE
+  @param[in]  Arg                   Point to the old NET_VECTOR.
 
 **/
 VOID
@@ -507,14 +489,15 @@ NetbufGetFragmentFree (
   created but the associated data in NET_VECTOR is shared.
   This function exists to do IP packet fragmentation.
 
-  @param  Nbuf                  Pointer to the net buffer to be cloned.
-  @param  Offset                Starting point of the data to be included in new
-                                buffer.
-  @param  Len                   How many data to include in new data
-  @param  HeadSpace             How many bytes of head space to reserve for
-                                protocol header
+  @param[in]  Nbuf                  Pointer to the net buffer to be cloned.
+  @param[in]  Offset                Starting point of the data to be included in new
+                                    buffer.
+  @param[in]  Len                   How many data to include in new data.
+  @param[in]  HeadSpace             How many bytes of head space to reserve for
+                                    protocol header.
 
-  @retval *                     Pointer to the cloned net buffer.
+  @return                       Pointer to the cloned net buffer.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF  *
@@ -687,17 +670,17 @@ FreeChild:
 /**
   Build a NET_BUF from external blocks.
 
-  @param  ExtFragment           Pointer to the data block.
-  @param  ExtNum                The number of the data block.
-  @param  HeadSpace             The head space to be reserved.
-  @param  HeadLen               The length of the protocol header, This function
-                                will pull that number of data into a linear block.
-  @param  ExtFree               Pointer to the caller provided free function.
-  @param  Arg                   The argument passed to ExtFree when ExtFree is
-                                called.
+  @param[in]  ExtFragment           Pointer to the data block.
+  @param[in]  ExtNum                The number of the data block.
+  @param[in]  HeadSpace             The head space to be reserved.
+  @param[in]  HeadLen               The length of the protocol header, This function
+                                    will pull that number of data into a linear block.
+  @param[in]  ExtFree               Pointer to the caller provided free function.
+  @param[in]  Arg                   The argument passed to ExtFree when ExtFree is
+                                    called.
 
-  @retval *                     Pointer to the net buffer built from the data
-                                blocks.
+  @return                    Pointer to the net buffer built from the data blocks.
+                             If NULL, the allocation failed due to resource limit.
 
 **/
 NET_BUF  *
@@ -822,7 +805,7 @@ NetbufFromExt (
   Vector       = Nbuf->Vector;
   Vector->Free = ExtFree;
   Vector->Arg  = Arg;
-  Vector->Flag = (FirstBlockLen ? NET_VECTOR_OWN_FIRST : 0);
+  Vector->Flag = ((FirstBlockLen != 0) ? NET_VECTOR_OWN_FIRST : 0);
 
   //
   // Set the first block up which may contain
@@ -847,7 +830,7 @@ NetbufFromExt (
   Vector->Len     = TotalLen + HeadSpace;
   Nbuf->TotalSize = TotalLen;
 
-  if (SavedIndex) {
+  if (SavedIndex != 0) {
     ExtFragment[SavedIndex] = SavedFragment;
   }
 
@@ -863,11 +846,11 @@ FreeFirstBlock:
   Build a fragment table to contain the fragments in the
   buffer. This is the opposite of the NetbufFromExt.
 
-  @param  Nbuf                  Point to the net buffer
-  @param  ExtFragment           Pointer to the data block.
-  @param  ExtNum                The number of the data block.
+  @param[in]       Nbuf                  Point to the net buffer.
+  @param[in, out]  ExtFragment           Pointer to the data block.
+  @param[in, out]  ExtNum                The number of the data block.
 
-  @retval EFI_BUFFER_TOO_SMALL  The number of non-empty block is bigger than ExtNum
+  @retval EFI_BUFFER_TOO_SMALL  The number of non-empty block is bigger than ExtNum.
   @retval EFI_SUCCESS           Fragment table built.
 
 **/
@@ -875,8 +858,8 @@ EFI_STATUS
 EFIAPI
 NetbufBuildExt (
   IN NET_BUF                *Nbuf,
-  IN NET_FRAGMENT           *ExtFragment,
-  IN UINT32                 *ExtNum
+  IN OUT NET_FRAGMENT       *ExtFragment,
+  IN OUT UINT32             *ExtNum
   )
 {
   UINT32                    Index;
@@ -906,15 +889,15 @@ NetbufBuildExt (
 /**
   Build a NET_BUF from a list of NET_BUF.
 
-  @param  BufList               A List of NET_BUF.
-  @param  HeadSpace             The head space to be reserved.
-  @param  HeaderLen             The length of the protocol header, This function
-                                will pull that number of data into a linear block.
-  @param  ExtFree               Pointer to the caller provided free function.
-  @param  Arg                   The argument passed to ExtFree when ExtFree is
-                                called.
+  @param[in]   BufList               A List of NET_BUF.
+  @param[in]   HeadSpace             The head space to be reserved.
+  @param[in]   HeaderLen             The length of the protocol header, This function
+                                     will pull that number of data into a linear block.
+  @param[in]   ExtFree               Pointer to the caller provided free function.
+  @param[in]   Arg                   The argument passed to ExtFree when ExtFree is
+                                     called.
 
-  @retval *                     Pointer to the net buffer built from the data
+  @return                       Pointer to the net buffer built from the data
                                 blocks.
 
 **/
@@ -986,16 +969,14 @@ NetbufFromBufList (
   of an empty NET_BUF not built from the external. But
   it should be enough for the network stack.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Len                   The length of buffer to be reserverd.
-
-  @return None.
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Len                   The length of buffer to be reserverd.
 
 **/
 VOID
 EFIAPI
 NetbufReserve (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT32                 Len
   )
 {
@@ -1015,19 +996,19 @@ NetbufReserve (
 /**
   Allocate some space from the header or tail of the buffer.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Len                   The length of the buffer to be allocated.
-  @param  FromHead              The flag to indicate whether reserve the data from
-                                head or tail. TRUE for from head, and FALSE for
-                                from tail.
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Len                   The length of the buffer to be allocated.
+  @param [in]      FromHead              The flag to indicate whether reserve the data from
+                                         head or tail. TRUE for from head, and FALSE for
+                                         from tail.
 
-  @retval *                     Pointer to the first byte of the allocated buffer.
+  @return                       Pointer to the first byte of the allocated buffer.
 
 **/
 UINT8  *
 EFIAPI
 NetbufAllocSpace (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT32                 Len,
   IN BOOLEAN                FromHead
   )
@@ -1107,17 +1088,15 @@ NetbufAllocSpace (
 /**
   Trim a single NET_BLOCK.
 
-  @param  BlockOp               Pointer to the NET_BLOCK.
-  @param  Len                   The length of the data to be trimmed.
-  @param  FromHead              The flag to indicate whether trim data from head or
-                                tail. TRUE for from head, and FALSE for from tail.
-
-  @return None.
+  @param[in, out]  BlockOp               Pointer to the NET_BLOCK.
+  @param[in]       Len                   The length of the data to be trimmed.
+  @param[in]       FromHead              The flag to indicate whether trim data from head or
+                                         tail. TRUE for from head, and FALSE for from tail.
 
 **/
 VOID
 NetblockTrim (
-  IN NET_BLOCK_OP           *BlockOp,
+  IN OUT NET_BLOCK_OP       *BlockOp,
   IN UINT32                 Len,
   IN BOOLEAN                FromHead
   )
@@ -1137,18 +1116,18 @@ NetblockTrim (
 /**
   Trim some data from the header or tail of the buffer.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Len                   The length of the data to be trimmed.
-  @param  FromHead              The flag to indicate whether trim data from head or
-                                tail. TRUE for from head, and FALSE for from tail.
+  @param[in, out]  Nbuf                  Pointer to the net buffer.
+  @param[in]       Len                   The length of the data to be trimmed.
+  @param[in]      FromHead               The flag to indicate whether trim data from head or
+                                         tail. TRUE for from head, and FALSE for from tail.
 
-  @retval UINTN                 Length of the actually trimmed data.
+  @return    Length of the actually trimmed data.
 
 **/
 UINT32
 EFIAPI
 NetbufTrim (
-  IN NET_BUF                *Nbuf,
+  IN OUT NET_BUF            *Nbuf,
   IN UINT32                 Len,
   IN BOOLEAN                FromHead
   )
@@ -1202,10 +1181,10 @@ NetbufTrim (
 /**
   Copy the data from the specific offset to the destination.
 
-  @param  Nbuf                  Pointer to the net buffer.
-  @param  Offset                The sequence number of the first byte to copy.
-  @param  Len                   Length of the data to copy.
-  @param  Dest                  The destination of the data to copy to.
+  @param[in]   Nbuf                  Pointer to the net buffer.
+  @param[in]   Offset                The sequence number of the first byte to copy.
+  @param[in]   Len                   Length of the data to copy.
+  @param[in]   Dest                  The destination of the data to copy to.
 
   @retval UINTN                 The length of the copied data.
 
@@ -1302,15 +1281,13 @@ NetbufCopy (
 /**
   Initiate the net buffer queue.
 
-  @param  NbufQue               Pointer to the net buffer queue to be initiated.
-
-  @return None.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue to be initiated.
 
 **/
 VOID
 EFIAPI
 NetbufQueInit (
-  IN NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE          *NbufQue
   )
 {
   NbufQue->Signature  = NET_QUE_SIGNATURE;
@@ -1326,9 +1303,8 @@ NetbufQueInit (
 /**
   Allocate an initialized net buffer queue.
 
-  None.
-
-  @retval *                     Pointer to the allocated net buffer queue.
+  @return                       Pointer to the allocated net buffer queue.If NULL, the
+                                allocation failed due to resource limit.
 
 **/
 NET_BUF_QUEUE  *
@@ -1353,9 +1329,7 @@ NetbufQueAlloc (
 /**
   Free a net buffer queue.
 
-  @param  NbufQue               Poitner to the net buffer queue to be freed.
-
-  @return None.
+  @param[in]  NbufQue               Poitner to the net buffer queue to be freed.
 
 **/
 VOID
@@ -1378,17 +1352,15 @@ NetbufQueFree (
 /**
   Append a buffer to the end of the queue.
 
-  @param  NbufQue               Pointer to the net buffer queue.
-  @param  Nbuf                  Pointer to the net buffer to be appended.
-
-  @return None.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue.
+  @param[in, out]  Nbuf                  Pointer to the net buffer to be appended.
 
 **/
 VOID
 EFIAPI
 NetbufQueAppend (
-  IN NET_BUF_QUEUE          *NbufQue,
-  IN NET_BUF                *Nbuf
+  IN OUT NET_BUF_QUEUE          *NbufQue,
+  IN OUT NET_BUF                *Nbuf
   )
 {
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
@@ -1404,16 +1376,17 @@ NetbufQueAppend (
 /**
   Remove a net buffer from head in the specific queue.
 
-  @param  NbufQue               Pointer to the net buffer queue.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue.
 
-  @retval *                     Pointer to the net buffer removed from the specific
+  @return                       Pointer to the net buffer removed from the specific
+                                queue. If NULL, there is no net buffer in the specific
                                 queue.
 
 **/
 NET_BUF  *
 EFIAPI
 NetbufQueRemove (
-  IN NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE          *NbufQue
   )
 {
   NET_BUF                   *First;
@@ -1437,20 +1410,22 @@ NetbufQueRemove (
 /**
   Copy some data from the buffer queue to the destination.
 
-  @param  NbufQue               Pointer to the net buffer queue.
-  @param  Offset                The sequence number of the first byte to copy.
-  @param  Len                   Length of the data to copy.
-  @param  Dest                  The destination of the data to copy to.
+  @param[in]   NbufQue               Pointer to the net buffer queue.
+  @param[in]   Offset                The sequence number of the first byte to copy.
+  @param[in]   Len                   Length of the data to copy.
+  @param[out]  Dest                  The destination of the data to copy to.
 
-  @retval UINTN                 The length of the copied data.
+  @return       The length of the copied data. If 0, then the length is zero or offset 
+                suppress the total size of net buffer.
 
 **/
 UINT32
+EFIAPI
 NetbufQueCopy (
   IN NET_BUF_QUEUE          *NbufQue,
   IN UINT32                 Offset,
   IN UINT32                 Len,
-  IN UINT8                  *Dest
+  OUT UINT8                 *Dest
   )
 {
   LIST_ENTRY                *Entry;
@@ -1534,16 +1509,16 @@ NetbufQueCopy (
   Trim some data from the queue header, release the buffer if
   whole buffer is trimmed.
 
-  @param  NbufQue               Pointer to the net buffer queue.
-  @param  Len                   Length of the data to trim.
+  @param[in, out]  NbufQue               Pointer to the net buffer queue.
+  @param[in]       Len                   Length of the data to trim.
 
-  @retval UINTN                 The length of the data trimmed.
+  @return   The length of the data trimmed, or 0 if length of the data to trim is zero.
 
 **/
 UINT32
 EFIAPI
 NetbufQueTrim (
-  IN NET_BUF_QUEUE          *NbufQue,
+  IN OUT NET_BUF_QUEUE      *NbufQue,
   IN UINT32                 Len
   )
 {
@@ -1594,15 +1569,13 @@ NetbufQueTrim (
 /**
   Flush the net buffer queue.
 
-  @param  NbufQue               Pointer to the queue to be flushed.
-
-  @return None.
+  @param[in, out]  NbufQue               Pointer to the queue to be flushed.
 
 **/
 VOID
 EFIAPI
 NetbufQueFlush (
-  IN NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE          *NbufQue
   )
 {
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
@@ -1617,10 +1590,10 @@ NetbufQueFlush (
 /**
   Compute checksum for a bulk of data.
 
-  @param  Bulk                  Pointer to the data.
-  @param  Len                   Length of the data, in bytes.
+  @param[in]   Bulk                  Pointer to the data.
+  @param[in]   Len                   Length of the data, in bytes.
 
-  @retval UINT16                The computed checksum.
+  @return    The computed checksum.
 
 **/
 UINT16
@@ -1650,7 +1623,7 @@ NetblockChecksum (
   //
   // Fold 32-bit sum to 16 bits
   //
-  while (Sum >> 16) {
+  while ((Sum >> 16) != 0) {
     Sum = (Sum & 0xffff) + (Sum >> 16);
 
   }
@@ -1662,10 +1635,10 @@ NetblockChecksum (
 /**
   Add two checksums.
 
-  @param  Checksum1             The first checksum to be added.
-  @param  Checksum2             The second checksum to be added.
+  @param[in]   Checksum1             The first checksum to be added.
+  @param[in]   Checksum2             The second checksum to be added.
 
-  @retval UINT16                The new checksum.
+  @return         The new checksum.
 
 **/
 UINT16
@@ -1682,7 +1655,7 @@ NetAddChecksum (
   //
   // two UINT16 can only add up to a carry of 1.
   //
-  if (Sum >> 16) {
+  if ((Sum >> 16) != 0) {
     Sum = (Sum & 0xffff) + 1;
 
   }
@@ -1694,9 +1667,9 @@ NetAddChecksum (
 /**
   Compute the checksum for a NET_BUF.
 
-  @param  Nbuf                  Pointer to the net buffer.
+  @param[in]   Nbuf                  Pointer to the net buffer.
 
-  @retval UINT16                The computed checksum.
+  @return    The computed checksum.
 
 **/
 UINT16
@@ -1724,7 +1697,7 @@ NetbufChecksum (
 
     BlockSum = NetblockChecksum (BlockOp[Index].Head, BlockOp[Index].Size);
 
-    if (Offset & 0x01) {
+    if ((Offset & 0x01) != 0) {
       //
       // The checksum starts with an odd byte, swap
       // the checksum before added to total checksum
@@ -1745,12 +1718,12 @@ NetbufChecksum (
   Src, Dst are in network byte order. and Len is
   in host byte order.
 
-  @param  Src                   The source address of the packet.
-  @param  Dst                   The destination address of the packet.
-  @param  Proto                 The protocol type of the packet.
-  @param  Len                   The length of the packet.
+  @param[in]   Src                   The source address of the packet.
+  @param[in]   Dst                   The destination address of the packet.
+  @param[in]   Proto                 The protocol type of the packet.
+  @param[in]   Len                   The length of the packet.
 
-  @retval UINT16                The computed checksum.
+  @return   The computed checksum.
 
 **/
 UINT16
