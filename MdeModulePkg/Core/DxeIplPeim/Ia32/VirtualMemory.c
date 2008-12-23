@@ -4,16 +4,16 @@
   enter Long Mode (x64 64-bit mode).
 
   While we make a 1:1 mapping (identity mapping) for all physical pages 
-  we still need to use the MTRR's to ensure that the cachability attirbutes
+  we still need to use the MTRR's to ensure that the cachability attributes
   for all memory regions is correct.
 
   The basic idea is to use 2MB page table entries where ever possible. If
   more granularity of cachability is required then 4K page tables are used.
 
   References:
-    1) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 1:Basic Architecture, Intel
-    2) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
-    3) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
+    1) IA-32 Intel(R) Architecture Software Developer's Manual Volume 1:Basic Architecture, Intel
+    2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
+    3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -29,11 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
-
-
-
-
-
 /**
   Allocates and fills in the Page Directory and Page Table Entries to
   establish a 1:1 Virtual to Physical mapping.
@@ -43,7 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                                 table entries  to the physical 
                                                 address space. 
 
-  @return EFI_SUCCESS           The 1:1 Virtual to Physical identity mapping was created
+  @return The address of 4 level page map.
 
 **/
 UINTN

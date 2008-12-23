@@ -231,7 +231,6 @@ DiskIoDriverBindingStop (
                   &Private->DiskIo
                   );
   if (!EFI_ERROR (Status)) {
-
     Status = gBS->CloseProtocol (
                     ControllerHandle,
                     &gEfiBlockIoProtocolGuid,

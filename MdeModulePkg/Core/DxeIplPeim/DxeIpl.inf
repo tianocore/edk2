@@ -1,8 +1,10 @@
 #/** @file
+#  Last PEIM executed in PEI phase to load DXE Core from a Firmware Volume.
 #  
-#  The responsibility of this module is to load the DXE Core from a Firmware Volume.
-#  This implementation is used to load a 32-bit DXE Core.
-#  
+#  This module produces a special PPI named the DXE Initial Program Load (IPL)
+#  PPI to discover and dispatch the DXE Foundation and components that are
+#  needed to run the DXE Foundation.
+#
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -79,8 +81,8 @@
 [Ppis]
   gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
   gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
-  gEfiPeiDecompressPpiGuid
-  gEfiPeiReadOnlyVariable2PpiGuid
+  gEfiPeiDecompressPpiGuid                      # PPI SOMETIMES_PRODUCED
+  gEfiPeiReadOnlyVariable2PpiGuid               # PPI SOMETIMES_CONSUMED
 
 [Guids]
   gEfiMemoryTypeInformationGuid

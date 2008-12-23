@@ -31,13 +31,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 
-extern const EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid;
-extern const EFI_GUID mEfiDevicePathMessagingSASGuid;
 
 #define MAX_CHAR                   480
-
-#define MIN_ALIGNMENT_SIZE         sizeof(UINTN)
-#define ALIGN_SIZE(a)              ((a % MIN_ALIGNMENT_SIZE) ? MIN_ALIGNMENT_SIZE - (a % MIN_ALIGNMENT_SIZE) : 0)
 
 #define IS_COMMA(a)                ((a) == L',')
 #define IS_HYPHEN(a)               ((a) == L'-')
@@ -47,11 +42,8 @@ extern const EFI_GUID mEfiDevicePathMessagingSASGuid;
 #define IS_SLASH(a)                ((a) == L'/')
 #define IS_NULL(a)                 ((a) == L'\0')
 
-#define DEVICE_NODE_END            1
-#define DEVICE_PATH_INSTANCE_END   2
-#define DEVICE_PATH_END            3
 
-#define SET_DEVICE_PATH_INSTANCE_END_NODE(a) {                \
+#define SET_DEVICE_PATH_INSTANCE_END_NODE(a) {           \
     (a)->Type       = END_DEVICE_PATH_TYPE;              \
     (a)->SubType    = END_INSTANCE_DEVICE_PATH_SUBTYPE;  \
     (a)->Length[0]  = sizeof (EFI_DEVICE_PATH_PROTOCOL); \

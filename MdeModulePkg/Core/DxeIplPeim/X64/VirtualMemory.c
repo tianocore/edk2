@@ -29,11 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
-
-
-
-
-
 /**
   Allocates and fills in the Page Directory and Page Table Entries to
   establish a 1:1 Virtual to Physical mapping.
@@ -43,7 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                                 table entries  to the physical 
                                                 address space. 
 
-  @return EFI_SUCCESS           The 1:1 Virtual to Physical identity mapping was created
+  @return The address of 4 level page map.
 
 **/
 UINTN
@@ -73,7 +68,7 @@ CreateIdentityMappingPageTables (
   
   Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
   if (Hob != NULL) {
-    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;    
+    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
   }
 
   //

@@ -49,22 +49,3 @@ PeiImageRead (
   return EFI_SUCCESS;
 }
 
-
-/**
-   This function simply retrieves the function pointer of ImageRead in
-   ImageContext structure.
-    
-   @param ImageContext       A pointer to the structure of 
-                             PE_COFF_LOADER_IMAGE_CONTEXT
-   
-   @retval EFI_SUCCESS       This function always returns EFI_SUCCESS.
-
-**/
-EFI_STATUS
-GetImageReadFunction (
-  IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  )
-{
-  ImageContext->ImageRead = PeiImageRead;
-  return EFI_SUCCESS;
-}

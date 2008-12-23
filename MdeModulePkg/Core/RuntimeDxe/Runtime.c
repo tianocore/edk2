@@ -1,5 +1,6 @@
 /** @file
-  Runtime Architectural Protocol as defined in the DXE CIS.
+  This file implements Runtime Architectural Protocol as defined in the
+  Platform Initialization specification 1.0 VOLUME 2 DXE Core Interface.
 
   This code is used to produce the EFI runtime virtual switch over
 
@@ -14,7 +15,7 @@
   So here is the concept. The code in this module will never ever be called in
   virtual mode. This is the code that collects the information needed to convert
   to virtual mode (DXE core registers runtime stuff with this code). Since this
-  code is used to fixup all runtime images, it CAN NOT fix it's self up. So some
+  code is used to fix up all runtime images, it CAN NOT fix it's self up. So some
   code has to stay behind and that is us.
 
   Also you need to be careful about when you allocate memory, as once we are in
@@ -34,7 +35,7 @@ Revision History:
   Table now contains an item named CalculateCrc32.
 
 
-Copyright (c) 2006, Intel Corporation. <BR>
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -86,7 +87,7 @@ EFI_RUNTIME_ARCH_PROTOCOL     mRuntime = {
 //
 /**
 
-  Calcualte the 32-bit CRC in a EFI table using the Runtime Drivers
+  Calculate the 32-bit CRC in a EFI table using the Runtime Drivers
   internal function.  The EFI Boot Services Table can not be used because
   the EFI Boot Services Table was destroyed at ExitBootServices().
   This is a internal function.
@@ -158,10 +159,10 @@ RuntimeDriverConvertPointer (
     return EFI_INVALID_PARAMETER;
   }
 
-  VirtEntry             = mVirtualMap;
+  VirtEntry = mVirtualMap;
   for (Index = 0; Index < mVirtualMapMaxIndex; Index++) {
     //
-    // To prevent the inclusion of 64-bit math functions a UINTN was placed in
+    //  To prevent the inclusion of 64-bit math functions a UINTN was placed in
     //  front of VirtEntry->NumberOfPages to cast it to a 32-bit thing on IA-32
     //  platforms. If you get this ASSERT remove the UINTN and do a 64-bit
     //  multiply.
@@ -315,7 +316,7 @@ RuntimeDriverSetVirtualAddressMap (
         RuntimeImage->RelocationData
         );
 
-      InvalidateInstructionCacheRange (RuntimeImage->ImageBase, (UINTN)RuntimeImage->ImageSize);
+      InvalidateInstructionCacheRange (RuntimeImage->ImageBase, (UINTN) RuntimeImage->ImageSize);
     }
   }
 
@@ -362,17 +363,16 @@ RuntimeDriverSetVirtualAddressMap (
 }
 
 /**
-  Install Runtime AP. This code includes the EfiDriverLib, but it functions at
-  RT in physical mode. The only Lib services are gBS, gRT, and the DEBUG and
-  ASSERT macros (they do ReportStatusCode).
+  Entry Point for Runtime driver.
 
+  This function installs Runtime Architectural Protocol and registers CalculateCrc32 boot services table,
+  SetVirtualAddressMap & ConvertPointer runtime services table.
 
   @param ImageHandle     Image handle of this driver.
-  @param SystemTable     Pointer to the EFI System Table.
+  @param SystemTable     a Pointer to the EFI System Table.
 
-  @retval  EFI_SUCEESS  Runtime Driver Architectural Protocol Installed
-  @return  Other value if gBS->InstallMultipleProtocolInterfaces fails. Check
-           gBS->InstallMultipleProtocolInterfaces for details.
+  @retval  EFI_SUCEESS  Runtime Driver Architectural Protocol is successfully installed
+  @return  Others       Some error occurs when installing Runtime Driver Architectural Protocol.
 
 **/
 EFI_STATUS
@@ -386,7 +386,7 @@ RuntimeDriverInitialize (
   EFI_LOADED_IMAGE_PROTOCOL *MyLoadedImage;
 
   //
-  // This image needs to be exclued from relocation for virtual mode, so cache
+  // This image needs to be excluded from relocation for virtual mode, so cache
   // a copy of the Loaded Image protocol to test later.
   //
   Status = gBS->HandleProtocol (
@@ -420,5 +420,5 @@ RuntimeDriverInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }

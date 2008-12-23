@@ -15,9 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UnicodeCollationEng.h"
 
-CHAR8 mEngUpperMap[0x100];
-CHAR8 mEngLowerMap[0x100];
-CHAR8 mEngInfoMap[0x100];
+CHAR8 mEngUpperMap[MAP_TABLE_SIZE];
+CHAR8 mEngLowerMap[MAP_TABLE_SIZE];
+CHAR8 mEngInfoMap[MAP_TABLE_SIZE];
 
 CHAR8 mOtherChars[] = {
   '0',
@@ -106,7 +106,7 @@ InitializeUnicodeCollationEng (
   //
   // Initialize mapping tables for the supported languages
   //
-  for (Index = 0; Index < 0x100; Index++) {
+  for (Index = 0; Index < MAP_TABLE_SIZE; Index++) {
     mEngUpperMap[Index] = (CHAR8) Index;
     mEngLowerMap[Index] = (CHAR8) Index;
     mEngInfoMap[Index]  = 0;
@@ -453,9 +453,9 @@ EngStrToFat (
     if (*String != '.' && *String != ' ') {
       //
       // If this is a valid fat char, move it.
-      // Otherwise, move a '_' and flag the fact that the name needs an Lfn
+      // Otherwise, move a '_' and flag the fact that the name needs a long file name.
       //
-      if (*String < 0x100 && ((mEngInfoMap[*String] & CHAR_FAT_VALID) != 0)) {
+      if (*String < MAP_TABLE_SIZE && ((mEngInfoMap[*String] & CHAR_FAT_VALID) != 0)) {
         *Fat = mEngUpperMap[*String];
       } else {
         *Fat              = '_';

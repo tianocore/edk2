@@ -2,9 +2,9 @@
   x64 Long Mode Virtual Memory Management Definitions  
 
   References:
-    1) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 1:Basic Architecture, Intel
-    2) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
-    3) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
+    1) IA-32 Intel(R) Architecture Software Developer's Manual Volume 1:Basic Architecture, Intel
+    2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
+    3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
     4) AMD64 Architecture Programmer's Manual Volume 2: System Programming
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
@@ -100,7 +100,6 @@ typedef union {
 #pragma pack()
 
 
-
 /**
   Allocates and fills in the Page Directory and Page Table Entries to
   establish a 1:1 Virtual to Physical mapping.
@@ -110,7 +109,7 @@ typedef union {
                                                 table entries  to the physical 
                                                 address space. 
 
-  @return EFI_SUCCESS           The 1:1 Virtual to Physical identity mapping was created
+  @return The address of 4 level page map.
 
 **/
 UINTN
@@ -119,15 +118,11 @@ CreateIdentityMappingPageTables (
   );
 
 
-
-
-
 /**
  
   Fix up the vector number in the vector code.
  
   @param VectorBase   Base address of the vector handler.
- 
   @param VectorNum    Index of vector.
 
 **/
@@ -137,9 +132,6 @@ AsmVectorFixup (
   VOID    *VectorBase,
   UINT8   VectorNum
   );
-
-
-
 
 
 /**

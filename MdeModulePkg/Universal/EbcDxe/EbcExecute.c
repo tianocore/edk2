@@ -108,7 +108,7 @@ VmReadIndex64 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 8-bit value from the memory adress.
+  @return The 8-bit value from the memory address.
 
 **/
 UINT8
@@ -123,7 +123,7 @@ VmReadMem8 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 16-bit value from the memory adress.
+  @return The 16-bit value from the memory address.
 
 **/
 UINT16
@@ -138,7 +138,7 @@ VmReadMem16 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 32-bit value from the memory adress.
+  @return The 32-bit value from the memory address.
 
 **/
 UINT32
@@ -153,7 +153,7 @@ VmReadMem32 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 64-bit value from the memory adress.
+  @return The 64-bit value from the memory address.
 
 **/
 UINT64
@@ -193,7 +193,7 @@ VmReadMemN (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -223,7 +223,7 @@ VmWriteMem8 (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -253,7 +253,7 @@ VmWriteMem16 (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -268,7 +268,7 @@ VmWriteMem32 (
   );
 
 /**
-  Reads 16-bit unsinged data from the code stream.
+  Reads 16-bit unsigned data from the code stream.
 
   This routine provides the ability to read raw unsigned data from the code
   stream.
@@ -286,7 +286,7 @@ VmReadCode16 (
   );
 
 /**
-  Reads 32-bit unsinged data from the code stream.
+  Reads 32-bit unsigned data from the code stream.
 
   This routine provides the ability to read raw unsigned data from the code
   stream.
@@ -304,7 +304,7 @@ VmReadCode32 (
   );
 
 /**
-  Reads 64-bit unsinged data from the code stream.
+  Reads 64-bit unsigned data from the code stream.
 
   This routine provides the ability to read raw unsigned data from the code
   stream.
@@ -4599,7 +4599,7 @@ VmReadIndex64 (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -4637,7 +4637,7 @@ VmWriteMem8 (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -4700,7 +4700,7 @@ VmWriteMem16 (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -4763,7 +4763,7 @@ VmWriteMem32 (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -4828,7 +4828,7 @@ VmWriteMem64 (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -5019,7 +5019,7 @@ VmReadImmed64 (
 
 
 /**
-  Reads 16-bit unsinged data from the code stream.
+  Reads 16-bit unsigned data from the code stream.
 
   This routine provides the ability to read raw unsigned data from the code
   stream.
@@ -5059,7 +5059,7 @@ VmReadCode16 (
 
 
 /**
-  Reads 32-bit unsinged data from the code stream.
+  Reads 32-bit unsigned data from the code stream.
 
   This routine provides the ability to read raw unsigned data from the code
   stream.
@@ -5093,7 +5093,7 @@ VmReadCode32 (
 
 
 /**
-  Reads 64-bit unsinged data from the code stream.
+  Reads 64-bit unsigned data from the code stream.
 
   This routine provides the ability to read raw unsigned data from the code
   stream.
@@ -5139,7 +5139,7 @@ VmReadCode64 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 8-bit value from the memory adress.
+  @return The 8-bit value from the memory address.
 
 **/
 UINT8
@@ -5164,7 +5164,7 @@ VmReadMem8 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 16-bit value from the memory adress.
+  @return The 16-bit value from the memory address.
 
 **/
 UINT16
@@ -5195,7 +5195,7 @@ VmReadMem16 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 32-bit value from the memory adress.
+  @return The 32-bit value from the memory address.
 
 **/
 UINT32
@@ -5230,7 +5230,7 @@ VmReadMem32 (
   @param  VmPtr             A pointer to VM context.
   @param  Addr              The memory address.
 
-  @return The 64-bit value from the memory adress.
+  @return The 64-bit value from the memory address.
 
 **/
 UINT64

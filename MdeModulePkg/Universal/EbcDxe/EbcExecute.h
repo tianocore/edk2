@@ -270,7 +270,7 @@ GetVmVersion (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.
@@ -300,7 +300,7 @@ VmWriteMemN (
   VM stack) to point into the EBC entry point arguments.
 
   @param  VmPtr             A pointer to a VM context.
-  @param  Addr              Adddress to write to.
+  @param  Addr              Address to write to.
   @param  Data              Value to write to Addr.
 
   @retval EFI_SUCCESS       The instruction is executed successfully.

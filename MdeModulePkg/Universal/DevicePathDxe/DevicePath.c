@@ -46,8 +46,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_GUID mEfiDevicePathMessagingSASGuid     
 /**
   The user Entry Point for DevicePath module.
 
-  This is the entrhy point for DevicePath module. It installs the UEFI Device Path Utility Protocol and
-  optionall the Device Path to Text and Device Path from Text protocols based on feature flags.
+  This is the entry point for DevicePath module. It installs the UEFI Device Path Utility Protocol and
+  optionally the Device Path to Text and Device Path from Text protocols based on feature flags.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.

@@ -1,5 +1,5 @@
 /** @file
-  Ia32-specifc functionality for DxeLoad.
+  Ia32-specific functionality for DxeLoad.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -49,9 +49,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR gLidtDescriptor = {
 
    This function performs a CPU architecture specific operations to execute
    the entry point of DxeCore with the parameters of HobList.
-   It also intalls EFI_END_OF_PEI_PPI to signal the end of PEI phase.
+   It also installs EFI_END_OF_PEI_PPI to signal the end of PEI phase.
 
-   @param DxeCoreEntryPoint         The entrypoint of DxeCore.
+   @param DxeCoreEntryPoint         The entry point of DxeCore.
    @param HobList                   The start of HobList passed to DxeCore.
 
 **/
@@ -102,7 +102,7 @@ HandOffToDxeCore (
     PageTables = CreateIdentityMappingPageTables ();
 
     //
-    // End of PEI phase singal
+    // End of PEI phase signal
     //
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
     ASSERT_EFI_ERROR (Status);
@@ -165,7 +165,7 @@ HandOffToDxeCore (
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
     //
-    // End of PEI phase singal
+    // End of PEI phase signal
     //
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
     ASSERT_EFI_ERROR (Status);
