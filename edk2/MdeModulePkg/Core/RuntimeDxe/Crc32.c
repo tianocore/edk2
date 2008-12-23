@@ -1,12 +1,13 @@
 /** @file
-  CalculateCrc32 Boot Services as defined in DXE CIS.
+  This file implements CalculateCrc32 Boot Services as defined in
+  Platform Initialization specification 1.0 VOLUME 2 DXE Core Interface.
 
   This Boot Services is in the Runtime Driver because this service is
   also required by SetVirtualAddressMap() when the EFI System Table and
   EFI Runtime Services Table are converted from physical address to
-  virtual addresses.	This requires that the 32-bit CRC be recomputed.
+  virtual addresses.  This requires that the 32-bit CRC be recomputed.
 
-Copyright (c) 2006, Intel Corporation. <BR>
+Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -61,8 +62,7 @@ RuntimeDriverCalculateCrc32 (
 
 
 /**
-  Reverse bits for 32bit data.
-  This is a internal function.
+  This internal function reverses bits for 32bit data.
 
   @param  Value                 The data to be reversed.
 
@@ -89,6 +89,7 @@ ReverseBits (
 
 /**
   Initialize CRC32 table.
+
 **/
 VOID
 RuntimeDriverInitializeCrc32Table (

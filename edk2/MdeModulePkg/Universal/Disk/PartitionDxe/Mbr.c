@@ -6,7 +6,7 @@
         code that is not run on an EFI system. The legacy code reads the 
         first sector of the active partition into memory and 
 
-  BPB - Boot(?) Parameter Block is in the first sector of a FAT file system. 
+  BPB - BIOS Parameter Block is in the first sector of a FAT file system. 
         The BPB contains information about the FAT file system. The BPB is 
         always on the first sector of a media. The first sector also contains
         the legacy boot strap code.
@@ -212,7 +212,7 @@ PartitionInstallMbrChildHandles (
       HdDev.PartitionNumber = PartitionNumber ++;
       HdDev.PartitionStart  = UNPACK_UINT32 (Mbr->Partition[Index].StartingLBA);
       HdDev.PartitionSize   = UNPACK_UINT32 (Mbr->Partition[Index].SizeInLBA);
-      CopyMem (HdDev.Signature, &(Mbr->UniqueMbrSignature[0]), sizeof (UINT32));
+      CopyMem (HdDev.Signature, &(Mbr->UniqueMbrSignature[0]), sizeof (Mbr->UniqueMbrSignature));
 
       Status = PartitionInstallChildHandle (
                 This,

@@ -1,12 +1,11 @@
 /**@file
-
   Firmware Volume Block Protocol Runtime Interface Abstraction
   And FVB Extension protocol Runtime Interface Abstraction
 
   mFvbEntry is an array of Handle Fvb pairs. The Fvb Lib Instance matches the
   index in the mFvbEntry array. This should be the same sequence as the FVB's
   were described in the HOB. We have to remember the handle so we can tell if
-  the protocol has been reinstalled and it needs updateing.
+  the protocol has been reinstalled and it needs updating.
 
 
 Copyright (c) 2006 - 2008, Intel Corporation
@@ -267,11 +266,11 @@ FvbVirtualAddressChangeNotifyEvent (
 /**
   Library constructor function entry.
 
-  @param ImageHandle    The handle of image who call this libary.
+  @param ImageHandle    The handle of image who call this library.
   @param SystemTable    The point of System Table.
 
-  @retval EFI_SUCESS    Sucess construct this library.
-  @retval Others        Fail to contruct this libary.
+  @retval EFI_SUCESS    Success construct this library.
+  @retval Others        Fail to construct this library.
 **/
 EFI_STATUS
 EFIAPI
@@ -413,9 +412,9 @@ EfiFvbReadBlock (
   
   If NumBytes is NULL, then ASSERT().
 
-  @param Instance               The FV instance to be written to
-  @param Lba                    The starting logical block index to write to
-  @param Offset                 The offset relative to the block, at which to begin writting.
+  @param Instance               The FV instance to be written to.
+  @param Lba                    The starting logical block index to write.
+  @param Offset                 The offset relative to the block to write.
   @param NumBytes               Pointer to a UINTN. On input, *NumBytes contains
                                 the total size of the buffer. On output, it contains
                                 the actual number of bytes written.

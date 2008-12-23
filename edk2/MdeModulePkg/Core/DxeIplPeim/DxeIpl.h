@@ -1,6 +1,6 @@
 /** @file
   Master header file for DxeIpl PEIM. All source files in this module should
-  include this file for common defininitions.
+  include this file for common definitions.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -50,17 +50,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 //
-// This macro aligns the ActualSize with a given alignment and is used to 
-// calculate the size an image occupies.
-//
-#define GET_OCCUPIED_SIZE(ActualSize, Alignment) ((ActualSize + (Alignment - 1)) & ~(Alignment - 1))
-
-//
-// Indicate whether DxeIpl has been shadowed to memory.
-//
-extern BOOLEAN gInMemory;
-
-//
 // This PPI is installed to indicate the end of the PEI usage of memory 
 //
 extern CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi;
@@ -103,18 +92,24 @@ DxeIplFindDxeCore (
 
 
 /**
-   This function simply retrieves the function pointer of ImageRead in
-   ImageContext structure.
-    
-   @param ImageContext       A pointer to the structure of 
-                             PE_COFF_LOADER_IMAGE_CONTEXT
-   
-   @retval EFI_SUCCESS       This function always return EFI_SUCCESS.
+  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
+
+  @param  FileHandle   The handle to the PE/COFF file 
+  @param  FileOffset   The offset, in bytes, into the file to read 
+  @param  ReadSize     The number of bytes to read from the file starting at 
+                       FileOffset 
+  @param  Buffer       A pointer to the buffer to read the data into. 
+
+  @retval EFI_SUCCESS  ReadSize bytes of data were read into Buffer from the 
+                       PE/COFF file starting at FileOffset
 
 **/
 EFI_STATUS
-GetImageReadFunction (
-  IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+PeiImageRead (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
   );
 
 
@@ -144,9 +139,9 @@ DxeLoadCore (
 
    This function performs a CPU architecture specific operations to execute
    the entry point of DxeCore with the parameters of HobList.
-   It also intalls EFI_END_OF_PEI_PPI to signal the end of PEI phase.
+   It also installs EFI_END_OF_PEI_PPI to signal the end of PEI phase.
 
-   @param DxeCoreEntryPoint         The entrypoint of DxeCore.
+   @param DxeCoreEntryPoint         The entry point of DxeCore.
    @param HobList                   The start of HobList passed to DxeCore.
 
 **/
@@ -241,7 +236,7 @@ CustomGuidedSectionExtract (
 /**
    Decompresses a section to the output buffer.
 
-   This function lookes up the compression type field in the input section and
+   This function looks up the compression type field in the input section and
    applies the appropriate compression algorithm to compress the section to a
    callee allocated buffer.
     

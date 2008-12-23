@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
-
 #include <Protocol/UnicodeCollation.h>
 
 #include <Library/DebugLib.h>
@@ -28,12 +27,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 
 //
-// Defines
+// Bit mask to indicate the validity of character in FAT file name.
 //
 #define CHAR_FAT_VALID  0x01
 
-#define TO_UPPER(a)      (CHAR16) (a <= 0xFF ? mEngUpperMap[a] : a)
-#define TO_LOWER(a)      (CHAR16) (a <= 0xFF ? mEngLowerMap[a] : a)
+//
+// Maximum FAT table size.
+//
+#define MAP_TABLE_SIZE  0x100
+
+//
+// Macro to map character a to upper case.
+//
+#define TO_UPPER(a)      (CHAR16) ((a) <= 0xFF ? mEngUpperMap[a] : (a))
+
+//
+// Macro to map character a to lower case.
+//
+#define TO_LOWER(a)      (CHAR16) ((a) <= 0xFF ? mEngLowerMap[a] : (a))
 
 //
 // Prototypes

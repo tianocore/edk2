@@ -1,11 +1,11 @@
 #/** @file
-#  
-#    Component description file for Partition module.
-#  
-#   Partition driver produces the logical BlockIo device
-#    that represents the bytes Start to End of the Parent Block IO
-#    device (one partition of physical BlockIo device,
-#    which can be one of GPT, MBR, ElTorito partition).
+#  Modules that produces the logic Block I/O protocol for every partition
+#  it discovers via the physical Block I/O.
+#
+#  This module produces the logical Block I/O device that represents
+#  the bytes from Start to End of the Parent Block I/O device.
+#  The partition of physical BlockIo device supported is one of legacy MBR, GPT,
+#  and "El Torito" partitions.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
@@ -31,9 +31,9 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gPartitionDriverBinding
-#  COMPONENT_NAME                =  gPartitionComponentName
-#  COMPONENT_NAME2               =  gPartitionComponentName2
+#  DRIVER_BINDING                = gPartitionDriverBinding
+#  COMPONENT_NAME                = gPartitionComponentName
+#  COMPONENT_NAME2               = gPartitionComponentName2
 #
 
 [Sources.common]
@@ -68,7 +68,7 @@
 [Protocols]
   gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
+  gEfiDiskIoProtocolGuid                        # PROTOCOL BY_START
+  gEfiBlockIoProtocolGuid                       # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiDiskIoProtocolGuid                        # PROTOCOL TO_START
-  gEfiBlockIoProtocolGuid                       # PROTOCOL TO_START
-

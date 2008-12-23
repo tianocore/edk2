@@ -1,6 +1,9 @@
 #/** @file
+#  Module that produces EFI runtime virtual switch over services.
 #
-#  This module is used to produce the EFI runtime virtual switch over services.
+#  This runtime module installs Runtime Architectural Protocol and registers
+#  CalculateCrc32 boot services table, SetVirtualAddressMap & ConvertPointer
+#  runtime services table.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation
 #

@@ -1,9 +1,10 @@
 #/** @file
+#  Device path driver that produces three UEFI device path protocols.
 #
-#    Component description file for Device Path Driver.
-#
-#   This driver implement these three UEFI deveice path protocols (
-#    DevicePathUtilities, DevicePahtToText and DevicePathFromText) and install them.
+#  This driver produces Device Path Utilities protocol and optionally
+#  DevicePahtToText and DevicePathFromText protocols based on feature flags
+#  PcdDevicePathSupportDevicePathToText & PcdDevicePathSupportDevicePathFromText
+#  respectively.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
@@ -57,7 +58,9 @@
   gEfiVT100Guid                                 # ALWAYS_CONSUMED
   gEfiVT100PlusGuid                             # ALWAYS_CONSUMED
   gEfiPcAnsiGuid                                # ALWAYS_CONSUMED
-
+  gEfiUartDevicePathGuid                        # ALWAYS_CONSUMED
+  gEfiSasDevicePathGuid                         # ALWAYS_CONSUMED
+  
 [Protocols]
   gEfiDevicePathToTextProtocolGuid              # PROTOCOL ALWAYS_PRODUCED
   gEfiDevicePathFromTextProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
@@ -70,4 +73,3 @@
 
 [Depex]
   TRUE
-

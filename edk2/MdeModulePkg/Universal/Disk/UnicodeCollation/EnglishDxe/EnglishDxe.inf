@@ -1,8 +1,11 @@
 #/** @file
+#  English module that provides Unicode Collation supports.
 #  
-#    Component description file for English module for unicode collation.
-#  
-#   This driver installs UEFI EFI_UNICODE_COLLATION_PROTOCOL protocol to provide Unicode strings function.
+#  This driver installs Unicode ISO 639-2 Collation and
+#  RFC 4646 Unicode Collation 2 protocols based on feature flags
+#  PcdUnicodeCollationSupport & PcdUnicodeCollation2Support respectively.
+#  It allows code running in the boot services environment to perform lexical
+#  comparison functions on Unicode strings for English languages.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials

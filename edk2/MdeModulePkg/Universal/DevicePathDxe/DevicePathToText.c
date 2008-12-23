@@ -55,10 +55,10 @@ CatPrint (
     Size = StrSize (AppendStr) - sizeof (UINT16);
     Size = Size + StrSize (Str->Str);
     Str->Str = ReallocatePool (
-                StrSize (Str->Str),
-                Size,
-                Str->Str
-                );
+                 StrSize (Str->Str),
+                 Size,
+                 Str->Str
+                 );
     ASSERT (Str->Str != NULL);
   }
 
@@ -73,9 +73,9 @@ CatPrint (
 }
 
 /**
-  Converts a PCI device path structure to its string representive.
+  Converts a PCI device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -100,9 +100,9 @@ DevPathToTextPci (
 }
 
 /**
-  Converts a PC Card device path structure to its string representive.
+  Converts a PC Card device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -127,9 +127,9 @@ DevPathToTextPccard (
 }
 
 /**
-  Converts a Memory Map device path structure to its string representive.
+  Converts a Memory Map device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -160,9 +160,9 @@ DevPathToTextMemMap (
 }
 
 /**
-  Converts a Vendor device path structure to its string representive.
+  Converts a Vendor device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -208,7 +208,7 @@ DevPathToTextVendor (
       } else if (CompareGuid (&Vendor->Guid, &gEfiVTUTF8Guid)) {
         CatPrint (Str, L"VenUft8()");
         return ;
-      } else if (CompareGuid (&Vendor->Guid, &mEfiDevicePathMessagingUartFlowControlGuid)) {
+      } else if (CompareGuid (&Vendor->Guid, &gEfiUartDevicePathGuid)) {
         FlowControlMap = (((UART_FLOW_CONTROL_DEVICE_PATH *) Vendor)->FlowControlMap);
         switch (FlowControlMap & 0x00000003) {
         case 0:
@@ -228,7 +228,7 @@ DevPathToTextVendor (
         }
 
         return ;
-      } else if (CompareGuid (&Vendor->Guid, &mEfiDevicePathMessagingSASGuid)) {
+      } else if (CompareGuid (&Vendor->Guid, &gEfiSasDevicePathGuid)) {
         CatPrint (
           Str,
           L"SAS(0x%lx,0x%lx,0x%x,",
@@ -287,9 +287,9 @@ DevPathToTextVendor (
 }
 
 /**
-  Converts a Controller device path structure to its string representive.
+  Converts a Controller device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -318,9 +318,9 @@ DevPathToTextController (
 }
 
 /**
-  Converts a ACPI device path structure to its string representive.
+  Converts a ACPI device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -404,9 +404,9 @@ EisaIdToText (
 }
 
 /**
-  Converts a ACPI extended HID device path structure to its string representive.
+  Converts a ACPI extended HID device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -488,9 +488,9 @@ DevPathToTextAcpiEx (
 }
 
 /**
-  Converts a ACPI address device path structure to its string representive.
+  Converts a ACPI address device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -525,9 +525,9 @@ DevPathToTextAcpiAdr (
 }
 
 /**
-  Converts a ATAPI device path structure to its string representive.
+  Converts a ATAPI device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -563,9 +563,9 @@ DevPathToTextAtapi (
 }
 
 /**
-  Converts a SCSI device path structure to its string representive.
+  Converts a SCSI device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -590,9 +590,9 @@ DevPathToTextScsi (
 }
 
 /**
-  Converts a Fibre device path structure to its string representive.
+  Converts a Fibre device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -617,9 +617,9 @@ DevPathToTextFibre (
 }
 
 /**
-  Converts a 1394 device path structure to its string representive.
+  Converts a 1394 device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -647,9 +647,9 @@ DevPathToText1394 (
 }
 
 /**
-  Converts a USB device path structure to its string representive.
+  Converts a USB device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -674,9 +674,9 @@ DevPathToTextUsb (
 }
 
 /**
-  Converts a USB WWID device path structure to its string representive.
+  Converts a USB WWID device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -723,9 +723,9 @@ DevPathToTextUsbWWID (
 }
 
 /**
-  Converts a Logic Unit device path structure to its string representive.
+  Converts a Logic Unit device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -750,9 +750,9 @@ DevPathToTextLogicalUnit (
 }
 
 /**
-  Converts a USB class device path structure to its string representive.
+  Converts a USB class device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -886,9 +886,9 @@ DevPathToTextUsbClass (
 }
 
 /**
-  Converts a SATA device path structure to its string representive.
+  Converts a SATA device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -919,9 +919,9 @@ DevPathToTextSata (
 }
 
 /**
-  Converts a I20 device path structure to its string representive.
+  Converts a I20 device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -946,9 +946,9 @@ DevPathToTextI2O (
 }
 
 /**
-  Converts a MAC address device path structure to its string representive.
+  Converts a MAC address device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -987,9 +987,9 @@ DevPathToTextMacAddr (
 }
 
 /**
-  Converts a IPv4 device path structure to its string representive.
+  Converts a IPv4 device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1039,9 +1039,9 @@ DevPathToTextIPv4 (
 }
 
 /**
-  Converts a IPv6 device path structure to its string representive.
+  Converts a IPv6 device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1127,9 +1127,9 @@ DevPathToTextIPv6 (
 }
 
 /**
-  Converts an Infini Band device path structure to its string representive.
+  Converts an Infini Band device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1162,9 +1162,9 @@ DevPathToTextInfiniBand (
 }
 
 /**
-  Converts a UART device path structure to its string representive.
+  Converts a UART device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1254,9 +1254,9 @@ DevPathToTextUart (
 }
 
 /**
-  Converts an iSCSI device path structure to its string representive.
+  Converts an iSCSI device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1302,9 +1302,9 @@ DevPathToTextiSCSI (
 }
 
 /**
-  Converts a Hard drive device path structure to its string representive.
+  Converts a Hard drive device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1360,9 +1360,9 @@ DevPathToTextHardDrive (
 }
 
 /**
-  Converts a CDROM device path structure to its string representive.
+  Converts a CDROM device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1392,9 +1392,9 @@ DevPathToTextCDROM (
 }
 
 /**
-  Converts a File device path structure to its string representive.
+  Converts a File device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1419,9 +1419,9 @@ DevPathToTextFilePath (
 }
 
 /**
-  Converts a Media protocol device path structure to its string representive.
+  Converts a Media protocol device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1446,9 +1446,9 @@ DevPathToTextMediaProtocol (
 }
 
 /**
-  Converts a Firmware Volume device path structure to its string representive.
+  Converts a Firmware Volume device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1473,9 +1473,9 @@ DevPathToTextFv (
 }
 
 /**
-  Converts a Firmware Volume File device path structure to its string representive.
+  Converts a Firmware Volume File device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1500,9 +1500,9 @@ DevPathToTextFvFile (
 }
 
 /**
-  Converts a BIOS Boot Specification device path structure to its string representive.
+  Converts a BIOS Boot Specification device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1569,9 +1569,9 @@ DevPathToTextBBS (
 }
 
 /**
-  Converts an End-of-Device-Path structure to its string representive.
+  Converts an End-of-Device-Path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly
@@ -1593,9 +1593,9 @@ DevPathToTextEndInstance (
 }
 
 /**
-  Converts an unknown device path structure to its string representive.
+  Converts an unknown device path structure to its string representative.
 
-  @param Str             The string representive of input device.
+  @param Str             The string representative of input device.
   @param DevPath         The input device path structure.
   @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
                          of the display node is used, where applicable. If DisplayOnly

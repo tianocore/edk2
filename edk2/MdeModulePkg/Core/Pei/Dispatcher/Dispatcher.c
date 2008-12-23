@@ -474,6 +474,7 @@ PeiDispatcher (
               // But if new stack is smaller than the size of old stack, we also reserve
               // the size of old stack at bottom of permenent memory.
               //
+              DEBUG ((EFI_D_ERROR, "Old Stack Size%d, New stack size%d\n", (INT32) Private->StackSize, (INT32) OldPeiStackSize));
               ASSERT (Private->StackSize >= OldPeiStackSize);
               StackGap = Private->StackSize - OldPeiStackSize;
 

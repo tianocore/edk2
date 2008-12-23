@@ -29,9 +29,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 
 
-#define DISK_IO_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('d', 's', 'k', 'I')
+#define DATA_BUFFER_BLOCK_NUM             64
 
-#define DATA_BUFFER_BLOCK_NUM           (64)
+#define DISK_IO_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('d', 's', 'k', 'I')
 
 typedef struct {
   UINTN                 Signature;

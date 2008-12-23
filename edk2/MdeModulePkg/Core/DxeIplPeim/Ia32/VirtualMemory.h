@@ -110,16 +110,13 @@ typedef union {
                                                 table entries  to the physical 
                                                 address space. 
 
-  @return EFI_SUCCESS           The 1:1 Virtual to Physical identity mapping was created
+  @return The address of 4 level page map.
 
 **/
 UINTN
 CreateIdentityMappingPageTables (
   VOID
   );
-
-
-
 
 
 /**

@@ -1504,7 +1504,7 @@ DevPathFromTextUartFlowCtrl (
                                                         sizeof (UART_FLOW_CONTROL_DEVICE_PATH)
                                                         );
 
-  CopyGuid (&UartFlowControl->Guid, &mEfiDevicePathMessagingUartFlowControlGuid);
+  CopyGuid (&UartFlowControl->Guid, &gEfiUartDevicePathGuid);
   if (StrCmp (ValueStr, L"XonXoff") == 0) {
     UartFlowControl->FlowControlMap = 2;
   } else if (StrCmp (ValueStr, L"Hardware") == 0) {
@@ -1555,7 +1555,7 @@ DevPathFromTextSAS (
                                        sizeof (SAS_DEVICE_PATH)
                                        );
 
-  CopyGuid (&Sas->Guid, &mEfiDevicePathMessagingSASGuid);
+  CopyGuid (&Sas->Guid, &gEfiSasDevicePathGuid);
   Strtoi64 (AddressStr, &Sas->SasAddress);
   Strtoi64 (LunStr, &Sas->Lun);
   Sas->RelativeTargetPort = (UINT16) Strtoi (RTPStr);
