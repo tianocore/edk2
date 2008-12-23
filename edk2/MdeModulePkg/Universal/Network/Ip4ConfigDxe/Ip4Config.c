@@ -1,22 +1,14 @@
 /** @file
+  This code implements the IP4Config and NicIp4Config protocols.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Ip4Config.c
-
-Abstract:
-
-  This code implements the IP4Config and NicIp4Config protocols.
-
 
 **/
 
@@ -290,15 +282,49 @@ EfiNicIp4ConfigSetInfo (
 
 
 /**
-  Start the auto configuration process.
+  Starts running the configuration policy for the EFI IPv4 Protocol driver.
+  
+  The Start() function is called to determine and to begin the platform 
+  configuration policy by the EFI IPv4 Protocol driver. This determination may 
+  be as simple as returning EFI_UNSUPPORTED if there is no EFI IPv4 Protocol 
+  driver configuration policy. It may be as involved as loading some defaults 
+  from nonvolatile storage, downloading dynamic data from a DHCP server, and 
+  checking permissions with a site policy server.
+  Starting the configuration policy is just the beginning. It may finish almost 
+  instantly or it may take several minutes before it fails to retrieve configuration 
+  information from one or more servers. Once the policy is started, drivers 
+  should use the DoneEvent parameter to determine when the configuration policy 
+  has completed. EFI_IP4_CONFIG_PROTOCOL.GetData() must then be called to 
+  determine if the configuration succeeded or failed.
+  Until the configuration completes successfully, EFI IPv4 Protocol driver instances 
+  that are attempting to use default configurations must return EFI_NO_MAPPING.
+  Once the configuration is complete, the EFI IPv4 Configuration Protocol driver 
+  signals DoneEvent. The configuration may need to be updated in the future, 
+  however; in this case, the EFI IPv4 Configuration Protocol driver must signal 
+  ReconfigEvent, and all EFI IPv4 Protocol driver instances that are using default 
+  configurations must return EFI_NO_MAPPING until the configuration policy has 
+  been rerun.
 
-  @param  This                   The IP4 configure protocol
-  @param  DoneEvent              The event to signal when auto configure is done
-  @param  ReconfigEvent          The event to signal when reconfigure is necessary.
-
-  @retval EFI_INVALID_PARAMETER  One of the function parameters is NULL.
-  @retval EFI_ALREADY_STARTED    The auto configuration has already started.
-  @retval EFI_SUCCESS            The auto configure is successfully started.
+  @param  This                   Pointer to the EFI_IP4_CONFIG_PROTOCOL instance.
+  @param  DoneEvent              Event that will be signaled when the EFI IPv4 
+                                 Protocol driver configuration policy completes 
+                                 execution. This event must be of type EVT_NOTIFY_SIGNAL.
+  @param  ReconfigEvent          Event that will be signaled when the EFI IPv4 
+                                 Protocol driver configuration needs to be updated. 
+                                 This event must be of type EVT_NOTIFY_SIGNAL.
+  
+  @retval EFI_SUCCESS            The configuration policy for the EFI IPv4 Protocol 
+                                 driver is now running.
+  @retval EFI_INVALID_PARAMETER  One or more of the following parameters is NULL:
+                                  This
+                                  DoneEvent
+                                  ReconfigEvent
+  @retval EFI_OUT_OF_RESOURCES   Required system resources could not be allocated.
+  @retval EFI_ALREADY_STARTED    The configuration policy for the EFI IPv4 Protocol 
+                                 driver was already started.
+  @retval EFI_DEVICE_ERROR       An unexpected system error or network error occurred.
+  @retval EFI_UNSUPPORTED        This interface does not support the EFI IPv4 Protocol 
+                                 driver configuration.
 
 **/
 EFI_STATUS
@@ -460,14 +486,19 @@ ON_EXIT:
 
 
 /**
-  Stop the current auto configuration
+  Stops running the configuration policy for the EFI IPv4 Protocol driver.
+  
+  The Stop() function stops the configuration policy for the EFI IPv4 Protocol driver. 
+  All configuration data will be lost after calling Stop().
 
-  @param  This                   The IP4 CONFIG protocol
+  @param  This                   Pointer to the EFI_IP4_CONFIG_PROTOCOL instance.
 
+  @retval EFI_SUCCESS            The configuration policy for the EFI IPv4 Protocol 
+                                 driver has been stopped.
   @retval EFI_INVALID_PARAMETER  This is NULL.
-  @retval EFI_NOT_STARTED        The auto configuration hasn't been started.
-  @retval EFI_SUCCESS            The auto configuration has been stopped.
-
+  @retval EFI_NOT_STARTED        The configuration policy for the EFI IPv4 Protocol 
+                                 driver was not started.
+  
 **/
 EFI_STATUS
 EFIAPI
@@ -508,16 +539,28 @@ ON_EXIT:
 
 
 /**
-  Get the current outcome of the auto configuration process
+  Returns the default configuration data (if any) for the EFI IPv4 Protocol driver.
 
-  @param  This                   The IP4 CONFIG protocol
-  @param  ConfigDataSize         The size of the configure data
-  @param  ConfigData             The buffer to save the configure data
+  The GetData() function returns the current configuration data for the EFI IPv4 
+  Protocol driver after the configuration policy has completed.
+  
+  @param  This                   Pointer to the EFI_IP4_CONFIG_PROTOCOL instance.
+  @param  ConfigDataSize         On input, the size of the ConfigData buffer. 
+                                 On output, the count of bytes that were written 
+                                 into the ConfigData buffer.
+  @param  ConfigData             Pointer to the EFI IPv4 Configuration Protocol 
+                                 driver configuration data structure. 
+                                 Type EFI_IP4_IPCONFIG_DATA is defined in 
+                                 "Related Definitions" below.
 
-  @retval EFI_INVALID_PARAMETER  This or ConfigDataSize is NULL
-  @retval EFI_BUFFER_TOO_SMALL   The buffer is too small. The needed size is
-                                 returned in the ConfigDataSize.
-  @retval EFI_SUCCESS            The configure data is put in the buffer
+  @retval EFI_SUCCESS            The EFI IPv4 Protocol driver configuration has been returned.
+  @retval EFI_INVALID_PARAMETER  This is NULL.
+  @retval EFI_NOT_STARTED        The configuration policy for the EFI IPv4 Protocol 
+                                 driver is not running.
+  @retval EFI_NOT_READY EFI      IPv4 Protocol driver configuration is still running.
+  @retval EFI_ABORTED EFI        IPv4 Protocol driver configuration could not complete.
+  @retval EFI_BUFFER_TOO_SMALL   *ConfigDataSize is smaller than the configuration 
+                                 data buffer or ConfigData is NULL.
 
 **/
 EFI_STATUS

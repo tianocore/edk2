@@ -1,27 +1,19 @@
 /** @file
+  Header file for IP4Config driver.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Ip4Config.h
-
-Abstract:
-
-  Header file for IP4Config driver.
-
-
 **/
 
-#ifndef __EFI_IP4CONFIG_H__
-#define __EFI_IP4CONFIG_H__
+#ifndef _EFI_IP4CONFIG_H_
+#define _EFI_IP4CONFIG_H_
 
 #include <PiDxe.h>
 

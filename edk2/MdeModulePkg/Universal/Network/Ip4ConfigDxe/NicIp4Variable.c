@@ -1,22 +1,14 @@
 /** @file
+  Routines used to operate the Ip4 configure variable
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  NicIp4Variable.c
-
-Abstract:
-
-  Routines used to operate the Ip4 configure variable
-
 
 **/
 
@@ -384,6 +376,15 @@ Ip4ConfigModifyVariable (
   return NewVar;
 }
 
+/**
+  Fix the RouteTable pointer in an EFI_IP4_IPCONFIG_DATA structure. 
+  
+  The pointer is set to be immediately follow the ConfigData if there're entries
+  in the RouteTable. Otherwise it is set to NULL.
+  
+  @param  ConfigData     The IP4 IP configure data.
+
+**/
 VOID
 Ip4ConfigFixRouteTablePointer (
   IN EFI_IP4_IPCONFIG_DATA  *ConfigData
