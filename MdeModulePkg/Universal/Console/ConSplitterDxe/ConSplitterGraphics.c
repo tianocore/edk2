@@ -31,7 +31,7 @@ CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
   @param  This                    Protocol instance pointer.
   @param  Mode                    Current video mode.
-  @param  GopExists               TRUE if GOP Spliter has found a GOP/UGA device
+  @param  GopUgaExists            TRUE if GOP Spliter has found a GOP/UGA device
   @param  StdInLocked             TRUE if StdIn device is keyboard locked
 
   @retval EFI_SUCCESS             Video mode information is returned.
