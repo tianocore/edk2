@@ -31,11 +31,12 @@ typedef enum {
 /**
   Return the current video mode information. Also returns info about existence
   of Graphics Output devices or UGA Draw devices in system, and whether the Std
-  In device is locked. GopUgaExists and StdInLocked parameters are optional.
+  In device is locked. GopUgaExists and StdInLocked parameters are optional, and
+  only returned if a non NULL pointer is passed in.
 
   @param  This                    Protocol instance pointer.
   @param  Mode                    Current video mode.
-  @param  GopExists               TRUE if GOP Spliter has found a GOP/UGA device
+  @param  GopUgaExists            TRUE if GOP Spliter has found a GOP/UGA device
   @param  StdInLocked             TRUE if StdIn device is keyboard locked
 
   @retval EFI_SUCCESS             Video mode information is returned.
