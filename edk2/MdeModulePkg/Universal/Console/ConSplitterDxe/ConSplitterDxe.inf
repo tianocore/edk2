@@ -3,6 +3,13 @@
 #
 # This driver acts as a virtual console, takes over the console I/O control from selected 
 # standard console devices, and transmits console I/O to related console device drivers.
+# Consplitter could install Graphics Output protocol and/or UGA Draw protocol in system
+# table according PCD settings(PcdConOutGopSupport, and PcdConOutUgaSupport). It always
+# consumes Graphics Output protocol which is produced by display device, and consumes UGA Draw 
+# protocol which is produced by display device according to PcdUgaConsumeSupport value. 
+# Note: If only UGA Draw protocol is installed in system table, PcdUgaConsumeSupport 
+# should be set to TRUE.
+#
 # Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
