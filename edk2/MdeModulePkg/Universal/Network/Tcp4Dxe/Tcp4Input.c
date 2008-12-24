@@ -257,10 +257,8 @@ TcpComputeRtt (
   @param  Left     The sequence number of the window's left edge.
   @param  Right    The sequence number of the window's right edge.
 
-  @return 0        The data is successfully trimmed.
-
 **/
-INTN
+VOID
 TcpTrimSegment (
   IN NET_BUF   *Nbuf,
   IN TCP_SEQNO Left,
@@ -284,7 +282,6 @@ TcpTrimSegment (
 
     Seg->Seq = Seg->End;
     NetbufTrim (Nbuf, Nbuf->TotalSize, NET_BUF_HEAD);
-    return 0;
   }
 
   //
@@ -338,7 +335,6 @@ TcpTrimSegment (
   }
 
   ASSERT (TcpVerifySegment (Nbuf) != 0);
-  return 0;
 }
 
 
@@ -348,16 +344,14 @@ TcpTrimSegment (
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Nbuf     Pointer to the NET_BUF containing the received tcp segment.
 
-  @return 0        The data is trimmed.
-
 **/
-INTN
+VOID
 TcpTrimInWnd (
   IN TCP_CB  *Tcb,
   IN NET_BUF *Nbuf
   )
 {
-  return TcpTrimSegment (Nbuf, Tcb->RcvNxt, Tcb->RcvWl2 + Tcb->RcvWnd);
+  TcpTrimSegment (Nbuf, Tcb->RcvNxt, Tcb->RcvWl2 + Tcb->RcvWnd);
 }
 
 
@@ -1271,8 +1265,6 @@ NO_UPDATE:
 
       TcpClose (Tcb);
     }
-    break;
-  default:
     break;
   }
 

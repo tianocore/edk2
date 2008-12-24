@@ -182,7 +182,7 @@ struct _TCP_CB {
   //
   // RFC793 and RFC1122 defined variables
   //
-  TCP_STATES             State;      ///< TCP state, such as SYN_SENT, LISTEN
+  UINT8             State;      ///< TCP state, such as SYN_SENT, LISTEN
   UINT8             DelayedAck; ///< Number of delayed ACKs
   UINT16            HeadSum;    ///< Checksum of the fixed parts of pesudo
                                 ///< header: Src IP, Dst IP, 0, Protocol,
@@ -342,7 +342,7 @@ extern UINT32         mTcpTick;
 typedef
 VOID
 (*TCP_TIMER_HANDLER) (
-  IN TCP_CB * Tcb
+  IN TCP_CB *Tcb
   );
 
 #include "Tcp4Func.h"

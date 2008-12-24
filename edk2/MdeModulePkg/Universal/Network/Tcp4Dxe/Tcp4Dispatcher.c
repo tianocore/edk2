@@ -69,8 +69,8 @@ Tcp4Route (
 **/
 EFI_STATUS
 Tcp4GetMode (
-  IN TCP_CB         *Tcb,
-  IN TCP4_MODE_DATA *Mode
+  IN     TCP_CB         *Tcb,
+  IN OUT TCP4_MODE_DATA *Mode
   )
 {
   SOCKET                *Sock;

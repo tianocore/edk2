@@ -99,7 +99,7 @@ TcpInitTcbPeer (
 {
   UINT16  RcvMss;
 
-  ASSERT (Tcb && Seg && Opt);
+  ASSERT ((Tcb != NULL) && (Seg != NULL) && (Opt != NULL));
   ASSERT (TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN));
 
   Tcb->SndWnd     = Seg->Wnd;
@@ -497,7 +497,7 @@ TcpGetRcvMss (
 VOID
 TcpSetState (
   IN TCP_CB      *Tcb,
-  IN TCP_STATES  State
+  IN UINT8       State
   )
 {
   DEBUG (
@@ -508,7 +508,7 @@ TcpSetState (
     mTcpStateName[State])
     );
 
-  Tcb->State = (TCP_STATES)State;
+  Tcb->State = State;
 
   switch (State) {
   case TCP_ESTABLISHED:
@@ -791,7 +791,7 @@ TcpOnAppSend (
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
 
 **/
-INTN
+VOID
 TcpOnAppConsume (
   IN TCP_CB *Tcb
   )
@@ -800,17 +800,14 @@ TcpOnAppConsume (
 
   switch (Tcb->State) {
   case TCP_CLOSED:
-    return -1;
-    break;
+    return;
 
   case TCP_LISTEN:
-    return -1;
-    break;
+    return;
 
   case TCP_SYN_SENT:
   case TCP_SYN_RCVD:
-    return 0;
-    break;
+    return;
 
   case TCP_ESTABLISHED:
     TcpOld = TcpRcvWinOld (Tcb);
@@ -834,19 +831,15 @@ TcpOnAppConsume (
     break;
 
   case TCP_CLOSE_WAIT:
-    return 0;
-    break;
+    return;
 
   case TCP_FIN_WAIT_1:
   case TCP_FIN_WAIT_2:
   case TCP_CLOSING:
   case TCP_LAST_ACK:
   case TCP_TIME_WAIT:
-    return -1;
-    break;
+    return;
   }
-
-  return -1;
 }
 
 
@@ -872,8 +865,6 @@ TcpOnAppAbort (
   case TCP_FIN_WAIT_2:
   case TCP_CLOSE_WAIT:
     TcpResetConnection (Tcb);
-    break;
-  default:
     break;
   }
 

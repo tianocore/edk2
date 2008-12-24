@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ServiceBinding.h>
 #include <Library/IpIoLib.h>
 
-#define TCP4_DRIVER_SIGNATURE   SIGNATURE_32 ('T', 'C', 'P', '4')
+#define TCP4_DRIVER_SIGNATURE   EFI_SIGNATURE_32 ('T', 'C', 'P', '4')
 
 #define TCP4_PORT_KNOWN         1024
 #define TCP4_PORT_USER_RESERVED 65535
@@ -29,12 +29,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Tcp4ServiceBinding, \
   TCP4_DRIVER_SIGNATURE \
   )
-
+  
+///
+/// TCP heartbeat tick timer.
+///
 typedef struct _TCP4_HEARTBEAT_TIMER {
-  EFI_EVENT  TimerEvent;
-  INTN       RefCnt;
+  EFI_EVENT  TimerEvent;         ///< The event assoiated with the timer
+  INTN       RefCnt;             ///< Number of reference
 } TCP4_HEARTBEAT_TIMER;
 
+///
+/// TCP service data
+///
 typedef struct _TCP4_SERVICE_DATA {
   UINT32                        Signature;
   EFI_HANDLE                    ControllerHandle;
@@ -45,6 +51,13 @@ typedef struct _TCP4_SERVICE_DATA {
   LIST_ENTRY                    SocketList;
 } TCP4_SERVICE_DATA;
 
+///
+/// TCP protocol data
+///
+typedef struct _TCP4_PROTO_DATA {
+  TCP4_SERVICE_DATA *TcpService;
+  TCP_CB            *TcpPcb;
+} TCP4_PROTO_DATA;
 
 
 /**
@@ -112,10 +125,6 @@ Tcp4Dispatcher (
   IN VOID                    *Data    OPTIONAL
   );
 
-typedef struct _TCP4_PROTO_DATA {
-  TCP4_SERVICE_DATA *TcpService;
-  TCP_CB            *TcpPcb;
-} TCP4_PROTO_DATA;
 
 /**
   The entry point for Tcp4 driver, used to install Tcp4 driver on the ImageHandle.
@@ -299,8 +308,8 @@ Tcp4DestroySocketCallback (
 EFI_STATUS
 EFIAPI
 Tcp4ServiceBindingCreateChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                    *ChildHandle
+  IN     EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN OUT EFI_HANDLE                    *ChildHandle
   );
 
 /**

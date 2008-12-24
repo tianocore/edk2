@@ -149,7 +149,7 @@ TcpGetRcvMss (
 VOID
 TcpSetState (
   IN TCP_CB      *Tcb,
-  IN TCP_STATES  State
+  IN UINT8       State
   );
 
 //
@@ -518,10 +518,8 @@ TcpComputeRtt (
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
   @param  Nbuf     Pointer to the NET_BUF containing the received tcp segment.
 
-  @return 0        The data is trimmed.
-
 **/
-INTN
+VOID
 TcpTrimInWnd (
   IN TCP_CB  *Tcb,
   IN NET_BUF *Nbuf
@@ -608,7 +606,7 @@ TcpOnAppConnect (
   @param  Tcb                   Pointer to the TCP_CB of this TCP instance.
 
 **/
-INTN
+VOID
 TcpOnAppConsume (
   IN TCP_CB *Tcb
   );

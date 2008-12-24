@@ -629,8 +629,8 @@ Tcp4DestroySocketCallback (
 EFI_STATUS
 EFIAPI
 Tcp4ServiceBindingCreateChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                    *ChildHandle
+  IN     EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN OUT EFI_HANDLE                    *ChildHandle
   )
 {
   SOCKET            *Sock;
