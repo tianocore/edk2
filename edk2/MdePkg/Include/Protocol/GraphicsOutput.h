@@ -93,12 +93,13 @@ typedef struct {
 } EFI_GRAPHICS_OUTPUT_MODE_INFORMATION;
 
 /**
-  Return the current video mode information.
+  Returns information for an available graphics mode that the graphics device
+  and the set of active video output devices supports.
 
-  @param  This       Protocol instance pointer.
-  @param  ModeNumber The mode number to return information on.
-  @param  SizeOfInfo A pointer to the size, in bytes, of the Info buffer.
-  @param  Info       A pointer to callee allocated buffer that returns information about ModeNumber.
+  @param  This                  The EFI_GRAPHICS_OUTPUT_PROTOCOL instance.
+  @param  ModeNumber            The mode number to return information on.
+  @param  SizeOfInfo            A pointer to the size, in bytes, of the Info buffer.
+  @param  Info                  A pointer to callee allocated buffer that returns information about ModeNumber.
 
   @retval EFI_SUCCESS           Mode information returned.
   @retval EFI_BUFFER_TOO_SMALL  The Info buffer was too small.
@@ -117,12 +118,13 @@ EFI_STATUS
   );
 
 /**
-  Return the current video mode information.
+  Set the video device into the specified mode and clears the visible portions of 
+  the output display to black.
 
-  @param  This              Protocol instance pointer.
-  @param  ModeNumber        The mode number to be set.
+  @param  This              The EFI_GRAPHICS_OUTPUT_PROTOCOL instance.
+  @param  ModeNumber        Abstraction that defines the current video mode.
 
-  @retval EFI_SUCCESS       Graphics mode was changed.
+  @retval EFI_SUCCESS       The graphics mode specified by ModeNumber was selected.
   @retval EFI_DEVICE_ERROR  The device had an error and could not complete the request.
   @retval EFI_UNSUPPORTED   ModeNumber is not supported by this device.
 
