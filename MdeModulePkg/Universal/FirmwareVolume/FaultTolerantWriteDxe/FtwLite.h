@@ -69,16 +69,6 @@ typedef struct {
 #define FTW_LITE_DEVICE_SIGNATURE SIGNATURE_32 ('F', 'T', 'W', 'L')
 
 //
-// MACRO for Block size.
-// Flash Erasing will do in block granularity.
-//
-#ifdef FV_BLOCK_SIZE
-#define FTW_BLOCK_SIZE  FV_BLOCK_SIZE
-#else
-#define FV_BLOCK_SIZE   0x10000
-#define FTW_BLOCK_SIZE  FV_BLOCK_SIZE
-#endif
-//
 // MACRO for FTW WORK SPACE Base & Size
 //
 #ifdef EFI_FTW_WORKING_OFFSET
@@ -249,7 +239,7 @@ FtwWriteRecord (
   );
 
 /**
-  To Erase one block. The size is FTW_BLOCK_SIZE
+  To erase the block with the spare block size.
 
 
   @param FtwLiteDevice   Calling context
@@ -349,26 +339,6 @@ IsInWorkingBlock (
   );
 
 /**
-
-  Check whether the block is a boot block.
-
-
-  @param FtwLiteDevice   Calling context
-  @param FvBlock         Fvb protocol instance
-  @param Lba             Lba value
-
-  @retval FALSE           This is a boot block.
-  @retval TRUE            This is not a boot block.
-
-**/
-BOOLEAN
-IsBootBlock (
-  EFI_FTW_LITE_DEVICE                 *FtwLiteDevice,
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
-  EFI_LBA                             Lba
-  );
-
-/**
   Copy the content of spare block to a target block. Size is FTW_BLOCK_SIZE.
   Spare block is accessed by FTW backup FVB protocol interface. LBA is
   FtwLiteDevice->FtwSpareLba.
@@ -413,27 +383,6 @@ FlushSpareBlockToTargetBlock (
 **/
 EFI_STATUS
 FlushSpareBlockToWorkingBlock (
-  EFI_FTW_LITE_DEVICE                 *FtwLiteDevice
-  );
-
-/**
-  Copy the content of spare block to a boot block. Size is FTW_BLOCK_SIZE.
-  Spare block is accessed by FTW backup FVB protocol interface. LBA is
-  FtwLiteDevice->FtwSpareLba.
-  Boot block is accessed by BootFvb protocol interface. LBA is 0.
-
-
-  @param FtwLiteDevice   The private data of FTW_LITE driver
-
-  @retval  EFI_SUCCESS               Spare block content is copied to boot block
-  @retval  EFI_INVALID_PARAMETER     Input parameter error
-  @retval  EFI_OUT_OF_RESOURCES      Allocate memory error
-  @retval  EFI_ABORTED               The function could not complete successfully
-                                     Notes:
-
-**/
-EFI_STATUS
-FlushSpareBlockToBootBlock (
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice
   );
 

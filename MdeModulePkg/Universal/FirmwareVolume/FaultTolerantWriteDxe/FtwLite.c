@@ -17,7 +17,7 @@
   
   The write record has three states to specify the different phase of write operation.
   1) WRITE_ALLOCATED is that the record is allocated in write space.
-     The write record structure records the information of write operation.
+     The information of write operation is stored in write record structure.
   2) SPARE_COMPLETED is that the data from write buffer is writed into the spare block as the backup.
   3) WRITE_COMPLETED is that the data is copied from the spare block to the target block.
 
@@ -423,7 +423,6 @@ FtwWriteRecord (
 
   //
   // IF target block is working block, THEN Flush Spare Block To Working Block;
-  // ELSE IF target block is boot block, THEN Flush Spare Block To boot Block;
   // ELSE flush spare block to normal target block.ENDIF
   //
   if (IsInWorkingBlock (FtwLiteDevice, Fvb, Record->Lba)) {
@@ -444,7 +443,7 @@ FtwWriteRecord (
     Status = FlushSpareBlockToWorkingBlock (FtwLiteDevice);
   } else {
     //
-    // Update blocks other than working block or boot block
+    // Update blocks other than working block
     //
     Status = FlushSpareBlockToTargetBlock (FtwLiteDevice, Fvb, Record->Lba);
   }
