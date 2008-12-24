@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Common header file shared by all source files.
 
   This file includes package header files, library classes and protocol, PPI & GUID definitions.
@@ -10,6 +10,7 @@
    http://opensource.org/licenses/bsd-license.php
    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+   
 **/
 
 #ifndef __IFRSUPPORT_LIB_INTERNAL_H_

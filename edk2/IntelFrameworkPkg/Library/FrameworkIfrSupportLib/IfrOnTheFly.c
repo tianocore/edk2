@@ -20,33 +20,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   The form package is a collection of forms that are intended to describe the pages that will be
   displayed to the user.
   
-  @param FormSetTitle         Title of formset
-  @param Guid                 Guid of formset
-  @param Class                Class of formset
-  @param SubClass             Sub class of formset
-  @param FormBuffer           Pointer of the formset created
-  @param StringBuffer         Pointer of FormSetTitile string created
+  @param  FormSetTitle         Title of formset
+  @param  Guid                 Guid of formset
+  @param  Class                Class of formset
+  @param  SubClass             Sub class of formset
+  @param  FormBuffer           Pointer of the formset created
+  @param  StringBuffer         Pointer of FormSetTitile string created
   
-  @retval EFI_OUT_OF_RESOURCES     No enough buffer to allocate
-  @retval EFI_SUCCESS              Formset successfully created  
+  @retval EFI_OUT_OF_RESOURCES No enough buffer to allocate
+  @retval EFI_SUCCESS          Formset successfully created  
 **/
 EFI_STATUS
 CreateFormSet (
-  IN      CHAR16              *FormSetTitle,
-  IN      EFI_GUID            *Guid,
-  IN      UINT8               Class,
-  IN      UINT8               SubClass,
-  IN OUT  VOID                **FormBuffer,
-  IN OUT  VOID                **StringBuffer
+  IN      CHAR16                    *FormSetTitle,
+  IN      EFI_GUID                  *Guid,
+  IN      UINT8                     Class,
+  IN      UINT8                     SubClass,
+  IN OUT  VOID                      **FormBuffer,
+  IN OUT  VOID                      **StringBuffer
   )
 {
-  EFI_STATUS            Status;
-  EFI_HII_IFR_PACK      IfrPack;
-  FRAMEWORK_EFI_IFR_FORM_SET      FormSet;
-  FRAMEWORK_EFI_IFR_END_FORM_SET  EndFormSet;
-  UINT8                 *Destination;
-  CHAR16                CurrentLanguage[4];
-  STRING_REF            StringToken;
+  EFI_STATUS                        Status;
+  EFI_HII_IFR_PACK                  IfrPack;
+  FRAMEWORK_EFI_IFR_FORM_SET        FormSet;
+  FRAMEWORK_EFI_IFR_END_FORM_SET    EndFormSet;
+  UINT8                             *Destination;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // Pre-allocate a buffer sufficient for us to work from.
@@ -119,31 +119,31 @@ CreateFormSet (
 }
 
 /**
-  Create a form
+  Create a form.
   A form is the encapsulation of what amounts to a browser page. The header defines a FormId,
   which is referenced by the form package, among others. It also defines a FormTitle, which is a
   string to be used as the title for the form
   
-  @param FormTitle        Title of the form
-  @param FormId           Id of the form
-  @param FormBuffer       Pointer of the form created
-  @param StringBuffer     Pointer of FormTitil string created
+  @param  FormTitle        Title of the form
+  @param  FormId           Id of the form
+  @param  FormBuffer       Pointer of the form created
+  @param  StringBuffer     Pointer of FormTitil string created
   
-  @retval EFI_SUCCESS     Form successfully created
+  @retval EFI_SUCCESS      Form successfully created
 **/
 EFI_STATUS
 CreateForm (
-  IN      CHAR16              *FormTitle,
-  IN      UINT16              FormId,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      CHAR16                    *FormTitle,
+  IN      UINT16                    FormId,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS        Status;
-  FRAMEWORK_EFI_IFR_FORM      Form;
-  FRAMEWORK_EFI_IFR_END_FORM  EndForm;
-  CHAR16            CurrentLanguage[4];
-  STRING_REF        StringToken;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_IFR_FORM            Form;
+  FRAMEWORK_EFI_IFR_END_FORM        EndForm;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // Obtain current language value
@@ -181,23 +181,23 @@ CreateForm (
   Subtitle strings are intended to be used by authors to separate sections of questions into semantic
   groups.
   
-  @param SubTitle         Sub title to be created
-  @param FormBuffer       Where this subtitle to add to
-  @param StringBuffer     String buffer created for subtitle
+  @param  SubTitle         Sub title to be created
+  @param  FormBuffer       Where this subtitle to add to
+  @param  StringBuffer     String buffer created for subtitle
   
   @retval EFI_SUCCESS      Subtitle successfully created
 **/
 EFI_STATUS
 CreateSubTitle (
-  IN      CHAR16              *SubTitle,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      CHAR16                    *SubTitle,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS        Status;
-  FRAMEWORK_EFI_IFR_SUBTITLE  Subtitle;
-  CHAR16            CurrentLanguage[4];
-  STRING_REF        StringToken;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_IFR_SUBTITLE        Subtitle;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // Obtain current language value
@@ -224,31 +224,31 @@ CreateSubTitle (
   Unlike HTML, text is simply another tag. 
   This tag type enables IFR to be more easily localized.
   
-  @param String          - First string of the text
-  @param String2         - Second string of the text
-  @param String3         - Help string of the text
-  @param Flags           - Flag of the text
-  @param Key             - Key of the text
-  @param FormBuffer      - The form where this text adds to
-  @param StringBuffer    - String buffer created for String, String2 and String3
+  @param  String          First string of the text
+  @param  String2         Second string of the text
+  @param  String3         Help string of the text
+  @param  Flags           Flag of the text
+  @param  Key             Key of the text
+  @param  FormBuffer      The form where this text adds to
+  @param  StringBuffer    String buffer created for String, String2 and String3
   
-  @retval EFI_SUCCESS     - Text successfully created
+  @retval EFI_SUCCESS     Text successfully created
 **/
 EFI_STATUS
 CreateText (
-  IN      CHAR16              *String,
-  IN      CHAR16              *String2,
-  IN      CHAR16              *String3,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      CHAR16                    *String,
+  IN      CHAR16                    *String2,
+  IN      CHAR16                    *String3,
+  IN      UINT8                     Flags,
+  IN      UINT16                    Key,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS    Status;
-  FRAMEWORK_EFI_IFR_TEXT  Text;
-  CHAR16        CurrentLanguage[4];
-  STRING_REF    StringToken;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_IFR_TEXT            Text;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // Obtain current language value
@@ -299,27 +299,27 @@ CreateText (
 }
 
 /**
-  Create a hyperlink
+  Create a hyperlink.
   
-  @param FormId         Form ID of the hyperlink
-  @param Prompt         Prompt of the hyperlink
-  @param FormBuffer     The form where this hyperlink adds to
-  @param StringBuffer   String buffer created for Prompt
+  @param  FormId         Form ID of the hyperlink
+  @param  Prompt         Prompt of the hyperlink
+  @param  FormBuffer     The form where this hyperlink adds to
+  @param  StringBuffer   String buffer created for Prompt
   
-  @retval EFI_SUCCESS   Hyperlink successfully created  
+  @retval EFI_SUCCESS    Hyperlink successfully created  
 **/
 EFI_STATUS
 CreateGoto (
-  IN      UINT16              FormId,
-  IN      CHAR16              *Prompt,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      UINT16                    FormId,
+  IN      CHAR16                    *Prompt,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS  Status;
-  FRAMEWORK_EFI_IFR_REF Hyperlink;
-  CHAR16      CurrentLanguage[4];
-  STRING_REF  StringToken;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_IFR_REF             Hyperlink;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // Obtain current language value
@@ -346,37 +346,37 @@ CreateGoto (
   Create a one-of question with a set of options to choose from.  The
   OptionsList is a pointer to a null-terminated list of option descriptions.
 
-  @param QuestionId      - Question ID of the one-of box
-  @param DataWidth       - DataWidth of the one-of box
-  @param Prompt          - Prompt of the one-of box
-  @param Help            - Help of the one-of box
-  @param OptionsList     - Each string in it is an option of the one-of box
-  @param OptionCount     - Option string count
-  @param FormBuffer      - The form where this one-of box adds to
-  @param StringBuffer    - String buffer created for Prompt, Help and Option strings
+  @param  QuestionId        Question ID of the one-of box
+  @param  DataWidth         DataWidth of the one-of box
+  @param  Prompt            Prompt of the one-of box
+  @param  Help              Help of the one-of box
+  @param  OptionsList       Each string in it is an option of the one-of box
+  @param  OptionCount       Option string count
+  @param  FormBuffer        The form where this one-of box adds to
+  @param  StringBuffer      String buffer created for Prompt, Help and Option strings
   
-  @retval EFI_DEVICE_ERROR    - DataWidth > 2
-  @retval EFI_SUCCESS         - One-Of box successfully created.
+  @retval EFI_DEVICE_ERROR  DataWidth > 2
+  @retval EFI_SUCCESS       One-Of box successfully created.
 **/
 EFI_STATUS
 CreateOneOf (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      IFR_OPTION          *OptionsList,
-  IN      UINTN               OptionCount,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      UINT16                    QuestionId,
+  IN      UINT8                     DataWidth,
+  IN      CHAR16                    *Prompt,
+  IN      CHAR16                    *Help,
+  IN      IFR_OPTION                *OptionsList,
+  IN      UINTN                     OptionCount,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 Index;
-  FRAMEWORK_EFI_IFR_ONE_OF        OneOf;
-  FRAMEWORK_EFI_IFR_ONE_OF_OPTION OneOfOption;
-  FRAMEWORK_EFI_IFR_END_ONE_OF    EndOneOf;
-  CHAR16                CurrentLanguage[4];
-  STRING_REF            StringToken;
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  FRAMEWORK_EFI_IFR_ONE_OF          OneOf;
+  FRAMEWORK_EFI_IFR_ONE_OF_OPTION   OneOfOption;
+  FRAMEWORK_EFI_IFR_END_ONE_OF      EndOneOf;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // We do not create op-code storage widths for one-of in excess of 16 bits for now
@@ -459,36 +459,36 @@ CreateOneOf (
   Create a one-of question with a set of options to choose from.  The
   OptionsList is a pointer to a null-terminated list of option descriptions.
   
-  @param QuestionId      - Question ID of the ordered list
-  @param MaxEntries      - MaxEntries of the ordered list
-  @param Prompt          - Prompt of the ordered list
-  @param Help            - Help of the ordered list
-  @param OptionsList     - Each string in it is an option of the ordered list
-  @param OptionCount     - Option string count
-  @param FormBuffer      - The form where this ordered list adds to
-  @param StringBuffer    - String buffer created for Prompt, Help and Option strings
+  @param  QuestionId      Question ID of the ordered list
+  @param  MaxEntries      MaxEntries of the ordered list
+  @param  Prompt          Prompt of the ordered list
+  @param  Help            Help of the ordered list
+  @param  OptionsList     Each string in it is an option of the ordered list
+  @param  OptionCount     Option string count
+  @param  FormBuffer      The form where this ordered list adds to
+  @param  StringBuffer    String buffer created for Prompt, Help and Option strings
   
-  @retval EFI_SUCCESS     - Ordered list successfully created.
+  @retval EFI_SUCCESS     Ordered list successfully created.
 **/
 EFI_STATUS
 CreateOrderedList (
-  IN      UINT16              QuestionId,
-  IN      UINT8               MaxEntries,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      IFR_OPTION          *OptionsList,
-  IN      UINTN               OptionCount,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      UINT16                    QuestionId,
+  IN      UINT8                     MaxEntries,
+  IN      CHAR16                    *Prompt,
+  IN      CHAR16                    *Help,
+  IN      IFR_OPTION                *OptionsList,
+  IN      UINTN                     OptionCount,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 Index;
-  FRAMEWORK_EFI_IFR_ORDERED_LIST  OrderedList;
-  FRAMEWORK_EFI_IFR_ONE_OF_OPTION OrderedListOption;
-  FRAMEWORK_EFI_IFR_END_ONE_OF    EndOrderedList;
-  CHAR16                CurrentLanguage[4];
-  STRING_REF            StringToken;
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  FRAMEWORK_EFI_IFR_ORDERED_LIST    OrderedList;
+  FRAMEWORK_EFI_IFR_ONE_OF_OPTION   OrderedListOption;
+  FRAMEWORK_EFI_IFR_END_ONE_OF      EndOrderedList;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // Obtain current language value
@@ -557,34 +557,34 @@ CreateOrderedList (
 }
 
 /**
-  Create a checkbox
+  Create a checkbox.
   
-  @param QuestionId       Question ID of the check box
-  @param DataWidth        DataWidth of the check box
-  @param Prompt           Prompt of the check box
-  @param Help             Help of the check box  
-  @param Flags            Flags of the check box
-  @param FormBuffer       The form where this check box adds to
-  @param StringBuffer     String buffer created for Prompt and Help.
+  @param  QuestionId        Question ID of the check box
+  @param  DataWidth         DataWidth of the check box
+  @param  Prompt            Prompt of the check box
+  @param  Help              Help of the check box  
+  @param  Flags             Flags of the check box
+  @param  FormBuffer        The form where this check box adds to
+  @param  StringBuffer      String buffer created for Prompt and Help.
   
-  @retval  EFI_DEVICE_ERROR    DataWidth > 1
-  @retval EFI_SUCCESS          Check box successfully created
+  @retval EFI_DEVICE_ERROR  DataWidth > 1
+  @retval EFI_SUCCESS       Check box successfully created
 **/
 EFI_STATUS
 CreateCheckBox (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      UINT8               Flags,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      UINT16                    QuestionId,
+  IN      UINT8                     DataWidth,
+  IN      CHAR16                    *Prompt,
+  IN      CHAR16                    *Help,
+  IN      UINT8                     Flags,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS        Status;
-  FRAMEWORK_EFI_IFR_CHECKBOX  CheckBox;
-  CHAR16            CurrentLanguage[4];
-  STRING_REF        StringToken;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_IFR_CHECKBOX        CheckBox;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // We do not create op-code storage widths for checkbox in excess of 8 bits for now
@@ -633,42 +633,42 @@ CreateCheckBox (
 /**
   Create a numeric
   
-  @param QuestionId       Question ID of the numeric
-  @param DataWidth        DataWidth of the numeric
-  @param Prompt           Prompt of the numeric
-  @param Help             Help of the numeric
-  @param Minimum          Minumun boundary of the numeric
-  @param Maximum          Maximum boundary of the numeric
-  @param Step             Step of the numeric
-  @param Default          Default value
-  @param Flags            Flags of the numeric
-  @param Key              Key of the numeric
-  @param FormBuffer       The form where this numeric adds to
-  @param StringBuffer     String buffer created for Prompt and Help.
+  @param  QuestionId        Question ID of the numeric
+  @param  DataWidth         DataWidth of the numeric
+  @param  Prompt            Prompt of the numeric
+  @param  Help              Help of the numeric
+  @param  Minimum           Minumun boundary of the numeric
+  @param  Maximum           Maximum boundary of the numeric
+  @param  Step              Step of the numeric
+  @param  Default           Default value
+  @param  Flags             Flags of the numeric
+  @param  Key               Key of the numeric
+  @param  FormBuffer        The form where this numeric adds to
+  @param  StringBuffer      String buffer created for Prompt and Help.
 
-  @retval EFI_DEVICE_ERROR       DataWidth > 2
-  @retval EFI_SUCCESS            Numeric is successfully created  
+  @retval EFI_DEVICE_ERROR  DataWidth > 2
+  @retval EFI_SUCCESS       Numeric is successfully created  
 **/
 EFI_STATUS
 CreateNumeric (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      UINT16              Minimum,
-  IN      UINT16              Maximum,
-  IN      UINT16              Step,
-  IN      UINT16              Default,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      UINT16                    QuestionId,
+  IN      UINT8                     DataWidth,
+  IN      CHAR16                    *Prompt,
+  IN      CHAR16                    *Help,
+  IN      UINT16                    Minimum,
+  IN      UINT16                    Maximum,
+  IN      UINT16                    Step,
+  IN      UINT16                    Default,
+  IN      UINT8                     Flags,
+  IN      UINT16                    Key,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS      Status;
-  FRAMEWORK_EFI_IFR_NUMERIC Numeric;
-  CHAR16          CurrentLanguage[4];
-  STRING_REF      StringToken;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_IFR_NUMERIC         Numeric;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // We do not create op-code storage widths for numerics in excess of 16 bits for now
@@ -720,38 +720,39 @@ CreateNumeric (
 }
 
 /**
-  Create a string
+  Create a string.
   
-  @param QuestionId      - Question ID of the string
-  @param DataWidth       - DataWidth of the string
-  @param Prompt          - Prompt of the string
-  @param Help            - Help of the string
-  @param MinSize         - Min size boundary of the string
-  @param MaxSize         - Max size boundary of the string
-  @param Flags           - Flags of the string
-  @param Key             - Key of the string
-  @param FormBuffer      - The form where this string adds to
-  @param StringBuffer    - String buffer created for Prompt and Help.
-  @retval EFI_SUCCESS     - String successfully created.  
+  @param  QuestionId     Question ID of the string
+  @param  DataWidth      DataWidth of the string
+  @param  Prompt         Prompt of the string
+  @param  Help           Help of the string
+  @param  MinSize        Min size boundary of the string
+  @param  MaxSize        Max size boundary of the string
+  @param  Flags          Flags of the string
+  @param  Key            Key of the string
+  @param  FormBuffer     The form where this string adds to
+  @param  StringBuffer   String buffer created for Prompt and Help.
+  
+  @retval EFI_SUCCESS    String successfully created.  
 **/
 EFI_STATUS
 CreateString (
-  IN      UINT16              QuestionId,
-  IN      UINT8               DataWidth,
-  IN      CHAR16              *Prompt,
-  IN      CHAR16              *Help,
-  IN      UINT8               MinSize,
-  IN      UINT8               MaxSize,
-  IN      UINT8               Flags,
-  IN      UINT16              Key,
-  IN OUT  VOID                *FormBuffer,
-  IN OUT  VOID                *StringBuffer
+  IN      UINT16                    QuestionId,
+  IN      UINT8                     DataWidth,
+  IN      CHAR16                    *Prompt,
+  IN      CHAR16                    *Help,
+  IN      UINT8                     MinSize,
+  IN      UINT8                     MaxSize,
+  IN      UINT8                     Flags,
+  IN      UINT16                    Key,
+  IN OUT  VOID                      *FormBuffer,
+  IN OUT  VOID                      *StringBuffer
   )
 {
-  EFI_STATUS      Status;
-  FRAMEWORK_EFI_IFR_STRING  String;
-  CHAR16          CurrentLanguage[4];
-  STRING_REF      StringToken;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_IFR_STRING          String;
+  CHAR16                            CurrentLanguage[4];
+  STRING_REF                        StringToken;
 
   //
   // Obtain current language value

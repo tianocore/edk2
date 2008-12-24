@@ -21,19 +21,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   language variable, then use default setting that 'eng' as current
   language setting.
   
-  @param Lang Pointer of system language
+  @param    Lang       Pointer of system language
   
-  @return whether sucess to get setting from variable
+  @return              whether sucess to get setting from variable
 **/
 EFI_STATUS
 GetCurrentLanguage (
-  OUT     CHAR16              *Lang
+  OUT  CHAR16                       *Lang
   )
 {
-  EFI_STATUS  Status;
-  UINTN       Size;
-  UINTN       Index;
-  CHAR8       Language[4];
+  EFI_STATUS                        Status;
+  UINTN                             Size;
+  UINTN                             Index;
+  CHAR8                             Language[4];
 
   //
   // Getting the system language and placing it into our Global Data
@@ -69,35 +69,35 @@ GetCurrentLanguage (
 }
 
 /**
-  Add a string to the incoming buffer and return the token and offset data
+  Add a string to the incoming buffer and return the token and offset data.
   
-  @param StringBuffer      The incoming buffer
-  @param Language          Currrent language
-  @param String            The string to be added
-  @param StringToken       The index where the string placed  
+  @param  StringBuffer         The incoming buffer
+  @param  Language             Currrent language
+  @param  String               The string to be added
+  @param  StringToken          The index where the string placed  
   
   @retval EFI_OUT_OF_RESOURCES No enough buffer to allocate
   @retval EFI_SUCCESS          String successfully added to the incoming buffer
 **/
 EFI_STATUS
 AddString (
-  IN      VOID                *StringBuffer,
-  IN      CHAR16              *Language,
-  IN      CHAR16              *String,
-  IN OUT  STRING_REF          *StringToken
+  IN      VOID                      *StringBuffer,
+  IN      CHAR16                    *Language,
+  IN      CHAR16                    *String,
+  IN OUT  STRING_REF                *StringToken
   )
 {
-  EFI_HII_STRING_PACK *StringPack;
-  EFI_HII_STRING_PACK *StringPackBuffer;
-  VOID                *NewBuffer;
-  RELOFST             *PackSource;
-  RELOFST             *PackDestination;
-  UINT8               *Source;
-  UINT8               *Destination;
-  UINTN               Index;
-  BOOLEAN             Finished;
-  UINTN               SizeofLanguage;
-  UINTN               SizeofString;
+  EFI_HII_STRING_PACK               *StringPack;
+  EFI_HII_STRING_PACK               *StringPackBuffer;
+  VOID                              *NewBuffer;
+  RELOFST                           *PackSource;
+  RELOFST                           *PackDestination;
+  UINT8                             *Source;
+  UINT8                             *Destination;
+  UINTN                             Index;
+  BOOLEAN                           Finished;
+  UINTN                             SizeofLanguage;
+  UINTN                             SizeofString;
 
   StringPack  = (EFI_HII_STRING_PACK *) StringBuffer;
   Finished    = FALSE;
@@ -279,23 +279,23 @@ AddString (
 }
 
 /**
-  Add op-code data to the FormBuffer
+  Add op-code data to the FormBuffer.
   
-  @param FormBuffer      Form buffer to be inserted to
-  @param OpCodeData      Op-code data to be inserted  
+  @param  FormBuffer            Form buffer to be inserted to
+  @param  OpCodeData            Op-code data to be inserted  
   
-  @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate
-  @retval EFI_SUCCESS             Op-code data successfully inserted  
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer to allocate
+  @retval EFI_SUCCESS           Op-code data successfully inserted  
 **/
 EFI_STATUS
 AddOpCode (
-  IN      VOID                *FormBuffer,
-  IN OUT  VOID                *OpCodeData
+  IN      VOID                      *FormBuffer,
+  IN OUT  VOID                      *OpCodeData
   )
 {
-  EFI_HII_PACK_HEADER *NewBuffer;
-  UINT8               *Source;
-  UINT8               *Destination;
+  EFI_HII_PACK_HEADER               *NewBuffer;
+  UINT8                             *Source;
+  UINT8                             *Destination;
 
   //
   // Pre-allocate a buffer sufficient for us to work on.
@@ -385,18 +385,18 @@ AddOpCode (
 }
 
 /**
-  Get the HII protocol interface
+  Get the HII protocol interface.
   
-  @param Hii     HII protocol interface
+  @param  Hii    HII protocol interface
   
-  @return the statue of locating HII protocol
+  @return        the statue of locating HII protocol
 **/
 EFI_STATUS
 GetHiiInterface (
-  OUT     EFI_HII_PROTOCOL    **Hii
+  OUT  EFI_HII_PROTOCOL             **Hii
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                        Status;
 
   //
   // There should only be one HII protocol
@@ -411,42 +411,41 @@ GetHiiInterface (
 }
 
 /**
-  Extract information pertaining to the HiiHandle
+  Extract information pertaining to the HiiHandle.
   
-  @param HiiHandle       Hii handle
-  @param ImageLength     For input, length of DefaultImage;
-                         For output, length of actually required
-  @param DefaultImage    Image buffer prepared by caller
-  @param Guid            Guid information about the form 
+  @param  HiiHandle             Hii handle
+  @param  ImageLength           For input, length of DefaultImage;
+                                For output, length of actually required
+  @param  DefaultImage          Image buffer prepared by caller
+  @param  Guid                  Guid information about the form 
   
-  @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate
-  @retval EFI_BUFFER_TOO_SMALL    DefualtImage has no enough ImageLength
-  @retval EFI_SUCCESS             Successfully extract data from Hii database.
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer to allocate
+  @retval EFI_BUFFER_TOO_SMALL  DefualtImage has no enough ImageLength
+  @retval EFI_SUCCESS           Successfully extract data from Hii database.
 **/
 EFI_STATUS
 ExtractDataFromHiiHandle (
-  IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
-  IN OUT  UINT16              *ImageLength,
-  OUT     UINT8               *DefaultImage,
-  OUT     EFI_GUID            *Guid
+  IN      FRAMEWORK_EFI_HII_HANDLE  HiiHandle,
+  IN OUT  UINT16                    *ImageLength,
+     OUT  UINT8                     *DefaultImage,
+     OUT  EFI_GUID                  *Guid
   )
 {
-  EFI_STATUS        Status;
-  EFI_HII_PROTOCOL  *Hii;
-  UINTN             DataLength;
-  UINT8             *RawData;
-  UINT8             *OldData;
-  UINTN             Index;
-  UINTN             Temp;
-  UINTN             SizeOfNvStore;
-  UINTN             CachedStart;
+  EFI_STATUS                        Status;
+  EFI_HII_PROTOCOL                  *Hii;
+  UINTN                             DataLength;
+  UINT8                             *RawData;
+  UINT8                             *OldData;
+  UINTN                             Index;
+  UINTN                             Temp;
+  UINTN                             SizeOfNvStore;
+  UINTN                             CachedStart;
 
   DataLength    = DEFAULT_FORM_BUFFER_SIZE;
   SizeOfNvStore = 0;
   CachedStart   = 0;
 
   Status        = GetHiiInterface (&Hii);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -463,7 +462,6 @@ ExtractDataFromHiiHandle (
   // Get all the forms associated with this HiiHandle
   //
   Status = Hii->GetForms (Hii, HiiHandle, 0, &DataLength, RawData);
-
   if (EFI_ERROR (Status)) {
     gBS->FreePool (RawData);
 
@@ -490,6 +488,7 @@ ExtractDataFromHiiHandle (
 
   for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
+      
     case FRAMEWORK_EFI_IFR_FORM_SET_OP:
       //
       // Copy the GUID information from this handle
@@ -538,6 +537,7 @@ ExtractDataFromHiiHandle (
   //
   for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
+      
     case FRAMEWORK_EFI_IFR_ONE_OF_OP:
       CachedStart = ((FRAMEWORK_EFI_IFR_ONE_OF *) &RawData[Index])->QuestionId;
       break;
@@ -578,30 +578,29 @@ ExtractDataFromHiiHandle (
 /**
   Finds HII handle for given pack GUID previously registered with the HII.
   
-  @param HiiProtocol pointer to pointer to HII protocol interface.
-                     If NULL, the interface will be found but not returned.
-                     If it points to NULL, the interface will be found and
-                     written back to the pointer that is pointed to.
-  @param Guid        The GUID of the pack that registered with the HII.
+  @param  HiiProtocol pointer to pointer to HII protocol interface.
+                      If NULL, the interface will be found but not returned.
+                      If it points to NULL, the interface will be found and
+                      written back to the pointer that is pointed to.
+  @param  Guid        The GUID of the pack that registered with the HII.
 
-  @return  Handle to the HII pack previously registered by the memory driver.
+  @return             Handle to the HII pack previously registered by the memory driver.
 **/
 FRAMEWORK_EFI_HII_HANDLE 
 FindHiiHandle (
-  IN OUT EFI_HII_PROTOCOL    **HiiProtocol, OPTIONAL
-  IN     EFI_GUID            *Guid
+  IN OUT  EFI_HII_PROTOCOL          **HiiProtocol, OPTIONAL
+  IN      EFI_GUID                  *Guid
   )
 {
-  EFI_STATUS        Status;
-
-  FRAMEWORK_EFI_HII_HANDLE     *HiiHandleBuffer;
-  FRAMEWORK_EFI_HII_HANDLE     HiiHandle;
-  UINT16            HiiHandleBufferLength;
-  UINT32            NumberOfHiiHandles;
-  EFI_GUID          HiiGuid;
-  EFI_HII_PROTOCOL  *HiiProt;
-  UINT32            Index;
-  UINT16            Length;
+  EFI_STATUS                        Status;
+  FRAMEWORK_EFI_HII_HANDLE          *HiiHandleBuffer;
+  FRAMEWORK_EFI_HII_HANDLE          HiiHandle;
+  UINT16                            HiiHandleBufferLength;
+  UINT32                            NumberOfHiiHandles;
+  EFI_GUID                          HiiGuid;
+  EFI_HII_PROTOCOL                  *HiiProt;
+  UINT32                            Index;
+  UINT16                            Length;
 
   HiiHandle = 0;
   if ((HiiProtocol != NULL) && (*HiiProtocol != NULL)) {
@@ -674,7 +673,6 @@ FindHiiHandle (
     ExtractDataFromHiiHandle (HiiHandleBuffer[Index], &Length, NULL, &HiiGuid);
 
     if (CompareGuid (&HiiGuid, Guid)) {
-
       HiiHandle = HiiHandleBuffer[Index];
       break;
     }
@@ -690,32 +688,32 @@ lbl_exit:
   the reasonable parameters for that FormSet.  Values for strings and passwords
   are not verified due to their not having the equivalent of valid range settings.
 
-  @param HiiHandle    Handle of the HII database entry to query
-
-  @param Results      If return Status is EFI_SUCCESS, Results provides valid data
+  @param  HiiHandle   Handle of the HII database entry to query
+  @param  Results     If return Status is EFI_SUCCESS, Results provides valid data
                       TRUE  = NVRAM Data is within parameters
                       FALSE = NVRAM Data is NOT within parameters
-  @retval EFI_OUT_OF_RESOURCES      No enough buffer to allocate
-  @retval EFI_SUCCESS               Data successfully validated
+                      
+  @retval EFI_OUT_OF_RESOURCES   No enough buffer to allocate
+  @retval EFI_SUCCESS            Data successfully validated
 **/
 EFI_STATUS
 ValidateDataFromHiiHandle (
-  IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
-  OUT     BOOLEAN             *Results
+  IN      FRAMEWORK_EFI_HII_HANDLE  HiiHandle,
+     OUT  BOOLEAN                   *Results
   )
 {
-  EFI_STATUS        Status;
-  EFI_HII_PROTOCOL  *Hii;
-  EFI_GUID          Guid;
-  UINT8             *RawData;
-  UINT8             *OldData;
-  UINTN             RawDataLength;
-  UINT8             *VariableData;
-  UINTN             Index;
-  UINTN             Temp;
-  UINTN             SizeOfNvStore;
-  UINTN             CachedStart;
-  BOOLEAN           GotMatch;
+  EFI_STATUS                        Status;
+  EFI_HII_PROTOCOL                  *Hii;
+  EFI_GUID                          Guid;
+  UINT8                             *RawData;
+  UINT8                             *OldData;
+  UINTN                             RawDataLength;
+  UINT8                             *VariableData;
+  UINTN                             Index;
+  UINTN                             Temp;
+  UINTN                             SizeOfNvStore;
+  UINTN                             CachedStart;
+  BOOLEAN                           GotMatch;
 
   RawDataLength = DEFAULT_FORM_BUFFER_SIZE;
   SizeOfNvStore = 0;
@@ -724,7 +722,6 @@ ValidateDataFromHiiHandle (
   *Results      = TRUE;
 
   Status        = GetHiiInterface (&Hii);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -741,7 +738,6 @@ ValidateDataFromHiiHandle (
   // Get all the forms associated with this HiiHandle
   //
   Status = Hii->GetForms (Hii, HiiHandle, 0, &RawDataLength, RawData);
-
   if (EFI_ERROR (Status)) {
     gBS->FreePool (RawData);
 
@@ -777,6 +773,7 @@ ValidateDataFromHiiHandle (
 
   for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
+      
     case FRAMEWORK_EFI_IFR_FORM_SET_OP:
       break;
 
@@ -856,6 +853,7 @@ ValidateDataFromHiiHandle (
   //
   for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     switch (RawData[Index]) {
+      
     case FRAMEWORK_EFI_IFR_ONE_OF_OP:
       //
       // A one_of has no data, its the option that does - cache the storage Id
