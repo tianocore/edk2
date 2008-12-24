@@ -1,5 +1,5 @@
 /** @file 
-PCD PEIM produces PCD database to manage all dynamic PCD in PEI phase and install Pcd Ppi.
+  All Pcd Ppi services are implemented here.
   
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -1207,7 +1207,7 @@ SetPtrTypeSize (
       (*CurrentSize == MAX_ADDRESS)) {
        *CurrentSize = MaxSize;
        return FALSE;
-    } 
+    }
     
     if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
       //

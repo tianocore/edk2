@@ -3,7 +3,7 @@
   This is a simple fault tolerant write driver.
   And it only supports write BufferSize <= SpareAreaLength.
 
-  This boot service only protocol provides fault tolerant write capability for 
+  This boot service protocol only provides fault tolerant write capability for 
   block devices.  The protocol has internal non-volatile intermediate storage 
   of the data and private information. It should be able to recover 
   automatically from a critical fault, such as power failure. 
@@ -11,6 +11,22 @@
   The implementation uses an FTW Lite (Fault Tolerant Write) Work Space. 
   This work space is a memory copy of the work space on the Working Block,
   the size of the work space is the FTW_WORK_SPACE_SIZE bytes.
+  
+  The work space stores each write record as EFI_FTW_LITE_RECORD structure.
+  The spare block stores the write buffer before write to the target block.
+  
+  The write record has three states to specify the different phase of write operation.
+  1) WRITE_ALLOCATED is that the record is allocated in write space.
+     The write record structure records the information of write operation.
+  2) SPARE_COMPLETED is that the data from write buffer is writed into the spare block as the backup.
+  3) WRITE_COMPLETED is that the data is copied from the spare block to the target block.
+
+  This driver operates the data as the whole size of spare block. It also assumes that 
+  working block is an area which contains working space in its last block and has the same size as spare block.
+  It first read the SpareAreaLength data from the target block into the spare memory buffer.
+  Then copy the write buffer data into the spare memory buffer.
+  Then write the spare memory buffer into the spare block.
+  Final copy the data from the spare block to the target block.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -29,11 +45,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Starts a target block update. This function will record data about write
   in fault tolerant storage and will complete the write in a recoverable
   manner, ensuring at all times that either the original contents or
-  the modified contents are available. We should check the target
-  range to prevent the user from writing Spare block and Working 
-  space directly.
+  the modified contents are available.
 
-  @param This            Calling context
+  @param This            The pointer to this protocol instance. 
   @param FvbHandle       The handle of FVB protocol that provides services for
                          reading, writing, and erasing the target block.
   @param Lba             The logical block address of the target block.
@@ -41,13 +55,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param NumBytes        The number of bytes to write to the target block.
   @param Buffer          The data to write.
 
-  @retval  EFI_SUCCESS           The function completed successfully
-  @retval  EFI_BAD_BUFFER_SIZE   The write would span a target block, which is not
-                                 a valid action.
-  @retval  EFI_ACCESS_DENIED     No writes have been allocated.
-  @retval  EFI_NOT_FOUND         Cannot find FVB by handle.
-  @retval  EFI_OUT_OF_RESOURCES  Cannot allocate memory.
-  @retval  EFI_ABORTED           The function could not complete successfully.
+  @retval EFI_SUCCESS          The function completed successfully 
+  @retval EFI_ABORTED          The function could not complete successfully. 
+  @retval EFI_BAD_BUFFER_SIZE  The input data can't fit within the spare block. 
+                               Offset + *NumBytes > SpareAreaLength.
+  @retval EFI_ACCESS_DENIED    No writes have been allocated. 
+  @retval EFI_OUT_OF_RESOURCES Cannot allocate enough memory resource.
+  @retval EFI_NOT_FOUND        Cannot find FVB protocol by handle.
 
 **/
 EFI_STATUS
@@ -112,7 +126,7 @@ FtwLiteWrite (
   //
   // Check if there is enough free space for allocate a record
   //
-  if ((MyOffset + WRITE_TOTAL_SIZE) > FtwLiteDevice->FtwWorkSpaceSize) {
+  if ((MyOffset + FTW_LITE_RECORD_SIZE) > FtwLiteDevice->FtwWorkSpaceSize) {
     Status = FtwReclaimWorkSpace (FtwLiteDevice, TRUE);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "FtwLite: Reclaim work space - %r", Status));
@@ -309,7 +323,7 @@ FtwLiteWrite (
   FreePool (MyBuffer);
 
   //
-  // Set the SpareCompleteD in the FTW record,
+  // Set the SpareComplete in the FTW record,
   //
   MyOffset = (UINT8 *) Record - FtwLiteDevice->FtwWorkSpace;
   Status = FtwUpdateFvState (
@@ -428,11 +442,6 @@ FtwWriteRecord (
     ASSERT_EFI_ERROR (Status);
 
     Status = FlushSpareBlockToWorkingBlock (FtwLiteDevice);
-  } else if (IsBootBlock (FtwLiteDevice, Fvb, Record->Lba)) {
-    //
-    // Update boot block
-    //
-    Status = FlushSpareBlockToBootBlock (FtwLiteDevice);
   } else {
     //
     // Update blocks other than working block or boot block
@@ -607,8 +616,13 @@ InitializeFtwLite (
   //
   // Allocate Private data of this driver, including the FtwWorkSpace[FTW_WORK_SPACE_SIZE].
   //
+  Length = FTW_WORK_SPACE_SIZE;
+  if (Length < PcdGet32 (PcdFlashNvStorageFtwWorkingSize)) {
+    Length = PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
+  }
+
   FtwLiteDevice = NULL;
-  FtwLiteDevice = AllocatePool (sizeof (EFI_FTW_LITE_DEVICE) + FTW_WORK_SPACE_SIZE);
+  FtwLiteDevice = AllocatePool (sizeof (EFI_FTW_LITE_DEVICE) + Length);
   if (FtwLiteDevice != NULL) {
     Status = EFI_SUCCESS;
   } else {
@@ -625,6 +639,7 @@ InitializeFtwLite (
   //
   FtwLiteDevice->FtwWorkSpace     = (UINT8 *) (FtwLiteDevice + 1);
   FtwLiteDevice->FtwWorkSpaceSize = FTW_WORK_SPACE_SIZE;
+  FtwLiteDevice->FtwWorkSpaceBase = FTW_WORK_SPACE_BASE;
   SetMem (
     FtwLiteDevice->FtwWorkSpace,
     FtwLiteDevice->FtwWorkSpaceSize,
@@ -676,7 +691,7 @@ InitializeFtwLite (
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) BaseAddress);
 
     if ((FtwLiteDevice->WorkSpaceAddress >= BaseAddress) &&
-        (FtwLiteDevice->WorkSpaceAddress <= (BaseAddress + FwVolHeader->FvLength))
+        (FtwLiteDevice->WorkSpaceAddress < (BaseAddress + FwVolHeader->FvLength))
         ) {
       FtwLiteDevice->FtwFvBlock = Fvb;
       //
@@ -689,7 +704,8 @@ InitializeFtwLite (
         FvbMapEntry = &FwVolHeader->BlockMap[0];
         while (!((FvbMapEntry->NumBlocks == 0) && (FvbMapEntry->Length == 0))) {
           for (LbaIndex = 1; LbaIndex <= FvbMapEntry->NumBlocks; LbaIndex += 1) {
-            if (FtwLiteDevice->WorkSpaceAddress < (BaseAddress + FvbMapEntry->Length * LbaIndex)) {
+            if ((FtwLiteDevice->WorkSpaceAddress >= (BaseAddress + FvbMapEntry->Length * (LbaIndex - 1)))
+              && (FtwLiteDevice->WorkSpaceAddress < (BaseAddress + FvbMapEntry->Length * LbaIndex))) {
               FtwLiteDevice->FtwWorkSpaceLba = LbaIndex - 1;
               //
               // Get the Work space size and Base(Offset)
@@ -702,6 +718,12 @@ InitializeFtwLite (
           //
           // end for
           //
+          if (LbaIndex <= FvbMapEntry->NumBlocks) {
+            //
+            // Work space range is found.
+            //
+            break;
+          }
           FvbMapEntry++;
         }
         //
@@ -724,7 +746,8 @@ InitializeFtwLite (
         FvbMapEntry = &FwVolHeader->BlockMap[0];
         while (!((FvbMapEntry->NumBlocks == 0) && (FvbMapEntry->Length == 0))) {
           for (LbaIndex = 1; LbaIndex <= FvbMapEntry->NumBlocks; LbaIndex += 1) {
-            if (FtwLiteDevice->SpareAreaAddress < (BaseAddress + FvbMapEntry->Length * LbaIndex)) {
+            if ((FtwLiteDevice->SpareAreaAddress >= (BaseAddress + FvbMapEntry->Length * (LbaIndex - 1)))
+              && (FtwLiteDevice->SpareAreaAddress < (BaseAddress + FvbMapEntry->Length * LbaIndex))) {
               //
               // Get the NumberOfSpareBlock and SizeOfSpareBlock
               //
@@ -738,7 +761,12 @@ InitializeFtwLite (
               break;
             }
           }
-
+          if (LbaIndex <= FvbMapEntry->NumBlocks) {
+            //
+            // Spare FV range is found.
+            //
+            break;
+          }
           FvbMapEntry++;
         }
         //
@@ -873,7 +901,7 @@ InitializeFtwLite (
   Record  = FtwLiteDevice->FtwLastRecord;
   Offset  = (UINT8 *) Record - FtwLiteDevice->FtwWorkSpace;
   if (FtwLiteDevice->FtwWorkSpace[Offset] != FTW_ERASED_BYTE) {
-    Offset += WRITE_TOTAL_SIZE;
+    Offset += FTW_LITE_RECORD_SIZE;
   }
 
   if (!IsErasedFlashBuffer (

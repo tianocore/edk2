@@ -1,6 +1,6 @@
 /** @file
 
-  Internal generic functions to support fault tolerant write.
+  Internal generic functions to operate flash block.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -54,7 +54,7 @@ IsErasedFlashBuffer (
 }
 
 /**
-  To Erase one block. The size is FTW_BLOCK_SIZE
+  To erase the block with the spare block size.
 
 
   @param FtwLiteDevice   Calling context

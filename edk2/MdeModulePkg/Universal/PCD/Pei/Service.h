@@ -1,5 +1,5 @@
 /** @file
-Private functions used by PCD PEIM.
+  The internal header file declares the private functions used by PeiPcd driver.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

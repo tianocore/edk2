@@ -1,5 +1,6 @@
 /** @file
-Private functions used by PCD PEIM.
+  The driver internal functions are implmented here.
+  They build Pei PCD database, and provide access service to PCD database.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
