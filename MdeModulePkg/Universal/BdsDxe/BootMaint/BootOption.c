@@ -20,12 +20,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BBSsupport.h"
 
 /**
-  Create a menu entry give a Menu type.
+  Create a menu entry by given menu type.
 
   @param MenuType        The Menu type to be created.
 
   @retval NULL           If failed to create the menu.
-  @return                The menu.
+  @return the new menu entry.
 
 **/
 BM_MENU_ENTRY *
@@ -77,12 +77,12 @@ BOpt_CreateMenuEntry (
   // Create new menu entry
   //
   MenuEntry = AllocateZeroPool (sizeof (BM_MENU_ENTRY));
-  if (NULL == MenuEntry) {
-    return MenuEntry;
+  if (MenuEntry == NULL) {
+    return NULL;
   }
 
   MenuEntry->VariableContext = AllocateZeroPool (ContextSize);
-  if (NULL == MenuEntry->VariableContext) {
+  if (MenuEntry->VariableContext == NULL) {
     FreePool (MenuEntry);
     return NULL;
   }
@@ -170,7 +170,7 @@ BOpt_DestroyMenuEntry (
   }
 
   FreePool (MenuEntry->DisplayString);
-  if (NULL != MenuEntry->HelpString) {
+  if (MenuEntry->HelpString != NULL) {
     FreePool (MenuEntry->HelpString);
   }
 
