@@ -92,8 +92,8 @@ typedef struct {
 } CONSOLE_OUT_MODE;
 
 typedef struct {
-  UINTN Columns;
-  UINTN Rows;
+  UINTN   Columns;
+  UINTN   Rows;
 } TEXT_OUT_SPLITTER_QUERY_DATA;
 
 
@@ -1861,8 +1861,8 @@ ConSpliterConsoleControlGetMode (
   Set the current mode to either text or graphics. Graphics is
   for Quiet Boot.
 
-  @param  This                    Protocol instance pointer.
-  @param  Mode                    Mode to set the
+  @param  This                    Console Control Protocol instance pointer.
+  @param  Mode                    Mode to set.
 
   @retval EFI_SUCCESS             Mode information returned.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -1877,21 +1877,20 @@ ConSpliterConsoleControlSetMode (
   );
 
 /**
-  Return the current video mode information.
+  Returns information for an available graphics mode that the graphics device
+  and the set of active video output devices supports.
 
-  @param  This                    Protocol instance pointer.
-  @param  ModeNumber              The mode number to return information on.
-  @param  SizeOfInfo              A pointer to the size, in bytes, of the Info
-                                  buffer.
-  @param  Info                    Caller allocated buffer that returns information
-                                  about ModeNumber.
+  @param  This                  The EFI_GRAPHICS_OUTPUT_PROTOCOL instance.
+  @param  ModeNumber            The mode number to return information on.
+  @param  SizeOfInfo            A pointer to the size, in bytes, of the Info buffer.
+  @param  Info                  A pointer to callee allocated buffer that returns information about ModeNumber.
 
-  @retval EFI_SUCCESS             Mode information returned.
-  @retval EFI_BUFFER_TOO_SMALL    The Info buffer was too small.
-  @retval EFI_DEVICE_ERROR        A hardware error occurred trying to retrieve the
-                                  video mode.
-  @retval EFI_NOT_STARTED         Video display is not initialized. Call SetMode ()
-  @retval EFI_INVALID_PARAMETER   One of the input args was NULL.
+  @retval EFI_SUCCESS           Mode information returned.
+  @retval EFI_BUFFER_TOO_SMALL  The Info buffer was too small.
+  @retval EFI_DEVICE_ERROR      A hardware error occurred trying to retrieve the video mode.
+  @retval EFI_NOT_STARTED       Video display is not initialized. Call SetMode ()
+  @retval EFI_INVALID_PARAMETER One of the input args was NULL.
+  @retval EFI_OUT_OF_RESOURCES  No resource available.
 
 **/
 EFI_STATUS
@@ -1904,15 +1903,16 @@ ConSpliterGraphicsOutputQueryMode (
   );
 
 /**
-  Graphics output protocol interface to set video mode.
+  Set the video device into the specified mode and clears the visible portions of 
+  the output display to black.
 
-  @param  This                    Protocol instance pointer.
-  @param  ModeNumber              The mode number to be set.
+  @param  This                  The EFI_GRAPHICS_OUTPUT_PROTOCOL instance.
+  @param  ModeNumber            Abstraction that defines the current video mode.
 
-  @retval EFI_SUCCESS             Graphics mode was changed.
-  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
-                                  the request.
-  @retval EFI_UNSUPPORTED         ModeNumber is not supported by this device.
+  @retval EFI_SUCCESS           The graphics mode specified by ModeNumber was selected.
+  @retval EFI_DEVICE_ERROR      The device had an error and could not complete the request.
+  @retval EFI_UNSUPPORTED       ModeNumber is not supported by this device.
+  @retval EFI_OUT_OF_RESOURCES  No resource available.
 
 **/
 EFI_STATUS
@@ -2007,15 +2007,15 @@ DevNullGopSync (
 /**
   Return the current video mode information.
 
-  @param  This                    Protocol instance pointer.
-  @param  HorizontalResolution    Current video horizontal resolution in pixels
-  @param  VerticalResolution      Current video vertical resolution in pixels
-  @param  ColorDepth              Current video color depth in bits per pixel
-  @param  RefreshRate             Current video refresh rate in Hz.
+  @param  This                  The EFI_UGA_DRAW_PROTOCOL instance.
+  @param  HorizontalResolution  The size of video screen in pixels in the X dimension.
+  @param  VerticalResolution    The size of video screen in pixels in the Y dimension.
+  @param  ColorDepth            Number of bits per pixel, currently defined to be 32.
+  @param  RefreshRate           The refresh rate of the monitor in Hertz.
 
-  @retval EFI_SUCCESS             Mode information returned.
-  @retval EFI_NOT_STARTED         Video display is not initialized. Call SetMode ()
-  @retval EFI_INVALID_PARAMETER   One of the input args was NULL.
+  @retval EFI_SUCCESS           Mode information returned.
+  @retval EFI_NOT_STARTED       Video display is not initialized. Call SetMode ()
+  @retval EFI_INVALID_PARAMETER One of the input args was NULL.
 
 **/
 EFI_STATUS
@@ -2029,17 +2029,17 @@ ConSpliterUgaDrawGetMode (
   );
 
 /**
-  Return the current video mode information.
+  Set the current video mode information.
 
-  @param  This                    Protocol instance pointer.
-  @param  HorizontalResolution    Current video horizontal resolution in pixels
-  @param  VerticalResolution      Current video vertical resolution in pixels
-  @param  ColorDepth              Current video color depth in bits per pixel
-  @param  RefreshRate             Current video refresh rate in Hz.
+  @param  This                 The EFI_UGA_DRAW_PROTOCOL instance.
+  @param  HorizontalResolution The size of video screen in pixels in the X dimension.
+  @param  VerticalResolution   The size of video screen in pixels in the Y dimension.
+  @param  ColorDepth           Number of bits per pixel, currently defined to be 32.
+  @param  RefreshRate          The refresh rate of the monitor in Hertz.
 
-  @retval EFI_SUCCESS             Mode information returned.
-  @retval EFI_NOT_STARTED         Video display is not initialized. Call SetMode ()
-  @retval EFI_OUT_OF_RESOURCES    Out of resources.
+  @retval EFI_SUCCESS          Mode information returned.
+  @retval EFI_NOT_STARTED      Video display is not initialized. Call SetMode ()
+  @retval EFI_OUT_OF_RESOURCES Out of resources.
 
 **/
 EFI_STATUS
@@ -2053,49 +2053,52 @@ ConSpliterUgaDrawSetMode (
   );
 
 /**
+  Blt a rectangle of pixels on the graphics screen.
+
   The following table defines actions for BltOperations.
 
-  EfiUgaVideoFill - Write data from the  BltBuffer pixel (SourceX, SourceY)
-  directly to every pixel of the video display rectangle
-  (DestinationX, DestinationY)
-  (DestinationX + Width, DestinationY + Height).
-  Only one pixel will be used from the BltBuffer. Delta is NOT used.
-  EfiUgaVideoToBltBuffer - Read data from the video display rectangle
-  (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
-  the BltBuffer rectangle (DestinationX, DestinationY )
-  (DestinationX + Width, DestinationY + Height). If DestinationX or
-  DestinationY is not zero then Delta must be set to the length in bytes
-  of a row in the BltBuffer.
-  EfiUgaBltBufferToVideo - Write data from the  BltBuffer rectangle
-  (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
-  video display rectangle (DestinationX, DestinationY)
-  (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
-  not zero then Delta must be set to the length in bytes of a row in the
-  BltBuffer.
-  EfiUgaVideoToVideo - Copy from the video display rectangle
-  (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
-  to the video display rectangle (DestinationX, DestinationY)
-  (DestinationX + Width, DestinationY + Height).
-  The BltBuffer and Delta  are not used in this mode.
+  EfiUgaVideoFill:
+    Write data from the  BltBuffer pixel (SourceX, SourceY)
+    directly to every pixel of the video display rectangle
+    (DestinationX, DestinationY)
+    (DestinationX + Width, DestinationY + Height).
+    Only one pixel will be used from the BltBuffer. Delta is NOT used.
+  EfiUgaVideoToBltBuffer: 
+    Read data from the video display rectangle
+    (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+    the BltBuffer rectangle (DestinationX, DestinationY )
+    (DestinationX + Width, DestinationY + Height). If DestinationX or
+    DestinationY is not zero then Delta must be set to the length in bytes
+    of a row in the BltBuffer.
+  EfiUgaBltBufferToVideo:
+    Write data from the  BltBuffer rectangle
+    (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+    video display rectangle (DestinationX, DestinationY)
+    (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+    not zero then Delta must be set to the length in bytes of a row in the
+    BltBuffer.
+  EfiUgaVideoToVideo:
+    Copy from the video display rectangle
+    (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
+    to the video display rectangle (DestinationX, DestinationY)
+    (DestinationX + Width, DestinationY + Height).
+    The BltBuffer and Delta  are not used in this mode.
 
-  @param  This                    Protocol instance pointer.
-  @param  BltBuffer               Buffer containing data to blit into video buffer.
-                                  This buffer has a size of
-                                  Width*Height*sizeof(EFI_UGA_PIXEL)
-  @param  BltOperation            Operation to perform on BlitBuffer and video
-                                  memory
-  @param  SourceX                 X coordinate of source for the BltBuffer.
-  @param  SourceY                 Y coordinate of source for the BltBuffer.
-  @param  DestinationX            X coordinate of destination for the BltBuffer.
-  @param  DestinationY            Y coordinate of destination for the BltBuffer.
-  @param  Width                   Width of rectangle in BltBuffer in pixels.
-  @param  Height                  Hight of rectangle in BltBuffer in pixels.
-  @param  Delta                   OPTIONAL.
+  @param  This           Protocol instance pointer.
+  @param  BltBuffer      Buffer containing data to blit into video buffer. This
+                         buffer has a size of Width*Height*sizeof(EFI_UGA_PIXEL)
+  @param  BltOperation   Operation to perform on BlitBuffer and video memory
+  @param  SourceX        X coordinate of source for the BltBuffer.
+  @param  SourceY        Y coordinate of source for the BltBuffer.
+  @param  DestinationX   X coordinate of destination for the BltBuffer.
+  @param  DestinationY   Y coordinate of destination for the BltBuffer.
+  @param  Width          Width of rectangle in BltBuffer in pixels.
+  @param  Height         Hight of rectangle in BltBuffer in pixels.
+  @param  Delta          OPTIONAL
 
-  @retval EFI_SUCCESS             The Blt operation completed.
-  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
-  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video
-                                  buffer.
+  @retval EFI_SUCCESS            The Blt operation completed.
+  @retval EFI_INVALID_PARAMETER  BltOperation is not valid.
+  @retval EFI_DEVICE_ERROR       A hardware error occured writting to the video buffer.
 
 **/
 EFI_STATUS
@@ -2162,7 +2165,7 @@ DevNullTextOutOutputString (
 /**
   Sets the output device(s) to a specified mode.
 
-  @param  Private                 Private data structure pointer.
+  @param  Private                 Text Out Splitter pointer.
   @param  ModeNumber              The mode number to set.
 
   @retval EFI_SUCCESS             The requested text mode was set.
@@ -2182,7 +2185,7 @@ DevNullTextOutSetMode (
   Clears the output device(s) display to the currently selected background
   color.
 
-  @param  Private                 Protocol instance pointer.
+  @param  Private                 Text Out Splitter pointer.
 
   @retval EFI_SUCCESS             The operation completed successfully.
   @retval EFI_DEVICE_ERROR        The device had an error and could not complete
@@ -2198,7 +2201,7 @@ DevNullTextOutClearScreen (
 /**
   Sets the current coordinates of the cursor position.
 
-  @param  Private                 Protocol instance pointer.
+  @param  Private                 Text Out Splitter pointer.
   @param  Column                  
   @param  Row                     the position to set the cursor to. Must be
                                   greater than or equal to zero and less than the
@@ -2220,14 +2223,13 @@ DevNullTextOutSetCursorPosition (
   );
 
 /**
-  Implements SIMPLE_TEXT_OUTPUT.EnableCursor().
-  In this driver, the cursor cannot be hidden.
+  Set cursor visibility property.
 
-  @param  Private                 Indicates the calling context.
+  @param  Private                 Text Out Splitter pointer.
   @param  Visible                 If TRUE, the cursor is set to be visible, If
                                   FALSE, the cursor is set to be invisible.
 
-  @retval EFI_SUCCESS             The request is valid.
+  @retval EFI_SUCCESS             Returns always.
 
 **/
 EFI_STATUS
@@ -2240,7 +2242,7 @@ DevNullTextOutEnableCursor (
   Take the DevNull TextOut device and update the Simple Text Out on every
   UGA device.
 
-  @param  Private                 Indicates the calling context.
+  @param  Private                 Text Out Splitter pointer.
 
   @retval EFI_SUCCESS             The request is valid.
   @retval other                   Return status of TextOut->OutputString ()
