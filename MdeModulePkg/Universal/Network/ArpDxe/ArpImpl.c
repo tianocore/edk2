@@ -1,5 +1,5 @@
 /** @file
-  Abstract:
+  The implementation of the ARP protocol.
   
 Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -14,6 +14,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "ArpImpl.h"
 
+//
+// Global variable of EFI ARP Protocol Interface.
+//
 EFI_ARP_PROTOCOL  mEfiArpProtocolTemplate = {
   ArpConfigure,
   ArpAdd,
@@ -28,17 +31,17 @@ EFI_ARP_PROTOCOL  mEfiArpProtocolTemplate = {
 /**
   Initialize the instance context data.
 
-  @param[in]  ArpService             Pointer to the arp service context data this
-                                     instance belongs to.
-  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]   ArpService        Pointer to the arp service context data this
+                                 instance belongs to.
+  @param[out]  Instance          Pointer to the instance context data.
 
   @return None.
 
 **/
 VOID
 ArpInitInstance (
-  IN ARP_SERVICE_DATA   *ArpService,
-  IN ARP_INSTANCE_DATA  *Instance
+  IN  ARP_SERVICE_DATA   *ArpService,
+  OUT ARP_INSTANCE_DATA  *Instance
   )
 {
   NET_CHECK_SIGNATURE (ArpService, ARP_SERVICE_DATA_SIGNATURE);

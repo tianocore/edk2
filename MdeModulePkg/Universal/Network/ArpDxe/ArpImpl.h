@@ -1,5 +1,5 @@
 /** @file
-  Abstract:
+  EFI Address Resolution Protocol (ARP) Protocol interface header file.
 
 Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _ARP_IMPL_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Arp.h>
 #include <Protocol/ManagedNetwork.h>
@@ -31,19 +31,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
+//
+// Ethernet protocol type definitions.
+//
 #define ARP_ETHER_PROTO_TYPE         0x0806
 #define IPV4_ETHER_PROTO_TYPE        0x0800
 #define IPV6_ETHER_PROTO_TYPE        0x86DD
 
+//
+// ARP opcode definitions.
+//
 #define ARP_OPCODE_REQUEST           0x0001
 #define ARP_OPCODE_REPLY             0x0002
 
+//
+// ARP timeout, retry count and interval definitions.
+//
 #define ARP_DEFAULT_TIMEOUT_VALUE    (400 * TICKS_PER_SECOND)
 #define ARP_DEFAULT_RETRY_COUNT      2
 #define ARP_DEFAULT_RETRY_INTERVAL   (5   * TICKS_PER_MS)
 #define ARP_PERIODIC_TIMER_INTERVAL  (500 * TICKS_PER_MS)
 
+//
+// ARP packet head definition.
+//
 #pragma pack(1)
 typedef struct {
   UINT16  HwType;
@@ -54,6 +65,9 @@ typedef struct {
 } ARP_HEAD;
 #pragma pack()
 
+//
+// ARP Address definition for internal use.
+//
 typedef struct {
   UINT8  *SenderHwAddr;
   UINT8  *SenderProtoAddr;
@@ -64,6 +78,10 @@ typedef struct {
 #define MATCH_SW_ADDRESS  0x1
 #define MATCH_HW_ADDRESS  0x2
 
+//
+// Enumeration for the search type. A search type is specified as the keyword to find
+// a cache entry in the cache table.
+//
 typedef enum {
   ByNone         = 0,
   ByProtoAddress = MATCH_SW_ADDRESS,
@@ -73,9 +91,16 @@ typedef enum {
 
 #define ARP_INSTANCE_DATA_SIGNATURE  SIGNATURE_32('A', 'R', 'P', 'I')
 
-//
-//comment for macro
-//
+/**
+  Returns a pointer to the ARP_INSTANCE_DATA structure from the input a.
+  
+  If the signatures matches, then a pointer to the data structure that contains 
+  a specified field of that data structure is returned.
+   
+  @param  a              Pointer to the field specified by ArpProto within a data 
+                         structure of type ARP_INSTANCE_DATA.
+ 
+**/
 #define ARP_INSTANCE_DATA_FROM_THIS(a) \
   CR ( \
   (a), \
@@ -86,6 +111,9 @@ typedef enum {
 
 typedef struct _ARP_SERVICE_DATA  ARP_SERVICE_DATA;
 
+//
+// ARP instance context data structure.
+//
 typedef struct {
   UINT32               Signature;
   ARP_SERVICE_DATA     *ArpService;
@@ -99,9 +127,16 @@ typedef struct {
 
 #define ARP_SERVICE_DATA_SIGNATURE  SIGNATURE_32('A', 'R', 'P', 'S')
 
-//
-//comment for macro
-//
+/**
+  Returns a pointer to the ARP_SERVICE_DATA structure from the input a.
+  
+  If the signatures matches, then a pointer to the data structure that contains 
+  a specified field of that data structure is returned.
+   
+  @param  a              Pointer to the field specified by ServiceBinding within 
+                         a data structure of type ARP_SERVICE_DATA.
+ 
+**/
 #define ARP_SERVICE_DATA_FROM_THIS(a) \
   CR ( \
   (a), \
@@ -110,6 +145,9 @@ typedef struct {
   ARP_SERVICE_DATA_SIGNATURE \
   )
 
+//
+// ARP service data structure.
+//
 struct _ARP_SERVICE_DATA {
   UINT32                           Signature;
   EFI_SERVICE_BINDING_PROTOCOL     ServiceBinding;
@@ -134,6 +172,9 @@ struct _ARP_SERVICE_DATA {
   EFI_EVENT                        PeriodicTimer;
 };
 
+//
+// User request context structure.
+//
 typedef struct {
   LIST_ENTRY         List;
   ARP_INSTANCE_DATA  *Instance;
@@ -144,6 +185,9 @@ typedef struct {
 #define ARP_MAX_PROTOCOL_ADDRESS_LEN  sizeof(EFI_IP_ADDRESS)
 #define ARP_MAX_HARDWARE_ADDRESS_LEN  sizeof(EFI_MAC_ADDRESS)
 
+//
+// ARP address structure in an ARP packet.
+//
 typedef struct {
   UINT16  Type;
   UINT8   Length;
@@ -154,11 +198,17 @@ typedef struct {
   } Buffer;
 } NET_ARP_ADDRESS;
 
+//
+// Enumeration for ARP address type.
+//
 typedef enum {
   Hardware,
   Protocol
 } ARP_ADDRESS_TYPE;
 
+//
+// ARP cache entry definition.
+//
 typedef struct {
   LIST_ENTRY      List;
 
@@ -174,17 +224,18 @@ typedef struct {
 
 /**
   This function is used to assign a station address to the ARP cache for this instance
-  of the ARP driver. Each ARP instance has one station address. The EFI_ARP_PROTOCOL 
-  driver will respond to ARP requests that match this registered station address. 
-  A call to this function with the ConfigData field set to NULL will reset this 
-  ARP instance.
+  of the ARP driver.
+  
+  Each ARP instance has one station address. The EFI_ARP_PROTOCOL driver will 
+  respond to ARP requests that match this registered station address. A call to 
+  this function with the ConfigData field set to NULL will reset this ARP instance.
   
   Once a protocol type and station address have been assigned to this ARP instance, 
   all the following ARP functions will use this information. Attempting to change 
   the protocol type or station address to a configured ARP instance will result in errors.
 
-  @param[in]  This               Pointer to the EFI_ARP_PROTOCOL instance.
-  @param[in]  ConfigData         Pointer to the EFI_ARP_CONFIG_DATA structure.
+  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  ConfigData             Pointer to the EFI_ARP_CONFIG_DATA structure.
 
   @retval EFI_SUCCESS            The new station address was successfully
                                  registered.
@@ -220,19 +271,19 @@ ArpConfigure (
   Final product implementations of the EFI network stack should be tuned for 
   their expected network environments.
   
-  @param[in]  This               Pointer to the EFI_ARP_PROTOCOL instance.
-  @param[in]  DenyFlag           Set to TRUE if this entry is a deny entry. Set to
+  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  DenyFlag               Set to TRUE if this entry is a deny entry. Set to
                                  FALSE if this  entry is a normal entry.
-  @param[in]  TargetSwAddress    Pointer to a protocol address to add (or deny).
+  @param  TargetSwAddress        Pointer to a protocol address to add (or deny).
                                  May be set to NULL if DenyFlag is TRUE.
-  @param[in]  TargetHwAddress    Pointer to a hardware address to add (or deny).
+  @param  TargetHwAddress        Pointer to a hardware address to add (or deny).
                                  May be set to NULL if DenyFlag is TRUE.
-  @param[in]  TimeoutValue       Time in 100-ns units that this entry will remain
+  @param  TimeoutValue           Time in 100-ns units that this entry will remain
                                  in the ARP cache. A value of zero means that the
                                  entry is permanent. A nonzero value will override
                                  the one given by Configure() if the entry to be
                                  added is a dynamic entry.
-  @param[in]  Overwrite          If TRUE, the matching cache entry will be
+  @param  Overwrite              If TRUE, the matching cache entry will be
                                  overwritten with the supplied parameters. If
                                  FALSE, EFI_ACCESS_DENIED is returned if the
                                  corresponding cache entry already exists.
@@ -273,18 +324,18 @@ ArpAdd (
   set to TRUE. If the found ARP cache entry is a permanent entry, it is not 
   affected by Refresh.
   
-  @param[in]  This               Pointer to the EFI_ARP_PROTOCOL instance.
-  @param[in]  BySwAddress        Set to TRUE to look for matching software protocol
+  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  BySwAddress            Set to TRUE to look for matching software protocol
                                  addresses. Set to FALSE to look for matching
                                  hardware protocol addresses.
-  @param[in]  AddressBuffer      Pointer to address buffer. Set to NULL to match
+  @param  AddressBuffer          Pointer to address buffer. Set to NULL to match
                                  all addresses.
-  @param[out]  EntryLength       The size of an entry in the entries buffer.
-  @param[out]  EntryCount        The number of ARP cache entries that are found by
+  @param  EntryLength            The size of an entry in the entries buffer.
+  @param  EntryCount             The number of ARP cache entries that are found by
                                  the specified criteria.
-  @param[out]  Entries           Pointer to the buffer that will receive the ARP
+  @param  Entries                Pointer to the buffer that will receive the ARP
                                  cache entries.
-  @param[in]  Refresh            Set to TRUE to refresh the timeout value of the
+  @param  Refresh                Set to TRUE to refresh the timeout value of the
                                  matching ARP cache entry.
 
   @retval EFI_SUCCESS            The requested ARP cache entries were copied into
@@ -311,11 +362,11 @@ ArpFind (
 /**
   This function removes specified ARP cache entries.
 
-  @param[in]  This               Pointer to the EFI_ARP_PROTOCOL instance.
-  @param[in]  BySwAddress        Set to TRUE to delete matching protocol addresses.
+  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  BySwAddress            Set to TRUE to delete matching protocol addresses.
                                  Set to FALSE to delete matching hardware
                                  addresses.
-  @param[in]  AddressBuffer      Pointer to the address buffer that is used as a
+  @param  AddressBuffer          Pointer to the address buffer that is used as a
                                  key to look for the cache entry. Set to NULL to
                                  delete all entries.
 
@@ -337,7 +388,7 @@ ArpDelete (
   This function delete all dynamic entries from the ARP cache that match the specified
   software protocol type.
 
-  @param[in]  This               Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
 
   @retval EFI_SUCCESS            The cache has been flushed.
   @retval EFI_INVALID_PARAMETER  This is NULL.
@@ -355,11 +406,11 @@ ArpFlush (
   This function tries to resolve the TargetSwAddress and optionally returns a
   TargetHwAddress if it already exists in the ARP cache.
 
-  @param[in]  This               Pointer to the EFI_ARP_PROTOCOL instance.
-  @param[in]  TargetSwAddress    Pointer to the protocol address to resolve.
-  @param[in]  ResolvedEvent      Pointer to the event that will be signaled when
+  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  TargetSwAddress        Pointer to the protocol address to resolve.
+  @param  ResolvedEvent          Pointer to the event that will be signaled when
                                  the address is resolved or some error occurs.
-  @param[out]  TargetHwAddress   Pointer to the buffer for the resolved hardware
+  @param  TargetHwAddress        Pointer to the buffer for the resolved hardware
                                  address in network byte order.
 
   @retval EFI_SUCCESS            The data is copied from the ARP cache into the
@@ -392,10 +443,10 @@ ArpRequest (
   NULL, all the pending asynchronous requests that have been issued by This 
   instance will be cancelled and their corresponding events will be signaled.
   
-  @param[in]  This               Pointer to the EFI_ARP_PROTOCOL instance.
-  @param[in]  TargetSwAddress    Pointer to the protocol address in previous
+  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  TargetSwAddress        Pointer to the protocol address in previous
                                  request session.
-  @param[in]  ResolvedEvent      Pointer to the event that is used as the
+  @param  ResolvedEvent          Pointer to the event that is used as the
                                  notification event in previous request session.
 
   @retval EFI_SUCCESS            The pending request session(s) is/are aborted and
@@ -572,17 +623,17 @@ ArpSendFrame (
 /**
   Initialize the instance context data.
 
-  @param[in]  ArpService             Pointer to the arp service context data this
-                                     instance belongs to.
-  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]   ArpService        Pointer to the arp service context data this
+                                 instance belongs to.
+  @param[out]  Instance          Pointer to the instance context data.
 
   @return None.
 
 **/
 VOID
 ArpInitInstance (
-  IN ARP_SERVICE_DATA   *ArpService,
-  IN ARP_INSTANCE_DATA  *Instance
+  IN  ARP_SERVICE_DATA   *ArpService,
+  OUT ARP_INSTANCE_DATA  *Instance
   );
 
 /**
@@ -619,7 +670,7 @@ ArpOnFrameRcvd (
 
 /**
   Process the already sent arp packets.
-
+  
   @param[in]  Context                Pointer to the context data registerd to the
                                      Event.
 
@@ -633,7 +684,7 @@ ArpOnFrameSentDpc (
   );
 
 /**
-  Queue ArpOnFrameRcvdDpc as a DPC at TPL_CALLBACK.
+  Request ArpOnFrameSentDpc as a DPC at TPL_CALLBACK.
 
   @param[in]  Event                  The Event this notify function registered to.
   @param[in]  Context                Pointer to the context data registerd to the
