@@ -1,5 +1,5 @@
 /** @file
-  Abstract:
+  Implementation of EFI Address Resolution Protocol (ARP) Protocol interface functions.
   
 Copyright (c) 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -17,10 +17,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   This function is used to assign a station address to the ARP cache for this instance
-  of the ARP driver. Each ARP instance has one station address. The EFI_ARP_PROTOCOL 
-  driver will respond to ARP requests that match this registered station address. 
-  A call to this function with the ConfigData field set to NULL will reset this 
-  ARP instance.
+  of the ARP driver.
+  
+  Each ARP instance has one station address. The EFI_ARP_PROTOCOL driver will 
+  respond to ARP requests that match this registered station address. A call to 
+  this function with the ConfigData field set to NULL will reset this ARP instance.
   
   Once a protocol type and station address have been assigned to this ARP instance, 
   all the following ARP functions will use this information. Attempting to change 
