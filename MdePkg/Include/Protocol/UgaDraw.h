@@ -135,7 +135,7 @@ typedef enum {
     @retval EFI_INVALID_PARAMETER - BltOperation is not valid.
     @retval EFI_DEVICE_ERROR      - A hardware error occured writting to the video buffer.
 
---*/
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_UGA_DRAW_PROTOCOL_BLT)(
