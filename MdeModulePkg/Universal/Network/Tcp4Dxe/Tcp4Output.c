@@ -832,9 +832,6 @@ SEND_AGAIN:
   }
 
   if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
-    //
-    // TODO: double check this
-    //
     NetbufTrim (Nbuf, (Nbuf->Tcp->HeadLen << 2), NET_BUF_HEAD);
     Nbuf->Tcp = NULL;
 

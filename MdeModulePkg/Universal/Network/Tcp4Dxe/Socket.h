@@ -114,7 +114,7 @@ typedef enum {
 
 #define SOCK_IS_NO_MORE_DATA(Sock)    (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
 
-#define SOCK_SIGNATURE                SIGNATURE_32 ('S', 'O', 'C', 'K')
+#define SOCK_SIGNATURE                EFI_SIGNATURE_32 ('S', 'O', 'C', 'K')
 
 #define SOCK_FROM_THIS(a)             CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
 
@@ -198,17 +198,6 @@ typedef enum {
 } SOCK_TYPE;
 
 ///
-///  The handler of protocol for request from socket.
-///
-typedef
-EFI_STATUS
-(*SOCK_PROTO_HANDLER) (
-  IN SOCKET       *Socket,      ///< The socket issuing the request to protocol
-  IN SOCK_REQUEST Request,      ///< The request issued by socket
-  IN VOID         *RequestData  ///< The request related data
-  );
-
-///
 ///  The buffer structure of rcvd data and send data used by socket.
 ///
 typedef struct _SOCK_BUFFER {
@@ -217,7 +206,27 @@ typedef struct _SOCK_BUFFER {
   NET_BUF_QUEUE *DataQueue; ///< The queue to buffer data
 } SOCK_BUFFER;
 
-
+/**
+  The handler of protocol for request from socket.
+  
+  @param Socket              The socket issuing the request to protocol
+  @param Request             The request issued by socket
+  @param RequestData         The request related data
+  
+  @retval EFI_SUCCESS        The socket request is completed successfully.
+  @retval other              The error status returned by the corresponding TCP
+                             layer function.
+                             
+**/
+typedef
+EFI_STATUS
+(*SOCK_PROTO_HANDLER) (
+  IN SOCKET       *Socket,
+  IN SOCK_REQUEST Request,
+  IN VOID         *RequestData
+  );
+  
+  
 //
 // Socket provided oprerations for low layer protocol
 //
@@ -241,7 +250,9 @@ SockSetState (
 
 /**
   Called by the low layer protocol to indicate the socket a connection is 
-  established. This function just changes the socket's state to SO_CONNECTED 
+  established. 
+  
+  This function just changes the socket's state to SO_CONNECTED 
   and signals the token used for connection establishment.
 
   @param  Sock                  Pointer to the socket associated with the
@@ -254,9 +265,10 @@ SockConnEstablished (
   );
 
 /**
-  Called by the low layer protocol to indicate the connection is closed; This 
-  function flushes the socket, sets the state to SO_CLOSED and signals the close 
-  token.
+  Called by the low layer protocol to indicate the connection is closed.
+  
+  This function flushes the socket, sets the state to SO_CLOSED and signals 
+  the close token.
 
   @param  Sock                  Pointer to the socket associated with the closed
                                 connection.
@@ -268,7 +280,8 @@ SockConnClosed (
   );
 
 /**
-  Called by low layer protocol to indicate that some data is sent or processed; 
+  Called by low layer protocol to indicate that some data is sent or processed.
+   
   This function trims the sent data in the socket send buffer, signals the data 
   token if proper.
 
@@ -305,10 +318,10 @@ SockGetDataToSend (
 
 /**
   Called by the low layer protocol to indicate that there
-  will be no more data from the communication peer; This
-  function set the socket's state to SO_NO_MORE_DATA and
-  signal all queued IO tokens with the error status
-  EFI_CONNECTION_FIN.
+  will be no more data from the communication peer.
+  
+  This function set the socket's state to SO_NO_MORE_DATA and
+  signal all queued IO tokens with the error status EFI_CONNECTION_FIN.
 
   @param  Sock                  Pointer to the socket.
 
@@ -319,7 +332,8 @@ SockNoMoreData (
   );
 
 /**
-  Called by the low layer protocol to deliver received data to socket layer; 
+  Called by the low layer protocol to deliver received data to socket layer.
+  
   This function will append the data to the socket receive buffer, set ther 
   urgent data length and then check if any receive token can be signaled.
 
@@ -720,8 +734,8 @@ SockClose (
 **/
 EFI_STATUS
 SockGetMode (
-  IN SOCKET *Sock,
-  IN VOID   *Mode
+  IN     SOCKET *Sock,
+  IN OUT VOID   *Mode
   );
 
 /**

@@ -856,8 +856,8 @@ Exit:
 **/
 EFI_STATUS
 SockGetMode (
-  IN SOCKET *Sock,
-  IN VOID   *Mode
+  IN     SOCKET *Sock,
+  IN OUT VOID   *Mode
   )
 {
   return Sock->ProtoHandler (Sock, SOCK_MODE, Mode);

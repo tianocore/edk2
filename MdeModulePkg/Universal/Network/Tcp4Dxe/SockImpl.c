@@ -83,7 +83,6 @@ SockTcpDataToRcv (
   UINT32        DataLen;
   TCP_RSV_DATA  *TcpRsvData;
   BOOLEAN       Urg;
-
   ASSERT ((SockBuffer != NULL) && (IsUrg != NULL) && (BufLen > 0));
 
   RcvBufEntry = SockBufFirst (SockBuffer);
@@ -232,7 +231,6 @@ SockProcessRcvToken (
   SockSetTcpRxData (Sock, RxData, TokenRcvdBytes, IsUrg);
 
   NetbufQueTrim (Sock->RcvBuffer.DataQueue, TokenRcvdBytes);
-//  SOCK_TRIM_RCV_BUFF (Sock, TokenRcvdBytes);
   SIGNAL_TOKEN (&(RcvToken->Token), EFI_SUCCESS);
 
   return TokenRcvdBytes;
@@ -545,7 +543,7 @@ OnError:
 
   @param  SockInitData          Pointer to the initial data of the socket.
 
-  @return Pointer to the newly created socket.
+  @return Pointer to the newly created socket, return NULL when exception occured.
 
 **/
 SOCKET *
@@ -934,7 +932,9 @@ SockClone (
 
 /**
   Called by the low layer protocol to indicate the socket a connection is 
-  established. This function just changes the socket's state to SO_CONNECTED 
+  established. 
+  
+  This function just changes the socket's state to SO_CONNECTED 
   and signals the token used for connection establishment.
 
   @param  Sock                  Pointer to the socket associated with the
@@ -961,12 +961,14 @@ SockConnEstablished (
 
 
 /**
-  Called by the low layer protocol to indicate the connection is closed; This 
-  function flushes the socket, sets the state to SO_CLOSED and signals the close 
-  token.
+  Called by the low layer protocol to indicate the connection is closed.
+  
+  This function flushes the socket, sets the state to SO_CLOSED and signals 
+  the close token.
 
   @param  Sock                  Pointer to the socket associated with the closed
                                 connection.
+                                
 **/
 VOID
 SockConnClosed (
@@ -989,7 +991,8 @@ SockConnClosed (
 
 
 /**
-  Called by low layer protocol to indicate that some data is sent or processed; 
+  Called by low layer protocol to indicate that some data is sent or processed.
+   
   This function trims the sent data in the socket send buffer, signals the data 
   token if proper.
 
@@ -1078,7 +1081,8 @@ SockGetDataToSend (
 
 
 /**
-  Called by the low layer protocol to deliver received data to socket layer; 
+  Called by the low layer protocol to deliver received data to socket layer.
+  
   This function will append the data to the socket receive buffer, set ther 
   urgent data length and then check if any receive token can be signaled.
 
@@ -1184,11 +1188,11 @@ SockRcvdErr (
 
 
 /**
-  Called by the low layer protocol to indicate that there
-  will be no more data from the communication peer; This
-  function set the socket's state to SO_NO_MORE_DATA and
-  signal all queued IO tokens with the error status
-  EFI_CONNECTION_FIN.
+  Called by the low layer protocol to indicate that there will be no more data 
+  from the communication peer.
+  
+  This function set the socket's state to SO_NO_MORE_DATA and signal all queued 
+  IO tokens with the error status EFI_CONNECTION_FIN.
 
   @param  Sock                  Pointer to the socket.
 
