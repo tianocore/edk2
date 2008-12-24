@@ -109,7 +109,7 @@ InitWorkSpaceHeader (
     &gEfiSystemNvDataFvGuid,
     sizeof (EFI_GUID)
     );
-  WorkingHeader->WriteQueueSize = FTW_WORKING_QUEUE_SIZE;
+  WorkingHeader->WriteQueueSize = (UINT64) (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
 
   //
   // Crc is calculated with all the fields except Crc and STATE
@@ -284,7 +284,7 @@ WorkSpaceRefresh (
   // If work space has error or Record is out of the workspace limit, THEN
   //   call reclaim.
   //
-  if (EFI_ERROR (Status) || (Offset + WRITE_TOTAL_SIZE >= FtwLiteDevice->FtwWorkSpaceSize)) {
+  if (EFI_ERROR (Status) || (Offset + FTW_LITE_RECORD_SIZE >= FtwLiteDevice->FtwWorkSpaceSize)) {
     //
     // reclaim work space in working block.
     //
@@ -388,7 +388,7 @@ FtwReclaimWorkSpace (
       CopyMem (
         (UINT8 *) Ptr + sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
         Record,
-        WRITE_TOTAL_SIZE
+        FTW_LITE_RECORD_SIZE
         );
     }
   }

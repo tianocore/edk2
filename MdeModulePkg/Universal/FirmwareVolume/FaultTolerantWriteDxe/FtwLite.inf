@@ -1,8 +1,11 @@
 #/** @file
-# Component description file for FtwLite module.
+# This driver provides lite fault tolerant capability for write operation on flash devices.
+# Its implementation depends on the full functionality FVB protocol that support read, write/erase flash access.
+# It only supports write BufferSize <= PcdFlashNvStorageFtwSpareSize.
+# That's the input write buffer data must fit within the spare range.
+# This driver doesn't differentiate the update for boot block and other block.
 #
-# This driver provides fault tolerant write capability for block devices.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2008, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -10,7 +13,6 @@
 #  http://opensource.org/licenses/bsd-license.php
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
 #
 #**/
 
@@ -33,25 +35,10 @@
   FtwMisc.c
   FtwLite.c
   FtwLite.h
- 
-[Sources.Ia32]
-  Ia32/Ia32FtwMisc.c
-
-[Sources.X64]
-  X64/X64FtwMisc.c
-
-[Sources.IPF]
-  Ipf/IpfFtwMisc.c
-
-[Sources.EBC]
-  Ia32/Ia32FtwMisc.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
-
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -63,18 +50,11 @@
   DevicePathLib
   
 [Guids]
-  gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED
+  gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED, Signature of Working Space Header
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
   gEfiFaultTolerantWriteLiteProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
-
-[Protocols.IA32]
-  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-
-[Protocols.EBC]
-  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize

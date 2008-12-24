@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 
-#include <Protocol/PciRootBridgeIo.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Protocol/FaultTolerantWriteLite.h>
 #include <Protocol/FirmwareVolumeBlock.h>
@@ -96,9 +95,7 @@ typedef struct {
 //
 // MACRO for FTW header and record
 //
-#define FTW_WORKING_QUEUE_SIZE  (FTW_WORK_SPACE_SIZE - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER))
 #define FTW_LITE_RECORD_SIZE    (sizeof (EFI_FTW_LITE_RECORD))
-#define WRITE_TOTAL_SIZE        FTW_LITE_RECORD_SIZE
 
 //
 // EFI Fault tolerant protocol private data structure
@@ -138,9 +135,9 @@ typedef struct {
   This function is the entry point of the Fault Tolerant Write driver.
 
 
-  @param ImageHandle     EFI_HANDLE: A handle for the image that is initializing
+  @param ImageHandle     A handle for the image that is initializing
                          this driver
-  @param SystemTable     EFI_SYSTEM_TABLE: A pointer to the EFI system table
+  @param SystemTable     A pointer to the EFI system table
 
   @retval  EFI_SUCCESS            FTW has finished the initialization
   @retval  EFI_ABORTED            FTW initialization error
