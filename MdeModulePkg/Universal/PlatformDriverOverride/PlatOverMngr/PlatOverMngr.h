@@ -24,9 +24,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 //
 // The max number of the supported driver list.
-// 
 //
-#define MAX_CHOICE_NUM    0x0100
+#define MAX_CHOICE_NUM    0x00ff
 #define UPDATE_DATA_SIZE  0x1000
 
 #define FORM_ID_DEVICE                 0x1100

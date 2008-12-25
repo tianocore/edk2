@@ -975,7 +975,7 @@ UpdatePrioritySelectPage (
     EFI_IFR_FLAG_RESET_REQUIRED,
     0,
     EFI_IFR_NUMERIC_SIZE_1,
-    MAX_CHOICE_NUM,
+    (UINT8) MAX_CHOICE_NUM,
     IfrOptionList,
     SelectedDriverImageNum,
     &UpdateData
