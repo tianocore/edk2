@@ -137,11 +137,11 @@ FreeNBuf:
 }
 
 /**
-  Free the vector. 
+  Free the net vector. 
    
-  Decrease the reference count of the vector by one. The real resource free 
-  operation isn't performed until the reference count of the vector is decreased 
-  to 0.
+  Decrease the reference count of the net vector by one. The real resource free 
+  operation isn't performed until the reference count of the net vector is 
+  decreased to 0. 
 
   @param[in]  Vector                Pointer to the NET_VECTOR to be freed.
 
@@ -190,11 +190,11 @@ NetbufFreeVector (
 /**
   Free the net buffer and its associated NET_VECTOR.
  
-  Decrease the reference count of the net buffer by one. Free the associated
-  vector and itself if the reference count of the net buffer is decreased to 0.
-  The vector free operation just decrease the reference count of the vector by
-  one and do the real resource free operation when the reference count of the
-  vector is 0.
+  Decrease the reference count of the net buffer by one. Free the associated net
+  vector and itself if the reference count of the net buffer is decreased to 0. 
+  The net vector free operation just decrease the reference count of the net 
+  vector by one and do the real resource free operation when the reference count
+  of the net vector is 0. 
  
   @param[in]  Nbuf                  Pointer to the NET_BUF to be freed.
 
@@ -323,7 +323,7 @@ NetbufDuplicate (
   Free a list of net buffers.
 
   @param[in, out]  Head              Pointer to the head of linked net buffers.
-NOT YET
+
 **/
 VOID
 EFIAPI
@@ -362,8 +362,8 @@ NetbufFreeList (
   @param[out]  Index     Index of the NET_BLOCK_OP that contains the byte at 
                          Offset.
 
-  @return       Pointer to the nth byte of data in the net buffer, or NULL 
-                indicating there is no such data in the net buffer.
+  @return       Pointer to the Offset'th byte of data in the net buffer, or NULL
+                if there is no such data in the net buffer.
 
 **/
 UINT8  *
@@ -486,13 +486,13 @@ NetbufSetBlockOp (
 
 
 /**
-  Helper function for NetbufClone. It is necessary because NetbufGetFragment
-  may allocate the first block to accomodate the HeadSpace and HeadLen. So, it
-  need to create a new NET_VECTOR. But, we want to avoid data copy by sharing
-  the old NET_VECTOR.
+  Helper function for NetbufGetFragment. NetbufGetFragment may allocate the 
+  first block to reserve HeadSpace bytes header space. So it needs to create a 
+  new net vector for the first block and can avoid copy for the remaining data 
+  by sharing the old net vector. 
 
   @param[in]  Arg                   Point to the old NET_VECTOR.
-NOT YET
+
 **/
 VOID
 NetbufGetFragmentFree (
@@ -520,8 +520,8 @@ NetbufGetFragmentFree (
   @param[in]  Len          Bytes of data to be included in the new net buffer. 
   @param[in]  HeadSpace    Bytes of head space to reserve for protocol header. 
 
-  @return                  Pointer to the cloned net buffer, or NULL indicating 
-                           the allocation failed due to resource limit.
+  @return                  Pointer to the cloned net buffer, or NULL if the 
+                           allocation failed due to resource limit.
 
 **/
 NET_BUF  *
@@ -631,7 +631,7 @@ NetbufGetFragment (
     Vector->Len   = HeadSpace;
 
     //
-    //Reserve the head space in the first block
+    // Reserve the head space in the first block
     //
     NetbufSetBlock (Child, FirstBulk, HeadSpace, 0);
     Child->BlockOp[0].Head += HeadSpace;
@@ -709,8 +709,8 @@ FreeChild:
                                     called.
 
   @return                  Pointer to the net buffer built from the data blocks, 
-                           or NULL indicating the allocation failed due to
-                           resource limit.
+                           or NULL if the allocation failed due to resource
+                           limit.
 
 **/
 NET_BUF  *
@@ -1034,7 +1034,7 @@ NetbufReserve (
                               from head (TRUE) or tail (FALSE).
 
   @return                     Pointer to the first byte of the allocated buffer, 
-                              or NULL indicating there is no sufficient space.
+                              or NULL if there is no sufficient space.
 
 **/
 UINT8*
@@ -1420,8 +1420,7 @@ NetbufQueAppend (
   @param[in, out]  NbufQue               Pointer to the net buffer queue.
 
   @return           Pointer to the net buffer removed from the specific queue, 
-                    or NULL indicating there is no net buffer in the specific
-                    queue.
+                    or NULL if there is no net buffer in the specific queue.
 
 **/
 NET_BUF  *
@@ -1460,7 +1459,7 @@ NetbufQueRemove (
   @param[in]   Len             Length of the data to copy.
   @param[out]  Dest            The destination of the data to copy to.
 
-  @return       The length of the actual copied data, or 0 indicating the offset
+  @return       The length of the actual copied data, or 0 if the offset 
                 specified exceeds the total size of net buffer queue.
 
 **/
