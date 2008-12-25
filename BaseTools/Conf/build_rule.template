@@ -321,16 +321,6 @@
         GenFw -o ${dst} -j ${src}
         -$(CP) ${dst} $(BIN_DIR)
 
-[Unicode-Text-File]
-    <InputFile>
-        *.uni, *.Uni, *.UNI
-
-    <OutputFile>
-        $(DEBUG_DIR)(+)AutoGen.c
-        $(DEBUG_DIR)(+)AutoGen.h
-
-    <Command>
-
 [EFI-Image-File]
     <InputFile>
         ?.efi, ?.Efi, ?.EFI
