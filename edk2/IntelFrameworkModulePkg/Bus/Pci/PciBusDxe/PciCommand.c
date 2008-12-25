@@ -1,4 +1,4 @@
-/**@file
+/** @file
   This module implement Pci register operation interface for 
   Pci device.
   
@@ -81,7 +81,7 @@ PciOperateRegister (
   @param PciIoDevice  Pointer to instance of PCI_IO_DEVICE
   
   @retval TRUE  Support
-  @retval FALSE Not support
+  @retval FALSE Not support.
 **/
 BOOLEAN
 PciCapabilitySupport (

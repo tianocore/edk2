@@ -31,7 +31,7 @@
   @param  Controller TODO: add argument description
   @param  Handle TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -49,7 +49,7 @@ DeRegisterIdeDevice (
   @param  ParentDevicePath TODO: add argument description
   @param  RemainingDevicePath TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -66,7 +66,7 @@ EnableIdeDevice (
   @param  PciIo TODO: add argument description
   @param  Port TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 UINT8
@@ -83,7 +83,7 @@ IDEReadPortB (
   @param  Count TODO: add argument description
   @param  Buffer TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -101,7 +101,7 @@ IDEReadPortWMultiple (
   @param  Port TODO: add argument description
   @param  Data TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -136,7 +136,7 @@ IDEWritePortW (
   @param  Count TODO: add argument description
   @param  Buffer TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -153,7 +153,7 @@ IDEWritePortWMultiple (
   @param  PciIo TODO: add argument description
   @param  IdeRegsBaseAddr TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -167,7 +167,7 @@ GetIdeRegistersBaseAddr (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -180,7 +180,7 @@ ReassignIdeResources (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -205,7 +205,7 @@ InitializeIDEChannelData (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -219,7 +219,7 @@ DetectIDEController (
   @param  IdeDev TODO: add argument description
   @param  TimeoutInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -234,7 +234,7 @@ DRQClear (
   @param  IdeDev TODO: add argument description
   @param  TimeoutInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -249,7 +249,7 @@ DRQClear2 (
   @param  IdeDev TODO: add argument description
   @param  TimeoutInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -264,7 +264,7 @@ DRQReady (
   @param  IdeDev TODO: add argument description
   @param  TimeoutInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -279,7 +279,7 @@ DRQReady2 (
   @param  IdeDev TODO: add argument description
   @param  TimeoutInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -294,7 +294,7 @@ WaitForBSYClear (
   @param  IdeDev TODO: add argument description
   @param  TimeoutInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -309,7 +309,7 @@ WaitForBSYClear2 (
   @param  IdeDev TODO: add argument description
   @param  DelayInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -324,7 +324,7 @@ DRDYReady (
   @param  IdeDev TODO: add argument description
   @param  DelayInMilliSeconds TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -340,7 +340,7 @@ DRDYReady2 (
   @param  Source TODO: add argument description
   @param  Size TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -358,7 +358,7 @@ SwapStringChars (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -371,7 +371,7 @@ ATAIdentify (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -392,7 +392,7 @@ PrintAtaModuleName (
   @param  CylinderLsb TODO: add argument description
   @param  CylinderMsb TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -421,7 +421,7 @@ AtaPioDataIn (
   @param  CylinderLsb TODO: add argument description
   @param  CylinderMsb TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -458,7 +458,7 @@ CheckErrorStatus (
   @param  Lba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -477,7 +477,7 @@ AtaReadSectors (
   @param  Lba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -493,7 +493,7 @@ AtaWriteSectors (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -510,7 +510,7 @@ AtaSoftReset (
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -531,7 +531,7 @@ AtaBlkIoReadBlocks (
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -551,7 +551,7 @@ AtaBlkIoWriteBlocks (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -564,7 +564,7 @@ ATAPIIdentify (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -581,7 +581,7 @@ AtapiInquiry (
   @param  ByteCount TODO: add argument description
   @param  TimeOut TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -602,7 +602,7 @@ AtapiPacketCommandIn (
   @param  ByteCount TODO: add argument description
   @param  TimeOut TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -623,7 +623,7 @@ AtapiPacketCommandOut (
   @param  Read TODO: add argument description
   @param  TimeOut TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -638,10 +638,10 @@ PioReadWriteData (
 /**
   TODO: Add function description
 
-  @param  IdeDev TODO: add argument description
-  @param  IdeDev TODO: add argument description
+  @param  IdeDev  TODO: add argument description
+  @param  SResult TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -656,7 +656,7 @@ AtapiTestUnitReady (
   @param  IdeDev TODO: add argument description
   @param  SenseCounts TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -668,10 +668,10 @@ AtapiRequestSense (
 /**
   TODO: Add function description
 
-  @param  IdeDev TODO: add argument description
-  @param  IdeDev TODO: add argument description
+  @param  IdeDev  TODO: add argument description
+  @param  SResult TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -686,7 +686,7 @@ AtapiReadCapacity (
   @param  IdeDev TODO: add argument description
   @param  MediaChange TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -703,7 +703,7 @@ AtapiDetectMedia (
   @param  Lba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -722,7 +722,7 @@ AtapiReadSectors (
   @param  Lba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -738,7 +738,7 @@ AtapiWriteSectors (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -755,7 +755,7 @@ AtapiSoftReset (
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -776,7 +776,7 @@ AtapiBlkIoReadBlocks (
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -795,7 +795,7 @@ AtapiBlkIoWriteBlocks (
   @param  SenseCount TODO: add argument description
   @param  Result TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -810,7 +810,7 @@ ParseSenseData (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -824,7 +824,7 @@ AtapiReadPendingData (
   @param  IdeDev TODO: add argument description
   @param  WriteProtected TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -838,7 +838,7 @@ IsLS120orZipWriteProtected (
 
   @param  IdeBlkIoDevice TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -852,7 +852,7 @@ ReleaseIdeResources (
   @param  IdeDev TODO: add argument description
   @param  TransferMode TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -867,7 +867,7 @@ SetDeviceTransferMode (
   @param  IdeDev TODO: add argument description
   @param  NativeMaxAddress TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -883,7 +883,7 @@ ReadNativeMaxAddress (
   @param  MaxAddress TODO: add argument description
   @param  bVolatile TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -905,7 +905,7 @@ SetMaxAddress (
   @param  LbaMiddle TODO: add argument description
   @param  LbaHigh TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -930,7 +930,7 @@ AtaNonDataCommandIn (
   @param  SectorCount TODO: add argument description
   @param  LbaAddress TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -951,7 +951,7 @@ AtaNonDataCommandInExt (
   @param  StartLba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -970,7 +970,7 @@ AtaReadSectorsExt (
   @param  StartLba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -989,7 +989,7 @@ AtaWriteSectorsExt (
   @param  StartLba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1008,7 +1008,7 @@ AtaUdmaReadExt (
   @param  StartLba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1027,7 +1027,7 @@ AtaUdmaRead (
   @param  StartLba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1081,7 +1081,7 @@ DoAtaUdma (
   @param  StartLba TODO: add argument description
   @param  NumberOfBlocks TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1102,7 +1102,7 @@ AtaUdmaWrite (
   @param  SectorCount TODO: add argument description
   @param  LbaAddress TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1125,7 +1125,7 @@ AtaCommandIssueExt (
   @param  SectorCount TODO: add argument description
   @param  LbaAddress TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1143,7 +1143,7 @@ AtaCommandIssue (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1157,7 +1157,7 @@ AtaAtapi6Identify (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -1175,7 +1175,7 @@ AtaSMARTSupport (
   @param  StartLba TODO: add argument description
   @param  SectorCount TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1198,7 +1198,7 @@ AtaPioDataInExt (
   @param  StartLba TODO: add argument description
   @param  SectorCount TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1217,7 +1217,7 @@ AtaPioDataOutExt (
   @param  IdeDev TODO: add argument description
   @param  DriveParameters TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1231,7 +1231,7 @@ SetDriveParameters (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1245,7 +1245,7 @@ EnableInterrupt (
   @param[in]  Event   Pointer to this event
   @param[in]  Context Event hanlder private data
 
-  @retval  EFI_SUCCESS - Interrupt cleared
+  @retval  EFI_SUCCESS - Interrupt cleared.
 
 **/
 VOID

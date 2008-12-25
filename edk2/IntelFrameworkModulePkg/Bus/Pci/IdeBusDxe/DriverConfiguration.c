@@ -33,9 +33,9 @@ EFI_DRIVER_CONFIGURATION_PROTOCOL gIDEBusDriverConfiguration = {
 /**
   TODO: Add function description
 
-  @retval  EFI_ABORTED TODO: Add description for return value
-  @retval  EFI_SUCCESS TODO: Add description for return value
-  @retval  EFI_NOT_FOUND TODO: Add description for return value
+  @retval  EFI_ABORTED TODO: Add description for return value.
+  @retval  EFI_SUCCESS TODO: Add description for return value.
+  @retval  EFI_NOT_FOUND TODO: Add description for return value.
 
 **/
 EFI_STATUS

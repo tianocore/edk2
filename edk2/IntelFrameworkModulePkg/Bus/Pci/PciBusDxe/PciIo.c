@@ -831,7 +831,7 @@ PciIoMap (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) {
+  if ((PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) != 0) {
     Operation = (EFI_PCI_IO_PROTOCOL_OPERATION) (Operation + EfiPciOperationBusMasterRead64);
   }
 
@@ -919,14 +919,14 @@ PciIoAllocateBuffer (
   EFI_STATUS    Status;
   PCI_IO_DEVICE *PciIoDevice;
 
-  if (Attributes &
-      (~(EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE | EFI_PCI_ATTRIBUTE_MEMORY_CACHED))) {
+  if ((Attributes &
+      (~(EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE | EFI_PCI_ATTRIBUTE_MEMORY_CACHED))) != 0){
     return EFI_UNSUPPORTED;
   }
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) {
+  if ((PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) != 0) {
     Attributes |= EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE;
   }
 
@@ -1146,7 +1146,7 @@ ModifyRootBridgeAttributes (
   //
   // Call the PCI Root Bridge to attempt to modify the attributes
   //
-  if (NewPciRootBridgeAttributes ^ PciRootBridgeAttributes) {
+  if ((NewPciRootBridgeAttributes ^ PciRootBridgeAttributes) != 0) {
 
     Status = PciIoDevice->PciRootBridgeIo->SetAttributes (
                                             PciIoDevice->PciRootBridgeIo,
@@ -1200,7 +1200,7 @@ SupportPaletteSnoopAttributes (
   //
   Temp = ActiveVGADeviceOnTheSameSegment (PciIoDevice);
 
-  if (!Temp) {
+  if (Temp == NULL) {
     //
     // If there is no VGA device on the segement, set
     // this graphics card to decode the palette range
@@ -1228,7 +1228,7 @@ SupportPaletteSnoopAttributes (
     // If they are on the same bus, either one can
     // be set to snoop, the other set to decode
     //
-    if (VGACommand & EFI_PCI_COMMAND_VGA_PALETTE_SNOOP) {
+    if ((VGACommand & EFI_PCI_COMMAND_VGA_PALETTE_SNOOP) != 0) {
       //
       // VGA has set to snoop, so GFX can be only set to disable snoop
       //
@@ -1399,7 +1399,7 @@ PciIoAttributes (
   //
   // For Root Bridge, just call RootBridgeIo to set attributes;
   //
-  if (!PciIoDevice->Parent) {
+  if (PciIoDevice->Parent == NULL) {
     Status = ModifyRootBridgeAttributes (PciIoDevice, Attributes, Operation);
     return Status;
   }
@@ -1410,14 +1410,14 @@ PciIoAttributes (
   //
   // Check VGA and VGA16, they can not be set at the same time
   //
-  if (((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO)         &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO_16))         ||
-      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO)         &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) ||
-      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO) &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO_16))         ||
-      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO) &&
-       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) ) {
+  if (((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO) != 0         &&
+       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO_16) != 0)         ||
+      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO) != 0         &&
+       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16) != 0) ||
+      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO) != 0 &&
+       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO_16) != 0)         ||
+      ((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO) != 0 &&
+       (Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16) != 0) ) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1426,19 +1426,19 @@ PciIoAttributes (
   //
   if (IS_PCI_BRIDGE (&PciIoDevice->Pci) || IS_CARDBUS_BRIDGE (&PciIoDevice->Pci)) {
 
-    if (Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) {
+    if ((Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) != 0) {
       BridgeControl |= EFI_PCI_BRIDGE_CONTROL_VGA;
     }
 
-    if (Attributes & EFI_PCI_IO_ATTRIBUTE_ISA_IO) {
+    if ((Attributes & EFI_PCI_IO_ATTRIBUTE_ISA_IO) != 0) {
       BridgeControl |= EFI_PCI_BRIDGE_CONTROL_ISA;
     }
 
-    if (Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) {
+    if ((Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) != 0) {
       Command |= EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO;
     }
 
-    if (Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16 | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) {
+    if ((Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16 | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) != 0) {
       BridgeControl |= EFI_PCI_BRIDGE_CONTROL_VGA_16;
     }
 
@@ -1447,10 +1447,10 @@ PciIoAttributes (
     // Do with the attributes on VGA
     // Only for VGA's legacy resource, we just can enable once.
     //
-    if (Attributes &
+    if ((Attributes &
         (EFI_PCI_IO_ATTRIBUTE_VGA_IO    |
          EFI_PCI_IO_ATTRIBUTE_VGA_IO_16 |
-         EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY)) {
+         EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY)) != 0) {
       //
       // Check if a VGA has been enabled before enabling a new one
       //
@@ -1471,7 +1471,7 @@ PciIoAttributes (
     //
     // Do with the attributes on GFX
     //
-    if (Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) {
+    if ((Attributes & (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) != 0) {
 
       if (Operation == EfiPciIoAttributeOperationEnable) {
         //
@@ -1501,15 +1501,15 @@ PciIoAttributes (
     }
   }
 
-  if (Attributes & EFI_PCI_IO_ATTRIBUTE_IO) {
+  if ((Attributes & EFI_PCI_IO_ATTRIBUTE_IO) != 0) {
     Command |= EFI_PCI_COMMAND_IO_SPACE;
   }
 
-  if (Attributes & EFI_PCI_IO_ATTRIBUTE_MEMORY) {
+  if ((Attributes & EFI_PCI_IO_ATTRIBUTE_MEMORY) != 0) {
     Command |= EFI_PCI_COMMAND_MEMORY_SPACE;
   }
 
-  if (Attributes & EFI_PCI_IO_ATTRIBUTE_BUS_MASTER) {
+  if ((Attributes & EFI_PCI_IO_ATTRIBUTE_BUS_MASTER) != 0) {
     Command |= EFI_PCI_COMMAND_BUS_MASTER;
   }
   //

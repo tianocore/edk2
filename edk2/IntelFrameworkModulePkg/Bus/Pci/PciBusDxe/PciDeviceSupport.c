@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 LIST_ENTRY  gPciDevicePool;
 
 /**
-  Initialize the gPciDevicePool
+  Initialize the gPciDevicePool.
 **/
 EFI_STATUS
 InitializePciDevicePool (
@@ -75,7 +75,7 @@ InsertPciDevice (
 /**
   Destroy root bridge and remove it from deivce tree.
   
-  @param RootBridge   The bridge want to be removed
+  @param RootBridge   The bridge want to be removed.
   
 **/
 EFI_STATUS
@@ -174,7 +174,7 @@ DestroyRootBridgeByHandle (
 
   CurrentLink = gPciDevicePool.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &gPciDevicePool) {
+  while (CurrentLink != NULL && CurrentLink != &gPciDevicePool) {
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
     if (Temp->Handle == Controller) {
@@ -456,7 +456,7 @@ DeRegisterPciDevice (
 
       CurrentLink = PciIoDevice->ChildList.ForwardLink;
 
-      while (CurrentLink && CurrentLink != &PciIoDevice->ChildList) {
+      while (CurrentLink != NULL && CurrentLink != &PciIoDevice->ChildList) {
         Node    = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
         Status  = DeRegisterPciDevice (Controller, Node->Handle);
 
@@ -571,7 +571,7 @@ StartPciDevicesOnBridge (
 
   CurrentLink = RootBridge->ChildList.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &RootBridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &RootBridge->ChildList) {
 
     PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (RemainingDevicePath != NULL) {
@@ -728,7 +728,7 @@ StartPciDevices (
 
   CurrentLink = gPciDevicePool.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &gPciDevicePool) {
+  while (CurrentLink != NULL && CurrentLink != &gPciDevicePool) {
 
     RootBridge = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     //
@@ -839,11 +839,11 @@ CreateRootBridge (
 }
 
 /**
-  Get root bridge device instance by specific handle
+  Get root bridge device instance by specific handle.
 
-  @param RootBridgeHandle    Given root bridge handle
+  @param RootBridgeHandle    Given root bridge handle.
 
-  @return root bridge device instance
+  @return root bridge device instance.
 **/
 PCI_IO_DEVICE *
 GetRootBridgeByHandle (
@@ -855,7 +855,7 @@ GetRootBridgeByHandle (
 
   CurrentLink = gPciDevicePool.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &gPciDevicePool) {
+  while (CurrentLink != NULL && CurrentLink != &gPciDevicePool) {
 
     RootBridgeDev = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (RootBridgeDev->Handle == RootBridgeHandle) {
@@ -869,12 +869,12 @@ GetRootBridgeByHandle (
 }
 
 /**
-  Judege whether Pci device existed
+  Judege whether Pci device existed.
   
-  @param Bridge       Parent bridege instance 
-  @param PciIoDevice  Device instance
+  @param Bridge       Parent bridege instance.
+  @param PciIoDevice  Device instance.
   
-  @return whether Pci device existed
+  @return whether Pci device existed.
 **/
 BOOLEAN
 PciDeviceExisted (
@@ -888,7 +888,7 @@ PciDeviceExisted (
 
   CurrentLink = Bridge->ChildList.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
@@ -909,11 +909,11 @@ PciDeviceExisted (
 }
 
 /**
-  Active VGA device
+  Active VGA device.
   
-  @param VgaDevice device instance for VGA
+  @param VgaDevice device instance for VGA.
   
-  @return device instance
+  @return device instance.
 **/
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheSameSegment (
@@ -925,7 +925,7 @@ ActiveVGADeviceOnTheSameSegment (
 
   CurrentLink = gPciDevicePool.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &gPciDevicePool) {
+  while (CurrentLink != NULL && CurrentLink != &gPciDevicePool) {
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
@@ -945,11 +945,11 @@ ActiveVGADeviceOnTheSameSegment (
 }
 
 /**
-  Active VGA device on root bridge
+  Active VGA device on root bridge.
   
-  @param RootBridge  Root bridge device instance
+  @param RootBridge  Root bridge device instance.
   
-  @return VGA device instance
+  @return VGA device instance.
 **/
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheRootBridge (
@@ -961,7 +961,7 @@ ActiveVGADeviceOnTheRootBridge (
 
   CurrentLink = RootBridge->ChildList.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &RootBridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &RootBridge->ChildList) {
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
@@ -969,7 +969,7 @@ ActiveVGADeviceOnTheRootBridge (
         (Temp->Attributes &
          (EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY |
           EFI_PCI_IO_ATTRIBUTE_VGA_IO     |
-          EFI_PCI_IO_ATTRIBUTE_VGA_IO_16))) {
+          EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) != 0) {
       return Temp;
     }
 
@@ -989,13 +989,13 @@ ActiveVGADeviceOnTheRootBridge (
 }
 
 /**
-  Get HPC PCI address according to its device path
-  @param PciRootBridgeIo   Root bridege Io instance
-  @param HpcDevicePath     Given searching device path
-  @param PciAddress        Buffer holding searched result
+  Get HPC PCI address according to its device path.
+  @param PciRootBridgeIo   Root bridege Io instance.
+  @param HpcDevicePath     Given searching device path.
+  @param PciAddress        Buffer holding searched result.
   
   @retval EFI_NOT_FOUND Can not find the specific device path.
-  @retval EFI_SUCCESS   Success to get the device path
+  @retval EFI_SUCCESS   Success to get the device path.
 **/
 EFI_STATUS
 GetHpcPciAddress (
@@ -1041,7 +1041,7 @@ GetHpcPciAddress (
 
   CurrentLink = gPciDevicePool.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &gPciDevicePool) {
+  while (CurrentLink != NULL && CurrentLink != &gPciDevicePool) {
 
     RootBridge = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     //
@@ -1068,10 +1068,10 @@ GetHpcPciAddress (
 }
 
 /**
-  Get HPC PCI address according to its device path
-  @param RootBridge           Root bridege Io instance
-  @param RemainingDevicePath  Given searching device path
-  @param PciAddress           Buffer holding searched result
+  Get HPC PCI address according to its device path.
+  @param RootBridge           Root bridege Io instance.
+  @param RemainingDevicePath  Given searching device path.
+  @param PciAddress           Buffer holding searched result.
   
   @retval EFI_NOT_FOUND Can not find the specific device path.
 **/
@@ -1099,7 +1099,7 @@ GetHpcPciAddressFromRootBridge (
     CurrentLink   = RootBridge->ChildList.ForwardLink;
     Node.DevPath  = CurrentDevicePath;
 
-    while (CurrentLink && CurrentLink != &RootBridge->ChildList) {
+    while (CurrentLink != NULL && CurrentLink != &RootBridge->ChildList) {
       Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
       if (Node.Pci->Device   == Temp->DeviceNumber &&

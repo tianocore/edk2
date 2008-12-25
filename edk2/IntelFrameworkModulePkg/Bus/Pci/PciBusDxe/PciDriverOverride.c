@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -15,11 +15,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciBus.h"
 
 /**
-  Initializes a PCI Driver Override Instance
+  Initializes a PCI Driver Override Instance.
 
-  @param  PciIoDevice   Device instance
+  @param  PciIoDevice   Device instance.
 
-  @retval EFI_SUCCESS Operation success
+  @retval EFI_SUCCESS Operation success.
 **/
 EFI_STATUS
 InitializePciDriverOverrideInstance (
@@ -31,13 +31,13 @@ InitializePciDriverOverrideInstance (
 }
 
 /**
-  Get a overriding driver image
-  @param  This                Pointer to instance of EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL
-  @param  DriverImageHandle   Override driver image,
+  Get a overriding driver image.
+  @param  This                Pointer to instance of EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL.
+  @param  DriverImageHandle   Override driver image.
   
-  @retval EFI_SUCCESS                 Success to get driver image handle
-  @retval EFI_NOT_FOUND               can not find override driver image
-  @retval EFI_INVALID_PARAMETER       Invalid parameter
+  @retval EFI_SUCCESS                 Success to get driver image handle.
+  @retval EFI_NOT_FOUND               can not find override driver image.
+  @retval EFI_INVALID_PARAMETER       Invalid parameter.
 **/
 EFI_STATUS
 EFIAPI
@@ -54,7 +54,7 @@ GetDriver (
 
   CurrentLink = PciIoDevice->OptionRomDriverList.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &PciIoDevice->OptionRomDriverList) {
+  while (CurrentLink != NULL && CurrentLink != &PciIoDevice->OptionRomDriverList) {
 
     Node = DRIVER_OVERRIDE_FROM_LINK (CurrentLink);
 

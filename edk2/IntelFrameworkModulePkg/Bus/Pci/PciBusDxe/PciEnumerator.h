@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Header file declares all logic function for PCI bus enumeration.
   
 Copyright (c) 2006, Intel Corporation                                                         
@@ -22,9 +22,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   This routine is used to enumerate entire pci bus system
   in a given platform
 
-  @param Controller  Parent controller handle
+  @param Controller  Parent controller handle.
   
-  @return Status of enumerating
+  @return Status of enumerating.
 **/
 EFI_STATUS
 PciEnumerator (
@@ -35,10 +35,10 @@ PciEnumerator (
   Enumerate PCI root bridge
   
   @param PciResAlloc   Pointer to protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
-  @param RootBridgeDev Instance of root bridge device
+  @param RootBridgeDev Instance of root bridge device.
   
-  @retval EFI_SUCCESS  Success to enumerate root bridge
-  @retval Others       Fail to enumerate root bridge
+  @retval EFI_SUCCESS  Success to enumerate root bridge.
+  @retval Others       Fail to enumerate root bridge.
   
 **/
 EFI_STATUS
@@ -50,9 +50,9 @@ PciRootBridgeEnumerator (
 /**
   This routine is used to process option rom on a certain root bridge
   
-  @param Bridge     Given parent's root bridge
-  @param RomBase    Base address of ROM driver loaded from
-  @param MaxLength  Max rom size
+  @param Bridge     Given parent's root bridge.
+  @param RomBase    Base address of ROM driver loaded from.
+  @param MaxLength  Max rom size.
   
   @retval EFI_SUCCESS Success to process option rom image.
 **/
@@ -66,11 +66,11 @@ ProcessOptionRom (
 /**
   This routine is used to assign bus number to the given PCI bus system
   
-  @param Bridge           Parent root bridge instance
-  @param StartBusNumber   Number of beginning
-  @param SubBusNumber     the number of sub bus
+  @param Bridge           Parent root bridge instance.
+  @param StartBusNumber   Number of beginning.
+  @param SubBusNumber     the number of sub bus.
   
-  @retval EFI_SUCCESS  Success to assign bus number
+  @retval EFI_SUCCESS  Success to assign bus number.
 **/
 EFI_STATUS
 PciAssignBusNumber (
@@ -83,11 +83,11 @@ PciAssignBusNumber (
   This routine is used to determine the root bridge attribute by interfacing
   the host bridge resource allocation protocol.
 
-  @param PciResAlloc    Protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
-  @param RootBridgeDev  Root bridge instance
+  @param PciResAlloc    Protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
+  @param RootBridgeDev  Root bridge instance.
   
-  @retval EFI_SUCCESS  Success to get root bridge's attribute
-  @retval Others       Fail to get attribute
+  @retval EFI_SUCCESS  Success to get root bridge's attribute.
+  @retval Others       Fail to get attribute.
 **/
 EFI_STATUS
 DetermineRootBridgeAttributes (
@@ -98,8 +98,8 @@ DetermineRootBridgeAttributes (
 /**
   Get Max Option Rom size on this bridge
   
-  @param Bridge  Bridge device instance
-  @return Max size of option rom
+  @param Bridge  Bridge device instance.
+  @return Max size of option rom.
 **/
 UINT64
 GetMaxOptionRomSize (
@@ -111,9 +111,9 @@ GetMaxOptionRomSize (
   
   @param PciResAlloc Protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
   
-  @retval EFI_NOT_FOUND Can not find the specific root bridge device
-  @retval EFI_SUCCESS   Success Process attribute
-  @retval Others        Can not determine the root bridge device's attribute
+  @retval EFI_NOT_FOUND Can not find the specific root bridge device.
+  @retval EFI_SUCCESS   Success Process attribute.
+  @retval Others        Can not determine the root bridge device's attribute.
 **/
 EFI_STATUS
 PciHostBridgeDeviceAttribute (
@@ -123,12 +123,12 @@ PciHostBridgeDeviceAttribute (
 /**
   Get resource allocation status from the ACPI pointer
 
-  @param AcpiConfig       Point to Acpi configuration table
-  @param IoResStatus      Return the status of I/O resource
-  @param Mem32ResStatus   Return the status of 32-bit Memory resource
-  @param PMem32ResStatus  Return the status of 32-bit PMemory resource
-  @param Mem64ResStatus   Return the status of 64-bit Memory resource
-  @param PMem64ResStatus  Return the status of 64-bit PMemory resource
+  @param AcpiConfig       Point to Acpi configuration table.
+  @param IoResStatus      Return the status of I/O resource.
+  @param Mem32ResStatus   Return the status of 32-bit Memory resource.
+  @param PMem32ResStatus  Return the status of 32-bit PMemory resource.
+  @param Mem64ResStatus   Return the status of 64-bit Memory resource.
+  @param PMem64ResStatus  Return the status of 64-bit PMemory resource.
   
   @retval EFI_SUCCESS Success to get resource allocation status from ACPI configuration table.
 **/
@@ -145,10 +145,10 @@ GetResourceAllocationStatus (
 /**
   Remove a PCI device from device pool and mark its bar
   
-  @param PciDevice Instance of Pci device
+  @param PciDevice Instance of Pci device.
   
-  @retval EFI_SUCCESS Success Operation
-  @retval EFI_ABORTED Pci device is a root bridge
+  @retval EFI_SUCCESS Success Operation.
+  @retval EFI_ABORTED Pci device is a root bridge.
 **/
 EFI_STATUS
 RejectPciDevice (
@@ -158,9 +158,9 @@ RejectPciDevice (
 /**
   Determine whethter a PCI device can be rejected
   
-  @param PciResNode Pointer to Pci resource node instance 
+  @param PciResNode Pointer to Pci resource node instance.
   
-  @return whethter a PCI device can be rejected
+  @return whethter a PCI device can be rejected.
 **/
 BOOLEAN
 IsRejectiveDevice (
@@ -170,8 +170,8 @@ IsRejectiveDevice (
 /**
   Compare two resource node and get the larger resource consumer
   
-  @param PciResNode1  resource node 1 want to be compared
-  @param PciResNode2  resource node 2 want to be compared
+  @param PciResNode1  resource node 1 want to be compared.
+  @param PciResNode2  resource node 2 want to be compared.
   
   @return Larger resource consumer.
 **/
@@ -184,9 +184,9 @@ GetLargerConsumerDevice (
 /**
   Get the max resource consumer in the host resource pool
   
-  @param ResPool  Pointer to resource pool node
+  @param ResPool  Pointer to resource pool node.
   
-  @return the max resource consumer in the host resource pool
+  @return the max resource consumer in the host resource pool.
 **/
 PCI_RESOURCE_NODE *
 GetMaxResourceConsumerDevice (
@@ -196,16 +196,16 @@ GetMaxResourceConsumerDevice (
 /**
   Adjust host bridge allocation so as to reduce resource requirement
   
-  @param IoPool           Pointer to instance of I/O resource Node
-  @param Mem32Pool        Pointer to instance of 32-bit memory resource Node
-  @param PMem32Pool       Pointer to instance of 32-bit Pmemory resource node
-  @param Mem64Pool        Pointer to instance of 64-bit memory resource node
-  @param PMem64Pool       Pointer to instance of 64-bit Pmemory resource node
-  @param IoResStatus      Status of I/O resource Node
-  @param Mem32ResStatus   Status of 32-bit memory resource Node
-  @param PMem32ResStatus  Status of 32-bit Pmemory resource node
-  @param Mem64ResStatus   Status of 64-bit memory resource node
-  @param PMem64ResStatus  Status of 64-bit Pmemory resource node
+  @param IoPool           Pointer to instance of I/O resource Node.
+  @param Mem32Pool        Pointer to instance of 32-bit memory resource Node.
+  @param PMem32Pool       Pointer to instance of 32-bit Pmemory resource node.
+  @param Mem64Pool        Pointer to instance of 64-bit memory resource node.
+  @param PMem64Pool       Pointer to instance of 64-bit Pmemory resource node.
+  @param IoResStatus      Status of I/O resource Node.
+  @param Mem32ResStatus   Status of 32-bit memory resource Node.
+  @param PMem32ResStatus  Status of 32-bit Pmemory resource node.
+  @param Mem64ResStatus   Status of 64-bit memory resource node.
+  @param PMem64ResStatus  Status of 64-bit Pmemory resource node.
 **/
 EFI_STATUS
 PciHostBridgeAdjustAllocation (
@@ -225,13 +225,13 @@ PciHostBridgeAdjustAllocation (
   Summary requests for all resource type, and contruct ACPI resource
   requestor instance.
   
-  @param Bridge           detecting bridge
-  @param IoNode           Pointer to instance of I/O resource Node
-  @param Mem32Node        Pointer to instance of 32-bit memory resource Node
-  @param PMem32Node       Pointer to instance of 32-bit Pmemory resource node
-  @param Mem64Node        Pointer to instance of 64-bit memory resource node
-  @param PMem64Node       Pointer to instance of 64-bit Pmemory resource node
-  @param pConfig          outof buffer holding new constructed APCI resource requestor
+  @param Bridge           detecting bridge.
+  @param IoNode           Pointer to instance of I/O resource Node.
+  @param Mem32Node        Pointer to instance of 32-bit memory resource Node.
+  @param PMem32Node       Pointer to instance of 32-bit Pmemory resource node.
+  @param Mem64Node        Pointer to instance of 64-bit memory resource node.
+  @param PMem64Node       Pointer to instance of 64-bit Pmemory resource node.
+  @param pConfig          outof buffer holding new constructed APCI resource requestor.
 **/
 EFI_STATUS
 ConstructAcpiResourceRequestor (
@@ -248,13 +248,13 @@ ConstructAcpiResourceRequestor (
   Get resource base from a acpi configuration descriptor.
   
   @param pConfig      an acpi configuration descriptor.
-  @param IoBase       output of I/O resource base address
-  @param Mem32Base    output of 32-bit memory base address
-  @param PMem32Base   output of 32-bit pmemory base address
-  @param Mem64Base    output of 64-bit memory base address
-  @param PMem64Base   output of 64-bit pmemory base address
+  @param IoBase       output of I/O resource base address.
+  @param Mem32Base    output of 32-bit memory base address.
+  @param PMem32Base   output of 32-bit pmemory base address.
+  @param Mem64Base    output of 64-bit memory base address.
+  @param PMem64Base   output of 64-bit pmemory base address.
   
-  @return EFI_SUCCESS  Success operation
+  @return EFI_SUCCESS  Success operation.
 **/
 EFI_STATUS
 GetResourceBase (
@@ -270,10 +270,10 @@ GetResourceBase (
   Enumerate pci bridge, allocate resource and determine attribute
   for devices on this bridge
   
-  @param BridgeDev Pointer to instance of bridge device
+  @param BridgeDev Pointer to instance of bridge device.
   
-  @retval EFI_SUCCESS Success operation
-  @retval Others      Fail to enumerate
+  @retval EFI_SUCCESS Success operation.
+  @retval Others      Fail to enumerate.
 **/
 EFI_STATUS
 PciBridgeEnumerator (
@@ -283,10 +283,10 @@ PciBridgeEnumerator (
 /**
   Allocate all kinds of resource for bridge
   
-  @param Bridge      Pointer to bridge instance
+  @param Bridge      Pointer to bridge instance.
   
   @retval EFI_SUCCESS Success operation.
-  @retval Others      Fail to allocate resource for bridge
+  @retval Others      Fail to allocate resource for bridge.
 **/
 EFI_STATUS
 PciBridgeResourceAllocator (
@@ -296,14 +296,14 @@ PciBridgeResourceAllocator (
 /**
   Get resource base address for a pci bridge device
   
-  @param Bridge  Given Pci driver instance
-  @param IoBase  output for base address of I/O type resource
-  @param Mem32Base  output for base address of 32-bit memory type resource
-  @param PMem32Base  output for base address of 32-bit Pmemory type resource
-  @param Mem64Base  output for base address of 64-bit memory type resource
-  @param PMem64Base  output for base address of 64-bit Pmemory type resource
+  @param Bridge  Given Pci driver instance.
+  @param IoBase  output for base address of I/O type resource.
+  @param Mem32Base  output for base address of 32-bit memory type resource.
+  @param PMem32Base  output for base address of 32-bit Pmemory type resource.
+  @param Mem64Base  output for base address of 64-bit memory type resource.
+  @param PMem64Base  output for base address of 64-bit Pmemory type resource.
   
-  @retval EFI_SUCCESS Succes to get resource base address
+  @retval EFI_SUCCESS Succes to get resource base address.
 **/
 EFI_STATUS
 GetResourceBaseFromBridge (
@@ -318,10 +318,10 @@ GetResourceBaseFromBridge (
 /**
   Process Option Rom on this host bridge
   
-  @param PciResAlloc Pointer to instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  @param PciResAlloc Pointer to instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
   
-  @retval EFI_NOT_FOUND Can not find the root bridge instance
-  @retval EFI_SUCCESS   Success process
+  @retval EFI_NOT_FOUND Can not find the root bridge instance.
+  @retval EFI_SUCCESS   Success process.
 **/
 EFI_STATUS
 PciHostBridgeP2CProcess (
@@ -373,7 +373,7 @@ PciHostBridgeP2CProcess (
                                           required here. This notification can be used to perform any chipsetspecific
                                           programming.
       
-   @param[in] This                The instance pointer of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+   @param[in] PciResAlloc         The instance pointer of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
    @param[in] Phase               The phase during enumeration
    
    @retval EFI_NOT_READY          This phase cannot be entered at this time. For example, this error
@@ -438,12 +438,12 @@ PreprocessController (
   @param This                 - A pointer to the hot plug request protocol.
   @param Operation            - The operation.
   @param Controller           - A pointer to the controller.
-  @param RemainningDevicePath - A pointer to the device path.
+  @param RemainingDevicePath  - A pointer to the device path.
   @param NumberOfChildren     - A the number of child handle in the ChildHandleBuffer.
   @param ChildHandleBuffer    - A pointer to the array contain the child handle.
   
-  @retval EFI_NOT_FOUND Can not find bridge according to controller handle
-  @retval EFI_SUCCESS   Success operating
+  @retval EFI_NOT_FOUND Can not find bridge according to controller handle.
+  @retval EFI_SUCCESS   Success operating.
 **/
 EFI_STATUS
 EFIAPI
@@ -459,7 +459,7 @@ PciHotPlugRequestNotify (
 /**
   Search hostbridge according to given handle
   
-  @return whether found
+  @return whether found.
 **/
 BOOLEAN
 SearchHostBridgeHandle (
@@ -469,7 +469,7 @@ SearchHostBridgeHandle (
 /**
   Add host bridge handle to global variable for enumating.
   
-  @param HostBridgeHandle host bridge handle
+  @param HostBridgeHandle host bridge handle.
 **/
 EFI_STATUS
 AddHostBridgeEnumerator (

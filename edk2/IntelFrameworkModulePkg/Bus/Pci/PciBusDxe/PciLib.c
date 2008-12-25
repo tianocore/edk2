@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
   PCI Bus Driver Lib file
   It abstracts some functions that can be different
@@ -217,7 +217,7 @@ RemoveRejectedPciDevices (
 
   CurrentLink = Bridge->ChildList.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
@@ -650,7 +650,6 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
 
   @retval EFI_SUCCESS           Success
 **/
-
 EFI_STATUS
 PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
@@ -1605,8 +1604,8 @@ PciScanBus_WithHotPlugDeviceSupport (
           // Ensure the device is enabled and initialized
           //
           if ((Attributes == EfiPaddingPciRootBridge) &&
-              (State & EFI_HPC_STATE_ENABLED)         &&
-              (State & EFI_HPC_STATE_INITIALIZED)     ) {
+              (State & EFI_HPC_STATE_ENABLED) != 0    &&
+              (State & EFI_HPC_STATE_INITIALIZED) != 0) {
             *PaddedBusRange = (UINT8) ((UINT8) (BusRange) +*PaddedBusRange);
           } else {
             *SubBusNumber = (UINT8) ((UINT8) (BusRange) +*SubBusNumber);
@@ -1662,13 +1661,13 @@ PciRootBridgeP2CProcess (
 
   CurrentLink = Bridge->ChildList.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
     if (IS_CARDBUS_BRIDGE (&Temp->Pci)) {
 
-      if (gPciHotPlugInit && Temp->Allocated) {
+      if (gPciHotPlugInit != NULL && Temp->Allocated) {
 
         //
         // Raise the EFI_IOB_PCI_HPC_INIT status code

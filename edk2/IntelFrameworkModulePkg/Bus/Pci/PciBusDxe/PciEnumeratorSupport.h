@@ -1,4 +1,4 @@
-/**@file
+/**@ file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -99,7 +99,7 @@ GatherDeviceInfo (
   @param Device     Bridge device's device NO.
   @param Func       Bridge device's func NO.
   
-  @return bridge device instance
+  @return bridge device instance.
 **/
 PCI_IO_DEVICE             *
 GatherPpbInfo (
@@ -133,8 +133,8 @@ GatherP2CInfo (
 /**
   Create device path for pci deivce
   
-  @param ParentDevicePath  Parent bridge's path
-  @param PciIoDevice       Pci device instance
+  @param ParentDevicePath  Parent bridge's path.
+  @param PciIoDevice       Pci device instance.
   
   @return device path protocol instance for specific pci device.
 **/
@@ -173,7 +173,7 @@ BarExisted (
   @param OldCommand    Old command register offset
   @param OldBridgeControl Old Bridge control value for PPB or P2C.
   
-  @return EFI_SUCCESS
+  @return EFI_SUCCESS.
 **/
 EFI_STATUS
 PciTestSupportedAttribute (
@@ -204,8 +204,8 @@ PciSetDeviceAttribute (
 /**
   Determine if the device can support Fast Back to Back attribute
   
-  @param PciIoDevice  Pci device instance
-  @param StatusIndex  Status register value
+  @param PciIoDevice  Pci device instance.
+  @param StatusIndex  Status register value.
 **/
 EFI_STATUS
 GetFastBackToBackSupport (
@@ -216,7 +216,7 @@ GetFastBackToBackSupport (
 /**
  Determine the related attributes of all devices under a Root Bridge
  
- @param PciIoDevice   PCI device instance
+ @param PciIoDevice   PCI device instance.
  
 **/
 EFI_STATUS
@@ -227,8 +227,8 @@ DetermineDeviceAttribute (
 /**
   This routine is used to update the bar information for those incompatible PCI device
   
-  @param PciIoDevice      Pci device instance
-  @return EFI_UNSUPPORTED failed to update Pci Info
+  @param PciIoDevice      Pci device instance.
+  @return EFI_UNSUPPORTED failed to update Pci Info.
 **/
 EFI_STATUS
 UpdatePciInfo (
@@ -238,8 +238,8 @@ UpdatePciInfo (
 /**
   This routine will update the alignment with the new alignment
   
-  @param Alignment old alignment
-  @param NewAlignment new alignment
+  @param Alignment old alignment.
+  @param NewAlignment new alignment.
   
 **/
 VOID
@@ -251,9 +251,9 @@ SetNewAlign (
 /**
   Parse PCI bar bit.
   
-  @param PciIoDevice  Pci device instance
-  @param Offset       bar offset
-  @param BarIndex     bar index
+  @param PciIoDevice  Pci device instance.
+  @param Offset       bar offset.
+  @param BarIndex     bar index.
   
   @return next bar offset.
 **/
@@ -266,9 +266,9 @@ PciParseBar (
 
 /**
   This routine is used to initialize the bar of a PCI device
-  It can be called typically when a device is going to be rejected
+  It can be called typically when a device is going to be rejected.
 
-  @param PciIoDevice Pci device instance
+  @param PciIoDevice Pci device instance.
 **/
 EFI_STATUS
 InitializePciDevice (
@@ -278,7 +278,7 @@ InitializePciDevice (
 /**
   Init PPB for bridge device
   
-  @param  PciIoDevice Pci device instance
+  @param  PciIoDevice Pci device instance.
 **/
 EFI_STATUS
 InitializePpb (
@@ -288,7 +288,7 @@ InitializePpb (
 /**
   Init private data for Hotplug bridge device
   
-  @param PciIoDevice hotplug bridge device
+  @param PciIoDevice hotplug bridge device.
 **/
 EFI_STATUS
 InitializeP2C (
@@ -299,13 +299,13 @@ InitializeP2C (
   Create and initiliaze general PCI I/O device instance for
   PCI device/bridge device/hotplug bridge device.
   
-  @param PciRootBridgeIo   Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL
+  @param PciRootBridgeIo   Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param Pci               Pci bar block
   @param Bus               device Bus NO.
   @param Device            device device NO.
   @param Func              device func NO.
   
-  @return instance of PCI device
+  @return instance of PCI device.
 **/
 PCI_IO_DEVICE             *
 CreatePciIoDevice (
@@ -321,7 +321,7 @@ CreatePciIoDevice (
   in a given platform
   It is only called on the second start on the same Root Bridge.
 
-  @param Controller  Parent bridge handler
+  @param Controller  Parent bridge handler.
   
   @return status of operation.
 **/
@@ -357,10 +357,10 @@ StartManagingRootBridge (
 /**
   This routine can be used to check whether a PCI device should be rejected when light enumeration
 
-  @param PciIoDevice  Pci device instance
+  @param PciIoDevice  Pci device instance.
 
-  @retval TRUE      This device should be rejected
-  @retval FALSE     This device shouldn't be rejected
+  @retval TRUE      This device should be rejected.
+  @retval FALSE     This device shouldn't be rejected.
   
 **/
 BOOLEAN

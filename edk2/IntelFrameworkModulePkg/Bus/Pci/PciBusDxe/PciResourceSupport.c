@@ -215,7 +215,7 @@ CalculateApertureIo16 (
 
   Aperture = 0;
 
-  if (!Bridge) {
+  if (Bridge == NULL) {
     return EFI_SUCCESS;
   }
 
@@ -233,7 +233,7 @@ CalculateApertureIo16 (
     //
     offset = Aperture & (Node->Alignment);
 
-    if (offset) {
+    if (offset != 0) {
 
       Aperture = Aperture + (Node->Alignment + 1) - offset;
 
@@ -257,7 +257,7 @@ CalculateApertureIo16 (
             Node->Length               
             );
           offset = Aperture & (Node->Alignment);
-          if (offset) {
+          if (offset != 0) {
             Aperture = Aperture + (Node->Alignment + 1) - offset;
           }
         } else if (VGAEnable) {
@@ -266,7 +266,7 @@ CalculateApertureIo16 (
             Node->Length
             );
           offset = Aperture & (Node->Alignment);
-          if (offset) {
+          if (offset != 0) {
             Aperture = Aperture + (Node->Alignment + 1) - offset;
           }
         }
@@ -289,7 +289,7 @@ CalculateApertureIo16 (
   //
   offset = Aperture & (Bridge->Alignment);
 
-  if (offset) {
+  if (offset != 0) {
     Aperture = Aperture + (Bridge->Alignment + 1) - offset;
   }
 
@@ -330,7 +330,7 @@ CalculateResourceAperture (
 
   Aperture = 0;
 
-  if (!Bridge) {
+  if (Bridge == NULL) {
     return EFI_SUCCESS;
   }
 
@@ -353,7 +353,7 @@ CalculateResourceAperture (
         
     offset = Aperture & (Node->Alignment);
 
-    if (offset) {
+    if (offset != 0) {
 
       Aperture = Aperture + (Node->Alignment + 1) - offset;
 
@@ -382,7 +382,7 @@ CalculateResourceAperture (
   // alignment
   //
   offset = Aperture & (Bridge->Alignment);
-  if (offset) {
+  if (offset != 0) {
     Aperture = Aperture + (Bridge->Alignment + 1) - offset;
   }
 
@@ -634,7 +634,7 @@ CreateResourceMap (
 
   CurrentLink = Bridge->ChildList.ForwardLink;
 
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
@@ -923,7 +923,7 @@ DegradeResource (
   // 
   HasOprom = FALSE;
   CurrentLink = Bridge->ChildList.ForwardLink;
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
 
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (Temp->RomSize != 0) {
@@ -1021,7 +1021,7 @@ BridgeSupportResourceDecode (
   )
 {
 
-  if ((Bridge->Decodes) & Decode) {
+  if (((Bridge->Decodes) & Decode) != 0) {
     return TRUE;
   }
 
@@ -1362,7 +1362,7 @@ ProgrameUpstreamBridgeForRom (
   //
   Parent = PciDevice->Parent;
   ZeroMem (&Node, sizeof (Node));
-  while (Parent) {
+  while (Parent != NULL) {
     if (!IS_PCI_BRIDGE (&Parent->Pci)) {
       break;
     }
@@ -2128,7 +2128,7 @@ GetResourcePaddingPpb (
   IN  PCI_IO_DEVICE                  *PciIoDevice
   )
 {
-  if (gPciHotPlugInit) {
+  if (gPciHotPlugInit != NULL) {
     if (PciIoDevice->ResourcePaddingDescriptors == NULL) {
       GetResourcePaddingForHpb (PciIoDevice);
     }

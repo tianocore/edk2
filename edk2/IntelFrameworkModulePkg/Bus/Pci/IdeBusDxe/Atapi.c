@@ -90,11 +90,11 @@ LS120GetMediaStatus (
   //
   StatusValue = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
 
-  if (StatusValue & BIT1) {
+  if ((StatusValue & BIT1) != 0) {
     return EFI_NO_MEDIA;
   }
 
-  if (StatusValue & BIT6) {
+  if ((StatusValue & BIT6) != 0) {
     return EFI_WRITE_PROTECTED;
   } else {
     return EFI_SUCCESS;
@@ -803,7 +803,7 @@ PioReadWriteData (
 
   @param[in] *IdeDev     Pointer pointing to IDE_BLK_IO_DEV data structure, used
                          to record all the information of the IDE device.
-  @param[in] *SResult    Sense result for this packet command.
+  @param[out] *SResult   Sense result for this packet command.
 
   @retval EFI_SUCCESS      Device is accessible.
   @retval EFI_DEVICE_ERROR Device is not accessible.
@@ -851,16 +851,10 @@ AtapiTestUnitReady (
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[out] **SenseBuffers
+  @param[out] **SenseCounts
   allocated in this function, and freed by the calling function.
   This buffer is used to accommodate all the sense data returned 
   by the device.
-
-  @param[out] *BufUnit
-  record the unit size of the sense data block in the SenseBuffers,
-
-  @param[out] *BufNumbers
-  record the number of units in the SenseBuffers.
 
   @retval EFI_SUCCESS
   Request Sense command completes successfully.
@@ -961,7 +955,7 @@ AtapiRequestSense (
 
   @param[in] *IdeDev    Pointer pointing to IDE_BLK_IO_DEV data structure, used
                         to record all the information of the IDE device.
-  @param[in] SResult    Sense result for this packet command
+  @param[out] SResult   Sense result for this packet command
 
   @retval EFI_SUCCESS      Read Capacity Command finally completes successfully.
   @retval EFI_DEVICE_ERROR Read Capacity Command failed because of device error.
@@ -1657,7 +1651,7 @@ AtapiSoftReset (
   This function is the ATAPI implementation for ReadBlocks in the
   Block I/O Protocol interface.
 
-  @param[in] *IdeBlkIoDev
+  @param[in] *IdeBlkIoDevice
   Indicates the calling context.
 
   @param[in] MediaId
@@ -1795,7 +1789,7 @@ AtapiBlkIoReadBlocks (
   //
   // save the first block to the cache for performance
   //
-  if (LBA == 0 && !IdeBlkIoDevice->Cache) {
+  if (LBA == 0 && (IdeBlkIoDevice->Cache == NULL)) {
     IdeBlkIoDevice->Cache = AllocatePool (BlockSize);
     if (IdeBlkIoDevice != NULL) {
       CopyMem ((UINT8 *) IdeBlkIoDevice->Cache, (UINT8 *) Buffer, BlockSize);
@@ -1810,7 +1804,7 @@ AtapiBlkIoReadBlocks (
   This function is the ATAPI implementation for WriteBlocks in the
   Block I/O Protocol interface.
 
-  @param[in] *This
+  @param[in] *IdeBlkIoDevice
   Indicates the calling context.
 
   @param[in] MediaId
@@ -1869,7 +1863,7 @@ AtapiBlkIoWriteBlocks (
   EFI_STATUS          Status;
   BOOLEAN             MediaChange;
 
-  if (LBA == 0 && IdeBlkIoDevice->Cache) {
+  if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
     gBS->FreePool (IdeBlkIoDevice->Cache);
     IdeBlkIoDevice->Cache = NULL;
   }
@@ -1890,7 +1884,7 @@ AtapiBlkIoWriteBlocks (
   Status      = AtapiDetectMedia (IdeBlkIoDevice, &MediaChange);
   if (EFI_ERROR (Status)) {
 
-    if (LBA == 0 && IdeBlkIoDevice->Cache) {
+    if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
       gBS->FreePool (IdeBlkIoDevice->Cache);
       IdeBlkIoDevice->Cache = NULL;
     }
@@ -1906,7 +1900,7 @@ AtapiBlkIoWriteBlocks (
 
   if (!(Media->MediaPresent)) {
 
-    if (LBA == 0 && IdeBlkIoDevice->Cache) {
+    if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
       gBS->FreePool (IdeBlkIoDevice->Cache);
       IdeBlkIoDevice->Cache = NULL;
     }
@@ -1915,7 +1909,7 @@ AtapiBlkIoWriteBlocks (
 
   if ((MediaId != Media->MediaId) || MediaChange) {
 
-    if (LBA == 0 && IdeBlkIoDevice->Cache) {
+    if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
       gBS->FreePool (IdeBlkIoDevice->Cache);
       IdeBlkIoDevice->Cache = NULL;
     }
@@ -2073,7 +2067,7 @@ AtapiReadPendingData (
 
   @retval  EFI_DEVICE_ERROR TODO: Add description for return value
   @retval  EFI_DEVICE_ERROR TODO: Add description for return value
-  @retval  EFI_SUCCESS TODO: Add description for return value
+  @retval  EFI_SUCCESS TODO: Add description for return value.
 
 **/
 EFI_STATUS

@@ -154,7 +154,7 @@ IDEBusComponentNameGetControllerName (
 
   @param  IdeBlkIoDevicePtr TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID

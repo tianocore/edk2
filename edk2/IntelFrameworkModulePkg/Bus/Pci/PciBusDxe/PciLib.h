@@ -53,7 +53,7 @@ typedef struct {
   Install protocol gEfiPciHotPlugRequestProtocolGuid
   @param Status    return status of protocol installation.
 **/
-void
+VOID
 InstallHotPlugRequestProtocol (
   IN  EFI_STATUS                    *Status
   );

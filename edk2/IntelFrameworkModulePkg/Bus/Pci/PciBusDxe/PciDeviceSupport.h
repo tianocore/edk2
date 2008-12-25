@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EFI_PCI_DEVICE_SUPPORT_H
 
 /**
-  Initialize the gPciDevicePool
+  Initialize the gPciDevicePool.
 **/
 EFI_STATUS
 InitializePciDevicePool (
@@ -183,11 +183,11 @@ CreateRootBridge (
   );
 
 /**
-  Get root bridge device instance by specific handle
+  Get root bridge device instance by specific handle.
 
-  @param RootBridgeHandle    Given root bridge handle
+  @param RootBridgeHandle    Given root bridge handle.
 
-  @return root bridge device instance
+  @return root bridge device instance.
 **/
 PCI_IO_DEVICE *
 GetRootBridgeByHandle (
@@ -200,12 +200,12 @@ RootBridgeExisted (
   );
 
 /**
-  Judege whether Pci device existed
+  Judege whether Pci device existed.
   
-  @param Bridge       Parent bridege instance 
-  @param PciIoDevice  Device instance
+  @param Bridge       Parent bridege instance. 
+  @param PciIoDevice  Device instance.
   
-  @return whether Pci device existed
+  @return whether Pci device existed.
 **/
 BOOLEAN
 PciDeviceExisted (
@@ -214,11 +214,11 @@ PciDeviceExisted (
   );
 
 /**
-  Active VGA device
+  Active VGA device.
   
-  @param VgaDevice device instance for VGA
+  @param VgaDevice device instance for VGA.
   
-  @return device instance
+  @return device instance.
 **/
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheSameSegment (
@@ -226,11 +226,11 @@ ActiveVGADeviceOnTheSameSegment (
   );
 
 /**
-  Active VGA device on root bridge
+  Active VGA device on root bridge.
   
-  @param RootBridge  Root bridge device instance
+  @param RootBridge  Root bridge device instance.
   
-  @return VGA device instance
+  @return VGA device instance.
 **/
 PCI_IO_DEVICE *
 ActiveVGADeviceOnTheRootBridge (
@@ -238,13 +238,13 @@ ActiveVGADeviceOnTheRootBridge (
   );
 
 /**
-  Get HPC PCI address according to its device path
-  @param PciRootBridgeIo   Root bridege Io instance
-  @param HpcDevicePath     Given searching device path
-  @param PciAddress        Buffer holding searched result
+  Get HPC PCI address according to its device path.
+  @param PciRootBridgeIo   Root bridege Io instance.
+  @param HpcDevicePath     Given searching device path.
+  @param PciAddress        Buffer holding searched result.
   
   @retval EFI_NOT_FOUND Can not find the specific device path.
-  @retval EFI_SUCCESS   Success to get the device path
+  @retval EFI_SUCCESS   Success to get the device path.
 **/
 EFI_STATUS
 GetHpcPciAddress (
@@ -254,10 +254,10 @@ GetHpcPciAddress (
   );
 
 /**
-  Get HPC PCI address according to its device path
-  @param RootBridge           Root bridege Io instance
-  @param RemainingDevicePath  Given searching device path
-  @param PciAddress           Buffer holding searched result
+  Get HPC PCI address according to its device path.
+  @param RootBridge           Root bridege Io instance.
+  @param RemainingDevicePath  Given searching device path.
+  @param PciAddress           Buffer holding searched result.
   
   @retval EFI_NOT_FOUND Can not find the specific device path.
 **/
