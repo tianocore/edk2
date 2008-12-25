@@ -329,3 +329,12 @@
 
     <Command>
 
+[Unicode-Text-File]
+    <InputFile>
+        *.uni, *.Uni, *.UNI
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)AutoGen.c
+        $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+
+    <Command>
