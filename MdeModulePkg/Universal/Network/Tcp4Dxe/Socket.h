@@ -114,7 +114,7 @@ typedef enum {
 
 #define SOCK_IS_NO_MORE_DATA(Sock)    (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
 
-#define SOCK_SIGNATURE                EFI_SIGNATURE_32 ('S', 'O', 'C', 'K')
+#define SOCK_SIGNATURE                SIGNATURE_32 ('S', 'O', 'C', 'K')
 
 #define SOCK_FROM_THIS(a)             CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
 
