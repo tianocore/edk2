@@ -54,7 +54,6 @@
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiPlatformDriverOverrideProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
   gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
   gEfiDriverBindingProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED

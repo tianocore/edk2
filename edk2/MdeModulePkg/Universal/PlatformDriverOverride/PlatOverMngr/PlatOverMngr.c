@@ -15,32 +15,80 @@ Module Name:
 
 Abstract:
 
-  A UI driver to offer a UI interface in device manager to let user configue
+  A UI application to offer a UI interface in device manager to let user configue
   platform override protocol to override the default algorithm for matching
   drivers to controllers.
 
   The main flow:
-  1. The UI driver dynamicly locate all controller device path.
-  2. The UI driver dynamicly locate all drivers which support binding protocol.
-  3. The UI driver export and dynamicly update two  menu to let user select the
+  1. The UI application dynamicly locate all controller device path.
+  2. The UI application dynamicly locate all drivers which support binding protocol.
+  3. The UI application export and dynamicly update two menu to let user select the
      mapping between drivers to controllers.
-  4. The UI driver save all the mapping info in NV variables which will be consumed
+  4. The UI application save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
 **/
 
+#include <PiDxe.h>
+
+#include <Protocol/HiiConfigAccess.h>
+#include <Protocol/HiiConfigRouting.h>
+#include <Protocol/HiiDatabase.h>
+#include <Protocol/FormBrowser2.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/FirmwareVolume2.h>
+#include <Protocol/PciIo.h>
+#include <Protocol/BusSpecificDriverOverride.h>
+#include <Protocol/ComponentName2.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/DriverBinding.h>
+
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiApplicationEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/PlatDriOverLib.h>
+#include <Library/HiiLib.h>
+#include <Library/IfrSupportLib.h>
+#include <Library/ExtendedHiiLib.h>
+#include <Library/ExtendedIfrSupportLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/GenericBdsLib.h>
 #include "PlatOverMngr.h"
 
-EFI_GUID      mPlatformOverridesManagerGuid = PLAT_OVER_MNGR_GUID;
+#define EFI_CALLBACK_INFO_SIGNATURE SIGNATURE_32 ('C', 'l', 'b', 'k')
+#define EFI_CALLBACK_INFO_FROM_THIS(a)  CR (a, EFI_CALLBACK_INFO, ConfigAccess, EFI_CALLBACK_INFO_SIGNATURE)
 
-LIST_ENTRY    mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
+typedef struct {
+  UINTN                           Signature;
+  EFI_HANDLE                      DriverHandle;
+  EFI_HII_HANDLE                  RegisteredHandle;
+  PLAT_OVER_MNGR_DATA             FakeNvData;
+  EFI_HII_CONFIG_ROUTING_PROTOCOL *HiiConfigRouting;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
+} EFI_CALLBACK_INFO;
 
-EFI_HANDLE    *mDevicePathHandleBuffer;
-EFI_HANDLE    *mDriverImageHandleBuffer;
+//
+// uni string and Vfr Binary data.
+//
+extern UINT8  VfrBin[];
+extern UINT8  PlatOverMngrStrings[];
 
-UINTN         mSelectedCtrIndex;
-EFI_STRING_ID mControllerToken[MAX_CHOICE_NUM];
+//
+// module global data
+//
+EFI_GUID                     mPlatformOverridesManagerGuid = PLAT_OVER_MNGR_GUID;
+LIST_ENTRY                   mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
 
+EFI_HANDLE                   *mDevicePathHandleBuffer;
+EFI_HANDLE                   *mDriverImageHandleBuffer;
+
+UINTN                        mSelectedCtrIndex;
+EFI_STRING_ID                mControllerToken[MAX_CHOICE_NUM];
 UINTN                        mDriverImageHandleCount;
 EFI_STRING_ID                mDriverImageToken[MAX_CHOICE_NUM];
 EFI_STRING_ID                mDriverImageFilePathToken[MAX_CHOICE_NUM];
@@ -52,212 +100,55 @@ CHAR8                        mLanguage[RFC_3066_ENTRY_SIZE];
 UINT16                       mCurrentPage;
 
 /**
-  The driver Entry Point. The funciton will export a disk device class formset and
-  its callback function to hii database.
+  Do string convertion for the ComponentName supported language. It do
+  the convertion just for english language code from RFC 3066 to ISO 639-2.
+  Then it will check whether the converted language is in the supported language list.
+  If not supported, NULL is returned.
+  If Language is not english, NULL is returned.
 
-  @param  ImageHandle    The firmware allocated handle for the EFI image.
-  @param  SystemTable    A pointer to the EFI System Table.
+  @param SupportedLanguages        Pointer to ComponentName supported language string list. ISO 639-2 language
+  @param Language                  The language string. RFC 3066 language
 
-  @retval EFI_SUCCESS    The entry point is executed successfully.
-  @retval other          Some error occurs when executing this entry point.
-
-**/
-EFI_STATUS
-EFIAPI
-PlatOverMngrInit (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
-  )
-{
-  EFI_STATUS                  Status;
-  EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-  EFI_CALLBACK_INFO           *CallbackInfo;
-  EFI_HANDLE                  DriverHandle;
-  EFI_FORM_BROWSER2_PROTOCOL       *FormBrowser2;
-
-  //
-  // There should only be one HII protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiHiiDatabaseProtocolGuid,
-                  NULL,
-                  (VOID **) &HiiDatabase
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status ;
-  }
-
-
-  //
-  // There should only be one Form Configuration protocol
-  //
-  Status = gBS->LocateProtocol (
-                 &gEfiFormBrowser2ProtocolGuid,
-                 NULL,
-                 (VOID **) &FormBrowser2
-                 );
-  if (EFI_ERROR (Status)) {
-    return Status;;
-  }
-
-
-  CallbackInfo = AllocateZeroPool (sizeof (EFI_CALLBACK_INFO));
-  if (CallbackInfo == NULL) {
-    return EFI_BAD_BUFFER_SIZE;
-  }
-
-  CallbackInfo->Signature = EFI_CALLBACK_INFO_SIGNATURE;
-  CallbackInfo->ConfigAccess.ExtractConfig = PlatOverMngrExtractConfig;
-  CallbackInfo->ConfigAccess.RouteConfig   = PlatOverMngrRouteConfig;
-  CallbackInfo->ConfigAccess.Callback      = PlatOverMngrCallback;
-
-  //
-  // Create driver handle used by HII database
-  //
-  Status = HiiLibCreateHiiDriverHandle (&DriverHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  CallbackInfo->DriverHandle = DriverHandle;
-
-  //
-  // Install Config Access protocol to driver handle
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &DriverHandle,
-                  &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &CallbackInfo->ConfigAccess
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Publish our HII data
-  //
-  PackageList = HiiLibPreparePackageList (
-                  2,
-                  &mPlatformOverridesManagerGuid,
-                  VfrBin,
-                  PlatOverMngrStrings
-                  );
-  ASSERT (PackageList != NULL);
-
-  Status = HiiDatabase->NewPackageList (
-                           HiiDatabase,
-                           PackageList,
-                           DriverHandle,
-                           &CallbackInfo->RegisteredHandle
-                           );
-  gBS->FreePool (PackageList);
-
-  //
-  // Locate ConfigRouting protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiHiiConfigRoutingProtocolGuid,
-                  NULL,
-                  (VOID **) &CallbackInfo->HiiConfigRouting
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Clear all the globle variable
-  //
-  mDriverImageHandleCount = 0;
-  mCurrentPage = 0;
-  ZeroMem (mDriverImageToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
-  ZeroMem (mDriverImageFilePathToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
-  ZeroMem (mControllerToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
-  ZeroMem (mDriverImageProtocol, MAX_CHOICE_NUM * sizeof (EFI_LOADED_IMAGE_PROTOCOL *));
-
-  //
-  // Show the page
-  //
-  Status = FormBrowser2->SendForm (
-                           FormBrowser2,
-                           &CallbackInfo->RegisteredHandle,
-                           1,
-                           NULL,
-                           0,
-                           NULL,
-                           NULL
-                           );
-
-  Status = HiiDatabase->RemovePackageList (HiiDatabase, CallbackInfo->RegisteredHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Do some convertion for the ComponentName2 supported language. It do
-  the convertion just for english language code currently.
-
-  @param ComponentName    Pointer to the ComponentName2 protocl pointer.
-  @param Language         The language string.
-
-  @return   Return the duplication of Language if it is not english otherwise return
-            the supported english language code.
+  @return  English language string (ISO 639-2)
+  @return  NULL if the conertion is not successful.
 
 **/
 CHAR8 *
-ConvertComponentName2SupportLanguage (
-  IN EFI_COMPONENT_NAME2_PROTOCOL    *ComponentName,
+ConvertComponentNameSupportLanguage (
+  IN CHAR8                           *SupportedLanguages,
   IN CHAR8                           *Language
   )
 {
-  CHAR8                              *SupportedLanguages;
   CHAR8                              *LangCode;
-  UINTN                              Index;
-
   LangCode           = NULL;
-  SupportedLanguages = NULL;
 
   //
-  // treat all the english language code (en-xx or eng) equally
+  // check the input language is English
   //
-  if ((AsciiStrnCmp (Language, "en-", 3) == 0) || (AsciiStrCmp (Language, "eng") == 0)) {
-    SupportedLanguages = AsciiStrStr (ComponentName->SupportedLanguages, "en");
-    if (SupportedLanguages == NULL) {
-      SupportedLanguages = AsciiStrStr (ComponentName->SupportedLanguages, "eng");
-    }
+  if (AsciiStrnCmp (Language, "en-", 3) != 0) {
+    return NULL;
   }
 
   //
-  // duplicate the Language if it is not english
+  // Convert Language string from RFC 3066 to ISO 639-2
   //
-  if (SupportedLanguages == NULL) {
-    SupportedLanguages = Language;
+  LangCode = AllocateZeroPool(4);
+  AsciiStrCpy (LangCode, "eng");
+  
+  //
+  // Check whether the converted language is supported in the SupportedLanguages list.
+  //
+  if (AsciiStrStr (SupportedLanguages, LangCode) == NULL) {
+    FreePool (LangCode);
+    return NULL;
   }
 
-  //
-  // duplicate the returned language code.
-  //
-  if (AsciiStrStr (SupportedLanguages, "-") != NULL) {
-    LangCode = AllocateZeroPool(32);
-    for(Index = 0; (Index < 31) && (SupportedLanguages[Index] != '\0') && (SupportedLanguages[Index] != ';'); Index++) {
-      LangCode[Index] = SupportedLanguages[Index];
-    }
-    LangCode[Index] = '\0';
-  } else {
-    LangCode = AllocateZeroPool(4);
-    for(Index = 0; (Index < 3) && (SupportedLanguages[Index] != '\0'); Index++) {
-      LangCode[Index] = SupportedLanguages[Index];
-    }
-    LangCode[Index] = '\0';
-  }
   return LangCode;
 }
 
 /**
-  Get the ComponentName or ComponentName2 protocol according to the driver binding handle
+  Get the driver name by ComponentName or ComponentName2 protocol 
+  according to the driver binding handle
 
   @param DriverBindingHandle  The Handle of DriverBinding.
 
@@ -301,23 +192,24 @@ GetComponentName (
   DriverName = NULL;
   if (ComponentName != NULL) {
     if (ComponentName->GetDriverName != NULL) {
+      SupportedLanguage = ConvertComponentNameSupportLanguage (ComponentName->SupportedLanguages, mLanguage);
       Status = ComponentName->GetDriverName (
                                 ComponentName,
-                                mLanguage,
+                                SupportedLanguage,
                                 &DriverName
                                 );
+      FreePool (SupportedLanguage);
     }
   } else if (ComponentName2 != NULL) {
     if (ComponentName2->GetDriverName != NULL) {
-      SupportedLanguage = ConvertComponentName2SupportLanguage (ComponentName2, mLanguage);
       Status = ComponentName2->GetDriverName (
                                  ComponentName2,
-                                 SupportedLanguage,
+                                 mLanguage,
                                  &DriverName
                                  );
-        gBS->FreePool (SupportedLanguage);
     }
   }
+
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -326,12 +218,13 @@ GetComponentName (
 }
 
 /**
-  Get the image name
+  Get the image name from EFI UI section.
+  Get FV protocol by its loaded image protoocl to abastract EFI UI section.
 
-  @param Image            Image to search.
+  @param Image            Pointer to the loaded image protocol
 
-  @retval !NULL           Pointer into the image name if the image name is found,
-  @retval NULL            Pointer to NULL if the image name is not found.
+  @retval !NULL           Pointer to the image name if the image name is found,
+  @retval NULL            NULL if the image name is not found.
 
 **/
 CHAR16 *
@@ -356,12 +249,7 @@ GetImageName (
   if (Image->FilePath == NULL) {
     return NULL;
   }
-
   DevPathNode  = Image->FilePath;
-
-  if (DevPathNode == NULL) {
-    return NULL;
-  }
 
   while (!IsDevicePathEnd (DevPathNode)) {
     //
@@ -380,6 +268,9 @@ GetImageName (
                     &gEfiFirmwareVolume2ProtocolGuid,
                     (VOID **) &Fv2
                     );
+      //
+      // Locate Image EFI UI section to get the image name.
+      //
       if (!EFI_ERROR (Status)) {
         Status = Fv2->ReadSection (
                         Fv2,
@@ -411,7 +302,9 @@ GetImageName (
 
 /**
   Prepare the first page to let user select the device controller which need to
-  add mapping drivers.
+  add mapping drivers if user select 'Refresh' in first page.
+  During first page, user will see all currnet controller device path in system,
+  select any device path will go to second page to select its overrides drivers.
 
   @param  Private        Pointer to EFI_CALLBACK_INFO.
   @param  KeyValue       The callback key value of device controller item in first page.
@@ -439,14 +332,15 @@ UpdateDeviceSelectPage (
   EFI_PCI_IO_PROTOCOL                       *PciIo;
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL *BusSpecificDriverOverride;
   UINTN                                     Len;
-
-  mCurrentPage = FORM_ID_DEVICE;
+  
   //
-  // Following code will be run if user select 'Refresh' in first page
-  // During first page, user will see all currnet controller device path in system,
-  // select any device path will go to second page to select its overrides drivers
+  // set current page form ID.
   //
-
+  mCurrentPage = FORM_ID_DEVICE;  
+  
+  //
+  // Get Platform supported Language (RFC_3066 format)
+  //
   LangSize = RFC_3066_ENTRY_SIZE;
   Status = gRT->GetVariable (
               L"PlatformLang",
@@ -484,21 +378,22 @@ UpdateDeviceSelectPage (
 
   //
   // When user enter the page at first time, the 'first refresh' string is given to notify user to refresh all the drivers,
-  // then the 'first refresh' string will be replaced by the 'refresh' string, and the two strings content are  same after the replacement
+  // then the 'first refresh' string will be replaced by the 'refresh' string, and the two strings content are same after the replacement
   //
   NewStringToken = STRING_TOKEN (STR_FIRST_REFRESH);
   HiiLibGetStringFromHandle (Private->RegisteredHandle, STRING_TOKEN (STR_REFRESH), &NewString);
   ASSERT (NewString != NULL);
   Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, NewString);
   ASSERT_EFI_ERROR (Status);
-  gBS->FreePool (NewString);
+  FreePool (NewString);
 
   NewStringToken = STRING_TOKEN (STR_FIRST_REFRESH_HELP);
   HiiLibGetStringFromHandle (Private->RegisteredHandle, STRING_TOKEN (STR_REFRESH_HELP), &NewString);
   ASSERT (NewString != NULL);
   Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, NewString);
   ASSERT_EFI_ERROR (Status);
-  gBS->FreePool (NewString);
+  FreePool (NewString);
+
   //
   // created needed controller device item in first page
   //
@@ -587,7 +482,7 @@ UpdateDeviceSelectPage (
       Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, NewString);
     }
     ASSERT_EFI_ERROR (Status);
-    gBS->FreePool (NewString);
+    FreePool (NewString);
     //
     // Save the device path string toke for next access use
     //
@@ -615,8 +510,76 @@ UpdateDeviceSelectPage (
     &UpdateData
     );
 
-  gBS->FreePool (UpdateData.Data);
+  FreePool (UpdateData.Data);
   return EFI_SUCCESS;
+}
+
+/**
+  Get the first Driver Binding handle which has the specific image handle.
+
+  @param  ImageHandle          The Image handle
+
+  @return                      Handle to Driver binding
+  @retval NULL                 The paramter is not valid or the driver binding handle is not found.
+
+**/
+EFI_HANDLE
+GetDriverBindingHandleFromImageHandle (
+  IN  EFI_HANDLE   ImageHandle
+  )
+{
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  UINTN                             DriverBindingHandleCount;
+  EFI_HANDLE                        *DriverBindingHandleBuffer;
+  EFI_DRIVER_BINDING_PROTOCOL       *DriverBindingInterface;
+  EFI_HANDLE                        DriverBindingHandle;
+
+  DriverBindingHandle = NULL;
+
+  if (ImageHandle == NULL) {
+    return NULL;
+  }
+  //
+  // Get all drivers which support driver binding protocol
+  //
+  DriverBindingHandleCount  = 0;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiDriverBindingProtocolGuid,
+                  NULL,
+                  &DriverBindingHandleCount,
+                  &DriverBindingHandleBuffer
+                  );
+  if (EFI_ERROR (Status) || (DriverBindingHandleCount == 0)) {
+    return NULL;
+  }
+
+  for (Index = 0; Index < DriverBindingHandleCount; Index++) {
+    DriverBindingInterface = NULL;
+    Status = gBS->OpenProtocol (
+                    DriverBindingHandleBuffer[Index],
+                    &gEfiDriverBindingProtocolGuid,
+                    (VOID **) &DriverBindingInterface,
+                    NULL,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if (DriverBindingInterface->ImageHandle == ImageHandle) {
+      DriverBindingHandle = DriverBindingHandleBuffer[Index];
+      break;
+    }
+  }
+
+  //
+  // If no Driver Binding Protocol instance is found
+  //
+  FreePool (DriverBindingHandleBuffer);
+  return DriverBindingHandle;
 }
 
 /**
@@ -640,20 +603,17 @@ UpdateBindingDriverSelectPage (
   EFI_HII_UPDATE_DATA                       UpdateData;
   EFI_STATUS                                Status;
   UINTN                                     Index;
-
   CHAR16                                    *NewString;
   EFI_STRING_ID                             NewStringToken;
   EFI_STRING_ID                             NewStringHelpToken;
   UINTN                                     DriverImageHandleCount;
-
-  EFI_DRIVER_BINDING_PROTOCOL               *DriverBindingInterface;
   EFI_LOADED_IMAGE_PROTOCOL                 *LoadedImage;
   CHAR16                                    *DriverName;
   BOOLEAN                                   FreeDriverName;
-
   EFI_DEVICE_PATH_PROTOCOL                  *LoadedImageDevicePath;
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL *BusSpecificDriverOverride;
   EFI_HANDLE                                DriverBindingHandle;
+
   //
   // If user select a controller item in the first page  the following code will be run.
   // During second page, user will see all currnet driver bind protocol driver, the driver name and its device path will be shown
@@ -667,7 +627,7 @@ UpdateBindingDriverSelectPage (
   //
   // Switch the item callback key value to its NO. in mDevicePathHandleBuffer
   //
-  mSelectedCtrIndex = KeyValue - 0x100;
+  mSelectedCtrIndex = KeyValue - KEY_VALUE_DEVICE_OFFSET;
   ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
   mLastSavedDriverImageNum = 0;
   //
@@ -731,13 +691,8 @@ UpdateBindingDriverSelectPage (
     //
     // Find its related driver binding protocol
     //
-    DriverBindingInterface = NULL;
-    DriverBindingHandle = NULL;
-    DriverBindingInterface = GetBindingProtocolFromImageHandle (
-                                mDriverImageHandleBuffer[Index],
-                                &DriverBindingHandle
-                                );
-    if (DriverBindingInterface == NULL) {
+    DriverBindingHandle = GetDriverBindingHandleFromImageHandle (mDriverImageHandleBuffer[Index]);
+    if (DriverBindingHandle == NULL) {
       FakeNvData->DriSelection[Index] = 0x00;
       continue;
     }
@@ -822,9 +777,9 @@ UpdateBindingDriverSelectPage (
     }
     mDriverImageToken[Index] = NewStringToken;
     ASSERT_EFI_ERROR (Status);
-    gBS->FreePool (NewString);
+    FreePool (NewString);
     if (FreeDriverName) {
-      gBS->FreePool (DriverName);
+      FreePool (DriverName);
     }
 
     //
@@ -842,8 +797,8 @@ UpdateBindingDriverSelectPage (
     }
     mDriverImageFilePathToken[Index] = NewStringHelpToken;
     ASSERT_EFI_ERROR (Status);
-    gBS->FreePool (NewString);
-    gBS->FreePool (DriverName);
+    FreePool (NewString);
+    FreePool (DriverName);
 
     CreateCheckBoxOpCode (
       (UINT16) (DRIVER_SELECTION_QUESTION_ID + Index),
@@ -869,7 +824,7 @@ UpdateBindingDriverSelectPage (
     &UpdateData
     );
 
-  gBS->FreePool (UpdateData.Data);
+  FreePool (UpdateData.Data);
   return EFI_SUCCESS;
 }
 
@@ -893,9 +848,7 @@ UpdatePrioritySelectPage (
 {
   EFI_HII_UPDATE_DATA                       UpdateData;
   UINTN                                     Index;
-
   EFI_DEVICE_PATH_PROTOCOL                  *LoadedImageDevicePath;
-
   IFR_OPTION                                *IfrOptionList;
   UINTN                                     SelectedDriverImageNum;
   UINT32                                    DriverImageNO;
@@ -939,8 +892,8 @@ UpdatePrioritySelectPage (
   if (SelectedDriverImageNum == 0) {
     return EFI_SUCCESS;
   }
-
-  IfrOptionList = AllocateZeroPool (0x200);
+  
+  IfrOptionList = AllocateZeroPool (sizeof (IFR_OPTION) * mSelectedDriverImageNum);
   ASSERT_EFI_ERROR (IfrOptionList != NULL);
   //
   // Create order list for those selected drivers
@@ -990,7 +943,7 @@ UpdatePrioritySelectPage (
   //
   // NvRamMap Must be clear firstly
   //
-  ZeroMem (FakeNvData->DriOrder, 100);
+  ZeroMem (FakeNvData->DriOrder, sizeof (FakeNvData->DriOrder));
 
   //
   // Order the selected drivers according to the info already in mapping database
@@ -1010,7 +963,7 @@ UpdatePrioritySelectPage (
     // the IfrOptionList[MinNO].Value = the driver NO. in driver binding buffer
     //
     FakeNvData->DriOrder[Index] =IfrOptionList[MinNO].Value.u8;
-    TempNO[MinNO] = 101;
+    TempNO[MinNO] = MAX_CHOICE_NUM + 1;
   }
 
   CreateOrderedListOpCode (
@@ -1022,7 +975,7 @@ UpdatePrioritySelectPage (
     EFI_IFR_FLAG_RESET_REQUIRED,
     0,
     EFI_IFR_NUMERIC_SIZE_1,
-    100,
+    MAX_CHOICE_NUM,
     IfrOptionList,
     SelectedDriverImageNum,
     &UpdateData
@@ -1040,8 +993,8 @@ UpdatePrioritySelectPage (
     &UpdateData
     );
 
-  gBS->FreePool (IfrOptionList);
-  gBS->FreePool (UpdateData.Data);
+  FreePool (IfrOptionList);
+  FreePool (UpdateData.Data);
   return EFI_SUCCESS;
 }
 
@@ -1124,7 +1077,7 @@ CommintChanges (
 EFI_STATUS
 EFIAPI
 PlatOverMngrExtractConfig (
- IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
   IN  CONST EFI_STRING                       Request,
   OUT EFI_STRING                             *Progress,
   OUT EFI_STRING                             *Results
@@ -1275,7 +1228,7 @@ PlatOverMngrCallback (
 
   if (((KEY_VALUE_DEVICE_OFFSET <= KeyValue) && (KeyValue < KEY_VALUE_DEVICE_MAX)) || (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS)) {
     if (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS) {
-      KeyValue = (EFI_QUESTION_ID) (mSelectedCtrIndex + 0x100);
+      KeyValue = (EFI_QUESTION_ID) (mSelectedCtrIndex + KEY_VALUE_DEVICE_OFFSET);
     }
     UpdateBindingDriverSelectPage (Private, KeyValue, FakeNvData);
     //
@@ -1323,41 +1276,144 @@ PlatOverMngrCallback (
 }
 
 /**
-  Get the description string by device path.
+  The driver Entry Point. The funciton will export a disk device class formset and
+  its callback function to hii database.
 
-  @param  DevPath     The input device path.
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
+  @param  SystemTable    A pointer to the EFI System Table.
 
-  @retval !NULL       The description string retured.
-  @retval  NULL       The description string cannot be found.
+  @retval EFI_SUCCESS    The entry point is executed successfully.
+  @retval other          Some error occurs when executing this entry point.
 
 **/
-CHAR16 *
-DevicePathToStr (
-  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
+EFI_STATUS
+EFIAPI
+PlatOverMngrInit (
+  IN EFI_HANDLE                   ImageHandle,
+  IN EFI_SYSTEM_TABLE             *SystemTable
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           *ToText;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
+  EFI_STATUS                  Status;
+  EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
+  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
+  EFI_CALLBACK_INFO           *CallbackInfo;
+  EFI_HANDLE                  DriverHandle;
+  EFI_FORM_BROWSER2_PROTOCOL       *FormBrowser2;
 
-  if (DevPath == NULL) {
-    return NULL;
-  }
-
+  //
+  // There should only be one HII protocol
+  //
   Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
+                  &gEfiHiiDatabaseProtocolGuid,
                   NULL,
-                  (VOID **) &DevPathToText
+                  (VOID **) &HiiDatabase
                   );
-  if (!EFI_ERROR (Status)) {
-    ToText = DevPathToText->ConvertDevicePathToText (
-                              DevPath,
-                              FALSE,
-                              TRUE
-                              );
-    ASSERT (ToText != NULL);
-    return ToText;
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-  return NULL;
+  //
+  // There should only be one Form Configuration protocol
+  //
+  Status = gBS->LocateProtocol (
+                 &gEfiFormBrowser2ProtocolGuid,
+                 NULL,
+                 (VOID **) &FormBrowser2
+                 );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  CallbackInfo = AllocateZeroPool (sizeof (EFI_CALLBACK_INFO));
+  if (CallbackInfo == NULL) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  CallbackInfo->Signature = EFI_CALLBACK_INFO_SIGNATURE;
+  CallbackInfo->ConfigAccess.ExtractConfig = PlatOverMngrExtractConfig;
+  CallbackInfo->ConfigAccess.RouteConfig   = PlatOverMngrRouteConfig;
+  CallbackInfo->ConfigAccess.Callback      = PlatOverMngrCallback;
+
+  //
+  // Create driver handle used by HII database
+  //
+  Status = HiiLibCreateHiiDriverHandle (&DriverHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  CallbackInfo->DriverHandle = DriverHandle;
+
+  //
+  // Install Config Access protocol to driver handle
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &DriverHandle,
+                  &gEfiHiiConfigAccessProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &CallbackInfo->ConfigAccess
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Publish our HII data
+  //
+  PackageList = HiiLibPreparePackageList (
+                  2,
+                  &mPlatformOverridesManagerGuid,
+                  VfrBin,
+                  PlatOverMngrStrings
+                  );
+  ASSERT (PackageList != NULL);
+
+  Status = HiiDatabase->NewPackageList (
+                           HiiDatabase,
+                           PackageList,
+                           DriverHandle,
+                           &CallbackInfo->RegisteredHandle
+                           );
+  FreePool (PackageList);
+
+  //
+  // Locate ConfigRouting protocol
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiConfigRoutingProtocolGuid,
+                  NULL,
+                  (VOID **) &CallbackInfo->HiiConfigRouting
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Clear all the globle variable
+  //
+  mDriverImageHandleCount = 0;
+  mCurrentPage = 0;
+  ZeroMem (mDriverImageToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
+  ZeroMem (mDriverImageFilePathToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
+  ZeroMem (mControllerToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
+  ZeroMem (mDriverImageProtocol, MAX_CHOICE_NUM * sizeof (EFI_LOADED_IMAGE_PROTOCOL *));
+
+  //
+  // Show the page
+  //
+  Status = FormBrowser2->SendForm (
+                           FormBrowser2,
+                           &CallbackInfo->RegisteredHandle,
+                           1,
+                           NULL,
+                           0,
+                           NULL,
+                           NULL
+                           );
+
+  Status = HiiDatabase->RemovePackageList (HiiDatabase, CallbackInfo->RegisteredHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return EFI_SUCCESS;
 }

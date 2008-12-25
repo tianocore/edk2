@@ -16,69 +16,6 @@
 
 LIST_ENTRY   mDevicePathStack = INITIALIZE_LIST_HEAD_VARIABLE (mDevicePathStack);
 
-
-/**
-  Installs the Platform Driver Override Protocol.
-
-  This function installs the Platform Driver Override Protocol, and ensure there is only one
-  Platform Driver Override Protocol in the system.
-
-  @param  gPlatformDriverOverride  PlatformDriverOverride protocol interface which
-                                   needs to be installed
-
-  @retval EFI_SUCCESS              The protocol is installed successfully.
-  @retval EFI_ALREADY_STARTED      There has been a Platform Driver Override
-                                   Protocol in the system, cannot install it again.
-
-**/
-EFI_STATUS
-EFIAPI
-InstallPlatformDriverOverrideProtocol (
-  EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL *gPlatformDriverOverride
-  )
-{
-  EFI_HANDLE          Handle;
-  EFI_STATUS          Status;
-  UINTN               HandleCount;
-  EFI_HANDLE          *HandleBuffer;
-
-  //
-  // According to UEFI spec, there can be at most a single instance
-  // in the system of the EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL.
-  // So here we check the existence.
-  //
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiPlatformDriverOverrideProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
-  //
-  // If there was no error, assume there is an installation and return error
-  //
-  if (!EFI_ERROR (Status)) {
-    if (HandleBuffer != NULL) {
-      FreePool (HandleBuffer);
-    }
-    return EFI_ALREADY_STARTED;
-  }
-
-  //
-  // Install platform driver override protocol
-  //
-  Handle = NULL;
-  Status = gBS->InstallProtocolInterface (
-                  &Handle,
-                  &gEfiPlatformDriverOverrideProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  gPlatformDriverOverride
-                  );
-  ASSERT_EFI_ERROR (Status);
-  return EFI_SUCCESS;
-}
-
-
 /**
   Free all the mapping database memory resource and initialize the mapping list entry.
 
@@ -154,7 +91,7 @@ FreeMappingDatabase (
   // large mapping infos.
   // The variable(s) name rule is PlatDriOver, PlatDriOver1, PlatDriOver2, ....
   //
-  UINT32                         NotEnd;
+  UINT32                         NotEnd;               //Zero is the last one.
   //
   // The entry which contains the mapping that Controller Device Path to a set of Driver Device Paths
   // There are often multi mapping entries in a variable.
@@ -166,6 +103,7 @@ FreeMappingDatabase (
   EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
   EFI_DEVICE_PATH_PROTOCOL       DriverDevicePath[];
   ......
+  UINT32                         NotEnd;                //Zero is the last one.
   UINT32                         SIGNATURE;
   UINT32                         DriverNum;
   EFI_DEVICE_PATH_PROTOCOL       ControllerDevicePath[];
@@ -224,6 +162,9 @@ InitOverridesMapping (
   Corrupted = FALSE;
   do {
     VariableIndex = VariableBuffer;
+    //
+    // End flag
+    //
     NotEnd = *(UINT32*) VariableIndex;
     //
     // Traverse the entries containing the mapping that Controller Device Path
@@ -363,6 +304,69 @@ GetOneItemNeededSize (
   return NeededSize;
 }
 
+/**
+  Deletes all environment variable(s) that contain the override mappings from Controller Device Path to
+  a set of Driver Device Paths.
+
+  @retval EFI_SUCCESS  Delete all variable(s) successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+DeleteOverridesVariables (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  VOID                        *VariableBuffer;
+  UINTN                       VariableNum;
+  UINTN                       BufferSize;
+  UINTN                       Index;
+  CHAR16                      OverrideVariableName[40];
+
+  //
+  // Get environment variable(s) number
+  //
+  VariableNum = 0;
+  VariableBuffer = GetVariableAndSize (L"PlatDriOver", &gEfiOverrideVariableGuid, &BufferSize);
+  VariableNum++;
+  if (VariableBuffer == NULL) {
+    return EFI_NOT_FOUND;
+  }
+  //
+  // Check NotEnd to get all PlatDriOverX variable(s)
+  //
+  while ((*(UINT32*)VariableBuffer) != 0) {
+    UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", VariableNum);
+    VariableBuffer = GetVariableAndSize (OverrideVariableName, &gEfiOverrideVariableGuid, &BufferSize);
+    VariableNum++;
+    ASSERT (VariableBuffer != NULL);
+  }
+
+  //
+  // Delete PlatDriOver and all additional variables, if exist.
+  //
+  Status = gRT->SetVariable (
+                  L"PlatDriOver",
+                  &gEfiOverrideVariableGuid,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                  0,
+                  NULL
+                  );
+  ASSERT (!EFI_ERROR (Status));
+  for (Index = 1; Index < VariableNum; Index++) {
+    UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", Index);
+    Status = gRT->SetVariable (
+                    OverrideVariableName,
+                    &gEfiOverrideVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    0,
+                    NULL
+                    );
+    ASSERT (!EFI_ERROR (Status));
+  }
+  return EFI_SUCCESS;
+}
 
 
 /**
@@ -627,8 +631,6 @@ GetCurrentTpl (
   Retrieves the image handle of the platform override driver for a controller in
   the system from the memory mapping database.
 
-  @param  This                     A pointer to the
-                                   EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
   @param  ControllerHandle         The device handle of the controller to check if
                                    a driver override exists.
   @param  DriverImageHandle        On input, the previously returnd driver image handle.
@@ -653,7 +655,6 @@ GetCurrentTpl (
 EFI_STATUS
 EFIAPI
 GetDriverFromMapping (
-  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN     EFI_HANDLE                                     ControllerHandle,
   IN OUT EFI_HANDLE                                     *DriverImageHandle,
   IN     LIST_ENTRY                                     *MappingDataBase,
@@ -1364,72 +1365,6 @@ DeleteDriverImage (
 
   return EFI_SUCCESS;
 }
-
-
-/**
-  Deletes all environment variable(s) that contain the override mappings from Controller Device Path to
-  a set of Driver Device Paths.
-
-  @retval EFI_SUCCESS  Delete all variable(s) successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-DeleteOverridesVariables (
-  VOID
-  )
-{
-  EFI_STATUS                  Status;
-  VOID                        *VariableBuffer;
-  UINTN                       VariableNum;
-  UINTN                       BufferSize;
-  UINTN                       Index;
-  CHAR16                      OverrideVariableName[40];
-
-  //
-  // Get environment variable(s) number
-  //
-  VariableNum = 0;
-  VariableBuffer = GetVariableAndSize (L"PlatDriOver", &gEfiOverrideVariableGuid, &BufferSize);
-  VariableNum++;
-  if (VariableBuffer == NULL) {
-    return EFI_NOT_FOUND;
-  }
-  //
-  // Check NotEnd to get all PlatDriOverX variable(s)
-  //
-  while ((*(UINT32*)VariableBuffer) != 0) {
-    UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", VariableNum);
-    VariableBuffer = GetVariableAndSize (OverrideVariableName, &gEfiOverrideVariableGuid, &BufferSize);
-    VariableNum++;
-    ASSERT (VariableBuffer != NULL);
-  }
-
-  //
-  // Delete PlatDriOver and all additional variables, if exist.
-  //
-  Status = gRT->SetVariable (
-                  L"PlatDriOver",
-                  &gEfiOverrideVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                  0,
-                  NULL
-                  );
-  ASSERT (!EFI_ERROR (Status));
-  for (Index = 1; Index < VariableNum; Index++) {
-    UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", Index);
-    Status = gRT->SetVariable (
-                    OverrideVariableName,
-                    &gEfiOverrideVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                    0,
-                    NULL
-                    );
-    ASSERT (!EFI_ERROR (Status));
-  }
-  return EFI_SUCCESS;
-}
-
 
 /**
   Push a controller device path into a globle device path list.

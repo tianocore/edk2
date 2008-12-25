@@ -94,10 +94,10 @@ typedef struct {
 ///
 /// Variable State flags
 ///
-#define VAR_IN_DELETED_TRANSITION     0xfe  /// Variable is in obsolete transistion
-#define VAR_DELETED                   0xfd  /// Variable is obsolete
-#define VAR_HEADER_VALID_ONLY         0x7f  /// Variable header has been valid
-#define VAR_ADDED                     0x3f  /// Variable has been completely added
+#define VAR_IN_DELETED_TRANSITION     0xfe  ///< Variable is in obsolete transistion
+#define VAR_DELETED                   0xfd  ///< Variable is obsolete
+#define VAR_HEADER_VALID_ONLY         0x7f  ///< Variable header has been valid
+#define VAR_ADDED                     0x3f  ///< Variable has been completely added
 
 ///
 /// Removed

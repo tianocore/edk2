@@ -1,5 +1,5 @@
 #/** @file
-# PCD PEIM produces PCD database to manage all dynamic PCD in PEI phase and install Pcd Ppi.
+# PCD PEIM produces PCD database to manage all dynamic PCD in PEI phase and install Pcd Ppi service.
 #
 # Copyright (c) 2006 - 2008, Intel Corporation
 #

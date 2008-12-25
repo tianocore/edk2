@@ -1,5 +1,5 @@
 /** @file
-  This file defines the platform override variable name and variable guid.
+  This file defines the platform driver override variable name and variable guid.
 
 Copyright (c) 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -24,6 +24,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_PLATFORM_OVERRIDE_VARIABLE_NAME L"PlatDriOver"
 
 extern EFI_GUID gEfiOverrideVariableGuid;
-
 
 #endif // #ifndef __EFI_OVERRIDE_VARIABLE_GUID_H__

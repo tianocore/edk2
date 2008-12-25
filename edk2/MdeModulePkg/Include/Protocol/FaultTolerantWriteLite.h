@@ -43,7 +43,8 @@ typedef struct _EFI_FTW_LITE_PROTOCOL EFI_FTW_LITE_PROTOCOL;
 
   @retval EFI_SUCCESS          The function completed successfully 
   @retval EFI_ABORTED          The function could not complete successfully. 
-  @retval EFI_BAD_BUFFER_SIZE  The input data can't fit within the target block. 
+  @retval EFI_BAD_BUFFER_SIZE  The input data can't fit within the FTW range. 
+                               The write buffer is too large to be supported.
   @retval EFI_ACCESS_DENIED    No writes have been allocated. 
   @retval EFI_OUT_OF_RESOURCES Cannot allocate enough memory resource.
   @retval EFI_NOT_FOUND        Cannot find FVB protocol by handle.
