@@ -24,6 +24,7 @@ Abstract:
 
 #pragma pack(1)
 
+#if (EFI_SPECIFICATION_VERSION <= 0x00020000)
 //
 // EFI Specification extension on Media Device Path. MEDIA_FW_VOL_FILEPATH_DEVICE_PATH is adopted by UEFI later and added in UEFI2.10. 
 // In EdkCompatibility Package, we only support MEDIA_FW_VOL_FILEPATH_DEVICE_PATH that complies with
@@ -34,6 +35,7 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
   EFI_GUID                  NameGuid;
 } MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
+#endif
 
 
 #if (EFI_SPECIFICATION_VERSION > 0x00020000)
