@@ -437,7 +437,7 @@ IDEBusDriverBindingStart (
       //
       // Check whether the configuration options allow this device
       //
-      if (!(ConfigurationOptions & (1 << (IdeChannel * 2 + IdeDevice)))) {
+      if ((ConfigurationOptions & (1 << (IdeChannel * 2 + IdeDevice))) == 0) {
         continue;
       }
 
@@ -822,7 +822,7 @@ ErrorExit:
   Stop this driver on Controller Handle.
 
   @param  This Protocol instance pointer.
-  @param  DeviceHandle Handle of device to stop driver on
+  @param  Controller Handle of device to stop driver on
   @param  NumberOfChildren Not used
   @param  ChildHandleBuffer Not used
 

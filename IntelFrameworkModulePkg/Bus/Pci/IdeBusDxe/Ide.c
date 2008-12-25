@@ -24,7 +24,7 @@ UINT8   MasterDeviceType      = INVALID_DEVICE_TYPE;
   @param  PciIo TODO: add argument description
   @param  Port TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 UINT8
@@ -66,7 +66,7 @@ IDEReadPortWMultiple (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port,
   IN  UINTN                 Count,
-  IN  VOID                  *Buffer
+  OUT VOID                  *Buffer
   )
 {
   UINT16  *AlignedBuffer;
@@ -115,7 +115,7 @@ IDEReadPortWMultiple (
   @param  Port TODO: add argument description
   @param  Data TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -146,7 +146,7 @@ IDEWritePortB (
   @param  Port TODO: add argument description
   @param  Data TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -409,7 +409,7 @@ ReassignIdeResources (
 /**
   Detect if there is disk connected to this port
 
-  @param  IdeDev The BLK_IO private data which specifies the IDE device
+  @param  IdeDev The BLK_IO private data which specifies the IDE device.
 
 **/
 EFI_STATUS
@@ -426,7 +426,7 @@ DiscoverIdeDevice (
   // If a channel has not been checked, check it now. Then set it to "checked" state
   // After this step, all devices in this channel have been checked.
   //
-  if (ChannelDeviceDetected == FALSE) {
+  if (!ChannelDeviceDetected) {
     Status = DetectIDEController (IdeDev);
     if (EFI_ERROR (Status)) {
       return EFI_NOT_FOUND;
@@ -787,7 +787,7 @@ DRQClear (
 
     Delay--;
 
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -861,7 +861,7 @@ DRQClear2 (
 
     Delay--;
 
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -939,7 +939,7 @@ DRQReady (
     gBS->Stall (30);
 
     Delay--;
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -1016,7 +1016,7 @@ DRQReady2 (
     gBS->Stall (30);
 
     Delay--;
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -1075,7 +1075,7 @@ WaitForBSYClear (
 
     Delay--;
 
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -1132,7 +1132,7 @@ WaitForBSYClear2 (
 
     Delay--;
 
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -1154,7 +1154,7 @@ WaitForBSYClear2 (
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  @param[in] UINTN     IN    DelayInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
@@ -1203,7 +1203,7 @@ DRDYReady (
     gBS->Stall (30);
 
     Delay--;
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -1225,7 +1225,7 @@ DRDYReady (
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  @param[in] UINTN     IN    DelayInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
@@ -1274,7 +1274,7 @@ DRDYReady2 (
     gBS->Stall (30);
 
     Delay--;
-  } while (Delay);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -1401,7 +1401,7 @@ ReleaseIdeResources (
   @param[in] *IdeDev       Standard IDE device private data structure
   @param[in] *TransferMode The device transfer mode to be set
 
-  @return Set transfer mode Command execute status
+  @return Set transfer mode Command execute status.
 
 **/
 EFI_STATUS
@@ -1450,7 +1450,7 @@ SetDeviceTransferMode (
 
   @retval  EFI_SUCCESS Reading succeed
   @retval  EFI_ABORTED Command failed
-  @retval  EFI_DEVICE_ERROR Device status error
+  @retval  EFI_DEVICE_ERROR Device status error.
 
 **/
 EFI_STATUS
@@ -1542,7 +1542,7 @@ AtaNonDataCommandIn (
 
   @retval  EFI_SUCCESS Reading succeed
   @retval  EFI_ABORTED Command failed
-  @retval  EFI_DEVICE_ERROR Device status error
+  @retval  EFI_DEVICE_ERROR Device status error.
 
 **/
 EFI_STATUS
@@ -1658,7 +1658,7 @@ AtaNonDataCommandInExt (
   @param[in] IdeDev       Standard IDE device private data structure
   @param[in] DriveParameters The device parameters to be set into the disk
 
-  @return SetParameters Command execute status
+  @return SetParameters Command execute status.
 
 **/
 EFI_STATUS
@@ -1708,7 +1708,7 @@ SetDriveParameters (
 
   @param  IdeDev TODO: add argument description
 
-  @retval  EFI_SUCCESS TODO: Add description for return value
+  @retval  EFI_SUCCESS TODO: Add description for return value.
 
 **/
 EFI_STATUS

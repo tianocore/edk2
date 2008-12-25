@@ -1,4 +1,4 @@
-/**@file
+/**@ file
   This module provide support function for hot plug device.
   
 Copyright (c) 2006, Intel Corporation                                                         
@@ -44,11 +44,11 @@ PciHPCInitialized (
 /**
   Compare two device path
   
-  @param DevicePath1    the first device path want to be compared
-  @param DevicePath2    the first device path want to be compared
+  @param DevicePath1    the first device path want to be compared.
+  @param DevicePath2    the first device path want to be compared.
   
-  @retval TRUE    equal
-  @retval FALSE   different
+  @retval TRUE    equal.
+  @retval FALSE   different.
 **/
 BOOLEAN
 EfiCompareDevicePath (
@@ -131,11 +131,11 @@ InitializeHotPlugSupport (
 /**
   Test whether device path is for root pci hot plug bus
   
-  @param HpbdevicePath  tested device path
+  @param HpbdevicePath  tested device path.
   @param HpIndex        Return the index of root hot plug in global array.
   
-  @retval TRUE  device path is for root pci hot plug
-  @retval FALSE device path is not for root pci hot plug
+  @retval TRUE  device path is for root pci hot plug.
+  @retval FALSE device path is not for root pci hot plug.
 **/
 BOOLEAN
 IsRootPciHotPlugBus (
@@ -163,11 +163,11 @@ IsRootPciHotPlugBus (
 /**
   Test whether device path is for root pci hot plug controller
   
-  @param HpbdevicePath  tested device path
+  @param HpbdevicePath  tested device path.
   @param HpIndex        Return the index of root hot plug in global array.
   
-  @retval TRUE  device path is for root pci hot plug controller
-  @retval FALSE device path is not for root pci hot plug controller
+  @retval TRUE  device path is for root pci hot plug controller.
+  @retval FALSE device path is not for root pci hot plug controller.
 **/
 BOOLEAN
 IsRootPciHotPlugController (
@@ -195,10 +195,10 @@ IsRootPciHotPlugController (
 /**
   Wrapper for creating event object for HPC 
   
-  @param  HpIndex   index of hot plug device in global array
-  @param  Event     event object
+  @param  HpIndex   index of hot plug device in global array.
+  @param  Event     event object.
   
-  @return status of create event invoken
+  @return status of create event invoken.
 **/
 EFI_STATUS
 CreateEventForHpc (
@@ -226,7 +226,7 @@ CreateEventForHpc (
 /**
   Wait for all root HPC initialized.
   
-  @param TimeoutInMicroSeconds  microseconds to wait for all root hpc's initialization
+  @param TimeoutInMicroSeconds  microseconds to wait for all root hpc's initialization.
 **/
 EFI_STATUS
 AllRootHPCInitialized (
@@ -257,7 +257,7 @@ AllRootHPCInitialized (
 
     Delay--;
 
-  } while (Delay);
+  } while (Delay > 0);
 
   return EFI_TIMEOUT;
 }
@@ -265,10 +265,10 @@ AllRootHPCInitialized (
 /**
   Check HPC capability register block
   
-  @param PciIoDevice PCI device instance
+  @param PciIoDevice PCI device instance.
   
-  @retval EFI_SUCCESS   PCI device is HPC
-  @retval EFI_NOT_FOUND PCI device is not HPC
+  @retval EFI_SUCCESS   PCI device is HPC.
+  @retval EFI_NOT_FOUND PCI device is not HPC.
 **/
 EFI_STATUS
 IsSHPC (
@@ -279,7 +279,7 @@ IsSHPC (
   EFI_STATUS  Status;
   UINT8       Offset;
 
-  if (!PciIoDevice) {
+  if (PciIoDevice == NULL) {
     return EFI_NOT_FOUND;
   }
 
@@ -352,7 +352,7 @@ Returns:
       return Status;
     }
 
-    if ((State & EFI_HPC_STATE_ENABLED) && (State & EFI_HPC_STATE_INITIALIZED)) {
+    if ((State & EFI_HPC_STATE_ENABLED) != 0 && (State & EFI_HPC_STATE_INITIALIZED) != 0) {
       PciIoDevice->ResourcePaddingDescriptors = Descriptors;
       PciIoDevice->PaddingAttributes          = Attributes;
     }
@@ -366,10 +366,10 @@ Returns:
 /**
   Test whether PCI device is hot plug bus.
   
-  @param PciIoDevice  PCI device instance
+  @param PciIoDevice  PCI device instance.
   
-  @retval EFI_SUCCESS   PCI device is hot plug bus
-  @retval EFI_NOT_FOUND PCI device is not hot plug bus
+  @retval EFI_SUCCESS   PCI device is hot plug bus.
+  @retval EFI_NOT_FOUND PCI device is not hot plug bus.
 **/
 EFI_STATUS
 IsPciHotPlugBus (

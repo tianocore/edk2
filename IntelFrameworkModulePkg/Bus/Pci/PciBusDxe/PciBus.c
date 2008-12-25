@@ -1,4 +1,4 @@
-/**@file
+/** @file
    Driver Binding functions for PCI bus module.
    
 Copyright (c) 2006, Intel Corporation                                                         
@@ -44,8 +44,8 @@ EFI_PCI_PLATFORM_PROTOCOL                     *gPciPlatformProtocol;
   Initialize the global variables
   publish the driver binding protocol
 
-  @param[IN] ImageHandle,
-  @param[IN] *SystemTable
+  @param[in] ImageHandle,
+  @param[in] *SystemTable
 
   @retval status of installing driver binding component name protocol.
 

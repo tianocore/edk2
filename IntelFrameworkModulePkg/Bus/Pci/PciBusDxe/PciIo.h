@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -59,9 +59,9 @@ PciIoVerifyBarAccess (
   @param Count        The number of memory or I/O operations to perform.
   @param Offset       The offset within the PCI configuration space for the PCI controller.
 
-  @retval EFI_INVALID_PARAMETER  Invalid Width
-  @retval EFI_UNSUPPORTED        Offset overflow
-  @retval EFI_SUCCESS            Success operation
+  @retval EFI_INVALID_PARAMETER  Invalid Width.
+  @retval EFI_UNSUPPORTED        Offset overflow.
+  @retval EFI_SUCCESS            Success operation.
 **/
 EFI_STATUS
 PciIoVerifyConfigAccess (

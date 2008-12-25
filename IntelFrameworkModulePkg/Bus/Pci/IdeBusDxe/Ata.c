@@ -630,7 +630,7 @@ CheckErrorStatus (
 
   DEBUG_CODE_BEGIN ();
 
-    if (StatusRegister & ATA_STSREG_DWF) {
+    if ((StatusRegister & ATA_STSREG_DWF) != 0) {
       DEBUG (
         (EFI_D_BLKIO,
         "CheckErrorStatus()-- %02x : Error : Write Fault\n",
@@ -638,7 +638,7 @@ CheckErrorStatus (
         );
     }
 
-    if (StatusRegister & ATA_STSREG_CORR) {
+    if ((StatusRegister & ATA_STSREG_CORR) != 0) {
       DEBUG (
         (EFI_D_BLKIO,
         "CheckErrorStatus()-- %02x : Error : Corrected Data\n",
@@ -646,10 +646,10 @@ CheckErrorStatus (
         );
     }
 
-    if (StatusRegister & ATA_STSREG_ERR) {
+    if ((StatusRegister & ATA_STSREG_ERR) != 0) {
       ErrorRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Error);
 
-      if (ErrorRegister & ATA_ERRREG_BBK) {
+      if ((ErrorRegister & ATA_ERRREG_BBK) != 0) {
       DEBUG (
         (EFI_D_BLKIO,
         "CheckErrorStatus()-- %02x : Error : Bad Block Detected\n",
@@ -657,7 +657,7 @@ CheckErrorStatus (
         );
       }
 
-      if (ErrorRegister & ATA_ERRREG_UNC) {
+      if ((ErrorRegister & ATA_ERRREG_UNC) != 0) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Uncorrectable Data\n",
@@ -665,7 +665,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & ATA_ERRREG_MC) {
+      if ((ErrorRegister & ATA_ERRREG_MC) != 0) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Media Change\n",
@@ -673,7 +673,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & ATA_ERRREG_ABRT) {
+      if ((ErrorRegister & ATA_ERRREG_ABRT) != 0) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Abort\n",
@@ -681,7 +681,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & ATA_ERRREG_TK0NF) {
+      if ((ErrorRegister & ATA_ERRREG_TK0NF) != 0) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Track 0 Not Found\n",
@@ -689,7 +689,7 @@ CheckErrorStatus (
           );
       }
 
-      if (ErrorRegister & ATA_ERRREG_AMNF) {
+      if ((ErrorRegister & ATA_ERRREG_AMNF) != 0) {
         DEBUG (
           (EFI_D_BLKIO,
           "CheckErrorStatus()-- %02x : Error : Address Mark Not Found\n",
@@ -1348,7 +1348,7 @@ AtaReadSectorsExt (
   @param[in] *DataBuffer
   A pointer to the source buffer for the data.
 
-  @param[in] Lba
+  @param[in] StartLba
   The starting logical block address to write onto
   the device media.
 
@@ -1439,7 +1439,7 @@ AtaWriteSectorsExt (
   @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
 
-  @param[in,out] *Buffer  buffer contained data transferred from device to host.
+  @param[in, out] *Buffer  buffer contained data transferred from device to host.
   @param[in] ByteCount    data size in byte unit of the buffer.
   @param[in] AtaCommand   value of the Command Register
   @param[in] StartLba     the start LBA of this transaction
@@ -1908,7 +1908,7 @@ AtaSMARTSupport (
   @param  LbaAddress The LBA address in 48-bit mode
 
   @retval  EFI_SUCCESS Reading succeed
-  @retval  EFI_DEVICE_ERROR Error executing commands on this device
+  @retval  EFI_DEVICE_ERROR Error executing commands on this device.
 
 **/
 EFI_STATUS
@@ -2020,7 +2020,7 @@ AtaCommandIssueExt (
   @param  LbaAddress The LBA address in 48-bit mode
 
   @retval  EFI_SUCCESS Reading succeed
-  @retval  EFI_DEVICE_ERROR Error executing commands on this device
+  @retval  EFI_DEVICE_ERROR Error executing commands on this device.
 
 **/
 EFI_STATUS
@@ -2574,8 +2574,8 @@ DoAtaUdma (
                           1,
                           &RegisterValue
                           );
-      if ((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) || (Count == 0)) {
-        if ((RegisterValue & BMIS_ERROR) || (Count == 0)) {
+      if (((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) != 0) || (Count == 0)) {
+        if (((RegisterValue & BMIS_ERROR) != 0) || (Count == 0)) {
 		  Status = EFI_DEVICE_ERROR;
 		  break;
         }
@@ -2637,7 +2637,7 @@ DoAtaUdma (
                         &RegisterValue
                         );
 
-    if (RegisterValue & BMIS_ERROR) {
+    if ((RegisterValue & BMIS_ERROR) != 0) {
       return EFI_DEVICE_ERROR;
     }
 

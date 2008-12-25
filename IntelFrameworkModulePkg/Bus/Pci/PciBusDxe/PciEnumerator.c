@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -19,11 +19,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   This routine is used to enumerate entire pci bus system
-  in a given platform
+  in a given platform.
 
-  @param Controller  Parent controller handle
+  @param Controller  Parent controller handle.
   
-  @return Status of enumerating
+  @return Status of enumerating.
 **/
 EFI_STATUS
 PciEnumerator (
@@ -128,11 +128,11 @@ PciEnumerator (
 /**
   Enumerate PCI root bridge
   
-  @param PciResAlloc   Pointer to protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
-  @param RootBridgeDev Instance of root bridge device
+  @param PciResAlloc   Pointer to protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
+  @param RootBridgeDev Instance of root bridge device.
   
-  @retval EFI_SUCCESS  Success to enumerate root bridge
-  @retval Others       Fail to enumerate root bridge
+  @retval EFI_SUCCESS  Success to enumerate root bridge.
+  @retval Others       Fail to enumerate root bridge.
   
 **/
 EFI_STATUS
@@ -256,7 +256,7 @@ ProcessOptionRom (
   // Go through bridges to reach all devices
   //
   CurrentLink = Bridge->ChildList.ForwardLink;
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (!IsListEmpty (&Temp->ChildList)) {
 
@@ -283,11 +283,11 @@ ProcessOptionRom (
 /**
   This routine is used to assign bus number to the given PCI bus system
   
-  @param Bridge           Parent root bridge instance
-  @param StartBusNumber   Number of beginning
-  @param SubBusNumber     the number of sub bus
+  @param Bridge           Parent root bridge instance.
+  @param StartBusNumber   Number of beginning.
+  @param SubBusNumber     the number of sub bus.
   
-  @retval EFI_SUCCESS  Success to assign bus number
+  @retval EFI_SUCCESS  Success to assign bus number.
 **/
 EFI_STATUS
 PciAssignBusNumber (
@@ -462,11 +462,11 @@ DetermineRootBridgeAttributes (
   // Currently we hardcoded for ea815
   //
 
-  if (Attributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) {
+  if ((Attributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0) {
     RootBridgeDev->Decodes |= EFI_BRIDGE_PMEM_MEM_COMBINE_SUPPORTED;
   }
 
-  if (Attributes & EFI_PCI_HOST_BRIDGE_MEM64_DECODE) {
+  if ((Attributes & EFI_PCI_HOST_BRIDGE_MEM64_DECODE) != 0) {
     RootBridgeDev->Decodes |= EFI_BRIDGE_PMEM64_DECODE_SUPPORTED;
   }
 
@@ -480,8 +480,8 @@ DetermineRootBridgeAttributes (
 /**
   Get Max Option Rom size on this bridge
   
-  @param Bridge  Bridge device instance
-  @return Max size of option rom
+  @param Bridge  Bridge device instance.
+  @return Max size of option rom.
 **/
 UINT64
 GetMaxOptionRomSize (
@@ -499,7 +499,7 @@ GetMaxOptionRomSize (
   // Go through bridges to reach all devices
   //
   CurrentLink = Bridge->ChildList.ForwardLink;
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (!IsListEmpty (&Temp->ChildList)) {
 
@@ -540,11 +540,11 @@ GetMaxOptionRomSize (
 /**
   Process attributes of devices on this host bridge
   
-  @param PciResAlloc Protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  @param PciResAlloc Protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
   
-  @retval EFI_NOT_FOUND Can not find the specific root bridge device
-  @retval EFI_SUCCESS   Success Process attribute
-  @retval Others        Can not determine the root bridge device's attribute
+  @retval EFI_NOT_FOUND Can not find the specific root bridge device.
+  @retval EFI_SUCCESS   Success Process attribute.
+  @retval Others        Can not determine the root bridge device's attribute.
 **/
 EFI_STATUS
 PciHostBridgeDeviceAttribute (
@@ -667,10 +667,10 @@ GetResourceAllocationStatus (
 /**
   Remove a PCI device from device pool and mark its bar
   
-  @param PciDevice Instance of Pci device
+  @param PciDevice Instance of Pci device.
   
-  @retval EFI_SUCCESS Success Operation
-  @retval EFI_ABORTED Pci device is a root bridge
+  @retval EFI_SUCCESS Success Operation.
+  @retval EFI_ABORTED Pci device is a root bridge.
 **/
 EFI_STATUS
 RejectPciDevice (
@@ -685,7 +685,7 @@ RejectPciDevice (
   // Remove the padding resource from a bridge
   //
   if ( IS_PCI_BRIDGE(&PciDevice->Pci) && \
-       PciDevice->ResourcePaddingDescriptors ) {
+       PciDevice->ResourcePaddingDescriptors != NULL ) {
     gBS->FreePool (PciDevice->ResourcePaddingDescriptors);
     PciDevice->ResourcePaddingDescriptors = NULL;
     return EFI_SUCCESS;
@@ -694,7 +694,7 @@ RejectPciDevice (
   //
   // Skip RB and PPB
   //
-  if (IS_PCI_BRIDGE (&PciDevice->Pci) || (!PciDevice->Parent)) {
+  if (IS_PCI_BRIDGE (&PciDevice->Pci) || (PciDevice->Parent == NULL)) {
     return EFI_ABORTED;
   }
 
@@ -703,7 +703,7 @@ RejectPciDevice (
     // Get the root bridge device
     //
     Bridge = PciDevice;
-    while (Bridge->Parent) {
+    while (Bridge->Parent != NULL) {
       Bridge = Bridge->Parent;
     }
 
@@ -720,7 +720,7 @@ RejectPciDevice (
   //
   Bridge      = PciDevice->Parent;
   CurrentLink = Bridge->ChildList.ForwardLink;
-  while (CurrentLink && CurrentLink != &Bridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (Temp == PciDevice) {
       InitializePciDevice (Temp);
@@ -736,11 +736,11 @@ RejectPciDevice (
 }
 
 /**
-  Determine whethter a PCI device can be rejected
+  Determine whethter a PCI device can be rejected.
   
-  @param PciResNode Pointer to Pci resource node instance 
+  @param PciResNode Pointer to Pci resource node instance.
   
-  @return whethter a PCI device can be rejected
+  @return whethter a PCI device can be rejected.
 **/
 BOOLEAN
 IsRejectiveDevice (
@@ -754,21 +754,21 @@ IsRejectiveDevice (
   //
   // Ensure the device is present
   //
-  if (!Temp) {
+  if (Temp == NULL) {
     return FALSE;
   }
 
   //
   // PPB and RB should go ahead
   //
-  if (IS_PCI_BRIDGE (&Temp->Pci) || (!Temp->Parent)) {
+  if (IS_PCI_BRIDGE (&Temp->Pci) || (Temp->Parent == NULL)) {
     return TRUE;
   }
 
   //
   // Skip device on Bus0
   //
-  if ((Temp->Parent) && (Temp->BusNumber == 0)) {
+  if ((Temp->Parent != NULL) && (Temp->BusNumber == 0)) {
     return FALSE;
   }
 
@@ -796,17 +796,17 @@ GetLargerConsumerDevice (
   IN  PCI_RESOURCE_NODE   *PciResNode2
   )
 {
-  if (!PciResNode2) {
+  if (PciResNode2 == NULL) {
     return PciResNode1;
   }
 
-  if ((IS_PCI_BRIDGE(&(PciResNode2->PciDev->Pci)) || !(PciResNode2->PciDev->Parent)) \
+  if ((IS_PCI_BRIDGE(&(PciResNode2->PciDev->Pci)) || (PciResNode2->PciDev->Parent == NULL)) \
        && (PciResNode2->ResourceUsage != PciResUsagePadding) )
   {
     return PciResNode1;
   }
 
-  if (!PciResNode1) {
+  if (PciResNode1 == NULL) {
     return PciResNode2;
   }
 
@@ -820,11 +820,11 @@ GetLargerConsumerDevice (
 
 
 /**
-  Get the max resource consumer in the host resource pool
+  Get the max resource consumer in the host resource pool.
   
-  @param ResPool  Pointer to resource pool node
+  @param ResPool  Pointer to resource pool node.
   
-  @return the max resource consumer in the host resource pool
+  @return the max resource consumer in the host resource pool.
 **/
 PCI_RESOURCE_NODE *
 GetMaxResourceConsumerDevice (
@@ -839,7 +839,7 @@ GetMaxResourceConsumerDevice (
   PciResNode  = NULL;
 
   CurrentLink = ResPool->ChildList.ForwardLink;
-  while (CurrentLink && CurrentLink != &ResPool->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &ResPool->ChildList) {
 
     Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
 
@@ -848,7 +848,7 @@ GetMaxResourceConsumerDevice (
       continue;
     }
 
-    if ((IS_PCI_BRIDGE (&(Temp->PciDev->Pci)) || (!Temp->PciDev->Parent)) \
+    if ((IS_PCI_BRIDGE (&(Temp->PciDev->Pci)) || (Temp->PciDev->Parent == NULL)) \
           && (Temp->ResourceUsage != PciResUsagePadding))
     {
       PPBResNode  = GetMaxResourceConsumerDevice (Temp);
@@ -866,16 +866,16 @@ GetMaxResourceConsumerDevice (
 /**
   Adjust host bridge allocation so as to reduce resource requirement
   
-  @param IoPool           Pointer to instance of I/O resource Node
-  @param Mem32Pool        Pointer to instance of 32-bit memory resource Node
-  @param PMem32Pool       Pointer to instance of 32-bit Pmemory resource node
-  @param Mem64Pool        Pointer to instance of 64-bit memory resource node
-  @param PMem64Pool       Pointer to instance of 64-bit Pmemory resource node
-  @param IoResStatus      Status of I/O resource Node
-  @param Mem32ResStatus   Status of 32-bit memory resource Node
-  @param PMem32ResStatus  Status of 32-bit Pmemory resource node
-  @param Mem64ResStatus   Status of 64-bit memory resource node
-  @param PMem64ResStatus  Status of 64-bit Pmemory resource node
+  @param IoPool           Pointer to instance of I/O resource Node.
+  @param Mem32Pool        Pointer to instance of 32-bit memory resource Node.
+  @param PMem32Pool       Pointer to instance of 32-bit Pmemory resource node.
+  @param Mem64Pool        Pointer to instance of 64-bit memory resource node.
+  @param PMem64Pool       Pointer to instance of 64-bit Pmemory resource node.
+  @param IoResStatus      Status of I/O resource Node.
+  @param Mem32ResStatus   Status of 32-bit memory resource Node.
+  @param PMem32ResStatus  Status of 32-bit Pmemory resource node.
+  @param Mem64ResStatus   Status of 64-bit memory resource node.
+  @param PMem64ResStatus  Status of 64-bit Pmemory resource node.
 **/
 EFI_STATUS
 PciHostBridgeAdjustAllocation (
@@ -937,7 +937,7 @@ PciHostBridgeAdjustAllocation (
     // Hostbridge hasn't enough resource
     //
     PciResNode = GetMaxResourceConsumerDevice (ResPool[ResType]);
-    if (!PciResNode) {
+    if (PciResNode == NULL) {
       continue;
     }
 
@@ -1091,7 +1091,7 @@ ConstructAcpiResourceRequestor (
     //
     // Deal with io aperture
     //
-    if (Aperture & 0x01) {
+    if ((Aperture & 0x01) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
       Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
       //
@@ -1110,7 +1110,7 @@ ConstructAcpiResourceRequestor (
     //
     // Deal with mem32 aperture
     //
-    if (Aperture & 0x02) {
+    if ((Aperture & 0x02) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
       Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
       //
@@ -1134,7 +1134,7 @@ ConstructAcpiResourceRequestor (
     //
     // Deal with Pmem32 aperture
     //
-    if (Aperture & 0x04) {
+    if ((Aperture & 0x04) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
       Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
       //
@@ -1157,7 +1157,7 @@ ConstructAcpiResourceRequestor (
     //
     // Deal with mem64 aperture
     //
-    if (Aperture & 0x08) {
+    if ((Aperture & 0x08) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
       Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
       //
@@ -1180,7 +1180,7 @@ ConstructAcpiResourceRequestor (
     //
     // Deal with Pmem64 aperture
     //
-    if (Aperture & 0x10) {
+    if ((Aperture & 0x10) != 0) {
       Ptr->Desc     = ACPI_ADDRESS_SPACE_DESCRIPTOR;
       Ptr->Len      = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
       //
@@ -1238,13 +1238,13 @@ ConstructAcpiResourceRequestor (
   Get resource base from a acpi configuration descriptor.
   
   @param pConfig      an acpi configuration descriptor.
-  @param IoBase       output of I/O resource base address
-  @param Mem32Base    output of 32-bit memory base address
-  @param PMem32Base   output of 32-bit pmemory base address
-  @param Mem64Base    output of 64-bit memory base address
-  @param PMem64Base   output of 64-bit pmemory base address
+  @param IoBase       output of I/O resource base address.
+  @param Mem32Base    output of 32-bit memory base address.
+  @param PMem32Base   output of 32-bit pmemory base address.
+  @param Mem64Base    output of 64-bit memory base address.
+  @param PMem64Base   output of 64-bit pmemory base address.
   
-  @return EFI_SUCCESS  Success operation
+  @return EFI_SUCCESS  Success operation.
 **/
 EFI_STATUS
 GetResourceBase (
@@ -1331,10 +1331,10 @@ GetResourceBase (
   Enumerate pci bridge, allocate resource and determine attribute
   for devices on this bridge
   
-  @param BridgeDev Pointer to instance of bridge device
+  @param BridgeDev Pointer to instance of bridge device.
   
-  @retval EFI_SUCCESS Success operation
-  @retval Others      Fail to enumerate
+  @retval EFI_SUCCESS Success operation.
+  @retval Others      Fail to enumerate.
 **/
 EFI_STATUS
 PciBridgeEnumerator (
@@ -1390,10 +1390,10 @@ PciBridgeEnumerator (
 /**
   Allocate all kinds of resource for bridge
   
-  @param Bridge      Pointer to bridge instance
+  @param Bridge      Pointer to bridge instance.
   
   @retval EFI_SUCCESS Success operation.
-  @retval Others      Fail to allocate resource for bridge
+  @retval Others      Fail to allocate resource for bridge.
 **/
 EFI_STATUS
 PciBridgeResourceAllocator (
@@ -1544,14 +1544,14 @@ PciBridgeResourceAllocator (
 /**
   Get resource base address for a pci bridge device
   
-  @param Bridge  Given Pci driver instance
-  @param IoBase  output for base address of I/O type resource
-  @param Mem32Base  output for base address of 32-bit memory type resource
-  @param PMem32Base  output for base address of 32-bit Pmemory type resource
-  @param Mem64Base  output for base address of 64-bit memory type resource
-  @param PMem64Base  output for base address of 64-bit Pmemory type resource
+  @param Bridge  Given Pci driver instance.
+  @param IoBase  output for base address of I/O type resource.
+  @param Mem32Base  output for base address of 32-bit memory type resource.
+  @param PMem32Base  output for base address of 32-bit Pmemory type resource.
+  @param Mem64Base  output for base address of 64-bit memory type resource.
+  @param PMem64Base  output for base address of 64-bit Pmemory type resource.
   
-  @retval EFI_SUCCESS Succes to get resource base address
+  @retval EFI_SUCCESS Succes to get resource base address.
 **/
 EFI_STATUS
 GetResourceBaseFromBridge (
@@ -1575,19 +1575,19 @@ GetResourceBaseFromBridge (
 
   if (IS_PCI_BRIDGE (&Bridge->Pci)) {
 
-    if (Bridge->PciBar[PPB_IO_RANGE].Length) {
+    if (Bridge->PciBar[PPB_IO_RANGE].Length > 0) {
       *IoBase = Bridge->PciBar[PPB_IO_RANGE].BaseAddress;
     }
 
-    if (Bridge->PciBar[PPB_MEM32_RANGE].Length) {
+    if (Bridge->PciBar[PPB_MEM32_RANGE].Length > 0) {
       *Mem32Base = Bridge->PciBar[PPB_MEM32_RANGE].BaseAddress;
     }
 
-    if (Bridge->PciBar[PPB_PMEM32_RANGE].Length) {
+    if (Bridge->PciBar[PPB_PMEM32_RANGE].Length > 0) {
       *PMem32Base = Bridge->PciBar[PPB_PMEM32_RANGE].BaseAddress;
     }
 
-    if (Bridge->PciBar[PPB_PMEM64_RANGE].Length) {
+    if (Bridge->PciBar[PPB_PMEM64_RANGE].Length > 0) {
       *PMem64Base = Bridge->PciBar[PPB_PMEM64_RANGE].BaseAddress;
     } else {
       *PMem64Base = gAllOne;
@@ -1596,15 +1596,15 @@ GetResourceBaseFromBridge (
   }
 
   if (IS_CARDBUS_BRIDGE (&Bridge->Pci)) {
-    if (Bridge->PciBar[P2C_IO_1].Length) {
+    if (Bridge->PciBar[P2C_IO_1].Length > 0) {
       *IoBase = Bridge->PciBar[P2C_IO_1].BaseAddress;
     } else {
-      if (Bridge->PciBar[P2C_IO_2].Length) {
+      if (Bridge->PciBar[P2C_IO_2].Length > 0) {
         *IoBase = Bridge->PciBar[P2C_IO_2].BaseAddress;
       }
     }
 
-    if (Bridge->PciBar[P2C_MEM_1].Length) {
+    if (Bridge->PciBar[P2C_MEM_1].Length > 0) {
       if (Bridge->PciBar[P2C_MEM_1].BarType == PciBarTypePMem32) {
         *PMem32Base = Bridge->PciBar[P2C_MEM_1].BaseAddress;
       }
@@ -1614,7 +1614,7 @@ GetResourceBaseFromBridge (
       }
     }
 
-    if (Bridge->PciBar[P2C_MEM_2].Length) {
+    if (Bridge->PciBar[P2C_MEM_2].Length > 0) {
       if (Bridge->PciBar[P2C_MEM_2].BarType == PciBarTypePMem32) {
         *PMem32Base = Bridge->PciBar[P2C_MEM_2].BaseAddress;
       }
@@ -1673,7 +1673,7 @@ GetResourceBaseFromBridge (
                                           required here. This notification can be used to perform any chipsetspecific
                                           programming.
       
-   @param[in] This                The instance pointer of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+   @param[in] PciResAlloc         The instance pointer of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
    @param[in] Phase               The phase during enumeration
    
    @retval EFI_NOT_READY          This phase cannot be entered at this time. For example, this error
@@ -1822,7 +1822,7 @@ PreprocessController (
   //
   // Get Root Brige Handle
   //
-  while (Bridge->Parent) {
+  while (Bridge->Parent != NULL) {
     Bridge = Bridge->Parent;
   }
 
@@ -1882,8 +1882,8 @@ PreprocessController (
   @param NumberOfChildren     - A the number of child handle in the ChildHandleBuffer.
   @param ChildHandleBuffer    - A pointer to the array contain the child handle.
   
-  @retval EFI_NOT_FOUND Can not find bridge according to controller handle
-  @retval EFI_SUCCESS   Success operating
+  @retval EFI_NOT_FOUND Can not find bridge according to controller handle.
+  @retval EFI_SUCCESS   Success operating.
 **/
 EFI_STATUS
 EFIAPI
@@ -1922,7 +1922,7 @@ PciHotPlugRequestNotify (
   // Get root bridge handle
   //
   Temp = Bridge;
-  while (Temp->Parent) {
+  while (Temp->Parent != NULL) {
     Temp = Temp->Parent;
   }
 
@@ -2029,7 +2029,7 @@ SearchHostBridgeHandle (
 /**
   Add host bridge handle to global variable for enumating.
   
-  @param HostBridgeHandle host bridge handle
+  @param HostBridgeHandle host bridge handle.
 **/
 EFI_STATUS
 AddHostBridgeEnumerator (
@@ -2038,7 +2038,7 @@ AddHostBridgeEnumerator (
 {
   UINTN Index;
 
-  if (!HostBridgeHandle) {
+  if (HostBridgeHandle == NULL) {
     return EFI_ABORTED;
   }
 
