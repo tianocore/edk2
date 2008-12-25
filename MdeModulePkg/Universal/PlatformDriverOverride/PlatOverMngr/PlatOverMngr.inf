@@ -1,7 +1,17 @@
 #/** @file
-# Component description file for PlatOverMngr driver
 #
-# FIX ME!
+#  A UI application to offer a UI interface in device manager to let user configue
+#  platform override protocol to override the default algorithm for matching
+#  drivers to controllers.
+#
+#  The main flow:
+#  1. The UI application dynamicly locate all controller device path.
+#  2. The UI application dynamicly locate all drivers which support binding protocol.
+#  3. The UI application export and dynamicly update two menu to let user select the
+#     mapping between drivers to controllers.
+#  4. The UI application save all the mapping info in NV variables for the following boot, 
+#     which will be consumed by platform override protocol driver to publish the platform override protocol.
+#
 # Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -35,33 +45,43 @@
   PlatOverMngr.c
   PlatOverMngr.h
 
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
 [LibraryClasses]
   BaseLib
-  UefiBootServicesTableLib
-  UefiApplicationEntryPoint
-  UefiLib
   DebugLib
+  UefiLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
   PlatDriOverLib
+  HiiLib
   IfrSupportLib
+  ExtendedHiiLib
   ExtendedIfrSupportLib
   BaseMemoryLib
   MemoryAllocationLib
-  HiiLib
-  ExtendedHiiLib
   UefiRuntimeServicesTableLib
   DevicePathLib
+  GenericBdsLib
   
+[Guids]
+  gEfiGlobalVariableGuid                        # Get value of variable L"PlatformLang". 
+                                                # this value specifies the platform supported language string (RFC 3066)
+
 [Protocols]
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathToTextProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
+  gEfiDriverBindingProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadedImageDevicePathProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
+  

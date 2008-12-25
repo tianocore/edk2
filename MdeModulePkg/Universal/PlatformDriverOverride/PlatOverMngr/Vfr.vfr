@@ -1,6 +1,6 @@
 // *++
 //
-// Copyright (c) 2007, Intel Corporation
+// Copyright (c) 2007 - 2008, Intel Corporation
 // All rights reserved. This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -20,38 +20,7 @@
 //
 // --*/
 
-#define PLAT_OVER_MNGR_GUID \
-  { \
-    0x8614567d, 0x35be, 0x4415, 0x8d, 0x88, 0xbd, 0x7d, 0xc, 0x9c, 0x70, 0xc0 \
-  }
-
-typedef struct {
-  UINT8   DriSelection[100];
-  UINT8   DriOrder[100];
-  UINT8   PciDeviceFilter;
-} PLAT_OVER_MNGR_DATA;
-
-#define FORM_ID_DEVICE                 0x1234
-#define FORM_ID_DRIVER                 0x1200
-#define FORM_ID_ORDER                  0x1500
-
-#define KEY_VALUE_DEVICE_OFFSET        0x0100
-#define KEY_VALUE_DEVICE_MAX           0x04ff
-
-#define QUESTION_ID_OFFSET             0x0500
-
-#define KEY_VALUE_DEVICE_REFRESH       0x1234
-#define KEY_VALUE_DEVICE_FILTER        0x1235
-#define KEY_VALUE_DEVICE_CLEAR         0x1236
-
-#define KEY_VALUE_DRIVER_GOTO_PREVIOUS 0x1300
-#define KEY_VALUE_DRIVER_GOTO_ORDER    0x1301
-
-#define KEY_VALUE_ORDER_GOTO_PREVIOUS  0x2000
-#define KEY_VALUE_ORDER_SAVE_AND_EXIT  0x1800
-
-#define VARSTORE_ID_PLAT_OVER_MNGR     0x1000
-
+#include "PlatOverMngr.h"
 
 #define EFI_DISK_DEVICE_CLASS          0x01
 #define LABEL_END                      0xffff

@@ -1,7 +1,8 @@
 /** @file
 
   This file defines the Alternate Firmware Volume Block Guid, which is 
-  used to specify that the additional FVB protocol is installed into FVB handle.
+  used to specify that the full funcationality FVB protocol is installed
+  that support read, write and erase capability for block devices.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

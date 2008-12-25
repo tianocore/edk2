@@ -22,7 +22,7 @@
   FILE_GUID                      = e405ec31-ccaa-4dd4-83e8-0aec01703f7e
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER   
+  LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER UEFI_APPLICATION 
 
 #
 # The following information is for reference only and not required by the build tools.

@@ -16,30 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _PLAT_DRI_OVER_LIB_H_
 #define _PLAT_DRI_OVER_LIB_H_
 
-#include <Protocol/PlatformDriverOverride.h>
 #include <Protocol/DevicePath.h>
-#include <Protocol/DriverBinding.h>
-#include <Library/BaseLib.h>
-
-#include <VariableFormat.h>
-
-/**
-  Install the Platform Driver Override Protocol, and ensure there is only one Platform Driver Override Protocol
-  in the system.
-
-  @param  gPlatformDriverOverride  PlatformDriverOverride protocol interface which
-                                   needs to be installed
-
-  @retval EFI_ALREADY_STARTED      There has been a Platform Driver Override
-                                   Protocol in the system, cannot install it again.
-  @retval EFI_SUCCESS              The protocol is installed successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-InstallPlatformDriverOverrideProtocol (
-  EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL *gPlatformDriverOverride
-  );
 
 /**
   Free all the mapping database memory resource and initialize the mapping list entry.
@@ -57,8 +34,8 @@ FreeMappingDatabase (
   );
 
 /**
-  Read the environment variable(s) that contain the override mappings from Controller Device Path to
-  a set of Driver Device Paths, and create the mapping database in memory with those variable info.
+  Read the NV environment variable(s) that contain the override mappings from Controller Device Path to
+  a set of Driver Device Paths, and create the mapping database in memory to contain these variable info.
 
   @param  MappingDataBase          Mapping database list entry pointer
 
@@ -76,6 +53,7 @@ InitOverridesMapping (
 
 /**
   Save the memory mapping database into NV environment variable(s).
+  If MappingDataBase list is empty, then delete all platform override NV variables.
 
   @param  MappingDataBase          Mapping database list entry pointer
 
@@ -92,7 +70,6 @@ SaveOverridesMapping (
 /**
   Retrieves the image handle of the platform override driver for a controller in the system from the memory mapping database.
 
-  @param  This                     A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
   @param  ControllerHandle         The device handle of the controller to check if
                                    a driver override exists.
   @param  DriverImageHandle        On output, a pointer to the next driver handle.
@@ -117,27 +94,14 @@ SaveOverridesMapping (
 EFI_STATUS
 EFIAPI
 GetDriverFromMapping (
-  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              * This,
   IN     EFI_HANDLE                                     ControllerHandle,
-  IN OUT EFI_HANDLE                                     * DriverImageHandle,
-  IN     LIST_ENTRY                                     * MappingDataBase,
+  IN OUT EFI_HANDLE                                     *DriverImageHandle,
+  IN     LIST_ENTRY                                     *MappingDataBase,
   IN     EFI_HANDLE                                     CallerImageHandle
   );
 
 /**
-  Deletes all environment variable(s) that contain the override mappings from Controller Device Path to
-  a set of Driver Device Paths.
-
-  @retval EFI_SUCCESS  Delete all variable(s) successfully.
-**/
-EFI_STATUS
-EFIAPI
-DeleteOverridesVariables (
-  VOID
-  );
-
-/**
-  Check mapping database whether already has the  mapping info which
+  Check mapping database whether already has the mapping info which
   records the input Controller to input DriverImage.
 
   @param  ControllerDevicePath     The controller device path is to be check.
@@ -212,24 +176,6 @@ DeleteDriverImage (
   IN     EFI_DEVICE_PATH_PROTOCOL                       *ControllerDevicePath,
   IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath,
   IN     LIST_ENTRY                                     *MappingDataBase
-  );
-
-/**
-  Get the first Binding protocol which has the specific image handle
-
-  @param  ImageHandle          The Image handle
-  @param  BindingHandle        The BindingHandle of the found Driver Binding protocol.
-                               If Binding protocol is not found, it is set to NULL. 
-
-  @return                      Pointer into the Binding Protocol interface
-  @retval NULL                 The parameter is not valid or the binding protocol is not found.
-
-**/
-EFI_DRIVER_BINDING_PROTOCOL *
-EFIAPI
-GetBindingProtocolFromImageHandle (
-  IN  EFI_HANDLE   ImageHandle,
-  OUT EFI_HANDLE   *BindingHandle
   );
 
 #endif

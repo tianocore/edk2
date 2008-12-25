@@ -19,9 +19,7 @@
 
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/LoadedImage.h>
-#include <Protocol/PlatformDriverOverride.h>
 #include <Protocol/DevicePath.h>
-#include <Protocol/DriverBinding.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 
 #include <Library/BaseLib.h>
@@ -37,6 +35,7 @@
 #include <Library/PlatDriOverLib.h>
 
 #include <Guid/OverrideVariable.h>
+#include <VariableFormat.h>
 
 
 #define PLATFORM_OVERRIDE_ITEM_SIGNATURE      SIGNATURE_32('p','d','o','i')

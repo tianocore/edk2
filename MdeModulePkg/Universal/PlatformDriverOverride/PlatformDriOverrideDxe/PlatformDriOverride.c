@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,52 +9,20 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    PlatformDriOverride.c
-
-Abstract:
-
-
 **/
 
+#include <Uefi.h>
 
-#include "PlatformDriOverride.h"
-
-EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL gPlatformDriverOverride = {
-  GetDriver,
-  GetDriverPath,
-  DriverLoaded
-};
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/PlatDriOverLib.h>
+#include <Protocol/PlatformDriverOverride.h>
 
 LIST_ENTRY      mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
 BOOLEAN         mEnvironmentVariableRead = FALSE;
-EFI_HANDLE      mCallerImageHandle;
-
-/**
-  Platform Driver Override driver entry point, install the Platform Driver Override Protocol
-
-  @param  ImageHandle  ImageHandle of the loaded driver.
-  @param  SystemTable  Pointer to the EFI System Table.
-
-  @retval  EFI_SUCCESS               The DXE Driver, DXE Runtime Driver, DXE SMM Driver,
-                                     or UEFI Driver exited normally.
-  @retval  EFI_INCOMPATIBLE_VERSION  _gUefiDriverRevision is greater than SystemTable->Hdr.Revision.
-  @retval  Other                     Return value from ProcessModuleEntryPointList().
-**/
-EFI_STATUS
-EFIAPI
-PlatformDriverOverrideEntry (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  mEnvironmentVariableRead = FALSE;
-  mCallerImageHandle = ImageHandle;
-  InitializeListHead (&mMappingDataBase);
-  return InstallPlatformDriverOverrideProtocol (&gPlatformDriverOverride);
-}
-
+EFI_HANDLE      mCallerImageHandle = NULL;
 
 /**
   Retrieves the image handle of the platform override driver for a controller in the system.
@@ -82,12 +50,13 @@ PlatformDriverOverrideEntry (
 EFI_STATUS
 EFIAPI
 GetDriver (
-  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              * This,
+  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN     EFI_HANDLE                                     ControllerHandle,
-  IN OUT EFI_HANDLE                                     * DriverImageHandle
+  IN OUT EFI_HANDLE                                     *DriverImageHandle
   )
 {
   EFI_STATUS  Status;
+
   //
   // Check that ControllerHandle is a valid handle
   //
@@ -105,59 +74,46 @@ GetDriver (
     mEnvironmentVariableRead = TRUE;
 
     Status = InitOverridesMapping (&mMappingDataBase);
-    if (Status == EFI_NOT_FOUND) {
-      InitializeListHead (&mMappingDataBase);
-      return EFI_NOT_FOUND;
-    } else if (Status == EFI_VOLUME_CORRUPTED){
-      DEBUG ((DEBUG_ERROR, "Platform Driver Override Variable is corrupt\n"));
-      //
-      // The environment variable(s) that contain the override mappings from Controller Device Path to
-      //  a set of Driver Device Paths is corrupted,  platform code can use LibDeleteOverridesVariables to
-      //  delete all orverride variables as a policy. Here can be IBV/OEM customized.
-      //
-
-      //LibDeleteOverridesVariables();
-      InitializeListHead (&mMappingDataBase);
-      return EFI_NOT_FOUND;
-    } else if (EFI_ERROR (Status)){
+    if (EFI_ERROR (Status)){
+      DEBUG ((DEBUG_ERROR, "The status to Get Platform Driver Override Variable is %r\n", Status));
       InitializeListHead (&mMappingDataBase);
       return EFI_NOT_FOUND;
     }
   }
+
   //
-  // if the environment variable does not exist or the variable appears to be corrupt, just return not found
+  // if the environment variable does not exist, just return not found
   //
   if (IsListEmpty (&mMappingDataBase)) {
     return EFI_NOT_FOUND;
   }
 
   return GetDriverFromMapping (
-            This,
             ControllerHandle,
             DriverImageHandle,
             &mMappingDataBase,
             mCallerImageHandle
             );
-
 }
 
-
 /**
-  For the use of the ControllerHandle parameter in the GetDriverPath()
-  But this API is very difficult to use, so not support.
+  Retrieves the device path of the platform override driver for a controller in the system.
+  This driver doesn't support this API.
 
-  @param  This                   A pointer to the
-                                 EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
-  @param  ControllerHandle       The device handle of the controller to check if a
-                                 driver override exists.
-  @param  DriverImagePath        The device path for this Image.
+  @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_
+                                PROTOCOL instance.                            
+  @param  ControllerHandle      The device handle of the controller to check if a driver override
+                                exists.                                                          
+  @param  DriverImageHandle     On input, a pointer to the previous driver image handle returned
+                                by GetDriverPath(). On output, a pointer to the next driver         
+                                device path.
   
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
 EFIAPI
 GetDriverPath (
-  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              * This,
+  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
   IN     EFI_HANDLE                                     ControllerHandle,
   IN OUT EFI_DEVICE_PATH_PROTOCOL                       **DriverImagePath
   )
@@ -167,30 +123,89 @@ GetDriverPath (
 
 
 /**
-  For the use of the ControllerHandle parameter in the DriverLoaded()
-  But this API is very difficult to use, so not support.
+  Used to associate a driver image handle with a device path that was returned on a prior call to the
+  GetDriverPath() service. This driver image handle will then be available through the               
+  GetDriver() service. This driver doesn't support this API.
 
-  @param  This                   A pointer to the
-                                 EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
-  @param  ControllerHandle       The device handle of the controller to check if a
-                                 driver override exists.
-  @param  DriverImagePath        The device path for this Image.
-  @param  DriverImageHandle      On input, a pointer to the previous driver image
-                                 handle returned by GetDriver().  On output, a
-                                 pointer to the next driver image handle. Passing
-                                 in a NULL,  will return the first driver image
-                                 handle for ControllerHandle.
+  @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_
+                                PROTOCOL instance.                            
+  @param  ControllerHandle      The device handle of the controller.                                                             
+  @param  DriverImagePath       A pointer to the driver device path that was returned in a prior
+                                call to GetDriverPath().                                                                        
+  @param  DriverImageHandle     The driver image handle that was returned by LoadImage()
+                                when the driver specified by DriverImagePath was loaded 
+                                into memory. 
   
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
 EFIAPI
 DriverLoaded (
-  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL          * This,
+  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL          *This,
   IN EFI_HANDLE                                     ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL                       * DriverImagePath,
+  IN EFI_DEVICE_PATH_PROTOCOL                       *DriverImagePath,
   IN EFI_HANDLE                                     DriverImageHandle
   )
 {
   return EFI_UNSUPPORTED;
+}
+
+EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL mPlatformDriverOverride = {
+  GetDriver,
+  GetDriverPath,
+  DriverLoaded
+};
+
+/**
+  Platform Driver Override driver entry point, install the Platform Driver Override Protocol
+
+  @param  ImageHandle  ImageHandle of the loaded driver.
+  @param  SystemTable  Pointer to the EFI System Table.
+
+  @retval  EFI_SUCCESS               The DXE Driver, DXE Runtime Driver, DXE SMM Driver,
+                                     or UEFI Driver exited normally.
+  @retval  EFI_ALREADY_STARTED       A protocol instance has been installed. Not need install again.
+**/
+EFI_STATUS
+EFIAPI
+PlatformDriverOverrideEntry (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_HANDLE          Handle;
+  EFI_STATUS          Status;
+  VOID                *Instance;
+
+  mCallerImageHandle = ImageHandle;
+
+  //
+  // According to UEFI spec, there can be at most a single instance
+  // in the system of the EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL.
+  // So here we check the existence.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiPlatformDriverOverrideProtocolGuid,
+                  NULL,
+                  &Instance
+                  );
+  //
+  // If there was no error, assume there is an installation and return error
+  //
+  if (!EFI_ERROR (Status)) {
+    return EFI_ALREADY_STARTED;
+  }
+
+  //
+  // Install platform driver override protocol
+  //
+  Handle = NULL;
+  Status = gBS->InstallProtocolInterface (
+                  &Handle,
+                  &gEfiPlatformDriverOverrideProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mPlatformDriverOverride
+                  );
+  ASSERT_EFI_ERROR (Status);
+  return EFI_SUCCESS;
 }

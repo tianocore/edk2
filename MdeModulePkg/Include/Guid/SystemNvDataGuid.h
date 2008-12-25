@@ -1,6 +1,8 @@
 /** @file
-  This file defines NvDataHob GUIDs for System Non Volatile HOB entries 
-  in the HOB list and NV system hob entry structure. 
+  This file defines NvData Hob GUIDs for System Non Volatile HOB entries and the corresponding hob data structure.
+  NvData Hob is used to report the region of the system non volatile data 
+  for the specific purpose, such as FTW region, Error log region.
+  
   It also defines NvDataFv GUID used as the signature of FTW working block header.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
@@ -27,13 +29,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// Hob entry for NV data region
 ///
 typedef struct {
-  EFI_GUID                  SystemNvDataHobGuid; /// EFI_SYSTEM_NV_DATA_HOB_GUID
-  EFI_GUID                  SystemNvDataFvGuid;  /// Guid specifies the NvData Fv for the specific purpose, such as FTW, Error Log.
-  EFI_LBA                   StartLba;            /// The starting logical block index.
-  UINTN                     StartLbaOffset;      /// Offset into the starting block at which to the start of NvData region.
-  EFI_LBA                   EndLba;              /// The last logical block index.
-  UINTN                     EndLbaOffset;        /// Offset into the last block at which to the end of Nvdata region.
-  UINT32                    DataTypeSignature;   /// NvData type in the specified NV range.
+  EFI_GUID                  SystemNvDataHobGuid; ///> EFI_SYSTEM_NV_DATA_HOB_GUID
+  EFI_GUID                  SystemNvDataFvGuid;  ///> Guid specifies the NvData Fv for the specific purpose, such as FTW, Error Log.
+  EFI_LBA                   StartLba;            ///> The starting logical block index.
+  UINTN                     StartLbaOffset;      ///> Offset into the starting block at which to the start of NvData region.
+  EFI_LBA                   EndLba;              ///> The last logical block index.
+  UINTN                     EndLbaOffset;        ///> Offset into the last block at which to the end of Nvdata region.
+  UINT32                    DataTypeSignature;   ///> NvData type in the specified NV range.
 } NV_SYSTEM_DATA_GUID_TYPE;
 
 extern EFI_GUID gEfiSystemNvDataHobGuid;

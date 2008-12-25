@@ -1,8 +1,10 @@
 #/** @file
-# Component name for module PlatformDriOverride
-#
-# FIX ME!
-# Copyright (c) 2007, Intel Corporation. All rights reserved.
+# This driver produces UEFI PLATFORM_DRIVER_OVERRIDE_PROTOCOL if this protocol doesn't exist.
+# It doesn't install again if this protocol exists.
+# It only implements one interface GetDriver of PLATFORM_DRIVER_OVERRIDE_PROTOCOL protocol 
+# and doesn't support other two interfaces GetDriverPath, DriverLoaded. 
+# 
+# Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,14 +14,13 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#
 #**/
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformDriOverrideDxe
   FILE_GUID                      = 35034CE2-A6E5-4fb4-BABE-A0156E9B2549
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = PlatformDriverOverrideEntry
 
@@ -31,7 +32,6 @@
 
 [Sources.common]
   PlatformDriOverride.c
-  PlatformDriOverride.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,4 +42,8 @@
   UefiDriverEntryPoint
   DebugLib
   PlatDriOverLib
+  UefiBootServicesTableLib
 
+[Protocols]
+  gEfiPlatformDriverOverrideProtocolGuid   # ALWAYS_PRODUCED
+  
