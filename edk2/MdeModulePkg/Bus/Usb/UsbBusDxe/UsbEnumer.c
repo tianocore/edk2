@@ -946,7 +946,7 @@ UsbHubEnumeration (
   UINT8                   Bit;
   UINT8                   Index;
 
-  ASSERT (Context);
+  ASSERT (Context != NULL);
 
   HubIf = (USB_INTERFACE *) Context;
 
