@@ -477,17 +477,19 @@ FindUsbNsKey (
   )
 {
   LIST_ENTRY      *Link;
+  LIST_ENTRY      *NsKeyList;
   USB_NS_KEY      *UsbNsKey;
-
-  Link = GetFirstNode (&UsbKeyboardDevice->NsKeyList);
-  while (!IsNull (&UsbKeyboardDevice->NsKeyList, Link)) {
+  
+  NsKeyList = &UsbKeyboardDevice->NsKeyList;
+  Link = GetFirstNode (NsKeyList);
+  while (!IsNull (NsKeyList, Link)) {
     UsbNsKey = USB_NS_KEY_FORM_FROM_LINK (Link);
 
     if (UsbNsKey->NsKey[0].Key == KeyDescriptor->Key) {
       return UsbNsKey;
     }
 
-    Link = GetNextNode (&UsbKeyboardDevice->NsKeyList, Link);
+    Link = GetNextNode (NsKeyList, Link);
   }
 
   return NULL;
@@ -644,7 +646,7 @@ SetKeyboardLayoutEvent (
   KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, 0x28);
   CopyMem (TableEntry, KeyDescriptor, sizeof (EFI_KEY_DESCRIPTOR));
 
-  gBS->FreePool (KeyboardLayout);
+  FreePool (KeyboardLayout);
 }
 
 /**
@@ -1921,7 +1923,7 @@ USBKeyboardRepeatHandler (
       );
 
     //
-    // Set repeate rate for next repeat key generation.
+    // Set repeat rate for next repeat key generation.
     //
     gBS->SetTimer (
            UsbKeyboardDevice->RepeatTimer,
