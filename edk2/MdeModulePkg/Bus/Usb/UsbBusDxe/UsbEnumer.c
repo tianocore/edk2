@@ -32,9 +32,12 @@ UsbGetEndpointDesc (
   )
 {
   USB_ENDPOINT_DESC       *EpDesc;
-  UINTN                   Index;
-
-  for (Index = 0; Index < UsbIf->IfSetting->Desc.NumEndpoints; Index++) {
+  UINT8                   Index;
+  UINT8                   NumEndpoints;
+  
+  NumEndpoints = UsbIf->IfSetting->Desc.NumEndpoints;
+  
+  for (Index = 0; Index < NumEndpoints; Index++) {
     EpDesc = UsbIf->IfSetting->Endpoints[Index];
 
     if (EpDesc->Desc.EndpointAddress == EpAddr) {
@@ -71,10 +74,10 @@ UsbFreeInterface (
          );
 
   if (UsbIf->DevicePath != NULL) {
-    gBS->FreePool (UsbIf->DevicePath);
+    FreePool (UsbIf->DevicePath);
   }
 
-  gBS->FreePool (UsbIf);
+  FreePool (UsbIf);
 }
 
 
@@ -175,10 +178,10 @@ UsbCreateInterface (
 
 ON_ERROR:
   if (UsbIf->DevicePath != NULL) {
-    gBS->FreePool (UsbIf->DevicePath);
+    FreePool (UsbIf->DevicePath);
   }
 
-  gBS->FreePool (UsbIf);
+  FreePool (UsbIf);
   return NULL;
 }
 
@@ -240,7 +243,7 @@ UsbCreateDevice (
 
 /**
   Connect the USB interface with its driver. EFI USB bus will
-  create a USB interface for each seperate interface descriptor.
+  create a USB interface for each separate interface descriptor.
 
   @param  UsbIf             The interface to connect driver to.
 

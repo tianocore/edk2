@@ -61,7 +61,7 @@ EFI_DRIVER_BINDING_PROTOCOL mUsbBusDriverBinding = {
   @param  UsbStatus              USB result
 
   @retval EFI_INVALID_PARAMETER  The parameters are invalid
-  @retval EFI_SUCCESS            The control transfer succeded.
+  @retval EFI_SUCCESS            The control transfer succeeded.
   @retval Others                 Failed to execute the transfer
 
 **/
@@ -152,7 +152,7 @@ UsbIoControlTransfer (
   // should stop use its current UsbIo after calling this driver. The old
   // UsbIo will be uninstalled and new UsbIo be installed. We can't use
   // ReinstallProtocol since interfaces in different configuration may be
-  // completely irrellvant.
+  // completely irrelevant.
   //
   if ((Request->Request == USB_REQ_SET_CONFIG) &&
       (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD,
@@ -924,13 +924,13 @@ UsbBusBuildProtocol (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to open device path %r\n", Status));
 
-    gBS->FreePool (UsbBus);
+    FreePool (UsbBus);
     return Status;
   }
 
   //
   // Get USB_HC2/USB_HC host controller protocol (EHCI/UHCI).
-  // This is for backward compatbility with EFI 1.x. In UEFI
+  // This is for backward compatibility with EFI 1.x. In UEFI
   // 2.x, USB_HC2 replaces USB_HC. We will open both USB_HC2
   // and USB_HC because EHCI driver will install both protocols
   // (for the same reason). If we don't consume both of them,
@@ -965,7 +965,7 @@ UsbBusBuildProtocol (
   UsbHcSetState (UsbBus, EfiUsbHcStateOperational);
 
   //
-  // Install an EFI_USB_BUS_PROTOCOL to host controler to identify it.
+  // Install an EFI_USB_BUS_PROTOCOL to host controller to identify it.
   //
   Status = gBS->InstallProtocolInterface (
                   &Controller,
@@ -998,7 +998,7 @@ UsbBusBuildProtocol (
   RootIf = AllocateZeroPool (sizeof (USB_INTERFACE));
 
   if (RootIf == NULL) {
-    gBS->FreePool (RootHub);
+    FreePool (RootHub);
     Status = EFI_OUT_OF_RESOURCES;
     goto FREE_ROOTHUB;
   }
@@ -1024,10 +1024,10 @@ UsbBusBuildProtocol (
 
 FREE_ROOTHUB:
   if (RootIf != NULL) {
-    gBS->FreePool (RootIf);
+    FreePool (RootIf);
   }
   if (RootHub != NULL) {
-    gBS->FreePool (RootHub);
+    FreePool (RootHub);
   }
 
 UNINSTALL_USBBUS:
@@ -1056,7 +1056,7 @@ CLOSE_HC:
          This->DriverBindingHandle,
          Controller
          );
-  gBS->FreePool (UsbBus);
+  FreePool (UsbBus);
 
   DEBUG ((EFI_D_ERROR, "UsbBusStart: Failed to start bus driver %r\n", Status));
   return Status;
@@ -1251,7 +1251,7 @@ UsbBusControllerDriverStart (
 
   if (EFI_ERROR (Status)) {
     //
-    // If first start, build the bus execute enviorment and install bus protocol
+    // If first start, build the bus execute environment and install bus protocol
     //
     Status = UsbBusBuildProtocol (This, Controller, RemainingDevicePath);
     if (EFI_ERROR (Status)) {

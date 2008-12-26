@@ -40,14 +40,14 @@ UsbFreeInterfaceDesc (
       Ep = Setting->Endpoints[Index];
 
       if (Ep != NULL) {
-        gBS->FreePool (Ep);
+        FreePool (Ep);
       }
     }
 
-    gBS->FreePool (Setting->Endpoints);
+    FreePool (Setting->Endpoints);
   }
 
-  gBS->FreePool (Setting);
+  FreePool (Setting);
 }
 
 
@@ -89,13 +89,13 @@ UsbFreeConfigDesc (
         }
       }
 
-      gBS->FreePool (Interface);
+      FreePool (Interface);
     }
 
-    gBS->FreePool (Config->Interfaces);
+    FreePool (Config->Interfaces);
   }
 
-  gBS->FreePool (Config);
+  FreePool (Config);
 
 }
 
@@ -122,10 +122,10 @@ UsbFreeDevDesc (
       }
     }
 
-    gBS->FreePool (DevDesc->Configs);
+    FreePool (DevDesc->Configs);
   }
 
-  gBS->FreePool (DevDesc);
+  FreePool (DevDesc);
 }
 
 
@@ -133,7 +133,7 @@ UsbFreeDevDesc (
   Create a descriptor.
 
   @param  DescBuf               The buffer of raw descriptor.
-  @param  Len                   The lenght of the raw descriptor buffer.
+  @param  Len                   The length of the raw descriptor buffer.
   @param  Type                  The type of descriptor to create.
   @param  Consumed              Number of bytes consumed.
 
@@ -198,13 +198,10 @@ UsbCreateDesc (
     return NULL;
   }
 
-  Desc = AllocateZeroPool (CtrlLen);
-
+  Desc = AllocateCopyPool(CtrlLen, Head);
   if (Desc == NULL) {
     return NULL;
   }
-
-  CopyMem (Desc, Head, DescLen);
   *Consumed = Offset + Head->Len;
 
   return Desc;
@@ -212,10 +209,10 @@ UsbCreateDesc (
 
 
 /**
-  Parse an interface desciptor and its endpoints.
+  Parse an interface descriptor and its endpoints.
 
   @param  DescBuf               The buffer of raw descriptor.
-  @param  Len                   The lenght of the raw descriptor buffer.
+  @param  Len                   The length of the raw descriptor buffer.
   @param  Consumed              The number of raw descriptor consumed.
 
   @return The create interface setting or NULL if failed.
@@ -246,7 +243,7 @@ UsbParseInterfaceDesc (
   Offset = Used;
 
   //
-  // Create an arry to hold the interface's endpoints
+  // Create an array to hold the interface's endpoints
   //
   NumEp  = Setting->Desc.NumEndpoints;
 
@@ -293,7 +290,7 @@ ON_ERROR:
   Parse the configuration descriptor and its interfaces.
 
   @param  DescBuf               The buffer of raw descriptor.
-  @param  Len                   The lenght of the raw descriptor buffer.
+  @param  Len                   The length of the raw descriptor buffer.
 
   @return The created configuration descriptor.
 
@@ -631,7 +628,7 @@ UsbGetOneString (
              );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Buf);
+    FreePool (Buf);
     return NULL;
   }
 
@@ -675,8 +672,8 @@ UsbBuildLangTable (
   Status = EFI_SUCCESS;
 
   Max   = (Desc->Length - 2) / 2;
-  Max   = (Max < USB_MAX_LANG_ID ? Max : USB_MAX_LANG_ID);
-
+  Max   = MIN(Max, USB_MAX_LANG_ID);
+  
   Point = Desc->String;
   for (Index = 0; Index < Max; Index++) {
     UsbDev->LangId[Index] = *Point;
@@ -693,7 +690,7 @@ ON_EXIT:
 
 /**
   Retrieve the indexed configure for the device. USB device
-  returns the configuration togetther with the interfaces for
+  returns the configuration together with the interfaces for
   this configuration. Configuration descriptor is also of
   variable length.
 
@@ -739,7 +736,7 @@ UsbGetOneConfig (
   if (EFI_ERROR (Status)) {
     DEBUG (( EFI_D_ERROR, "UsbGetOneConfig: failed to get full descript %r\n", Status));
 
-    gBS->FreePool (Buf);
+    FreePool (Buf);
     return NULL;
   }
 
@@ -813,7 +810,7 @@ UsbBuildDescTable (
 
     ConfigDesc = UsbParseConfigDesc ((UINT8 *) Config, Config->TotalLength);
 
-    gBS->FreePool (Config);
+    FreePool (Config);
 
     if (ConfigDesc == NULL) {
       DEBUG (( EFI_D_ERROR, "UsbBuildDescTable: failed to parse configure (index %d)\n", Index));
