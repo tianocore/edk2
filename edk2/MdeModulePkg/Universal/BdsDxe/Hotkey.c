@@ -23,9 +23,7 @@ VOID            *mHotkeyRegistration;
 
 
 /**
-
   Check if the Key Option is valid or not.
-
 
   @param KeyOption       The Hot Key Option to be checked.
 
@@ -67,15 +65,14 @@ IsKeyOptionValid (
 }
 
 /**
-
   Create Key#### for the given hotkey.
-
 
   @param KeyOption       The Hot Key Option to be added.
   @param KeyOptionNumber The key option number for Key#### (optional).
 
   @retval  EFI_SUCCESS            Register hotkey successfully.
   @retval  EFI_INVALID_PARAMETER  The hotkey option is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Fail to allocate memory resource.
 
 **/
 EFI_STATUS
@@ -110,7 +107,6 @@ RegisterHotkey (
   //
   // check whether HotKey conflict with keys used by Setup Browser
   //
-
   KeyOrder = BdsLibGetVariableAndSize (
                VAR_KEY_ORDER,
                &gEfiGlobalVariableGuid,
@@ -187,7 +183,7 @@ RegisterHotkey (
                   KeyOption
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (KeyOrder);
+    FreePool (KeyOrder);
     return Status;
   }
 
@@ -201,6 +197,7 @@ RegisterHotkey (
 
   NewKeyOrder = AllocatePool (KeyOrderSize);
   if (NewKeyOrder == NULL) {
+    FreePool (KeyOrder);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -307,11 +304,10 @@ UnregisterHotkey (
   This is the common notification function for HotKeys, it will be registered
   with SimpleTextInEx protocol interface - RegisterKeyNotify() of ConIn handle.
 
-
   @param KeyData         A pointer to a buffer that is filled in with the keystroke
                          information for the key that was pressed.
 
-  @retval  EFI_SUCCESS            KeyData is successfully processed.
+  @retval  EFI_SUCCESS   KeyData is successfully processed.
 
 **/
 EFI_STATUS
@@ -427,9 +423,7 @@ HotkeyCallback (
 }
 
 /**
-
   Register the common HotKey notify function to given SimpleTextInEx protocol instance.
-
 
   @param SimpleTextInEx  Simple Text Input Ex protocol instance
 
@@ -481,11 +475,8 @@ HotkeyRegisterNotify (
 /**
   Callback function for SimpleTextInEx protocol install events
 
-
   @param Event           the event that is signaled.
   @param Context         not used here.
-
-  @return VOID
 
 **/
 VOID
@@ -528,14 +519,12 @@ HotkeyEvent (
 }
 
 /**
-
   Insert Key Option to hotkey list.
-
 
   @param KeyOption       The Hot Key Option to be added to hotkey list.
 
-  @retval  EFI_SUCCESS  Add to hotkey list success.
-
+  @retval EFI_SUCCESS           Add to hotkey list success.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate memory resource.
 **/
 EFI_STATUS
 HotkeyInsertList (

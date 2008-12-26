@@ -232,7 +232,7 @@ UpdateFileExplorer (
   @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
   @retval  EFI_DEVICE_ERROR      The variable could not be saved.
   @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
-
+  @retval  EFI_INVALID_PARAMETER If paramter Value or ActionRequest is NULL.
 **/
 EFI_STATUS
 EFIAPI
@@ -259,7 +259,7 @@ FileExplorerCallback (
   *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
   //
-  // Retrive uncommitted data from Form Browser
+  // Retrieve uncommitted data from Form Browser
   //
   NvRamMap = &Private->FeFakeNvData;
   BufferSize = sizeof (FILE_EXPLORER_NV_DATA);

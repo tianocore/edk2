@@ -70,17 +70,16 @@ BdsLockFv (
   Then call the dispatcher to dispatch drivers from them. Finally, check
   the status of the updates.
 
+  This function should be called by BDS in case we need to do some
+  sort of processing even if there is no capsule to process. We
+  need to do this if an earlier update went away and we need to
+  clear the capsule variable so on the next reset PEI does not see it and
+  think there is a capsule available.
 
-  @param BootMode        - the current boot mode
+  @param BootMode                 the current boot mode
 
-  @retval  EFI_INVALID_PARAMETER  boot mode is not correct for an update
-                                  Note:
-                                  This function should be called by BDS in case we need to do some
-                                  sort of processing even if there is no capsule to process. We
-                                  need to do this if an earlier update went awry and we need to
-                                  clear the capsule variable so on the next reset PEI does not see it and
-                                  think there is a capsule available.
-  @retval EFI_SUCCESS There is no error when processing capsule
+  @retval EFI_INVALID_PARAMETER   boot mode is not correct for an update
+  @retval EFI_SUCCESS             There is no error when processing capsule
 
 **/
 EFI_STATUS
