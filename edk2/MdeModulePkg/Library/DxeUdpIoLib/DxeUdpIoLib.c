@@ -4,7 +4,7 @@
 Copyright (c) 2005 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -24,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  Free a UDP_TX_TOKEN. The event is closed and memory released.
+  Free a UDP_TX_TOKEN. The TX event is closed.
 
   @param  Token                 The UDP_TX_TOKEN to release.
 
@@ -39,9 +39,9 @@ UdpIoFreeTxToken (
 }
 
 /**
-  Free a receive request wrap.
+  Free a UDP_RX_TOKEN. The RX event is closed.
 
-  @param  Token                 The receive request to release.
+  @param  Token                 The UDP_RX_TOKEN to release.
 
 **/
 VOID
@@ -55,8 +55,9 @@ UdpIoFreeRxToken (
 
 /**
   The callback function when the packet is sent by UDP.
+  
   It will remove the packet from the local list then call
-  the packet owner's callback function.
+  the packet owner's callback function set by UdpIoSendDatagram.
 
   @param  Context               The UDP TX Token.
 
@@ -117,8 +118,9 @@ UdpIoRecycleDgram (
 }
 
 /**
-  The event handle for UDP receive request. It will build
-  a NET_BUF from the recieved UDP data, then deliver it
+  The event handle for UDP receive request.
+  
+  It will build a NET_BUF from the recieved UDP data, then deliver it
   to the receiver.
 
   @param  Context               The UDP RX token.
@@ -363,12 +365,15 @@ UdpIoWrapTx (
   return Token;
 }
 
-
-
-
 /**
-  Create a UDP IO port to access the UDP service. It will
-  create and configure a UDP child.
+  Create a UDP_IO_PORT to access the UDP service. It will create and configure
+  a UDP child.
+  
+  The function will locate the UDP service binding prototype on the Controller
+  parameter and use it to create a UDP child (aka Udp instance). Then the UDP
+  child will be configured by calling Configure function prototype. Any failures
+  in creating or configure the UDP child will lead to the failure of UDP_IO_PORT
+  creation.
 
   @param  Controller            The controller that has the UDP service binding
                                 protocol installed.
@@ -376,7 +381,7 @@ UdpIoWrapTx (
   @param  Configure             The function to configure the created UDP child
   @param  Context               The opaque parameter for the Configure funtion.
 
-  @return A point to just created UDP IO port or NULL if some error happened.
+  @return Newly-created UDP_IO_PORT or NULL if failed.
 
 **/
 UDP_IO_PORT *
@@ -465,12 +470,11 @@ FREE_MEM:
   return NULL;
 }
 
-
 /**
-  Cancel all the sent datagram that pass the selection of ToCancel.
+  Cancel all the sent datagram that pass the selection criteria of ToCancel.
   If ToCancel is NULL, all the datagrams are cancelled.
 
-  @param  UdpIo                 The UDP IO port to cancel packet
+  @param  UdpIo                 The UDP_IO_PORT to cancel packet
   @param  IoStatus              The IoStatus to return to the packet owners.
   @param  ToCancel              The select funtion to test whether to cancel this
                                 packet or not.
@@ -498,14 +502,14 @@ UdpIoCancelDgrams (
   }
 }
 
-
 /**
-  Free the UDP IO port and all its related resources including
-  all the transmitted packet.
+  Free the UDP_IO_PORT and all its related resources.
+  
+  The function will cancel all sent datagram and receive request.
 
-  @param  UdpIo                 The UDP IO port to free.
+  @param  UdpIo                 The UDP_IO_PORT to free.
 
-  @retval EFI_SUCCESS           The UDP IO port is freed.
+  @retval EFI_SUCCESS           The UDP_IO_PORT is freed.
 
 **/
 EFI_STATUS
@@ -557,11 +561,13 @@ UdpIoFreePort (
 
 
 /**
-  Clean up the UDP IO port. It will release all the transmitted
-  datagrams and receive request. It will also configure NULL the
-  UDP child.
+  Clean up the UDP_IO_PORT without freeing it. The function is called when
+  user wants to re-use the UDP_IO_PORT later.
+  
+  It will release all the transmitted datagrams and receive request. It will
+  also configure NULL for the UDP instance.
 
-  @param  UdpIo                 UDP IO port to clean up.
+  @param  UdpIo                 The UDP_IO_PORT to clean up.
 
 **/
 VOID
@@ -585,15 +591,20 @@ UdpIoCleanPort (
 }
 
 /**
-  Send a packet through the UDP IO port.
+  Send a packet through the UDP_IO_PORT.
+  
+  The packet will be wrapped in UDP_TX_TOKEN. Function Callback will be called
+  when the packet is sent. The optional parameter EndPoint overrides the default
+  address pair if specified.
 
-  @param  UdpIo                 The UDP IO Port to send the packet through
+  @param  UdpIo                 The UDP_IO_PORT to send the packet through
   @param  Packet                The packet to send
-  @param  EndPoint              The local and remote access point
+  @param  EndPoint              The local and remote access point. Override the
+                                default address pair set during configuration.
   @param  Gateway               The gateway to use
-  @param  CallBack              The call back function to call when packet is
+  @param  CallBack              The function being called when packet is
                                 transmitted or failed.
-  @param  Context               The opque parameter to the CallBack
+  @param  Context               The opaque parameter passed to CallBack
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the packet
   @retval EFI_SUCCESS           The packet is successfully delivered to UDP  for
@@ -637,10 +648,10 @@ UdpIoSendDatagram (
 
 
 /**
-  The selection function to cancel a single sent datagram.
+  The select function to cancel a single sent datagram.
 
-  @param  Token                 The UDP TX token to test againist.
-  @param  Context               The context
+  @param  Token                 The UDP_TX_TOKEN to test against
+  @param  Context               The NET_BUF of the sent datagram
 
   @retval TRUE              The packet is to be cancelled.
   @retval FALSE             The packet is not to be cancelled.
@@ -662,11 +673,10 @@ UdpIoCancelSingleDgram (
   return FALSE;
 }
 
-
 /**
   Cancel a single sent datagram.
 
-  @param  UdpIo                 The UDP IO port to cancel the packet from
+  @param  UdpIo                 The UDP_IO_PORT to cancel the packet from
   @param  Packet                The packet to cancel
 
 **/
@@ -681,17 +691,22 @@ UdpIoCancelSentDatagram (
 }
 
 /**
-  Issue a receive request to the UDP IO port.
+  Issue a receive request to the UDP_IO_PORT.
+  
+  This function is called when upper-layer needs packet from UDP for processing.
+  Only one receive request is acceptable at a time so a common usage model is
+  to invoke this function inside its Callback function when the former packet
+  is processed.
 
-  @param  UdpIo                 The UDP IO port to recieve the packet from.
-  @param  CallBack              The call back function to execute when receive
-                                finished.
-  @param  Context               The opque context to the call back
-  @param  HeadLen               The lenght of the application's header
+  @param  UdpIo                 The UDP_IO_PORT to receive the packet from.
+  @param  CallBack              The call back function to execute when the packet
+                                is received.
+  @param  Context               The opaque context passed to Callback
+  @param  HeadLen               The length of the upper-layer's protocol header
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request. Only
-                                one receive request is supported.
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate some resource.
+                                one receive request is supported at a time.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate needed resources.
   @retval EFI_SUCCESS           The receive request is issued successfully.
 
 **/
