@@ -545,6 +545,7 @@ USBKeyboardReadKeyStrokeWorker (
   EFI_STATUS                        Status;
   UINT8                             KeyCode;  
   LIST_ENTRY                        *Link;
+  LIST_ENTRY                        *NotifyList;
   KEYBOARD_CONSOLE_IN_EX_NOTIFY     *CurrentNotify;  
   EFI_KEY_DATA                      OriginalKeyData;
 
@@ -609,9 +610,10 @@ USBKeyboardReadKeyStrokeWorker (
   //
   // Invoke notification functions if the key is registered.
   //
-  for (Link = GetFirstNode (&UsbKeyboardDevice->NotifyList);
-       !IsNull (&UsbKeyboardDevice->NotifyList, Link);
-       Link = GetNextNode (&UsbKeyboardDevice->NotifyList, Link)) {
+  NotifyList = &UsbKeyboardDevice->NotifyList;
+  for (Link = GetFirstNode (NotifyList);
+       !IsNull (NotifyList, Link);
+       Link = GetNextNode (NotifyList, Link)) {
     CurrentNotify = CR (Link, KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
     if (IsKeyRegistered (&CurrentNotify->KeyData, &OriginalKeyData)) { 
       CurrentNotify->KeyNotificationFn (&OriginalKeyData);
@@ -622,7 +624,7 @@ USBKeyboardReadKeyStrokeWorker (
 }
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   There are 2 types of reset for USB keyboard.
   For non-exhaustive reset, only keyboard buffer is cleared.
@@ -695,7 +697,7 @@ USBKeyboardReset (
 
   @retval EFI_SUCCESS          The keystroke information was returned.
   @retval EFI_NOT_READY        There was no keystroke data availiable.
-  @retval EFI_DEVICE_ERROR     The keydtroke information was not returned due to
+  @retval EFI_DEVICE_ERROR     The keystroke information was not returned due to
                                hardware errors.
 
 **/
@@ -826,7 +828,7 @@ KbdFreeNotifyList (
   @param  InputData         A pointer to keystroke data for the key that was pressed.
 
   @retval TRUE              Key pressed matches a registered key.
-  @retval FLASE             Key pressed does not matche a registered key.
+  @retval FLASE             Key pressed does not matches a registered key.
 
 **/
 BOOLEAN
@@ -1015,7 +1017,7 @@ USBKeyboardSetState (
   @param  NotifyHandle                Points to the unique handle assigned to the registered notification.
 
   @retval EFI_SUCCESS                 The notification function was registered successfully.
-  @retval EFI_OUT_OF_RESOURCES        Unable to allocate resources for necesssary data structures.
+  @retval EFI_OUT_OF_RESOURCES        Unable to allocate resources for necessary data structures.
   @retval EFI_INVALID_PARAMETER       KeyData or NotifyHandle or KeyNotificationFunction is NULL.
 
 **/
@@ -1032,6 +1034,7 @@ USBKeyboardRegisterKeyNotify (
   EFI_STATUS                        Status;
   KEYBOARD_CONSOLE_IN_EX_NOTIFY     *NewNotify;
   LIST_ENTRY                        *Link;
+  LIST_ENTRY                        *NotifyList;
   KEYBOARD_CONSOLE_IN_EX_NOTIFY     *CurrentNotify;  
 
   if (KeyData == NULL || NotifyHandle == NULL || KeyNotificationFunction == NULL) {
@@ -1043,9 +1046,11 @@ USBKeyboardRegisterKeyNotify (
   //
   // Return EFI_SUCCESS if the (KeyData, NotificationFunction) is already registered.
   //
-  for (Link = GetFirstNode (&UsbKeyboardDevice->NotifyList);
-       !IsNull (&UsbKeyboardDevice->NotifyList, Link);
-       Link = GetNextNode (&UsbKeyboardDevice->NotifyList, Link)) {
+  NotifyList = &UsbKeyboardDevice->NotifyList;
+  
+  for (Link = GetFirstNode (NotifyList);
+       !IsNull (NotifyList, Link);
+       Link = GetNextNode (NotifyList, Link)) {
     CurrentNotify = CR (
                       Link, 
                       KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
@@ -1112,6 +1117,7 @@ USBKeyboardUnregisterKeyNotify (
   EFI_STATUS                        Status;
   KEYBOARD_CONSOLE_IN_EX_NOTIFY     *CurrentNotify;
   LIST_ENTRY                        *Link;
+  LIST_ENTRY                        *NotifyList;
 
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1137,9 +1143,10 @@ USBKeyboardUnregisterKeyNotify (
   //
   // Traverse notify list of USB keyboard and remove the entry of NotificationHandle.
   //
-  for (Link = GetFirstNode (&UsbKeyboardDevice->NotifyList);
-       !IsNull (&UsbKeyboardDevice->NotifyList, Link);
-       Link = GetNextNode (&UsbKeyboardDevice->NotifyList, Link)) {
+  NotifyList = &UsbKeyboardDevice->NotifyList;
+  for (Link = GetFirstNode (NotifyList);
+       !IsNull (NotifyList, Link);
+       Link = GetNextNode (NotifyList, Link)) {
     CurrentNotify = CR (
                       Link, 
                       KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
