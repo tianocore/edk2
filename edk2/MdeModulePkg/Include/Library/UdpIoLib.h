@@ -60,7 +60,7 @@ typedef struct {
 **/
 typedef
 VOID
-(EFIAPI *UDP_IO_CALLBACK) (
+(*UDP_IO_CALLBACK) (
   IN NET_BUF                *Packet,
   IN UDP_POINTS             *Points,
   IN EFI_STATUS             IoStatus,
@@ -149,7 +149,7 @@ struct _UDP_IO_PORT {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *UDP_IO_CONFIG) (
+(*UDP_IO_CONFIG) (
   IN UDP_IO_PORT            *UdpIo,
   IN VOID                   *Context
   );
