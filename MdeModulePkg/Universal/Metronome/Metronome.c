@@ -34,7 +34,7 @@ EFI_HANDLE  mMetronomeHandle = NULL;
 //
 EFI_METRONOME_ARCH_PROTOCOL mMetronome = {
   WaitForTick,
-  1		// TickPeriod = 1*100 ns units
+  1  // TickPeriod = 1*100 ns units
 };
 
 /**
