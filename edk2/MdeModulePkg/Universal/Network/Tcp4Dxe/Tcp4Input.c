@@ -282,6 +282,7 @@ TcpTrimSegment (
 
     Seg->Seq = Seg->End;
     NetbufTrim (Nbuf, Nbuf->TotalSize, NET_BUF_HEAD);
+    return;
   }
 
   //
@@ -1265,6 +1266,9 @@ NO_UPDATE:
 
       TcpClose (Tcb);
     }
+    break;
+
+  default:
     break;
   }
 

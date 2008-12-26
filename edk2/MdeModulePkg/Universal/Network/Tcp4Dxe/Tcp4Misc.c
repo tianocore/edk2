@@ -839,6 +839,9 @@ TcpOnAppConsume (
   case TCP_LAST_ACK:
   case TCP_TIME_WAIT:
     return;
+
+  default:
+    break;
   }
 }
 
