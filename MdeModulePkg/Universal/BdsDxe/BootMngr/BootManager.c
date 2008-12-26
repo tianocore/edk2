@@ -1,5 +1,5 @@
 /** @file
-  The platform boot manager reference implement
+  The platform boot manager reference implementation
 
 Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

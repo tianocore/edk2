@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Function creates a device path data structure that identically matches the
   device path passed in.
 
-
   @param DevPath         A pointer to a device path data structure.
 
   @return        The new copy of DevPath is created to identically match the input.
@@ -32,7 +31,6 @@ DevicePathInstanceDup (
 
 /**
   Update Com Ports attributes from DevicePath
-
 
   @param DevicePath      DevicePath that contains Com ports
 

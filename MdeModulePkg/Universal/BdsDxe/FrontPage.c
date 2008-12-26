@@ -42,14 +42,14 @@ FRONT_PAGE_CALLBACK_DATA  gFrontPagePrivate = {
   or more named elements from the target driver.
 
 
-  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-  @param Request         - A null-terminated Unicode string in <ConfigRequest> format.
-  @param Progress        - On return, points to a character in the Request string.
+  @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Request         A null-terminated Unicode string in <ConfigRequest> format.
+  @param Progress        On return, points to a character in the Request string.
                          Points to the string's null terminator if request was successful.
                          Points to the most recent '&' before the first failing name/value
                          pair (or the beginning of the string if the failure is in the
                          first name/value pair) if the request was not successful.
-  @param Results         - A null-terminated Unicode string in <ConfigAltResp> format which
+  @param Results         A null-terminated Unicode string in <ConfigAltResp> format which
                          has all values filled in for the names in the Request string.
                          String to be allocated by the called function.
 
@@ -75,9 +75,9 @@ FakeExtractConfig (
   This function processes the results of changes in configuration.
 
 
-  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-  @param Configuration   - A null-terminated Unicode string in <ConfigResp> format.
-  @param Progress        - A pointer to a string filled in with the offset of the most
+  @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Configuration   A null-terminated Unicode string in <ConfigResp> format.
+  @param Progress        A pointer to a string filled in with the offset of the most
                          recent '&' before the first failing name/value pair (or the
                          beginning of the string if the failure is in the first
                          name/value pair) or the terminating NULL if all was successful.
@@ -102,13 +102,13 @@ FakeRouteConfig (
   This function processes the results of changes in configuration.
 
 
-  @param This            - Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
-  @param Action          - Specifies the type of action taken by the browser.
-  @param QuestionId      - A unique value which is sent to the original exporting driver
+  @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param Action          Specifies the type of action taken by the browser.
+  @param QuestionId      A unique value which is sent to the original exporting driver
                          so that it can identify the type of data to expect.
-  @param Type            - The type of value for the question.
-  @param Value           - A pointer to the data being sent to the original exporting driver.
-  @param ActionRequest   - On return, points to the action requested by the callback function.
+  @param Type            The type of value for the question.
+  @param Value           A pointer to the data being sent to the original exporting driver.
+  @param ActionRequest   On return, points to the action requested by the callback function.
 
   @retval  EFI_SUCCESS           The callback successfully handled the action.
   @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
@@ -491,9 +491,9 @@ CallFrontPage (
   Acquire the string associated with the ProducerGuid and return it.
 
 
-  @param ProducerGuid    - The Guid to search the HII database for
-  @param Token           - The token value of the string to extract
-  @param String          - The string that is extracted
+  @param ProducerGuid    The Guid to search the HII database for
+  @param Token           The token value of the string to extract
+  @param String          The string that is extracted
 
   @retval  EFI_SUCCESS  The function returns EFI_SUCCESS always.
 
@@ -518,11 +518,8 @@ GetProducerString (
 /**
   Convert Processor Frequency Data to a string
 
-
-  @param ProcessorFrequency - The frequency data to process
-  @param String          - The string that is created
-
-  @return VOID.
+  @param ProcessorFrequency The frequency data to process
+  @param String             The string that is created
 
 **/
 VOID
@@ -559,9 +556,8 @@ ConvertProcessorToString (
 /**
   Convert Memory Size to a string.
 
-
-  @param MemorySize      - The size of the memory to process
-  @param String          - The string that is created
+  @param MemorySize      The size of the memory to process
+  @param String          The string that is created
 
 **/
 VOID
@@ -689,13 +685,11 @@ UpdateFrontPageStrings (
 /**
   Function waits for a given event to fire, or for an optional timeout to expire.
 
+  @param Event              The event to wait for
+  @param Timeout            An optional timeout value in 100 ns units.
 
-  @param Event           The event to wait for
-                        
-  @param Timeout         An optional timeout value in 100 ns units.
-
-  @retval  EFI_SUCCESS       Event fired before Timeout expired.
-  @retval  EFI_TIME_OUT      Timout expired before Event fired..
+  @retval  EFI_SUCCESS      Event fired before Timeout expired.
+  @retval  EFI_TIME_OUT     Timout expired before Event fired..
 
 **/
 EFI_STATUS
@@ -755,8 +749,7 @@ WaitForSingleEvent (
   Function show progress bar to wait for user input.
 
 
-  @param TimeoutDefault  - The fault time out value before the system
-                         continue to boot.
+  @param TimeoutDefault  The fault time out value before the system continue to boot.
 
   @retval  EFI_SUCCESS       User pressed some key except "Enter"
   @retval  EFI_TIME_OUT      Timout expired or user press "Enter"
@@ -850,12 +843,10 @@ ShowProgress (
   this is the platform reference part and can be customize.
 
 
-  @param TimeoutDefault  - The fault time out value before the system
-                         continue to boot.
-  @param ConnectAllHappened - The indicater to check if the connect all have
-                         already happended.
-
-  @return VOID.
+  @param TimeoutDefault     The fault time out value before the system
+                            continue to boot.
+  @param ConnectAllHappened The indicater to check if the connect all have
+                            already happended.
 
 **/
 VOID

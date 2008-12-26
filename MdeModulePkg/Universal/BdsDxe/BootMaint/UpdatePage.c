@@ -114,11 +114,9 @@ UpdatePageEnd (
 }
 
 /**
-  Clean up the dynamic opcode at label and form specified by
-  both LabelId. 
+  Clean up the dynamic opcode at label and form specified by both LabelId. 
 
-  @param LabelId         It is both the Form ID and Label ID for
-                         opcode deletion.
+  @param LabelId         It is both the Form ID and Label ID for opcode deletion.
   @param CallbackData    The BMM context data.
 
 **/
@@ -150,7 +148,7 @@ CleanUpPage (
                          of the file to be boot from.
 
   @retval EFI_SUCCESS    The function completed successfull.
-  @return                 Other value if the boot from the file fails.
+  @return Other value if the boot from the file fails.
 
 **/
 EFI_STATUS
@@ -163,7 +161,7 @@ BootThisFile (
   CHAR16            *ExitData;
   BDS_COMMON_OPTION *Option;
 
-  Status                  = gBS->AllocatePool (EfiBootServicesData, sizeof (BDS_COMMON_OPTION), (VOID **) &Option);
+  Option = (BDS_COMMON_OPTION *) AllocatePool (sizeof (BDS_COMMON_OPTION));
   Option->Description     = FileContext->FileName;
   Option->DevicePath      = FileContext->DevicePath;
   Option->LoadOptionsSize = 0;
@@ -562,7 +560,7 @@ UpdateOrderPage (
 
 /**
   Create the dynamic page to allow user to set
-  the "BootNext" vaule.
+  the "BootNext" value.
 
   @param CallbackData    The BMM context data.
 
@@ -633,8 +631,7 @@ UpdateBootNextPage (
 }
 
 /**
-  Create the dynamic page to allow user to set
-  the "TimeOut" vaule.
+  Create the dynamic page to allow user to set the "TimeOut" value.
 
   @param CallbackData    The BMM context data.
 
@@ -673,7 +670,7 @@ UpdateTimeOutPage (
 }
 
 /**
-  Refresh the text mode page
+  Refresh the text mode page.
 
   @param CallbackData    The BMM context data.
 
@@ -778,8 +775,7 @@ UpdateConModePage (
 }
 
 /**
-  Create the dynamic page which allows user to 
-  set the property such as Baud Rate, Data Bits,
+  Create the dynamic page which allows user to set the property such as Baud Rate, Data Bits,
   Parity, Stop Bits, Terminal Type.
 
   @param CallbackData    The BMM context data.

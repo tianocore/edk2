@@ -1,5 +1,5 @@
 /** @file
-  The platform device manager reference implement
+  The platform device manager reference implementation
 
 Copyright (c) 2004 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -43,7 +43,6 @@ DEVICE_MANAGER_MENU_ITEM  mDeviceManagerMenuItemTable[] = {
   This function is invoked if user selected a iteractive opcode from Device Manager's
   Formset. The decision by user is saved to gCallbackKey for later processing. If
   user set VBIOS, the new value is saved to EFI variable.
-
 
   @param This            Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
   @param Action          Specifies the type of action taken by the browser.
@@ -163,7 +162,6 @@ InitializeDeviceManager (
 }
 
 /**
-
   Call the browser and display the device manager to allow user
   to configure the platform.
 
@@ -171,7 +169,7 @@ InitializeDeviceManager (
   section header for all class of devices, one-of opcode to set VBIOS.
   
   @retval  EFI_SUCCESS             Operation is successful.
-  @retval  Other values if failed to clean up the dynamic content from HII
+  @return  Other values if failed to clean up the dynamic content from HII
            database.
 
 **/
@@ -306,7 +304,7 @@ CallDeviceManager (
                   &gEfiGenericPlatformVariableGuid,
                   &VideoOptionSize
                   );
-  if (NULL == VideoOption) {
+  if (VideoOption == NULL) {
     gDeviceManagerPrivate.VideoBios = 0;
   } else {
     gDeviceManagerPrivate.VideoBios = VideoOption[0];

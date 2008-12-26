@@ -20,7 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   make sure BootOrder is in valid state.
 
   @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to  
-                        BM_LOAD_CONTEXT marked for deletion is deleted
+                        BM_LOAD_CONTEXT marked for deletion is deleted.
+  @retval EFI_NOT_FOUND If can not find the boot option want to be deleted.
   @return Others        If failed to update the "BootOrder" variable after deletion. 
 
 **/
@@ -176,7 +177,8 @@ Var_ChangeBootOrder (
   After deleting this Driver option, call Var_ChangeDriverOrder to
   make sure DriverOrder is in valid state.
 
-  @retval EFI_SUCCESS Load Option is successfully updated.
+  @retval EFI_SUCCESS       Load Option is successfully updated.
+  @retval EFI_NOT_FOUND     Fail to find the driver option want to be deleted.
   @return Other value than EFI_SUCCESS if failed to update "Driver Order" EFI
           Variable.
 
@@ -476,8 +478,7 @@ Var_UpdateConsoleOption (
   console device.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
-                         for detail return information.
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 **/
 EFI_STATUS
 Var_UpdateConsoleInpOption (
@@ -492,8 +493,7 @@ Var_UpdateConsoleInpOption (
   console device.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
-                         for detail return information.
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 **/
 EFI_STATUS
 Var_UpdateConsoleOutOption (
@@ -508,8 +508,7 @@ Var_UpdateConsoleOutOption (
   console device.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
-                         for detail return information.
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.  
 **/
 EFI_STATUS
 Var_UpdateErrorOutOption (
@@ -586,6 +585,7 @@ Var_UpdateDriverOption (
 
   NewMenuEntry = BOpt_CreateMenuEntry (BM_LOAD_CONTEXT_SELECT);
   if (NULL == NewMenuEntry) {
+    FreePool (Buffer);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1007,10 +1007,9 @@ Var_UpdateBootOrder (
 
   @param CallbackData    The BMM context data.
 
-  @retval EFI_SUCCESS    The function complete successfully.
-  @retval EFI_SUCCESS    Not enough memory to complete the function.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
-                         for detail return information.
+  @retval EFI_SUCCESS           The function complete successfully.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory to complete the function.
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 
 **/
 EFI_STATUS
@@ -1076,9 +1075,9 @@ Var_UpdateDriverOrder (
 
   @param CallbackData    The context data for BMM.
 
-  @return EFI_SUCCESS    The function completed successfully.
-  @retval EFI_NOT_FOUND  If L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable can be found.
-
+  @return EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         If L"LegacyDevOrder" and EfiLegacyDevOrderGuid EFI Variable can be found.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate memory resource
 **/
 EFI_STATUS
 Var_UpdateBBSOption (
@@ -1169,7 +1168,7 @@ Var_UpdateBBSOption (
                         &VarSize
                         );
 
-  if (NULL == VarData) {
+  if (VarData == NULL) {
     return EFI_NOT_FOUND;
   }
 
@@ -1192,7 +1191,7 @@ Var_UpdateBBSOption (
   }
 
   NewOrder = (UINT16 *) AllocateZeroPool (DevOrder->Length - sizeof (UINT16));
-  if (NULL == NewOrder) {
+  if (NewOrder == NULL) {
     FreePool (VarData);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1243,7 +1242,7 @@ Var_UpdateBBSOption (
   //
   BootOptionVar = GetLegacyBootOptionVar (CallbackData->BbsType, &Index, &OptionSize);
 
-  if (NULL != BootOptionVar) {
+  if (BootOptionVar != NULL) {
     CopyMem (
       DescString,
       LegacyDeviceContext->Description,
@@ -1263,7 +1262,7 @@ Var_UpdateBBSOption (
 
     Attribute = (UINT32 *) Ptr;
     *Attribute |= LOAD_OPTION_ACTIVE;
-    if (0xFF == LegacyDev[0]) {
+    if (LegacyDev[0] == 0xFF) {
       //
       // Disable this legacy boot option
       //
@@ -1276,7 +1275,7 @@ Var_UpdateBBSOption (
     Ptr += StrSize ((CHAR16 *) Ptr);
 
     NewOptionPtr = AllocateZeroPool (NewOptionSize);
-    if (NULL == NewOptionPtr) {
+    if (NewOptionPtr == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 

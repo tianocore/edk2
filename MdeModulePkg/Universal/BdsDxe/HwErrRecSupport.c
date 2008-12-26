@@ -22,10 +22,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
   @param HwErrRecSupportLevel
-                         zero value      - Indicates that the platform implements no support for
-                         Hardware Error Record Persistence.
-                         non-zero value  - Indicates that the platform implements Hardware Error
-                         Record Persistence.
+                         zero value:      Indicates that the platform implements no support for
+                                          Hardware Error Record Persistence.
+                         non-zero value:  Indicates that the platform implements Hardware Error
+                                          Record Persistence.
 
 **/
 VOID
