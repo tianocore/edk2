@@ -288,7 +288,7 @@ UDP_TX_TOKEN *
 UdpIoWrapTx (
   IN UDP_IO_PORT            *UdpIo,
   IN NET_BUF                *Packet,
-  IN UDP_POINTS             *EndPoint, OPTIONAL
+  IN UDP_POINTS             *EndPoint  OPTIONAL,
   IN IP4_ADDR               Gateway,
   IN UDP_IO_CALLBACK        CallBack,
   IN VOID                   *Context
