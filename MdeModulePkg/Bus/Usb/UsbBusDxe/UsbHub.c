@@ -252,7 +252,7 @@ UsbHubCtrlGetHubStatus (
   @param  State                 Variable to return the hub port state.
 
   @retval EFI_SUCCESS           The port state is returned in State.
-  @retval Others                Failed to retrive the port state.
+  @retval Others                Failed to retrieve the port state.
 
 **/
 EFI_STATUS
@@ -627,6 +627,7 @@ UsbHubInit (
   USB_DEVICE              *HubDev;
   EFI_STATUS              Status;
   UINT8                   Index;
+  UINT8                   NumEndpoints;
 
   //
   // Locate the interrupt endpoint for port change map
@@ -635,8 +636,9 @@ UsbHubInit (
   Setting       = HubIf->IfSetting;
   HubDev        = HubIf->Device;
   EpDesc        = NULL;
+  NumEndpoints  = Setting->Desc.NumEndpoints;
 
-  for (Index = 0; Index < Setting->Desc.NumEndpoints; Index++) {
+  for (Index = 0; Index < NumEndpoints; Index++) {
     ASSERT ((Setting->Endpoints != NULL) && (Setting->Endpoints[Index] != NULL));
 
     EpDesc = Setting->Endpoints[Index];
@@ -647,7 +649,7 @@ UsbHubInit (
     }
   }
 
-  if (Index == Setting->Desc.NumEndpoints) {
+  if (Index == NumEndpoints) {
     DEBUG (( EFI_D_ERROR, "UsbHubInit: no interrupt endpoint found for hub %d\n", HubDev->Address));
     return EFI_DEVICE_ERROR;
   }
@@ -862,7 +864,7 @@ UsbHubClearPortFeature (
 
 
 /**
-  Interface funtion to reset the port.
+  Interface function to reset the port.
 
   @param  HubIf                 The hub interface.
   @param  Port                  The port to reset.
@@ -964,7 +966,7 @@ UsbHubRelease (
 
   @param  HubIf                 The root hub interface.
 
-  @retval EFI_SUCCESS           The interface is initialied for root hub.
+  @retval EFI_SUCCESS           The interface is initialized for root hub.
   @retval Others                Failed to initialize the hub.
 
 **/
@@ -1155,7 +1157,7 @@ UsbRootHubClearPortFeature (
 
 
 /**
-  Interface funtion to reset the root hub port.
+  Interface function to reset the root hub port.
 
   @param  RootIf                The root hub interface.
   @param  Port                  The port to reset.
