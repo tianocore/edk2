@@ -25,7 +25,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = EdkCompatibilityPkg
   PACKAGE_GUID                   = 98EDD7B0-2A6C-4b4a-AC72-4AAE0F95A3F8
-  PACKAGE_VERSION                = 0.1
+  PACKAGE_VERSION                = 0.5
   
   
 ################################################################################
