@@ -549,15 +549,13 @@ TcpTickingDpc (
         //
         if ((Next->BackLink != Entry) ||
             (Tcb->EnabledTimer == 0)) {
-
-          goto NextConnection;
+          break;
         }
       }
     }
-
-    TcpUpdateTimer (Tcb);
-NextConnection:
-    ;
+    if (Index == TCP_TIMER_NUMBER) {
+      TcpUpdateTimer (Tcb);
+    }
   }
 }
 
