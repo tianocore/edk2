@@ -1490,7 +1490,7 @@ UhciAllocateDev (
   return Uhc;
 
 ON_ERROR:
-  gBS->FreePool (Uhc);
+  FreePool (Uhc);
   return NULL;
 }
 
@@ -1520,7 +1520,7 @@ UhciFreeDev (
     FreeUnicodeStringTable (Uhc->CtrlNameTable);
   }
 
-  gBS->FreePool (Uhc);
+  FreePool (Uhc);
 }
 
 

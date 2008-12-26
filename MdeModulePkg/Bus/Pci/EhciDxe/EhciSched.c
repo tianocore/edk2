@@ -981,7 +981,7 @@ EhcMoniteAsyncRequests (
     }
 
     if (ProcBuf != NULL) {
-      gBS->FreePool (ProcBuf);
+      FreePool (ProcBuf);
     }
   }
 
