@@ -763,10 +763,12 @@ CheckModeSupported (
   EFI_STATUS Status;
   UINTN      SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+  UINT32     MaxMode;
 
-  Status = EFI_SUCCESS;
-
-  for (ModeNumber = 0; ModeNumber < GraphicsOutput->Mode->MaxMode; ModeNumber++) {
+  Status  = EFI_SUCCESS;
+  MaxMode = GraphicsOutput->Mode->MaxMode;
+  
+  for (ModeNumber = 0; ModeNumber < MaxMode; ModeNumber++) {
     Status = GraphicsOutput->QueryMode (
                        GraphicsOutput,
                        ModeNumber,
@@ -778,11 +780,11 @@ CheckModeSupported (
           (Info->VerticalResolution == VerticalResolution)) {
         Status = GraphicsOutput->SetMode (GraphicsOutput, ModeNumber);
         if (!EFI_ERROR (Status)) {
-          gBS->FreePool (Info);
+          FreePool (Info);
           break;
         }
       }
-      gBS->FreePool (Info);
+      FreePool (Info);
     }
   }
 
