@@ -222,7 +222,7 @@ TcpComponentNameGetDriverName (
            This->SupportedLanguages,
            mTcpDriverNameTable,
            DriverName,
-           (BOOLEAN)(This == &gTcp4ComponentName)
+           (BOOLEAN) (This == &gTcp4ComponentName)
            );
 }
 

@@ -124,8 +124,8 @@ TcpBuildOption (
 **/
 INTN
 TcpParseOption (
-  IN TCP_HEAD   *Tcp,
-  IN TCP_OPTION *Option
+  IN     TCP_HEAD   *Tcp,
+  IN OUT TCP_OPTION *Option
   );
 
 /**

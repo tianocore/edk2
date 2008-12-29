@@ -59,8 +59,8 @@ TcpGetUint32 (
 **/
 VOID
 TcpPutUint32 (
-  IN UINT8  *Buf,
-  IN UINT32 Data
+     OUT UINT8  *Buf,
+  IN     UINT32 Data
   )
 {
   Data = HTONL (Data);
@@ -236,8 +236,8 @@ TcpBuildOption (
 **/
 INTN
 TcpParseOption (
-  IN TCP_HEAD   *Tcp,
-  IN TCP_OPTION *Option
+  IN     TCP_HEAD   *Tcp,
+  IN OUT TCP_OPTION *Option
   )
 {
   UINT8 *Head;

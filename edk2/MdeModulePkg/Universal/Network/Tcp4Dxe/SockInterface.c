@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  Event                The event to be checked.
 
   @retval  TRUE                The specific Event exists in the List. 
-  @retval  False               The specific Event is not in the List.
+  @retval  FALSE               The specific Event is not in the List.
 
 **/
 BOOLEAN
@@ -57,7 +57,8 @@ SockTokenExistedInList (
   @param  Sock                 Pointer to the instance's socket.
   @param  Event                The event to be checked.
 
-  @return The specific Event exists in one of socket's lists or not.
+  @retval  TRUE                The Event exists in related socket's lists. 
+  @retval  FALSE               The Event is not in related socket's lists.
 
 **/
 BOOLEAN
@@ -139,7 +140,7 @@ SockBufferToken (
 **/
 EFI_STATUS
 SockDestroyChild (
-  IN   SOCKET *Sock
+  IN SOCKET *Sock
   )
 {
   EFI_STATUS  Status;

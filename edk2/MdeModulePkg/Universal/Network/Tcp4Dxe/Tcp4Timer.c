@@ -24,7 +24,7 @@ UINT32    mTcpTick = 1000;
 **/
 VOID
 TcpConnectTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   );
 
 /**
@@ -35,7 +35,7 @@ TcpConnectTimeout (
 **/
 VOID
 TcpRexmitTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   );
   
 /**
@@ -46,7 +46,7 @@ TcpRexmitTimeout (
 **/
 VOID
 TcpProbeTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   );
 
 /**
@@ -57,7 +57,7 @@ TcpProbeTimeout (
 **/
 VOID
 TcpKeepaliveTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   );
 
 /**
@@ -68,7 +68,7 @@ TcpKeepaliveTimeout (
 **/
 VOID
 TcpFinwait2Timeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   );
 
 /**
@@ -79,7 +79,7 @@ TcpFinwait2Timeout (
 **/
 VOID
 Tcp2MSLTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   );
 
 TCP_TIMER_HANDLER mTcpTimerHandler[TCP_TIMER_NUMBER] = {
@@ -99,7 +99,7 @@ TCP_TIMER_HANDLER mTcpTimerHandler[TCP_TIMER_NUMBER] = {
 **/
 VOID
 TcpClose (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   NetbufFreeList (&Tcb->SndQue);
@@ -117,7 +117,7 @@ TcpClose (
 **/
 VOID
 TcpConnectTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   if (!TCP_CONNECTED (Tcb->State)) {
@@ -149,7 +149,7 @@ TcpConnectTimeout (
 **/
 VOID
 TcpRexmitTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   UINT32  FlightSize;
@@ -200,7 +200,7 @@ TcpRexmitTimeout (
 **/
 VOID
 TcpProbeTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   //
@@ -228,7 +228,7 @@ TcpProbeTimeout (
 **/
 VOID
 TcpKeepaliveTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   Tcb->KeepAliveProbes++;
@@ -259,7 +259,7 @@ TcpKeepaliveTimeout (
 **/
 VOID
 TcpFinwait2Timeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   DEBUG ((EFI_D_WARN, "TcpFinwait2Timeout: connection closed "
@@ -277,7 +277,7 @@ TcpFinwait2Timeout (
 **/
 VOID
 Tcp2MSLTimeout (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   DEBUG ((EFI_D_WARN, "Tcp2MSLTimeout: connection closed "
@@ -296,7 +296,7 @@ Tcp2MSLTimeout (
 **/
 VOID
 TcpUpdateTimer (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   UINT16  Index;
@@ -330,9 +330,9 @@ TcpUpdateTimer (
 **/
 VOID
 TcpSetTimer (
-  IN TCP_CB *Tcb,
-  IN UINT16 Timer,
-  IN UINT32 TimeOut
+  IN OUT TCP_CB *Tcb,
+  IN     UINT16 Timer,
+  IN     UINT32 TimeOut
   )
 {
   TCP_SET_TIMER (Tcb->EnabledTimer, Timer);
@@ -351,8 +351,8 @@ TcpSetTimer (
 **/
 VOID
 TcpClearTimer (
-  IN TCP_CB *Tcb,
-  IN UINT16 Timer
+  IN OUT TCP_CB *Tcb,
+  IN     UINT16 Timer
   )
 {
   TCP_CLEAR_TIMER (Tcb->EnabledTimer, Timer);
@@ -368,7 +368,7 @@ TcpClearTimer (
 **/
 VOID
 TcpClearAllTimer (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   Tcb->EnabledTimer = 0;
@@ -384,7 +384,7 @@ TcpClearAllTimer (
 **/
 VOID
 TcpSetProbeTimer (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   if (!TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_PROBE)) {
@@ -414,7 +414,7 @@ TcpSetProbeTimer (
 **/
 VOID
 TcpSetKeepaliveTimer (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_KEEPALIVE)) {
@@ -450,7 +450,7 @@ TcpSetKeepaliveTimer (
 **/
 VOID
 TcpBackoffRto (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   //
@@ -553,6 +553,10 @@ TcpTickingDpc (
         }
       }
     }
+    
+    //
+    // If the Tcb still exist or some timer is set, update the timer
+    //
     if (Index == TCP_TIMER_NUMBER) {
       TcpUpdateTimer (Tcb);
     }
