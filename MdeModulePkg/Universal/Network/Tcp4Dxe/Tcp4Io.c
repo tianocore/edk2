@@ -26,8 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  Context     Pointer to the context configured in IpIoOpen(), not used
                       now.
 
-  @return None
-
 **/
 VOID
 Tcp4RxCallback (

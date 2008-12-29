@@ -86,8 +86,8 @@ SockSetTcpRxData (
 **/
 UINT32
 SockProcessRcvToken (
-  IN SOCKET        *Sock,
-  IN SOCK_IO_TOKEN *RcvToken
+  IN     SOCKET        *Sock,
+  IN OUT SOCK_IO_TOKEN *RcvToken
   );
 
 /**
@@ -98,7 +98,7 @@ SockProcessRcvToken (
 **/
 VOID
 SockConnFlush (
-  IN SOCKET *Sock
+  IN OUT SOCKET *Sock
   );
 
 /**
@@ -122,7 +122,7 @@ SockCreate (
 **/
 VOID
 SockDestroy (
-  IN SOCKET *Sock
+  IN OUT SOCKET *Sock
   );
 
 #endif

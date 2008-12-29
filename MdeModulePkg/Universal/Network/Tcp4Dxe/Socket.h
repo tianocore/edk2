@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _SOCKET_H_
 #define _SOCKET_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Ip4.h>
 #include <Protocol/Tcp4.h>
@@ -23,12 +23,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/NetLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/BaseMemoryLib.h>
 
 #define SOCK_SND_BUF        0
 #define SOCK_RCV_BUF        1
@@ -244,8 +240,8 @@ EFI_STATUS
 **/
 VOID
 SockSetState (
-  IN SOCKET     *Sock,
-  IN SOCK_STATE State
+  IN OUT SOCKET     *Sock,
+  IN     SOCK_STATE State
   );
 
 /**
@@ -276,7 +272,7 @@ SockConnEstablished (
 **/
 VOID
 SockConnClosed (
-  IN SOCKET *Sock
+  IN OUT SOCKET *Sock
   );
 
 /**
@@ -328,7 +324,7 @@ SockGetDataToSend (
 **/
 VOID
 SockNoMoreData (
-  IN SOCKET *Sock
+  IN OUT SOCKET *Sock
   );
 
 /**
@@ -345,9 +341,9 @@ SockNoMoreData (
 **/
 VOID
 SockDataRcvd (
-  IN SOCKET    *Sock,
-  IN NET_BUF   *NetBuffer,
-  IN UINT32    UrgLen
+  IN     SOCKET    *Sock,
+  IN OUT NET_BUF   *NetBuffer,
+  IN     UINT32    UrgLen
   );
 
 /**
@@ -389,8 +385,8 @@ SockClone (
 **/
 VOID
 SockRcvdErr (
-  IN SOCKET       *Sock,
-  IN EFI_STATUS   Error
+  IN OUT SOCKET       *Sock,
+  IN     EFI_STATUS   Error
   );
 
 ///

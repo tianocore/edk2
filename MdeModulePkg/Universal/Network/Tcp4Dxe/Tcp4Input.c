@@ -46,8 +46,8 @@ TcpSeqAcceptable (
 **/
 VOID
 TcpFastRecover (
-  IN TCP_CB  *Tcb,
-  IN TCP_SEG *Seg
+  IN OUT TCP_CB  *Tcb,
+  IN     TCP_SEG *Seg
   )
 {
   UINT32  FlightSize;
@@ -156,8 +156,8 @@ TcpFastRecover (
 **/
 VOID
 TcpFastLossRecover (
-  IN TCP_CB  *Tcb,
-  IN TCP_SEG *Seg
+  IN OUT TCP_CB  *Tcb,
+  IN     TCP_SEG *Seg
   )
 {
   if (TCP_SEQ_GT (Seg->Ack, Tcb->SndUna)) {
@@ -200,8 +200,8 @@ TcpFastLossRecover (
 **/
 VOID
 TcpComputeRtt (
-  IN TCP_CB *Tcb,
-  IN UINT32 Measure
+  IN OUT TCP_CB *Tcb,
+  IN     UINT32 Measure
   )
 {
   INT32 Var;
@@ -369,7 +369,7 @@ TcpTrimInWnd (
 **/
 INTN
 TcpDeliverData (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   )
 {
   LIST_ENTRY      *Entry;
@@ -533,8 +533,8 @@ TcpDeliverData (
 **/
 VOID
 TcpQueueData (
-  IN TCP_CB  *Tcb,
-  IN NET_BUF *Nbuf
+  IN OUT TCP_CB  *Tcb,
+  IN     NET_BUF *Nbuf
   )
 {
   TCP_SEG         *Seg;
