@@ -16,21 +16,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Snp.h"
 
 /**
-  this routine calls undi to receive a packet and fills in the data in the
-  input pointers!
+  Call UNDI to receive a packet and fills in the data in the input pointers.
 
-  @param  Snp                 pointer to snp driver structure
-  @param  Buffer           pointer to the memory for the received data
-  @param  BufferSize         is a pointer to the length of the buffer on entry and
-                              contains the length of the received data on return
-  @param  HeaderSize       pointer to the header portion of the data received.
-  @param  SrcAddr       optional parameter, is a pointer to contain the
-                              source ethernet address on return
-  @param  DestAddr  optional parameter, is a pointer to contain the
-                              destination ethernet address on return
-  @param  Protocol         optional parameter, is a pointer to contain the
-                              protocol type from the ethernet header on return
+  @param  Snp          Pointer to snp driver structure
+  @param  Buffer       Pointer to the memory for the received data
+  @param  BufferSize   Pointer to the length of the buffer on entry and contains
+                       the length of the received data on return
+  @param  HeaderSize   Pointer to the header portion of the data received.
+  @param  SrcAddr      Pointer to contain the source ethernet address on return 
+  @param  DestAddr     Pointer to contain the destination ethernet address on 
+                       return
+  @param  Protocol     Pointer to contain the protocol type from the ethernet 
+                       header on return
 
+
+  @retval EFI_SUCCESS           The received data was stored in Buffer, and 
+                                BufferSize has been updated to the number of 
+                                bytes received.
+  @retval EFI_DEVICE_ERROR      Fail to execute UNDI command. 
+  @retval EFI_NOT_READY         No packets have been received on the network 
+                                interface.
+  @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the received 
+                                packets. BufferSize has been updated to the
+                                required size.
 
 **/
 EFI_STATUS
@@ -74,7 +82,7 @@ PxeReceive (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.receive ()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive ()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -84,7 +92,7 @@ PxeReceive (
 
   case PXE_STATCODE_NO_DATA:
     DEBUG (
-      (EFI_D_NET,
+      (EFI_D_ERROR | EFI_D_NET,
       "\nsnp->undi.receive ()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -94,7 +102,7 @@ PxeReceive (
 
   default:
     DEBUG (
-      (EFI_D_ERROR,
+      (EFI_D_ERROR | EFI_D_NET,
       "\nsnp->undi.receive()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -118,7 +126,10 @@ PxeReceive (
   }
 
   if (Protocol != NULL) {
-    *Protocol = (UINT16) PXE_SWAP_UINT16 (Db->Protocol); /*  we need to do the byte swapping */
+    //
+    // We need to do the byte swapping
+    //
+    *Protocol = (UINT16) PXE_SWAP_UINT16 (Db->Protocol);
   }
 
   return (*BufferSize <= BuffSize) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL;

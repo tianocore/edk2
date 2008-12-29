@@ -16,13 +16,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  this routine calls undi to read the MAC address of the NIC and updates the
-  mode structure with the address.
+  Call UNDI to read the MAC address of the NIC and update the mode structure 
+  with the address. 
 
-  @param  Snp         pointer to snp driver structure.
+  @param  Snp         Pointer to snp driver structure.
    
-  @retval EFI_SUCCESS       the MAC address of the NIC is read successfully.
-  @retval EFI_DEVICE_ERROR  failed to read the MAC address of the NIC.
+  @retval EFI_SUCCESS       The MAC address of the NIC is read successfully.
+  @retval EFI_DEVICE_ERROR  Failed to read the MAC address of the NIC.
 
 **/
 EFI_STATUS
@@ -50,7 +50,7 @@ PxeGetStnAddr (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.station_addr()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -90,10 +90,10 @@ PxeGetStnAddr (
 
 
 /**
-  this routine calls undi to set a new MAC address for the NIC,
+  Call UNDI to set a new MAC address for the NIC.
 
-  @param  Snp         pointer to Snp driver structure
-  @param  NewMacAddr  pointer to a mac address to be set for the nic, if this is
+  @param  Snp         Pointer to Snp driver structure.
+  @param  NewMacAddr  Pointer to a MAC address to be set for the NIC, if this is
                       NULL then this routine resets the mac address to the NIC's
                       original address.
 
@@ -139,7 +139,7 @@ PxeSetStnAddr (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.station_addr()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 

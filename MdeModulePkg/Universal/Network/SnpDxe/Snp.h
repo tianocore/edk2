@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _SNP_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/PciIo.h>

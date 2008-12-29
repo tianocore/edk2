@@ -16,14 +16,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Snp.h"
 
 /**
-  this routine calls undi to initialize the interface.
+  Call UNDI to initialize the interface.
 
-  @param  Snp                   pointer to snp driver structure
-  @param  CableDetectFlag       Do/don't detect the cable (depending on what undi supports)
+  @param  Snp                   Pointer to snp driver structure.
+  @param  CableDetectFlag       Do/don't detect the cable (depending on what 
+                                undi supports).
   
-  @retval EFI_SUCCESS           UNDI is initialized successfully
-  @retval EFI_DEVICE_ERROR      UNDI could not be initialized
-  @retval Other                 other errors 
+  @retval EFI_SUCCESS           UNDI is initialized successfully.
+  @retval EFI_DEVICE_ERROR      UNDI could not be initialized.
+  @retval Other                 Other errors as indicated.
 
 **/
 EFI_STATUS
@@ -94,7 +95,7 @@ PxeInit (
   Snp->Cdb.IFnum      = Snp->IfNum;
   Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_NET, "\nSnp->undi.initialize()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.initialize()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -104,7 +105,7 @@ PxeInit (
     Status          = EFI_SUCCESS;
   } else {
     DEBUG (
-      (EFI_D_WARN,
+      (EFI_D_ERROR,
       "\nSnp->undi.initialize()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

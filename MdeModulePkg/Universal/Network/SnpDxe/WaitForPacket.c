@@ -25,8 +25,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 EFIAPI
 SnpWaitForPacketNotify (
-  EFI_EVENT Event,
-  VOID      *SnpPtr
+  EFI_EVENT     Event,
+  VOID          *SnpPtr
   )
 {
   PXE_DB_GET_STATUS PxeDbGetStatus;
@@ -90,5 +90,3 @@ SnpWaitForPacketNotify (
     gBS->SignalEvent (Event);
   }
 }
-
-/* eof - WaitForPacket.c */

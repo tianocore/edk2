@@ -16,19 +16,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  This routine calls undi to create the meadia header for the given data buffer.
+  Call UNDI to create the meadia header for the given data buffer.
 
-  @param  Snp                 pointer to SNP driver structure
-  @param  MacHeaderPtr        address where the media header will be filled in.
-  @param  HeaderSize       size of the memory at MacHeaderPtr
-  @param  Buffer           data buffer pointer
-  @param  BufferSize        Size of data in the Buffer
-  @param  DestAddr  address of the destination mac address buffer
-  @param  SrcAddr       address of the source mac address buffer
-  @param  ProtocolPtr         address of the protocol type
+  @param  Snp              Pointer to SNP driver structure.
+  @param  MacHeaderPtr     Address where the media header will be filled in.
+  @param  HeaderSize       Size of the memory at MacHeaderPtr.
+  @param  Buffer           Data buffer pointer.
+  @param  BufferSize       Size of data in the Buffer
+  @param  DestAddr         Address of the destination mac address buffer.
+  @param  SrcAddr          Address of the source mac address buffer.
+  @param  ProtocolPtr      Address of the protocol type.
 
-  @retval EFI_SUCCESS         if successfully completed the undi call
-  @retval Other               error return from undi call.
+  @retval EFI_SUCCESS      Successfully completed the undi call.
+  @retval Other            Error return from undi call.
 
 **/
 EFI_STATUS
@@ -101,7 +101,7 @@ PxeFillHeader (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.fill_header()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.fill_header()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
 
@@ -177,16 +177,16 @@ PxeTransmit (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.transmit()  "));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
-  DEBUG ((EFI_D_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.transmit()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
 
   (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
 
-  DEBUG ((EFI_D_NET, "\nexit Snp->undi.transmit()  "));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.StatCode == %r", Snp->Cdb.StatCode));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nexit Snp->undi.transmit()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->Cdb.StatCode == %r", Snp->Cdb.StatCode));
 
   //
   // we will unmap the buffers in get_status call, not here

@@ -16,12 +16,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  this routine calls undi to shut down the interface.
+  Call UNDI to shut down the interface.
 
-  @param  Snp   pointer to snp driver structure
+  @param  Snp   Pointer to snp driver structure.
 
-  @retval EFI_SUCCESS        UNDI is shut down successfully
-  @retval EFI_DEVICE_ERROR   UNDI could not be shut down
+  @retval EFI_SUCCESS        UNDI is shut down successfully.
+  @retval EFI_DEVICE_ERROR   UNDI could not be shut down.
 
 **/
 EFI_STATUS
@@ -43,7 +43,7 @@ PxeShutdown (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.shutdown()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.shutdown()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -51,7 +51,7 @@ PxeShutdown (
     //
     // UNDI could not be shutdown. Return UNDI error.
     //
-    DEBUG ((EFI_D_WARN, "\nsnp->undi.shutdown()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
+    DEBUG ((EFI_D_ERROR, "\nsnp->undi.shutdown()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
 
     return EFI_DEVICE_ERROR;
   }

@@ -16,15 +16,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Snp.h"
 
 /**
-  this routine calls undi to get the status of the interrupts, get the list of
-  transmit buffers that completed transmitting!
+  Call undi to get the status of the interrupts, get the list of transmit 
+  buffers that completed transmitting. 
 
-  @param  Snp                     pointer to snp driver structure
-  @param  InterruptStatusPtr      a non null pointer gets the interrupt status
-  @param  TransmitBufferListPtrs  a non null ointer gets the list of pointers of
-                                  previously  transmitted buffers whose
-                                  transmission was completed  asynchrnously.
-
+  @param  Snp                     Pointer to snp driver structure.
+  @param  InterruptStatusPtr      A non null pointer to contain the interrupt 
+                                  status.
+  @param  TransmitBufferListPtrs  A non null pointer to contain the list of 
+                                  pointers of previous transmitted buffers whose
+                                  transmission was completed asynchrnously.
+   
+  @retval EFI_SUCCESS         The status of the network interface was retrieved.
+  @retval EFI_DEVICE_ERROR    The command could not be sent to the network 
+                              interface.
 
 **/
 EFI_STATUS
@@ -68,13 +72,13 @@ PxeGetStatus (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.get_status()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.get_status()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != EFI_SUCCESS) {
     DEBUG (
-      (EFI_D_NET,
+      (EFI_D_ERROR | EFI_D_NET,
       "\nSnp->undi.get_status()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatFlags)
