@@ -309,7 +309,7 @@ BdsLibConnectAllConsoles (
           &HandleCount,
           &HandleBuffer
           );
-  
+
   for (Index = 0; Index < HandleCount; Index++) {
     gBS->HandleProtocol (
             HandleBuffer[Index],
@@ -416,7 +416,7 @@ BdsLibConnectAllDefaultConsoles (
   @param  PixelHeight   Height of GopBlt/BmpImage in pixels
   @param  PixelWidth    Width of GopBlt/BmpImage in pixels
 
-  @retval EFI_SUCCESS           GopBlt and GopBltSize are returned. 
+  @retval EFI_SUCCESS           GopBlt and GopBltSize are returned.
   @retval EFI_UNSUPPORTED       BmpImage is not a valid *.BMP image
   @retval EFI_BUFFER_TOO_SMALL  The passed in GopBlt buffer is not big enough.
                                 GopBltSize will contain the required size.
@@ -587,7 +587,7 @@ ConvertBmpToGopBlt (
 
 
 /**
-  Use Console Control Protocol to lock the Console In Spliter virtual handle. 
+  Use Console Control Protocol to lock the Console In Spliter virtual handle.
   This is the ConInHandle and ConIn handle in the EFI system table. All key
   presses will be ignored until the Password is typed in. The only way to
   disable the password is to type it in to a ConIn device.
@@ -691,7 +691,8 @@ EnableQuietBoot (
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
     SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+
+  } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
     Status = UgaDraw->GetMode (UgaDraw, &SizeOfX, &SizeOfY, &ColorDepth, &RefreshRate);
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
@@ -835,7 +836,7 @@ EnableQuietBoot (
                             Height,
                             Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                             );
-      } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+      } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
         Status = UgaDraw->Blt (
                             UgaDraw,
                             (EFI_UGA_PIXEL *) Blt,
@@ -869,7 +870,7 @@ EnableQuietBoot (
 }
 
 /**
-  Use Console Control to turn on UGA based Simple Text Out consoles. The UGA 
+  Use Console Control to turn on UGA based Simple Text Out consoles. The UGA
   Simple Text Out screens will now be synced up with all non UGA output devices
 
   @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
