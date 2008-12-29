@@ -16,12 +16,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  this routine calls undi to start the interface and changes the snp state.
+  Call UNDI to start the interface and changes the snp state.
 
-  @param  Snp                    pointer to snp driver structure
+  @param  Snp                    pointer to snp driver structure.
 
-  @retval EFI_DEVICE_ERROR       UNDI could not be started
-  @retval EFI_SUCCESS            UNDI is started successfully
+  @retval EFI_SUCCESS            UNDI is started successfully.
+  @retval EFI_DEVICE_ERROR       UNDI could not be started.
   
 **/
 EFI_STATUS
@@ -72,7 +72,7 @@ PxeStart (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.start()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.start()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -99,7 +99,7 @@ PxeStart (
 
 
 /**
-  Changes the state of a network interface from "stopped" to "started."
+  Change the state of a network interface from "stopped" to "started."
   
   This function starts a network interface. If the network interface successfully
   starts, then EFI_SUCCESS will be returned.

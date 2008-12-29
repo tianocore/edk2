@@ -242,7 +242,8 @@ SimpleNetworkComponentNameGetDriverName (
   and EFI_SUCCESS is returned.  If the driver specified by This is not currently
   managing the controller specified by ControllerHandle and ChildHandle,
   then EFI_UNSUPPORTED is returned.  If the driver specified by This does not
-  support the language specified by Language, then EFI_UNSUPPORTED is returned.
+  support the language specified by Language, then EFI_UNSUPPORTED is returned. 
+  Currently not implemented. 
 
   @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.

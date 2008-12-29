@@ -24,10 +24,14 @@ V2P                         *mV2p = NULL; // undi3.0 map_list head
 
 
 /**
-  Unsupport currently.
+  Send command to UNDI. It does nothing currently.
   
   @param Cdb   command to be sent to UNDI.
-
+   
+  @retval EFI_INVALID_PARAMETER  The command is 0. 
+  @retval EFI_UNSUPPORTED        Default return status because it's not 
+                                 supported currently.
+   
 **/
 EFI_STATUS
 IssueHwUndiCommand (
@@ -53,8 +57,8 @@ IssueHwUndiCommand (
   @param  Buffer               Pointer to buffer.
   @param  Length               Length of buffer in bytes.
 
-  @return 8-bit checksum of all bytes in buffer.
-  @return If ptr is NULL or len is zero, zero is returned.
+  @return 8-bit checksum of all bytes in buffer, or zero if ptr is NULL or len 
+          is zero.
 
 **/
 UINT8
@@ -89,13 +93,13 @@ Calc8BitCksum (
   Supported() it must also follow these calling restrictions.
 
   @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test
+  @param  ControllerHandle    Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval EFI_ALREADY_STARTED This driver is already running on this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval EFI_ALREADY_STARTED This driver is already running on this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -151,7 +155,7 @@ SimpleNetworkDriverSupported (
   // Check to see if !PXE structure is valid. Paragraph alignment of !PXE structure is required.
   //
   if (NiiProtocol->ID & 0x0F) {
-    DEBUG ((EFI_D_NET, "\n!PXE structure is not paragraph aligned.\n"));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE structure is not paragraph aligned.\n"));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
@@ -162,25 +166,25 @@ SimpleNetworkDriverSupported (
   //  Verify !PXE revisions.
   //
   if (Pxe->hw.Signature != PXE_ROMID_SIGNATURE) {
-    DEBUG ((EFI_D_NET, "\n!PXE signature is not valid.\n"));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE signature is not valid.\n"));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
 
   if (Pxe->hw.Rev < PXE_ROMID_REV) {
-    DEBUG ((EFI_D_NET, "\n!PXE.Rev is not supported.\n"));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE.Rev is not supported.\n"));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
 
   if (Pxe->hw.MajorVer < PXE_ROMID_MAJORVER) {
 
-    DEBUG ((EFI_D_NET, "\n!PXE.MajorVer is not supported.\n"));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE.MajorVer is not supported.\n"));
     Status = EFI_UNSUPPORTED;
     goto Done;
 
   } else if (Pxe->hw.MajorVer == PXE_ROMID_MAJORVER && Pxe->hw.MinorVer < PXE_ROMID_MINORVER) {
-    DEBUG ((EFI_D_NET, "\n!PXE.MinorVer is not supported."));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE.MinorVer is not supported."));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
@@ -189,13 +193,13 @@ SimpleNetworkDriverSupported (
   //
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_HW_UNDI) == 0) {
     if (Pxe->sw.EntryPoint < Pxe->sw.Len) {
-      DEBUG ((EFI_D_NET, "\n!PXE S/W entry point is not valid."));
+      DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE S/W entry point is not valid."));
       Status = EFI_UNSUPPORTED;
       goto Done;
     }
 
     if (Pxe->sw.BusCnt == 0) {
-      DEBUG ((EFI_D_NET, "\n!PXE.BusCnt is zero."));
+      DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE.BusCnt is zero."));
       Status = EFI_UNSUPPORTED;
       goto Done;
     }
@@ -254,7 +258,7 @@ SimpleNetworkDriverStart (
   UINT8                                     BarIndex;
   PXE_STATFLAGS                             InitStatFlags;
 
-  DEBUG ((EFI_D_NET, "\nSnpNotifyNetworkInterfaceIdentifier()  "));
+  DEBUG ((EFI_D_INFO, "\nSnpNotifyNetworkInterfaceIdentifier()  "));
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -316,7 +320,7 @@ SimpleNetworkDriverStart (
   Pxe = (PXE_UNDI *) (UINTN) (Nii->ID);
 
   if (Calc8BitCksum (Pxe, Pxe->hw.Len) != 0) {
-    DEBUG ((EFI_D_NET, "\n!PXE checksum is not correct.\n"));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\n!PXE checksum is not correct.\n"));
     goto NiiError;
   }
 
@@ -331,7 +335,7 @@ SimpleNetworkDriverStart (
     //  broadcast support or we cannot do DHCP!
     //
   } else {
-    DEBUG ((EFI_D_NET, "\nUNDI does not have promiscuous or broadcast support."));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\nUNDI does not have promiscuous or broadcast support."));
     goto NiiError;
   }
   //
@@ -348,7 +352,7 @@ SimpleNetworkDriverStart (
                         );
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_NET, "\nCould not allocate SNP_DRIVER structure.\n"));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\nCould not allocate SNP_DRIVER structure.\n"));
     goto NiiError;
   }
 
@@ -422,7 +426,7 @@ SimpleNetworkDriverStart (
                         );
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_NET, "\nCould not allocate CPB and DB structures.\n"));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\nCould not allocate CPB and DB structures.\n"));
     goto Error_DeleteSNP;
   }
 
@@ -464,7 +468,7 @@ SimpleNetworkDriverStart (
   Snp->Cdb.IFnum      = Snp->IfNum;
   Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_NET, "\nSnp->undi.get_init_info()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.get_init_info()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -474,7 +478,7 @@ SimpleNetworkDriverStart (
   InitStatFlags = Snp->Cdb.StatFlags;
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
-    DEBUG ((EFI_D_NET, "\nSnp->undi.init_info()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\nSnp->undi.init_info()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
     PxeStop (Snp);
     goto Error_DeleteSNP;
   }
@@ -494,12 +498,12 @@ SimpleNetworkDriverStart (
   Snp->Cdb.IFnum      = Snp->IfNum;
   Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_NET, "\nSnp->undi.get_config_info()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.get_config_info()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
-    DEBUG ((EFI_D_NET, "\nSnp->undi.config_info()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
+    DEBUG ((EFI_D_ERROR | EFI_D_NET, "\nSnp->undi.config_info()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
     PxeStop (Snp);
     goto Error_DeleteSNP;
   }
@@ -609,7 +613,7 @@ SimpleNetworkDriverStart (
   Status = PxeGetStnAddr (Snp);
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "\nSnp->undi.get_station_addr()  failed.\n"));
+    DEBUG ((EFI_D_ERROR, "\nSnp->undi.get_station_addr() failed.\n"));
     PxeShutdown (Snp);
     PxeStop (Snp);
     goto Error_DeleteSNP;
@@ -811,27 +815,27 @@ AddV2P (
     return EFI_INVALID_PARAMETER;
   }
 
-  *V2p = AllocatePool (sizeof (V2P  ));
+  *V2p = AllocatePool (sizeof (V2P));
   if (*V2p != NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   Status = mPciIo->Map (
-                        mPciIo,
-                        Type,
-                        VirtualAddress,
-                        &BufferSize,
-                        &(*V2p)->PhysicalAddress,
-                        &(*V2p)->Unmap
-                        );
+                     mPciIo,
+                     Type,
+                     VirtualAddress,
+                     &BufferSize,
+                     &(*V2p)->PhysicalAddress,
+                     &(*V2p)->Unmap
+                     );
   if (Status != EFI_SUCCESS) {
     FreePool (*V2p);
     return Status;
   }
   (*V2p)->VirtualAddress = VirtualAddress;
-  (*V2p)->BufferSize = BufferSize;
-  (*V2p)->Next  = mV2p;
-  mV2p          = *V2p;
+  (*V2p)->BufferSize     = BufferSize;
+  (*V2p)->Next           = mV2p;
+  mV2p                   = *V2p;
 
   return EFI_SUCCESS;
 }
@@ -846,8 +850,8 @@ AddV2P (
   @param  VirtualAddr          virtual address (or CPU address) to be searched in
                                the map list
 
-  @retval EFI_SUCEESS          if a match found!
-  @retval Other                match not found
+  @retval EFI_SUCEESS          A match was found.
+  @retval Other                A match cannot be found.
 
 **/
 EFI_STATUS
@@ -874,13 +878,13 @@ FindV2p (
 
 
 /**
-  This routine unmaps the given virtual address and frees the memory allocated
-  for the map list node corresponding to that address.
+  Unmap the given virtual address and free the memory allocated for the map list
+  node corresponding to that address.
 
-  @param  VirtualAddress       virtual address (or CPU address) to be unmapped
+  @param  VirtualAddress       virtual address (or CPU address) to be unmapped.
 
-  @retval EFI_SUCEESS          if successfully unmapped
-  @retval Other                as indicated by the error
+  @retval EFI_SUCEESS          Successfully unmapped.
+  @retval Other                Other errors as indicated.
 
 **/
 EFI_STATUS

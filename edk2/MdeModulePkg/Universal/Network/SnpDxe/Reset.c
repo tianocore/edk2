@@ -1,20 +1,14 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Implementation of resetting a network adapter.
+ 
+Copyright (c) 2004 - 2007, Intel Corporation.<BR> All rights reserved. This 
+program and the accompanying materials are licensed and made available under the 
+terms and conditions of the BSD License which accompanies this distribution. The 
+full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  reset.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-09 M(f)J   Genesis.
 
 **/
 
@@ -22,12 +16,12 @@ Revision history:
 
 
 /**
-  This routine calls undi to reset the nic.
+  Call UNDI to reset the NIC.
 
-  @param  Snp                   pointer to the snp driver structure
+  @param  Snp                 Pointer to the snp driver structure.
 
-  @return EFI_SUCCESSFUL for a successful completion
-  @return other for failed calls
+  @return EFI_SUCCESSFUL      The NIC was reset.
+  @retval EFI_DEVICE_ERROR    The NIC cannot be reset.
 
 **/
 EFI_STATUS
@@ -49,13 +43,13 @@ PxeReset (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.reset()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.reset()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_WARN,
+      (EFI_D_ERROR | EFI_D_NET,
       "\nsnp->undi32.reset()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

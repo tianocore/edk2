@@ -1,20 +1,15 @@
 /** @file
-Copyright (c) 2004 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Implementation of managing the multicast receive filters of a network
+    interface.
+
+Copyright (c) 2004 - 2007, Intel Corporation.<BR> All rights reserved. This 
+program and the accompanying materials are licensed and made available under the 
+terms and conditions of the BSD License which accompanies this distribution. The 
+full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module name:
-  receive_filters.c
-
-Abstract:
-
-Revision history:
-  2000-Feb-17 M(f)J   Genesis.
 
 **/
 
@@ -23,14 +18,18 @@ Revision history:
 #include "Snp.h"
 
 /**
-  this routine calls undi to enable the receive filters.
+  Call undi to enable the receive filters.
 
-  @param  Snp                pointer to snp driver structure
-  @param  EnableFlags        bit mask for enabling the receive filters
-  @param  MCastAddressCount  multicast address count for a new multicast address
-                             list
-  @param  MCastAddressList   list of new multicast addresses
-
+  @param  Snp                Pointer to snp driver structure.
+  @param  EnableFlags        Bit mask for enabling the receive filters.
+  @param  MCastAddressCount  Multicast address count for a new multicast address
+                             list.
+  @param  MCastAddressList   List of new multicast addresses. 
+   
+  @retval EFI_SUCCESS           The multicast receive filter list was updated.
+  @retval EFI_INVALID_PARAMETER Invalid UNDI command.
+  @retval EFI_UNSUPPORTED       Command is not supported by UNDI.
+  @retval EFI_DEVICE_ERROR      Fail to execute UNDI command.
 
 **/
 EFI_STATUS
@@ -80,7 +79,7 @@ PxeRecvFilterEnable (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -112,14 +111,17 @@ PxeRecvFilterEnable (
 }
 
 /**
-  this routine calls undi to disable the receive filters.
+  Call undi to disable the receive filters.
 
-  @param  Snp                pointer to snp driver structure
-  @param  DisableFlags       bit mask for disabling the receive filters
-  @param  ResetMCastList     boolean flag to reset/delete the multicast filter list
+  @param  Snp             Pointer to snp driver structure
+  @param  DisableFlags    Bit mask for disabling the receive filters
+  @param  ResetMCastList  Boolean flag to reset/delete the multicast filter 
+                          list.
 
-
-**/
+  @retval EFI_SUCCESS           The multicast receive filter list was updated.
+  @retval EFI_DEVICE_ERROR      Fail to execute UNDI command.
+   
+**/ 
 EFI_STATUS
 PxeRecvFilterDisable (
   SNP_DRIVER *Snp,
@@ -165,7 +167,7 @@ PxeRecvFilterDisable (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -174,7 +176,7 @@ PxeRecvFilterDisable (
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
-      (EFI_D_ERROR,
+      (EFI_D_ERROR | EFI_D_NET,
       "\nsnp->undi.receive_filters()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -187,11 +189,13 @@ PxeRecvFilterDisable (
 }
 
 /**
-  this routine calls undi to read the receive filters.
+  Call undi to read the receive filters.
 
-  @param  Snp                pointer to snp driver structure
+  @param  Snp                Pointer to snp driver structure.
 
-
+  @retval EFI_SUCCESS           The receive filter was read.
+  @retval EFI_DEVICE_ERROR      Fail to execute UNDI command. 
+   
 **/
 EFI_STATUS
 PxeRecvFilterRead (
@@ -215,7 +219,7 @@ PxeRecvFilterRead (
   Snp->Cdb.IFnum      = Snp->IfNum;
   Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 

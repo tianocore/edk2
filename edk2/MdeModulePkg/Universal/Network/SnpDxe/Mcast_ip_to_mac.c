@@ -16,13 +16,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Snp.h"
 
 /**
-  this routine calls undi to convert an multicast IP address to a MAC address.
+  Call undi to convert an multicast IP address to a MAC address.
 
-  @param  Snp   pointer to snp driver structure
-  @param  IPv6  flag to indicate if this is an ipv6 address
-  @param  IP    multicast IP address
-  @param  MAC   pointer to hold the return MAC address
+  @param  Snp   Pointer to snp driver structure.
+  @param  IPv6  Flag to indicate if this is an ipv6 address.
+  @param  IP    Multicast IP address.
+  @param  MAC   Pointer to hold the return MAC address.
 
+  @retval EFI_SUCCESS           The multicast IP address was mapped to the 
+                                multicast HW MAC address.
+  @retval EFI_INVALID_PARAMETER Invalid UNDI command. 
+  @retval EFI_UNSUPPORTED       Command is not supported by UNDI. 
+  @retval EFI_DEVICE_ERROR      Fail to execute UNDI command. 
 
 **/
 EFI_STATUS
@@ -56,7 +61,7 @@ PxeIp2Mac (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.mcast_ip_to_mac()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.mcast_ip_to_mac()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -69,7 +74,7 @@ PxeIp2Mac (
 
   case PXE_STATCODE_UNSUPPORTED:
     DEBUG (
-      (EFI_D_NET,
+      (EFI_D_ERROR | EFI_D_NET,
       "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -82,7 +87,7 @@ PxeIp2Mac (
     // to caller.
     //
     DEBUG (
-      (EFI_D_NET,
+      (EFI_D_ERROR | EFI_D_NET,
       "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

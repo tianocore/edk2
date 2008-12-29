@@ -16,14 +16,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  this routine calls undi to stop the interface and changes the snp state.
+  Call UNDI to stop the interface and changes the snp state.
 
-  @param  Snp   pointer to snp driver structure
-
-  @retval EFI_INVALID_PARAMETER  invalid parameter
-  @retval EFI_NOT_STARTED        SNP is not started
-  @retval EFI_DEVICE_ERROR       SNP is not initialized
-  @retval EFI_UNSUPPORTED        operation unsupported
+  @param  Snp   Pointer to snp driver structure
+   
+  @retval EFI_SUCCESS            The network interface was stopped.
+  @retval EFI_DEVICE_ERROR       SNP is not initialized.
 
 **/
 EFI_STATUS
@@ -45,13 +43,13 @@ PxeStop (
   //
   // Issue UNDI command
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.stop()  "));
+  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.stop()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_WARN,
+      (EFI_D_ERROR,
       "\nsnp->undi.stop()  %xh:%xh\n",
       Snp->Cdb.StatCode,
       Snp->Cdb.StatFlags)
@@ -74,15 +72,18 @@ PxeStop (
   interface is in the started state. If the network interface was successfully
   stopped, then EFI_SUCCESS will be returned.
   
-  @param  This                    A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
+  @param  This                    A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL 
+                                  instance.
   
   
   @retval EFI_SUCCESS             The network interface was stopped.
   @retval EFI_NOT_STARTED         The network interface has not been started.
-  @retval EFI_INVALID_PARAMETER   This parameter was NULL or did not point to a valid 
-                                  EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  @retval EFI_DEVICE_ERROR        The command could not be sent to the network interface.
-  @retval EFI_UNSUPPORTED         This function is not supported by the network interface.
+  @retval EFI_INVALID_PARAMETER   This parameter was NULL or did not point to a 
+                                  valid EFI_SIMPLE_NETWORK_PROTOCOL structure.
+  @retval EFI_DEVICE_ERROR        The command could not be sent to the network 
+                                  interface.
+  @retval EFI_UNSUPPORTED         This function is not supported by the network 
+                                  interface.
 
 **/
 EFI_STATUS
