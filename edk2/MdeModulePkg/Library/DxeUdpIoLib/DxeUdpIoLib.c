@@ -198,7 +198,7 @@ UdpIoOnDgramRcvdDpc (
 }
 
 /**
-  Request UdpIoOnDgramRcvdDpc as a DPC at TPL_CALLBACK.
+  Request UdpIoOnDgramRcvdDpc() as a DPC at TPL_CALLBACK.
 
   @param  Event                 The UDP receive request event.
   @param  Context               The UDP RX token.

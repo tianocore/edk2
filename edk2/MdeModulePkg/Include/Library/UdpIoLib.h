@@ -46,15 +46,15 @@ typedef struct {
   Prototype called when receiving or sending packets from/to a UDP point.
 
   This prototype is used by both receive and sending when calling
-  UdpIoRecvDatagram or UdpIoSendDatagram. When receiving, Netbuf is allocated by
+  UdpIoRecvDatagram() or UdpIoSendDatagram(). When receiving, Netbuf is allocated by
   UDP access point, and released by user. When sending, the NetBuf is from user,
   and provided to the callback as a reference.
   
   @param Packet       Packet received or sent
   @param Points       The Udp4 address pair corresponds to the Udp4 IO
   @param IoStatus     Packet receiving or sending status
-  @param Context      User-defined data when calling UdpIoRecvDatagram or
-                      UdpIoSendDatagram
+  @param Context      User-defined data when calling UdpIoRecvDatagram() or
+                      UdpIoSendDatagram()
 
   @return None
 **/
@@ -138,14 +138,14 @@ struct _UDP_IO_PORT {
 /**
   Prototype called when UdpIo Library configures a Udp4 instance.
   
-  The prototype is set and called when creating a UDP_IO_PORT in UdpIoCreatePort.
+  The prototype is set and called when creating a UDP_IO_PORT in UdpIoCreatePort().
   
   @param UdpIo         The UDP_IO_PORT to configure
-  @param Context       User-defined data when calling UdpIoCreatePort
+  @param Context       User-defined data when calling UdpIoCreatePort()
   
   @retval EFI_SUCCESS  The configure process succeeds
   @retval Others       The UDP_IO_PORT fails to configure indicating
-                       UdpIoCreatePort should fail
+                       UdpIoCreatePort() should fail
 **/
 typedef
 EFI_STATUS
@@ -158,7 +158,7 @@ EFI_STATUS
   The select function to decide whether to cancel the UDP_TX_TOKEN. It is used
   
   @param Token        The UDP_TX_TOKEN to decide whether to cancel
-  @param Context      User-defined data in UdpIoCancelDgrams
+  @param Context      User-defined data in UdpIoCancelDgrams()
   
   @retval TRUE        To cancel the UDP_TX_TOKEN
   @retval FALSE       Do not cancel this UDP_TX_TOKEN
