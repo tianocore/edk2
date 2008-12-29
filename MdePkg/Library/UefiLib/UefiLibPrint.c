@@ -48,7 +48,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   @param Format   Null-terminated Unicode format string.
   @param Console  The output console.
   @param Marker   VA_LIST marker for the variable argument list.
-  
+
   @return The number of Unicode characters in the produced
           output buffer not including the Null-terminator.
 **/
@@ -85,22 +85,22 @@ InternalPrint (
   return Return;
 }
 
-/** 
-  Prints a formatted Unicode string to the console output device specified by 
+/**
+  Prints a formatted Unicode string to the console output device specified by
   ConOut defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted Unicode string to the console output device 
-  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of Unicode 
-  characters that printed to ConOut.  If the length of the formatted Unicode 
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  This function prints a formatted Unicode string to the console output device
+  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of Unicode
+  characters that printed to ConOut.  If the length of the formatted Unicode
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param ...      Variable argument list whose contents are accessed based
                   on the format string specified by Format.
-  
+
   @return Number of Unicode characters printed to ConOut.
 
 **/
@@ -123,22 +123,22 @@ Print (
   return Return;
 }
 
-/** 
-  Prints a formatted Unicode string to the console output device specified by 
+/**
+  Prints a formatted Unicode string to the console output device specified by
   StdErr defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted Unicode string to the console output device 
-  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of Unicode 
-  characters that printed to StdErr.  If the length of the formatted Unicode 
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  This function prints a formatted Unicode string to the console output device
+  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of Unicode
+  characters that printed to StdErr.  If the length of the formatted Unicode
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
   @param Format   Null-terminated Unicode format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param ...      Variable argument list whose contents are accessed based
                   on the format string specified by Format.
-  
+
   @return Number of Unicode characters printed to StdErr.
 
 **/
@@ -213,21 +213,21 @@ AsciiInternalPrint (
   return Return;
 }
 
-/** 
-  Prints a formatted ASCII string to the console output device specified by 
+/**
+  Prints a formatted ASCII string to the console output device specified by
   ConOut defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted ASCII string to the console output device 
-  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of ASCII 
-  characters that printed to ConOut.  If the length of the formatted ASCII 
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  This function prints a formatted ASCII string to the console output device
+  specified by ConOut in EFI_SYSTEM_TABLE and returns the number of ASCII
+  characters that printed to ConOut.  If the length of the formatted ASCII
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param ...      Variable argument list whose contents are accessed based
                   on the format string specified by Format.
-  
+
   @return Number of ASCII characters printed to ConOut.
 
 **/
@@ -241,7 +241,7 @@ AsciiPrint (
   VA_LIST Marker;
   UINTN   Return;
   ASSERT (Format != NULL);
-  
+
   VA_START (Marker, Format);
 
   Return = AsciiInternalPrint( Format, gST->ConOut, Marker);
@@ -251,21 +251,21 @@ AsciiPrint (
   return Return;
 }
 
-/** 
-  Prints a formatted ASCII string to the console output device specified by 
+/**
+  Prints a formatted ASCII string to the console output device specified by
   StdErr defined in the EFI_SYSTEM_TABLE.
 
-  This function prints a formatted ASCII string to the console output device 
-  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of ASCII 
-  characters that printed to StdErr.  If the length of the formatted ASCII 
-  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  This function prints a formatted ASCII string to the console output device
+  specified by StdErr in EFI_SYSTEM_TABLE and returns the number of ASCII
+  characters that printed to StdErr.  If the length of the formatted ASCII
+  string is greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
 
   @param Format   Null-terminated ASCII format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param ...      Variable argument list whose contents are accessed based
                   on the format string specified by Format.
-  
+
   @return Number of ASCII characters printed to ConErr.
 
 **/
@@ -280,7 +280,7 @@ AsciiErrorPrint (
   UINTN   Return;
 
   ASSERT (Format != NULL);
-  
+
   VA_START (Marker, Format);
 
   Return = AsciiInternalPrint( Format, gST->StdErr, Marker);
@@ -291,19 +291,19 @@ AsciiErrorPrint (
 }
 
 /**
-  Internal function to print a formatted Unicode string to a graphics console device specified by 
+  Internal function to print a formatted Unicode string to a graphics console device specified by
   ConsoleOutputHandle defined in the EFI_SYSTEM_TABLE at the given (X,Y) coordinates.
 
-  This function prints a formatted Unicode string to the graphics console device 
-  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
-  Unicode characters printed. The EFI_HII_FONT_PROTOCOL is used to convert the 
-  string to a bitmap using the glyphs registered with the 
+  This function prints a formatted Unicode string to the graphics console device
+  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of
+  Unicode characters printed. The EFI_HII_FONT_PROTOCOL is used to convert the
+  string to a bitmap using the glyphs registered with the
   HII database.  No wrapping is performed, so any portions of the string the fall
   outside the active display region will not be displayed.
 
-  If a graphics console device is not associated with the ConsoleOutputHandle 
+  If a graphics console device is not associated with the ConsoleOutputHandle
   defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
-  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
+  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no
   string is printed, and 0 is returned.
 
   @param  X            X coordinate to print the string.
@@ -313,13 +313,13 @@ AsciiErrorPrint (
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
   @param  BackGround   The background color of the string being printed.  This is
-                       an optional parameter that may be NULL.  If it is NULL, 
+                       an optional parameter that may be NULL.  If it is NULL,
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
   @param  Buffer       Null-terminated Unicode formatted string.
   @param  PrintNum     The number of Unicode formatted string to be printed.
 
-  @return  Number of Unicode Characters printed. Zero means no any character 
+  @return  Number of Unicode Characters printed. Zero means no any character
            displayed successfully.
 
 **/
@@ -393,7 +393,7 @@ InternalPrintGraphic (
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
     VerticalResolution = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+  } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
   } else {
     Status = EFI_UNSUPPORTED;
@@ -452,7 +452,7 @@ InternalPrintGraphic (
 
   if (GraphicsOutput != NULL) {
     Blt->Image.Screen = GraphicsOutput;
-    
+
     Status = HiiFont->StringToImage (
                          HiiFont,
                          EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN,
@@ -530,21 +530,21 @@ Error:
 }
 
 /**
-  Prints a formatted Unicode string to a graphics console device specified by 
+  Prints a formatted Unicode string to a graphics console device specified by
   ConsoleOutputHandle defined in the EFI_SYSTEM_TABLE at the given (X,Y) coordinates.
 
-  This function prints a formatted Unicode string to the graphics console device 
-  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
+  This function prints a formatted Unicode string to the graphics console device
+  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of
   Unicode characters printed.  If the length of the formatted Unicode string is
-  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
-  is used to convert the string to a bitmap using the glyphs registered with the 
+  is used to convert the string to a bitmap using the glyphs registered with the
   HII database.  No wrapping is performed, so any portions of the string the fall
   outside the active display region will not be displayed.
 
-  If a graphics console device is not associated with the ConsoleOutputHandle 
+  If a graphics console device is not associated with the ConsoleOutputHandle
   defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
-  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
+  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
@@ -556,13 +556,13 @@ Error:
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
   @param  BackGround   The background color of the string being printed.  This is
-                       an optional parameter that may be NULL.  If it is NULL, 
+                       an optional parameter that may be NULL.  If it is NULL,
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  Format       Null-terminated Unicode format string.  See Print Library 
+  @param  Format       Null-terminated Unicode format string.  See Print Library
                        for the supported format string syntax.
-  @param  ...          Variable argument list whose contents are accessed based on 
-                       the format string specified by Format.         
+  @param  ...          Variable argument list whose contents are accessed based on
+                       the format string specified by Format.
 
   @return  The number of Unicode characters printed.
 
@@ -593,7 +593,7 @@ PrintXY (
 
   Buffer = (CHAR16 *) AllocatePool (BufferSize);
   ASSERT (Buffer != NULL);
-    
+
   PrintNum = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
   ReturnNum = InternalPrintGraphic (X, Y, ForeGround, BackGround, Buffer, PrintNum);
@@ -604,21 +604,21 @@ PrintXY (
 }
 
 /**
-  Prints a formatted ASCII string to a graphics console device specified by 
+  Prints a formatted ASCII string to a graphics console device specified by
   ConsoleOutputHandle defined in the EFI_SYSTEM_TABLE at the given (X,Y) coordinates.
 
-  This function prints a formatted ASCII string to the graphics console device 
-  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
+  This function prints a formatted ASCII string to the graphics console device
+  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of
   ASCII characters printed.  If the length of the formatted ASCII string is
-  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  greater than PcdUefiLibMaxPrintBufferSize, then only the first
   PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
-  is used to convert the string to a bitmap using the glyphs registered with the 
+  is used to convert the string to a bitmap using the glyphs registered with the
   HII database.  No wrapping is performed, so any portions of the string the fall
   outside the active display region will not be displayed.
 
-  If a graphics console device is not associated with the ConsoleOutputHandle 
+  If a graphics console device is not associated with the ConsoleOutputHandle
   defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
-  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
+  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
 
@@ -629,13 +629,13 @@ PrintXY (
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
   @param  BackGround   The background color of the string being printed.  This is
-                       an optional parameter that may be NULL.  If it is NULL, 
+                       an optional parameter that may be NULL.  If it is NULL,
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  Format       Null-terminated ASCII format string.  See Print Library 
+  @param  Format       Null-terminated ASCII format string.  See Print Library
                        for the supported format string syntax.
-  @param  ...          Variable argument list whose contents are accessed based on 
-                       the format string specified by Format.         
+  @param  ...          Variable argument list whose contents are accessed based on
+                       the format string specified by Format.
 
   @return  The number of ASCII characters printed.
 
@@ -665,13 +665,13 @@ AsciiPrintXY (
 
   Buffer = (CHAR16 *) AllocatePool (BufferSize);
   ASSERT (Buffer != NULL);
-    
+
   PrintNum = UnicodeSPrintAsciiFormat (Buffer, BufferSize, Format, Marker);
 
   ReturnNum = InternalPrintGraphic (X, Y, ForeGround, BackGround, Buffer, PrintNum);
 
   FreePool (Buffer);
- 
+
   return ReturnNum;
 }
 
