@@ -1,7 +1,7 @@
 #/** @file
 #
 #  Implement ReadOnly Variable Services required by PEIM and install
-#  PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
+#  PEI ReadOnly Varaiable2 PPI. These services operates the non-volatile storage space.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation<BR>
 #  All rights reserved. This program and the accompanying materials

@@ -1,7 +1,7 @@
 #/** @file
 #  
 #  SCSI bus driver. This driver scans all SCSI devices and creates a device handle for
-#  each of them. After this the driver installs the Path Device Protocol and SCSI I/O Protocol on
+#  each of them. After this the driver installs the Device Path Protocol and SCSI I/O Protocol on
 #  these handles.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
