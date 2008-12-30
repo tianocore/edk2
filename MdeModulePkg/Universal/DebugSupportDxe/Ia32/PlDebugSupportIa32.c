@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "DebugSupport.h"
+#include "PlDebugSupport.h"
 
 IA32_IDT_GATE_DESCRIPTOR  NullDesc = {{0}};
 
@@ -30,7 +30,11 @@ GetInterruptHandleFromIdt (
   )
 {
   UINTN      InterruptHandle;
- 
+
+  //
+  // InterruptHandle  0-15 : OffsetLow
+  // InterruptHandle 16-31 : OffsetHigh
+  //
   ((UINT16 *) &InterruptHandle)[0] = (UINT16) IdtGateDescriptor->Bits.OffsetLow;
   ((UINT16 *) &InterruptHandle)[1] = (UINT16) IdtGateDescriptor->Bits.OffsetHigh;
 

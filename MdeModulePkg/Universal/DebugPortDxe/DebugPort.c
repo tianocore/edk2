@@ -37,9 +37,9 @@ DEBUGPORT_DEVICE mDebugPortDevice = {
   (EFI_DEVICE_PATH_PROTOCOL *) NULL,
   {
     DebugPortReset,
-    DebugPortRead, 
-    DebugPortWrite, 
-    DebugPortPoll 
+    DebugPortRead,
+    DebugPortWrite,
+    DebugPortPoll
   },
   (EFI_HANDLE) 0,
   (EFI_SERIAL_IO_PROTOCOL *) NULL,
@@ -127,15 +127,15 @@ GetDebugPortVariable (
 }
 
 /**
-  Debug Port Driver entry point. 
+  Debug Port Driver entry point.
 
   Reads DebugPort variable to determine what device and settings to use as the
   debug port.  Binds exclusively to SerialIo. Reverts to defaults if no variable
   is found.
 
-  @param[in] ImageHandle       The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle       The firmware allocated handle for the EFI image.
   @param[in] SystemTable       A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS          The entry point is executed successfully.
   @retval EFI_OUT_OF_RESOURCES Fails to allocate memory for device.
   @retval other                Some error occurs when executing this entry point.
@@ -167,7 +167,7 @@ InitializeDebugPortDriver (
 }
 
 /**
-  Checks to see if there's not already a DebugPort interface somewhere. 
+  Checks to see if there's not already a DebugPort interface somewhere.
 
   If there's a DEBUGPORT variable, the device path must match exactly.  If there's
   no DEBUGPORT variable, then device path is not checked and does not matter.
@@ -238,15 +238,15 @@ DebugPortSupported (
       Status = EFI_UNSUPPORTED;
     }
 
-    if (Status == EFI_SUCCESS && 
+    if (Status == EFI_SUCCESS &&
         (Dp2->Type != MESSAGING_DEVICE_PATH ||
-         Dp2->SubType != MSG_VENDOR_DP || 
+         Dp2->SubType != MSG_VENDOR_DP ||
          *((UINT16 *) Dp2->Length) != sizeof (DEBUGPORT_DEVICE_PATH))) {
 
       Status = EFI_UNSUPPORTED;
     }
 
-    if (Status == EFI_SUCCESS && CompareMem (&gEfiDebugPortDevicePathGuid, Dp2 + 1, sizeof (EFI_GUID))) {
+    if (Status == EFI_SUCCESS && !CompareGuid (&gEfiDebugPortDevicePathGuid, (GUID *) (Dp2 + 1))) {
       Status = EFI_UNSUPPORTED;
     }
 
@@ -289,7 +289,7 @@ DebugPortSupported (
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle.
   @retval EFI_OUT_OF_RESOURCES Fails to allocate memory for device.
-  @retval others               Some error occurs.                
+  @retval others               Some error occurs.
 
 **/
 EFI_STATUS
@@ -365,7 +365,7 @@ DebugPortStart (
   DebugPortDP.Header.Type     = MESSAGING_DEVICE_PATH;
   DebugPortDP.Header.SubType  = MSG_VENDOR_DP;
   SetDevicePathNodeLength (&(DebugPortDP.Header), sizeof (DebugPortDP));
-  CopyMem (&DebugPortDP.Guid, &gEfiDebugPortDevicePathGuid, sizeof (EFI_GUID));
+  CopyGuid (&DebugPortDP.Guid, &gEfiDebugPortDevicePathGuid);
 
   Dp1 = DevicePathFromHandle (ControllerHandle);
   if (Dp1 == NULL) {
@@ -547,11 +547,11 @@ DebugPortStop (
 
   The port itself should be fine since it was set up during initialization.
 
-  @param  This              Protocol instance pointer.   
+  @param  This              Protocol instance pointer.
 
   @return EFI_SUCCESS       Always.
 
-**/  
+**/
 EFI_STATUS
 EFIAPI
 DebugPortReset (
@@ -579,8 +579,8 @@ DebugPortReset (
                               On output, the amount of data actually written.
   @param  Buffer              Pointer to buffer to read.
 
-  @retval EFI_SUCCESS         
-  @retval others              
+  @retval EFI_SUCCESS
+  @retval others
 
 **/
 EFI_STATUS
@@ -692,7 +692,7 @@ DebugPortWrite (
                               DebugPort interface
   @retval EFI_DEVICE_ERROR    A hardware failure occured... (from SerialIo)
 
-**/   
+**/
 EFI_STATUS
 EFIAPI
 DebugPortPoll (
