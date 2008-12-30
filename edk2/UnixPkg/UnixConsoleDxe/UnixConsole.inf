@@ -62,4 +62,6 @@
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL BY_START
   gEfiUnixIoProtocolGuid                        # PROTOCOL TO_START
+
+[Guids]
   gEfiUnixConsoleGuid
