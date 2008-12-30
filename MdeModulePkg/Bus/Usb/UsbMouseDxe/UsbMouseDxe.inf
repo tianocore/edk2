@@ -1,8 +1,7 @@
 #/** @file
-# Component name for module UsbMouse
+# USB Mouse Driver that manages USB mouse and produces Simple Pointer Protocol.
 #
-# FIX ME!
-# Copyright (c) 2006, Intel Corporation. 
+# Copyright (c) 2006 - 2008, Intel Corporation. 
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -37,7 +36,6 @@
 [Sources.common]
   ComponentName.c
   MouseHid.c
-  MouseHid.h
   UsbMouse.c
   UsbMouse.h
 
@@ -54,11 +52,10 @@
   PcdLib
   UefiUsbLib
 
-
 [Protocols]
-  gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimplePointerProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiUsbIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiSimplePointerProtocolGuid                 # PROTOCOL BY_START
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError
