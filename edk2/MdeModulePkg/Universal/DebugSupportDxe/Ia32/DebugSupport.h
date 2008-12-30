@@ -86,7 +86,7 @@ Vect2Desc (
   );
 
 /**
-  Initializes driver's handler registration databas. 
+  Initializes driver's handler registration database. 
   
   This code executes in boot services context
   Must be public because it's referenced from DebugSupport.c

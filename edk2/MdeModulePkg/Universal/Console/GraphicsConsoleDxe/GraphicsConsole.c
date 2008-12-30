@@ -1883,17 +1883,17 @@ EraseCursor (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   )
 {
-  GRAPHICS_CONSOLE_DEV        *Private;
-  EFI_SIMPLE_TEXT_OUTPUT_MODE *CurrentMode;
-  INTN                        GlyphX;
-  INTN                        GlyphY;
+  GRAPHICS_CONSOLE_DEV                *Private;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE         *CurrentMode;
+  INTN                                GlyphX;
+  INTN                                GlyphY;
   EFI_GRAPHICS_OUTPUT_PROTOCOL        *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL       *UgaDraw;
+  EFI_UGA_DRAW_PROTOCOL               *UgaDraw;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION Background;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION BltChar[EFI_GLYPH_HEIGHT][EFI_GLYPH_WIDTH];
-  UINTN                       PosX;
-  UINTN                       PosY;
+  UINTN                               PosX;
+  UINTN                               PosY;
 
   CurrentMode = This->Mode;
 
@@ -1991,8 +1991,8 @@ EraseCursor (
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
 
-  @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs when executing this entry point.
+  @retval  EFI_SUCCESS       The entry point is executed successfully.
+  @return  other             Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
@@ -2016,7 +2016,6 @@ InitializeGraphicsConsole (
              &gGraphicsConsoleComponentName2
              );
   ASSERT_EFI_ERROR (Status);
-
 
   return Status;
 }

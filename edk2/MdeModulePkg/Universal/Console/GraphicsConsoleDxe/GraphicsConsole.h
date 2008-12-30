@@ -230,20 +230,21 @@ ReturnNarrowFontSize (
   );
 
 /**
+  Reset the text output device hardware and optionally run diagnostics.
+  
   Implements SIMPLE_TEXT_OUTPUT.Reset().
   If ExtendeVerification is TRUE, then perform dependent Graphics Console
   device reset, and set display mode to mode 0.
   If ExtendedVerification is FALSE, only set display mode to mode 0.
 
-  @param  This                  Indicates the calling context.
+  @param  This                  Protocol instance pointer.
   @param  ExtendedVerification  Indicates that the driver may perform a more
                                 exhaustive verification operation of the device
                                 during reset.
 
-  @return EFI_SUCCESS
-  @return The reset operation succeeds.
-  @return EFI_DEVICE_ERROR
-  @return The Graphics Console is not functioning correctly
+  @retval EFI_SUCCESS          The text output device was reset.
+  @retval EFI_DEVICE_ERROR     The text output device is not functioning correctly and
+                               could not be reset.
 
 **/
 EFI_STATUS

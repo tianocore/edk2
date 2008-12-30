@@ -33,7 +33,7 @@ EFI_DEBUG_SUPPORT_PROTOCOL  mDebugSupportProtocolInterface = {
   @param[in] SystemTable       A pointer to the EFI System Table.
   
   @retval EFI_SUCCESS          The entry point is executed successfully.
-  @retval EFI_ALREADY_STARTED  DebugS upport protocol is installed already.
+  @retval EFI_ALREADY_STARTED  Debug Support protocol is installed already.
   @retval other                Some error occurs when executing this entry point.
 
 **/
