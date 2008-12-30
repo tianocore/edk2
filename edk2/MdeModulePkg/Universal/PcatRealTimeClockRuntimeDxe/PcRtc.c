@@ -306,7 +306,7 @@ PcRtcGetTime (
     EfiReleaseLock (&Global->RtcLock);
   }
   //
-  // Get the variable that containts the TimeZone and Daylight fields
+  // Get the variable that contains the TimeZone and Daylight fields
   //
   Time->TimeZone  = Global->SavedTimeZone;
   Time->Daylight  = Global->Daylight;
@@ -431,7 +431,7 @@ PcRtcSetTime (
     EfiReleaseLock (&Global->RtcLock);
   }
   //
-  // Set the variable that containts the TimeZone and Daylight fields
+  // Set the variable that contains the TimeZone and Daylight fields
   //
   Global->SavedTimeZone = Time->TimeZone;
   Global->Daylight      = Time->Daylight;
@@ -454,7 +454,7 @@ PcRtcSetTime (
   Returns the current wakeup alarm clock setting.
 
   @param  Enabled  Indicates if the alarm is currently enabled or disabled.
-  @param  Pending  Indicates if the alarm signal is pending and requires acknowledgement.
+  @param  Pending  Indicates if the alarm signal is pending and requires acknowledgment.
   @param  Time     The current alarm setting.
   @param  Global   For global use inside this module.
 
@@ -480,7 +480,7 @@ PcRtcGetWakeupTime (
   UINT8           Century;
 
   //
-  // Check paramters for null pointers
+  // Check parameters for null pointers
   //
   if ((Enabled == NULL) || (Pending == NULL) || (Time == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -676,7 +676,7 @@ PcRtcSetWakeupTime (
 }
 
 /**
-  See if centry register of RTC is valid.
+  See if century register of RTC is valid.
 
   @retval  EFI_SUCCESS       Century register is valid.
   @retval  EFI_DEVICE_ERROR  Century register is NOT valid.
@@ -910,12 +910,12 @@ DayValid (
 }
 
 /**
-  Check if it is a leapyear.
+  Check if it is a leap year.
 
   @param    Time   The time to be checked.
 
-  @retval   TRUE   It is a leapyear.
-  @retval   FALSE  It is NOT a leapyear.
+  @retval   TRUE   It is a leap year.
+  @retval   FALSE  It is NOT a leap year.
 **/
 BOOLEAN
 IsLeapYear (
