@@ -422,23 +422,16 @@ Returns:
   UINT32                                   Number;
   EFI_PEI_HOB_POINTERS                     GuidHob;
 
-  BufferSize = 0;
-  //
-  // Get Hob List from configuration table
-  //
-  GuidHob.Raw = GetHobList ();
-
   //
   // Get PciExpressAddressInfo Hob
   //
-  GuidHob.Raw = GetNextGuidHob (&gEfiPciExpressBaseAddressGuid, GuidHob.Raw);
-  if (GuidHob.Raw == NULL) {
-    DEBUG ((EFI_D_ERROR, "Fail to get gEfiPciExpressBaseAddressGuid from GUID HOB\n"));
-    return 0;
-  }
-  PciExpressBaseAddressInfo = (EFI_PCI_EXPRESS_BASE_ADDRESS_INFORMATION *) GET_GUID_HOB_DATA (GuidHob.Guid);
-  if (PciExpressBaseAddressInfo == NULL) {
-    DEBUG ((EFI_D_ERROR, "Fail to get gEfiPciExpressBaseAddressGuid from GUID HOB\n"));
+  PciExpressBaseAddressInfo = NULL;
+  BufferSize                = 0;
+  GuidHob.Raw = GetFirstGuidHob (&gEfiPciExpressBaseAddressGuid);
+  if (GuidHob.Raw != NULL) {
+    PciExpressBaseAddressInfo = GET_GUID_HOB_DATA (GuidHob.Guid);
+    BufferSize                = GET_GUID_HOB_DATA_SIZE (GuidHob.Guid);
+  } else {
     return 0;
   }
 
@@ -456,7 +449,7 @@ Returns:
   //
   // Do not find the PciExpress Base Address in the Hob
   //
-  return 0;
+  return 0;  
 }
 
 VOID
@@ -469,7 +462,9 @@ PatchPciRootBridgeDevicePath (
   UINT64  PciExpressBase;
 
   PciExpressBase = GetPciExpressBaseAddressForRootBridge (HostBridgeNumber, RootBridgeNumber);
-
+  
+  DEBUG ((EFI_D_INFO, "Get PciExpress Address from Hob: 0x%X\n", PciExpressBase));
+  
   if (PciExpressBase != 0) {
     RootBridge->PciRootBridge.HID = EISA_PNP_ID(0x0A08);
   }
@@ -514,6 +509,8 @@ Returns:
                   &gPlatformRootBridges[0], 
                   &RootHandle
                   );
+  DEBUG ((EFI_D_INFO, "Pci Root bridge handle is 0x%X\n", RootHandle));
+  
   if (EFI_ERROR (Status)) {
     return Status;
   }
