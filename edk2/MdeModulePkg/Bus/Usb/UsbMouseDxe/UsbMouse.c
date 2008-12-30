@@ -1,6 +1,5 @@
 /** @file
-
-  Usb Mouse Driver Binding and Implement SIMPLE_POINTER_PROTOCOL Protocol.
+  USB Mouse Driver that manages USB mouse and produces Simple Pointer Protocol.
 
 Copyright (c) 2004 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -15,18 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UsbMouse.h"
 
-#include <Library/DebugLib.h>
-#include <IndustryStandard/Usb.h>
-
-
-#include "UsbMouse.h"
-#include "MouseHid.h"
-
-
-EFI_GUID  gEfiUsbMouseDriverGuid = {
-  0x290156b5, 0x6a05, 0x4ac0, {0xb8, 0x0, 0x51, 0x27, 0x55, 0xad, 0x14, 0x29}
-};
-
 EFI_DRIVER_BINDING_PROTOCOL gUsbMouseDriverBinding = {
   USBMouseDriverBindingSupported,
   USBMouseDriverBindingStart,
@@ -37,114 +24,15 @@ EFI_DRIVER_BINDING_PROTOCOL gUsbMouseDriverBinding = {
 };
 
 /**
-  Tell if a Usb Controller is a mouse.
+  Entrypoint of USB Mouse Driver.
 
-  @param  UsbIo                 Protocol instance pointer.
+  This function is the entrypoint of USB Mouse Driver. It installs Driver Binding
+  Protocols together with Component Name Protocols.
 
-  @retval TRUE                  It is a mouse.
-  @retval FALSE                 It is not a mouse.
+  @param  ImageHandle       The firmware allocated handle for the EFI image.
+  @param  SystemTable       A pointer to the EFI System Table.
 
-**/
-BOOLEAN
-IsUsbMouse (
-  IN  EFI_USB_IO_PROTOCOL     *UsbIo
-  );
-
-/**
-  Initialize the Usb Mouse Device.
-
-  @param  UsbMouseDev           Device instance to be initialized.
-
-  @retval EFI_SUCCESS           Success.
-  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory.
-  @retval Other                 Init error. 
-
-**/
-EFI_STATUS
-InitializeUsbMouseDevice (
-  IN  USB_MOUSE_DEV           *UsbMouseDev
-  );
-
-/**
-  Event notification function for SIMPLE_POINTER.WaitForInput event
-  Signal the event if there is input from mouse.
-
-  @param  Event                 Wait Event.
-  @param  Context               Passed parameter to event handler.
- 
-**/
-VOID
-EFIAPI
-UsbMouseWaitForInput (
-  IN  EFI_EVENT               Event,
-  IN  VOID                    *Context
-  );
-
-/**
-  It is called whenever there is data received from async interrupt
-  transfer.
-
-  @param  Data                  Data received.
-  @param  DataLength            Length of Data.
-  @param  Context               Passed in context.
-  @param  Result                Async Interrupt Transfer result.
-
-  @return EFI_SUCCESS           Receive data successfully.
-  @return EFI_DEVICE_ERROR      USB async interrupt transfer fails.
-
-**/
-EFI_STATUS
-EFIAPI
-OnMouseInterruptComplete (
-  IN  VOID        *Data,
-  IN  UINTN       DataLength,
-  IN  VOID        *Context,
-  IN  UINT32      Result
-  );
-
-/**
-  Get the mouse state, see SIMPLE POINTER PROTOCOL.
-
-  @param  This                  Protocol instance pointer.
-  @param  MouseState            Current mouse state.
-
-  @return EFI_SUCCESS           Get usb mouse status successfully.
-  @return EFI_DEVICE_ERROR      The parameter is error.
-  @return EFI_NOT_READY         Mouse status doesn't change.
-
-**/
-EFI_STATUS
-EFIAPI
-GetMouseState (
-  IN   EFI_SIMPLE_POINTER_PROTOCOL  *This,
-  OUT  EFI_SIMPLE_POINTER_STATE     *MouseState
-  );
-
-/**
-  Reset the mouse device, see SIMPLE POINTER PROTOCOL.
-
-  @param  This                  Protocol instance pointer.
-  @param  ExtendedVerification  Ignored here.
-
-  @return EFI_SUCCESS           Reset usb mouse successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-UsbMouseReset (
-  IN EFI_SIMPLE_POINTER_PROTOCOL    *This,
-  IN BOOLEAN                        ExtendedVerification
-  );
-
-
-/**
-  The USB Mouse driver entry pointer.
-
-  @param  ImageHandle      The driver image handle.
-  @param  SystemTable      The system table.
-
-  @return EFI_SUCCESS      The component name protocol is installed.
-  @return Others           Failed to init the usb driver.
+  @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/
 EFI_STATUS
@@ -154,27 +42,31 @@ USBMouseDriverBindingEntryPoint (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  return EfiLibInstallDriverBindingComponentName2 (
-           ImageHandle,
-           SystemTable,
-           &gUsbMouseDriverBinding,
-           ImageHandle,
-           &gUsbMouseComponentName,
-           &gUsbMouseComponentName2
-           );
+  EFI_STATUS              Status;
+
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gUsbMouseDriverBinding,
+             ImageHandle,
+             &gUsbMouseComponentName,
+             &gUsbMouseComponentName2
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
 }
 
 
 /**
-  Test to see if this driver supports ControllerHandle. Any ControllerHandle
-  that has UsbIoProtocol installed will be supported.
+  Check whether USB mouse driver supports this device.
 
-  @param  This                  Protocol instance pointer.
-  @param  Controller            Handle of device to test
-  @param  RemainingDevicePath   Not used.
+  @param  This                   The USB mouse driver binding protocol.
+  @param  Controller             The controller handle to check.
+  @param  RemainingDevicePath    The remaining device path.
 
-  @retval EFI_SUCCESS           This driver supports this device.
-  @retval EFI_UNSUPPORTED       This driver does not support this device.
+  @retval EFI_SUCCESS            The driver supports this controller.
+  @retval other                  This device isn't supported.
 
 **/
 EFI_STATUS
@@ -185,29 +77,24 @@ USBMouseDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-  EFI_STATUS          OpenStatus;
-  EFI_USB_IO_PROTOCOL *UsbIo;
   EFI_STATUS          Status;
+  EFI_USB_IO_PROTOCOL *UsbIo;
 
-  OpenStatus = gBS->OpenProtocol (
-                      Controller,
-                      &gEfiUsbIoProtocolGuid,
-                      (VOID **) &UsbIo,
-                      This->DriverBindingHandle,
-                      Controller,
-                      EFI_OPEN_PROTOCOL_BY_DRIVER
-                      );
-  if (EFI_ERROR (OpenStatus) && (OpenStatus != EFI_ALREADY_STARTED)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if (OpenStatus == EFI_ALREADY_STARTED) {
-    return EFI_ALREADY_STARTED;
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiUsbIoProtocolGuid,
+                  (VOID **) &UsbIo,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //
-  // Use the USB I/O protocol interface to see the Controller is
-  // the Mouse controller that can be managed by this driver.
+  // Use the USB I/O Protocol interface to check whether Controller is
+  // a mouse device that can be managed by this driver.
   //
   Status = EFI_SUCCESS;
   if (!IsUsbMouse (UsbIo)) {
@@ -220,16 +107,22 @@ USBMouseDriverBindingSupported (
         This->DriverBindingHandle,
         Controller
         );
+
   return Status;
 }
 
 
 /**
-  Starting the Usb Mouse Driver.
+  Starts the mouse device with this driver.
 
-  @param  This                  Protocol instance pointer.
-  @param  Controller            Handle of device to test.
-  @param  RemainingDevicePath   Not used.
+  This function consumes USB I/O Portocol, intializes USB mouse device,
+  installs Simple Pointer Protocol, and submits Asynchronous Interrupt
+  Transfer to manage the USB mouse device.
+
+  @param  This                  The USB mouse driver binding instance.
+  @param  Controller            Handle of device to bind driver to.
+  @param  RemainingDevicePath   Optional parameter use to pick a specific child
+                                device to start.
 
   @retval EFI_SUCCESS           This driver supports this device.
   @retval EFI_UNSUPPORTED       This driver does not support this device.
@@ -248,17 +141,18 @@ USBMouseDriverBindingStart (
 {
   EFI_STATUS                  Status;
   EFI_USB_IO_PROTOCOL         *UsbIo;
-  EFI_USB_ENDPOINT_DESCRIPTOR *EndpointDesc;
   USB_MOUSE_DEV               *UsbMouseDevice;
   UINT8                       EndpointNumber;
+  EFI_USB_ENDPOINT_DESCRIPTOR EndpointDescriptor;
   UINT8                       Index;
   UINT8                       EndpointAddr;
   UINT8                       PollingInterval;
   UINT8                       PacketSize;
+  BOOLEAN                     Found;
 
-  UsbMouseDevice  = NULL;
-  Status          = EFI_SUCCESS;
-
+  //
+  // Open USB I/O Protocol
+  //
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
@@ -268,30 +162,15 @@ USBMouseDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    goto ErrorExit;
+    return Status;
   }
 
   UsbMouseDevice = AllocateZeroPool (sizeof (USB_MOUSE_DEV));
-  if (UsbMouseDevice == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ErrorExit;
-  }
+  ASSERT (UsbMouseDevice != NULL);
 
-  UsbMouseDevice->UsbIo               = UsbIo;
+  UsbMouseDevice->UsbIo     = UsbIo;
+  UsbMouseDevice->Signature = USB_MOUSE_DEV_SIGNATURE;
 
-  UsbMouseDevice->Signature           = USB_MOUSE_DEV_SIGNATURE;
-
-  UsbMouseDevice->InterfaceDescriptor = AllocatePool (sizeof (EFI_USB_INTERFACE_DESCRIPTOR));
-  if (UsbMouseDevice->InterfaceDescriptor == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ErrorExit;
-  }
-
-  EndpointDesc = AllocatePool (sizeof (EFI_USB_ENDPOINT_DESCRIPTOR));
-  if (EndpointDesc == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ErrorExit;
-  }
   //
   // Get the Device Path Protocol on Controller's handle
   //
@@ -311,31 +190,36 @@ USBMouseDriverBindingStart (
   // Get interface & endpoint descriptor
   //
   UsbIo->UsbGetInterfaceDescriptor (
-          UsbIo,
-          UsbMouseDevice->InterfaceDescriptor
-          );
+           UsbIo,
+           &UsbMouseDevice->InterfaceDescriptor
+           );
 
-  EndpointNumber = UsbMouseDevice->InterfaceDescriptor->NumEndpoints;
+  EndpointNumber = UsbMouseDevice->InterfaceDescriptor.NumEndpoints;
 
+  //
+  // Traverse endpoints to find interrupt endpoint
+  //
+  Found = FALSE;
   for (Index = 0; Index < EndpointNumber; Index++) {
     UsbIo->UsbGetEndpointDescriptor (
-            UsbIo,
-            Index,
-            EndpointDesc
-            );
+             UsbIo,
+             Index,
+             &EndpointDescriptor
+             );
 
-    if ((EndpointDesc->Attributes & 0x03) == 0x03) {
-
+    if ((EndpointDescriptor.Attributes & (BIT0 | BIT1)) == USB_ENDPOINT_INTERRUPT) {
       //
       // We only care interrupt endpoint here
       //
-      UsbMouseDevice->IntEndpointDescriptor = EndpointDesc;
+      CopyMem(&UsbMouseDevice->IntEndpointDescriptor, &EndpointDescriptor, sizeof(EndpointDescriptor));
+      Found = TRUE;
+      break;
     }
   }
 
-  if (UsbMouseDevice->IntEndpointDescriptor == NULL) {
+  if (!Found) {
     //
-    // No interrupt endpoint, then error
+    // No interrupt endpoint found, then return unsupported.
     //
     Status = EFI_UNSUPPORTED;
     goto ErrorExit;
@@ -343,15 +227,21 @@ USBMouseDriverBindingStart (
 
   Status = InitializeUsbMouseDevice (UsbMouseDevice);
   if (EFI_ERROR (Status)) {
-    MouseReportStatusCode (
-      UsbMouseDevice->DevicePath,
+    //
+    // Fail to initialize USB mouse device.
+    //
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      PcdGet32 (PcdStatusCodeValueMouseInterfaceError)
+      PcdGet32 (PcdStatusCodeValueMouseInterfaceError),
+      UsbMouseDevice->DevicePath
       );
 
     goto ErrorExit;
   }
 
+  //
+  // Initialize and install EFI Simple Pointer Protocol.
+  //
   UsbMouseDevice->SimplePointerProtocol.GetState  = GetMouseState;
   UsbMouseDevice->SimplePointerProtocol.Reset     = UsbMouseReset;
   UsbMouseDevice->SimplePointerProtocol.Mode      = &UsbMouseDevice->Mode;
@@ -375,28 +265,26 @@ USBMouseDriverBindingStart (
                   );
 
   if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
     goto ErrorExit;
   }
 
   //
-  // After Enabling Async Interrupt Transfer on this mouse Device
-  // we will be able to get key data from it. Thus this is deemed as
-  // the enable action of the mouse
+  // The next step would be submitting Asynchronous Interrupt Transfer on this mouse device.
+  // After that we will be able to get key data from it. Thus this is deemed as
+  // the enable action of the mouse, so report status code accordingly.
   //
-
-  MouseReportStatusCode (
-    UsbMouseDevice->DevicePath,
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueMouseEnable)
+    PcdGet32 (PcdStatusCodeValueMouseEnable),
+    UsbMouseDevice->DevicePath
     );
 
   //
-  // submit async interrupt transfer
+  // Submit Asynchronous Interrupt Transfer to manage this device.
   //
-  EndpointAddr    = UsbMouseDevice->IntEndpointDescriptor->EndpointAddress;
-  PollingInterval = UsbMouseDevice->IntEndpointDescriptor->Interval;
-  PacketSize      = (UINT8) (UsbMouseDevice->IntEndpointDescriptor->MaxPacketSize);
+  EndpointAddr    = UsbMouseDevice->IntEndpointDescriptor.EndpointAddress;
+  PollingInterval = UsbMouseDevice->IntEndpointDescriptor.Interval;
+  PacketSize      = (UINT8) (UsbMouseDevice->IntEndpointDescriptor.MaxPacketSize);
 
   Status = UsbIo->UsbAsyncInterruptTransfer (
                     UsbIo,
@@ -408,38 +296,39 @@ USBMouseDriverBindingStart (
                     UsbMouseDevice
                     );
 
-  if (!EFI_ERROR (Status)) {
-
-    UsbMouseDevice->ControllerNameTable = NULL;
-    AddUnicodeString2 (
-      "eng",
-      gUsbMouseComponentName.SupportedLanguages,
-      &UsbMouseDevice->ControllerNameTable,
-      L"Generic Usb Mouse",
-      TRUE
-      );
-    AddUnicodeString2 (
-      "en",
-      gUsbMouseComponentName2.SupportedLanguages,
-      &UsbMouseDevice->ControllerNameTable,
-      L"Generic Usb Mouse",
-      FALSE
-      );
-
-
-    return EFI_SUCCESS;
+  if (EFI_ERROR (Status)) {
+    //
+    // If submit error, uninstall that interface
+    //
+    gBS->UninstallProtocolInterface (
+           Controller,
+           &gEfiSimplePointerProtocolGuid,
+           &UsbMouseDevice->SimplePointerProtocol
+           );
+    goto ErrorExit;
   }
+  
+  UsbMouseDevice->ControllerNameTable = NULL;
+  AddUnicodeString2 (
+    "eng",
+    gUsbMouseComponentName.SupportedLanguages,
+    &UsbMouseDevice->ControllerNameTable,
+    L"Generic Usb Mouse",
+    TRUE
+    );
+  AddUnicodeString2 (
+    "en",
+    gUsbMouseComponentName2.SupportedLanguages,
+    &UsbMouseDevice->ControllerNameTable,
+    L"Generic Usb Mouse",
+    FALSE
+    );
 
-  //
-  // If submit error, uninstall that interface
-  //
-  Status = EFI_DEVICE_ERROR;
-  gBS->UninstallProtocolInterface (
-        Controller,
-        &gEfiSimplePointerProtocolGuid,
-        &UsbMouseDevice->SimplePointerProtocol
-        );
+  return EFI_SUCCESS;
 
+//
+// Error handler
+//
 ErrorExit:
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
@@ -450,19 +339,11 @@ ErrorExit:
           );
 
     if (UsbMouseDevice != NULL) {
-      if (UsbMouseDevice->InterfaceDescriptor != NULL) {
-        gBS->FreePool (UsbMouseDevice->InterfaceDescriptor);
-      }
-
-      if (UsbMouseDevice->IntEndpointDescriptor != NULL) {
-        gBS->FreePool (UsbMouseDevice->IntEndpointDescriptor);
-      }
-
       if ((UsbMouseDevice->SimplePointerProtocol).WaitForInput != NULL) {
         gBS->CloseEvent ((UsbMouseDevice->SimplePointerProtocol).WaitForInput);
       }
 
-      gBS->FreePool (UsbMouseDevice);
+      FreePool (UsbMouseDevice);
       UsbMouseDevice = NULL;
     }
   }
@@ -472,16 +353,16 @@ ErrorExit:
 
 
 /**
-  Stop this driver on ControllerHandle. Support stopping any child handles
-  created by this driver.
+  Stop the USB mouse device handled by this driver.
 
-  @param  This                  Protocol instance pointer.
-  @param  Controller            Handle of device to stop driver on.
-  @param  NumberOfChildren      Number of Children in the ChildHandleBuffer.
-  @param  ChildHandleBuffer     List of handles for the children we need to stop.
+  @param  This                   The USB mouse driver binding protocol.
+  @param  Controller             The controller to release.
+  @param  NumberOfChildren       The number of handles in ChildHandleBuffer.
+  @param  ChildHandleBuffer      The array of child handle.
 
-  @retval EFI_SUCCESS           The controller or children are stopped.
-  @retval Other                 Failed to stop the driver.
+  @retval EFI_SUCCESS            The device was stopped.
+  @retval EFI_UNSUPPORTED        Simple Pointer Protocol is not installed on Controller.
+  @retval Others                 Fail to uninstall protocols attached on the device.
 
 **/
 EFI_STATUS
@@ -498,9 +379,6 @@ USBMouseDriverBindingStop (
   EFI_SIMPLE_POINTER_PROTOCOL *SimplePointerProtocol;
   EFI_USB_IO_PROTOCOL         *UsbIo;
 
-  //
-  // Get our context back.
-  //
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiSimplePointerProtocolGuid,
@@ -516,44 +394,29 @@ USBMouseDriverBindingStop (
 
   UsbMouseDevice = USB_MOUSE_DEV_FROM_MOUSE_PROTOCOL (SimplePointerProtocol);
 
-  gBS->CloseProtocol (
-        Controller,
-        &gEfiSimplePointerProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
-
   UsbIo = UsbMouseDevice->UsbIo;
 
   //
-  // Uninstall the Asyn Interrupt Transfer from this device
-  // will disable the mouse data input from this device
+  // The key data input from this device will be disabled.
   //
-  MouseReportStatusCode (
-    UsbMouseDevice->DevicePath,
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueMouseDisable)
+    PcdGet32 (PcdStatusCodeValueMouseDisable),
+    UsbMouseDevice->DevicePath
     );
 
   //
-  // Delete Mouse Async Interrupt Transfer
+  // Delete the Asynchronous Interrupt Transfer from this device
   //
   UsbIo->UsbAsyncInterruptTransfer (
-          UsbIo,
-          UsbMouseDevice->IntEndpointDescriptor->EndpointAddress,
-          FALSE,
-          UsbMouseDevice->IntEndpointDescriptor->Interval,
-          0,
-          NULL,
-          NULL
-          );
-
-  gBS->CloseEvent (UsbMouseDevice->SimplePointerProtocol.WaitForInput);
-
-  if (UsbMouseDevice->DelayedRecoveryEvent != NULL) {
-    gBS->CloseEvent (UsbMouseDevice->DelayedRecoveryEvent);
-    UsbMouseDevice->DelayedRecoveryEvent = 0;
-  }
+           UsbIo,
+           UsbMouseDevice->IntEndpointDescriptor.EndpointAddress,
+           FALSE,
+           UsbMouseDevice->IntEndpointDescriptor.Interval,
+           0,
+           NULL,
+           NULL
+           );
 
   Status = gBS->UninstallProtocolInterface (
                   Controller,
@@ -565,20 +428,27 @@ USBMouseDriverBindingStop (
   }
 
   gBS->CloseProtocol (
-        Controller,
-        &gEfiUsbIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiUsbIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
-  gBS->FreePool (UsbMouseDevice->InterfaceDescriptor);
-  gBS->FreePool (UsbMouseDevice->IntEndpointDescriptor);
+  //
+  // Free all resources.
+  //
+  gBS->CloseEvent (UsbMouseDevice->SimplePointerProtocol.WaitForInput);
+
+  if (UsbMouseDevice->DelayedRecoveryEvent != NULL) {
+    gBS->CloseEvent (UsbMouseDevice->DelayedRecoveryEvent);
+    UsbMouseDevice->DelayedRecoveryEvent = NULL;
+  }
 
   if (UsbMouseDevice->ControllerNameTable != NULL) {
     FreeUnicodeStringTable (UsbMouseDevice->ControllerNameTable);
   }
 
-  gBS->FreePool (UsbMouseDevice);
+  FreePool (UsbMouseDevice);
 
   return EFI_SUCCESS;
 
@@ -586,12 +456,12 @@ USBMouseDriverBindingStop (
 
 
 /**
-  Tell if a Usb Controller is a mouse.
+  Uses USB I/O to check whether the device is a USB mouse device.
 
-  @param  UsbIo                 Protocol instance pointer.
+  @param  UsbIo    Pointer to a USB I/O protocol instance.
 
-  @retval TRUE                  It is a mouse.
-  @retval FALSE                 It is not a mouse.
+  @retval TRUE     Device is a USB mouse device.
+  @retval FALSE    Device is a not USB mouse device.
 
 **/
 BOOLEAN
@@ -603,8 +473,7 @@ IsUsbMouse (
   EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
 
   //
-  // Get the Default interface descriptor, now we only
-  // suppose it is interface 1
+  // Get the default interface descriptor
   //
   Status = UsbIo->UsbGetInterfaceDescriptor (
                     UsbIo,
@@ -627,18 +496,23 @@ IsUsbMouse (
 
 
 /**
-  Initialize the Usb Mouse Device.
+  Initialize the USB mouse device.
+
+  This function retrieves and parses HID report descriptor, and
+  initializes state of USB_MOUSE_DEV. Then it sets indefinite idle
+  rate for the device. Finally it creates event for delayed recovery,
+  which deals with device error.
 
   @param  UsbMouseDev           Device instance to be initialized.
 
-  @retval EFI_SUCCESS           Success.
-  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory.
-  @retval Other                 Init error. 
+  @retval EFI_SUCCESS           USB mouse device successfully initialized..
+  @retval EFI_UNSUPPORTED       HID descriptor type is not report descriptor.
+  @retval Other                 USB mouse device was not initialized successfully.
 
 **/
 EFI_STATUS
 InitializeUsbMouseDevice (
-  IN  USB_MOUSE_DEV           *UsbMouseDev
+  IN OUT USB_MOUSE_DEV           *UsbMouseDev
   )
 {
   EFI_USB_IO_PROTOCOL     *UsbIo;
@@ -646,6 +520,8 @@ InitializeUsbMouseDevice (
   EFI_STATUS              Status;
   EFI_USB_HID_DESCRIPTOR  MouseHidDesc;
   UINT8                   *ReportDesc;
+  UINT8                   ReportId;
+  UINT8                   Duration;
 
   UsbIo = UsbMouseDev->UsbIo;
 
@@ -653,36 +529,33 @@ InitializeUsbMouseDevice (
   // Get HID descriptor
   //
   Status = UsbGetHidDescriptor (
-            UsbIo,
-            UsbMouseDev->InterfaceDescriptor->InterfaceNumber,
-            &MouseHidDesc
-            );
-
+             UsbIo,
+             UsbMouseDev->InterfaceDescriptor.InterfaceNumber,
+             &MouseHidDesc
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // Get Report descriptor
+  // Get report descriptor
   //
-  if (MouseHidDesc.HidClassDesc[0].DescriptorType != 0x22) {
+  if (MouseHidDesc.HidClassDesc[0].DescriptorType != USB_DESC_TYPE_REPORT) {
     return EFI_UNSUPPORTED;
   }
 
   ReportDesc = AllocateZeroPool (MouseHidDesc.HidClassDesc[0].DescriptorLength);
-  if (ReportDesc == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (ReportDesc != NULL);
 
   Status = UsbGetReportDescriptor (
-            UsbIo,
-            UsbMouseDev->InterfaceDescriptor->InterfaceNumber,
-            MouseHidDesc.HidClassDesc[0].DescriptorLength,
-            ReportDesc
-            );
+             UsbIo,
+             UsbMouseDev->InterfaceDescriptor.InterfaceNumber,
+             MouseHidDesc.HidClassDesc[0].DescriptorLength,
+             ReportDesc
+             );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (ReportDesc);
+    FreePool (ReportDesc);
     return Status;
   }
 
@@ -690,89 +563,106 @@ InitializeUsbMouseDevice (
   // Parse report descriptor
   //
   Status = ParseMouseReportDescriptor (
-            UsbMouseDev,
-            ReportDesc,
-            MouseHidDesc.HidClassDesc[0].DescriptorLength
-            );
+             UsbMouseDev,
+             ReportDesc,
+             MouseHidDesc.HidClassDesc[0].DescriptorLength
+             );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (ReportDesc);
+    FreePool (ReportDesc);
     return Status;
   }
 
+  //
+  // Check the presence of left and right buttons,
+  // and initialize fields of EFI_SIMPLE_POINTER_MODE.
+  //
   if (UsbMouseDev->NumberOfButtons >= 1) {
     UsbMouseDev->Mode.LeftButton = TRUE;
   }
-
   if (UsbMouseDev->NumberOfButtons > 1) {
     UsbMouseDev->Mode.RightButton = TRUE;
   }
-
   UsbMouseDev->Mode.ResolutionX = 8;
   UsbMouseDev->Mode.ResolutionY = 8;
   UsbMouseDev->Mode.ResolutionZ = 0;
+
   //
-  // Here we just assume interface 0 is the mouse interface
+  // Set boot protocol for the USB mouse.
+  // This driver only supports boot protocol.
   //
   UsbGetProtocolRequest (
     UsbIo,
-    0,
+    UsbMouseDev->InterfaceDescriptor.InterfaceNumber,
     &Protocol
     );
-
   if (Protocol != BOOT_PROTOCOL) {
     Status = UsbSetProtocolRequest (
-              UsbIo,
-              0,
-              BOOT_PROTOCOL
-              );
+               UsbIo,
+               0,
+               BOOT_PROTOCOL
+               );
 
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (ReportDesc);
-      return EFI_DEVICE_ERROR;
+      FreePool (ReportDesc);
+      return Status;
     }
   }
 
   //
-  // Set indefinite Idle rate for USB Mouse
+  // ReportId is zero, which means the idle rate applies to all input reports.
   //
+  ReportId = 0;
+  //
+  // Duration is zero, which means the duration is infinite.
+  // so the endpoint will inhibit reporting forever,
+  // and only reporting when a change is detected in the report data.
+  //
+  Duration = 0;
   UsbSetIdleRequest (
     UsbIo,
-    0,
-    0,
-    0
+    UsbMouseDev->InterfaceDescriptor.InterfaceNumber,
+    ReportId,
+    Duration
     );
 
-  gBS->FreePool (ReportDesc);
+  FreePool (ReportDesc);
 
+  //
+  // Create event for delayed recovery, which deals with device error.
+  //
   if (UsbMouseDev->DelayedRecoveryEvent != NULL) {
     gBS->CloseEvent (UsbMouseDev->DelayedRecoveryEvent);
     UsbMouseDev->DelayedRecoveryEvent = 0;
   }
 
-  Status = gBS->CreateEvent (
-                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  USBMouseRecoveryHandler,
-                  UsbMouseDev,
-                  &UsbMouseDev->DelayedRecoveryEvent
-                  );
+  gBS->CreateEvent (
+         EVT_TIMER | EVT_NOTIFY_SIGNAL,
+         TPL_NOTIFY,
+         USBMouseRecoveryHandler,
+         UsbMouseDev,
+         &UsbMouseDev->DelayedRecoveryEvent
+         );
 
   return EFI_SUCCESS;
 }
 
 
 /**
-  It is called whenever there is data received from async interrupt
-  transfer.
+  Handler function for USB mouse's asynchronous interrupt transfer.
 
-  @param  Data                  Data received.
-  @param  DataLength            Length of Data.
-  @param  Context               Passed in context.
-  @param  Result                Async Interrupt Transfer result.
+  This function is the handler function for USB mouse's asynchronous interrupt transfer
+  to manage the mouse. It parses data returned from asynchronous interrupt transfer, and
+  get button and movement state.
 
-  @return EFI_SUCCESS           Receive data successfully.
-  @return EFI_DEVICE_ERROR      USB async interrupt transfer fails.
+  @param  Data             A pointer to a buffer that is filled with key data which is
+                           retrieved via asynchronous interrupt transfer.
+  @param  DataLength       Indicates the size of the data buffer.
+  @param  Context          Pointing to USB_KB_DEV instance.
+  @param  Result           Indicates the result of the asynchronous interrupt transfer.
+
+  @retval EFI_SUCCESS      Asynchronous interrupt transfer is handled successfully.
+  @retval EFI_DEVICE_ERROR Hardware error occurs.
 
 **/
 EFI_STATUS
@@ -796,14 +686,14 @@ OnMouseInterruptComplete (
     //
     // Some errors happen during the process
     //
-    MouseReportStatusCode (
-      UsbMouseDevice->DevicePath,
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      PcdGet32 (PcdStatusCodeValueMouseInputError)
+      PcdGet32 (PcdStatusCodeValueMouseInputError),
+      UsbMouseDevice->DevicePath
       );
 
     if ((Result & EFI_USB_ERR_STALL) == EFI_USB_ERR_STALL) {
-      EndpointAddr = UsbMouseDevice->IntEndpointDescriptor->EndpointAddress;
+      EndpointAddr = UsbMouseDevice->IntEndpointDescriptor.EndpointAddress;
 
       UsbClearEndpointHalt (
         UsbIo,
@@ -812,24 +702,33 @@ OnMouseInterruptComplete (
         );
     }
 
+    //
+    // Delete & Submit this interrupt again
+    // Handler of DelayedRecoveryEvent triggered by timer will re-submit the interrupt. 
+    //
     UsbIo->UsbAsyncInterruptTransfer (
-            UsbIo,
-            UsbMouseDevice->IntEndpointDescriptor->EndpointAddress,
-            FALSE,
-            0,
-            0,
-            NULL,
-            NULL
-            );
-
+             UsbIo,
+             UsbMouseDevice->IntEndpointDescriptor.EndpointAddress,
+             FALSE,
+             0,
+             0,
+             NULL,
+             NULL
+             );
+    //
+    // EFI_USB_INTERRUPT_DELAY is defined in USB standard for error handling.
+    //
     gBS->SetTimer (
-          UsbMouseDevice->DelayedRecoveryEvent,
-          TimerRelative,
-          EFI_USB_INTERRUPT_DELAY
-          );
+           UsbMouseDevice->DelayedRecoveryEvent,
+           TimerRelative,
+           EFI_USB_INTERRUPT_DELAY
+           );
     return EFI_DEVICE_ERROR;
   }
 
+  //
+  // If no error and no data, just return EFI_SUCCESS.
+  //
   if (DataLength == 0 || Data == NULL) {
     return EFI_SUCCESS;
   }
@@ -838,9 +737,18 @@ OnMouseInterruptComplete (
 
   //
   // Check mouse Data
+  // USB HID Specification specifies following data format:
+  // Byte    Bits    Description
+  // 0       0       Button 1
+  //         1       Button 2
+  //         2       Button 3
+  //         4 to 7  Device-specific
+  // 1       0 to 7  X displacement
+  // 2       0 to 7  Y displacement
+  // 3 to n  0 to 7  Device specific (optional)
   //
-  UsbMouseDevice->State.LeftButton  = (BOOLEAN) (*(UINT8 *) Data & 0x01);
-  UsbMouseDevice->State.RightButton = (BOOLEAN) (*(UINT8 *) Data & 0x02);
+  UsbMouseDevice->State.LeftButton  = (BOOLEAN) ((*(UINT8 *) Data & BIT0) != 0);
+  UsbMouseDevice->State.RightButton = (BOOLEAN) ((*(UINT8 *) Data & BIT1) != 0);
   UsbMouseDevice->State.RelativeMovementX += *((INT8 *) Data + 1);
   UsbMouseDevice->State.RelativeMovementY += *((INT8 *) Data + 2);
 
@@ -851,16 +759,18 @@ OnMouseInterruptComplete (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Get the mouse state, see SIMPLE POINTER PROTOCOL.
-
-  @param  This                  Protocol instance pointer.
-  @param  MouseState            Current mouse state.
-
-  @return EFI_SUCCESS           Get usb mouse status successfully.
-  @return EFI_DEVICE_ERROR      The parameter is error.
-  @return EFI_NOT_READY         Mouse status doesn't change.
+  Retrieves the current state of a pointer device.
+    
+  @param  This                  A pointer to the EFI_SIMPLE_POINTER_PROTOCOL instance.                                   
+  @param  MouseState            A pointer to the state information on the pointer device.
+                                
+  @retval EFI_SUCCESS           The state of the pointer device was returned in State.
+  @retval EFI_NOT_READY         The state of the pointer device has not changed since the last call to
+                                GetState().                                                           
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to retrieve the pointer device's
+                                current state.                                                           
+  @retval EFI_INVALID_PARAMETER MouseState is NULL.                                                           
 
 **/
 EFI_STATUS
@@ -873,7 +783,7 @@ GetMouseState (
   USB_MOUSE_DEV *MouseDev;
 
   if (MouseState == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_INVALID_PARAMETER;
   }
 
   MouseDev = USB_MOUSE_DEV_FROM_MOUSE_PROTOCOL (This);
@@ -882,6 +792,9 @@ GetMouseState (
     return EFI_NOT_READY;
   }
 
+  //
+  // Retrieve mouse state from USB_MOUSE_DEV, which was filled by OnMouseInterruptComplete()
+  //
   CopyMem (
     MouseState,
     &MouseDev->State,
@@ -901,13 +814,15 @@ GetMouseState (
 }
 
 
-/**
-  Reset the mouse device, see SIMPLE POINTER PROTOCOL.
-
-  @param  This                  Protocol instance pointer.
-  @param  ExtendedVerification  Ignored here.
-
-  @return EFI_SUCCESS           Reset usb mouse successfully.
+/**                                                                 
+  Resets the pointer device hardware.
+  
+  @param  This                  A pointer to the EFI_SIMPLE_POINTER_PROTOCOL instance.
+  @param  ExtendedVerification  Indicates that the driver may perform a more exhaustive
+                                verification operation of the device during reset.
+                                
+  @retval EFI_SUCCESS           The device was reset.
+  @retval EFI_DEVICE_ERROR      The device is not functioning correctly and could not be reset.
 
 **/
 EFI_STATUS
@@ -921,13 +836,15 @@ UsbMouseReset (
 
   UsbMouseDevice  = USB_MOUSE_DEV_FROM_MOUSE_PROTOCOL (This);
 
-  MouseReportStatusCode (
-    UsbMouseDevice->DevicePath,
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueMouseReset)
-
+    PcdGet32 (PcdStatusCodeValueMouseReset),
+    UsbMouseDevice->DevicePath
     );
 
+  //
+  // Clear mouse state.
+  //
   ZeroMem (
     &UsbMouseDevice->State,
     sizeof (EFI_SIMPLE_POINTER_STATE)
@@ -939,11 +856,10 @@ UsbMouseReset (
 
 
 /**
-  Event notification function for SIMPLE_POINTER.WaitForInput event
-  Signal the event if there is input from mouse.
+  Event notification function for SIMPLE_POINTER.WaitForInput event.
 
-  @param  Event                 Wait Event
-  @param  Context               Passed parameter to event handler
+  @param  Event        Event to be signaled when there's input from mouse.
+  @param  Context      Points to USB_MOUSE_DEV instance.
  
 **/
 VOID
@@ -958,8 +874,7 @@ UsbMouseWaitForInput (
   UsbMouseDev = (USB_MOUSE_DEV *) Context;
 
   //
-  // Someone is waiting on the mouse event, if there's
-  // input from mouse, signal the event
+  // If there's input from mouse, signal the event.
   //
   if (UsbMouseDev->StateChanged) {
     gBS->SignalEvent (Event);
@@ -968,11 +883,16 @@ UsbMouseWaitForInput (
 
 
 /**
-  Timer handler for Delayed Recovery timer.
+  Handler for Delayed Recovery event.
 
-  @param  Event                 The Delayed Recovery event.
-  @param  Context               Points to the USB_KB_DEV instance.
+  This function is the handler for Delayed Recovery event triggered
+  by timer.
+  After a device error occurs, the event would be triggered
+  with interval of EFI_USB_INTERRUPT_DELAY. EFI_USB_INTERRUPT_DELAY
+  is defined in USB standard for error handling.
 
+  @param  Event              The Delayed Recovery event.
+  @param  Context            Points to the USB_MOUSE_DEV instance.
 
 **/
 VOID
@@ -989,38 +909,16 @@ USBMouseRecoveryHandler (
 
   UsbIo       = UsbMouseDev->UsbIo;
 
+  //
+  // Re-submit Asynchronous Interrupt Transfer for recovery.
+  //
   UsbIo->UsbAsyncInterruptTransfer (
-          UsbIo,
-          UsbMouseDev->IntEndpointDescriptor->EndpointAddress,
-          TRUE,
-          UsbMouseDev->IntEndpointDescriptor->Interval,
-          UsbMouseDev->IntEndpointDescriptor->MaxPacketSize,
-          OnMouseInterruptComplete,
-          UsbMouseDev
-          );
-}
-
-
-/**
-  Report Status Code in Usb Bot Driver.
-
-  @param  DevicePath            Use this to get Device Path
-  @param  CodeType              Status Code Type
-  @param  CodeValue             Status Code Value
-
-  @return None
-
-**/
-VOID
-MouseReportStatusCode (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
-  IN EFI_STATUS_CODE_TYPE      CodeType,
-  IN EFI_STATUS_CODE_VALUE     Value
-  )
-{
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-    CodeType,
-    Value,
-    DevicePath
-    );
+           UsbIo,
+           UsbMouseDev->IntEndpointDescriptor.EndpointAddress,
+           TRUE,
+           UsbMouseDev->IntEndpointDescriptor.Interval,
+           UsbMouseDev->IntEndpointDescriptor.MaxPacketSize,
+           OnMouseInterruptComplete,
+           UsbMouseDev
+           );
 }
