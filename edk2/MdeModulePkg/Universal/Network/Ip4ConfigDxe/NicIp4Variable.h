@@ -15,8 +15,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _NIC_IP4_VARIABLE_H_
 #define _NIC_IP4_VARIABLE_H_
 
+#include <Uefi.h>
+
+#include <Library/NetLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/NicIp4Config.h>
+
 
 //
 // Return the size of NIC_IP4_CONFIG_INFO and EFI_IP4_IPCONFIG_DATA.
@@ -75,7 +84,7 @@ Ip4ConfigReadVariable (
 **/
 EFI_STATUS
 Ip4ConfigWriteVariable (
-  IN IP4_CONFIG_VARIABLE    *Config       OPTIONAL
+  IN IP4_CONFIG_VARIABLE    *Config        OPTIONAL
   );
 
 /**
@@ -107,9 +116,9 @@ Ip4ConfigFindNicVariable (
   @param  Config       The new configuration parameter (NULL to remove the old)
 
   @return The new IP4_CONFIG_VARIABLE variable if the new variable has at
-  @return least one NIC configure and no EFI_OUT_OF_RESOURCES failure.
-  @return Return NULL either because failed to locate memory for new variable
-  @return or the only NIC configure is removed from the Variable.
+          least one NIC configure and no EFI_OUT_OF_RESOURCES failure.
+          Return NULL either because failed to locate memory for new variable
+          or the only NIC configure is removed from the Variable.
 
 **/
 IP4_CONFIG_VARIABLE *
@@ -130,7 +139,7 @@ Ip4ConfigModifyVariable (
 **/
 VOID
 Ip4ConfigFixRouteTablePointer (
-  IN EFI_IP4_IPCONFIG_DATA  *ConfigData
+  IN OUT EFI_IP4_IPCONFIG_DATA  *ConfigData
   );
 
 #endif
