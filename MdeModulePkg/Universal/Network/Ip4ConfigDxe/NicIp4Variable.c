@@ -12,15 +12,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Uefi.h>
-
-#include <Library/NetLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-
 #include "NicIp4Variable.h"
 
 
@@ -206,7 +197,7 @@ Ip4ConfigWriteVariable (
   @param  NicAddr      The interface address to check
 
   @return The point to the NIC's IP4 configure info if it is found
-  @return in the IP4 variable, otherwise NULL.
+          in the IP4 variable, otherwise NULL.
 
 **/
 NIC_IP4_CONFIG_INFO *
@@ -263,9 +254,9 @@ Ip4ConfigFindNicVariable (
   @param  Config       The new configuration parameter (NULL to remove the old)
 
   @return The new IP4_CONFIG_VARIABLE variable if the new variable has at
-  @return least one NIC configure and no EFI_OUT_OF_RESOURCES failure.
-  @return Return NULL either because failed to locate memory for new variable
-  @return or the only NIC configure is removed from the Variable.
+          least one NIC configure and no EFI_OUT_OF_RESOURCES failure.
+          Return NULL either because failed to locate memory for new variable
+          or the only NIC configure is removed from the Variable.
 
 **/
 IP4_CONFIG_VARIABLE *
@@ -387,7 +378,7 @@ Ip4ConfigModifyVariable (
 **/
 VOID
 Ip4ConfigFixRouteTablePointer (
-  IN EFI_IP4_IPCONFIG_DATA  *ConfigData
+  IN OUT EFI_IP4_IPCONFIG_DATA  *ConfigData
   )
 {
   //

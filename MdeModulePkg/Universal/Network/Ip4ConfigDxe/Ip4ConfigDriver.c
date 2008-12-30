@@ -15,6 +15,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Ip4Config.h"
 
+EFI_DRIVER_BINDING_PROTOCOL gIp4ConfigDriverBinding = {
+  Ip4ConfigDriverBindingSupported,
+  Ip4ConfigDriverBindingStart,
+  Ip4ConfigDriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
 
 /**
   Stop all the auto configuration when the IP4 configure driver is
@@ -500,11 +508,3 @@ Ip4ConfigDriverBindingStop (
   return EFI_SUCCESS;
 }
 
-EFI_DRIVER_BINDING_PROTOCOL gIp4ConfigDriverBinding = {
-  Ip4ConfigDriverBindingSupported,
-  Ip4ConfigDriverBindingStart,
-  Ip4ConfigDriverBindingStop,
-  0xa,
-  NULL,
-  NULL
-};
