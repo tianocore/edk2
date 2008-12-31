@@ -22,38 +22,18 @@ if [ \
      "$1" = "--help" \
    ]
 then
-  echo BaseTools Usage: \'. edksetup.sh BaseTools\'
-  echo Ant Tools Usage: \'. edksetup.sh [AntBuild \| ForceRebuild]\'
+  echo BaseTools Usage: \'. edksetup.sh\'
   echo
   echo Please note: This script must be \'sourced\' so the environment can be changed.
   echo \(Either \'. edksetup.sh\' or \'source edksetup.sh\'\)
   return
 fi
 
-if [ "$1" = BaseTools ]
+if [ -z "$WORKSPACE" ]
 then
-  if [ -z "$WORKSPACE" ]
-  then
-    . BaseTools/BuildEnv $*
-  else
-    . $WORKSPACE/BaseTools/BuildEnv $*
-  fi
+  . BaseTools/BuildEnv $*
 else
-  if [ "$1" = AntBuild -o "$1" = ForceRebuild ]
-  then
-    if [ -z "$WORKSPACE" ]
-    then
-      if [ "$1" = AntBuild ]
-      then
-        shift
-      fi
-      . Tools/OldBuildEnv $*
-    else
-      . $WORKSPACE/Tools/OldBuildEnv $*
-    fi
-  else
-    echo Please run \'. edksetup.sh --help\' for help.
-  fi
+  . $WORKSPACE/BaseTools/BuildEnv $*
 fi
 
 
