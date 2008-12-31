@@ -58,17 +58,9 @@ TOOL_CHAIN_CONF       = Conf/tools_def.txt
 #                                             used for the build.  The list uses space character separation.
 TOOL_CHAIN_TAG        = MYTOOLS
 
-#  MULTIPLE_THREAD       FLAG      Optional   Flag to enable multi-thread build. If not specified, default
-#                                             is "Disable". If your computer is multi-core or multiple CPUs,
-#                                             enabling this feature will bring much benefit. 
-#                                             This feature is only available for "spawn" build mode, and 
-#                                             only for PLATFORM build. The clean, cleanall or
-#                                             stand-alone module build is still using the normal way.
-MULTIPLE_THREAD       = Enable
-
-# MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Default is 1. Recommend to
-#                                                 set this value to one more than the number of your compurter
-#                                                 cores or CPUs.
+# MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Recommend to set this
+#                                                 value to one more than the number of your compurter
+#                                                 cores or CPUs. Less than 2 means disable multithread build.
 MAX_CONCURRENT_THREAD_NUMBER = 1
 
 # Build rules definition

@@ -200,20 +200,19 @@
 
 [Static-Library-File]
     <InputFile>
-        ?.lib
+        *.lib
 
     <ExtraDependency>
-        $(LIBS)
         $(MAKE_FILE)
 
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
     <Command.MSFT, Command.INTEL>
-        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) $(LIBS) ${src}
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) ${src} 
 
     <Command.GCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(LIBS) ${src} -\) $(DLINK2_FLAGS)
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) ${src} -\) $(DLINK2_FLAGS)
 
 [Dynamic-Library-File]
     <InputFile>
