@@ -64,6 +64,7 @@
 #   $(BIN_DIR)          Common directory for executable files
 #   $(FV_DIR)           Directory to store flash image files
 #   $(INC)              Search path of current module
+#   $(INC_LIST)         A file containing search pathes of current module
 #   $(LIBS)             Static library files of current module
 #   $(<tool>_FLAGS)     Tools flags of current module
 #   $(MODULE_NAME)      Current module name
@@ -73,9 +74,17 @@
 #   $(TARGET)           Target of current module (DEBUG/RELEASE)
 #   $(<tool>)           Path of tool
 #   $(EDK_TOOLS_PATH)   Path of build tools
-#   $(<FILE_TYPE_LIST>) File list of each file type
+#   $(<FILE_TYPES>)     File list of each file type
 #                       (Note: The macro name is derived from file type name. For example,
-#                        C-Code-File will have C_CODE_FILE_LIST macro.)
+#                        C-Code-File will have C_CODE_FILES macro.)
+#   $(<FILE_TYPES_LIST>) Macro point to a file containing list of files of a file type
+#                       (
+#                        Note: The macro and file name are derived from file type name.
+#                        For example, C-Code-File will have C_CODE_FILES_LIST macro pointing 
+#                        to $(OUTPUT_DIR)/c_code_files.lst. The list file and macro name
+#                        will be generated only when this macro is used in command line.
+#                        This is intended to get over the long command line limitation.
+#                       )
 #
 #   $(CP)     copy command
 #   $(MV)     move command
