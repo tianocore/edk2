@@ -757,9 +757,8 @@ EnableQuietBoot (
               &Width
               );
     if (EFI_ERROR (Status)) {
-      if (ImageData != NULL) {
-        FreePool (ImageData);
-      }
+      FreePool (ImageData);
+
       if (Badging == NULL) {
         return Status;
       } else {
@@ -854,9 +853,8 @@ EnableQuietBoot (
       }
     }
 
-    if (ImageData != NULL) {
-      FreePool (ImageData);
-    }
+    FreePool (ImageData);
+
     if (Blt != NULL) {
       FreePool (Blt);
     }
