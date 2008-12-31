@@ -1,9 +1,0 @@
-defineset=net.sf.antcontrib.cpptasks.types.DefineSet
-compiler=net.sf.antcontrib.cpptasks.CompilerDef
-linker=net.sf.antcontrib.cpptasks.LinkerDef
-assembler=net.sf.antcontrib.cpptasks.AssemblerDef
-aslcompiler=net.sf.antcontrib.cpptasks.AslcompilerDef
-targetplatform=net.sf.antcontrib.cpptasks.TargetDef
-versioninfo=net.sf.antcontrib.cpptasks.VersionInfo
-distributer=net.sf.antcontrib.cpptasks.DistributerDef
-command=net.sf.antcontrib.cpptasks.userdefine.UserDefineDef

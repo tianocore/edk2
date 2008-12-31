@@ -1,8 +1,0 @@
-FPDParser          = org.tianocore.build.fpd.FpdParserTask
-bl                 = org.tianocore.build.global.VariableTask
-GenBuild           = org.tianocore.build.GenBuildTask
-FrameworkBuild     = org.tianocore.build.FrameworkBuildTask
-OnDependency       = org.tianocore.build.global.OnDependency
-sourcefiles        = org.tianocore.build.global.DpFileList
-targetfiles        = org.tianocore.build.global.DpFileList
-file               = org.tianocore.build.global.DpFile
