@@ -205,7 +205,7 @@ PeiPcdGet64 (
 
   @param[in]  TokenNumber The PCD token number. 
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
   
 **/
 VOID *
@@ -402,7 +402,7 @@ PeiPcdGet64Ex (
   @param[in]  Guid          The token space for the token number.
   @param[in]  ExTokenNumber The PCD token number. 
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
   
 **/
 VOID *
@@ -1091,7 +1091,7 @@ PeiPcdGetNextTokenSpace (
   The max size of this PCD's value is described in PCD's definition in DEC file.
 
   @param LocalTokenNumberTableIdx Index of PCD token number in PCD token table
-  @param MaxSize                  Maxmium size of PCD's value
+  @param MaxSize                  Maximum size of PCD's value
   @param Database                 Pcd database in PEI phase.
 
   @return PCD value's size for POINTER type PCD.
@@ -1162,11 +1162,11 @@ GetPtrTypeSize (
   The max size of this PCD's value is described in PCD's definition in DEC file.
 
   @param LocalTokenNumberTableIdx Index of PCD token number in PCD token table
-  @param CurrentSize              Maxmium size of PCD's value
+  @param CurrentSize              Maximum size of PCD's value
   @param Database                 Pcd database in PEI phase.
 
-  @retval TRUE  Success to set PCD's value size, which is not exceed maxmium size
-  @retval FALSE Fail to set PCD's value size, which maybe exceed maxmium size
+  @retval TRUE  Success to set PCD's value size, which is not exceed maximum size
+  @retval FALSE Fail to set PCD's value size, which maybe exceed maximum size
 
 **/
 BOOLEAN

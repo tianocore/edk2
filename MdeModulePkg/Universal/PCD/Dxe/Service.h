@@ -32,7 +32,7 @@ Module Name: Service.h
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 //
-// Please make sure the PCD Serivce PEIM Version is consistent with
+// Please make sure the PCD Service PEIM Version is consistent with
 // the version of PCD Database generation tool
 //
 #define PCD_SERVICE_DXE_DRIVER_VERSION      2
@@ -153,7 +153,7 @@ DxePcdGet64 (
 
   @param[in]  TokenNumber The PCD token number. 
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
   
 **/
 VOID *
@@ -293,7 +293,7 @@ DxePcdGet64Ex (
   @param[in]  Guid The token space for the token number.
   @param[in]  TokenNumber The PCD token number. 
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
   
 **/
 VOID *
@@ -862,7 +862,7 @@ GetWorker (
   Wrapper function for get PCD value for dynamic-ex PCD.
 
   @param Guid            Token space guid for dynamic-ex PCD.
-  @param ExTokenNumber   Token number for dyanmic-ex PCD.
+  @param ExTokenNumber   Token number for dynamic-ex PCD.
   @param GetSize         The size of dynamic-ex PCD value.
 
   @return PCD entry in PCD database.
@@ -1047,7 +1047,7 @@ ExGetNextTokeNumber (
   Get size of POINTER type PCD value.
 
   @param LocalTokenNumberTableIdx Index of local token number in local token number table.
-  @param MaxSize                  Maxmium size of POINTER type PCD value.
+  @param MaxSize                  Maximum size of POINTER type PCD value.
 
   @return size of POINTER type PCD value.
 
@@ -1059,7 +1059,7 @@ GetPtrTypeSize (
   );
 
 /**
-  Set size of POINTER type PCD value. The size should not exceed the maxmium size
+  Set size of POINTER type PCD value. The size should not exceed the maximum size
   of this PCD value.
 
   @param LocalTokenNumberTableIdx Index of local token number in local token number table.

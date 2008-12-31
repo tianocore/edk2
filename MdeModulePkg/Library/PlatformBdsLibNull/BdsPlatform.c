@@ -37,7 +37,7 @@ PlatformBdsInit (
   Connect the predefined platform default console device. Always try to find
   and enable the vga device if have.
 
-  @param PlatformConsole          Predfined platform default console device array.
+  @param PlatformConsole          Predefined platform default console device array.
 
   @retval EFI_SUCCESS             Success connect at least one ConIn and ConOut
                                   device, there must have one ConOut device is
@@ -54,7 +54,7 @@ PlatformBdsConnectConsole (
 }
 
 /**
-  Connect with predeined platform connect sequence,
+  Connect with predefined platform connect sequence,
   the OEM/IBV can customize with their own connect sequence.
 **/
 VOID
@@ -82,7 +82,7 @@ PlatformBdsGetDriverOption (
 
 /**
   Perform the platform diagnostic, such like test memory. OEM/IBV also
-  can customize this fuction to support specific platform diagnostic.
+  can customize this function to support specific platform diagnostic.
 
   @param MemoryTestLevel  The memory test intensive level
   @param QuietBoot        Indicate if need to enable the quiet boot
@@ -98,7 +98,7 @@ PlatformBdsDiagnostics (
 }
 
 /**
-  The function will excute with as the platform policy, current policy
+  The function will execute with as the platform policy, current policy
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 
@@ -122,7 +122,7 @@ PlatformBdsPolicyBehavior (
   Hook point after a boot attempt succeeds. We don't expect a boot option to
   return, so the UEFI 2.0 specification defines that you will default to an
   interactive mode and stop processing the BootOrder list in this case. This
-  is alos a platform implementation and can be customized by IBV/OEM.
+  is also a platform implementation and can be customized by IBV/OEM.
 
   @param  Option                  Pointer to Boot Option that succeeded to boot.
 

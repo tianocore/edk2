@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   This function will connect all the system driver to controller
   first, and then special connect the default console, this make
-  sure all the system controller avialbe and the platform default
+  sure all the system controller available and the platform default
   console connected.
 
 **/
@@ -49,7 +49,7 @@ BdsLibConnectAll (
 /**
   This function will connect all the system drivers to all controllers
   first, and then connect all the console devices the system current
-  have. After this we should get all the device work and console avariable
+  have. After this we should get all the device work and console available
   if the system have console device.
 
 **/
@@ -320,8 +320,8 @@ BdsLibConnectAllDriversToAllControllers (
   @return EFI_INVALID_PARAMETER  RemainingDevicePath is NULL pointer.
                                  RemainingDevicePath is not a USB device path.
                                  Invalid HostControllerPI type.
-  @return EFI_SUCCESS            Sucess to connect USB device
-  @return EFI_NOT_FOUND          Fail to find hanlde for USB controller to connect.
+  @return EFI_SUCCESS            Success to connect USB device
+  @return EFI_NOT_FOUND          Fail to find handle for USB controller to connect.
 
 **/
 EFI_STATUS

@@ -443,6 +443,7 @@ BuildPcdDxeDataBase (
   //
 
   mCallbackFnTable = AllocateZeroPool (PCD_TOTAL_TOKEN_NUMBER * sizeof (LIST_ENTRY));
+  ASSERT(mCallbackFnTable != NULL);
   
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
@@ -856,7 +857,7 @@ SetWorker (
   Wrapper function for get PCD value for dynamic-ex PCD.
 
   @param Guid            Token space guid for dynamic-ex PCD.
-  @param ExTokenNumber   Token number for dyanmic-ex PCD.
+  @param ExTokenNumber   Token number for dynamic-ex PCD.
   @param GetSize         The size of dynamic-ex PCD value.
 
   @return PCD entry in PCD database.
@@ -1079,7 +1080,7 @@ GetExPcdTokenNumber (
 }
 
 /**
-  Get SKU ID tabble from PCD database.
+  Get SKU ID table from PCD database.
 
   @param LocalTokenNumberTableIdx Index of local token number in token number table.
   @param IsPeiPcd                 If TRUE, 
@@ -1290,7 +1291,7 @@ GetPtrTypeSize (
 }
 
 /**
-  Set size of POINTER type PCD value. The size should not exceed the maxmium size
+  Set size of POINTER type PCD value. The size should not exceed the maximum size
   of this PCD value.
 
   @param LocalTokenNumberTableIdx Index of local token number in local token number table.
