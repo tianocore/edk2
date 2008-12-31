@@ -50,7 +50,7 @@ BdsLibDoLegacyBoot (
     return EFI_UNSUPPORTED;
   }
   //
-  // Notes: if we seperate the int 19, then we don't need to refresh BBS
+  // Notes: if we separate the int 19, then we don't need to refresh BBS
   //
   BdsRefreshBbsTableForBoot (Option);
 
@@ -77,7 +77,7 @@ BdsLibDoLegacyBoot (
 
   @param  Option                 The boot option need to be processed
   @param  DevicePath             The device path which describe where to load the
-                                 boot image or the legcy BBS device path to boot
+                                 boot image or the legacy BBS device path to boot
                                  the legacy OS
   @param  ExitDataSize           The size of exit data.
   @param  ExitData               Data returned when Boot image failed.
@@ -175,6 +175,7 @@ BdsLibBootViaBootOption (
       FreePool(Option->DevicePath);
     }
     Option->DevicePath  = AllocateZeroPool (GetDevicePathSize (DevicePath));
+    ASSERT(Option->DevicePath != NULL);
     CopyMem (Option->DevicePath, DevicePath, GetDevicePathSize (DevicePath));
     //
     // Update the shell boot option
@@ -286,7 +287,7 @@ Done:
 /**
   Expand a device path that starts with a hard drive media device path node to be a
   full device path that includes the full hardware path to the device. We need
-  to do this so it can be booted. As an optimizaiton the front match (the part point
+  to do this so it can be booted. As an optimization the front match (the part point
   to the partition node. E.g. ACPI() /PCI()/ATA()/Partition() ) is saved in a variable
   so a connect all is not required on every boot. All successful history device path
   which point to partition node (the front part) will be saved.
@@ -338,8 +339,8 @@ BdsExpandPartitionPartialDevicePathToFull (
     do {
       //
       // Check every instance of the variable
-      // First, check wheather the instance contain the partition node, which is needed for distinguishing  multi
-      // partial partition boot option. Second, check wheather the instance could be connected.
+      // First, check whether the instance contain the partition node, which is needed for distinguishing  multi
+      // partial partition boot option. Second, check whether the instance could be connected.
       //
       Instance  = GetNextDevicePathInstance (&TempNewDevicePath, &Size);
       if (MatchPartitionDevicePathNode (Instance, HardDriveDevicePath)) {
@@ -363,13 +364,13 @@ BdsExpandPartitionPartialDevicePathToFull (
     if (DeviceExist) {
       //
       // Find the matched device path.
-      // Append the file path infomration from the boot option and return the fully expanded device path.
+      // Append the file path information from the boot option and return the fully expanded device path.
       //
       DevicePath     = NextDevicePathNode ((EFI_DEVICE_PATH_PROTOCOL *) HardDriveDevicePath);
       FullDevicePath = AppendDevicePath (Instance, DevicePath);
 
       //
-      // Adjust the 'HDDP' instances sequense if the matched one is not first one.
+      // Adjust the 'HDDP' instances sequence if the matched one is not first one.
       //
       if (NeedAdjust) {
         //
@@ -380,7 +381,7 @@ BdsExpandPartitionPartialDevicePathToFull (
         FreePool (TempNewDevicePath);
         
         //
-        // Second, append the remaining parth after the matched instance
+        // Second, append the remaining path after the matched instance
         //
         TempNewDevicePath = CachedDevicePath;
         CachedDevicePath = AppendDevicePathInstance (Instance, CachedDevicePath );
@@ -405,7 +406,7 @@ BdsExpandPartitionPartialDevicePathToFull (
 
   //
   // If we get here we fail to find or 'HDDP' not exist, and now we need
-  // to seach all devices in the system for a matched partition
+  // to search all devices in the system for a matched partition
   //
   BdsLibConnectAllDriversToAllControllers ();
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoHandleCount, &BlockIoBuffer);
@@ -434,11 +435,11 @@ BdsExpandPartitionPartialDevicePathToFull (
       FullDevicePath = AppendDevicePath (BlockIoDevicePath, DevicePath);
 
       //
-      // Save the matched patition device path in 'HDDP' variable
+      // Save the matched partition device path in 'HDDP' variable
       //
       if (CachedDevicePath != NULL) {
         //
-        // Save the matched patition device path as first instance of 'HDDP' variable
+        // Save the matched partition device path as first instance of 'HDDP' variable
         //
         if (BdsLibMatchDevicePaths (CachedDevicePath, BlockIoDevicePath)) {
           TempNewDevicePath = CachedDevicePath;
@@ -455,7 +456,7 @@ BdsExpandPartitionPartialDevicePathToFull (
         }
         //
         // Here limit the device path instance number to 12, which is max number for a system support 3 IDE controller
-        // If the user try to boot many OS in different HDs or partitions, in theary, the 'HDDP' variable maybe become larger and larger.
+        // If the user try to boot many OS in different HDs or partitions, in theory, the 'HDDP' variable maybe become larger and larger.
         //
         InstanceNum = 0;
         TempNewDevicePath = CachedDevicePath;
@@ -806,7 +807,7 @@ BdsDeleteAllInvalidEfiBootOption (
 
 /**
   This function will enumerate all possible boot device in the system,
-  it will only excute once of every boot.
+  it will only execute once of every boot.
 
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
@@ -1286,7 +1287,7 @@ BdsLibGetBootableHandle (
     }
   } else {
     //
-    // Get BlockIo protocal and check removable attribute
+    // Get BlockIo protocol and check removable attribute
     //
     Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo);
     //
@@ -1315,7 +1316,7 @@ BdsLibGetBootableHandle (
 
   //
   // If fail to get bootable handle specified by a USB boot option, the BDS should try to find other bootable device in the same USB bus
-  // Try to locate the USB node device path first, if fail then use its previour PCI node to search
+  // Try to locate the USB node device path first, if fail then use its previous PCI node to search
   //
   DupDevicePath = DuplicateDevicePath (DevicePath);
   ASSERT (DupDevicePath != NULL);
@@ -1464,23 +1465,23 @@ BdsLibNetworkBootWithMediaPresent (
 
   @param  DevicePath                      The bootable device Path to check
 
-  @retval BDS_EFI_MEDIA_HD_BOOT           If the device path contains any media deviec path node, it is media boot type
+  @retval BDS_EFI_MEDIA_HD_BOOT           If the device path contains any media device path node, it is media boot type
                                           For the floppy node, handle it as media node
-  @retval BDS_EFI_MEDIA_CDROM_BOOT        If the device path contains any media deviec path node, it is media boot type
+  @retval BDS_EFI_MEDIA_CDROM_BOOT        If the device path contains any media device path node, it is media boot type
                                           For the floppy node, handle it as media node
-  @retval BDS_EFI_ACPI_FLOPPY_BOOT        If the device path contains any media deviec path node, it is media boot type
+  @retval BDS_EFI_ACPI_FLOPPY_BOOT        If the device path contains any media device path node, it is media boot type
                                           For the floppy node, handle it as media node
-  @retval BDS_EFI_MESSAGE_ATAPI_BOOT      If the device path not contains any media deviec path node,  and
+  @retval BDS_EFI_MESSAGE_ATAPI_BOOT      If the device path not contains any media device path node,  and
                                           its last device path node point to a message device path node, it is
   
-  @retval BDS_EFI_MESSAGE_SCSI_BOOT       If the device path not contains any media deviec path node,  and
+  @retval BDS_EFI_MESSAGE_SCSI_BOOT       If the device path not contains any media device path node,  and
                                           its last device path node point to a message device path node, it is
-  @retval BDS_EFI_MESSAGE_USB_DEVICE_BOOT If the device path not contains any media deviec path node,  and
+  @retval BDS_EFI_MESSAGE_USB_DEVICE_BOOT If the device path not contains any media device path node,  and
                                           its last device path node point to a message device path node, it is
-  @retval BDS_EFI_MESSAGE_MISC_BOOT       If the device path not contains any media deviec path node,  and
+  @retval BDS_EFI_MESSAGE_MISC_BOOT       If the device path not contains any media device path node,  and
                                           its last device path node point to a message device path node, it is
   @retval BDS_LEGACY_BBS_BOOT             Legacy boot type
-  @retval BDS_EFI_UNSUPPORT               An EFI Removable BlockIO device path not point to a media and message devie,   
+  @retval BDS_EFI_UNSUPPORT               An EFI Removable BlockIO device path not point to a media and message device,   
 
 **/
 UINT32
@@ -1554,14 +1555,14 @@ BdsGetBootTypeFromDevicePath (
 }
 
 /**
-  Check whether the Device path in a boot option point to a valide bootable device,
+  Check whether the Device path in a boot option point to a valid bootable device,
   And if CheckMedia is true, check the device is ready to boot now.
 
   @param  DevPath     the Device path in a boot option
   @param  CheckMedia  if true, check the device is ready to boot now.
 
-  @retval TRUE        the Device path  is valide
-  @retval FALSE       the Device path  is invalide .
+  @retval TRUE        the Device path  is valid
+  @retval FALSE       the Device path  is invalid .
 
 **/
 BOOLEAN
@@ -1707,7 +1708,7 @@ BdsLibIsValidEFIBootOptDevicePath (
 /**
   According to a file guild, check a Fv file device path is valid. If it is invalid,
   try to return the valid device path.
-  FV address maybe changes for memory layout adjust from time to time, use this funciton
+  FV address maybe changes for memory layout adjust from time to time, use this function
   could promise the Fv file device path is right.
 
   @param  DevicePath             on input, the Fv file device path need to check on

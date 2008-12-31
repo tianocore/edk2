@@ -80,7 +80,7 @@ FreeMappingDatabase (
 
 
 /**
-  Create the mappging database according to variable.
+  Create the mapping database according to variable.
 
   Read the environment variable(s) that contain the override mappings from Controller Device Path to
   a set of Driver Device Paths, and create the mapping database in memory with those variable info.
