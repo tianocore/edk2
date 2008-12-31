@@ -1,8 +1,7 @@
 #/** @file
-# Component name for module UsbMouseAbsolutePointerDxe
+# USB Mouse Driver that manages USB mouse and produces Absolute Pointer Protocol.
 #
-# FIX ME!
-# Copyright (c) 2006, Intel Corporation. 
+# Copyright (c) 2006 - 2008, Intel Corporation. 
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -33,11 +32,11 @@
 #  COMPONENT_NAME                =  gUsbMouseAbsolutePointerComponentName
 #  COMPONENT_NAME2               =  gUsbMouseAbsolutePointerComponentName2
 #
+
 [Sources.common]
-  mousehid.h
   ComponentName.c
+  MouseHid.c
   UsbMouseAbsolutePointer.c
-  mousehid.c
   UsbMouseAbsolutePointer.h
 
 [Packages]
@@ -54,9 +53,9 @@
   UefiUsbLib
 
 [Protocols]
-  gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiAbsolutePointerProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiUsbIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiAbsolutePointerProtocolGuid               # PROTOCOL BY_START
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError
