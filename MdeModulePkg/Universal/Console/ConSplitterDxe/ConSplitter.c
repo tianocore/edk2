@@ -12,8 +12,8 @@
   These 3 virtual handles would be installed on gST.
 
   Each virtual handle, that supports the Console I/O protocol, will be produced
-  in the driver entry point. The virtual handle are added on driver entry and 
-  never removed. Such design ensures sytem function well during none console 
+  in the driver entry point. The virtual handle are added on driver entry and
+  never removed. Such design ensures sytem function well during none console
   device situation.
 
 Copyright (c) 2006 - 2008 Intel Corporation. <BR>
@@ -337,7 +337,7 @@ EFI_DRIVER_BINDING_PROTOCOL           gConSplitterAbsolutePointerDriverBinding =
 
   Installs driver module protocols and. Creates virtual device handles for ConIn,
   ConOut, and StdErr. Installs Simple Text In protocol, Simple Text In Ex protocol,
-  Simple Pointer protocol, Absolute Pointer protocol on those virtual handlers. 
+  Simple Pointer protocol, Absolute Pointer protocol on those virtual handlers.
   Installs Graphics Output protocol and/or UGA Draw protocol if needed.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
@@ -469,7 +469,7 @@ ConSplitterDriverEntry(
   if (!EFI_ERROR (Status)) {
     if (!FeaturePcdGet (PcdConOutGopSupport)) {
       //
-      // If Graphics Outpurt protocol not supported, UGA Draw protocol is installed 
+      // If Graphics Outpurt protocol not supported, UGA Draw protocol is installed
       // on the virtual handle.
       //
       Status = gBS->InstallMultipleProtocolInterfaces (
@@ -565,7 +565,7 @@ ConSplitterTextInConstructor (
   EFI_STATUS  Status;
 
   //
-  // Allocate buffer for Simple Text Input device  
+  // Allocate buffer for Simple Text Input device
   //
   Status = ConSplitterGrowBuffer (
             sizeof (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *),
@@ -587,7 +587,7 @@ ConSplitterTextInConstructor (
                   );
   ASSERT_EFI_ERROR (Status);
   //
-  // Create Event to wait for a key 
+  // Create Event to wait for a key
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
@@ -599,7 +599,7 @@ ConSplitterTextInConstructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Allocate buffer for Simple Text Input Ex device  
+  // Allocate buffer for Simple Text Input Ex device
   //
   Status = ConSplitterGrowBuffer (
              sizeof (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *),
@@ -625,7 +625,7 @@ ConSplitterTextInConstructor (
 
   ConInPrivate->AbsolutePointer.Mode = &ConInPrivate->AbsolutePointerMode;
   //
-  // Allocate buffer for Absolute Pointer device  
+  // Allocate buffer for Absolute Pointer device
   //
   Status = ConSplitterGrowBuffer (
             sizeof (EFI_ABSOLUTE_POINTER_PROTOCOL *),
@@ -649,7 +649,7 @@ ConSplitterTextInConstructor (
 
   ConInPrivate->SimplePointer.Mode = &ConInPrivate->SimplePointerMode;
   //
-  // Allocate buffer for Simple Pointer device  
+  // Allocate buffer for Simple Pointer device
   //
   Status = ConSplitterGrowBuffer (
             sizeof (EFI_SIMPLE_POINTER_PROTOCOL *),
@@ -712,7 +712,7 @@ ConSplitterTextOutConstructor (
   //
   ConOutPrivate->TextOutMode.Mode = 0xFF;
   //
-  // Allocate buffer for Console Out device  
+  // Allocate buffer for Console Out device
   //
   Status = ConSplitterGrowBuffer (
             sizeof (TEXT_OUT_AND_GOP_DATA),
@@ -793,7 +793,7 @@ ConSplitterTextOutConstructor (
 
 
 /**
-  Test to see if the specified protocol could be supported on the specified device. 
+  Test to see if the specified protocol could be supported on the specified device.
 
   @param  This                Driver Binding protocol pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -819,7 +819,7 @@ ConSplitterSupported (
   //
   if (ControllerHandle == mConIn.VirtualHandle  ||
       ControllerHandle == mConOut.VirtualHandle ||
-      ControllerHandle == mStdErr.VirtualHandle 
+      ControllerHandle == mStdErr.VirtualHandle
       ) {
     return EFI_UNSUPPORTED;
   }
@@ -851,7 +851,7 @@ ConSplitterSupported (
 }
 
 /**
-  Test to see if Console In Device could be supported on the Controller. 
+  Test to see if Console In Device could be supported on the Controller.
 
   @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -878,7 +878,7 @@ ConSplitterConInDriverBindingSupported (
 }
 
 /**
-  Test to see if Simple Pointer protocol could be supported on the Controller. 
+  Test to see if Simple Pointer protocol could be supported on the Controller.
 
   @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -905,7 +905,7 @@ ConSplitterSimplePointerDriverBindingSupported (
 }
 
 /**
-  Test to see if Absolute Pointer protocol could be supported on the Controller. 
+  Test to see if Absolute Pointer protocol could be supported on the Controller.
 
   @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -933,7 +933,7 @@ ConSplitterAbsolutePointerDriverBindingSupported (
 
 
 /**
-  Test to see if Console Out Device could be supported on the Controller. 
+  Test to see if Console Out Device could be supported on the Controller.
 
   @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -960,7 +960,7 @@ ConSplitterConOutDriverBindingSupported (
 }
 
 /**
-  Test to see if Standard Error Device could be supported on the Controller. 
+  Test to see if Standard Error Device could be supported on the Controller.
 
   @param  This                Driver Binding protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -988,9 +988,9 @@ ConSplitterStdErrDriverBindingSupported (
 
 
 /**
-  Start ConSplitter on devcie handle by opening Console Device Guid on device handle 
+  Start ConSplitter on devcie handle by opening Console Device Guid on device handle
   and the console virtual handle. And Get the console interface on controller handle.
-  
+
   @param  This                      Driver Binding protocol instance pointer.
   @param  ControllerHandle          Handle of device.
   @param  ConSplitterVirtualHandle  Console virtual Handle.
@@ -1031,7 +1031,7 @@ ConSplitterStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
- 
+
   //
   // Create virtual handle and open DeviceGuid on the virtul handle.
   //
@@ -1089,8 +1089,8 @@ Err:
 
 
 /**
-  Start Console In Consplitter on device handle. 
-  
+  Start Console In Consplitter on device handle.
+
   @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -1157,8 +1157,8 @@ ConSplitterConInDriverBindingStart (
 
 
 /**
-  Start Simple Pointer Consplitter on device handle. 
-  
+  Start Simple Pointer Consplitter on device handle.
+
   @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -1203,8 +1203,8 @@ ConSplitterSimplePointerDriverBindingStart (
 
 
 /**
-  Start Absolute Pointer Consplitter on device handle. 
-  
+  Start Absolute Pointer Consplitter on device handle.
+
   @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -1250,8 +1250,8 @@ ConSplitterAbsolutePointerDriverBindingStart (
 
 
 /**
-  Start Console Out Consplitter on device handle. 
-  
+  Start Console Out Consplitter on device handle.
+
   @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -1343,10 +1343,10 @@ ConSplitterConOutDriverBindingStart (
         return Status;
       }
       ASSERT ( SizeOfInfo <= sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-        
+
       mConOut.UgaHorizontalResolution = Info->HorizontalResolution;
       mConOut.UgaVerticalResolution   = Info->VerticalResolution;
-      mConOut.UgaColorDepth           = 32;        
+      mConOut.UgaColorDepth           = 32;
       mConOut.UgaRefreshRate          = 60;
 
       FreePool (Info);
@@ -1367,8 +1367,8 @@ ConSplitterConOutDriverBindingStart (
 
 
 /**
-  Start Standard Error Consplitter on device handle. 
-  
+  Start Standard Error Consplitter on device handle.
+
   @param  This                 Driver Binding protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -1440,9 +1440,9 @@ ConSplitterStdErrDriverBindingStart (
 
 
 /**
-  Stop ConSplitter on device handle by closing Console Device Guid on device handle 
+  Stop ConSplitter on device handle by closing Console Device Guid on device handle
   and the console virtual handle.
-  
+
   @param  This                      Protocol instance pointer.
   @param  ControllerHandle          Handle of device.
   @param  ConSplitterVirtualHandle  Console virtual Handle.
@@ -1541,7 +1541,7 @@ ConSplitterConInDriverBindingStop (
     //
     // If Simple Text Input Ex protocol exists,
     // remove device from Text Input Ex devices list.
-    //  
+    //
     Status = ConSplitterTextInExDeleteDevice (&mConIn, TextInEx);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1565,7 +1565,7 @@ ConSplitterConInDriverBindingStop (
 
   //
   // Remove device from Text Input devices list.
-  // 
+  //
   return ConSplitterTextInDeleteDevice (&mConIn, TextIn);
 }
 
@@ -1825,7 +1825,7 @@ ConSplitterGrowBuffer (
   //
   *Count += CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT;
   Ptr = ReallocatePool (
-          SizeOfCount * ((*Count) - CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT), 
+          SizeOfCount * ((*Count) - CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT),
           SizeOfCount * (*Count),
           *Buffer
           );
@@ -2237,7 +2237,7 @@ ConSplitterGrowMapTable (
 
   @param  Private               Text Out Splitter pointer
   @param  TextOut               Simple Text Output protocol pointer.
-  
+
   @retval EFI_SUCCESS           Device added successfully.
   @retval EFI_OUT_OF_RESOURCES  Could not grow the buffer size.
 
@@ -2387,7 +2387,7 @@ ConSplitterGetIntersection (
 
   @param  Private               Text Out Splitter pointer.
   @param  TextOut               Simple Text Output protocol pointer.
-  
+
 **/
 VOID
 ConSplitterSyncOutputMode (
@@ -2741,7 +2741,7 @@ ConSplitterAddGraphicsOutputMode (
           if ((Info->HorizontalResolution == Mode->HorizontalResolution) &&
               (Info->VerticalResolution == Mode->VerticalResolution)) {
             //
-            // If GOP device supports one mode in current mode buffer, 
+            // If GOP device supports one mode in current mode buffer,
             // it will be added into matched mode buffer
             //
             Match = TRUE;
@@ -2753,7 +2753,7 @@ ConSplitterAddGraphicsOutputMode (
 
         if (Match) {
           AlreadyExist = FALSE;
-          
+
           //
           // Check if GOP mode has been in the mode buffer, ModeBuffer = MatchedMode at begin.
           //
@@ -3101,7 +3101,7 @@ ConSplitterTextOutAddDevice (
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
     UgaHorizontalResolution = 800;
     UgaVerticalResolution   = 600;
-    UgaColorDepth           = 32;        
+    UgaColorDepth           = 32;
     UgaRefreshRate          = 60;
 
     Status = EFI_DEVICE_ERROR;
@@ -3119,7 +3119,7 @@ ConSplitterTextOutAddDevice (
       UgaVerticalResolution   = Info->VerticalResolution;
 
       FreePool (Info);
-    
+
     } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = UgaDraw->GetMode (
                     UgaDraw,
@@ -3129,7 +3129,7 @@ ConSplitterTextOutAddDevice (
                     &UgaRefreshRate
                     );
     }
-    
+
     //
     //  Set UGA Draw mode,
     //  if GetMode is failed, set to 800x600 mode
@@ -3469,7 +3469,7 @@ ConSpliterConsoleControlLockStdInEvent (
 
 
 /**
-  If Password is NULL or the Password is too big, then return an error. If the 
+  If Password is NULL or the Password is too big, then return an error. If the
   Password is valid, then store the password, lock StdIn and arm the periodic timer.
 
   @param  This                     Console Control protocol pointer.
@@ -4495,6 +4495,8 @@ ConSplitterTextOutOutputString (
     TargetString = WString;
   } else {
     TargetString = AllocatePool (sizeof (CHAR16) * (StrLen (WString) + BackSpaceCount + 1));
+    ASSERT (TargetString != NULL);
+
     StrCpy (TargetString, WString);
   }
   //
