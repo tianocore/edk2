@@ -42,18 +42,18 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 ##########                 Revision number of tools source code                 ##########
     BaseTools/Bin/Win32/build.exe
-        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
-        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
-        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
-        r1400 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
 
     BaseTools/Bin/Win32/GenFds.exe
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
-        r1396 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
 
     BaseTools/Bin/Win32/GenDepex.exe
         r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/AutoGen
@@ -78,6 +78,30 @@ EDK_0000: Compatible: owner
         r767 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/fpd2dsc
 
 ==========================================================================================
+basetools_7159: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Re-fine and fully test the mechanism of getting over the long command
+           line limitation
+        2) Change the -s option of build from "SpawnMode" to be "SilentMode"
+        3) Change the prototype of PeiCoreEntryPoint in AutoGen-ed code
+        4) Remove CalcDeps module since it's no longer needed.
+        5) Remove "-k", "-g" and "-l" switches from build
+        6) Remove MULTIPLE_THREAD in target.template. Use MAX_CONCURRENT_THREAD_NUMBER
+           to get the same functionality.
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+        1) /trunk/edk2/BaseTools/Bin/Win32/GenFds.exe
+
+        Possible Impacts:
+        1) The local version build_rule.txt must be updated with changes in build_rule.template
+        2) Use "build -s" to pass "-s" switch to "make" tool to do silent "make".
+           To suppress all message from stdout, use "build -q" instead.
+        3) To get over the long command line limitation, use "@$(<FILE_TYPE>S_LIST)"
+           in the place of ${src} for those commands encountering such kind of
+           problem.
+
 basetools_7009: Non-Compatible: jwang36
 
       Class_BuildTool:
