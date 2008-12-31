@@ -588,10 +588,12 @@ PeCoffLoaderRelocateImage (
 
     if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
       RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
+      ASSERT(RelocBase != NULL);
       RelocBaseEnd = PeCoffLoaderImageAddress (
                       ImageContext,
                       RelocDir->VirtualAddress + RelocDir->Size - 1
                       );
+      ASSERT(RelocBaseEnd !=NULL);
     } else {
       //
       // Set base and end to bypass processing below.
@@ -626,6 +628,7 @@ PeCoffLoaderRelocateImage (
     RelocEnd  = (UINT16 *) ((CHAR8 *) RelocBase + RelocBase->SizeOfBlock);
     if (!(ImageContext->IsTeImage)) {
       FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress);
+      ASSERT(FixupBase != NULL);
     } else {
       FixupBase = (CHAR8 *)(UINTN)(ImageContext->ImageAddress +
                     RelocBase->VirtualAddress +
