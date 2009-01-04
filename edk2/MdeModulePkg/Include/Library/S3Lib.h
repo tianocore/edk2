@@ -1,5 +1,5 @@
 /** @file
-  S3 Library. This library class defines a set of methods related do S3 mode.
+  S3 library class defines a set of methods related do S3 boot mode.
 
 Copyright (c) 2005 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

@@ -233,7 +233,7 @@
 
 [PcdsFeatureFlag.common]
   ## Indicate whether platform can support update capsule across a system reset
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE|BOOLEAN|0x0001001d
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
   
   ## This feature flag can be used to enable or disable the Pcd PEIM database 
   #  traverse capability. Disable it can reduce the size of final image generated.

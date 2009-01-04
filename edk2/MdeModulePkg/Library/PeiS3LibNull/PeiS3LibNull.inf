@@ -1,6 +1,7 @@
 #/** @file
 #  
-#  A NULL instance of S3 Library for PEIM
+#  Null S3 library instance for PEIM module
+#  It can make core modules pass package level build.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation.
 #
@@ -29,13 +30,9 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
-[Sources.common]
+[Sources]
   PeiS3LibNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
-[LibraryClasses]
-  BaseLib
-

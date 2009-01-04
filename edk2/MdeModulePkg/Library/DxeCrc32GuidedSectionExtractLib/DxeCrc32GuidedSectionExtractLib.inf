@@ -1,5 +1,8 @@
 #/** @file
-# Crc32SectionExtract library instance registers Crc32 handler into ExtractGuidedSectionLib.
+#  This library doesn't produce any library class. In its constructor function,
+#  it uses ExtractGuidedSectionLib service to registers CRC32 guided section handler
+#  that parses CRC32 encapsulation section and extracts raw data.
+#  It uses UEFI boot service CalculateCrc32 to authenticate 32 bit CRC value.
 #
 # Copyright (c) 2006 - 2008, Intel Corporation
 #
@@ -9,7 +12,6 @@
 #  http://opensource.org/licenses/bsd-license.php
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
 #
 #**/
 
@@ -43,6 +45,6 @@
   BaseMemoryLib
 
 [Protocols]
-  gEfiCrc32GuidedSectionExtractionProtocolGuid
-  gEfiSecurityPolicyProtocolGuid
+  gEfiCrc32GuidedSectionExtractionProtocolGuid     # ALWAYS CONSUMED used as Guid, not protocol service
+  gEfiSecurityPolicyProtocolGuid                   # ALWAYS CONSUMED
   

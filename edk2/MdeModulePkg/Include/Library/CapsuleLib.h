@@ -1,9 +1,8 @@
 /** @file
 
-  Capsule Library. This library class defines a set of interfaces on 
-  how to process capusle image update.
+  This library class defines a set of interfaces on how to process capusle image update.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +17,8 @@
 #define __CAPSULE_LIB_H__
 
 /**
-  Those capsules supported by the firmwares.
+  The firmware checks whether the capsule image is supported 
+  by the CapsuleGuid in CapsuleHeader or other specific information in capsule image.
   
   @param  CapsuleHeader    Point to the UEFI capsule image to be checked.
   
@@ -32,7 +32,8 @@ SupportCapsuleImage (
   );
 
 /**
-  The firmware implements to process the capsule image.
+  The firmware specific implementation processes the capsule image
+  if it recognized the format of this capsule image.
   
   @param  CapsuleHeader    Point to the UEFI capsule image to be processed. 
    
@@ -46,5 +47,3 @@ ProcessCapsuleImage (
   );
 
 #endif
-
-

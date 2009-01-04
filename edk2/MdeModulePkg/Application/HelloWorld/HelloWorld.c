@@ -1,7 +1,8 @@
 /** @file
-  This simple application just print a "UEFI Hello World!" to the UEFI Console.
-  
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  This sample application bases on HelloWorld PCD setting 
+  to print "UEFI Hello World!" to the UEFI Console.
+
+  Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -20,8 +21,7 @@
 
 /**
   The user Entry Point for Application. The user code starts with this function
-  as the real entry point for the image goes into a library that calls this 
-  function.
+  as the real entry point for the application.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
   @param[in] SystemTable    A pointer to the EFI System Table.
@@ -46,6 +46,9 @@ UefiMain (
   //
   if (FeaturePcdGet (PcdHelloWorldPrintEnable)) {
   	for (Index = 0; Index < PcdGet32 (PcdHelloWorldPrintTimes); Index ++) {
+  	  //
+  	  // Use UefiLib Print API to print string to UEFI console
+  	  //
     	Print ((CHAR16*)PcdGetPtr (PcdHelloWorldPrintString));
     }
   }
