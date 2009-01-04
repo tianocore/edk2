@@ -311,7 +311,7 @@
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInDataHub|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInRuntimeMemory|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInOEM|FALSE
-  gEfiEdkModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE
+  gEfiEdkModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE
@@ -348,7 +348,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInDataHub|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInRuntimeMemory|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInOEM|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|TRUE
@@ -356,7 +356,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleRest|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
