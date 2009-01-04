@@ -172,7 +172,7 @@ Returns:
   CHAR16                            Name[FAT_NAME_LEN + 1];
   EFI_STATUS                        Status;
 
-  Size        = SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL_INFO;
+  Size        = SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL;
   Status      = FatGetVolumeEntry (Volume, Name);
   NameSize    = StrSize (Name);
   ResultSize  = Size + NameSize;
@@ -252,11 +252,11 @@ Returns:
 
 --*/
 {
-  EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *Info;
+  EFI_FILE_SYSTEM_VOLUME_LABEL *Info;
 
-  Info = (EFI_FILE_SYSTEM_VOLUME_LABEL_INFO *) Buffer;
+  Info = (EFI_FILE_SYSTEM_VOLUME_LABEL *) Buffer;
 
-  if (BufferSize < SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL_INFO + 2) {
+  if (BufferSize < SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL + 2) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
