@@ -56,7 +56,7 @@ GetPackageDataFromPackageList (
   Package = NULL;
   Index   = 0;
   Offset  = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
+  PackageListLength = ReadUnaligned32 (&HiiPackageList->PackageLength);
   while (Offset < PackageListLength) {
     Package = (EFI_HII_PACKAGE_HEADER *) (((UINT8 *) HiiPackageList) + Offset);
     CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
@@ -178,7 +178,7 @@ UpdateFormPackageData (
       }
 
       ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
-      CopyMem (&LabelNumber, &((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number, sizeof (UINT16));
+      LabelNumber = ReadUnaligned16 (&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number);
       if ((ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) || (LabelNumber != Label) 
           || !CompareGuid ((EFI_GUID *)(UINTN)(&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid), &mIfrVendorGuid)) {
         //
@@ -436,7 +436,7 @@ IfrLibUpdateForm (
   // Update package list length
   //
   BufferSize = UpdateBufferPos - (UINT8 *) UpdateBuffer;
-  CopyMem (&UpdateBuffer->PackageLength, &BufferSize, sizeof (UINT32));
+  WriteUnaligned32 (&UpdateBuffer->PackageLength, (UINT32)BufferSize);
 
   FreePool (HiiPackageList);
 
@@ -493,13 +493,13 @@ IfrLibExtractDefault(
   VA_START (Args, Number);
   for (Index = 0; Index < Number; Index++) {
     BufCfgArray = (UINT8 *) VA_ARG (Args, VOID *);
-    CopyMem (&TotalLen, BufCfgArray, sizeof (UINT32));
+    TotalLen = ReadUnaligned32 ((UINT32 *)BufCfgArray);
     BufferPos = BufCfgArray + sizeof (UINT32);
 
     while ((UINT32)(BufferPos - BufCfgArray) < TotalLen) {
-      CopyMem (&Offset, BufferPos, sizeof (UINT16));
+      Offset = ReadUnaligned16 ((UINT16 *)BufferPos);
       BufferPos += sizeof (UINT16);
-      CopyMem (&Width, BufferPos, sizeof (UINT16));
+      Width = ReadUnaligned16 ((UINT16 *)BufferPos);
       BufferPos += sizeof (UINT16);
       Value = BufferPos;
       BufferPos += Width;
