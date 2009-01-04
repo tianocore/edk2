@@ -1,6 +1,5 @@
 /** @file
-  Null Recovery Library instance. 
-  This library class defines a set of methods related do recovery.
+  Null Recovery Library instance does nothing and returns unsupport status.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -13,9 +12,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #include <PiPei.h>
+#include <Library/RecoveryLib.h>
 
 /**
-  Calling this function causes the system do recovery.
+  Calling this function causes the system do recovery boot path.
   
   @retval EFI_UNSUPPORTED       Recovery is not supported.
 **/

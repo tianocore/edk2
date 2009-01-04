@@ -1,5 +1,6 @@
 #/** @file
-#  Sample SecurityStub module implements the dummy platform security service.
+#  Sample SecurityStub driver implements the dummy platform security service.
+#  It always return success without any authentication check.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation
 #  All rights reserved. This program and the accompanying materials
@@ -28,7 +29,6 @@
 
 [Sources.common]
   SecurityStub.c
-  SecurityStub.h
 
 [Packages]
   MdePkg/MdePkg.dec

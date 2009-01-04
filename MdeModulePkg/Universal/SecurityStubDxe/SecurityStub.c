@@ -1,5 +1,5 @@
 /** @file
-  This driver implements one sample platform security service, which does 
+  This driver implements a sample platform security service, which does 
   nothing and always return EFI_SUCCESS.
   
   Copyright (c) 2006 - 2008, Intel Corporation                                              
@@ -14,20 +14,16 @@
 **/
 
 
-#include "SecurityStub.h"
+#include <Uefi.h>
+#include <Protocol/Security.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiDriverEntryPoint.h>
 
 //
 // Handle for the Security Architectural Protocol instance produced by this driver
 //
 EFI_HANDLE                  mSecurityArchProtocolHandle = NULL;
-
-//
-// Security Architectural Protocol instance produced by this driver
-//
-EFI_SECURITY_ARCH_PROTOCOL  mSecurityStub = { 
-  SecurityStubAuthenticateState 
-};
-
 
 /**
   The EFI_SECURITY_ARCH_PROTOCOL (SAP) is used to abstract platform-specific 
@@ -61,7 +57,7 @@ EFI_SECURITY_ARCH_PROTOCOL  mSecurityStub = {
   @param  File             This is a pointer to the device path of the file that is
                            being dispatched. This will optionally be used for logging.
 
-  @retval EFI_SUCCESS            Do nothing and return.
+  @retval EFI_SUCCESS            Do nothing and return success.
   @retval EFI_INVALID_PARAMETER  File is NULL.
 **/
 EFI_STATUS
@@ -79,14 +75,18 @@ SecurityStubAuthenticateState (
   return EFI_SUCCESS;
 }
 
+//
+// Security Architectural Protocol instance produced by this driver
+//
+EFI_SECURITY_ARCH_PROTOCOL  mSecurityStub = { 
+  SecurityStubAuthenticateState 
+};
 
 /**
-  The user Entry Point installs SAP. The user code starts with this function
-  as the real entry point for the image goes into a library that calls this 
-  function.
+  Installs Security Architectural Protocol.
 
-  @param ImageHandle    The firmware allocated handle for the EFI image.  
-  @param SystemTable    A pointer to the EFI System Table.
+  @param  ImageHandle  The image handle of this driver.
+  @param  SystemTable  A pointer to the EFI System Table.
   
   @retval EFI_SUCCESS   Install the sample Security Architectural Protocol successfully.
 

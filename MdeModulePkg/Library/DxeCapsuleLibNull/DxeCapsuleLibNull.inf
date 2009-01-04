@@ -1,5 +1,6 @@
 #/** @file
-#  Capsule library NULL instance for DXE_DRIVER, DXE_RUNTIME_DRIVER
+#  NULL Dxe Capsule library instance.
+#  It can make core modules pass package level build.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation.
 #

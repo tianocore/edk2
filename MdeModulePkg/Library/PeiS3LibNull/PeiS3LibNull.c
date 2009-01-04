@@ -1,5 +1,5 @@
 /** @file
-  S3 Library. This library class defines a set of methods related do S3 mode
+  Null S3 Library instance does nothing and returns unsupport status.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #include <PiPei.h>
+#include <Library/S3Lib.h>
 
 /**
   This function is responsible for calling the S3 resume vector in the ACPI Tables.

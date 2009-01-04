@@ -1,7 +1,8 @@
 /** @file
 
-  Implements CRC32 guided section handler to parse CRC32 encapsulation section, 
-  extract data and authenticate 32 bit CRC value.
+  This library registers CRC32 guided section handler 
+  to parse CRC32 encapsulation section and extract raw data.
+  It uses UEFI boot service CalculateCrc32 to authenticate 32 bit CRC value.
 
 Copyright (c) 2007 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -24,15 +25,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define EFI_SECITON_SIZE_MASK 0x00ffffff
 
+///
+/// CRC32 Guided Section header
+///
 typedef struct {
-  EFI_GUID_DEFINED_SECTION  GuidedSectionHeader;
-  UINT32                    CRC32Checksum;
+  EFI_GUID_DEFINED_SECTION  GuidedSectionHeader; ///< EFI guided section header
+  UINT32                    CRC32Checksum;       ///< 32bit CRC check sum
 } CRC32_SECTION_HEADER;
 
 /**
 
-  The implementation of Crc32 guided section GetInfo() to get 
-  size and attribute of the guided section.
+  GetInfo gets raw data size and attribute of the input guided section.
+  It first checks whether the input guid section is supported. 
+  If not, EFI_INVALID_PARAMETER will return.
 
   @param InputSection       Buffer containing the input GUIDed section to be processed.
   @param OutputBufferSize   The size of OutputBuffer.
@@ -74,13 +79,16 @@ Crc32GuidedSectionGetInfo (
 
 /**
 
-  The implementation of Crc32 Guided section extraction to get the section data.
+  Extraction handler tries to extract raw data from the input guided section.
+  It also does authentication check for 32bit CRC value in the input guided section.
+  It first checks whether the input guid section is supported. 
+  If not, EFI_INVALID_PARAMETER will return.
 
   @param InputSection    Buffer containing the input GUIDed section to be processed.
-  @param OutputBuffer    to contain the output data, which is allocated by the caller.
+  @param OutputBuffer    Buffer to contain the output raw data allocated by the caller.
   @param ScratchBuffer   A pointer to a caller-allocated buffer for function internal use.
   @param AuthenticationStatus A pointer to a caller-allocated UINT32 that indicates the
-                         authentication status of the output buffer.
+                              authentication status of the output buffer.
 
   @retval EFI_SUCCESS            Section Data and Auth Status is extracted successfully.
   @retval EFI_INVALID_PARAMETER  The GUID in InputSection does not match this instance guid.
@@ -161,13 +169,13 @@ Crc32GuidedSectionHandler (
 }
 
 /**
-  Register Crc32 section handler.
+  Register the handler to extract CRC32 guided section.
 
   @param  ImageHandle  ImageHandle of the loaded driver.
   @param  SystemTable  Pointer to the EFI System Table.
 
-  @retval  RETURN_SUCCESS            Register successfully.
-  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to register this handler.
+  @retval  EFI_SUCCESS            Register successfully.
+  @retval  EFI_OUT_OF_RESOURCES   No enough memory to register this handler.
 **/
 EFI_STATUS
 EFIAPI

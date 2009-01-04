@@ -1,6 +1,7 @@
 #/** @file
 #  
 #  Null Recovery library instance for PEIM module
+#  It can make core modules pass package level build.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials

@@ -1,5 +1,5 @@
 /** @file
-  Recovery Library. This library class defines a set of methods related recovery mode.
+  Recovery library class defines a set of methods related recovery boot mode.
 
 Copyright (c) 2005 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __RECOVERY_LIB_H__
 
 /**
-  Calling this function causes the system do recovery.
+  Calling this function causes the system do recovery boot path.
   
   @retval EFI_SUCESS   Sucess to do recovery.
   @retval Others       Fail to do recovery.

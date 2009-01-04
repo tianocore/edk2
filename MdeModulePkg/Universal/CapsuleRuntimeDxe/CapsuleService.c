@@ -1,6 +1,8 @@
 /** @file
   Capsule Runtime Drivers produces two UEFI capsule runtime services.
   (UpdateCapsule, QueryCapsuleCapabilities)
+  It installs the Capsule Architectural Protocol (EDKII definition) to signify 
+  the capsule runtime services are ready.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -13,7 +15,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "CapsuleService.h"
+#include <Uefi.h>
+
+#include <Protocol/Capsule.h>
+#include <Guid/CapsuleVendor.h>
+
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+#include <Library/CapsuleLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/UefiRuntimeLib.h>
 
 /**
   Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
@@ -90,7 +103,7 @@ UpdateCapsule (
     //
     // Check if the platform supports update capsule across a system reset
     //
-    if (!FeaturePcdGet(PcdSupportUpdateCapsuleRest)) {
+    if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
       return EFI_UNSUPPORTED;
     }
     //
@@ -105,13 +118,13 @@ UpdateCapsule (
       // system reset. Set its value into NV storage to let pre-boot driver to pick it up 
       // after coming through a system reset.
       //
-      Status = EfiSetVariable (
-                 EFI_CAPSULE_VARIABLE_NAME,
-                 &gEfiCapsuleVendorGuid,
-                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                 sizeof (UINTN),
-                 (VOID *) &ScatterGatherList
-                 );
+      Status = gRT->SetVariable (
+                     EFI_CAPSULE_VARIABLE_NAME,
+                     &gEfiCapsuleVendorGuid,
+                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                     sizeof (UINTN),
+                     (VOID *) &ScatterGatherList
+                     );
       if (Status != EFI_SUCCESS) {
         return Status;
       }
@@ -219,7 +232,7 @@ QueryCapsuleCapabilities (
     //
     //Check if the platform supports update capsule across a system reset
     //
-    if (!FeaturePcdGet(PcdSupportUpdateCapsuleRest)) {
+    if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
       return EFI_UNSUPPORTED;
     }
     *ResetType = EfiResetWarm;
@@ -237,7 +250,7 @@ QueryCapsuleCapabilities (
 
 /**
 
-  This code is to install UEFI capsule runtime service.
+  This code installs UEFI capsule runtime service.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.  
   @param  SystemTable    A pointer to the EFI System Table.
@@ -258,8 +271,8 @@ CapsuleServiceInitialize (
   //
   // Install capsule runtime services into UEFI runtime service tables.
   //
-  SystemTable->RuntimeServices->UpdateCapsule                    = UpdateCapsule;
-  SystemTable->RuntimeServices->QueryCapsuleCapabilities         = QueryCapsuleCapabilities;
+  gRT->UpdateCapsule                    = UpdateCapsule;
+  gRT->QueryCapsuleCapabilities         = QueryCapsuleCapabilities;
 
   //
   // Install the Capsule Architectural Protocol on a new handle

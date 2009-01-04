@@ -1,5 +1,5 @@
 /** @file
-  Null Dxe Capsule Library instance.
+  Null Dxe Capsule Library instance does nothing and returns unsupport status.
 
 Copyright (c) 2007 - 2008 Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -15,7 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/CapsuleLib.h>
 
 /**
-  Check those capsules are supported by the firmwares.
+  The firmware checks whether the capsule image is supported 
+  by the CapsuleGuid in CapsuleHeader or other specific information in capsule image.
   
   @param  CapsuleHeader    Point to the UEFI capsule image to be checked.
   
@@ -31,7 +32,8 @@ SupportCapsuleImage (
 }
 
 /**
-  The firmware implements to process the capsule image.
+  The firmware specific implementation processes the capsule image
+  if it recognized the format of this capsule image.
   
   @param  CapsuleHeader    Point to the UEFI capsule image to be processed. 
    
