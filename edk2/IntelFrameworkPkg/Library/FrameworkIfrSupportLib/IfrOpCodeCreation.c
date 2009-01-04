@@ -27,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_SUCCESS      Subtitle created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateSubTitleOpCode (
   IN      STRING_REF                StringToken,
   IN OUT  VOID                      *FormBuffer
@@ -39,6 +40,7 @@ CreateSubTitleOpCode (
   Subtitle.SubTitle       = StringToken;
 
   CopyMem (FormBuffer, &Subtitle, sizeof (FRAMEWORK_EFI_IFR_SUBTITLE));
+  
   return EFI_SUCCESS;
 }
 
@@ -59,6 +61,7 @@ CreateSubTitleOpCode (
   @retval EFI_SUCCESS        Text created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateTextOpCode (
   IN      STRING_REF                StringToken,
   IN      STRING_REF                StringTokenTwo,
@@ -101,6 +104,7 @@ CreateTextOpCode (
   @retval EFI_SUCCESS     Hyperlink created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateGotoOpCode (
   IN      UINT16                    FormId,
   IN      STRING_REF                StringToken,
@@ -147,6 +151,7 @@ CreateGotoOpCode (
   @retval EFI_DEVICE_ERROR  DataWidth > 2
 **/
 EFI_STATUS
+EFIAPI
 CreateOneOfOpCode (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -226,6 +231,7 @@ CreateOneOfOpCode (
   @retval EFI_SUCCESS     Ordered list created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateOrderedListOpCode (
   IN      UINT16                    QuestionId,
   IN      UINT8                     MaxEntries,
@@ -296,6 +302,7 @@ CreateOrderedListOpCode (
   @retval EFI_DEVICE_ERROR  DataWidth > 1
 **/
 EFI_STATUS
+EFIAPI
 CreateCheckBoxOpCode (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -352,6 +359,7 @@ CreateCheckBoxOpCode (
   @retval EFI_DEVICE_ERROR  DataWidth > 2
 **/
 EFI_STATUS
+EFIAPI
 CreateNumericOpCode (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -412,6 +420,7 @@ CreateNumericOpCode (
   @retval EFI_SUCCESS      String created to be a form.
 **/
 EFI_STATUS
+EFIAPI
 CreateStringOpCode (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -453,6 +462,7 @@ CreateStringOpCode (
   @retval EFI_SUCCESS  Banner created to be a form.
 **/
 EFI_STATUS
+EFIAPI
 CreateBannerOpCode (
   IN      UINT16                    Title,
   IN      UINT16                    LineNumber,

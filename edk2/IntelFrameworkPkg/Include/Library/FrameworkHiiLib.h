@@ -36,9 +36,9 @@
 
   @param  NumberOfPackages  The number of HII packages to prepare.
   @param  Guid              Package GUID.
-  @Param  ...               The variable argument list of package pointers.
+  @param  ...               The variable argument list of package pointers.
 
-  @return The allocated and initialized packages.
+  @return                   The allocated and initialized packages.
 **/
 EFI_HII_PACKAGES *
 EFIAPI

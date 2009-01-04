@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IfrSupportLibInternal.h"
 
 /**
-  Create a formset
+  Create a formset.
   
   The form package is a collection of forms that are intended to describe the pages that will be
   displayed to the user.
@@ -31,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_SUCCESS          Formset successfully created  
 **/
 EFI_STATUS
+EFIAPI
 CreateFormSet (
   IN      CHAR16                    *FormSetTitle,
   IN      EFI_GUID                  *Guid,
@@ -61,20 +62,15 @@ CreateFormSet (
   //
   StringBuffer = AllocateZeroPool (DEFAULT_STRING_BUFFER_SIZE);
   if (StringBuffer == NULL) {
-    gBS->FreePool (FormBuffer);
+    FreePool (FormBuffer);
     return EFI_OUT_OF_RESOURCES;
   }
 
   //
-  // Obtain current language value
+  // Add FormSetTitle to the StringBuffer, get FormSetTitle's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
-  //
-  // Add the FormSetTitle to the string buffer and get the StringToken
-  //
   Status = AddString (*StringBuffer, CurrentLanguage, FormSetTitle, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -93,28 +89,26 @@ CreateFormSet (
   FormSet.FormSetTitle  = StringToken;
   FormSet.Class         = Class;
   FormSet.SubClass      = SubClass;
-  CopyMem (&FormSet.Guid, Guid, sizeof (EFI_GUID));
-
+  CopyGuid (&FormSet.Guid, Guid);
+  
   //
   // Initialize the end formset data
   //
   EndFormSet.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET);
   EndFormSet.Header.OpCode  = FRAMEWORK_EFI_IFR_END_FORM_SET_OP;
 
-  Destination               = (UINT8 *) *FormBuffer;
-
   //
   // Copy the formset/endformset data to the form buffer
   //
+  Destination = (UINT8 *) *FormBuffer;
   CopyMem (Destination, &IfrPack, sizeof (EFI_HII_PACK_HEADER));
 
   Destination = Destination + sizeof (EFI_HII_PACK_HEADER);
-
   CopyMem (Destination, &FormSet, sizeof (FRAMEWORK_EFI_IFR_FORM_SET));
 
   Destination = Destination + sizeof (FRAMEWORK_EFI_IFR_FORM_SET);
-
   CopyMem (Destination, &EndFormSet, sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET));
+  
   return EFI_SUCCESS;
 }
 
@@ -132,6 +126,7 @@ CreateFormSet (
   @retval EFI_SUCCESS      Form successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateForm (
   IN      CHAR16                    *FormTitle,
   IN      UINT16                    FormId,
@@ -146,12 +141,10 @@ CreateForm (
   STRING_REF                        StringToken;
 
   //
-  // Obtain current language value
+  // Add FormTitle to the StringBuffer, get FormTitle's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
   Status = AddString (StringBuffer, CurrentLanguage, FormTitle, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -161,8 +154,7 @@ CreateForm (
   Form.FormId         = FormId;
   Form.FormTitle      = StringToken;
 
-  Status              = AddOpCode (FormBuffer, &Form);
-
+  Status = AddOpCode (FormBuffer, &Form);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -171,12 +163,12 @@ CreateForm (
   EndForm.Header.Length = sizeof (FRAMEWORK_EFI_IFR_END_FORM);
 
   Status                = AddOpCode (FormBuffer, &EndForm);
-
+  
   return Status;
 }
 
 /**
-  Create a SubTitle
+  Create a SubTitle.
   
   Subtitle strings are intended to be used by authors to separate sections of questions into semantic
   groups.
@@ -188,6 +180,7 @@ CreateForm (
   @retval EFI_SUCCESS      Subtitle successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateSubTitle (
   IN      CHAR16                    *SubTitle,
   IN OUT  VOID                      *FormBuffer,
@@ -200,12 +193,10 @@ CreateSubTitle (
   STRING_REF                        StringToken;
 
   //
-  // Obtain current language value
+  // Add SubTitle to the StringBuffer, get SubTitle's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
   Status = AddString (StringBuffer, CurrentLanguage, SubTitle, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -220,7 +211,7 @@ CreateSubTitle (
 }
 
 /**
-  Create a line of text
+  Create a line of text.
   Unlike HTML, text is simply another tag. 
   This tag type enables IFR to be more easily localized.
   
@@ -235,6 +226,7 @@ CreateSubTitle (
   @retval EFI_SUCCESS     Text successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateText (
   IN      CHAR16                    *String,
   IN      CHAR16                    *String2,
@@ -251,15 +243,10 @@ CreateText (
   STRING_REF                        StringToken;
 
   //
-  // Obtain current language value
+  // Add first string to the StringBuffer, get first string's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
-  //
-  // Add first string, get first string's token
-  //
   Status = AddString (StringBuffer, CurrentLanguage, String, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -272,13 +259,11 @@ CreateText (
   // Add second string, get first string's token
   //
   Status = AddString (StringBuffer, CurrentLanguage, String2, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   Text.TextTwo  = StringToken;
-
   Text.Flags    = (UINT8) (Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
   Text.Key      = Key;
 
@@ -286,7 +271,6 @@ CreateText (
   // Add second string, get first string's token
   //
   Status = AddString (StringBuffer, CurrentLanguage, String3, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -309,6 +293,7 @@ CreateText (
   @retval EFI_SUCCESS    Hyperlink successfully created  
 **/
 EFI_STATUS
+EFIAPI
 CreateGoto (
   IN      UINT16                    FormId,
   IN      CHAR16                    *Prompt,
@@ -322,12 +307,10 @@ CreateGoto (
   STRING_REF                        StringToken;
 
   //
-  // Obtain current language value
+  // Add Prompt string to the StringBuffer, get Prompt string's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
   Status = AddString (StringBuffer, CurrentLanguage, Prompt, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -359,6 +342,7 @@ CreateGoto (
   @retval EFI_SUCCESS       One-Of box successfully created.
 **/
 EFI_STATUS
+EFIAPI
 CreateOneOf (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -386,15 +370,10 @@ CreateOneOf (
   }
 
   //
-  // Obtain current language value
+  // Add Prompt string to the StringBuffer, get Prompt string's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
-  //
-  // Add first string, get first string's token
-  //
   Status = AddString (StringBuffer, CurrentLanguage, Prompt, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -406,18 +385,16 @@ CreateOneOf (
   OneOf.Prompt        = StringToken;
 
   //
-  // Add second string, get first string's token
+  // Add Help string to the StringBuffer, get Help string's token
   //
   Status = AddString (StringBuffer, CurrentLanguage, Help, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   OneOf.Help  = StringToken;
 
-  Status      = AddOpCode (FormBuffer, &OneOf);
-
+  Status = AddOpCode (FormBuffer, &OneOf);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -427,17 +404,16 @@ CreateOneOf (
     OneOfOption.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION);
 
     //
-    // Add string and get token back
+    // Add OptionString string to the StringBuffer, get OptionString string's token
     //
-    Status              = AddString (StringBuffer, CurrentLanguage, OptionsList[Index].OptionString, &StringToken);
+    Status = AddString (StringBuffer, CurrentLanguage, OptionsList[Index].OptionString, &StringToken);
 
     OneOfOption.Option  = StringToken;
     OneOfOption.Value   = OptionsList[Index].Value;
     OneOfOption.Flags   = (UINT8) (OptionsList[Index].Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
     OneOfOption.Key     = OptionsList[Index].Key;
 
-    Status              = AddOpCode (FormBuffer, &OneOfOption);
-
+    Status = AddOpCode (FormBuffer, &OneOfOption);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -446,8 +422,7 @@ CreateOneOf (
   EndOneOf.Header.Length  = sizeof (FRAMEWORK_EFI_IFR_END_ONE_OF);
   EndOneOf.Header.OpCode  = FRAMEWORK_EFI_IFR_END_ONE_OF_OP;
 
-  Status                  = AddOpCode (FormBuffer, &EndOneOf);
-
+  Status = AddOpCode (FormBuffer, &EndOneOf);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -471,6 +446,7 @@ CreateOneOf (
   @retval EFI_SUCCESS     Ordered list successfully created.
 **/
 EFI_STATUS
+EFIAPI
 CreateOrderedList (
   IN      UINT16                    QuestionId,
   IN      UINT8                     MaxEntries,
@@ -491,15 +467,10 @@ CreateOrderedList (
   STRING_REF                        StringToken;
 
   //
-  // Obtain current language value
+  // Add Prompt string to the StringBuffer, get Prompt string's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
-  //
-  // Add first string, get first string's token
-  //
   Status = AddString (StringBuffer, CurrentLanguage, Prompt, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -511,18 +482,16 @@ CreateOrderedList (
   OrderedList.Prompt        = StringToken;
 
   //
-  // Add second string, get first string's token
+  // Add Help string to the StringBuffer, get Help string's token
   //
   Status = AddString (StringBuffer, CurrentLanguage, Help, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   OrderedList.Help  = StringToken;
 
-  Status            = AddOpCode (FormBuffer, &OrderedList);
-
+  Status = AddOpCode (FormBuffer, &OrderedList);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -532,17 +501,16 @@ CreateOrderedList (
     OrderedListOption.Header.Length = sizeof (FRAMEWORK_EFI_IFR_ONE_OF_OPTION);
 
     //
-    // Add string and get token back
+    // Add OptionString string to the StringBuffer, get OptionString string's token
     //
-    Status                    = AddString (StringBuffer, CurrentLanguage, OptionsList[Index].OptionString, &StringToken);
+    Status = AddString (StringBuffer, CurrentLanguage, OptionsList[Index].OptionString, &StringToken);
 
     OrderedListOption.Option  = StringToken;
     OrderedListOption.Value   = OptionsList[Index].Value;
     OrderedListOption.Flags   = (UINT8) (OptionsList[Index].Flags | FRAMEWORK_EFI_IFR_FLAG_CREATED);
     OrderedListOption.Key     = OptionsList[Index].Key;
 
-    Status                    = AddOpCode (FormBuffer, &OrderedListOption);
-
+    Status = AddOpCode (FormBuffer, &OrderedListOption);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -571,6 +539,7 @@ CreateOrderedList (
   @retval EFI_SUCCESS       Check box successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateCheckBox (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -594,15 +563,10 @@ CreateCheckBox (
   }
 
   //
-  // Obtain current language value
+  // Add Prompt string to the StringBuffer, get Prompt string's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
-  //
-  // Add first string, get first string's token
-  //
   Status = AddString (StringBuffer, CurrentLanguage, Prompt, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -614,10 +578,9 @@ CreateCheckBox (
   CheckBox.Prompt         = StringToken;
 
   //
-  // Add second string, get first string's token
+  // Add Help string to the StringBuffer, get Help string's token
   //
   Status = AddString (StringBuffer, CurrentLanguage, Help, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -631,7 +594,7 @@ CreateCheckBox (
 }
 
 /**
-  Create a numeric
+  Create a numeric.
   
   @param  QuestionId        Question ID of the numeric
   @param  DataWidth         DataWidth of the numeric
@@ -650,6 +613,7 @@ CreateCheckBox (
   @retval EFI_SUCCESS       Numeric is successfully created  
 **/
 EFI_STATUS
+EFIAPI
 CreateNumeric (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -678,15 +642,10 @@ CreateNumeric (
   }
 
   //
-  // Obtain current language value
+  // Add Prompt string to the StringBuffer, get Prompt string's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
-  //
-  // Add first string, get first string's token
-  //
   Status = AddString (StringBuffer, CurrentLanguage, Prompt, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -698,10 +657,9 @@ CreateNumeric (
   Numeric.Prompt        = StringToken;
 
   //
-  // Add second string, get first string's token
+  // Add Help string to the StringBuffer, get Help string's token
   //
   Status = AddString (StringBuffer, CurrentLanguage, Help, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -736,6 +694,7 @@ CreateNumeric (
   @retval EFI_SUCCESS    String successfully created.  
 **/
 EFI_STATUS
+EFIAPI
 CreateString (
   IN      UINT16                    QuestionId,
   IN      UINT8                     DataWidth,
@@ -755,15 +714,10 @@ CreateString (
   STRING_REF                        StringToken;
 
   //
-  // Obtain current language value
+  // Add Prompt string to the StringBuffer, get Prompt string's token
   //
   GetCurrentLanguage (CurrentLanguage);
-
-  //
-  // Add first string, get first string's token
-  //
   Status = AddString (StringBuffer, CurrentLanguage, Prompt, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -775,10 +729,9 @@ CreateString (
   String.Prompt         = StringToken;
 
   //
-  // Add second string, get first string's token
+  // Add Help string to the StringBuffer, get Help string's token
   //
   Status = AddString (StringBuffer, CurrentLanguage, Help, &StringToken);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }

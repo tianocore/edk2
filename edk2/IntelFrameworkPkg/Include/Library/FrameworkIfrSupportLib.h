@@ -39,11 +39,12 @@ typedef struct {
   language variable, then use default setting that 'eng' as current
   language setting.
   
-  @param Lang Pointer of system language
+  @param  Lang       Pointer of system language
   
-  @return whether sucess to get setting from variable
+  @return            whether success to get setting from variable
 **/
 EFI_STATUS
+EFIAPI
 GetCurrentLanguage (
   OUT     CHAR16              *Lang
   );
@@ -60,6 +61,7 @@ GetCurrentLanguage (
   @retval EFI_SUCCESS          String successfully added to the incoming buffer
 **/
 EFI_STATUS
+EFIAPI
 AddString (
   IN      VOID                *StringBuffer,
   IN      CHAR16              *Language,
@@ -77,6 +79,7 @@ AddString (
   @retval EFI_SUCCESS             Op-code data successfully inserted
 **/
 EFI_STATUS
+EFIAPI
 AddOpCode (
   IN      VOID                *FormBuffer,
   IN OUT  VOID                *OpCodeData
@@ -99,6 +102,7 @@ AddOpCode (
   @retval EFI_SUCCESS              Formset successfully created  
 **/
 EFI_STATUS
+EFIAPI
 CreateFormSet (
   IN      CHAR16              *FormSetTitle,
   IN      EFI_GUID            *Guid,
@@ -122,6 +126,7 @@ CreateFormSet (
   @retval EFI_SUCCESS      Form successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateForm (
   IN      CHAR16              *FormTitle,
   IN      UINT16              FormId,
@@ -142,6 +147,7 @@ CreateForm (
   @retval EFI_SUCCESS      Subtitle successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateSubTitle (
   IN      CHAR16              *SubTitle,
   IN OUT  VOID                *FormBuffer,
@@ -164,6 +170,7 @@ CreateSubTitle (
   @retval EFI_SUCCESS      Text successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateText (
   IN      CHAR16              *String,
   IN      CHAR16              *String2,
@@ -185,6 +192,7 @@ CreateText (
   @retval EFI_SUCCESS      Hyperlink successfully created  
 **/
 EFI_STATUS
+EFIAPI
 CreateGoto (
   IN      UINT16              FormId,
   IN      CHAR16              *Prompt,
@@ -209,6 +217,7 @@ CreateGoto (
   @retval EFI_SUCCESS      One-Of box successfully created.
 **/
 EFI_STATUS
+EFIAPI
 CreateOneOf (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -236,6 +245,7 @@ CreateOneOf (
   @retval EFI_SUCCESS      Ordered list successfully created.
 **/
 EFI_STATUS
+EFIAPI
 CreateOrderedList (
   IN      UINT16              QuestionId,
   IN      UINT8               MaxEntries,
@@ -262,6 +272,7 @@ CreateOrderedList (
   @retval EFI_SUCCESS       Check box successfully created
 **/
 EFI_STATUS
+EFIAPI
 CreateCheckBox (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -292,6 +303,7 @@ CreateCheckBox (
   @retval EFI_SUCCESS      Numeric is successfully created  
 **/
 EFI_STATUS
+EFIAPI
 CreateNumeric (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -323,6 +335,7 @@ CreateNumeric (
   @retval EFI_SUCCESS      String successfully created.  
 **/
 EFI_STATUS
+EFIAPI
 CreateString (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -350,6 +363,7 @@ CreateString (
   @retval EFI_SUCCESS           Successfully extract data from Hii database.
 **/
 EFI_STATUS
+EFIAPI
 ExtractDataFromHiiHandle (
   IN      FRAMEWORK_EFI_HII_HANDLE   HiiHandle,
   IN OUT  UINT16              *ImageLength,
@@ -368,7 +382,8 @@ ExtractDataFromHiiHandle (
 
   @return                  Handle to the HII pack previously registered by the memory driver.
 **/
-FRAMEWORK_EFI_HII_HANDLE 
+FRAMEWORK_EFI_HII_HANDLE
+EFIAPI
 FindHiiHandle (
   IN OUT EFI_HII_PROTOCOL    **HiiProtocol, OPTIONAL
   IN     EFI_GUID            *Guid
@@ -386,6 +401,7 @@ FindHiiHandle (
   @retval EFI_SUCCESS      Subtitle created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateSubTitleOpCode (
   IN      STRING_REF          StringToken,
   IN OUT  VOID                *FormBuffer
@@ -408,6 +424,7 @@ CreateSubTitleOpCode (
   @retval EFI_SUCCESS      Text created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateTextOpCode (
   IN      STRING_REF          StringToken,
   IN      STRING_REF          StringTokenTwo,
@@ -434,6 +451,7 @@ CreateTextOpCode (
   @retval EFI_SUCCESS      Hyperlink created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateGotoOpCode (
   IN      UINT16              FormId,
   IN      STRING_REF          StringToken,
@@ -465,6 +483,7 @@ CreateGotoOpCode (
   @retval EFI_DEVICE_ERROR DataWidth > 2
 **/
 EFI_STATUS
+EFIAPI
 CreateOneOfOpCode (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -495,6 +514,7 @@ CreateOneOfOpCode (
   @retval EFI_SUCCESS      Ordered list created to be a form
 **/
 EFI_STATUS
+EFIAPI
 CreateOrderedListOpCode (
   IN      UINT16              QuestionId,
   IN      UINT8               MaxEntries,
@@ -523,6 +543,7 @@ CreateOrderedListOpCode (
   @retval EFI_DEVICE_ERROR DataWidth > 1
 **/
 EFI_STATUS
+EFIAPI
 CreateCheckBoxOpCode (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -556,6 +577,7 @@ CreateCheckBoxOpCode (
   @retval EFI_DEVICE_ERROR  DataWidth > 2
 **/
 EFI_STATUS
+EFIAPI
 CreateNumericOpCode (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -589,6 +611,7 @@ CreateNumericOpCode (
   @retval EFI_SUCCESS      String created to be a form.
 **/
 EFI_STATUS
+EFIAPI
 CreateStringOpCode (
   IN      UINT16              QuestionId,
   IN      UINT8               DataWidth,
@@ -615,6 +638,7 @@ CreateStringOpCode (
   @retval EFI_SUCCESS           Data successfully validated
 **/
 EFI_STATUS
+EFIAPI
 ValidateDataFromHiiHandle (
   IN      FRAMEWORK_EFI_HII_HANDLE       HiiHandle,
   OUT     BOOLEAN             *Results
@@ -631,6 +655,7 @@ ValidateDataFromHiiHandle (
   @retval EFI_SUCCESS      Banner created to be a form.
 **/
 EFI_STATUS
+EFIAPI
 CreateBannerOpCode (
   IN      UINT16              Title,
   IN      UINT16              LineNumber,
@@ -649,6 +674,7 @@ CreateBannerOpCode (
   @param Size              Size of the variable/map in bytes
 **/
 VOID
+EFIAPI
 EfiLibHiiVariablePackGetMap (
   IN    EFI_HII_VARIABLE_PACK *Pack,  
   OUT   CHAR16                **Name,  OPTIONAL
@@ -666,6 +692,7 @@ EfiLibHiiVariablePackGetMap (
   @return                  The number of map count.
 **/
 UINTN
+EFIAPI
 EfiLibHiiVariablePackListGetMapCnt (
   IN    EFI_HII_VARIABLE_PACK_LIST   *List
   );
@@ -696,6 +723,7 @@ typedef VOID (EFI_LIB_HII_VARIABLE_PACK_LIST_CALLBACK) (
   @param Callback          Routine to be called for each iterated variable.
 **/
 VOID
+EFIAPI
 EfiLibHiiVariablePackListForEachVar (
   IN    EFI_HII_VARIABLE_PACK_LIST               *List,
   IN    EFI_LIB_HII_VARIABLE_PACK_LIST_CALLBACK  *Callback
@@ -717,6 +745,7 @@ EfiLibHiiVariablePackListForEachVar (
   @return EFI_NOT_FOUND    Variable is not found, OUT parameters are not valid
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariablePackListGetMapByIdx (
   IN    UINTN                         Idx,  
   IN    EFI_HII_VARIABLE_PACK_LIST    *List,  
@@ -742,6 +771,7 @@ EfiLibHiiVariablePackListGetMapByIdx (
   @retval EFI_NOT_FOUND    Variable is not found, OUT parameters are not valid
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariablePackListGetMapById (
   IN    UINT16                        Id,  
   IN    EFI_HII_VARIABLE_PACK_LIST    *List,
@@ -765,6 +795,7 @@ EfiLibHiiVariablePackListGetMapById (
   @retval EFI_NOT_FOUND    variable is not found, OUT parameters are not valid
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariablePackListGetMap (
   IN    EFI_HII_VARIABLE_PACK_LIST   *List,
   IN    CHAR16                       *Name,
@@ -789,6 +820,7 @@ EfiLibHiiVariablePackListGetMap (
   @retval EFI_LOAD_ERROR   The variable in the NV was of different size, or NV API returned error.
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariableRetrieveFromNv (
   IN  CHAR16                     *Name,
   IN  EFI_GUID                   *Guid,
@@ -805,8 +837,8 @@ EfiLibHiiVariableRetrieveFromNv (
 
   @param Suffix            Suffix the Name should end with.
   @param Name              Name of the variable to retrieve.
-  @Param Guid              Guid of the variable to retrieve.
-  @Param Size              Parameters of the variable to retrieve.
+  @param Guid              Guid of the variable to retrieve.
+  @param Size              Parameters of the variable to retrieve.
   @param Var               Variable will be retrieved into this buffer.
                            Caller is responsible for providing storage of exactly Size size in bytes.
 
@@ -816,6 +848,7 @@ EfiLibHiiVariableRetrieveFromNv (
   @retval EFI_LOAD_ERROR        The variable in the NV was of different size, or NV API returned error.
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariableOverrideIfSuffix (
   IN  CHAR16                 *Suffix,
   IN  CHAR16                 *Name,
@@ -843,6 +876,7 @@ EfiLibHiiVariableOverrideIfSuffix (
   @retval EFI_LOAD_ERROR   The variable in the NV was of different size, or NV API returned error.
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariableOverrideBySuffix (
   IN  CHAR16                 *Suffix,
   IN  CHAR16                 *Name,

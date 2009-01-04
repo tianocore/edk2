@@ -12,9 +12,6 @@
 
 **/
 
-
-
-
 #include "UefiLibInternal.h"
 
 typedef struct {
@@ -199,30 +196,29 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   @retval 0             The width if UnicodeChar could not be determined.
   @retval 1             UnicodeChar is a narrow glyph.
   @retval 2             UnicodeChar is a wide glyph.
-
 **/
 UINTN
 EFIAPI
 GetGlyphWidth (
-  IN CHAR16  UnicodeChar
+  IN CHAR16                         UnicodeChar
   )
 {
-  UINTN                     Index;
-  UINTN                     Low;
-  UINTN                     High;
-  CONST UNICODE_WIDTH_ENTRY *Item;
+  UINTN                             Index;
+  UINTN                             Low;
+  UINTN                             High;
+  CONST UNICODE_WIDTH_ENTRY         *Item;
 
   Item  = NULL;
   Low   = 0;
   High  = (sizeof (mUnicodeWidthTable)) / (sizeof (UNICODE_WIDTH_ENTRY)) - 1;
-  while (Low <= High) {
+  
+  while (Low <= High) {    
     Index = (Low + High) >> 1;
     Item  = &(mUnicodeWidthTable[Index]);
     if (Index == 0) {
       if (UnicodeChar <= Item->WChar) {
         break;
       }
-
       return 0;
     }
 
@@ -256,19 +252,18 @@ GetGlyphWidth (
   characters that are width glyphs have a width of 2. 
   If String is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  String      A pointer to a Null-terminated Unicode string.
+  @param  String   A pointer to a Null-terminated Unicode string.
 
-  @return The display length of the Null-terminated Unicode string specified by String.
-  
+  @return          The display length of the Null-terminated Unicode string specified by String.
 **/
 UINTN
 EFIAPI
 UnicodeStringDisplayLength (
-  IN CONST CHAR16  *String
+  IN CONST CHAR16                   *String
   )
 {
-  UINTN      Length;
-  UINTN      Width;
+  UINTN                             Length;
+  UINTN                             Width;
 
   if (String == NULL) {
     return 0;
