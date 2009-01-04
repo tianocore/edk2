@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return              whether sucess to get setting from variable
 **/
 EFI_STATUS
+EFIAPI
 GetCurrentLanguage (
   OUT  CHAR16                       *Lang
   )
@@ -39,7 +40,6 @@ GetCurrentLanguage (
   // Getting the system language and placing it into our Global Data
   //
   Size = sizeof (Language);
-
   Status = gRT->GetVariable (
                   (CHAR16 *) L"Lang",
                   &gEfiGlobalVariableGuid,
@@ -47,7 +47,6 @@ GetCurrentLanguage (
                   &Size,
                   Language
                   );
-
   if (EFI_ERROR (Status)) {
     AsciiStrCpy (Language, "eng");
   }
@@ -80,6 +79,7 @@ GetCurrentLanguage (
   @retval EFI_SUCCESS          String successfully added to the incoming buffer
 **/
 EFI_STATUS
+EFIAPI
 AddString (
   IN      VOID                      *StringBuffer,
   IN      CHAR16                    *Language,
@@ -146,8 +146,8 @@ AddString (
       //
       // Add a new stringpointer in the new buffer since we are adding a string.  Null terminate it
       //
-      PackDestination[Index] = (UINT16)(PackDestination[Index-1] +
-                                        StrSize((CHAR16 *)((CHAR8 *)(StringPack) + PackSource[Index-1])));
+      PackDestination[Index] = (UINT16)(PackDestination[Index - 1] +
+                                        StrSize((CHAR16 *)((CHAR8 *)(StringPack) + PackSource[Index - 1])));
       PackDestination[Index + 1] = (UINT16) 0;
 
       //
@@ -274,7 +274,7 @@ AddString (
   //
   // Free the newly created buffer since we don't need it anymore
   //
-  gBS->FreePool (NewBuffer);
+  FreePool (NewBuffer);
   return EFI_SUCCESS;
 }
 
@@ -288,6 +288,7 @@ AddString (
   @retval EFI_SUCCESS           Op-code data successfully inserted  
 **/
 EFI_STATUS
+EFIAPI
 AddOpCode (
   IN      VOID                      *FormBuffer,
   IN OUT  VOID                      *OpCodeData
@@ -307,12 +308,11 @@ AddOpCode (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Source      = (UINT8 *) FormBuffer;
-  Destination = (UINT8 *) NewBuffer;
-
   //
   // Copy the IFR Package header to the new buffer
   //
+  Source      = (UINT8 *) FormBuffer;
+  Destination = (UINT8 *) NewBuffer;
   CopyMem (Destination, Source, sizeof (EFI_HII_PACK_HEADER));
 
   //
@@ -326,7 +326,7 @@ AddOpCode (
   //
   for (; ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->OpCode != FRAMEWORK_EFI_IFR_END_FORM_OP;) {
     //
-    // If the this opcode is an end_form_set we better be creating and endform
+    // If the opcode is an end_form_set we better be creating and endform
     // Nonetheless, we will add data before the end_form_set.  This also provides
     // for interesting behavior in the code we will run, but has no bad side-effects
     // since we will possibly do a 0 byte copy in this particular end-case.
@@ -351,8 +351,8 @@ AddOpCode (
   // Prior to the end_form is where we insert the new op-code data
   //
   CopyMem (Destination, OpCodeData, ((FRAMEWORK_EFI_IFR_OP_HEADER *) OpCodeData)->Length);
-  Destination       = Destination + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-
+  
+  Destination = Destination + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) OpCodeData)->Length;
   NewBuffer->Length = (UINT32) (NewBuffer->Length + (UINT32) (((FRAMEWORK_EFI_IFR_OP_HEADER *) OpCodeData)->Length));
 
   //
@@ -361,14 +361,10 @@ AddOpCode (
   CopyMem (Destination, Source, ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length);
 
   //
-  // Adjust Source/Destination to next op-code location
+  // Copy end-formset data to new buffer
   //
   Destination = Destination + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length;
   Source      = Source + (UINTN) ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length;
-
-  //
-  // Copy end-formset data to new buffer
-  //
   CopyMem (Destination, Source, ((FRAMEWORK_EFI_IFR_OP_HEADER *) Source)->Length);
 
   //
@@ -380,7 +376,7 @@ AddOpCode (
   //
   // Free the newly created buffer since we don't need it anymore
   //
-  gBS->FreePool (NewBuffer);
+  FreePool (NewBuffer);
   return EFI_SUCCESS;
 }
 
@@ -392,6 +388,7 @@ AddOpCode (
   @return        the statue of locating HII protocol
 **/
 EFI_STATUS
+EFIAPI
 GetHiiInterface (
   OUT  EFI_HII_PROTOCOL             **Hii
   )
@@ -424,6 +421,7 @@ GetHiiInterface (
   @retval EFI_SUCCESS           Successfully extract data from Hii database.
 **/
 EFI_STATUS
+EFIAPI
 ExtractDataFromHiiHandle (
   IN      FRAMEWORK_EFI_HII_HANDLE  HiiHandle,
   IN OUT  UINT16                    *ImageLength,
@@ -463,7 +461,7 @@ ExtractDataFromHiiHandle (
   //
   Status = Hii->GetForms (Hii, HiiHandle, 0, &DataLength, RawData);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (RawData);
+    FreePool (RawData);
 
     //
     // Allocate space for retrieval of IFR data
@@ -493,7 +491,7 @@ ExtractDataFromHiiHandle (
       //
       // Copy the GUID information from this handle
       //
-      CopyMem (Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
+      CopyGuid (Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid);
       break;
 
     case FRAMEWORK_EFI_IFR_ONE_OF_OP:
@@ -523,7 +521,7 @@ ExtractDataFromHiiHandle (
   // Return an error if buffer is too small
   //
   if (SizeOfNvStore > *ImageLength) {
-    gBS->FreePool (OldData);
+    FreePool (OldData);
     *ImageLength = (UINT16) SizeOfNvStore;
     return EFI_BUFFER_TOO_SMALL;
   }
@@ -570,7 +568,7 @@ ExtractDataFromHiiHandle (
   //
   // Free our temporary repository of form data
   //
-  gBS->FreePool (OldData);
+  FreePool (OldData);
 
   return EFI_SUCCESS;
 }
@@ -586,7 +584,8 @@ ExtractDataFromHiiHandle (
 
   @return             Handle to the HII pack previously registered by the memory driver.
 **/
-FRAMEWORK_EFI_HII_HANDLE 
+FRAMEWORK_EFI_HII_HANDLE
+EFIAPI
 FindHiiHandle (
   IN OUT  EFI_HII_PROTOCOL          **HiiProtocol, OPTIONAL
   IN      EFI_GUID                  *Guid
@@ -646,7 +645,7 @@ FindHiiHandle (
   //
   if (Status == EFI_BUFFER_TOO_SMALL) {
 
-    gBS->FreePool (HiiHandleBuffer);
+    FreePool (HiiHandleBuffer);
 
     HiiHandleBuffer = AllocatePool (HiiHandleBufferLength);
     ASSERT (HiiHandleBuffer != NULL);
@@ -679,7 +678,7 @@ FindHiiHandle (
   }
 
 lbl_exit:
-  gBS->FreePool (HiiHandleBuffer);
+  FreePool (HiiHandleBuffer);
   return HiiHandle;
 }
 
@@ -697,6 +696,7 @@ lbl_exit:
   @retval EFI_SUCCESS            Data successfully validated
 **/
 EFI_STATUS
+EFIAPI
 ValidateDataFromHiiHandle (
   IN      FRAMEWORK_EFI_HII_HANDLE  HiiHandle,
      OUT  BOOLEAN                   *Results
@@ -739,7 +739,7 @@ ValidateDataFromHiiHandle (
   //
   Status = Hii->GetForms (Hii, HiiHandle, 0, &RawDataLength, RawData);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (RawData);
+    FreePool (RawData);
 
     //
     // Allocate space for retrieval of IFR data
@@ -764,10 +764,9 @@ ValidateDataFromHiiHandle (
 
   for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     if (RawData[Index] == FRAMEWORK_EFI_IFR_FORM_SET_OP) {
-      CopyMem (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid, sizeof (EFI_GUID));
+      CopyGuid (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid);
       break;
     }
-
     Index = RawData[Index + 1] + Index;
   }
 
@@ -829,7 +828,7 @@ ValidateDataFromHiiHandle (
       //
       // Free the buffer that was allocated that was too small
       //
-      gBS->FreePool (VariableData);
+      FreePool (VariableData);
 
       VariableData = AllocatePool (SizeOfNvStore);
       if (VariableData == NULL) {

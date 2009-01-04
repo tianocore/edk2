@@ -15,7 +15,6 @@
 
 #include <FrameworkDxe.h>
 
-
 #include <Protocol/FrameworkHii.h>
 
 #include <Library/HiiLib.h>
@@ -44,7 +43,7 @@ HiiLibFrameworkConstructor (
   IN      EFI_SYSTEM_TABLE          *SystemTable
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS                        Status;
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiProtocolGuid,
@@ -53,8 +52,7 @@ HiiLibFrameworkConstructor (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return Status;
-  
+  return Status;  
 }
 
 /**
@@ -67,23 +65,23 @@ HiiLibFrameworkConstructor (
   @param  Guid             Package GUID.
   @param  Args             Package contents
 
-  @return The allocated and initialized packages.
+  @return                  The allocated and initialized packages.
 
 **/
 EFI_HII_PACKAGES *
 InternalPreparePackages (
-  IN UINTN           NumberOfPackages,
-  IN CONST EFI_GUID  *Guid OPTIONAL,
-  IN VA_LIST         Args
+  IN UINTN                          NumberOfPackages,
+  IN CONST EFI_GUID                 *Guid OPTIONAL,
+  IN VA_LIST                        Args
   )
 {
-  EFI_HII_PACKAGES  *HiiPackages;
-  VOID              **Package;
-  UINTN             Index;
+  EFI_HII_PACKAGES                  *HiiPackages;
+  VOID                              **Package;
+  UINTN                             Index;
 
   ASSERT (NumberOfPackages > 0);
 
-  HiiPackages                   = AllocateZeroPool (sizeof (EFI_HII_PACKAGES) + NumberOfPackages * sizeof (VOID *));
+  HiiPackages = AllocateZeroPool (sizeof (EFI_HII_PACKAGES) + NumberOfPackages * sizeof (VOID *));
   ASSERT (HiiPackages != NULL);
 
   HiiPackages->GuidId           = (EFI_GUID *) Guid;
@@ -96,7 +94,6 @@ InternalPreparePackages (
   }
 
   return HiiPackages;
-
 }
 
 

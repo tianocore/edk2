@@ -86,12 +86,15 @@ typedef UINT16                    FRAMEWORK_EFI_HII_HANDLE;
 
 //
 // The following types are currently defined:
-// EFI_FROM_ID has been defined in UEFI spec.
+// EFI_FORM_ID has been defined in UEFI spec.
 //
 typedef UINT16  EFI_FORM_LABEL;
 
 #pragma pack(1)
 
+//
+// The header found at the start of each package.
+//
 typedef struct {
   UINT32  Length;
   UINT16  Type;

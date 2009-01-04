@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  Size              Size of the variable/map in bytes
 **/
 VOID
+EFIAPI
 EfiLibHiiVariablePackGetMap (
   IN      EFI_HII_VARIABLE_PACK     *Pack,  
      OUT  CHAR16                    **Name, OPTIONAL
@@ -64,6 +65,7 @@ EfiLibHiiVariablePackGetMap (
   @return                   The number of map count.
 **/
 UINTN
+EFIAPI
 EfiLibHiiVariablePackListGetMapCnt (
   IN  EFI_HII_VARIABLE_PACK_LIST    *List
   )
@@ -86,6 +88,7 @@ EfiLibHiiVariablePackListGetMapCnt (
   @param  Callback          Routine to be called for each iterated variable.
 **/
 VOID
+EFIAPI
 EfiLibHiiVariablePackListForEachVar (
   IN  EFI_HII_VARIABLE_PACK_LIST               *List,
   IN  EFI_LIB_HII_VARIABLE_PACK_LIST_CALLBACK  *Callback
@@ -123,6 +126,7 @@ EfiLibHiiVariablePackListForEachVar (
   @return EFI_NOT_FOUND  Variable is not found, OUT parameters are not valid
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariablePackListGetMapByIdx (
   IN      UINTN                      Idx,  
   IN      EFI_HII_VARIABLE_PACK_LIST *List,  
@@ -156,8 +160,10 @@ EfiLibHiiVariablePackListGetMapByIdx (
       if (NULL != Id) {
         *Id   = MapId;
       }
-        
-      return EFI_SUCCESS; // Map found
+      //
+      // Map found
+      //
+      return EFI_SUCCESS;
     }
     List = List->NextVariablePack;
   }
@@ -182,6 +188,7 @@ EfiLibHiiVariablePackListGetMapByIdx (
   @retval EFI_NOT_FOUND  Variable is not found, OUT parameters are not valid
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariablePackListGetMapById (
   IN      UINT16                     Id,  
   IN      EFI_HII_VARIABLE_PACK_LIST *List,
@@ -235,6 +242,7 @@ EfiLibHiiVariablePackListGetMapById (
   @retval EFI_NOT_FOUND  variable is not found, OUT parameters are not valid
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariablePackListGetMap (
   IN      EFI_HII_VARIABLE_PACK_LIST *List,
   IN      CHAR16                     *Name,
@@ -282,6 +290,7 @@ EfiLibHiiVariablePackListGetMap (
   @retval EFI_LOAD_ERROR  The variable in the NV was of different size, or NV API returned error.
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariableRetrieveFromNv (
   IN      CHAR16                    *Name,
   IN      EFI_GUID                  *Guid,
@@ -334,8 +343,8 @@ EfiLibHiiVariableRetrieveFromNv (
 
   @param  Suffix            Suffix the Name should end with.
   @param  Name              Name of the variable to retrieve.
-  @Param  Guid              Guid of the variable to retrieve.
-  @Param  Size              Parameters of the variable to retrieve.
+  @param  Guid              Guid of the variable to retrieve.
+  @param  Size              Parameters of the variable to retrieve.
   @param  Var               Variable will be retrieved into this buffer.
                             Caller is responsible for providing storage of exactly Size size in bytes.
 
@@ -345,6 +354,7 @@ EfiLibHiiVariableRetrieveFromNv (
   @retval EFI_LOAD_ERROR        The variable in the NV was of different size, or NV API returned error.
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariableOverrideIfSuffix (
   IN      CHAR16                    *Suffix,
   IN      CHAR16                    *Name,
@@ -386,6 +396,7 @@ EfiLibHiiVariableOverrideIfSuffix (
   @retval EFI_LOAD_ERROR  The variable in the NV was of different size, or NV API returned error.
 **/
 EFI_STATUS
+EFIAPI
 EfiLibHiiVariableOverrideBySuffix (
   IN      CHAR16                    *Suffix,
   IN      CHAR16                    *Name,
@@ -410,7 +421,7 @@ EfiLibHiiVariableOverrideBySuffix (
   StrCat (NameSuffixed, Suffix);
   
   Status = EfiLibHiiVariableRetrieveFromNv (NameSuffixed, Guid, Size, &Var);
-  gBS->FreePool (NameSuffixed);
+  FreePool (NameSuffixed);
   
   return Status;
 }

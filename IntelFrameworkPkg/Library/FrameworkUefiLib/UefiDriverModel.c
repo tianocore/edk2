@@ -13,7 +13,6 @@
 
 **/ 
 
-
 #include "UefiLibInternal.h"
 
 /**
@@ -36,18 +35,17 @@
   @retval EFI_SUCCESS           The protocol installation is completed successfully.
   @retval EFI_OUT_OF_RESOURCES  There was not enough system resources to install the protocol.
   @retval Others                Status from gBS->InstallMultipleProtocolInterfaces().
-
 **/
 EFI_STATUS
 EFIAPI
 EfiLibInstallDriverBinding (
-  IN CONST EFI_HANDLE             ImageHandle,
-  IN CONST EFI_SYSTEM_TABLE       *SystemTable,
-  IN EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding,
-  IN EFI_HANDLE                   DriverBindingHandle
+  IN CONST EFI_HANDLE               ImageHandle,
+  IN CONST EFI_SYSTEM_TABLE         *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL    *DriverBinding,
+  IN EFI_HANDLE                     DriverBindingHandle
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                        Status;
 
   ASSERT (DriverBinding != NULL);
 
@@ -56,9 +54,6 @@ EfiLibInstallDriverBinding (
                   &gEfiDriverBindingProtocolGuid, DriverBinding,
                   NULL
                   );
-  //
-  // ASSERT if the call to InstallMultipleProtocolInterfaces() failed
-  //
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -69,7 +64,6 @@ EfiLibInstallDriverBinding (
 
   return Status;
 }
-
 
 /**
   Installs and completes the initialization of a Driver Binding Protocol instance and
@@ -109,9 +103,11 @@ EfiLibInstallAllDriverProtocols (
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                                  Status;
 
-  ASSERT (DriverBinding != NULL);
+  if (DriverBinding == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (DriverDiagnostics == NULL || FeaturePcdGet(PcdDriverDiagnosticsDisable)) {
     if (DriverConfiguration == NULL) {
@@ -229,15 +225,15 @@ EfiLibInstallAllDriverProtocols (
 EFI_STATUS
 EFIAPI
 EfiLibInstallDriverBindingComponentName2 (
-  IN CONST EFI_HANDLE                         ImageHandle,
-  IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
-  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
+  IN CONST EFI_HANDLE                    ImageHandle,
+  IN CONST EFI_SYSTEM_TABLE              *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL         *DriverBinding,
+  IN EFI_HANDLE                          DriverBindingHandle,
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL   *ComponentName,  OPTIONAL
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL  *ComponentName2  OPTIONAL
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                             Status;
 
   ASSERT (DriverBinding != NULL);
 
