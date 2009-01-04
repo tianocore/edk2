@@ -117,7 +117,7 @@ IfrLibExtractClassFromHiiHandle (
   //
   Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
   Offset2 = 0;
-  CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
+  PackageListLength = ReadUnaligned32 (&HiiPackageList->PackageLength);
 
   while (Offset < PackageListLength) {
     Package = ((UINT8 *) HiiPackageList) + Offset;
