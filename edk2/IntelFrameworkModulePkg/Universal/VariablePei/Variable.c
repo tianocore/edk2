@@ -47,11 +47,12 @@ EFI_GUID mEfiVariableIndexTableGuid = EFI_VARIABLE_INDEX_TABLE_GUID;
 /**
   Provide the functionality of the variable services.
 
-  @param  FileHandle  Handle of the file being invoked.
-  @param  PeiServices Describes the list of possible PEI Services.
+  @param  FileHandle      Handle of the file being invoked.
+  @param  PeiServices     Describes the list of possible PEI Services.
 
-  @return Status -  EFI_SUCCESS if the interface could be successfully
-          installed
+  @return EFI_SUCCESS     If the interface could be successfully installed.
+  @return EFI_UNSUPPORTED If current boot path is in recovery mode, then does not
+                          install this interface.
 
 **/
 EFI_STATUS
@@ -61,9 +62,21 @@ PeimInitializeVariableServices (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_BOOT_MODE BootMode;
+  EFI_STATUS    Status;
+
   //
-  // Publish the variable capability to other modules
-  //
+  // Check if this is recovery boot path. If no, publish the variable access capability
+  // to other modules. If yes, the content of variable area is not reliable. Therefore,
+  // in this case we should not provide variable service to other pei modules. 
+  // 
+  Status = (*PeiServices)->GetBootMode (PeiServices, &BootMode);
+  ASSERT_EFI_ERROR (Status);
+  
+  if (BootMode == BOOT_IN_RECOVERY_MODE) {
+    return EFI_UNSUPPORTED;
+  }
+  
   return (**PeiServices).InstallPpi (PeiServices, &mPpiListVariable[0]);
 
 }
