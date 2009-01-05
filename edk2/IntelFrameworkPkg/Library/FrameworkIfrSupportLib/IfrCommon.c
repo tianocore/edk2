@@ -491,7 +491,7 @@ ExtractDataFromHiiHandle (
       //
       // Copy the GUID information from this handle
       //
-      CopyGuid (Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid);
+      CopyGuid (Guid, (GUID *)(VOID *)&((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid);
       break;
 
     case FRAMEWORK_EFI_IFR_ONE_OF_OP:
@@ -764,7 +764,7 @@ ValidateDataFromHiiHandle (
 
   for (Index = 0; RawData[Index] != FRAMEWORK_EFI_IFR_END_FORM_SET_OP;) {
     if (RawData[Index] == FRAMEWORK_EFI_IFR_FORM_SET_OP) {
-      CopyGuid (&Guid, &((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid);
+      CopyGuid (&Guid, (GUID *)(VOID *)&((FRAMEWORK_EFI_IFR_FORM_SET *) &RawData[Index])->Guid);
       break;
     }
     Index = RawData[Index + 1] + Index;

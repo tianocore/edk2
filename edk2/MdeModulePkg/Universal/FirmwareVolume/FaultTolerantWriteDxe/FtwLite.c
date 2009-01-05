@@ -622,13 +622,7 @@ InitializeFtwLite (
 
   FtwLiteDevice = NULL;
   FtwLiteDevice = AllocatePool (sizeof (EFI_FTW_LITE_DEVICE) + Length);
-  if (FtwLiteDevice != NULL) {
-    Status = EFI_SUCCESS;
-  } else {
-    Status = EFI_OUT_OF_RESOURCES;
-  }
-
-  ASSERT_EFI_ERROR (Status);
+  ASSERT (FtwLiteDevice != NULL);
 
   ZeroMem (FtwLiteDevice, sizeof (EFI_FTW_LITE_DEVICE));
   FtwLiteDevice->Signature = FTW_LITE_DEVICE_SIGNATURE;
@@ -791,7 +785,8 @@ InitializeFtwLite (
       (FtwLiteDevice->FtwSpareLba == (EFI_LBA) (-1))
       ) {
     DEBUG ((EFI_D_ERROR, "FtwLite: Working or spare FVB not ready\n"));
-    ASSERT_EFI_ERROR (Status);
+    FreePool (FtwLiteDevice);
+    return EFI_ABORTED;
   }
   //
   // Refresh workspace data from working block
@@ -831,6 +826,7 @@ InitializeFtwLite (
       //
       Status = WorkSpaceRefresh (FtwLiteDevice);
       if (EFI_ERROR (Status)) {
+        FreePool (FtwLiteDevice);
         return EFI_ABORTED;
       }
     } else {
@@ -850,6 +846,7 @@ InitializeFtwLite (
       Status = FtwReclaimWorkSpace (FtwLiteDevice, FALSE);
 
       if (EFI_ERROR (Status)) {
+        FreePool (FtwLiteDevice);
         return EFI_ABORTED;
       }
     }
@@ -869,6 +866,7 @@ InitializeFtwLite (
                   &FtwLiteDevice->FtwLiteInstance
                   );
   if (EFI_ERROR (Status)) {
+    FreePool (FtwLiteDevice);
     return EFI_ABORTED;
   }
   //
@@ -912,6 +910,7 @@ InitializeFtwLite (
     Status = FtwReclaimWorkSpace (FtwLiteDevice, TRUE);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_FTW_LITE, "FtwLite: Workspace reclaim - %r\n", Status));
+      FreePool (FtwLiteDevice);
       return EFI_ABORTED;
     }
   }

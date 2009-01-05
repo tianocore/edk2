@@ -468,6 +468,7 @@ SaveOverridesMapping (
     // ItemIndex now points to the next PLATFORM_OVERRIDE_ITEM which is not covered by VariableNeededSize
     //
     VariableBuffer = AllocateZeroPool (VariableNeededSize);
+    ASSERT (VariableBuffer != NULL);
     ASSERT ((UINTN) VariableBuffer % sizeof(UINTN) == 0);
 
     //
