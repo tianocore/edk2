@@ -20,8 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param ConVarName The name of the EFI variable.
 
-  @retval TRUE    Set the EFI variabel as NV type.
-  @retval FALSE   EFI variabel as NV type can be set NonNV.
+  @retval TRUE    Set the EFI variable as NV type.
+  @retval FALSE   EFI variable as NV type can be set NonNV.
 **/
 BOOLEAN
 IsNvNeed (
@@ -279,8 +279,8 @@ BdsLibConnectConsoleVariable (
 
 
 /**
-  This function will search every simpletxt devive in current system,
-  and make every simpletxt device as pertantial console device.
+  This function will search every simpletext device in current system,
+  and make every simpletext device as pertantial console device.
 
 **/
 VOID
@@ -300,7 +300,7 @@ BdsLibConnectAllConsoles (
   ConDevicePath = NULL;
 
   //
-  // Update all the console varables
+  // Update all the console variables
   //
   gBS->LocateHandleBuffer (
           ByProtocol,
@@ -519,8 +519,8 @@ ConvertBmpToGopBlt (
           Width++;
         }
 
-        Blt --;
-        Width --;
+        Blt--;
+        Width--;
         break;
 
       case 4:
@@ -767,7 +767,7 @@ EnableQuietBoot (
     }
 
     //
-    // Caculate the display position according to Attribute.
+    // Calculate the display position according to Attribute.
     //
     switch (Attribute) {
     case EfiBadgingDisplayAttributeLeftTop:
