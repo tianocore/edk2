@@ -89,7 +89,7 @@ CreateFormSet (
   FormSet.FormSetTitle  = StringToken;
   FormSet.Class         = Class;
   FormSet.SubClass      = SubClass;
-  CopyGuid (&FormSet.Guid, Guid);
+  CopyGuid ((GUID *)(VOID *)&FormSet.Guid, Guid);
   
   //
   // Initialize the end formset data

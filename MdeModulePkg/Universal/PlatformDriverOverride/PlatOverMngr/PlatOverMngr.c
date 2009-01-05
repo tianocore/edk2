@@ -468,6 +468,7 @@ UpdateDeviceSelectPage (
     //
     Len = StrSize (ControllerName);
     NewString = AllocateZeroPool (Len + StrSize (L"--"));
+    ASSERT (NewString != NULL);
     if (EFI_ERROR (CheckMapping (ControllerDevicePath,NULL, &mMappingDataBase, NULL, NULL))) {
       StrCat (NewString, L"--");
     } else {
@@ -762,6 +763,7 @@ UpdateBindingDriverSelectPage (
     // First create the driver image name
     //
     NewString = AllocateZeroPool (StrSize (DriverName));
+    ASSERT (NewString != NULL); 
     if (EFI_ERROR (CheckMapping (mControllerDevicePathProtocol[mSelectedCtrIndex], LoadedImageDevicePath, &mMappingDataBase, NULL, NULL))) {
       FakeNvData->DriSelection[Index] = 0x00;
     } else {
@@ -894,7 +896,7 @@ UpdatePrioritySelectPage (
   }
   
   IfrOptionList = AllocateZeroPool (sizeof (IFR_OPTION) * mSelectedDriverImageNum);
-  ASSERT_EFI_ERROR (IfrOptionList != NULL);
+  ASSERT (IfrOptionList != NULL);
   //
   // Create order list for those selected drivers
   //

@@ -178,7 +178,7 @@ UpdateFormPackageData (
       }
 
       ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
-      LabelNumber = ReadUnaligned16 (&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number);
+      LabelNumber = ReadUnaligned16 ((UINT16 *)(VOID*)&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number);
       if ((ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) || (LabelNumber != Label) 
           || !CompareGuid ((EFI_GUID *)(UINTN)(&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid), &mIfrVendorGuid)) {
         //
