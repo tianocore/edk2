@@ -155,7 +155,7 @@ UpdateFormPackageData (
     switch (IfrOpHdr->OpCode) {
     case EFI_IFR_FORM_SET_OP :
       if (FormSetGuid != NULL) {
-        if (CompareMem (&((EFI_IFR_FORM_SET *) IfrOpHdr)->Guid, FormSetGuid, sizeof (EFI_GUID)) == 0) {
+        if (CompareGuid((GUID *)(VOID *)&((EFI_IFR_FORM_SET *) IfrOpHdr)->Guid, FormSetGuid)) {
           GetFormSet = TRUE;
         }
       }
@@ -178,7 +178,7 @@ UpdateFormPackageData (
       }
 
       ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
-      LabelNumber = ReadUnaligned16 ((UINT16 *)(VOID*)&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number);
+      LabelNumber = ReadUnaligned16 ((UINT16 *)(VOID *)&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number);
       if ((ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) || (LabelNumber != Label) 
           || !CompareGuid ((EFI_GUID *)(UINTN)(&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid), &mIfrVendorGuid)) {
         //
