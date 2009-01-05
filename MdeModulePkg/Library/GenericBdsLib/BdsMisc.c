@@ -59,8 +59,8 @@ BdsLibGetTimeout (
 }
 
 /**
-  The function will go through the driver optoin link list, load and start
-  every driver the driver optoin device path point to.
+  The function will go through the driver option link list, load and start
+  every driver the driver option device path point to.
 
   @param  BdsDriverLists        The header of the current driver option link list
 
@@ -166,7 +166,7 @@ BdsLibLoadDrivers (
 
 /**
   Get the Option Number that does not used.
-  Try to locate the specific option variable one by one untile find a free number.
+  Try to locate the specific option variable one by one utile find a free number.
 
   @param  VariableName          Indicate if the boot#### or driver#### option
 
@@ -204,7 +204,7 @@ BdsLibGetFreeOptionNumber (
     if (OptionBuffer == NULL) {
       break;
     }
-    Index ++;
+    Index++;
   } while (TRUE);
 
   return ((UINT16) Index);
@@ -508,11 +508,16 @@ BdsLibVariableToOption (
 
   Option->Signature   = BDS_LOAD_OPTION_SIGNATURE;
   Option->DevicePath  = AllocateZeroPool (GetDevicePathSize (DevicePath));
+  ASSERT(Option->DevicePath != NULL);
   CopyMem (Option->DevicePath, DevicePath, GetDevicePathSize (DevicePath));
+
   Option->Attribute   = Attribute;
   Option->Description = AllocateZeroPool (StrSize (Description));
+  ASSERT(Option->Description != NULL);
   CopyMem (Option->Description, Description, StrSize (Description));
+
   Option->LoadOptions = AllocateZeroPool (LoadOptionsSize);
+  ASSERT(Option->LoadOptions != NULL);
   CopyMem (Option->LoadOptions, LoadOptions, LoadOptionsSize);
   Option->LoadOptionsSize = LoadOptionsSize;
 
@@ -827,7 +832,8 @@ BdsLibOutputStrings (
       break;
     }
   }
-
+  
+  VA_END(Args);
   return Status;
 }
 
