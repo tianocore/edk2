@@ -45,7 +45,7 @@ EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_INQUIRY)(
   IN EFI_DISK_INFO_PROTOCOL           * This,
   IN OUT VOID                         *InquiryData,
-  IN OUT UINT32                       *IntquiryDataSize
+  IN OUT UINT32                       *InquiryDataSize
   );
 
 

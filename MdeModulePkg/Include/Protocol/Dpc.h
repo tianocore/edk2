@@ -87,17 +87,17 @@ EFI_STATUS
   IN EFI_DPC_PROTOCOL  *This
   );
 
-//
-// DPC Protocol structure
-//
+///
+/// DPC Protocol structure
+///
 struct _EFI_DPC_PROTOCOL {
   EFI_DPC_QUEUE_DPC     QueueDpc;
   EFI_DPC_DISPATCH_DPC  DispatchDpc;
 };
 
-//
-// DPC Protocol GUID variable
-//
+///
+/// DPC Protocol GUID variable
+///
 extern EFI_GUID gEfiDpcProtocolGuid;
 
 #endif
