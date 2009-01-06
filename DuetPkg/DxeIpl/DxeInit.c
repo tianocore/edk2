@@ -111,6 +111,19 @@ EnterDxeMain (
   );
 
 VOID
+WaitForKey ()
+{
+    PrintString("Press Enter to continue ...\n");
+    _asm {
+            mov  al,  20h
+            out  64h, al
+     AGAIN: in   al,  60h
+            cmp  al,  1ch
+            jnz  AGAIN
+    }
+}
+
+VOID
 DxeInit (
   IN EFILDRHANDOFF  *Handoff
   )
@@ -139,6 +152,7 @@ Returns:
   
   ClearScreen();
   PrintString("Enter DxeIpl ...\n");
+  
 /*
   ClearScreen();
   PrintString("handoff:\n");
@@ -166,27 +180,31 @@ Returns:
   //   * Don't report FV as physical memory
   //   * MemoryAllocation Hob should only cover physical memory
   //   * Use ResourceDescriptor Hob to report physical memory or Firmware Device and they shouldn't be overlapped
-  
+  PrintString("Prepare Cpu HOB information ...\n");
   PrepareHobCpu ();
+
   //
   // 1. BFV
   //
+  PrintString("Prepare BFV HOB information ...\n");
   PrepareHobBfv (Handoff->BfvBase, Handoff->BfvSize);
 
   //
   // 2. Updates Memory information, and get the top free address under 4GB
   //
+  PrintString("Prepare Memory HOB information ...\n");
   MemoryTopOnDescriptor = PrepareHobMemory (Handoff->MemDescCount, Handoff->MemDesc);
-
+  
   //
   // 3. Put [NV], [Stack], [PageTable], [MemDesc], [HOB] just below the [top free address under 4GB]
   //
   
   //   3.1 NV data
+  PrintString("Prepare NV Storage information ...\n");
   NvStorageBase = PrepareHobNvStorage (MemoryTopOnDescriptor);
   AsciiSPrint (PrintBuffer, 256, "NV Storage Base=0x%x\n", (UINTN)NvStorageBase);
   PrintString (PrintBuffer);
-
+  
   //   3.2 Stack
   StackTop = NvStorageBase;
   StackBottom = PrepareHobStack (StackTop);
@@ -203,6 +221,7 @@ Returns:
   //
   // 4. Register the memory occupied by DxeCore and DxeIpl together as DxeCore
   //
+  PrintString("Prepare DxeCore memory Hob ...\n");
   PrepareHobDxeCore (
     Handoff->DxeCoreEntryPoint,
     (EFI_PHYSICAL_ADDRESS)(UINTN)Handoff->DxeCoreImageBase,
@@ -210,6 +229,7 @@ Returns:
     );
 
   PrepareHobLegacyTable (gHob);
+  
   PreparePpisNeededByDxeCore (gHob);
 
   CompleteHobGeneration ();
@@ -292,12 +312,14 @@ Returns:
   PrintString("\n");   
   EFI_DEADLOOP();
 */
+  WaitForKey ();
   ClearScreen();
   PrintString("\n\n\n\n\n\n\n\n\n\n");
   PrintString("                         WELCOME TO EFI WORLD!\n");
-
+  
   EnterDxeMain (StackTop, Handoff->DxeCoreEntryPoint, gHob, PageTableBase);
-
+  
+  PrintString("Fail to enter DXE main!\n");
   //
   // Should never get here
   //
