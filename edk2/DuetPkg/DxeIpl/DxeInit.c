@@ -111,19 +111,6 @@ EnterDxeMain (
   );
 
 VOID
-WaitForKey ()
-{
-    PrintString("Press Enter to continue ...\n");
-    _asm {
-            mov  al,  20h
-            out  64h, al
-     AGAIN: in   al,  60h
-            cmp  al,  1ch
-            jnz  AGAIN
-    }
-}
-
-VOID
 DxeInit (
   IN EFILDRHANDOFF  *Handoff
   )
@@ -312,7 +299,7 @@ Returns:
   PrintString("\n");   
   EFI_DEADLOOP();
 */
-  WaitForKey ();
+
   ClearScreen();
   PrintString("\n\n\n\n\n\n\n\n\n\n");
   PrintString("                         WELCOME TO EFI WORLD!\n");
