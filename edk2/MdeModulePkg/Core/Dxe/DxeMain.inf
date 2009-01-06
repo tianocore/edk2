@@ -143,5 +143,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd | 0x3040003          # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS     = /FAcs
+  MSFT:*_*_*_CC_FLAGS     = /FAsc
 
