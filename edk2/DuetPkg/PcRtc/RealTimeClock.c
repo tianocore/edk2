@@ -191,11 +191,13 @@ Returns:
   //
   // Wait for up to 0.1 seconds for the RTC to be updated
   //
-  Status = RtcWaitToUpdate (100000);
-  if (EFI_ERROR (Status)) {
-    EfiReleaseLock (&Global->RtcLock);
-    return EFI_DEVICE_ERROR;
-  }
+  // KEN: BUGBUG following wait action will cause failure under vmware environment.
+  //
+  //Status = RtcWaitToUpdate (100000);
+  //if (EFI_ERROR (Status)) {
+  //  EfiReleaseLock (&Global->RtcLock);
+  //  return EFI_DEVICE_ERROR;
+  //}
   //
   // Get the Time/Date/Daylight Savings values.
   //
