@@ -2,8 +2,7 @@
 
 @REM Set up environment at fisrt.
 
-@REM set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
-@set BASETOOLS_DIR=n:\BaseTools\Bin\Win32
+@set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
 @set BUILD_DIR=%WORKSPACE%\Build\DuetPkg\DEBUG_MYTOOLS
 @set DISK_LABEL=DUET
 @echo on
