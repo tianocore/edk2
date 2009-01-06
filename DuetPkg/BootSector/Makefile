@@ -44,7 +44,7 @@ $(OUTPUT_DIR)\bootsect.obj:$(MODULE_DIR)\bootsect.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\bootsect.obj" /FR"$(OUTPUT_DIR)\bootsect.txt" "$(MODULE_DIR)\bootsect.asm"
              
 $(OUTPUT_DIR)\bootsect.com:$(OUTPUT_DIR)\bootsect.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\bootsect.obj,$(OUTPUT_DIR)\bootsect.com,$(OUTPUT_DIR)\bootsect.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\bootsect.obj,$(OUTPUT_DIR)\bootsect.com,$(OUTPUT_DIR)\bootsect.map,,,
 
 #=============                
 
@@ -52,7 +52,7 @@ $(OUTPUT_DIR)\bs16.obj:$(MODULE_DIR)\bs16.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\bs16.obj" "$(MODULE_DIR)\bs16.asm"
              
 $(OUTPUT_DIR)\bs16.com:$(OUTPUT_DIR)\bs16.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\bs16.obj,$(OUTPUT_DIR)\bs16.com,$(OUTPUT_DIR)\bs16.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\bs16.obj,$(OUTPUT_DIR)\bs16.com,$(OUTPUT_DIR)\bs16.map,,,
 
 #=============                
 
@@ -60,7 +60,7 @@ $(OUTPUT_DIR)\bs32.obj:$(MODULE_DIR)\bs32.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\bs32.obj" "$(MODULE_DIR)\bs32.asm"
              
 $(OUTPUT_DIR)\bs32.com:$(OUTPUT_DIR)\bs32.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\bs32.obj,$(OUTPUT_DIR)\bs32.com,$(OUTPUT_DIR)\bs32.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\bs32.obj,$(OUTPUT_DIR)\bs32.com,$(OUTPUT_DIR)\bs32.map,,,
 
 #=============                
 
@@ -68,7 +68,7 @@ $(OUTPUT_DIR)\Gpt.obj:$(MODULE_DIR)\Gpt.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\Gpt.obj" "$(MODULE_DIR)\Gpt.asm"
              
 $(OUTPUT_DIR)\Gpt.com:$(OUTPUT_DIR)\Gpt.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\Gpt.obj,$(OUTPUT_DIR)\Gpt.com,$(OUTPUT_DIR)\Gpt.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\Gpt.obj,$(OUTPUT_DIR)\Gpt.com,$(OUTPUT_DIR)\Gpt.map,,,
 
 #=============                
 
@@ -76,7 +76,7 @@ $(OUTPUT_DIR)\Mbr.obj:$(MODULE_DIR)\Mbr.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\Mbr.obj" "$(MODULE_DIR)\Mbr.asm"
              
 $(OUTPUT_DIR)\Mbr.com:$(OUTPUT_DIR)\Mbr.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\Mbr.obj,$(OUTPUT_DIR)\Mbr.com,$(OUTPUT_DIR)\Mbr.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\Mbr.obj,$(OUTPUT_DIR)\Mbr.com,$(OUTPUT_DIR)\Mbr.map,,,
 
 #============
 
@@ -84,7 +84,7 @@ $(OUTPUT_DIR)\Start.obj:$(MODULE_DIR)\Start.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\Start.obj" "$(MODULE_DIR)\Start.asm"
              
 $(OUTPUT_DIR)\Start.com:$(OUTPUT_DIR)\Start.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\Start.obj,$(OUTPUT_DIR)\Start.com,$(OUTPUT_DIR)\Start.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\Start.obj,$(OUTPUT_DIR)\Start.com,$(OUTPUT_DIR)\Start.map,,,
   
 #=============     
 
@@ -92,7 +92,7 @@ $(OUTPUT_DIR)\Start16.obj:$(MODULE_DIR)\Start16.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\Start16.obj" "$(MODULE_DIR)\Start16.asm"
              
 $(OUTPUT_DIR)\Start16.com:$(OUTPUT_DIR)\Start16.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\Start16.obj,$(OUTPUT_DIR)\Start16.com,$(OUTPUT_DIR)\Start16.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\Start16.obj,$(OUTPUT_DIR)\Start16.com,$(OUTPUT_DIR)\Start16.map,,,
 
 #=============
 
@@ -100,7 +100,7 @@ $(OUTPUT_DIR)\Start32.obj:$(MODULE_DIR)\Start32.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\Start32.obj" "$(MODULE_DIR)\Start32.asm"
              
 $(OUTPUT_DIR)\Start32.com:$(OUTPUT_DIR)\Start32.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\Start32.obj,$(OUTPUT_DIR)\Start32.com,$(OUTPUT_DIR)\Start32.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\Start32.obj,$(OUTPUT_DIR)\Start32.com,$(OUTPUT_DIR)\Start32.map,,,
 
 #=============
 
@@ -108,7 +108,7 @@ $(OUTPUT_DIR)\Start64.obj:$(MODULE_DIR)\Start64.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\Start64.obj" "$(MODULE_DIR)\Start64.asm"
              
 $(OUTPUT_DIR)\Start64.com:$(OUTPUT_DIR)\Start64.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\Start64.obj,$(OUTPUT_DIR)\Start64.com,$(OUTPUT_DIR)\Start64.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\Start64.obj,$(OUTPUT_DIR)\Start64.com,$(OUTPUT_DIR)\Start64.map,,,
 
 #=============
 
@@ -116,7 +116,7 @@ $(OUTPUT_DIR)\St16_64.obj:$(MODULE_DIR)\St16_64.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\St16_64.obj" "$(MODULE_DIR)\St16_64.asm"
              
 $(OUTPUT_DIR)\St16_64.com:$(OUTPUT_DIR)\St16_64.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\St16_64.obj,$(OUTPUT_DIR)\St16_64.com,$(OUTPUT_DIR)\St16_64.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\St16_64.obj,$(OUTPUT_DIR)\St16_64.com,$(OUTPUT_DIR)\St16_64.map,,,
 
 #=============
 
@@ -124,7 +124,7 @@ $(OUTPUT_DIR)\St32_64.obj:$(MODULE_DIR)\St32_64.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\St32_64.obj" "$(MODULE_DIR)\St32_64.asm"
              
 $(OUTPUT_DIR)\St32_64.com:$(OUTPUT_DIR)\St32_64.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\St32_64.obj,$(OUTPUT_DIR)\St32_64.com,$(OUTPUT_DIR)\St32_64.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\St32_64.obj,$(OUTPUT_DIR)\St32_64.com,$(OUTPUT_DIR)\St32_64.map,,,
 
 #=============
 
@@ -132,7 +132,7 @@ $(OUTPUT_DIR)\efi32.obj:$(MODULE_DIR)\efi32.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\efi32.obj" "$(MODULE_DIR)\efi32.asm"
              
 $(OUTPUT_DIR)\efi32.com:$(OUTPUT_DIR)\efi32.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\efi32.obj,$(OUTPUT_DIR)\efi32.com,$(OUTPUT_DIR)\efi32.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\efi32.obj,$(OUTPUT_DIR)\efi32.com,$(OUTPUT_DIR)\efi32.map,,,
 
 #=============
 
@@ -145,7 +145,7 @@ $(OUTPUT_DIR)\efi64.obj:$(MODULE_DIR)\efi64.asm
 	"$(ASM16)" /c /omf /Fo"$(OUTPUT_DIR)\efi64.obj" "$(MODULE_DIR)\efi64.asm"
              
 $(OUTPUT_DIR)\efi64.com:$(OUTPUT_DIR)\efi64.obj
-	"$(ASMLINK16)" /tiny $(OUTPUT_DIR)\efi64.obj,$(OUTPUT_DIR)\efi64.com,$(OUTPUT_DIR)\efi64.map,,,
+	"$(ASMLINK)" /tiny $(OUTPUT_DIR)\efi64.obj,$(OUTPUT_DIR)\efi64.com,$(OUTPUT_DIR)\efi64.map,,,
 
 #=============
 
