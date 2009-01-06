@@ -16,23 +16,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __PXE_DHCP4CALLBACK_H__
 
 #include <Protocol/PxeDhcp4.h>
-//
-// GUID definition
-//
 
 #define EFI_PXE_DHCP4_CALLBACK_PROTOCOL_GUID \
 { 0xc1544c01, 0x92a4, 0x4198, {0x8a, 0x84, 0x77, 0x85, 0x83, 0xc2, 0x36, 0x21 } }
 
-
-//
-// Revision number
-//
-
 #define EFI_PXE_DHCP4_CALLBACK_INTERFACE_REVISION   0x00010000
-
-//
-// Interface definition
-//
 
 typedef struct _EFI_PXE_DHCP4_CALLBACK_PROTOCOL EFI_PXE_DHCP4_CALLBACK_PROTOCOL;
 
@@ -70,11 +58,7 @@ struct _EFI_PXE_DHCP4_CALLBACK_PROTOCOL {
   EFI_PXE_DHCP4_CALLBACK      Callback;
 };
 
-//
-// GUID declaration
-//
-
 extern EFI_GUID gEfiPxeDhcp4CallbackProtocolGuid;
 
-#endif /* _PXE_DHCP4CALLBACK_H */
-/* EOF - PxeDhcp4Callback.h */
+#endif
+

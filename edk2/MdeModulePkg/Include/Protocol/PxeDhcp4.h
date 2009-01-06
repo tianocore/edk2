@@ -24,19 +24,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_PXE_DHCP4_PROTOCOL_GUID \
   { 0x03c4e624, 0xac28, 0x11d3, {0x9a, 0x2d, 0x00, 0x90, 0x29, 0x3f, 0xc1, 0x4d } }
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 //
 // Interface definition
 //
-
 typedef struct _EFI_PXE_DHCP4_PROTOCOL EFI_PXE_DHCP4_PROTOCOL;
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 //
 // Descriptions of the DHCP version 4 header and options can be found
 // in RFC-2131 and RFC-2132 at www.ietf.org
 //
-
 #pragma pack(1)
 typedef struct {
 
@@ -90,12 +86,10 @@ typedef struct {
 } DHCP4_HEADER;
 #pragma pack()
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 //
 // DHCPv4 packet definition.  Room for 576 bytes including IP and
 // UDP header.
 //
-
 #define DHCP4_MAX_PACKET_SIZE     576
 #define DHCP4_UDP_HEADER_SIZE     8
 #define DHCP4_IP_HEADER_SIZE      20
@@ -113,11 +107,9 @@ typedef union _DHCP4_PACKET {
 #define DHCP4_SERVER_PORT 67
 #define DHCP4_CLIENT_PORT 68
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 //
 // DHCPv4 and PXE option numbers.
 //
-
 #define DHCP4_PAD                             0
 #define DHCP4_END                             255
 #define DHCP4_SUBNET_MASK                     1
@@ -230,11 +222,6 @@ typedef union _DHCP4_PACKET {
 #define DHCP4_NETWORK_ARCHITECTURE            94
 #define DHCP4_PLATFORM_ID                     97
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-//
-// DHCP4 option format.
-//
-
 #pragma pack(1)
 typedef struct {
   UINT8 op;
@@ -243,7 +230,6 @@ typedef struct {
 } DHCP4_OP;
 #pragma pack()
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 typedef struct {
   DHCP4_PACKET Discover;
@@ -257,7 +243,6 @@ typedef struct {
   BOOLEAN IsAck;
 } EFI_PXE_DHCP4_DATA;
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_DHCP4_RUN)(
@@ -266,7 +251,6 @@ EFI_STATUS
   IN OPTIONAL VOID          *OpList
   );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_DHCP4_SETUP)(
@@ -274,7 +258,6 @@ EFI_STATUS
   IN OPTIONAL EFI_PXE_DHCP4_DATA     * NewData
   );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_DHCP4_INIT)(
@@ -287,7 +270,6 @@ EFI_STATUS
 #define DHCP4_MIN_SECONDS   1
 #define DHCP4_MAX_SECONDS   60
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_DHCP4_SELECT)(
@@ -296,7 +278,6 @@ EFI_STATUS
   IN DHCP4_PACKET           * offer
   );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_DHCP4_RENEW)(
@@ -304,7 +285,6 @@ EFI_STATUS
   UINTN                     seconds_timeout
   );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_DHCP4_REBIND)(
@@ -312,14 +292,11 @@ EFI_STATUS
   UINTN                     seconds_timeout
   );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_DHCP4_RELEASE)(
   IN EFI_PXE_DHCP4_PROTOCOL * This
   );
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #define EFI_PXE_DHCP4_PROTOCOL_REVISION    0x00010000
 
@@ -335,11 +312,6 @@ struct _EFI_PXE_DHCP4_PROTOCOL {
   EFI_PXE_DHCP4_DATA *Data;
 };
 
-//
-//
-//
-
 extern EFI_GUID gEfiPxeDhcp4ProtocolGuid;
 
-#endif /* _PXEDHCP4_H_ */
-/* EOF - PxeDhcp4.h */
+#endif

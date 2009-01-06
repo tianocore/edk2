@@ -100,11 +100,6 @@ typedef struct {
 #define VAR_ADDED                     0x3f  ///< Variable has been completely added
 
 ///
-/// Removed
-///
-#define IS_VARIABLE_STATE(_c, _Mask)  (BOOLEAN) (((~_c) & (~_Mask)) != 0)
-
-///
 /// Variable Data Header Structure
 ///
 typedef struct {

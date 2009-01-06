@@ -20,10 +20,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/PxeBaseCode.h>
 
-//
-// PXE Base Code protocol
-//
-
+///
+/// EFI Transmission Control Protocol
+///
 #define EFI_TCP_PROTOCOL_GUID \
     { 0x02b3d5f2, 0xac28, 0x11d3, { 0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d }}
 
@@ -44,7 +43,7 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TCP_WRITE)(
-    IN EFI_PXE_BASE_CODE_PROTOCOL        *This,
+    IN EFI_PXE_BASE_CODE_PROTOCOL                *This,
     IN UINT16                                    OpFlags,
     IN UINT16                                    *UrgentPointer,
     IN UINT32                                    *SequenceNumber,
@@ -65,7 +64,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TCP_READ)(
-    IN EFI_PXE_BASE_CODE_PROTOCOL        *This,
+    IN EFI_PXE_BASE_CODE_PROTOCOL                *This,
     IN UINT16                                    OpFlags,
     IN OUT EFI_IP_ADDRESS                        *DestIp,      OPTIONAL
     IN OUT UINT16                                *DestPort,    OPTIONAL
@@ -80,13 +79,13 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_TCP_SET_PORT_FILTER)(
-    IN EFI_PXE_BASE_CODE_PROTOCOL    *This,
-    IN EFI_TCP_PORT_FILTER                   *NewFilter
+    IN EFI_PXE_BASE_CODE_PROTOCOL                *This,
+    IN EFI_TCP_PORT_FILTER                       *NewFilter
     );
 
-//
-// TCP Protocol structure
-//
+///
+/// TCP Protocol structure
+///
 typedef struct _EFI_TCP_PROTOCOL {
     EFI_TCP_WRITE             TcpWrite;
     EFI_TCP_READ              TcpRead;
@@ -95,4 +94,5 @@ typedef struct _EFI_TCP_PROTOCOL {
 
 extern EFI_GUID gEfiTcpProtocolGuid;
 
-#endif /* _EFITCP_H */
+#endif
+
