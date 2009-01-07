@@ -590,10 +590,6 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_ICC_*_ASLDLINK_FLAGS                   = /NODEFAULTLIB /ENTRY:main /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
 *_ICC_*_ASLPP_FLAGS                      = /nologo /EP /C
 
-*_ICC_*_ASM16_PATH                  = DEF(VS2005TEAMSUITE_BIN)\ml.exe
-  DEBUG_ICC_*_ASM16_FLAGS           = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-RELEASE_ICC_*_ASM16_FLAGS           = /nologo /c /WX /W3 /coff /Cx /Zd
-
 ##################
 # IA32 definitions
 ##################
@@ -695,10 +691,6 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_MYTOOLS_*_APP_FLAGS                    = /nologo /E /TC
 *_MYTOOLS_*_PP_FLAGS                     = /nologo /E /TC /FIAutoGen.h
 *_MYTOOLS_*_SLINK_FLAGS                  = /nologo /LTCG
-
-*_MYTOOLS_*_ASM16_PATH            = DEF(VS2005TEAMSUITE_BIN)\ml.exe
-  DEBUG_MYTOOLS_*_ASM16_FLAGS     = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-RELEASE_MYTOOLS_*_ASM16_FLAGS     = /nologo /c /WX /W3 /coff /Cx /Zd
 
 ##################
 # IA32 definitions
