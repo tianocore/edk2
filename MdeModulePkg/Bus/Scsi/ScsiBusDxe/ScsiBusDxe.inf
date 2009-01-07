@@ -58,7 +58,7 @@
 
 
 [Protocols]
-  gEfiScsiIoProtocolGuid                        # PROTOCOL BY_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiScsiPassThruProtocolGuid                  # PROTOCOL TO_START
-  gEfiExtScsiPassThruProtocolGuid               # PROTOCOL TO_START
+  gEfiScsiIoProtocolGuid                        ## BY_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiScsiPassThruProtocolGuid                  ## TO_START
+  gEfiExtScsiPassThruProtocolGuid               ## TO_START

@@ -28,7 +28,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gScsiDiskDriverBinding                       
+#  DRIVER_BINDING                =  gScsiDiskDriverBinding
 #  COMPONENT_NAME                =  gScsiDiskComponentName
 #  COMPONENT_NAME2               =  gScsiDiskComponentName2
 #
@@ -53,6 +53,6 @@
 
 
 [Protocols]
-  gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
-  gEfiScsiIoProtocolGuid                        # PROTOCOL TO_START
+  gEfiBlockIoProtocolGuid                       ## BY_START
+  gEfiScsiIoProtocolGuid                        ## TO_START
 
