@@ -22,7 +22,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DuetTimerLib
   FILE_GUID                      = 5F9A01F5-726E-4f59-809D-887F4766734E
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = TimerLib
   EDK_RELEASE_VERSION            = 0x00020000
@@ -43,26 +43,10 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-
 [LibraryClasses]
   BaseLib
-
-[LibraryClasses.IA32]
-  PcdLib
-  IoLib
-
-[LibraryClasses.X64]
-  PcdLib
-  IoLib
-
-[LibraryClasses.IPF]
   DebugLib
-  PalLib
+  UefiBootServicesTableLib
 
-
-[Pcd.IA32]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
-
-[Pcd.X64]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
-
+[Protocols]
+  gEfiMetronomeArchProtocolGuid         # ALWAYS_CONSUMED

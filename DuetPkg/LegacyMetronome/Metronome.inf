@@ -35,7 +35,8 @@
   UefiDriverEntryPoint
   DebugLib
   UefiBootServicesTableLib
-
+  IoLib
+  
 [Sources.common]
   Metronome.c
   Metronome.h
