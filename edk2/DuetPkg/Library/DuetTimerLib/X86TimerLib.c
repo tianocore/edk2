@@ -15,107 +15,26 @@
 #include <Base.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
-#include <Library/IoLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
-
-//
-// The following array is used in calculating the frequency of local APIC
-// timer. Refer to IA-32 developers' manual for more details.
-//
-GLOBAL_REMOVE_IF_UNREFERENCED
-CONST UINT8                           mTimerLibLocalApicDivisor[] = {
-  0x02, 0x04, 0x08, 0x10,
-  0x02, 0x04, 0x08, 0x10,
-  0x20, 0x40, 0x80, 0x01,
-  0x20, 0x40, 0x80, 0x01
-};
+#include <Protocol/Metronome.h>
 
 /**
-  Internal function to retrieve the base address of local APIC.
+EFI_METRONOME_ARCH_PROTOCOL *gDuetMetronome = NULL;
 
-  Internal function to retrieve the base address of local APIC.
-
-  @return The base address of local APIC
-
-**/
-UINTN
-InternalX86GetApicBase (
-  VOID
-  )
+EFI_METRONOME_ARCH_PROTOCOL*
+GetMetronomeArchProtocol (
+    VOID
+    )
 {
-  return (UINTN)AsmMsrBitFieldRead64 (27, 12, 35) << 12;
-}
-
-/**
-  Internal function to return the frequency of the local APIC timer.
-
-  Internal function to return the frequency of the local APIC timer.
-
-  @param  ApicBase  The base address of memory mapped registers of local APIC.
-
-  @return The frequency of the timer in Hz.
-
+  if (gDuetMetronome == NULL) {
+     gBS->LocateProtocol (&gEfiMetronomeArchProtocolGuid, NULL, (VOID**) &gDuetMetronome);
+  }
+  
+  return gDuetMetronome;
+}    
 **/
-UINT32
-InternalX86GetTimerFrequency (
-  IN      UINTN                     ApicBase
-  )
-{
-  return
-    PcdGet32(PcdFSBClock) /
-    mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + 0x3e0, 0, 3)];
-}
-
-/**
-  Internal function to read the current tick counter of local APIC.
-
-  Internal function to read the current tick counter of local APIC.
-
-  @param  ApicBase  The base address of memory mapped registers of local APIC.
-
-  @return The tick counter read.
-
-**/
-INT32
-InternalX86GetTimerTick (
-  IN      UINTN                     ApicBase
-  )
-{
-  return MmioRead32 (ApicBase + 0x390);
-}
-
-/**
-  Stalls the CPU for at least the given number of ticks.
-
-  Stalls the CPU for at least the given number of ticks. It's invoked by
-  MicroSecondDelay() and NanoSecondDelay().
-
-  @param  ApicBase  The base address of memory mapped registers of local APIC.
-  @param  Delay     A period of time to delay in ticks.
-
-**/
-VOID
-InternalX86Delay (
-  IN      UINTN                     ApicBase,
-  IN      UINT32                    Delay
-  )
-{
-  INT32                             Ticks;
-
-  //
-  // The target timer count is calculated here
-  //
-  Ticks = InternalX86GetTimerTick (ApicBase) - Delay;
-
-  //
-  // Wait until time out
-  // Delay > 2^31 could not be handled by this function
-  // Timer wrap-arounds are handled correctly by this function
-  //
-  while (InternalX86GetTimerTick (ApicBase) - Ticks >= 0);
-}
 
 /**
   Stalls the CPU for at least the given number of microseconds.
@@ -133,19 +52,36 @@ MicroSecondDelay (
   IN      UINTN                     MicroSeconds
   )
 {
-  UINTN                             ApicBase;
+  gBS->Stall (MicroSeconds);
+/**
+  EFI_METRONOME_ARCH_PROTOCOL       *mMetronome;
+  UINT32                            Counter;
+  UINTN                             Remainder;  
+  
+  if ((mMetronome = GetMetronomeArchProtocol()) == NULL) {
+    return MicroSeconds;
+  }
+  
+  //
+  // Calculate the number of ticks by dividing the number of microseconds by
+  // the TickPeriod.
+  // Calculation is based on 100ns unit.
+  //
+  Counter = (UINT32) DivU64x32Remainder (
+                       MicroSeconds * 10,
+                       mMetronome->TickPeriod,
+                       &Remainder
+                       );
+  //
+  // Call WaitForTick for Counter + 1 ticks to try to guarantee Counter tick
+  // periods, thus attempting to ensure Microseconds of stall time.
+  //
+  if (Remainder != 0) {
+    Counter++;
+  }
 
-  ApicBase = InternalX86GetApicBase ();
-  InternalX86Delay (
-    ApicBase,
-    (UINT32)DivU64x32 (
-              MultU64x64 (
-                InternalX86GetTimerFrequency (ApicBase),
-                MicroSeconds
-                ),
-              1000000u
-              )
-    );
+  mMetronome->WaitForTick (mMetronome, Counter);
+**/
   return MicroSeconds;
 }
 
@@ -165,20 +101,11 @@ NanoSecondDelay (
   IN      UINTN                     NanoSeconds
   )
 {
-  UINTN                             ApicBase;
-
-  ApicBase = InternalX86GetApicBase ();
-  InternalX86Delay (
-    ApicBase,
-    (UINT32)DivU64x32 (
-              MultU64x64 (
-                InternalX86GetTimerFrequency (ApicBase),
-                NanoSeconds
-                ),
-              1000000000u
-              )
-    );
-  return NanoSeconds;
+  //
+  // Duet platform need *not* this interface.
+  //
+  //ASSERT (FALSE);
+  return 0;
 }
 
 /**
@@ -199,7 +126,11 @@ GetPerformanceCounter (
   VOID
   )
 {
-  return (UINT64)(UINT32)InternalX86GetTimerTick (InternalX86GetApicBase ());
+  //
+  // Duet platform need *not* this interface.
+  //
+  //ASSERT (FALSE);
+  return 0;
 }
 
 /**
@@ -232,17 +163,9 @@ GetPerformanceCounterProperties (
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
-  UINTN                             ApicBase;
-
-  ApicBase = InternalX86GetApicBase ();
-
-  if (StartValue != NULL) {
-    *StartValue = MmioRead32 (ApicBase + 0x380);
-  }
-
-  if (EndValue != NULL) {
-    *EndValue = 0;
-  }
-
-  return (UINT64) InternalX86GetTimerFrequency (ApicBase);;
+  //
+  // Duet platform need *not* this interface.
+  //
+  //ASSERT (FALSE);
+  return 0;
 }

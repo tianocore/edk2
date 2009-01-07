@@ -36,7 +36,6 @@
   DxeSupport.c
   ReportStatusCodeLibInternal.h
 
-
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
