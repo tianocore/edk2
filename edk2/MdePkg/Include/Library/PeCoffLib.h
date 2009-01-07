@@ -319,9 +319,11 @@ PeCoffLoaderImageReadFromMemory (
   Reapply fixups on a fixed up PE32/PE32+ image to allow virutal calling at EFI
   runtime. 
   
-  PE_COFF_LOADER_IMAGE_CONTEXT.FixupData stores information needed to reapply
-  the fixups with a virtual mapping.
-
+  This function reapplies relocation fixups to the PE/COFF image specified by ImageBase 
+  and ImageSize so the image will execute correctly when the PE/COFF image is mapped 
+  to the address specified by VirtualImageBase.  RelocationData must be identical 
+  to the FiuxupData buffer from the PE_COFF_LOADER_IMAGE_CONTEXT structure 
+  after this PE/COFF image was relocated with PeCoffLoaderRelocateImage().
 
   @param  ImageBase          Base address of a PE/COFF image that has been loaded 
                              and relocated into system memory.

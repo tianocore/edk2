@@ -457,7 +457,7 @@ PeCoffLoaderGetImageInfo (
   Converts an image address to the loaded address.
 
   @param  ImageContext  The context of the image being loaded.
-  @param  Address       The address to be converted to the loaded address.
+  @param  Address       The relative virtual address to be converted to the loaded address.
 
   @return The converted address or NULL if the address can not be converted.
 
@@ -469,8 +469,7 @@ PeCoffLoaderImageAddress (
   )
 {
   //
-  // @bug Check to make sure ImageSize is correct for the relocated image.
-  //      it may only work for the file we start with and not the relocated image
+  // Make sure that Address and ImageSize is correct for the loaded image.
   //
   if (Address >= ImageContext->ImageSize) {
     ImageContext->ImageError = IMAGE_ERROR_INVALID_IMAGE_ADDRESS;
@@ -586,17 +585,20 @@ PeCoffLoaderRelocateImage (
     // the optional header to verify a desired directory entry is there.
     //
 
-    if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
+    if ((NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) && (RelocDir->Size > 0)) {
       RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
       RelocBaseEnd = PeCoffLoaderImageAddress (
                       ImageContext,
                       RelocDir->VirtualAddress + RelocDir->Size - 1
                       );
+      if (RelocBase == NULL || RelocBaseEnd == NULL) {
+        return RETURN_LOAD_ERROR;
+      }
     } else {
       //
       // Set base and end to bypass processing below.
       //
-      RelocBase = RelocBaseEnd = 0;
+      RelocBase = RelocBaseEnd = NULL;
     }
   } else {
     Hdr.Te             = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
@@ -607,13 +609,20 @@ PeCoffLoaderRelocateImage (
     // Find the relocation block
     //
     RelocDir = &Hdr.Te->DataDirectory[0];
-    RelocBase = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(
-                                    ImageContext->ImageAddress +
-                                    RelocDir->VirtualAddress +
-                                    sizeof(EFI_TE_IMAGE_HEADER) -
-                                    Hdr.Te->StrippedSize
-                                    );
-    RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *) ((UINTN) RelocBase + (UINTN) RelocDir->Size - 1);
+    if (RelocDir->Size > 0) {
+      RelocBase = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(
+                                      ImageContext->ImageAddress +
+                                      RelocDir->VirtualAddress +
+                                      sizeof(EFI_TE_IMAGE_HEADER) -
+                                      Hdr.Te->StrippedSize
+                                      );
+      RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *) ((UINTN) RelocBase + (UINTN) RelocDir->Size - 1);
+    } else {
+      //
+      // Set base and end to bypass processing below.
+      //
+      RelocBase = RelocBaseEnd = NULL;    
+    }
   }
 
   //
@@ -624,22 +633,28 @@ PeCoffLoaderRelocateImage (
 
     Reloc     = (UINT16 *) ((CHAR8 *) RelocBase + sizeof (EFI_IMAGE_BASE_RELOCATION));
     RelocEnd  = (UINT16 *) ((CHAR8 *) RelocBase + RelocBase->SizeOfBlock);
+    
+    //
+    // Make sure RelocEnd is in the Image range.
+    //
+    if ((CHAR8 *) RelocEnd < (CHAR8 *)((UINTN) ImageContext->ImageAddress) ||
+        (CHAR8 *) RelocEnd > (CHAR8 *)((UINTN)ImageContext->ImageAddress + (UINTN)ImageContext->ImageSize)) {
+      ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+      return RETURN_LOAD_ERROR;
+    }
+
     if (!(ImageContext->IsTeImage)) {
       FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress);
+      if (FixupBase == NULL) {
+        return RETURN_LOAD_ERROR;
+      }
     } else {
       FixupBase = (CHAR8 *)(UINTN)(ImageContext->ImageAddress +
                     RelocBase->VirtualAddress +
                     sizeof(EFI_TE_IMAGE_HEADER) -
                     Hdr.Te->StrippedSize
                     );
-    }
-
-    if ((CHAR8 *) RelocEnd < (CHAR8 *) ((UINTN) ImageContext->ImageAddress) ||
-        (CHAR8 *) RelocEnd > (CHAR8 *)((UINTN)ImageContext->ImageAddress +
-          (UINTN)ImageContext->ImageSize)) {
-      ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
-      return RETURN_LOAD_ERROR;
-    }
+    }    
 
     //
     // Run this relocation record
@@ -887,7 +902,6 @@ PeCoffLoaderLoadImage (
   //
   Section = FirstSection;
   for (Index = 0, MaxEnd = NULL; Index < NumberOfSections; Index++) {
-
     //
     // Compute sections address
     //
@@ -896,6 +910,15 @@ PeCoffLoaderLoadImage (
             ImageContext,
             Section->VirtualAddress + Section->Misc.VirtualSize - 1
             );
+
+    //
+    // If the base start or end address resolved to 0, then fail.
+    //
+    if ((Base == NULL) || (End == NULL)) {
+      ImageContext->ImageError = IMAGE_ERROR_SECTION_NOT_LOADED;
+      return RETURN_LOAD_ERROR;
+    }
+
     if (ImageContext->IsTeImage) {
       Base = (CHAR8 *)((UINTN) Base + sizeof (EFI_TE_IMAGE_HEADER) - (UINTN)Hdr.Te->StrippedSize);
       End  = (CHAR8 *)((UINTN) End +  sizeof (EFI_TE_IMAGE_HEADER) - (UINTN)Hdr.Te->StrippedSize);
@@ -903,13 +926,6 @@ PeCoffLoaderLoadImage (
 
     if (End > MaxEnd) {
       MaxEnd = End;
-    }
-    //
-    // If the base start or end address resolved to 0, then fail.
-    //
-    if ((Base == NULL) || (End == NULL)) {
-      ImageContext->ImageError = IMAGE_ERROR_SECTION_NOT_LOADED;
-      return RETURN_LOAD_ERROR;
     }
 
     //
@@ -1129,9 +1145,11 @@ PeCoffLoaderLoadImage (
   Reapply fixups on a fixed up PE32/PE32+ image to allow virutal calling at EFI
   runtime. 
   
-  PE_COFF_LOADER_IMAGE_CONTEXT.FixupData stores information needed to reapply
-  the fixups with a virtual mapping.
-
+  This function reapplies relocation fixups to the PE/COFF image specified by ImageBase 
+  and ImageSize so the image will execute correctly when the PE/COFF image is mapped 
+  to the address specified by VirtualImageBase.  RelocationData must be identical 
+  to the FiuxupData buffer from the PE_COFF_LOADER_IMAGE_CONTEXT structure 
+  after this PE/COFF image was relocated with PeCoffLoaderRelocateImage().
 
   @param  ImageBase          Base address of a PE/COFF image that has been loaded 
                              and relocated into system memory.
