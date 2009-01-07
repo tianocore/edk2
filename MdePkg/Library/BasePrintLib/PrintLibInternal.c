@@ -77,11 +77,17 @@ BasePrintLibFillBuffer (
   )
 {
   INTN  Index;
-
-  for (Index = 0; Index < Length && Buffer < EndBuffer; Index++) {
-    *Buffer       =  (CHAR8) Character;
-    *(Buffer + 1) =  (CHAR8) (Character >> 8);
-    Buffer        += Increment;
+  if(Increment != 1) {
+    for (Index = 0; Index < Length && Buffer < EndBuffer; Index++) {
+      *Buffer       =  (CHAR8) Character;
+      *(Buffer + 1) =  (CHAR8) (Character >> 8);
+    }
+    Buffer += Increment;
+  } else {
+    for (Index = 0; Index < Length && Buffer < EndBuffer; Index++) {
+      *Buffer       =  (CHAR8) Character;
+    }
+    Buffer += Increment;
   }
   return Buffer;
 }
