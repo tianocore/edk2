@@ -3418,7 +3418,7 @@ ConSpliterConsoleControlLockStdInEvent (
       //
       if ((Key.UnicodeChar == CHAR_CARRIAGE_RETURN) && (Key.ScanCode == SCAN_NULL)) {
         mConIn.PwdAttempt[mConIn.PwdIndex] = CHAR_NULL;
-        if (StrCmp (mConIn.Password, mConIn.PwdAttempt)) {
+        if (StrCmp (mConIn.Password, mConIn.PwdAttempt) != 0) {
           //
           // Password not match
           //
@@ -3475,9 +3475,9 @@ ConSpliterConsoleControlLockStdInEvent (
   @param  This                     Console Control protocol pointer.
   @param  Password                 The password input.
 
-  @retval EFI_SUCCESS              Lock the StdIn device
-  @retval EFI_INVALID_PARAMETER    Password is NULL
-  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the password fails
+  @retval EFI_SUCCESS              Lock the StdIn device.
+  @retval EFI_INVALID_PARAMETER    Password is NULL.
+  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the password fails.
 
 **/
 EFI_STATUS
@@ -3503,7 +3503,10 @@ ConSpliterConsoleControlLockStdIn (
   StrCpy (mConIn.Password, Password);
   mConIn.PasswordEnabled  = TRUE;
   mConIn.PwdIndex         = 0;
-  gBS->SetTimer (mConIn.LockEvent, TimerPeriodic, (10000 * 25));
+  //
+  // Timer Periodic is 25ms.
+  //
+  gBS->SetTimer (mConIn.LockEvent, TimerPeriodic, 10000 * 25);
 
   return EFI_SUCCESS;
 }

@@ -1,14 +1,14 @@
 /** @file
   IPF specific types, macros, and definitions for Debug Support Driver.
-  
-Copyright (c) 2004 - 2008, Intel Corporation                                                       
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2004 - 2008, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -36,7 +36,7 @@ typedef struct {
 } BUNDLE;
 
 /**
-  IPF specific DebugSupport driver initialization. 
+  IPF specific DebugSupport driver initialization.
 
   Must be public because it's referenced from DebugSupport.c
 
@@ -50,7 +50,7 @@ PlInitializeDebugSupportDriver (
 
 /**
   Unload handler that is called during UnloadImage() - deallocates pool memory
-  used by the driver. 
+  used by the driver.
 
   Must be public because it's referenced from DebugSuport.c
 
@@ -132,14 +132,14 @@ InstructionCacheFlush (
 
 /**
   Returns the maximum value that may be used for the ProcessorIndex parameter in
-  RegisterPeriodicCallback() and RegisterExceptionCallback().                   
-    
+  RegisterPeriodicCallback() and RegisterExceptionCallback().
+
   Hard coded to support only 1 processor for now.
 
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  MaxProcessorIndex     Pointer to a caller-allocated UINTN in which the maximum supported
-                                processor index is returned. Always 0 returned.                                     
-                                
+                                processor index is returned. Always 0 returned.
+
   @retval EFI_SUCCESS           Always returned with **MaxProcessorIndex set to 0.
 
 **/
@@ -152,17 +152,17 @@ GetMaximumProcessorIndex (
 
 /**
   Registers a function to be called back periodically in interrupt context.
-    
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor the callback function applies to.
   @param  PeriodicCallback      A pointer to a function of type PERIODIC_CALLBACK that is the main
                                 periodic entry point of the debug agent.
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
+
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
-                                function was previously registered.                
-  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
-                                function. 
+                                function was previously registered.
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback
+                                function.
 **/
 EFI_STATUS
 EFIAPI
@@ -176,17 +176,17 @@ RegisterPeriodicCallback (
   Registers a function to be called when a given processor exception occurs.
 
   This code executes in boot services context.
-    
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor the callback function applies to.
   @param  ExceptionCallback     A pointer to a function of type EXCEPTION_CALLBACK that is called
                                 when the processor exception specified by ExceptionType occurs.  
-  @param  ExceptionType         Specifies which processor exception to hook.                       
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
+  @param  ExceptionType         Specifies which processor exception to hook.
+
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
-                                function was previously registered.                
-  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
+                                function was previously registered.
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback
                                 function.
 **/
 EFI_STATUS
@@ -194,20 +194,20 @@ EFIAPI
 RegisterExceptionCallback (
   IN EFI_DEBUG_SUPPORT_PROTOCOL   *This,
   IN UINTN                        ProcessorIndex,
-  IN EFI_EXCEPTION_CALLBACK       NewCallback,
+  IN EFI_EXCEPTION_CALLBACK       ExceptionCallback,
   IN EFI_EXCEPTION_TYPE           ExceptionType
   );
 
 /**
   Invalidates processor instruction cache for a memory range. Subsequent execution in this range
-  causes a fresh memory fetch to retrieve code to be executed.                                  
-    
+  causes a fresh memory fetch to retrieve code to be executed.
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor's instruction cache is to be invalidated.
-  @param  Start                 Specifies the physical base of the memory range to be invalidated.                                
+  @param  Start                 Specifies the physical base of the memory range to be invalidated.
   @param  Length                Specifies the minimum number of bytes in the processor's instruction
-                                cache to invalidate.                                                 
-                                
+                                cache to invalidate.
+
   @retval EFI_SUCCESS           Always returned.
 
 **/
@@ -222,7 +222,7 @@ InvalidateInstructionCache (
 
 /**
   C routine that is called for all registered exceptions.  This is the main
-  exception dispatcher. 
+  exception dispatcher.
 
   Must be public because it's referenced from AsmFuncs.s.
 
@@ -306,7 +306,7 @@ UnchainExternalInterrupt (
 /**
   Given an integer number, return the physical address of the entry point in the IFT.
 
-  @param  HandlerIndex       Index of the Handler 
+  @param  HandlerIndex       Index of the Handler
   @param  EntryPoint         IFT Entrypoint
 
 **/
