@@ -170,9 +170,6 @@ RELEASE_VS2003_IA32_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 #   VS2005PRO           - Microsoft Visual Studio 2005 Professional Edition
 *_VS2005PRO_*_*_FAMILY              = MSFT
 
-*_VS2005PRO_*_TIANO_PATH            = TianoCompress.exe
-*_VS2005PRO_*_TIANO_GUID                 = A31280AD-481E-41B6-95E8-127F4C984779
-
 *_VS2005PRO_*_ASL_PATH              = DEF(ASL_BIN)\iasl.exe
 *_VS2005PRO_*_MAKE_PATH             = DEF(VS2005PRO_BIN)\nmake.exe
 
@@ -233,9 +230,6 @@ RELEASE_VS2005PRO_X64_DLINK_FLAGS        = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 ####################################################################################
 #   VS2005TEAMSUITE           - Microsoft Visual Studio 2005 Team Suite Edition
 *_VS2005TEAMSUITE_*_*_FAMILY        = MSFT
-
-*_VS2005TEAMSUITE_*_TIANO_PATH      = TianoCompress.exe
-*_VS2005TEAMSUITE_*_TIANO_GUID           = A31280AD-481E-41B6-95E8-127F4C984779
 
 *_VS2005TEAMSUITE_*_ASL_PATH        = DEF(ASL_BIN)\iasl.exe
 *_VS2005TEAMSUITE_*_MAKE_PATH       = DEF(VS2005TEAMSUITE_BIN)\nmake.exe
@@ -681,9 +675,6 @@ RELEASE_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 #   MYTOOLS          - Settings compatible with previous versions of tools_def.template
 *_MYTOOLS_*_*_FAMILY                = MSFT
 
-*_MYTOOLS_*_TIANO_PATH              = TianoCompress.exe
-*_MYTOOLS_*_TIANO_GUID                   = A31280AD-481E-41B6-95E8-127F4C984779
-
 *_MYTOOLS_*_ASL_PATH                = DEF(ASL_BIN)\iasl.exe
 
 *_MYTOOLS_*_MAKE_FLAGS                   = /nologo
@@ -799,3 +790,8 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_*_*_ASLPP_FLAGS                  = /nologo /EP /C
 *_*_*_ASL_FLAGS                    =
 
+##################
+# Tiano Compress tool definitions
+##################
+*_*_*_TIANO_PATH              = TianoCompress.exe
+*_*_*_TIANO_GUID                   = A31280AD-481E-41B6-95E8-127F4C984779
