@@ -1,20 +1,14 @@
 /** @file
+    Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2005 - 2008, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2005 - 2008, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  MnpDriver.c
-
-Abstract:
-
 
 **/
 
@@ -284,10 +278,10 @@ MnpDriverBindingStop (
                                  not NULL, then the I/O services are  added to the
                                  existing child handle.
 
-  @retval EFI_SUCCES             The child handle was created with the I/O
-                                 services.
-  @retval EFI_OUT_OF_RESOURCES   There are not enough resources availabe to create
-                                 the child.
+  @retval EFI_SUCCES             The protocol was added to ChildHandle. 
+  @retval EFI_INVALID_PARAMETER  ChildHandle is NULL. 
+  @retval EFI_OUT_OF_RESOURCES   There are not enough resources availabe to 
+                                 create the child.
   @retval other                  The child handle was not created.
 
 **/
@@ -295,7 +289,7 @@ EFI_STATUS
 EFIAPI
 MnpServiceBindingCreateChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                    *ChildHandle
+  IN OUT EFI_HANDLE                *ChildHandle
   )
 {
   EFI_STATUS         Status;
@@ -391,17 +385,22 @@ ErrorExit:
 
 /**
   Destroys a child handle with a set of I/O services.
-
-  @param  This                   Protocol instance pointer.
+   
+  The DestroyChild() function does the opposite of CreateChild(). It removes a 
+  protocol that was installed by CreateChild() from ChildHandle. If the removed 
+  protocol is the last protocol on ChildHandle, then ChildHandle is destroyed. 
+   
+  @param  This                   Pointer to the EFI_SERVICE_BINDING_PROTOCOL 
+                                 instance.
   @param  ChildHandle            Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The I/O services were removed from the child
-                                 handle.
-  @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
-                                  that are being removed.
-  @retval EFI_INVALID_PARAMETER  Child handle is not a valid EFI Handle.
-  @retval EFI_ACCESS_DENIED      The child handle could not be destroyed because
-                                 its  I/O services are being used.
+  @retval EFI_SUCCES             The protocol was removed from ChildHandle. 
+  @retval EFI_UNSUPPORTED        ChildHandle does not support the protocol that
+                                 is being removed.
+  @retval EFI_INVALID_PARAMETER  ChildHandle is not a valid UEFI handle.
+  @retval EFI_ACCESS_DENIED      The protocol could not be removed from the
+                                 ChildHandle because its services are being
+                                 used.
   @retval other                  The child handle was not destroyed.
 
 **/
@@ -524,7 +523,7 @@ MnpServiceBindingDestroyChild (
   @param  ImageHandle   The image handle of the driver.
   @param  SystemTable   The system table.
 
-  @retval EFI_SUCCES       the driver binding and component name protocols are 
+  @retval EFI_SUCCES       The driver binding and component name protocols are 
                            successfully installed.
   @retval other            failed.
 
