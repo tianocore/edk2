@@ -58,11 +58,10 @@
   PeiServicesLib
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid                # PPI_ALWAYS_PRODUCED
+  gEfiPeiReadOnlyVariable2PpiGuid                ## PRODUCES
 
 [Pcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase  ## CONSUMES
 
 [Depex]
   TRUE
