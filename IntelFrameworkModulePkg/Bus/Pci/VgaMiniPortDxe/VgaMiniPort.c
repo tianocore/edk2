@@ -36,8 +36,8 @@ EFI_DRIVER_BINDING_PROTOCOL gPciVgaMiniPortDriverBinding = {
 /**
   Driver entry point for VgaMiniPort driver.
   
-  @param ImageHandle  Driver image handle
-  @param SystemTable  Point to EFI_SYSTEM_TABLE
+  @param ImageHandle  Driver image handle.
+  @param SystemTable  Point to EFI_SYSTEM_TABLE.
   
   @retval Status of install driver binding protocol.
 **/
@@ -64,7 +64,12 @@ PciVgaMiniPortDriverEntryPoint (
 
   (Standard DriverBinding Protocol Supported() function)
 
-  @return EFI_STATUS
+  @param  This                   The driver binding protocol.
+  @param  Controller             The controller handle to check.
+  @param  RemainingDevicePath    The remaining device path.
+
+  @retval EFI_SUCCESS            The driver supports this controller.
+  @retval EFI_UNSUPPORTED        This device isn't supported.
 
 **/
 EFI_STATUS
@@ -134,7 +139,13 @@ Done:
 
   (Standard DriverBinding Protocol Start() function)
 
-  @return EFI_STATUS
+  @param  This                   The driver binding instance.
+  @param  Controller             The controller to check.
+  @param  RemainingDevicePath    The remaining device patch.
+
+  @retval EFI_SUCCESS            The controller is controlled by the driver.
+  @retval EFI_ALREADY_STARTED    The controller is already controlled by the driver.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources.
 
 **/
 EFI_STATUS
@@ -212,7 +223,7 @@ Done:
           This->DriverBindingHandle,
           Controller
           );
-    if (PciVgaMiniPortPrivate) {
+    if (PciVgaMiniPortPrivate != NULL) {
       gBS->FreePool (PciVgaMiniPortPrivate);
     }
   }
@@ -226,7 +237,14 @@ Done:
 
   (Standard DriverBinding Protocol Stop() function)
 
-  @return EFI_STATUS
+  @param  This                   The driver binding protocol.
+  @param  Controller             The controller to release.
+  @param  NumberOfChildren       The child number that opened controller
+                                 BY_CHILD.
+  @param  ChildHandleBuffer      The array of child handle.
+
+  @retval EFI_SUCCESS            The controller or children are stopped.
+  @retval EFI_DEVICE_ERROR       Failed to stop the driver.
 
 **/
 EFI_STATUS
@@ -281,13 +299,13 @@ PciVgaMiniPortDriverBindingStop (
 //
 
 /**
-  Thunk function of EFI_VGA_MINI_PORT_SET_MODE
+  Thunk function of EFI_VGA_MINI_PORT_SET_MODE.
 
-  @param  This             Point to instance of EFI_VGA_MINI_PORT_PROTOCOL
-  @param  ModeNumber       Mode number
+  @param  This             Point to instance of EFI_VGA_MINI_PORT_PROTOCOL.
+  @param  ModeNumber       Mode number.
 
-  @retval EFI_UNSUPPORTED  Invalid mode number
-  @retval EFI_SUCCESS      Success
+  @retval EFI_UNSUPPORTED  Invalid mode number.
+  @retval EFI_SUCCESS      Success.
 
 **/
 EFI_STATUS

@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#ifndef _EFI_PCI_BUS_H
-#define _EFI_PCI_BUS_H
+#ifndef _EFI_PCI_BUS_H_
+#define _EFI_PCI_BUS_H_
 
 
 #include <FrameworkDxe.h>
@@ -266,6 +266,20 @@ extern EFI_PCI_PLATFORM_PROTOCOL                    *gPciPlatformProtocol;
 //
 // PCI Bus Support Function Prototypes
 //
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  than contains a gEfiPciRootBridgeIoProtocolGuid protocol can be supported.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child.
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval EFI_ALREADY_STARTED This driver is already running on this device.
+  @retval other               This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 PciBusDriverBindingSupported (
@@ -274,6 +288,20 @@ PciBusDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Start this driver on ControllerHandle and enumerate Pci bus and start
+  all device under PCI bus.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child.
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle.
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle.
+  @retval other                This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 PciBusDriverBindingStart (
@@ -282,6 +310,20 @@ PciBusDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on.
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval other             This driver was not removed from this device.
+
+**/
 EFI_STATUS
 EFIAPI
 PciBusDriverBindingStop (

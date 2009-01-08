@@ -18,8 +18,8 @@
 
 **/
 
-#ifndef _IDE_H
-#define _IDE_H
+#ifndef _IDE_H_
+#define _IDE_H_
 
 //
 // Helper functions Prototype
@@ -118,7 +118,7 @@ IDEWritePortB (
   @param  Port TODO: add argument description
   @param  Data TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 VOID
@@ -442,7 +442,7 @@ AtaPioDataOut (
 
   @param  IdeDev TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS
@@ -1242,10 +1242,8 @@ EnableInterrupt (
 /**
   Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
 
-  @param[in]  Event   Pointer to this event
-  @param[in]  Context Event hanlder private data
-
-  @retval  EFI_SUCCESS - Interrupt cleared.
+  @param[in]  Event   Pointer to this event.
+  @param[in]  Context Event hanlder private data.
 
 **/
 VOID

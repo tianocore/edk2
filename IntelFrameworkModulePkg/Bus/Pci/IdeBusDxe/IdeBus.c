@@ -1042,9 +1042,12 @@ DeRegisterIdeDevice (
 // ***********************************************************************************
 //
 /**
-  TODO:    This - add argument and description to function comment
-  TODO:    ExtendedVerification - add argument and description to function comment
-  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  GC_TODO: Add function description
+
+  @param  This                  GC_TODO: add argument description.
+  @param  ExtendedVerification  GC_TODO: add argument description.
+
+  @retval EFI_DEVICE_ERROR      GC_TODO: Add description for return value.
 
 **/
 EFI_STATUS
@@ -1244,8 +1247,12 @@ Done:
 // ***********************************************************************************
 //
 /**
-  TODO:    This - add argument and description to function comment
-  TODO:    EFI_SUCCESS - add return value to function comment
+  TODO: Add function description
+
+  @param  This TODO: add argument description
+
+  @retval EFI_SUCCESS   GC_TODO: Add description for return value.
+
 **/
 EFI_STATUS
 EFIAPI

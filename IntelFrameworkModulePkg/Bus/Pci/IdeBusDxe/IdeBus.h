@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _IDE_BUS_H
-#define _IDE_BUS_H
+#ifndef _IDE_BUS_H_
+#define _IDE_BUS_H_
 
 
 
@@ -196,6 +196,18 @@ IDEBusDriverBindingStop (
 //
 // EFI Driver Configuration Functions
 //
+/**
+  TODO: Add function description
+
+  @param  This                 TODO: add argument description
+  @param  ControllerHandle     TODO: add argument description
+  @param  ChildHandle          TODO: add argument description
+  @param  Language             TODO: add argument description
+  @param  ActionRequired       TODO: add argument description
+
+  TODO: add return values.
+
+**/
 EFI_STATUS
 IDEBusDriverConfigurationSetOptions (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
@@ -205,6 +217,16 @@ IDEBusDriverConfigurationSetOptions (
   OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED               *ActionRequired
   );
 
+/**
+  TODO: Add function description
+
+  @param  This                 TODO: add argument description
+  @param  ControllerHandle     TODO: add argument description
+  @param  ChildHandle          TODO: add argument description
+
+  TODO: add return values.
+
+**/
 EFI_STATUS
 IDEBusDriverConfigurationOptionsValid (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL               *This,
@@ -212,6 +234,18 @@ IDEBusDriverConfigurationOptionsValid (
   IN  EFI_HANDLE                                      ChildHandle  OPTIONAL
   );
 
+/**
+  TODO: Add function description
+
+  @param  This                 TODO: add argument description
+  @param  ControllerHandle     TODO: add argument description
+  @param  ChildHandle          TODO: add argument description
+  @param  DefaultType          TODO: add argument description
+  @param  ActionRequired       TODO: add argument description
+
+  TODO: add return values.
+
+**/
 EFI_STATUS
 IDEBusDriverConfigurationForceDefaults (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
@@ -224,6 +258,21 @@ IDEBusDriverConfigurationForceDefaults (
 //
 // EFI Driver Diagnostics Functions
 //
+/**
+  TODO: Add function description
+
+  @param  This                 TODO: add argument description
+  @param  ControllerHandle     TODO: add argument description
+  @param  ChildHandle          TODO: add argument description
+  @param  DiagnosticType       TODO: add argument description
+  @param  Language             TODO: add argument description
+  @param  ErrorType            TODO: add argument description
+  @param  BufferSize           TODO: add argument description
+  @param  Buffer               TODO: add argument description
+
+  TODO: add return values.
+
+**/
 EFI_STATUS
 IDEBusDriverDiagnosticsRunDiagnostics (
   IN  EFI_DRIVER_DIAGNOSTICS_PROTOCOL               *This,
@@ -264,7 +313,7 @@ IDEBlkIoReset (
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
-  TODO: add return values
+  TODO: add return values.
 
 **/
 EFI_STATUS

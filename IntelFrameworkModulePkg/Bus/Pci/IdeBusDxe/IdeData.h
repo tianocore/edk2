@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef _IDE_DATA_H
-#define _IDE_DATA_H
+#ifndef _IDE_DATA_H_
+#define _IDE_DATA_H_
 
 #include <IndustryStandard/Atapi.h>
 

@@ -12,15 +12,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#ifndef _EFI_PCI_IO_PROTOCOL_H
-#define _EFI_PCI_IO_PROTOCOL_H
+#ifndef _EFI_PCI_IO_PROTOCOL_H_
+#define _EFI_PCI_IO_PROTOCOL_H_
 
 /**
-  Initializes a PCI I/O Instance
+  Initializes a PCI I/O Instance.
   
-  @param PciIoDevice  Pci device instance
+  @param PciIoDevice  Pci device instance.
   
-  @retval EFI_SUCCESS  Success operation
+  @retval EFI_SUCCESS  Success operation.
 **/
 EFI_STATUS
 InitializePciIoInstance (
@@ -109,7 +109,9 @@ PciIoPollMem (
           
   @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL.
   @param  Width                 Signifies the width of the memory or I/O operations.
-  @param  Address               The base address of the memory or I/O operations.  
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory or I/O operation to perform.                    
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.                                
   @param  Mask                  Mask used for the polling criteria.
   @param  Value                 The comparison value used for the polling exit criteria.
   @param  Delay                 The number of 100 ns units to poll.

@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param Start    address including VGA range
   @param Length   length of VGA range.
   
-  @retval EFI_SUCCESS success
+  @retval EFI_SUCCESS success.
 **/
 EFI_STATUS
 SkipVGAAperture (
@@ -50,12 +50,12 @@ SkipVGAAperture (
 }
 
 /**
-  This function is used to skip ISA aliasing aperture
+  This function is used to skip ISA aliasing aperture.
   
-  @param Start    address including ISA aliasing aperture
-  @param Length   length of ISA aliasing aperture
+  @param Start    address including ISA aliasing aperture.
+  @param Length   length of ISA aliasing aperture.
   
-  @retval EFI_SUCCESS success
+  @retval EFI_SUCCESS success.
 **/
 EFI_STATUS
 SkipIsaAliasAperture (
@@ -89,10 +89,10 @@ SkipIsaAliasAperture (
   This function inserts a resource node into the resource list.
   The resource list is sorted in descend order.
 
-  @param Bridge  PCI resource node for bridge
-  @param ResNode Resource node want to be inserted
+  @param Bridge  PCI resource node for bridge.
+  @param ResNode Resource node want to be inserted.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 InsertResourceNode (
@@ -141,13 +141,13 @@ Routine Description:
   If the TypeMerge is TRUE, Res resource type is changed to the type of destination resource
   type.
 
-  @param Dst        Point to destination resource tree
-  @param Res        Point to source resource tree
+  @param Dst        Point to destination resource tree.
+  @param Res        Point to source resource tree.
   @param TypeMerge  If the TypeMerge is TRUE, Res resource type is changed to the type of 
                     destination resource type.
                     
                     
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 MergeResourceTree (
@@ -183,7 +183,7 @@ MergeResourceTree (
 
   @param Bridge PCI resource node for bridge.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 CalculateApertureIo16 (
@@ -311,11 +311,11 @@ CalculateApertureIo16 (
 
 /**
   This function is used to calculate the resource aperture
-  for a given bridge device
+  for a given bridge device.
 
-  @param Bridge Give bridge device
+  @param Bridge Give bridge device.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 CalculateResourceAperture (
@@ -411,16 +411,16 @@ CalculateResourceAperture (
 }
 
 /**
-  Get IO/Memory resource infor for given PCI device
+  Get IO/Memory resource infor for given PCI device.
   
-  @param PciDev     Pci device instance
-  @param IoNode     Resource info node for IO 
-  @param Mem32Node  Resource info node for 32-bit memory
-  @param PMem32Node Resource info node for 32-bit PMemory
-  @param Mem64Node  Resource info node for 64-bit memory
-  @param PMem64Node Resource info node for 64-bit PMemory
+  @param PciDev     Pci device instance.
+  @param IoNode     Resource info node for IO .
+  @param Mem32Node  Resource info node for 32-bit memory.
+  @param PMem32Node Resource info node for 32-bit PMemory.
+  @param Mem64Node  Resource info node for 64-bit memory.
+  @param PMem64Node Resource info node for 64-bit PMemory.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 GetResourceFromDevice (
@@ -558,14 +558,14 @@ GetResourceFromDevice (
 }
 
 /**
-  This function is used to create a resource node
+  This function is used to create a resource node.
 
-  @param PciDev       Pci device instance
-  @param Length       Length of Io/Memory resource
-  @param Alignment    Alignment of resource
-  @param Bar          Bar index 
-  @param ResType      Type of resource: IO/Memory
-  @param ResUage      Resource usage
+  @param PciDev       Pci device instance.
+  @param Length       Length of Io/Memory resource.
+  @param Alignment    Alignment of resource.
+  @param Bar          Bar index.
+  @param ResType      Type of resource: IO/Memory.
+  @param ResUsage     Resource usage.
 **/
 PCI_RESOURCE_NODE *
 CreateResourceNode (
@@ -605,14 +605,14 @@ CreateResourceNode (
   This routine is used to extract resource request from
   device node list.
 
-  @param Bridge     Pci device instance
-  @param IoNode     Resource info node for IO 
-  @param Mem32Node  Resource info node for 32-bit memory
-  @param PMem32Node Resource info node for 32-bit PMemory
-  @param Mem64Node  Resource info node for 64-bit memory
-  @param PMem64Node Resource info node for 64-bit PMemory
+  @param Bridge     Pci device instance.
+  @param IoNode     Resource info node for IO.
+  @param Mem32Node  Resource info node for 32-bit memory.
+  @param PMem32Node Resource info node for 32-bit PMemory.
+  @param Mem64Node  Resource info node for 64-bit memory.
+  @param PMem64Node Resource info node for 64-bit PMemory.
 
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 CreateResourceMap (
@@ -849,16 +849,16 @@ CreateResourceMap (
 }
 
 /**
-  This function is used to do the resource padding for a specific platform
+  This function is used to do the resource padding for a specific platform.
 
-  @param Bridge     Pci device instance
-  @param IoNode     Resource info node for IO 
-  @param Mem32Node  Resource info node for 32-bit memory
-  @param PMem32Node Resource info node for 32-bit PMemory
-  @param Mem64Node  Resource info node for 64-bit memory
-  @param PMem64Node Resource info node for 64-bit PMemory
+  @param PciDev     Pci device instance.
+  @param IoNode     Resource info node for IO.
+  @param Mem32Node  Resource info node for 32-bit memory.
+  @param PMem32Node Resource info node for 32-bit PMemory.
+  @param Mem64Node  Resource info node for 64-bit memory.
+  @param PMem64Node Resource info node for 64-bit PMemory.
 
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 ResourcePaddingPolicy (
@@ -893,16 +893,15 @@ ResourcePaddingPolicy (
   doesn't support certain resource. Degradation path is 
   PMEM64 -> MEM64  -> MEM32
   PMEM64 -> PMEM32 -> MEM32
-  IO32   -> IO16
+  IO32   -> IO16.
 
-  @param Bridge     Pci device instance
-  @param IoNode     Resource info node for IO 
-  @param Mem32Node  Resource info node for 32-bit memory
-  @param PMem32Node Resource info node for 32-bit PMemory
-  @param Mem64Node  Resource info node for 64-bit memory
-  @param PMem64Node Resource info node for 64-bit PMemory
+  @param Bridge     Pci device instance.
+  @param Mem32Node  Resource info node for 32-bit memory.
+  @param PMem32Node Resource info node for 32-bit PMemory.
+  @param Mem64Node  Resource info node for 64-bit memory.
+  @param PMem64Node Resource info node for 64-bit PMemory.
 
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 DegradeResource (
@@ -1008,10 +1007,11 @@ DegradeResource (
 /**
   Test whether bridge device support decode resource
   
-  @param Bridge    Bridge device instance
-  @param Decode    Decode type according to resource type
+  @param Bridge    Bridge device instance.
+  @param Decode    Decode type according to resource type.
   
-  @return whether bridge device support decode resource
+  @return TRUE  bridge device support decode resource.
+  @return FALSE bridge device don't support decode resource.
   
 **/
 BOOLEAN
@@ -1030,13 +1030,13 @@ BridgeSupportResourceDecode (
 
 /**
   This function is used to program the resource allocated 
-  for each resource node
+  for each resource node.
 
   
-  @param Base     Base address of resource
-  @param Bridge   Bridge device instance
+  @param Base     Base address of resource.
+  @param Bridge   Bridge device instance.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 ProgramResource (
@@ -1084,10 +1084,10 @@ ProgramResource (
 /**
   Program Bar register.
   
-  @param Base  Base address for resource
-  @param Node  Point to resoure node structure
+  @param Base  Base address for resource.
+  @param Node  Point to resoure node structure.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 ProgramBar (
@@ -1166,12 +1166,12 @@ ProgramBar (
 }
 
 /**
-  Program PPB apperture
+  Program PPB apperture.
   
-  @param Base  Base address for resource
-  @param Node  Point to resoure node structure
+  @param Base  Base address for resource.
+  @param Node  Point to resoure node structure.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 ProgramPpbApperture (
@@ -1340,13 +1340,13 @@ ProgramPpbApperture (
 }
 
 /**
-  Program parent bridge for oprom
+  Program parent bridge for oprom.
   
-  @param PciDevice      Pci deivce instance
-  @param OptionRomBase  Base address for oprom
-  @param Enable         Enable/Disable
+  @param PciDevice      Pci deivce instance.
+  @param OptionRomBase  Base address for oprom.
+  @param Enable         Enable/Disable.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 ProgrameUpstreamBridgeForRom (
@@ -1392,11 +1392,11 @@ ProgrameUpstreamBridgeForRom (
 }
 
 /**
-  Test whether resource exists for a bridge
+  Test whether resource exists for a bridge.
   
-  @param Bridge  Point to resource node for a bridge 
+  @param Bridge  Point to resource node for a bridge.
   
-  @return whether resource exists
+  @return whether resource exists.
 **/
 BOOLEAN
 ResourceRequestExisted (
@@ -1415,8 +1415,8 @@ ResourceRequestExisted (
 /**
   Initialize resource pool structure.
   
-  @param ResourcePool Point to resource pool structure
-  @param ResourceType Type of resource
+  @param ResourcePool Point to resource pool structure.
+  @param ResourceType Type of resource.
 **/
 EFI_STATUS
 InitializeResourcePool (
@@ -1434,21 +1434,21 @@ InitializeResourcePool (
 }
 
 /**
-  Get all resource information for given Pci device
+  Get all resource information for given Pci device.
   
-  @param PciDev         Pci device instance
-  @param IoBridge       Io resource node
-  @param Mem32Bridge    32-bit memory node
-  @param PMem32Bridge   32-bit Pmemory node
-  @param Mem64Bridge    64-bit memory node
-  @param PMem64Bridge   64-bit PMemory node
-  @param IoPool         Link list header for Io resource
-  @param Mem32Pool      Link list header for 32-bit memory
-  @param PMem32Pool     Link list header for 32-bit Pmemory
-  @param Mem64Pool      Link list header for 64-bit memory
-  @param PMem64Pool     Link list header for 64-bit Pmemory
+  @param PciDev         Pci device instance.
+  @param IoBridge       Io resource node.
+  @param Mem32Bridge    32-bit memory node.
+  @param PMem32Bridge   32-bit Pmemory node.
+  @param Mem64Bridge    64-bit memory node.
+  @param PMem64Bridge   64-bit PMemory node.
+  @param IoPool         Link list header for Io resource.
+  @param Mem32Pool      Link list header for 32-bit memory.
+  @param PMem32Pool     Link list header for 32-bit Pmemory.
+  @param Mem64Pool      Link list header for 64-bit memory.
+  @param PMem64Pool     Link list header for 64-bit Pmemory.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 GetResourceMap (
@@ -1553,11 +1553,11 @@ GetResourceMap (
 }
 
 /**
-  Destory given resource tree
+  Destory given resource tree.
   
-  @param Bridge  root node of resource tree
+  @param Bridge  root node of resource tree.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 DestroyResourceTree (
@@ -1588,10 +1588,10 @@ DestroyResourceTree (
 /**
   Record the reserved resource and insert to reserved list.
   
-  @param Base     Base address of reserved resourse
-  @param Length   Length of reserved resource 
-  @param ResType  Resource type
-  @param Bridge   Pci device instance
+  @param Base     Base address of reserved resourse.
+  @param Length   Length of reserved resource. 
+  @param ResType  Resource type.
+  @param Bridge   Pci device instance.
 **/
 EFI_STATUS
 RecordReservedResource (
@@ -1619,16 +1619,16 @@ RecordReservedResource (
 }
 
 /**
-  Insert resource padding for P2C
+  Insert resource padding for P2C.
   
-  @param PciDev     Pci device instance
-  @param IoNode     Resource info node for IO 
-  @param Mem32Node  Resource info node for 32-bit memory
-  @param PMem32Node Resource info node for 32-bit PMemory
-  @param Mem64Node  Resource info node for 64-bit memory
-  @param PMem64Node Resource info node for 64-bit PMemory
+  @param PciDev     Pci device instance.
+  @param IoNode     Resource info node for IO. 
+  @param Mem32Node  Resource info node for 32-bit memory.
+  @param PMem32Node Resource info node for 32-bit PMemory.
+  @param Mem64Node  Resource info node for 64-bit memory.
+  @param PMem64Node Resource info node for 64-bit PMemory.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
 EFI_STATUS
 ResourcePaddingForCardBusBridge (
@@ -1959,14 +1959,14 @@ ProgramP2C (
 /**
   Create padding resource node.
   
-  @param PciDev     Pci device instance
-  @param IoNode     Resource info node for IO 
-  @param Mem32Node  Resource info node for 32-bit memory
-  @param PMem32Node Resource info node for 32-bit PMemory
-  @param Mem64Node  Resource info node for 64-bit memory
-  @param PMem64Node Resource info node for 64-bit PMemory
+  @param PciDev     Pci device instance.
+  @param IoNode     Resource info node for IO. 
+  @param Mem32Node  Resource info node for 32-bit memory.
+  @param PMem32Node Resource info node for 32-bit PMemory.
+  @param Mem64Node  Resource info node for 64-bit memory.
+  @param PMem64Node Resource info node for 64-bit PMemory.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 
 **/
 EFI_STATUS
@@ -2117,11 +2117,11 @@ ApplyResourcePadding (
 }
 
 /**
-  Get padding resource for PPB
+  Get padding resource for PPB.
   Light PCI bus driver woundn't support hotplug root device
-  So no need to pad resource for them
+  So no need to pad resource for them.
 
-  @param   PciIoDevice Pci device instance
+  @param   PciIoDevice Pci device instance.
 **/
 VOID
 GetResourcePaddingPpb (

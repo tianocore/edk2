@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Option Rom Support for PCI Bus Driver
 
 Copyright (c) 2006, Intel Corporation                                                         
@@ -30,14 +30,14 @@ UINTN                      mMaxNumberOfPciRomImages  = 0;
 EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
 
 /**
-  Add the Rom Image to internal database for later PCI light enumeration
+  Add the Rom Image to internal database for later PCI light enumeration.
   
-  @param ImageHandle    Option Rom image handle
-  @param Seg            Segment of PCI space
-  @param Bus            Bus NO of PCI space
-  @param Dev            Dev NO of PCI space
-  @param Func           Func NO of PCI space
-  @param RomAddress     Base address of OptionRom
+  @param ImageHandle    Option Rom image handle.
+  @param Seg            Segment of PCI space.
+  @param Bus            Bus NO of PCI space.
+  @param Dev            Dev NO of PCI space.
+  @param Func           Func NO of PCI space.
+  @param RomAddress     Base address of OptionRom.
   @param RomLength      Length of rom image.
 **/
 VOID
