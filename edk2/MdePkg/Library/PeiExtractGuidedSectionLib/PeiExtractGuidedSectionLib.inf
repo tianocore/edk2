@@ -43,6 +43,6 @@
   PcdLib
 
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler 
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler     ## CONSUMES
 
 

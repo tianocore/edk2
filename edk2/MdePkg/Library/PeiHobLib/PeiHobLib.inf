@@ -42,7 +42,7 @@
   DebugLib
 
 [Guids]
-  gEfiHobMemoryAllocStackGuid                   # ALWAYS_CONSUMED
-  gEfiHobMemoryAllocBspStoreGuid                # ALWAYS_CONSUMED
-  gEfiHobMemoryAllocModuleGuid                  # ALWAYS_CONSUMED
+  gEfiHobMemoryAllocStackGuid                   ## PRODUCES ## HOB
+  gEfiHobMemoryAllocBspStoreGuid                ## PRODUCES ## HOB
+  gEfiHobMemoryAllocModuleGuid                  ## PRODUCES ## HOB
 

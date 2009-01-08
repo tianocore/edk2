@@ -49,5 +49,5 @@
   DebugLib
 
 [Protocols]
-  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciRootBridgeIoProtocolGuid               ## CONSUMES
 

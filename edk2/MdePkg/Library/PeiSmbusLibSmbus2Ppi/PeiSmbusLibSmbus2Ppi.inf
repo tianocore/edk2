@@ -43,7 +43,7 @@
   DebugLib
 
 [Ppis]
-  gEfiPeiSmbus2PpiGuid                           # PPI ALWAYS_CONSUMED
+  gEfiPeiSmbus2PpiGuid                           ## CONSUMES
 
 [Depex]
   gEfiPeiSmbus2PpiGuid 
