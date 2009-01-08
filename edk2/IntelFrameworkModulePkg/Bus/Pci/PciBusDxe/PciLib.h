@@ -23,8 +23,8 @@ Revision History
 
 **/
 
-#ifndef _EFI_PCI_LIB_H
-#define _EFI_PCI_LIB_H
+#ifndef _EFI_PCI_LIB_H_
+#define _EFI_PCI_LIB_H_
 
 //
 // Mask definistions for PCD PcdPciIncompatibleDeviceSupportMask
@@ -60,9 +60,9 @@ InstallHotPlugRequestProtocol (
 
 /**
   Install protocol gEfiPciHotplugDeviceGuid into hotplug device
-  instance
+  instance.
   
-  @param PciIoDevice  hotplug device instance
+  @param PciIoDevice  hotplug device instance.
   
 **/
 VOID
@@ -72,9 +72,9 @@ InstallPciHotplugGuid (
 
 /**
   UnInstall protocol gEfiPciHotplugDeviceGuid into hotplug device
-  instance
+  instance.
   
-  @param PciIoDevice  hotplug device instance
+  @param PciIoDevice  hotplug device instance.
   
 **/
 VOID
@@ -83,9 +83,9 @@ UninstallPciHotplugGuid (
   );
 
 /**
-  Retrieve the BAR information via PciIo interface
+  Retrieve the BAR information via PciIo interface.
   
-  @param PciIoDevice Pci device instance
+  @param PciIoDevice Pci device instance.
 **/
 VOID
 GetBackPcCardBar (
@@ -96,8 +96,8 @@ GetBackPcCardBar (
   Remove rejected pci device from specific root bridge
   handle.
   
-  @param RootBridgeHandle  specific parent root bridge handle
-  @param Bridge            Bridge device instance
+  @param RootBridgeHandle  specific parent root bridge handle.
+  @param Bridge            Bridge device instance.
   
   @retval EFI_SUCCESS  Success operation.
 **/
@@ -110,7 +110,7 @@ RemoveRejectedPciDevices (
 /**
   Wrapper function for allocating resource for pci host bridge.
   
-  @param PciResAlloc Point to protocol instance EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  @param PciResAlloc Point to protocol instance EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
   
 **/
 EFI_STATUS
@@ -118,11 +118,23 @@ PciHostBridgeResourceAllocator (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   );
 
+/**
+  Wrapper function for allocating resource for pci host bridge without hotplug device support.
+  
+  @param PciResAlloc Point to protocol instance EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
+  
+**/
 EFI_STATUS
 PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
   );
 
+/**
+  Wrapper function for allocating resource for pci host bridge with hotplug device support.
+  
+  @param PciResAlloc Point to protocol instance EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
+  
+**/
 EFI_STATUS
 PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL *PciResAlloc
@@ -130,15 +142,15 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
 
 /**
   Wapper function of scanning pci bus and assign bus number to the given PCI bus system
-  Feature flag PcdPciBusHotplugDeviceSupport determine whether need support hotplug  
+  Feature flag PcdPciBusHotplugDeviceSupport determine whether need support hotplug.  
   
-  @param  Bridge          Bridge device instance
-  @param  StartBusNumber  start point
-  @param  SubBusNumber    Point to sub bus number
-  @param  PaddedBusRange  Customized bus number
+  @param  Bridge          Bridge device instance.
+  @param  StartBusNumber  start point.
+  @param  SubBusNumber    Point to sub bus number.
+  @param  PaddedBusRange  Customized bus number.
   
-  @retval EFI_SUCCESS     Success
-  @retval EFI_DEVICE_ERROR Fail to scan bus
+  @retval EFI_SUCCESS     Success.
+  @retval EFI_DEVICE_ERROR Fail to scan bus.
 **/
 EFI_STATUS
 PciScanBus (
@@ -148,6 +160,18 @@ PciScanBus (
   OUT UINT8                             *PaddedBusRange
   );
 
+/**
+  Wapper function of scanning pci bus and assign bus number to the given PCI bus system
+  Feature flag PcdPciBusHotplugDeviceSupport determine whether need support hotplug.  
+  
+  @param  Bridge          Bridge device instance.
+  @param  StartBusNumber  start point.
+  @param  SubBusNumber    Point to sub bus number.
+  @param  PaddedBusRange  Customized bus number.
+  
+  @retval EFI_SUCCESS     Success.
+  @retval EFI_DEVICE_ERROR Fail to scan bus.
+**/
 EFI_STATUS
 PciScanBus_WithHotPlugDeviceSupport (
   IN PCI_IO_DEVICE                      *Bridge,
@@ -156,6 +180,18 @@ PciScanBus_WithHotPlugDeviceSupport (
   OUT UINT8                             *PaddedBusRange
   );
 
+/**
+  Wapper function of scanning pci bus and assign bus number to the given PCI bus system
+  Feature flag PcdPciBusHotplugDeviceSupport determine whether need support hotplug.  
+  
+  @param  Bridge          Bridge device instance.
+  @param  StartBusNumber  start point.
+  @param  SubBusNumber    Point to sub bus number.
+  @param  PaddedBusRange  Customized bus number.
+  
+  @retval EFI_SUCCESS     Success.
+  @retval EFI_DEVICE_ERROR Fail to scan bus.
+**/
 EFI_STATUS
 PciScanBus_WithoutHotPlugDeviceSupport (
   IN PCI_IO_DEVICE                      *Bridge,
@@ -165,25 +201,24 @@ PciScanBus_WithoutHotPlugDeviceSupport (
   );
 
 /**
-  Process Option Rom on this host bridge
+  Process Option Rom on this host bridge.
   
-  @param Bridge  Pci bridge device instance
+  @param Bridge  Pci bridge device instance.
   
-  @retval EFI_SUCCESS Success
+  @retval EFI_SUCCESS Success.
 **/
-
 EFI_STATUS
 PciRootBridgeP2CProcess (
   IN PCI_IO_DEVICE *Bridge
   );
 
 /**
-  Process Option Rom on this host bridge
+  Process Option Rom on this host bridge.
   
-  @param PciResAlloc Pointer to instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  @param PciResAlloc Pointer to instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
   
-  @retval EFI_NOT_FOUND Can not find the root bridge instance
-  @retval EFI_SUCCESS   Success process
+  @retval EFI_NOT_FOUND Can not find the root bridge instance.
+  @retval EFI_SUCCESS   Success process.
 **/
 EFI_STATUS
 PciHostBridgeP2CProcess (
@@ -192,15 +227,14 @@ PciHostBridgeP2CProcess (
 
 /**
   This function is used to enumerate the entire host bridge
-  in a given platform
+  in a given platform.
 
   @param PciResAlloc   A pointer to the resource allocate protocol.
 
-  @retval EFI_OUT_OF_RESOURCES no enough resource
-  @retval EFI_SUCCESS Success
+  @retval EFI_OUT_OF_RESOURCES no enough resource.
+  @retval EFI_SUCCESS Success.
 
 **/
-
 EFI_STATUS
 PciHostBridgeEnumerator (
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc
@@ -211,7 +245,8 @@ PciHostBridgeEnumerator (
 
   @param  PciIo               A pointer to the EFI_PCI_O_PROTOCOL.
   @param  Width               Signifies the width of the memory operations.
-  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
 
@@ -235,7 +270,8 @@ PciIoRead (
 
   @param  PciIo               A pointer to the EFI_PCI_O_PROTOCOL.
   @param  Width               Signifies the width of the memory operations.
-  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Count               The number of unit to be write.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
 
@@ -260,7 +296,8 @@ PciIoWrite (
   @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Count               The number of unit to be write.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
 
@@ -286,7 +323,8 @@ PciRootBridgeIoWrite (
   @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @Param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
 
@@ -299,7 +337,7 @@ PciRootBridgeIoWrite (
 EFI_STATUS
 PciRootBridgeIoRead (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
-  IN       PCI_TYPE00                             *Pci,
+  IN       PCI_TYPE00                             *Pci,         OPTIONAL
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
   IN       UINT64                                 Address,
   IN       UINTN                                  Count,

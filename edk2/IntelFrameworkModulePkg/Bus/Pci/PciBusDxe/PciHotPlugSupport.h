@@ -1,4 +1,4 @@
-/**@ file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#ifndef _EFI_PCI_HOT_PLUG_SUPPORT_H
-#define _EFI_PCI_HOT_PLUG_SUPPORT_H
+#ifndef _EFI_PCI_HOT_PLUG_SUPPORT_H_
+#define _EFI_PCI_HOT_PLUG_SUPPORT_H_
 
 
 //

@@ -11,8 +11,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _EFI_PCI_DEVICE_SUPPORT_H
-#define _EFI_PCI_DEVICE_SUPPORT_H
+#ifndef _EFI_PCI_DEVICE_SUPPORT_H_
+#define _EFI_PCI_DEVICE_SUPPORT_H_
 
 /**
   Initialize the gPciDevicePool.
@@ -194,6 +194,13 @@ GetRootBridgeByHandle (
   EFI_HANDLE RootBridgeHandle
   );
 
+/**
+  Check root bridge device is existed or not.
+
+  @param RootBridgeHandle    Given root bridge handle.
+
+  @return root bridge device is existed or not.
+**/
 BOOLEAN
 RootBridgeExisted (
   IN EFI_HANDLE RootBridgeHandle

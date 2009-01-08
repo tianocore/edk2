@@ -88,11 +88,11 @@ GetDriver (
 /**
   Add an overriding driver image
   
-  @param PciIoDevice        Instance of PciIo device
-  @param DriverImageHandle  new added driver image
+  @param PciIoDevice        Instance of PciIo device.
+  @param DriverImageHandle  new added driver image.
   
-  @retval EFI_OUT_OF_RESOURCES no memory resource for new driver instance
-  @retval EFI_SUCCESS       Success add driver
+  @retval EFI_OUT_OF_RESOURCES no memory resource for new driver instance.
+  @retval EFI_SUCCESS       Success add driver.
 **/
 EFI_STATUS
 AddDriver (

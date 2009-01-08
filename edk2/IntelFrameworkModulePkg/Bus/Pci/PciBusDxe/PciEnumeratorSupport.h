@@ -1,4 +1,4 @@
-/**@ file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#ifndef _EFI_PCI_ENUMERATOR_SUPPORT_H
-#define _EFI_PCI_ENUMERATOR_SUPPORT_H
+#ifndef _EFI_PCI_ENUMERATOR_SUPPORT_H_
+#define _EFI_PCI_ENUMERATOR_SUPPORT_H_
 
 /**
   This routine is used to check whether the pci device is present.
@@ -42,7 +42,7 @@ PciDevicePresent (
   root bridge will then be created.
     
   @param Bridge         Parent bridge instance
-  @param StartBusNumer  Bus number of begining 
+  @param StartBusNumber Bus number of begining 
 **/
 EFI_STATUS
 PciPciDeviceInfoCollector (
@@ -62,12 +62,12 @@ PciPciDeviceInfoCollector (
 **/
 EFI_STATUS
 PciSearchDevice (
-  IN PCI_IO_DEVICE                      *Bridge,
-  PCI_TYPE00                            *Pci,
-  UINT8                                 Bus,
-  UINT8                                 Device,
-  UINT8                                 Func,
-  PCI_IO_DEVICE                         **PciDevice
+  IN  PCI_IO_DEVICE                         *Bridge,
+  IN  PCI_TYPE00                            *Pci,
+  IN  UINT8                                 Bus,
+  IN  UINT8                                 Device,
+  IN  UINT8                                 Func,
+  OUT PCI_IO_DEVICE                         **PciDevice
   );
 
 /**
@@ -349,6 +349,14 @@ PciGetBusRange (
   OUT    UINT16                             *BusRange
   );
 
+/**
+  This routine can be used to start the root bridge.
+
+  @param RootBridgeDev     Pci device instance.
+
+  @retval EFI_SUCCESS      This device started.
+  
+**/
 EFI_STATUS
 StartManagingRootBridge (
   IN PCI_IO_DEVICE *RootBridgeDev

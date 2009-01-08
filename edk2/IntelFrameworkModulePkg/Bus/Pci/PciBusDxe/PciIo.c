@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Implement all interfaces for EFI_PCI_IO_PROTOCOL.
   
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
@@ -18,6 +18,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Internal use only
 //
+/**
+  report a error Status code of PCI bus driver controller.
+  
+  @param PciIoDevice Pci device instance.
+  @param Code        status code.
+**/
 EFI_STATUS
 ReportErrorStatusCode (
   IN PCI_IO_DEVICE               *PciIoDevice,
@@ -61,10 +67,10 @@ EFI_PCI_IO_PROTOCOL  PciIoInterface = {
 };
 
 /**
-  report a error Status code of PCI bus driver controller
+  report a error Status code of PCI bus driver controller.
   
-  @param PciIoDevice Pci device instance
-  @param Code        status code
+  @param PciIoDevice Pci device instance.
+  @param Code        status code.
 **/
 EFI_STATUS
 ReportErrorStatusCode (
@@ -80,11 +86,11 @@ ReportErrorStatusCode (
 }
 
 /**
-  Initializes a PCI I/O Instance
+  Initializes a PCI I/O Instance.
   
-  @param PciIoDevice  Pci device instance
+  @param PciIoDevice  Pci device instance.
   
-  @retval EFI_SUCCESS  Success operation
+  @retval EFI_SUCCESS  Success operation.
 **/
 EFI_STATUS
 InitializePciIoInstance (
@@ -281,7 +287,9 @@ PciIoPollMem (
           
   @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL.
   @param  Width                 Signifies the width of the memory or I/O operations.
-  @param  Address               The base address of the memory or I/O operations.  
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory or I/O operation to perform.                    
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.                                
   @param  Mask                  Mask used for the polling criteria.
   @param  Value                 The comparison value used for the polling exit criteria.
   @param  Delay                 The number of 100 ns units to poll.
@@ -1459,7 +1467,7 @@ PciIoAttributes (
         // Check if there have been an active VGA device on the same segment
         //
         Temp = ActiveVGADeviceOnTheSameSegment (PciIoDevice);
-        if (Temp && Temp != PciIoDevice) {
+        if (Temp != NULL && Temp != PciIoDevice) {
           //
           // An active VGA has been detected, so can not enable another
           //
@@ -1529,7 +1537,7 @@ PciIoAttributes (
     // Enable relevant attributes to command register and bridge control register
     //
     Status = PciEnableCommandRegister (PciIoDevice, Command);
-    if (BridgeControl) {
+    if (BridgeControl != 0) {
       Status = PciEnableBridgeControlRegister (PciIoDevice, BridgeControl);
     }
 
@@ -1550,7 +1558,7 @@ PciIoAttributes (
     // Disable relevant attributes to command register and bridge control register
     //
     Status = PciDisableCommandRegister (PciIoDevice, Command);
-    if (BridgeControl) {
+    if (BridgeControl != 0) {
       Status = PciDisableBridgeControlRegister (PciIoDevice, BridgeControl);
     }
 
@@ -1838,7 +1846,7 @@ UpStreamBridgesAttributes (
 
   Parent = PciIoDevice->Parent;
 
-  while (Parent && IS_PCI_BRIDGE (&Parent->Pci)) {
+  while (Parent != NULL && IS_PCI_BRIDGE (&Parent->Pci)) {
 
     //
     // Get the PciIo Protocol

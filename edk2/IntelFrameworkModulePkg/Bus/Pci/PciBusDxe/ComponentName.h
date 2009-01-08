@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#ifndef _EFI_PCI_BUS_COMPONENT_NAME_H
-#define _EFI_PCI_BUS_COMPONENT_NAME_H
+#ifndef _EFI_PCI_BUS_COMPONENT_NAME_H_
+#define _EFI_PCI_BUS_COMPONENT_NAME_H_
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gPciBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gPciBusComponentName2;

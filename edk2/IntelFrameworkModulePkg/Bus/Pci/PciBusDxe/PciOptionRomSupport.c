@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -36,6 +36,8 @@ MEMMAP_DEVICE_PATH  mPciOptionRomImageDevicePathNodeTemplate = {
 /**
   Get Pci device's oprom infor bits.
   
+  @param PciIoDevice Pci device instance
+
   @retval EFI_NOT_FOUND Pci device has not oprom
   @retval EFI_SUCCESS   Pci device has oprom
 **/

@@ -10,8 +10,8 @@
 
 **/
 
-#ifndef _IDE_BUS_COMPONENT_NAME_H
-#define _IDE_BUS_COMPONENT_NAME_H
+#ifndef _IDE_BUS_COMPONENT_NAME_H_
+#define _IDE_BUS_COMPONENT_NAME_H_
 
 #define ADD_NAME(x) AddName ((x));
 

@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
-#ifndef _EFI_PCI_ENUMERATOR_H
-#define _EFI_PCI_ENUMERATOR_H
+#ifndef _EFI_PCI_ENUMERATOR_H_
+#define _EFI_PCI_ENUMERATOR_H_
 
 #include "PciResourceSupport.h"
 
@@ -405,13 +405,10 @@ NotifyPhase (
    member function. It allows the host bridge driver to preinitialize individual PCI controllers before
    enumeration.
 
-   @param This              Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL instance.
-   @param RootBridgeHandle  The associated PCI root bridge handle. Type EFI_HANDLE is defined in
-                            InstallProtocolInterface() in the UEFI 2.0 Specification.
-   @param PciAddress        The address of the PCI device on the PCI bus. This address can be passed to the
-                            EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL member functions to access the PCI
-                            configuration space of the device. See Table 12-1 in the UEFI 2.0 Specification for
-                            the definition of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS.
+   @param Bridge            Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL instance.
+   @param Bus               The bus number of the pci device. 
+   @param Device            The device number of the pci device. 
+   @param Func              The function number of the pci device. 
    @param Phase             The phase of the PCI device enumeration. 
    
    @retval EFI_SUCCESS              The requested parameters were returned.
@@ -459,7 +456,10 @@ PciHotPlugRequestNotify (
 /**
   Search hostbridge according to given handle
   
-  @return whether found.
+  @param RootBridgeHandle     - Host bridge handle.
+
+  @return TRUE  Found.
+  @return FALSE Not found.
 **/
 BOOLEAN
 SearchHostBridgeHandle (

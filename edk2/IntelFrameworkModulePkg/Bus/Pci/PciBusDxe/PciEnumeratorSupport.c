@@ -1,4 +1,4 @@
-/**@ file
+/** @file
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -85,7 +85,7 @@ PciDevicePresent (
   root bridge will then be created.
     
   @param Bridge         Parent bridge instance.
-  @param StartBusNumer  Bus number of begining. 
+  @param StartBusNumber Bus number of begining. 
 **/
 EFI_STATUS
 PciPciDeviceInfoCollector (
@@ -1844,6 +1844,14 @@ PciGetBusRange (
   return EFI_NOT_FOUND;
 }
 
+/**
+  This routine can be used to start the root bridge.
+
+  @param RootBridgeDev     Pci device instance.
+
+  @retval EFI_SUCCESS      This device started.
+  
+**/
 EFI_STATUS
 StartManagingRootBridge (
   IN PCI_IO_DEVICE *RootBridgeDev

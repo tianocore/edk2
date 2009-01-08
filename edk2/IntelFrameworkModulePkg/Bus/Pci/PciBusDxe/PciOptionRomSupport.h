@@ -1,4 +1,4 @@
-/**@file
+/** @file
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -11,12 +11,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _EFI_PCI_OP_ROM_SUPPORT_H
-#define _EFI_PCI_OP_ROM_SUPPORT_H
+#ifndef _EFI_PCI_OP_ROM_SUPPORT_H_
+#define _EFI_PCI_OP_ROM_SUPPORT_H_
 
 /**
   Get Pci device's oprom infor bits.
   
+  @param PciIoDevice Pci device instance
+
   @retval EFI_NOT_FOUND Pci device has not oprom
   @retval EFI_SUCCESS   Pci device has oprom
 **/
