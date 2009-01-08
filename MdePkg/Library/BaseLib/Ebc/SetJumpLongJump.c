@@ -1,6 +1,6 @@
 /** @file
   Implementation of SetJump() and LongJump() on EBC.
-  
+
   SetJump() and LongJump() are not currently supported for the EBC processor type.
   Implementation for EBC just returns 0 for SetJump(), and ASSERT() for LongJump().
 
@@ -29,11 +29,13 @@
 
   @param  JumpBuffer    A pointer to CPU context buffer.
 
+  @retval 0 Indicates a return from SetJump().
+
 **/
 UINTN
 EFIAPI
 SetJump (
-  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
+  OUT      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   )
 {
   InternalAssertJumpBuffer (JumpBuffer);
