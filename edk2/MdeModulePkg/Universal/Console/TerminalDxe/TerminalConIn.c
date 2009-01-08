@@ -92,8 +92,8 @@ ReadKeyStrokeWorker (
   @param  This                     Indicates the calling context.
   @param  ExtendedVerification     Skip by this driver.
 
-  @return EFI_SUCCESS              The reset operation succeeds.
-  @return EFI_DEVICE_ERROR         The dependent serial port reset fails.
+  @retval EFI_SUCCESS              The reset operation succeeds.
+  @retval EFI_DEVICE_ERROR         The dependent serial port reset fails.
 
 **/
 EFI_STATUS
@@ -145,9 +145,9 @@ TerminalConInReset (
                               keystroke information for the key that was sent
                               from terminal.
 
-  @return EFI_SUCCESS         The keystroke information is returned successfully.
-  @return EFI_NOT_READY       There is no keystroke data available.
-  @return EFI_DEVICE_ERROR    The dependent serial device encounters error.
+  @retval EFI_SUCCESS         The keystroke information is returned successfully.
+  @retval EFI_NOT_READY       There is no keystroke data available.
+  @retval EFI_DEVICE_ERROR    The dependent serial device encounters error.
 
 **/
 EFI_STATUS
@@ -217,8 +217,6 @@ IsKeyRegistered (
 
   @param  Event                    Indicates the event that invoke this function.
   @param  Context                  Indicates the calling context.
-
-  @return none.
 
 **/
 VOID
@@ -505,8 +503,6 @@ TerminalConInUnregisterKeyNotify (
 
   @param  TerminalDevice       Terminal driver private structure.
 
-  @return none.
-
 **/
 VOID
 TranslateRawDataToEfiKey (
@@ -545,8 +541,6 @@ TranslateRawDataToEfiKey (
 
   @param  Event                    Indicates the event that invoke this function.
   @param  Context                  Indicates the calling context.
-
-  @return None
 
 **/
 VOID
@@ -693,9 +687,9 @@ TerminalConInCheckForKey (
   @param  SerialIo           Serial I/O protocol attached to the serial device.
   @param  Output             The fetched key.
 
-  @return EFI_NOT_READY      If serial buffer is empty.
-  @return EFI_DEVICE_ERROR   If reading serial buffer encounter error.
-  @return EFI_SUCCESS        If reading serial buffer successfully, put
+  @retval EFI_NOT_READY      If serial buffer is empty.
+  @retval EFI_DEVICE_ERROR   If reading serial buffer encounter error.
+  @retval EFI_SUCCESS        If reading serial buffer successfully, put
                              the fetched key to the parameter output.
 
 **/
@@ -739,8 +733,8 @@ GetOneKeyFromSerial (
   @param  TerminalDevice       Terminal driver private structure.
   @param  Input                The key will be input.
 
-  @return TRUE                 If insert successfully.
-  @return FLASE                If Raw Data buffer is full before key insertion,
+  @retval TRUE                 If insert successfully.
+  @retval FLASE                If Raw Data buffer is full before key insertion,
                                and the key is lost.
 
 **/
@@ -774,8 +768,8 @@ RawFiFoInsertOneKey (
   @param  TerminalDevice       Terminal driver private structure.
   @param  Output               The key will be removed.
 
-  @return TRUE                 If insert successfully.
-  @return FLASE                If Raw Data FIFO buffer is empty before remove operation.
+  @retval TRUE                 If insert successfully.
+  @retval FLASE                If Raw Data FIFO buffer is empty before remove operation.
 
 **/
 BOOLEAN
@@ -808,8 +802,8 @@ RawFiFoRemoveOneKey (
 
   @param  TerminalDevice       Terminal driver private structure
 
-  @return TRUE                 If Raw Data FIFO buffer is empty.
-  @return FLASE                If Raw Data FIFO buffer is not empty.
+  @retval TRUE                 If Raw Data FIFO buffer is empty.
+  @retval FLASE                If Raw Data FIFO buffer is not empty.
 
 **/
 BOOLEAN
@@ -829,8 +823,8 @@ IsRawFiFoEmpty (
 
   @param  TerminalDevice       Terminal driver private structure
 
-  @return TRUE                 If Raw Data FIFO buffer is full.
-  @return FLASE                If Raw Data FIFO buffer is not full.
+  @retval TRUE                 If Raw Data FIFO buffer is full.
+  @retval FLASE                If Raw Data FIFO buffer is not full.
 
 **/
 BOOLEAN
@@ -858,8 +852,8 @@ IsRawFiFoFull (
   @param  TerminalDevice       Terminal driver private structure.
   @param  Key                  The key will be input.
 
-  @return TRUE                 If insert successfully.
-  @return FLASE                If FIFO buffer is full before key insertion,
+  @retval TRUE                 If insert successfully.
+  @retval FLASE                If FIFO buffer is full before key insertion,
                                and the key is lost.
 
 **/
@@ -893,8 +887,8 @@ EfiKeyFiFoInsertOneKey (
   @param  TerminalDevice       Terminal driver private structure.
   @param  Output               The key will be removed.
 
-  @return TRUE                 If insert successfully.
-  @return FLASE                If FIFO buffer is empty before remove operation.
+  @retval TRUE                 If insert successfully.
+  @retval FLASE                If FIFO buffer is empty before remove operation.
 
 **/
 BOOLEAN
@@ -928,8 +922,8 @@ EfiKeyFiFoRemoveOneKey (
 
   @param  TerminalDevice       Terminal driver private structure
 
-  @return TRUE                 If FIFO buffer is empty.
-  @return FLASE                If FIFO buffer is not empty.
+  @retval TRUE                 If FIFO buffer is empty.
+  @retval FLASE                If FIFO buffer is not empty.
 
 **/
 BOOLEAN
@@ -949,8 +943,8 @@ IsEfiKeyFiFoEmpty (
 
   @param  TerminalDevice       Terminal driver private structure
 
-  @return TRUE                 If FIFO buffer is full.
-  @return FLASE                If FIFO buffer is not full.
+  @retval TRUE                 If FIFO buffer is full.
+  @retval FLASE                If FIFO buffer is not full.
 
 **/
 BOOLEAN
@@ -978,8 +972,8 @@ IsEfiKeyFiFoFull (
   @param  TerminalDevice       Terminal driver private structure.
   @param  Input                The key will be input.
 
-  @return TRUE                 If insert successfully.
-  @return FLASE                If Unicode FIFO buffer is full before key insertion,
+  @retval TRUE                 If insert successfully.
+  @retval FLASE                If Unicode FIFO buffer is full before key insertion,
                                and the key is lost.
 
 **/
@@ -1013,8 +1007,8 @@ UnicodeFiFoInsertOneKey (
   @param  TerminalDevice       Terminal driver private structure.
   @param  Output               The key will be removed.
 
-  @return TRUE                 If insert successfully.
-  @return FLASE                If Unicode FIFO buffer is empty before remove operation.
+  @retval TRUE                 If insert successfully.
+  @retval FLASE                If Unicode FIFO buffer is empty before remove operation.
 
 **/
 BOOLEAN
@@ -1047,8 +1041,8 @@ UnicodeFiFoRemoveOneKey (
 
   @param  TerminalDevice       Terminal driver private structure
 
-  @return TRUE                 If Unicode FIFO buffer is empty.
-  @return FLASE                If Unicode FIFO buffer is not empty.
+  @retval TRUE                 If Unicode FIFO buffer is empty.
+  @retval FLASE                If Unicode FIFO buffer is not empty.
 
 **/
 BOOLEAN
@@ -1068,8 +1062,8 @@ IsUnicodeFiFoEmpty (
 
   @param  TerminalDevice       Terminal driver private structure
 
-  @return TRUE                 If Unicode FIFO buffer is full.
-  @return FLASE                If Unicode FIFO buffer is not full.
+  @retval TRUE                 If Unicode FIFO buffer is full.
+  @retval FLASE                If Unicode FIFO buffer is not full.
 
 **/
 BOOLEAN
@@ -1121,8 +1115,6 @@ UnicodeFiFoGetKeyCount (
   Update the Unicode characters from a terminal input device into EFI Keys FIFO.
   
   @param TerminalDevice   The terminal device to use to translate raw input into EFI Keys
-
-  @return None.
 
 **/
 VOID
@@ -1239,8 +1231,6 @@ UnicodeToEfiKeyFlushState (
   ESC R ESC r ESC R = Reset System
 
   @param TerminalDevice   The terminal device to use to translate raw input into EFI Keys
-
-  @return None.
 
 **/
 VOID

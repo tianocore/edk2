@@ -958,8 +958,6 @@ TerminalFreeNotifyList (
   @param  VariableName           The Console Device Environment Variable.
   @param  ParentDevicePath       The terminal device path to be updated.
 
-  @return None.
-
 **/
 VOID
 TerminalUpdateConsoleDevVariable (
@@ -1022,8 +1020,6 @@ TerminalUpdateConsoleDevVariable (
 
   @param  VariableName           Console Device Environment Variables.
   @param  ParentDevicePath       The terminal device path to be updated.
-
-  @return None.
 
 **/
 VOID
@@ -1288,8 +1284,6 @@ SetTerminalDevicePath (
 
   @param TerminalDevice          The terminal device.
 
-  @return None.
-
 **/
 VOID
 InitializeRawFiFo (
@@ -1307,8 +1301,6 @@ InitializeRawFiFo (
 
   @param TerminalDevice          The terminal device.
 
-  @return None.
-
 **/
 VOID
 InitializeUnicodeFiFo (
@@ -1325,8 +1317,6 @@ InitializeUnicodeFiFo (
   Initialize the EFI Key FIFO.
 
   @param TerminalDevice          The terminal device.
-
-  @return None.
 
 **/
 VOID

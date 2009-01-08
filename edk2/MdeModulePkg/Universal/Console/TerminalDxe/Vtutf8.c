@@ -20,8 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param TerminalDevice          The terminal device.
 
-  @return None.
-
 **/
 VOID
 VTUTF8RawDataToUnicode (
@@ -179,8 +177,6 @@ GetOneValidUtf8Char (
   @param  Utf8Char         VT-UTF8 character set needs translating.
   @param  ValidBytes       The count of valid VT-UTF8 characters.
   @param  UnicodeChar      Returned unicode character. 
-  
-  @return None.
 
 **/
 VOID
@@ -255,8 +251,6 @@ Utf8ToUnicode (
   @param  Utf8Char         Return VT-UTF8 character set.
   @param  ValidBytes       The count of valid VT-UTF8 characters. If
                            ValidBytes is zero, no valid VT-UTF8 returned.
-  
-  @return None.
 
 **/
 VOID
