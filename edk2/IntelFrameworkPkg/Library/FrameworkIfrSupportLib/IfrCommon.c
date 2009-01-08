@@ -804,6 +804,7 @@ ValidateDataFromHiiHandle (
   //
   VariableData = AllocateZeroPool (SizeOfNvStore);
   if (VariableData == NULL) {
+    FreePool (OldData);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -832,6 +833,7 @@ ValidateDataFromHiiHandle (
 
       VariableData = AllocatePool (SizeOfNvStore);
       if (VariableData == NULL) {
+        FreePool (OldData);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -875,7 +877,7 @@ ValidateDataFromHiiHandle (
       //
       if (!GotMatch) {
         *Results = FALSE;
-        return EFI_SUCCESS;
+        goto EXIT;
       }
       break;
 
@@ -886,7 +888,7 @@ ValidateDataFromHiiHandle (
       //
       if (VariableData[((FRAMEWORK_EFI_IFR_CHECKBOX *) &RawData[Index])->QuestionId] > 1) {
         *Results = FALSE;
-        return EFI_SUCCESS;
+        goto EXIT;
       }
       break;
 
@@ -894,7 +896,7 @@ ValidateDataFromHiiHandle (
         if ((VariableData[((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->QuestionId] < ((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->Minimum) ||
             (VariableData[((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->QuestionId] > ((FRAMEWORK_EFI_IFR_NUMERIC *)&RawData[Index])->Maximum)) {
         *Results = FALSE;
-        return EFI_SUCCESS;
+        goto EXIT;
       }
       break;
 
@@ -903,11 +905,12 @@ ValidateDataFromHiiHandle (
     Index = RawData[Index + 1] + Index;
   }
 
+EXIT: 
   //
   // Free our temporary repository of form data
   //
-  gBS->FreePool (OldData);
-  gBS->FreePool (VariableData);
+  FreePool (OldData);
+  FreePool (VariableData);
 
   return EFI_SUCCESS;
 }
