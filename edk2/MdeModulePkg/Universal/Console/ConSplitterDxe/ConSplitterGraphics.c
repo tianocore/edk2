@@ -76,15 +76,15 @@ ConSpliterConsoleControlGetMode (
 
 
 /**
-  Set the current mode to either text or graphics. Graphics is
+  Set the current video mode to either text or graphics. Graphics is
   for Quiet Boot.
 
   @param  This                    Console Control Protocol instance pointer.
-  @param  Mode                    Mode to set.
+  @param  Mode                    Video mode is to be set.
 
-  @retval EFI_SUCCESS             Mode information returned.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_UNSUPPORTED         Operation unsupported.
+  @retval EFI_SUCCESS             Mode is set successfully.
+  @retval EFI_INVALID_PARAMETER   Mode is not the valid mode value.
+  @retval EFI_UNSUPPORTED         Mode is unsupported by console device.
 
 **/
 EFI_STATUS
@@ -205,7 +205,7 @@ ConSpliterGraphicsOutputQueryMode (
 
 
 /**
-  Set the video device into the specified mode and clears the visible portions of 
+  Set the video device into the specified mode and clears the visible portions of
   the output display to black.
 
   @param  This                  The EFI_GRAPHICS_OUTPUT_PROTOCOL instance.
@@ -361,7 +361,7 @@ ConSpliterGraphicsOutputSetMode (
   @param  DestinationX            X coordinate of destination for the BltBuffer.
   @param  DestinationY            Y coordinate of destination for the BltBuffer.
   @param  Width                   Width of rectangle in BltBuffer in pixels.
-  @param  Height                  Hight of rectangle in BltBuffer in pixels. 
+  @param  Height                  Hight of rectangle in BltBuffer in pixels.
   @param  Delta                   OPTIONAL.
 
   @retval EFI_SUCCESS             The Blt operation completed.
@@ -525,7 +525,7 @@ DevNullGraphicsOutputBlt (
   @param  DestinationX            X coordinate of destination for the BltBuffer.
   @param  DestinationY            Y coordinate of destination for the BltBuffer.
   @param  Width                   Width of rectangle in BltBuffer in pixels.
-  @param  Height                  Hight of rectangle in BltBuffer in pixels. 
+  @param  Height                  Hight of rectangle in BltBuffer in pixels.
   @param  Delta                   OPTIONAL.
 
   @retval EFI_SUCCESS             The Blt operation completed.
@@ -634,7 +634,7 @@ ConSpliterGraphicsOutputBlt (
 }
 
 /**
-  Write data from the buffer to video display based on Graphics Output setting. 
+  Write data from the buffer to video display based on Graphics Output setting.
 
   @param  Private                 Consplitter Text Out pointer.
   @param  GraphicsOutput          Graphics Output protocol pointer.
@@ -644,7 +644,7 @@ ConSpliterGraphicsOutputBlt (
   @retval EFI_SUCCESS             The Blt operation completed.
   @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
   @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video buffer.
-                 
+
 
 **/
 EFI_STATUS
@@ -842,7 +842,7 @@ ConSpliterUgaDrawSetMode (
           ReturnStatus = Status;
         }
       }
-    } 
+    }
   }
 
   return ReturnStatus;
@@ -859,7 +859,7 @@ ConSpliterUgaDrawSetMode (
     (DestinationX, DestinationY)
     (DestinationX + Width, DestinationY + Height).
     Only one pixel will be used from the BltBuffer. Delta is NOT used.
-  EfiUgaVideoToBltBuffer: 
+  EfiUgaVideoToBltBuffer:
     Read data from the video display rectangle
     (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
     the BltBuffer rectangle (DestinationX, DestinationY )
@@ -891,7 +891,7 @@ ConSpliterUgaDrawSetMode (
   @param  DestinationX            X coordinate of destination for the BltBuffer.
   @param  DestinationY            Y coordinate of destination for the BltBuffer.
   @param  Width                   Width of rectangle in BltBuffer in pixels.
-  @param  Height                  Hight of rectangle in BltBuffer in pixels. 
+  @param  Height                  Hight of rectangle in BltBuffer in pixels.
   @param  Delta                   OPTIONAL.
 
   @retval EFI_SUCCESS             The Blt operation completed.
@@ -1028,7 +1028,7 @@ DevNullUgaBlt (
     (DestinationX, DestinationY)
     (DestinationX + Width, DestinationY + Height).
     Only one pixel will be used from the BltBuffer. Delta is NOT used.
-  EfiUgaVideoToBltBuffer: 
+  EfiUgaVideoToBltBuffer:
     Read data from the video display rectangle
     (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
     the BltBuffer rectangle (DestinationX, DestinationY )
@@ -1163,7 +1163,7 @@ ConSpliterUgaDrawBlt (
 }
 
 /**
-  Write data from the buffer to video display based on UGA Draw setting. 
+  Write data from the buffer to video display based on UGA Draw setting.
 
   @param  Private                 Consplitter Text Out pointer.
   @param  GraphicsOutput          Graphics Output protocol pointer.
@@ -1173,7 +1173,7 @@ ConSpliterUgaDrawBlt (
   @retval EFI_SUCCESS             The Blt operation completed.
   @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
   @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video buffer.
-                  
+
 **/
 EFI_STATUS
 DevNullUgaSync (
@@ -1261,7 +1261,7 @@ DevNullTextOutOutputString (
   LastRow         = Private->DevNullRows - 1;
   MaxColumn       = Private->DevNullColumns;
 
-  if (Mode->Attribute & EFI_WIDE_ATTRIBUTE) {
+  if ((Mode->Attribute & EFI_WIDE_ATTRIBUTE) != 0) {
     CurrentWidth = 2;
   } else {
     CurrentWidth = 1;
@@ -1561,7 +1561,7 @@ DevNullTextOutClearScreen (
   Sets the current coordinates of the cursor position.
 
   @param  Private                 Text Out Splitter pointer.
-  @param  Column                  
+  @param  Column
   @param  Row                     the position to set the cursor to. Must be
                                   greater than or equal to zero and less than the
                                   number of columns and rows by QueryMode ().

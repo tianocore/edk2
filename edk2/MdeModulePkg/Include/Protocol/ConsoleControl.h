@@ -2,14 +2,14 @@
 
   This protocol provides the interfaces to Get/Set the current video mode for GOP/UGA screen
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2008, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -48,7 +48,7 @@ EFI_STATUS
 (EFIAPI *EFI_CONSOLE_CONTROL_PROTOCOL_GET_MODE)(
   IN  EFI_CONSOLE_CONTROL_PROTOCOL      *This,
   OUT EFI_CONSOLE_CONTROL_SCREEN_MODE   *Mode,
-  OUT BOOLEAN                           *GopUgaExists,  OPTIONAL  
+  OUT BOOLEAN                           *GopUgaExists,  OPTIONAL
   OUT BOOLEAN                           *StdInLocked    OPTIONAL
   );
 
@@ -72,15 +72,15 @@ EFI_STATUS
   );
 
 /**
-  If Password is NULL or the Password is too big, then return an error. If the 
+  If Password is NULL or the Password is too big, then return an error. If the
   Password is valid, then store the password, lock StdIn and arm the periodic timer.
 
-  @param  This                     Console Control protocol pointer.
+  @param  This                     Protocol instance pointer.
   @param  Password                 The password input.
 
-  @retval EFI_SUCCESS              Lock the StdIn device
-  @retval EFI_INVALID_PARAMETER    Password is NULL
-  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the password fails
+  @retval EFI_SUCCESS              Lock the StdIn device.
+  @retval EFI_INVALID_PARAMETER    Password is NULL.
+  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the password fails.
 
 **/
 typedef
