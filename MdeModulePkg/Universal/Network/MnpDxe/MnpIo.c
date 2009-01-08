@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2007, Intel Corporation
+    Implementation of Managed Network Protocol I/O functions.
+    
+Copyright (c) 2005 - 2007, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  MnpIo.c
-
-Abstract:
-
-  Implementation of Managed Network Protocol I/O functions.
-
 
 **/
 
@@ -1070,8 +1062,6 @@ MnpCheckPacketTimeout (
   @param  Event                 The event this notify function registered to.
   @param  Context               Pointer to the context data registered to the
                                 event.
-
-  @return None.
 
 **/
 VOID

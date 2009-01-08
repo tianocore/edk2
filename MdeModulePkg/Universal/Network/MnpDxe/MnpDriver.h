@@ -1,26 +1,20 @@
 /** @file
-
-Copyright (c) 2005 - 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+    Declaration of strctures and functions for MnpDxe driver.
+    
+Copyright (c) 2005 - 2007, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  MnpDriver.h
-
-Abstract:
-
 
 **/
 
 #ifndef _MNP_DRIVER_H_
 #define _MNP_DRIVER_H_
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/ManagedNetwork.h>
 #include <Protocol/SimpleNetwork.h>
@@ -194,7 +188,7 @@ EFI_STATUS
 EFIAPI
 MnpServiceBindingCreateChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                    *ChildHandle
+  IN OUT EFI_HANDLE                *ChildHandle
   );
 
 /**
