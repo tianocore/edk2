@@ -53,13 +53,14 @@
   PcdLib
 
 [Guids]
-  gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
+  gEfiGenericPlatformVariableGuid               ## PRODUCES ##Variable:L"TimerVar"
+  gEfiGenericPlatformVariableGuid               ## CONSUMES ##Variable:L"TimerVar"
 
 [Protocols]
-  gEfiRealTimeClockArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
+  gEfiRealTimeClockArchProtocolGuid             ## PRODUCES
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
   
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout         ## CONSUMES
