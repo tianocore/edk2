@@ -99,8 +99,8 @@ CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0
                                 exhaustive verification operation of the device
                                 during reset.
 
-  @return EFI_SUCCESS           The reset operation succeeds.
-  @return EFI_DEVICE_ERROR      The terminal is not functioning correctly or the serial port reset fails.
+  @retval EFI_SUCCESS           The reset operation succeeds.
+  @retval EFI_DEVICE_ERROR      The terminal is not functioning correctly or the serial port reset fails.
 
 **/
 EFI_STATUS
@@ -346,8 +346,8 @@ OutputError:
   @param  This              Indicates the calling context.
   @param  WString           The Null-terminated Unicode string to be tested.
 
-  @return EFI_SUCCESS       The terminal is capable of rendering the output string.
-  @return EFI_UNSUPPORTED   Some of the characters in the Unicode string cannot be rendered.
+  @retval EFI_SUCCESS       The terminal is capable of rendering the output string.
+  @retval EFI_UNSUPPORTED   Some of the characters in the Unicode string cannot be rendered.
 
 **/
 EFI_STATUS
@@ -399,9 +399,9 @@ TerminalConOutTestString (
   @param Columns     The returned columns of the requested mode.
   @param Rows        The returned rows of the requested mode.
 
-  @return EFI_SUCCESS       The requested mode information is returned.
-  @return EFI_UNSUPPORTED   The mode number is not valid.
-  @return EFI_DEVICE_ERROR
+  @retval EFI_SUCCESS       The requested mode information is returned.
+  @retval EFI_UNSUPPORTED   The mode number is not valid.
+  @retval EFI_DEVICE_ERROR
 
 **/
 EFI_STATUS
@@ -444,10 +444,10 @@ TerminalConOutQueryMode (
   @param This          Indicates the calling context.
   @param ModeNumber    The text mode to set.
 
-  @return EFI_SUCCESS       The requested text mode is set.
-  @return EFI_DEVICE_ERROR  The requested text mode cannot be set 
+  @retval EFI_SUCCESS       The requested text mode is set.
+  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set 
                             because of serial device error.
-  @return EFI_UNSUPPORTED   The text mode number is not valid.
+  @retval EFI_UNSUPPORTED   The text mode number is not valid.
 
 **/
 EFI_STATUS
@@ -503,9 +503,9 @@ TerminalConOutSetMode (
   @param Attribute   The attribute to set. Only bit0..6 are valid, all other bits
                      are undefined and must be zero.
 
-  @return EFI_SUCCESS        The requested attribute is set.
-  @return EFI_DEVICE_ERROR   The requested attribute cannot be set due to serial port error.
-  @return EFI_UNSUPPORTED    The attribute requested is not defined by EFI spec.
+  @retval EFI_SUCCESS        The requested attribute is set.
+  @retval EFI_DEVICE_ERROR   The requested attribute cannot be set due to serial port error.
+  @retval EFI_UNSUPPORTED    The attribute requested is not defined by EFI spec.
 
 **/
 EFI_STATUS
@@ -676,9 +676,9 @@ TerminalConOutSetAttribute (
 
   @param This     Indicates the calling context.
 
-  @return EFI_SUCCESS       The operation completed successfully.
-  @return EFI_DEVICE_ERROR  The terminal screen cannot be cleared due to serial port error.
-  @return EFI_UNSUPPORTED   The terminal is not in a valid display mode.
+  @retval EFI_SUCCESS       The operation completed successfully.
+  @retval EFI_DEVICE_ERROR  The terminal screen cannot be cleared due to serial port error.
+  @retval EFI_UNSUPPORTED   The terminal is not in a valid display mode.
 
 **/
 EFI_STATUS
@@ -716,9 +716,9 @@ TerminalConOutClearScreen (
   @param Column    The row to set cursor to.
   @param Row       The column to set cursor to.
 
-  @return EFI_SUCCESS       The operation completed successfully.
-  @return EFI_DEVICE_ERROR  The request fails due to serial port error.
-  @return EFI_UNSUPPORTED   The terminal is not in a valid text mode, or the cursor position
+  @retval EFI_SUCCESS       The operation completed successfully.
+  @retval EFI_DEVICE_ERROR  The request fails due to serial port error.
+  @retval EFI_UNSUPPORTED   The terminal is not in a valid text mode, or the cursor position
                             is invalid for current mode.
 
 **/
@@ -794,8 +794,8 @@ TerminalConOutSetCursorPosition (
   @param Visible   If TRUE, the cursor is set to be visible,
                    If FALSE, the cursor is set to be invisible.
 
-  @return EFI_SUCCESS      The request is valid.
-  @return EFI_UNSUPPORTED  The terminal does not support cursor hidden.
+  @retval EFI_SUCCESS      The request is valid.
+  @retval EFI_UNSUPPORTED  The terminal does not support cursor hidden.
 
 **/
 EFI_STATUS
@@ -822,7 +822,7 @@ TerminalConOutEnableCursor (
   @param  Ascii        Optional pointer to return ASCII equivalent of
                        Graphic.
 
-  @return TRUE         If Graphic is a supported Unicode Box Drawing character.
+  @retval TRUE         If Graphic is a supported Unicode Box Drawing character.
 
 **/
 BOOLEAN

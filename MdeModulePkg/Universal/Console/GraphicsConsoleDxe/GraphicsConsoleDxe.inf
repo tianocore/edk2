@@ -53,12 +53,12 @@
   HiiLib
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleTextOutProtocolGuid                 # PROTOCOL BY_START
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL TO_START
-  gEfiUgaDrawProtocolGuid                       # PROTOCOL TO_START
-  gEfiHiiFontProtocolGuid                       # PROTOCOL TO_START
-  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL TO_START   
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiSimpleTextOutProtocolGuid                 ## BY_START
+  gEfiGraphicsOutputProtocolGuid                ## TO_START
+  gEfiUgaDrawProtocolGuid                       ## TO_START
+  gEfiHiiFontProtocolGuid                       ## TO_START
+  gEfiHiiDatabaseProtocolGuid                   ## TO_START   
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport

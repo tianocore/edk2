@@ -60,20 +60,20 @@
   BaseLib
 
 [Guids]
-  gEfiGlobalVariableGuid                        # SOMETIMES_CONSUMED L"ErrOutDev"
-  gEfiVTUTF8Guid                                # SOMETIMES_CONSUMED
-  gEfiVT100Guid                                 # SOMETIMES_CONSUMED
-  gEfiVT100PlusGuid                             # SOMETIMES_CONSUMED
-  gEfiPcAnsiGuid                                # SOMETIMES_CONSUMED
-  gSimpleTextInExNotifyGuid                     # SOMETIMES_CONSUMED
-  gEfiHotPlugDeviceGuid                         # PROTOCOL SOMETIMES_CONSUMED
+  gEfiGlobalVariableGuid                        ## SOMETIMES_CONSUMES ## Variable:L"ErrOutDev"
+  gEfiVTUTF8Guid                                ## SOMETIMES_CONSUMES ## GUID
+  gEfiVT100Guid                                 ## SOMETIMES_CONSUMES ## GUID
+  gEfiVT100PlusGuid                             ## SOMETIMES_CONSUMES ## GUID 
+  gEfiPcAnsiGuid                                ## SOMETIMES_CONSUMES ## GUID
+  gSimpleTextInExNotifyGuid                     ## SOMETIMES_CONSUMES ##
+  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES ##
   
 [Protocols]
-  gEfiSerialIoProtocolGuid                      # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
-  gEfiSimpleTextOutProtocolGuid                 # PROTOCOL BY_START
+  gEfiSerialIoProtocolGuid                      ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiSimpleTextOutProtocolGuid                 ## BY_START
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError

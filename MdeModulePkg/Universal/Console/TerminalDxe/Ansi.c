@@ -21,8 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param TerminalDevice          The terminal device.
 
-  @return None.
-
 **/
 VOID
 AnsiRawDataToUnicode (
