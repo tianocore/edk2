@@ -211,10 +211,10 @@ Error:
 
 
 /**
-  Start this driver on Controller by opening Graphics Output protocol or 
+  Start this driver on Controller by opening Graphics Output protocol or
   UGA Draw protocol, and installing Simple Text Out protocol on Controller.
   (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
-  
+
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -297,18 +297,18 @@ GraphicsConsoleControllerDriverStart (
     //
     //    +--------------------------------+ <-- Package
     //    |                                |
-    //    |    PackageLength(4 bytes)      | 
+    //    |    PackageLength(4 bytes)      |
     //    |                                |
     //    |--------------------------------| <-- SimplifiedFont
     //    |                                |
-    //    |EFI_HII_SIMPLE_FONT_PACKAGE_HDR | 
+    //    |EFI_HII_SIMPLE_FONT_PACKAGE_HDR |
     //    |                                |
     //    |--------------------------------| <-- Location
     //    |                                |
     //    |     gUsStdNarrowGlyphData      |
     //    |                                |
     //    +--------------------------------+
-    
+
     PackageLength   = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + NarrowFontSize + 4;
     Package = AllocateZeroPool (PackageLength);
     if (Package == NULL) {
@@ -370,10 +370,10 @@ GraphicsConsoleControllerDriverStart (
                    &ModeNumber
                    );
     }
-    
+
     Mode = Private->GraphicsOutput->Mode;
-     
-    if (EFI_ERROR (Status) || (Mode->MaxMode)) {
+
+    if (EFI_ERROR (Status) || (Mode->MaxMode != 0)) {
       //
       // Set default mode failed or device don't support default mode, then get the current mode information
       //
@@ -564,10 +564,10 @@ Error:
 }
 
 /**
-  Stop this driver on Controller by removing Simple Text Out protocol 
+  Stop this driver on Controller by removing Simple Text Out protocol
   and closing the Graphics Output Protocol or UGA Draw protocol on Controller.
   (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
-  
+
 
   @param  This              Protocol instance pointer.
   @param  Controller        Handle of device to stop driver on
@@ -576,7 +576,7 @@ Error:
   @param  ChildHandleBuffer List of Child Handles to Stop.
 
   @retval EFI_SUCCESS       This driver is removed Controller.
-  @retval EFI_NOT_STARTED   Simple Text Out protocol could not be found the 
+  @retval EFI_NOT_STARTED   Simple Text Out protocol could not be found the
                             Controller.
   @retval other             This driver was not removed from this device.
 
@@ -659,17 +659,17 @@ GraphicsConsoleControllerDriverStop (
   for the Graphics Console device based on Graphics Output Protocol.
 
   If yes, set the graphic devcice's current mode to this specific mode.
-  
+
   @param  GraphicsOutput        Graphics Output Protocol instance pointer.
   @param  HorizontalResolution  User defined horizontal resolution
   @param  VerticalResolution    User defined vertical resolution.
   @param  CurrentModeNumber     Current specific mode to be check.
 
   @retval EFI_SUCCESS       The mode is supported.
-  @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
+  @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics
                             device supported.
-  @retval other             The specific mode does not support user defined 
-                            resolution or failed to set the current mode to the 
+  @retval other             The specific mode does not support user defined
+                            resolution or failed to set the current mode to the
                             specific mode on graphics device.
 
 **/
@@ -689,7 +689,7 @@ CheckModeSupported (
 
   Status  = EFI_SUCCESS;
   MaxMode = GraphicsOutput->Mode->MaxMode;
-  
+
   for (ModeNumber = 0; ModeNumber < MaxMode; ModeNumber++) {
     Status = GraphicsOutput->QueryMode (
                        GraphicsOutput,
@@ -722,9 +722,9 @@ CheckModeSupported (
 /**
   Locate HII Database protocol and HII Font protocol.
 
-  @retval  EFI_SUCCESS     HII Database protocol and HII Font protocol 
+  @retval  EFI_SUCCESS     HII Database protocol and HII Font protocol
                            are located successfully.
-  @return  other           Failed to locate HII Database protocol or 
+  @return  other           Failed to locate HII Database protocol or
                            HII Font protocol.
 
 **/
@@ -778,7 +778,7 @@ EfiLocateHiiProtocol (
 
 /**
   Reset the text output device hardware and optionally run diagnostics.
-  
+
   Implements SIMPLE_TEXT_OUTPUT.Reset().
   If ExtendeVerification is TRUE, then perform dependent Graphics Console
   device reset, and set display mode to mode 0.
@@ -809,7 +809,7 @@ GraphicsConsoleConOutReset (
 /**
   Write a Unicode string to the output device.
 
-  Implements SIMPLE_TEXT_OUTPUT.OutputString(). 
+  Implements SIMPLE_TEXT_OUTPUT.OutputString().
   The Unicode string will be converted to Glyphs and will be
   sent to the Graphics Console.
 
@@ -1025,8 +1025,8 @@ GraphicsConsoleConOutOutputString (
       // Count is used to determine how many characters are used regardless of their attributes
       //
       for (Count = 0, Index = 0; (This->Mode->CursorColumn + Index) < MaxColumn; Count++, Index++) {
-        if (WString[Count] == CHAR_NULL || 
-            WString[Count] == CHAR_BACKSPACE || 
+        if (WString[Count] == CHAR_NULL ||
+            WString[Count] == CHAR_BACKSPACE ||
             WString[Count] == CHAR_LINEFEED ||
             WString[Count] == CHAR_CARRIAGE_RETURN ||
             WString[Count] == WIDE_CHAR ||
@@ -1036,7 +1036,7 @@ GraphicsConsoleConOutOutputString (
         //
         // Is the wide attribute on?
         //
-        if (This->Mode->Attribute & EFI_WIDE_ATTRIBUTE) {
+        if ((This->Mode->Attribute & EFI_WIDE_ATTRIBUTE) != 0) {
           //
           // If wide, add one more width unit than normal since we are going to increment at the end of the for loop
           //
@@ -1089,7 +1089,7 @@ GraphicsConsoleConOutOutputString (
 }
 
 /**
-  Verifies that all characters in a Unicode string can be output to the 
+  Verifies that all characters in a Unicode string can be output to the
   target device.
 
   Implements SIMPLE_TEXT_OUTPUT.TestString().
@@ -1201,7 +1201,7 @@ Done:
 
 /**
   Sets the output device(s) to a specified mode.
-  
+
   Implements SIMPLE_TEXT_OUTPUT.SetMode().
   Set the Graphics Console to a specified mode. In this driver, we only support mode 0.
 
@@ -1209,7 +1209,7 @@ Done:
   @param  ModeNumber            The text mode to set.
 
   @retval EFI_SUCCESS           The requested text mode is set.
-  @retval EFI_DEVICE_ERROR      The requested text mode cannot be set because of 
+  @retval EFI_DEVICE_ERROR      The requested text mode cannot be set because of
                                 Graphics Console device error.
   @retval EFI_UNSUPPORTED       The text mode number is not valid.
 
@@ -1402,7 +1402,7 @@ Done:
 
   @param  This                  Protocol instance pointer.
   @param  Attribute             The attribute to set. Bits 0..3 are the foreground
-                                color, and bits 4..6 are the background color. 
+                                color, and bits 4..6 are the background color.
                                 All other bits are undefined and must be zero.
 
   @retval EFI_SUCCESS           The requested attribute is set.
@@ -1442,7 +1442,7 @@ GraphicsConsoleConOutSetAttribute (
 
 
 /**
-  Clears the output device(s) display to the currently selected background 
+  Clears the output device(s) display to the currently selected background
   color.
 
   Implements SIMPLE_TEXT_OUTPUT.ClearScreen().
@@ -1702,7 +1702,7 @@ DrawUnicodeWeightAtCursorN (
 
   if (Private->GraphicsOutput != NULL) {
     //
-    // If Graphics Output protocol exists, using HII Font protocol to draw. 
+    // If Graphics Output protocol exists, using HII Font protocol to draw.
     //
     Blt->Image.Screen = Private->GraphicsOutput;
 
@@ -1721,7 +1721,7 @@ DrawUnicodeWeightAtCursorN (
 
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
-    // If Graphics Output protocol cannot be found and PcdUgaConsumeSupport enabled, 
+    // If Graphics Output protocol cannot be found and PcdUgaConsumeSupport enabled,
     // using UGA Draw protocol to draw.
     //
     ASSERT (Private->UgaDraw!= NULL);
