@@ -308,11 +308,11 @@ AsciiErrorPrint (
 
   @param  X            X coordinate to print the string.
   @param  Y            Y coordinate to print the string.
-  @param  ForeGround   The forground color of the string being printed.  This is
+  @param  Foreground   The forground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  BackGround   The background color of the string being printed.  This is
+  @param  Background   The background color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
