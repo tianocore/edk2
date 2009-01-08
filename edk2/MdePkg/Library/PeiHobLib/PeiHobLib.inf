@@ -46,3 +46,12 @@
   gEfiHobMemoryAllocBspStoreGuid                ## PRODUCES ## HOB
   gEfiHobMemoryAllocModuleGuid                  ## PRODUCES ## HOB
 
+#
+# [Hob]
+#   RESOURCE_DESCRIPTOR   ## PRODUCES
+#   MEMORY_ALLOCATION     ## PRODUCES
+#   GUID_EXTENSION        ## PRODUCES
+#   FV2                   ## PRODUCES
+#   FV                    ## PRODUCES
+#   
+
