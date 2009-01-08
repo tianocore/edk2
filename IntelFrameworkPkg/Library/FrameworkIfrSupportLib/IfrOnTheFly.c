@@ -72,6 +72,8 @@ CreateFormSet (
   GetCurrentLanguage (CurrentLanguage);
   Status = AddString (*StringBuffer, CurrentLanguage, FormSetTitle, &StringToken);
   if (EFI_ERROR (Status)) {
+    FreePool (FormBuffer);
+    FreePool (StringBuffer);
     return Status;
   }
 

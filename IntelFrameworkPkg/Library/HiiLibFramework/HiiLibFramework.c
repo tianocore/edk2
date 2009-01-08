@@ -17,7 +17,6 @@
 
 #include <Protocol/FrameworkHii.h>
 
-#include <Library/HiiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
