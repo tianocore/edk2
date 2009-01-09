@@ -56,33 +56,32 @@
   DevicePathLib
   
 [Guids]
-  gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
-  gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
+  gEfiEventReadyToBootGuid                      ## CONSUMES  ## Event
+  gEfiEventLegacyBootGuid                       ## CONSUMES  ## Event
 
 
 [Protocols]
-  gEfiDriverBindingProtocolGuid                 # ALWAYS_CONSUMED
-  gEfiSimpleTextOutProtocolGuid                 # ALWAYS_CONSUMED
-  gEfiGraphicsOutputProtocolGuid                # ALWAYS_CONSUMED
-  gEfiHiiFontProtocolGuid                       # ALWAYS_CONSUMED
-  gEfiComponentNameProtocolGuid                 # SOMETIMES_CONSUMED
-  gEfiComponentName2ProtocolGuid                # SOMETIMES_CONSUMED
-  gEfiDriverConfigurationProtocolGuid           # SOMETIMES_CONSUMED
-  gEfiDriverConfiguration2ProtocolGuid          # SOMETIMES_CONSUMED
-  gEfiDriverDiagnosticsProtocolGuid             # SOMETIMES_CONSUMED
-  gEfiDriverDiagnostics2ProtocolGuid            # SOMETIMES_CONSUMED
-  gEfiUgaDrawProtocolGuid                       # SOMETIMES_CONSUMED
+  gEfiDriverBindingProtocolGuid                 ## PRODUCES
+  gEfiSimpleTextOutProtocolGuid                 ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## CONSUMES
+  gEfiHiiFontProtocolGuid                       ## CONSUMES
+  gEfiUgaDrawProtocolGuid                       ## SOMETIMES_CONSUMES (Consumed if gEfiGraphicsOutputProtocolGuid not installed AND PcdUgaConsumeSupport set TRUE)
+  gEfiComponentNameProtocolGuid                 ## SOMETIMES_PRODUCES (User chooses to produce it AND PcdComponentNameDisable is set FALSE)
+  gEfiComponentName2ProtocolGuid                ## SOMETIMES_PRODUCES (User chooses to produce it AND PcdComponentName2Disable is set FALSE)
+  gEfiDriverConfigurationProtocolGuid           ## SOMETIMES_CONSUMES (User chooses to produce it)
+  gEfiDriverConfiguration2ProtocolGuid          ## SOMETIMES_CONSUMES (User chooses to produce it)
+  gEfiDriverDiagnosticsProtocolGuid             ## SOMETIMES_CONSUMES (User chooses to produce it AND PcdDriverDiagnosticsDisable is set FALSE)
+  gEfiDriverDiagnostics2ProtocolGuid            ## SOMETIMES_CONSUMES (User chooses to produce it AND PcdDriverDiagnostics2Disable is set FALSE)
 
 
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize   ## CONSUMES
 
 [FeaturePcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
-
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable   ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport           ## CONSUMES
 
 
