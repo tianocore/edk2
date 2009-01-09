@@ -45,6 +45,6 @@
   BaseMemoryLib
 
 [Protocols]
-  gEfiCrc32GuidedSectionExtractionProtocolGuid     # ALWAYS CONSUMED used as Guid, not protocol service
-  gEfiSecurityPolicyProtocolGuid                   # ALWAYS CONSUMED
+  gEfiCrc32GuidedSectionExtractionProtocolGuid     ## PRODUCED
+  gEfiSecurityPolicyProtocolGuid                   ## SOMETIMES_CONSUMED (Set platform override AUTH status if exist)
   

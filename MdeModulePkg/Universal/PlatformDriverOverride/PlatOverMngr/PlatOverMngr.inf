@@ -67,21 +67,22 @@
   GenericBdsLib
   
 [Guids]
-  gEfiGlobalVariableGuid                        # Get value of variable L"PlatformLang". 
-                                                # this value specifies the platform supported language string (RFC 3066)
+  gEfiGlobalVariableGuid                        ## CONSUMED ## Variable:L"PlatformLang" this variable specifies the platform supported language string (RFC 3066 format)
 
 [Protocols]
-  gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
-  gEfiDriverBindingProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadedImageDevicePathProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
+  gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMED (Get Driver Name if ComponentName2Protocol exists)
+  gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMED (Get Driver Name if ComponentNameProtocol exists and ComponentName2Protocol doesn't exist)
+  gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMED (Get Driver Name from EFI UI section if ComponentName2Protocol and ComponentNameProtocol don't exist)
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMED (Find the PCI device if PciIo protocol is installed)
+  gEfiBusSpecificDriverOverrideProtocolGuid     ## SOMETIMES_CONSUMED (Check whether the PCI device contains one or more efi drivers in its option rom by this protocol) 
+
+  gEfiDriverBindingProtocolGuid                 ## SOMETIMES_CONSUMED
+  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMED
+  gEfiLoadedImageDevicePathProtocolGuid         ## SOMETIMES_CONSUMED (Show the drivers in the second page that support DriverBindingProtocol, LoadedImageProtocol and LoadedImageDevicePathProtocol)
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMED (Show the controller device in the first page that support DevicePathProtocol)
+
+  gEfiHiiDatabaseProtocolGuid                   ## CONSUMED
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMED
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMED
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCED
   

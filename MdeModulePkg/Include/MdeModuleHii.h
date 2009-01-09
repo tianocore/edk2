@@ -1,5 +1,5 @@
 /** @file
-  EDK II implementation specific HII relative definition.
+  EDKII extented HII IFR guid opcodes.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -98,9 +98,9 @@ typedef struct _EFI_IFR_GUID_BANNER {
   /// EFI_IFR_EXTEND_OP_BANNER
   ///
   UINT8               ExtendOpCode;
-  EFI_STRING_ID       Title;        /// The string token for the banner title
-  UINT16              LineNumber;   /// 1-based line number
-  UINT8               Alignment;    /// left, center, or right-aligned
+  EFI_STRING_ID       Title;        ///< The string token for the banner title
+  UINT16              LineNumber;   ///< 1-based line number
+  UINT8               Alignment;    ///< left, center, or right-aligned
 } EFI_IFR_GUID_BANNER;
 
 ///
@@ -116,7 +116,7 @@ typedef struct _EFI_IFR_GUID_TIMEOUT {
   /// EFI_IFR_EXTEND_OP_TIMEOUT
   ///
   UINT8               ExtendOpCode;
-  UINT16              TimeOut;       /// TimeOut Value
+  UINT16              TimeOut;       ///< TimeOut Value
 } EFI_IFR_GUID_TIMEOUT;
 
 #define EFI_NON_DEVICE_CLASS              0x00
@@ -140,7 +140,7 @@ typedef struct _EFI_IFR_GUID_CLASS {
   /// EFI_IFR_EXTEND_OP_CLASS
   ///
   UINT8               ExtendOpCode;
-  UINT16              Class;           /// Device Class from the above
+  UINT16              Class;           ///< Device Class from the above
 } EFI_IFR_GUID_CLASS;
 
 #define EFI_SETUP_APPLICATION_SUBCLASS    0x00
@@ -161,7 +161,7 @@ typedef struct _EFI_IFR_GUID_SUBCLASS {
   /// EFI_IFR_EXTEND_OP_SUBCLASS
   ///
   UINT8               ExtendOpCode;
-  UINT16              SubClass;      ///Sub Class type from the above
+  UINT16              SubClass;      ///< Sub Class type from the above
 } EFI_IFR_GUID_SUBCLASS;
 
 ///

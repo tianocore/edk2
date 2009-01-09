@@ -45,5 +45,5 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiPlatformDriverOverrideProtocolGuid   # ALWAYS_PRODUCED
+  gEfiPlatformDriverOverrideProtocolGuid   ## PRODUCED
   

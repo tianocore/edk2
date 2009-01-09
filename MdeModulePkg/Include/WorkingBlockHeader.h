@@ -20,8 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define WORKING_BLOCK_INVALID 0x2
 
 ///
-/// EFI Fault tolerant working block header
-/// The header is immediately followed by the write queue.
+/// EDKII Fault tolerant working block header
+/// The header is immediately followed by the write queue data.
 ///
 typedef struct {
   ///

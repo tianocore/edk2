@@ -1,7 +1,6 @@
 /** @file
-
-  This file defines capsule vendor guid, capsule variable name 
-  and capsule guid hob data structure. 
+  This file defines capsule vendor guid for capsule variable and hob.
+  It also defines capsule varialbe name and capsule guid hob data structure. 
   They are used by EDKII implementation of capsule update across a system reset.
 
 Copyright (c) 2006 - 2008, Intel Corporation

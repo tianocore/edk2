@@ -1,6 +1,6 @@
 /** @file
-  This file defines header data structures for BMP file and default
-  FFS GUID Filename for BMP logo file. 
+  This file defines BMP file header data structures.
+  It also defines the File GUID for default BMP logo file.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -34,10 +34,10 @@ typedef struct {
   UINT32        HeaderSize;
   UINT32        PixelWidth;
   UINT32        PixelHeight;
-  UINT16        Planes;          /// Must be 1
-  UINT16        BitPerPixel;     /// 1, 4, 8, or 24
+  UINT16        Planes;          ///> Must be 1
+  UINT16        BitPerPixel;     ///> 1, 4, 8, or 24
   UINT32        CompressionType;
-  UINT32        ImageSize;       /// Compressed image size in bytes
+  UINT32        ImageSize;       ///> Compressed image size in bytes
   UINT32        XPixelsPerMeter;
   UINT32        YPixelsPerMeter;
   UINT32        NumberOfColors;

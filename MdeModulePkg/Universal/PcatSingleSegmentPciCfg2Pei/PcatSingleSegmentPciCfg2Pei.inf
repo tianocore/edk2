@@ -45,7 +45,7 @@
 
 
 [Ppis]
-  gEfiPciCfg2PpiGuid                   # PPI ALWAYS_PRODUCED
+  gEfiPciCfg2PpiGuid                   ## PRODUCED
 
 [Depex]
   TRUE
