@@ -49,5 +49,5 @@
   PeiServicesLib
 
 [Ppis]
-  gEfiPciCfg2PpiGuid                            # PPI ALWAYS_CONSUMED
+  gEfiPciCfg2PpiGuid                            ## CONSUMES
 

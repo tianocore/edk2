@@ -40,5 +40,5 @@
   ReportStatusCodeLib
 
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask     ## CONSUMES
 

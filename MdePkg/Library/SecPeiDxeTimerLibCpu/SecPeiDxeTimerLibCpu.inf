@@ -55,5 +55,5 @@
 
 
 [Pcd.IA32, Pcd.X64]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock  ## CONSUMES
 

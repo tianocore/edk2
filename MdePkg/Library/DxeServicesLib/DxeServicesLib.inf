@@ -39,6 +39,6 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiFirmwareVolume2ProtocolGuid               # ALWAYS_CONSUMED
-  gEfiLoadedImageProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## CONSUMES
 

@@ -44,7 +44,7 @@
   UefiBootServicesTableLib
 
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue   ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask       ## CONSUMES
 

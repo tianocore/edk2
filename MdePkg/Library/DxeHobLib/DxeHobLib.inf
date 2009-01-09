@@ -44,5 +44,5 @@
   UefiLib
 
 [Guids]
-  gEfiHobListGuid                               # ALWAYS_CONSUMED
+  gEfiHobListGuid                               ## CONSUMES
 

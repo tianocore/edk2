@@ -44,7 +44,7 @@
 
 
 [Protocols]
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadedImageProtocolGuid                   ## CONSUMES
 
 
 #

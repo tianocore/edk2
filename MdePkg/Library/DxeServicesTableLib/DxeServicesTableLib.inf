@@ -44,5 +44,5 @@
 
 
 [Guids]
-  gEfiDxeServicesTableGuid                      # ALWAYS_CONSUMED
+  gEfiDxeServicesTableGuid                      ## CONSUMES
 
