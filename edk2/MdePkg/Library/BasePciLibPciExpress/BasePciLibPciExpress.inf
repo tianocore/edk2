@@ -1,10 +1,10 @@
 #/** @file
-# Instance of PCI Library based on PCI Express Library.
+#  Instance of PCI Library based on PCI Express Library.
 #
-# PCI Library that uses the 256 MB PCI Express MMIO window to perform PCI
+#  PCI Library that uses the 256 MB PCI Express MMIO window to perform PCI
 #  Configuration cycles. Layers on one PCI Express Library instance.
 #
-# Copyright (c) 2007 - 2008, Intel Corporation.
+#  Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

@@ -1,10 +1,10 @@
 #/** @file
-# Instance of PCI CF8 Library using I/O ports 0xCF8 and 0xCFC.
+#  Instance of PCI CF8 Library using I/O ports 0xCF8 and 0xCFC.
 #
-# PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
+#  PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
 #  Layers on top of an I/O Library instance.
 #
-# Copyright (c) 2007 - 2008, Intel Corporation.
+#  Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

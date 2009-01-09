@@ -1,10 +1,10 @@
 #/** @file
-# Instance of Base Memory Library using MMX registers.
+#  Instance of Base Memory Library using MMX registers.
 #
-# Base Memory Library that uses MMX registers for high performance.
+#  Base Memory Library that uses MMX registers for high performance.
 #  Optimized for use in DXE.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+#  Copyright (c) 2006 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

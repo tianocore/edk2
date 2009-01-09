@@ -158,6 +158,7 @@ MakeTable (
   }
 
   for (Index = 0; Index < NumOfChar; Index++) {
+    ASSERT (BitLen[Index] != 0);
     Count[BitLen[Index]]++;
   }
 
