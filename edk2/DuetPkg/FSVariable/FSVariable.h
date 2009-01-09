@@ -53,15 +53,6 @@ Abstract:
 #define VARIABLE_SCRATCH_SIZE         (4 * 1024)
 #define VARIABLE_RECLAIM_THRESHOLD    (1024)
 
-//
-// Define GET_PAD_SIZE to optimize compiler
-//
-#if ((ALIGNMENT == 0) || (ALIGNMENT == 1))
-#define GET_PAD_SIZE(a) (0)
-#else
-#define GET_PAD_SIZE(a) (((~a) + 1) & (ALIGNMENT - 1))
-#endif
-
 #define GET_VARIABLE_NAME_PTR(a)  (CHAR16 *) ((UINTN) (a) + sizeof (VARIABLE_HEADER))
 
 typedef enum {
