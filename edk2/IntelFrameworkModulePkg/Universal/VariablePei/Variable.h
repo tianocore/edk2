@@ -25,17 +25,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeiServicesTablePointerLib.h>
 #include <VariableFormat.h>
 
-//
-// Define GET_PAD_SIZE to optimize compiler
-//
-#if ((ALIGNMENT == 0) || (ALIGNMENT == 1))
-#define GET_PAD_SIZE(a) (0)
-#else
-#define GET_PAD_SIZE(a) (((~a) + 1) & (ALIGNMENT - 1))
-#endif
-
-#define HEADER_ALIGN(Header)  (((UINTN) (Header) + HEADER_ALIGNMENT - 1) & (~(HEADER_ALIGNMENT - 1)))
-
 typedef struct {
   VARIABLE_HEADER *CurrPtr;
   VARIABLE_HEADER *EndPtr;
@@ -54,7 +43,6 @@ typedef struct {
   VARIABLE_HEADER *StartPtr;
   UINT16          Index[VARIABLE_INDEX_TABLE_VOLUME];
 } VARIABLE_INDEX_TABLE;
-
 
 //
 // Functions
