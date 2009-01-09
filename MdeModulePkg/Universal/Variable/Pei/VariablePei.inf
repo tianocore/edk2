@@ -58,10 +58,16 @@
   PeiServicesLib
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid                ## PRODUCES
+  gEfiPeiReadOnlyVariable2PpiGuid                ## SOMETIMES_PRODUCES (Not for boot mode RECOVERY)
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase  ## CONSUMES
 
 [Depex]
   TRUE
+
+#
+#  [BootMode]
+#    RECOVERY          ## CONSUMES
+#
+
