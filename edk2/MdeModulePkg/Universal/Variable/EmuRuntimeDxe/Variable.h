@@ -33,18 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <VariableFormat.h>
 
-#define VARIABLE_STORE_SIZE FixedPcdGet32(PcdVariableStoreSize)
-#define SCRATCH_SIZE        FixedPcdGet32(PcdMaxVariableSize)
-
-//
-// Define GET_PAD_SIZE to optimize compiler
-//
-#if ((ALIGNMENT == 0) || (ALIGNMENT == 1))
-#define GET_PAD_SIZE(a) (0)
-#else
-#define GET_PAD_SIZE(a) (((~a) + 1) & (ALIGNMENT - 1))
-#endif
-
 #define GET_VARIABLE_NAME_PTR(a)  (CHAR16 *) ((UINTN) (a) + sizeof (VARIABLE_HEADER))
 
 typedef enum {

@@ -50,11 +50,11 @@
   DevicePathLib
   
 [Guids]
-  gEfiSystemNvDataFvGuid                        # ALWAYS_CONSUMED, Signature of Working Space Header
+  gEfiSystemNvDataFvGuid                        ## CONSUMED ## FV Signature of Working Space Header
 
 [Protocols]
-  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
-  gEfiFaultTolerantWriteLiteProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
+  gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMED
+  gEfiFaultTolerantWriteLiteProtocolGuid        ## PRODUCED
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize

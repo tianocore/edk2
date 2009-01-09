@@ -167,9 +167,8 @@ GetHiiVariable (
                           &Size,
                           NULL
                           );
+
   if (Status == EFI_BUFFER_TOO_SMALL) {
-
-
     Status = PeiServicesAllocatePool (Size, &Buffer);
     ASSERT_EFI_ERROR (Status);
 
@@ -187,7 +186,7 @@ GetHiiVariable (
     *VariableData = Buffer;
 
     return EFI_SUCCESS;
-  } 
+  }
 
   return EFI_NOT_FOUND;
 }

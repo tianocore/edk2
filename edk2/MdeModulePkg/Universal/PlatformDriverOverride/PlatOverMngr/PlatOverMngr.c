@@ -1,20 +1,5 @@
 /** @file
 
-Copyright (c) 2007 - 2008, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  PlatOverMngr.c
-
-Abstract:
-
   A UI application to offer a UI interface in device manager to let user configue
   platform override protocol to override the default algorithm for matching
   drivers to controllers.
@@ -26,6 +11,15 @@ Abstract:
      mapping between drivers to controllers.
   4. The UI application save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
+
+Copyright (c) 2007 - 2008, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -119,30 +113,33 @@ ConvertComponentNameSupportLanguage (
   IN CHAR8                           *Language
   )
 {
-  CHAR8                              *LangCode;
-  LangCode           = NULL;
+  CHAR8    *LangCode;
+  LangCode = NULL;
 
   //
-  // check the input language is English
+  // Check the input language is English
   //
   if (AsciiStrnCmp (Language, "en-", 3) != 0) {
     return NULL;
   }
-
-  //
-  // Convert Language string from RFC 3066 to ISO 639-2
-  //
-  LangCode = AllocateZeroPool(4);
-  AsciiStrCpy (LangCode, "eng");
   
   //
-  // Check whether the converted language is supported in the SupportedLanguages list.
+  // Check SupportedLanguages format
   //
-  if (AsciiStrStr (SupportedLanguages, LangCode) == NULL) {
-    FreePool (LangCode);
-    return NULL;
+  if (AsciiStrStr (SupportedLanguages, "en-") != NULL) {
+    //
+    // Create RFC 3066 language
+    //
+    LangCode = AllocateZeroPool(AsciiStrSize (Language));
+    AsciiStrCpy (LangCode, Language);
+  } else if (AsciiStrStr (SupportedLanguages, "en") != NULL) {
+    //
+    // Create ISO 639-2 Language
+    //
+    LangCode = AllocateZeroPool(4);
+    AsciiStrCpy (LangCode, "eng");    
   }
-
+  
   return LangCode;
 }
 
@@ -193,12 +190,14 @@ GetComponentName (
   if (ComponentName != NULL) {
     if (ComponentName->GetDriverName != NULL) {
       SupportedLanguage = ConvertComponentNameSupportLanguage (ComponentName->SupportedLanguages, mLanguage);
-      Status = ComponentName->GetDriverName (
-                                ComponentName,
-                                SupportedLanguage,
-                                &DriverName
-                                );
-      FreePool (SupportedLanguage);
+      if (SupportedLanguage != NULL) {
+        Status = ComponentName->GetDriverName (
+                                  ComponentName,
+                                  SupportedLanguage,
+                                  &DriverName
+                                  );
+        FreePool (SupportedLanguage);
+      }
     }
   } else if (ComponentName2 != NULL) {
     if (ComponentName2->GetDriverName != NULL) {
@@ -555,7 +554,10 @@ GetDriverBindingHandleFromImageHandle (
   if (EFI_ERROR (Status) || (DriverBindingHandleCount == 0)) {
     return NULL;
   }
-
+  
+  //
+  // Get the first Driver Binding handle which has the specific image handle.
+  //
   for (Index = 0; Index < DriverBindingHandleCount; Index++) {
     DriverBindingInterface = NULL;
     Status = gBS->OpenProtocol (
@@ -576,9 +578,6 @@ GetDriverBindingHandleFromImageHandle (
     }
   }
 
-  //
-  // If no Driver Binding Protocol instance is found
-  //
   FreePool (DriverBindingHandleBuffer);
   return DriverBindingHandle;
 }
@@ -1301,7 +1300,7 @@ PlatOverMngrInit (
   EFI_CALLBACK_INFO           *CallbackInfo;
   EFI_HANDLE                  DriverHandle;
   EFI_FORM_BROWSER2_PROTOCOL       *FormBrowser2;
-
+  
   //
   // There should only be one HII protocol
   //
@@ -1341,7 +1340,7 @@ PlatOverMngrInit (
   //
   Status = HiiLibCreateHiiDriverHandle (&DriverHandle);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Finish;
   }
   CallbackInfo->DriverHandle = DriverHandle;
 
@@ -1355,7 +1354,7 @@ PlatOverMngrInit (
                   &CallbackInfo->ConfigAccess
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Finish;
   }
 
   //
@@ -1377,6 +1376,10 @@ PlatOverMngrInit (
                            );
   FreePool (PackageList);
 
+  if (EFI_ERROR (Status)) {
+    goto Finish;
+  }
+
   //
   // Locate ConfigRouting protocol
   //
@@ -1386,7 +1389,7 @@ PlatOverMngrInit (
                   (VOID **) &CallbackInfo->HiiConfigRouting
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Finish;
   }
 
   //
@@ -1411,11 +1414,24 @@ PlatOverMngrInit (
                            NULL,
                            NULL
                            );
+  if (EFI_ERROR (Status)) {
+    goto Finish;
+  }
 
   Status = HiiDatabase->RemovePackageList (HiiDatabase, CallbackInfo->RegisteredHandle);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Finish;
+  }
+  
+  return EFI_SUCCESS;
+
+Finish:
+  if (CallbackInfo->DriverHandle != NULL) {
+    HiiLibDestroyHiiDriverHandle (CallbackInfo->DriverHandle);
+  }
+  if (CallbackInfo != NULL) {
+    FreePool (CallbackInfo);
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }

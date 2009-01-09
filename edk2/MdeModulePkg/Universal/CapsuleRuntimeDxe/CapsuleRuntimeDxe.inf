@@ -2,7 +2,7 @@
 #  
 #  Capsule Runtime Drivers produces two UEFI capsule runtime services.
 #  (UpdateCapsule, QueryCapsuleCapabilities)
-#  It installs the Capsule Architectural Protocol (EDKII definition) to signify 
+#  It installs the Capsule Architectural Protocol (EDKII extension definition) to signify 
 #  the capsule runtime services are ready.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
@@ -47,10 +47,10 @@
   UefiRuntimeLib
 
 [Guids]
-  gEfiCapsuleVendorGuid                         # Produce variable L"CapsuleUpdateData" for capsule updated data
+  gEfiCapsuleVendorGuid                         ## SOMETIMES_PRODUCED (Process across reset capsule image) ## Variable:L"CapsuleUpdateData" for capsule updated data
 
 [Protocols]
-  gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
+  gEfiCapsuleArchProtocolGuid                   ## PRODUCED
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset
@@ -60,4 +60,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule
 
 [Depex]
-  gEfiVariableWriteArchProtocolGuid             # Depends on variable write functionality to produce capsule data variable
+  gEfiVariableWriteArchProtocolGuid             ## Depends on variable write functionality to produce capsule data variable

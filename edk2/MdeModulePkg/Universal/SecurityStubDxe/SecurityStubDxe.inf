@@ -39,7 +39,7 @@
   DebugLib
 
 [Protocols]
-  gEfiSecurityArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
+  gEfiSecurityArchProtocolGuid                  ## PRODUCED
 
 [Depex]
   TRUE

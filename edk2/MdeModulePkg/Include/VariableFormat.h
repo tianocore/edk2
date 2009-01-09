@@ -1,5 +1,6 @@
 /** @file
-  The variable data structure related to EDK II specific UEFI variable implementation.
+  The variable data structures are related to EDK II specific UEFI variable implementation.
+  Variable data header and Variable storage region header are defined here.
 
   Copyright (c) 2006 - 2008 Intel Corporation. <BR>
   All rights reserved. This program and the accompanying materials
@@ -16,23 +17,8 @@
 #define __VARIABLE_FORMAT_H__
 
 ///
-/// Maximum buffer for the single variable.
-///
-#ifndef MAX_VARIABLE_SIZE
-#define MAX_VARIABLE_SIZE                 FixedPcdGet32(PcdMaxVariableSize)
-#endif
-
-///
-/// Maximum buffer for Hardware error record variable
-///
-#ifndef MAX_HARDWARE_ERROR_VARIABLE_SIZE
-#define MAX_HARDWARE_ERROR_VARIABLE_SIZE  FixedPcdGet32(PcdMaxHardwareErrorVariableSize)
-#endif
-
-///
-/// The alignment of variable's start offset.
-/// For IA32/X64 architecture, the alignment is set to 1, and
-/// 8 is for IPF archtecture.
+/// Alignment of variable name and data.
+/// For IA32/X64 architecture, the alignment is set to 1, and 8 is for IPF archtecture.
 ///
 #if defined (MDE_CPU_IPF)
 #define ALIGNMENT         8
@@ -40,10 +26,23 @@
 #define ALIGNMENT         1
 #endif
 
-#define HEADER_ALIGNMENT  4
+//
+// Define GET_PAD_SIZE to optimize compiler
+//
+#if ((ALIGNMENT == 0) || (ALIGNMENT == 1))
+#define GET_PAD_SIZE(a) (0)
+#else
+#define GET_PAD_SIZE(a) (((~a) + 1) & (ALIGNMENT - 1))
+#endif
 
 ///
-/// Variable Store Status
+/// Alignment of Variable Data Header in Variable Store region
+///
+#define HEADER_ALIGNMENT  4
+#define HEADER_ALIGN(Header)  (((UINTN) (Header) + HEADER_ALIGNMENT - 1) & (~(HEADER_ALIGNMENT - 1)))
+
+///
+/// Status of Variable Store Region
 ///
 typedef enum {
   EfiRaw,
@@ -100,7 +99,7 @@ typedef struct {
 #define VAR_ADDED                     0x3f  ///< Variable has been completely added
 
 ///
-/// Variable Data Header Structure
+/// Single Variable Data Header Structure
 ///
 typedef struct {
   ///
@@ -125,7 +124,7 @@ typedef struct {
   ///
   UINT32      DataSize;
   ///
-  /// A unique identifier for the vendor.
+  /// A unique identifier for the vendor that produce and consume this varaible.
   ///
   EFI_GUID    VendorGuid;
 } VARIABLE_HEADER;

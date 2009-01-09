@@ -52,5 +52,5 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString  ## Valid when gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes   ## Valid when gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable

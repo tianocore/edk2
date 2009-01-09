@@ -47,13 +47,13 @@
   DebugLib
 
 [Guids]
-  gPcdPeiCallbackFnTableHobGuid                 # ALWAYS_PRODUCED  Hob: GUID_EXTENSION
-  gPcdDataBaseHobGuid                           # ALWAYS_PRODUCED  Hob: GUID_EXTENSION
-
+  gPcdPeiCallbackFnTableHobGuid                 ## RPIVATE   ## Hob
+  gPcdDataBaseHobGuid                           ## PRODUCED  ## Hob
+  gPcdDataBaseHobGuid                           ## CONSUMED  ## Hob
 
 [Ppis]
-  gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
-  gPcdPpiGuid                                   # PPI ALWAYS_PRODUCED
+  gEfiPeiReadOnlyVariable2PpiGuid               ## CONSUMED
+  gPcdPpiGuid                                   ## PRODUCED
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseSetEnabled
