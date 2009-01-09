@@ -1,10 +1,10 @@
 #/** @file
-# Instance of CPU Library for various architecture.
+#  Instance of CPU Library for various architecture.
 #
-# CPU Library implemented using ASM functions for IA-32 and X64,
-# PAL CALLs for IPF, and empty functions for EBC.
+#  CPU Library implemented using ASM functions for IA-32 and X64,
+#  PAL CALLs for IPF, and empty functions for EBC.
 #
-# Copyright (c) 2007 - 2008, Intel Corporation.
+#  Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
