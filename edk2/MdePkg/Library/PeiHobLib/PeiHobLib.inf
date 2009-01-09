@@ -50,7 +50,9 @@
 # [Hob]
 #   RESOURCE_DESCRIPTOR   ## PRODUCES
 #   MEMORY_ALLOCATION     ## PRODUCES
+#   GUID_EXTENSION        ## CONSUMES
 #   GUID_EXTENSION        ## PRODUCES
+#   CPU                   ## PRODUCES
 #   FV2                   ## PRODUCES
 #   FV                    ## PRODUCES
 #   

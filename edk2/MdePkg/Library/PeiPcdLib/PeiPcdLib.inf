@@ -43,7 +43,7 @@
 
 
 [Ppis]
-  gPcdPpiGuid                                   # PPI ALWAYS_CONSUMED
+  gPcdPpiGuid                                   ## CONSUMES
 
 [depex]
   gPcdPpiGuid

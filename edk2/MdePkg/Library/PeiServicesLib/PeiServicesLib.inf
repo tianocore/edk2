@@ -39,10 +39,10 @@
   DebugLib
 
 [Guids]
-  gEfiFirmwareFileSystem2Guid
+  gEfiFirmwareFileSystem2Guid        ## PRODUCES ## FV
 
 [Ppis]
-  gEfiPeiFirmwareVolumeInfoPpiGuid
+  gEfiPeiFirmwareVolumeInfoPpiGuid   ## PRODUCES
 
 
 

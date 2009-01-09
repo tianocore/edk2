@@ -47,9 +47,8 @@
 
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathUtilitiesProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
-
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiDevicePathUtilitiesProtocolGuid           ## CONSUMES
 
 [Depex]
   gEfiDevicePathUtilitiesProtocolGuid

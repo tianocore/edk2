@@ -50,5 +50,5 @@
   UefiRuntimeLib
 
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress  ## CONSUMES
 

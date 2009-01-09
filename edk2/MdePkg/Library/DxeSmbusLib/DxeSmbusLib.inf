@@ -43,7 +43,7 @@
 
 
 [Protocols]
-  gEfiSmbusHcProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmbusHcProtocolGuid                        ## CONSUMES
 
 [Depex]
   gEfiSmbusHcProtocolGuid
