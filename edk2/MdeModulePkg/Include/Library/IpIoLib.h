@@ -1,7 +1,7 @@
 /** @file
   This library provides IpIo layer upon EFI IP4 Protocol.
 
-Copyright (c) 2005 - 2008, Intel Corporation
+Copyright (c) 2005 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _IP_IO_H_
 
 #include <Protocol/Ip4.h>
-#include <Library/IpIoLib.h>
+
 #include <Library/NetLib.h>
 
 //
@@ -24,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // from IP
 //
 #define ICMP_TYPE_UNREACH              3
-#define ICMP_TYPE_TIMXCEED            11
+#define ICMP_TYPE_TIMXCEED             11
 #define ICMP_TYPE_PARAMPROB            12
 #define ICMP_TYPE_SOURCEQUENCH         4
 
@@ -41,6 +41,42 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ICMP_CODE_UNREACH_HOST_PROHIB  10
 #define ICMP_CODE_UNREACH_TOSNET       11
 #define ICMP_CODE_UNREACH_TOSHOST      12
+
+/**
+  Get the IP header length from EFI_IP4_HEADER struct. HeaderLength is
+  Internet header length in 32-bit words, so HeaderLength<<2 is the real
+  length of IP header.
+  
+  @param[out] HdrPtr   A pointer to EFI_IP4_HEADER
+  
+  @return The IP header length
+**/
+#define EFI_IP4_HEADER_LEN(HdrPtr) ((HdrPtr)->HeaderLength << 2)
+
+/**
+  To types of ICMP error which consist of ICMP header, IP header and original 
+  datagram's data, get length from sum of ICMP header length, IP header length 
+  and first 64 bits of datagram's data length.
+  
+  @param[in] IpHdr   A pointer to EFI_IP4_HEADER
+  
+  @return The ICMP error length
+**/
+#define ICMP_ERRLEN(IpHdr) \
+  (sizeof(IP4_ICMP_HEAD) + EFI_IP4_HEADER_LEN(IpHdr) + 8)
+
+/**
+  Get the packet header from NET_BUF.
+  
+  @param[out]  Buf    A pointer to NET_BUF
+  @param[in]   Type   Header type
+  
+  @return The pointer to packet header
+**/
+#define NET_PROTO_HDR(Buf, Type)  ((Type *) ((Buf)->BlockOp[0].Head))
+
+  
+extern EFI_IP4_CONFIG_DATA  mIpIoDefaultIpConfigData;
 
 ///
 /// This error will be delivered to the
@@ -63,21 +99,10 @@ typedef enum {
 ///
 /// The helper struct for IpIoGetIcmpErrStatus(). It is internal-use only.
 ///
-typedef struct _ICMP_ERROR_INFO {
+typedef struct {
   BOOLEAN     IsHard;
   BOOLEAN     Notify;
 } ICMP_ERROR_INFO;
-
-/**
-  Get the IP header length from EFI_IP4_HEADER struct.
-  
-  @param HdrPtr   A pointer to EFI_IP4_HEADER
-  
-  @return The IP header length
-**/
-#define EFI_IP4_HEADER_LEN(HdrPtr) ((HdrPtr)->HeaderLength << 2)
-
-extern EFI_IP4_CONFIG_DATA  mIpIoDefaultIpConfigData;
 
 ///
 /// The IP session for an IP receive packet.
@@ -91,12 +116,12 @@ typedef struct _EFI_NET_SESSION_DATA {
 /**
   The prototype is called back when an IP packet is received.
   
-  @param Status        Result of the receive request
-  @param IcmpErr       Valid when Status is EFI_ICMP_ERROR
-  @param NetSession    The IP session for the received packet
-  @param Pkt           Packet received
-  @param Context       The data provided by user for the received packet when
-                       the callback is registered in IP_IO_OPEN_DATA::RcvdContext.
+  @param[in] Status        Result of the receive request
+  @param[in] IcmpErr       Valid when Status is EFI_ICMP_ERROR
+  @param[in] NetSession    The IP session for the received packet
+  @param[in] Pkt           Packet received
+  @param[in] Context       The data provided by user for the received packet when
+                           the callback is registered in IP_IO_OPEN_DATA::RcvdContext.
   
 **/
 typedef
@@ -112,11 +137,11 @@ VOID
 /**
   The prototype is called back when an IP packet is sent.
   
-  @param Status        Result of the sending
-  @param Context       The data provided by user for the received packet when
-                       the callback is registered in IP_IO_OPEN_DATA::SndContext.
-  @param Sender        A pointer to EFI_IP4_PROTOCOL for sender
-  @param NotifyData    Context data specified when calling IpIoSend()
+  @param[in] Status        Result of the sending
+  @param[in] Context       The data provided by user for the received packet when
+                           the callback is registered in IP_IO_OPEN_DATA::SndContext.
+  @param[in] Sender        A pointer to EFI_IP4_PROTOCOL for sender
+  @param[in] NotifyData    Context data specified when calling IpIoSend()
   
 **/
 typedef
@@ -153,7 +178,7 @@ typedef struct _IP_IO {
   BOOLEAN                       IsConfigured;
 
   ///
-  /// some ip config data can be changed
+  /// Some ip config data can be changed
   ///
   UINT8                         Protocol;
 
@@ -226,9 +251,9 @@ typedef struct _IP_IO_IP_INFO {
   This function uses IP4 service binding protocol in Controller to create an IP4
   child (aka IP4 instance).
 
-  @param  Image                 The image handle of the driver or application that
+  @param[in]  Image             The image handle of the driver or application that
                                 consumes IP_IO.
-  @param  Controller            The controller handle that has IP4 service binding
+  @param[in]  Controller        The controller handle that has IP4 service binding
                                 protocol installed.
 
   @return Pointer to a newly created IP_IO instance, or NULL if failed.
@@ -247,17 +272,17 @@ IpIoCreate (
   This function is paired with IpIoCreate(). The IP_IO will be closed first.
   Resource will be freed afterwards. See IpIoClose().
 
-  @param  IpIo                  Pointer to the IP_IO instance that needs to be
+  @param[in, out]  IpIo         Pointer to the IP_IO instance that needs to be
                                 destroyed.
 
-  @retval EFI_SUCCESS           The IP_IO instance destroyed successfully.
-  @retval Other                 Error condition occurred.
+  @retval          EFI_SUCCESS  The IP_IO instance destroyed successfully.
+  @retval          Others       Error condition occurred.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoDestroy (
-  IN IP_IO *IpIo
+  IN OUT IP_IO *IpIo
   );
 
 /**
@@ -266,16 +291,16 @@ IpIoDestroy (
   This function is paired with IpIoOpen(). The IP_IO will be unconfigured and all
   the pending send/receive tokens will be canceled.
 
-  @param  IpIo                  Pointer to the IP_IO instance that needs to stop.
+  @param[in, out]  IpIo            Pointer to the IP_IO instance that needs to stop.
 
-  @retval EFI_SUCCESS           The IP_IO instance stopped successfully.
-  @retval Other                 Error condition occurred.
+  @retval          EFI_SUCCESS     The IP_IO instance stopped successfully.
+  @retval          Others          Error condition occurred.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoStop (
-  IN IP_IO *IpIo
+  IN OUT IP_IO *IpIo
   );
 
 /**
@@ -285,20 +310,23 @@ IpIoStop (
   instance and register the callbacks and their context data for sending and
   receiving IP packets.
 
-  @param  IpIo                  Pointer to an IP_IO instance that needs to open.
-  @param  OpenData              The configuration data and callbacks for the IP_IO
-                                instance.
+  @param[in, out]  IpIo               Pointer to an IP_IO instance that needs
+                                      to open.
+  @param[in]       OpenData           The configuration data and callbacks for
+                                      the IP_IO instance.
 
-  @retval EFI_SUCCESS           The IP_IO instance opened with OpenData
-                                successfully.
-  @retval Other                 Error condition occurred.
+  @retval          EFI_SUCCESS        The IP_IO instance opened with OpenData
+                                      successfully.
+  @retval          EFI_ACCESS_DENIED  The IP_IO instance is configured, avoid to 
+                                      reopen it.
+  @retval          Others             Error condition occurred.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoOpen (
-  IN IP_IO           *IpIo,
-  IN IP_IO_OPEN_DATA *OpenData
+  IN OUT IP_IO           *IpIo,
+  IN     IP_IO_OPEN_DATA *OpenData
   );
 
 /**
@@ -309,38 +337,38 @@ IpIoOpen (
   overriden by Sender. Other sending configs, like source address and gateway
   address etc., are specified in OverrideData.
 
-  @param  IpIo                  Pointer to an IP_IO instance used for sending IP
-                                packet.
-  @param  Pkt                   Pointer to the IP packet to be sent.
-  @param  Sender                The IP protocol instance used for sending.
-  @param  Context               Optional context data
-  @param  NotifyData            Optional notify data
-  @param  Dest                  The destination IP address to send this packet to.
-  @param  OverrideData          The data to override some configuration of the IP
-                                instance used for sending.
+  @param[in, out]  IpIo                  Pointer to an IP_IO instance used for sending IP
+                                         packet.
+  @param[in, out]  Pkt                   Pointer to the IP packet to be sent.
+  @param[in]       Sender                The IP protocol instance used for sending.
+  @param[in]       Context               Optional context data
+  @param[in]       NotifyData            Optional notify data
+  @param[in]       Dest                  The destination IP address to send this packet to.
+  @param[in]       OverrideData          The data to override some configuration of the IP
+                                         instance used for sending.
 
-  @retval EFI_SUCCESS           The operation is completed successfully.
-  @retval EFI_NOT_STARTED       The IpIo is not configured.
-  @retval EFI_OUT_OF_RESOURCES  Failed due to resource limit.
+  @retval          EFI_SUCCESS           The operation is completed successfully.
+  @retval          EFI_NOT_STARTED       The IpIo is not configured.
+  @retval          EFI_OUT_OF_RESOURCES  Failed due to resource limit.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoSend (
-  IN IP_IO           *IpIo,
-  IN NET_BUF         *Pkt,
-  IN IP_IO_IP_INFO   *Sender        OPTIONAL,
-  IN VOID            *Context       OPTIONAL,
-  IN VOID            *NotifyData    OPTIONAL,
-  IN IP4_ADDR        Dest,
-  IN IP_IO_OVERRIDE  *OverrideData  OPTIONAL
+  IN OUT IP_IO          *IpIo,
+  IN OUT NET_BUF        *Pkt,
+  IN     IP_IO_IP_INFO  *Sender        OPTIONAL,
+  IN     VOID           *Context       OPTIONAL,
+  IN     VOID           *NotifyData    OPTIONAL,
+  IN     IP4_ADDR       Dest,
+  IN     IP_IO_OVERRIDE *OverrideData  OPTIONAL
   );
 
 /**
   Cancel the IP transmit token which wraps this Packet.
 
-  @param  IpIo                  Pointer to the IP_IO instance.
-  @param  Packet                Pointer to the packet of NET_BUF to cancel.
+  @param[in]  IpIo                  Pointer to the IP_IO instance.
+  @param[in]  Packet                Pointer to the packet of NET_BUF to cancel.
 
 **/
 VOID
@@ -357,8 +385,8 @@ IpIoCancelTxToken (
   can later use IpIoFindSender() to get the IP_IO and call IpIoSend() to send
   data.
 
-  @param  IpIo                  Pointer to a IP_IO instance to add a new IP
-                                instance for sending purpose.
+  @param[in, out]  IpIo               Pointer to a IP_IO instance to add a new IP
+                                      instance for sending purpose.
 
   @return Pointer to the created IP_IO_IP_INFO structure, NULL if failed.
 
@@ -366,29 +394,29 @@ IpIoCancelTxToken (
 IP_IO_IP_INFO *
 EFIAPI
 IpIoAddIp (
-  IN IP_IO  *IpIo
+  IN OUT IP_IO  *IpIo
   );
 
 /**
   Configure the IP instance of this IpInfo and start the receiving if Ip4ConfigData
   is not NULL.
 
-  @param  IpInfo                Pointer to the IP_IO_IP_INFO instance.
-  @param  Ip4ConfigData         The IP4 configure data used to configure the IP
-                                instance, if NULL the IP instance is reset. If
-                                UseDefaultAddress is set to TRUE, and the configure
-                                operation succeeds, the default address information
-                                is written back in this Ip4ConfigData.
+  @param[in, out]  IpInfo          Pointer to the IP_IO_IP_INFO instance.
+  @param[in, out]  Ip4ConfigData   The IP4 configure data used to configure the IP
+                                   instance, if NULL the IP instance is reset. If
+                                   UseDefaultAddress is set to TRUE, and the configure
+                                   operation succeeds, the default address information
+                                   is written back in this Ip4ConfigData.
 
-  @retval EFI_STATUS            The status returned by IP4->Configure or
-                                IP4->Receive.
-  @retval Other                 Configuration fails.
+  @retval          EFI_SUCCESS     The IP instance of this IpInfo is configured successfully
+                                   or no need to reconfigure it.
+  @retval          Others          Configuration fails.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoConfigIp (
-  IN     IP_IO_IP_INFO        *IpInfo,
+  IN OUT IP_IO_IP_INFO        *IpInfo,
   IN OUT EFI_IP4_CONFIG_DATA  *Ip4ConfigData OPTIONAL
   );
 
@@ -400,8 +428,8 @@ IpIoConfigIp (
   IpIoAddIp(). The IP_IO_IP_INFO::RefCnt is decremented and the IP instance
   will be dstroyed if the RefCnt is zero.
 
-  @param  IpIo                  Pointer to the IP_IO instance.
-  @param  IpInfo                Pointer to the IpInfo to be removed.
+  @param[in]  IpIo                  Pointer to the IP_IO instance.
+  @param[in]  IpInfo                Pointer to the IpInfo to be removed.
 
 **/
 VOID
@@ -418,8 +446,8 @@ IpIoRemoveIp (
   This function is called when the caller needs the IpIo to send data to the
   specified Src. The IpIo was added previously by IpIoAddIp().
 
-  @param  IpIo                  Pointer to the pointer of the IP_IO instance.
-  @param  Src                   The local IP address.
+  @param[in, out]  IpIo              Pointer to the pointer of the IP_IO instance.
+  @param[in]       Src               The local IP address.
 
   @return Pointer to the IP protocol can be used for sending purpose and its local
           address is the same with Src.
@@ -438,11 +466,11 @@ IpIoFindSender (
   The ErrorStatus will be returned. The IsHard and Notify are optional. If they
   are not NULL, this routine will fill them.
 
-  @param  IcmpError             IcmpError Type
-  @param  IsHard                Whether it is a hard error
-  @param  Notify                Whether it need to notify SockError
+  @param[in]   IcmpError             IcmpError Type
+  @param[out]  IsHard                Whether it is a hard error
+  @param[out]  Notify                Whether it need to notify SockError
 
-  @return ICMP Error Status
+  @return ICMP Error Status, such as EFI_NETWORK_UNREACHABLE.
 
 **/
 EFI_STATUS
