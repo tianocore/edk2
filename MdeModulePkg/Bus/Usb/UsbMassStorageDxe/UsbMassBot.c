@@ -1,6 +1,6 @@
 /** @file
-
-  Implementation of the USB mass storage Bulk-Only Transport protocol.
+  Implementation of the USB mass storage Bulk-Only Transport protocol,
+  according to USB Mass Storage Class Bulk-Only Transport, Revision 1.0.
 
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -16,41 +16,36 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "UsbMass.h"
 #include "UsbMassBot.h"
 
-/**
-  Reset the mass storage device by BOT protocol.
-
-  @param  Context               The context of the BOT protocol, that is,
-                                USB_BOT_PROTOCOL.
-  @param  ExtendedVerification  The flag controlling the rule of reset dev.
-
-  @retval EFI_SUCCESS           The device is reset.
-  @retval Others                Failed to reset the device..
-
-**/
-EFI_STATUS
-UsbBotResetDevice (
-  IN  VOID                    *Context,
-  IN  BOOLEAN                  ExtendedVerification
-  );
-
+//
+// Definition of USB BOT Transport Protocol
+//
+USB_MASS_TRANSPORT mUsbBotTransport = {
+  USB_MASS_STORE_BOT,
+  UsbBotInit,
+  UsbBotExecCommand,
+  UsbBotResetDevice,
+  UsbBotGetMaxLun,
+  UsbBotCleanUp
+};
 
 /**
-  Initialize the USB mass storage class BOT transport protocol.
+  Initializes USB BOT protocol.
+
+  This function initializes the USB mass storage class BOT protocol.
   It will save its context which is a USB_BOT_PROTOCOL structure
   in the Context if Context isn't NULL.
 
-  @param  UsbIo                 The USB IO protocol to use
-  @param  Context               The variable to save the context to
+  @param  UsbIo                 The USB I/O Protocol instance
+  @param  Context               The buffer to save the context to
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory
+  @retval EFI_SUCCESS           The device is successfully initialized.
   @retval EFI_UNSUPPORTED       The transport protocol doesn't support the device.
-  @retval EFI_SUCCESS           The device is supported and protocol initialized.
-  @retval Other                 The UBS BOT initialization fails.
+  @retval Other                 The USB BOT initialization fails.
 
 **/
 EFI_STATUS
 UsbBotInit (
-  IN  EFI_USB_IO_PROTOCOL       * UsbIo,
+  IN  EFI_USB_IO_PROTOCOL       *UsbIo,
   OUT VOID                      **Context OPTIONAL
   )
 {
@@ -61,25 +56,22 @@ UsbBotInit (
   UINT8                         Index;
 
   //
-  // Allocate the BOT context, append two endpoint descriptors to it
+  // Allocate the BOT context for USB_BOT_PROTOCOL and two endpoint descriptors.
   //
   UsbBot = AllocateZeroPool (
              sizeof (USB_BOT_PROTOCOL) + 2 * sizeof (EFI_USB_ENDPOINT_DESCRIPTOR)
              );
-  if (UsbBot == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (UsbBot != NULL);
 
   UsbBot->UsbIo = UsbIo;
 
   //
   // Get the interface descriptor and validate that it
-  // is a USB MSC BOT interface.
+  // is a USB Mass Storage BOT interface.
   //
   Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &UsbBot->Interface);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBotInit: Get invalid BOT interface (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -115,14 +107,16 @@ UsbBotInit (
     }
   }
 
+  //
+  // If bulk-in or bulk-out endpoint is not found, report error.
+  //
   if ((UsbBot->BulkInEndpoint == NULL) || (UsbBot->BulkOutEndpoint == NULL)) {
-    DEBUG ((EFI_D_ERROR, "UsbBotInit: In/Out Endpoint invalid\n"));
     Status = EFI_UNSUPPORTED;
     goto ON_ERROR;
   }
 
   //
-  // The USB BOT protocol uses dCBWTag to match the CBW and CSW.
+  // The USB BOT protocol uses CBWTag to match the CBW and CSW.
   //
   UsbBot->CbwTag = 0x01;
 
@@ -139,19 +133,22 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Send the command to the device using Bulk-Out endpoint.
 
+  This function sends the command to the device using Bulk-Out endpoint.
+  BOT transfer is composed of three phases: Command, Data, and Status.
+  This is the Command phase.
+
   @param  UsbBot                The USB BOT device
   @param  Cmd                   The command to transfer to device
-  @param  CmdLen                the length of the command
+  @param  CmdLen                The length of the command
   @param  DataDir               The direction of the data
   @param  TransLen              The expected length of the data
   @param  Lun                   The number of logic unit
 
-  @retval EFI_NOT_READY         The device return NAK to the transfer
   @retval EFI_SUCCESS           The command is sent to the device.
+  @retval EFI_NOT_READY         The device return NAK to the transfer
   @retval Others                Failed to send the command to device
 
 **/
@@ -174,25 +171,24 @@ UsbBotSendCommand (
   ASSERT ((CmdLen > 0) && (CmdLen <= USB_BOT_MAX_CMDLEN));
 
   //
-  // Fill in the CSW. Only the first LUN is supported now.
+  // Fill in the Command Block Wrapper.
   //
   Cbw.Signature = USB_BOT_CBW_SIGNATURE;
   Cbw.Tag       = UsbBot->CbwTag;
   Cbw.DataLen   = TransLen;
-  Cbw.Flag      = (UINT8) ((DataDir == EfiUsbDataIn) ? 0x80 : 0);
+  Cbw.Flag      = (UINT8) ((DataDir == EfiUsbDataIn) ? BIT7 : 0);
   Cbw.Lun       = Lun;
   Cbw.CmdLen    = CmdLen;
 
   ZeroMem (Cbw.CmdBlock, USB_BOT_MAX_CMDLEN);
   CopyMem (Cbw.CmdBlock, Cmd, CmdLen);
 
-  Result        = 0;
-  DataLen       = sizeof (USB_BOT_CBW);
-  Timeout       = USB_BOT_SEND_CBW_TIMEOUT / USB_MASS_1_MILLISECOND;
+  Result  = 0;
+  DataLen = sizeof (USB_BOT_CBW);
+  Timeout = USB_BOT_SEND_CBW_TIMEOUT / USB_MASS_1_MILLISECOND;
 
   //
-  // Use the UsbIo to send the command to the device. The default
-  // time out is enough.
+  // Use USB I/O Protocol to send the Command Block Wrapper to the device.
   //
   Status = UsbBot->UsbIo->UsbBulkTransfer (
                             UsbBot->UsbIo,
@@ -202,12 +198,12 @@ UsbBotSendCommand (
                             Timeout,
                             &Result
                             );
-  //
-  // Respond to Bulk-Out endpoint stall with a Reset Recovery,
-  // see the spec section 5.3.1
-  //
   if (EFI_ERROR (Status)) {
     if (USB_IS_ERROR (Result, EFI_USB_ERR_STALL) && DataDir == EfiUsbDataOut) {
+      //
+      // Respond to Bulk-Out endpoint stall with a Reset Recovery,
+      // according to section 5.3.1 of USB Mass Storage Class Bulk-Only Transport Spec, v1.0.
+      //
       UsbBotResetDevice (UsbBot, FALSE);
     } else if (USB_IS_ERROR (Result, EFI_USB_ERR_NAK)) {
       Status = EFI_NOT_READY;
@@ -219,8 +215,11 @@ UsbBotSendCommand (
 
 
 /**
-  Transfer the data between the device and host. BOT transfer
-  is composed of three phase, command, data, and status.
+  Transfer the data between the device and host.
+
+  This function transfers the data between the device and host.
+  BOT transfer is composed of three phases: Command, Data, and Status.
+  This is the Data phase.
 
   @param  UsbBot                The USB BOT device
   @param  DataDir               The direction of the data
@@ -229,6 +228,8 @@ UsbBotSendCommand (
   @param  Timeout               The time to wait the command to complete
 
   @retval EFI_SUCCESS           The data is transferred
+  @retval EFI_SUCCESS           No data to transfer
+  @retval EFI_NOT_READY         The device return NAK to the transfer
   @retval Others                Failed to transfer data
 
 **/
@@ -246,7 +247,7 @@ UsbBotDataTransfer (
   UINT32                      Result;
 
   //
-  // It's OK if no data to transfer
+  // If no data to transfer, just return EFI_SUCCESS.
   //
   if ((DataDir == EfiUsbNoData) || (*TransLen == 0)) {
     return EFI_SUCCESS;
@@ -273,9 +274,7 @@ UsbBotDataTransfer (
                             &Result
                             );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBotDataTransfer: (%r)\n", Status));
     if (USB_IS_ERROR (Result, EFI_USB_ERR_STALL)) {
-      DEBUG ((EFI_D_ERROR, "UsbBotDataTransfer: DataIn Stall\n"));
       UsbClearEndpointStall (UsbBot->UsbIo, Endpoint->EndpointAddress);
     } else if (USB_IS_ERROR (Result, EFI_USB_ERR_NAK)) {
       Status = EFI_NOT_READY;
@@ -287,19 +286,22 @@ UsbBotDataTransfer (
 
 
 /**
-  Get the command execution status from device. BOT transfer is
-  composed of three phase, command, data, and status.
-  This function return the transfer status of the BOT's CSW status,
-  and return the high level command execution result in Result. So
-  even it returns EFI_SUCCESS, the command may still have failed.
+  Get the command execution status from device.
 
-  @param  UsbBot                The USB BOT device.
-  @param  TransLen              The expected length of the data.
-  @param  CmdStatus             The result of the command execution.
+  This function gets the command execution status from device.
+  BOT transfer is composed of three phases: Command, Data, and Status.
+  This is the Status phase.
 
-  @retval EFI_SUCCESS           Command execute result is retrieved and in the
-                                Result.
-  @retval Other                 Failed to get status.
+  This function returns the transfer status of the BOT's CSW status,
+  and returns the high level command execution result in Result. So
+  even if EFI_SUCCESS is returned, the command may still have failed.
+
+  @param  UsbBot         The USB BOT device.
+  @param  TransLen       The expected length of the data.
+  @param  CmdStatus      The result of the command execution.
+
+  @retval EFI_SUCCESS    Command execute result is retrieved and in the Result.
+  @retval Other          Error occurred when trying to get status.
 
 **/
 EFI_STATUS
@@ -326,7 +328,7 @@ UsbBotGetStatus (
 
   for (Index = 0; Index < USB_BOT_RECV_CSW_RETRY; Index++) {
     //
-    // Attemp to the read CSW from bulk in endpoint
+    // Attemp to the read Command Status Wrapper from bulk in endpoint
     //
     ZeroMem (&Csw, sizeof (USB_BOT_CSW));
     Result = 0;
@@ -340,9 +342,7 @@ UsbBotGetStatus (
                       &Result
                       );
     if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbBotGetStatus (%r)\n", Status));
       if (USB_IS_ERROR (Result, EFI_USB_ERR_STALL)) {
-        DEBUG ((EFI_D_ERROR, "UsbBotGetStatus: DataIn Stall\n"));
         UsbClearEndpointStall (UsbIo, Endpoint);
       }
       continue;
@@ -350,24 +350,21 @@ UsbBotGetStatus (
 
     if (Csw.Signature != USB_BOT_CSW_SIGNATURE) {
       //
-      // Invalid Csw need perform reset recovery
+      // CSW is invalid, so perform reset recovery
       //
-      DEBUG ((EFI_D_ERROR, "UsbBotGetStatus: Device return a invalid signature\n"));
       Status = UsbBotResetDevice (UsbBot, FALSE);
     } else if (Csw.CmdStatus == USB_BOT_COMMAND_ERROR) {
       //
-      // Respond phase error need perform reset recovery
+      // Respond phase error also needs reset recovery
       //
-      DEBUG ((EFI_D_ERROR, "UsbBotGetStatus: Device return a phase error\n"));
       Status = UsbBotResetDevice (UsbBot, FALSE);
     } else {
-
       *CmdStatus = Csw.CmdStatus;
       break;
     }
   }
   //
-  //The tag is increased even there is an error.
+  //The tag is increased even if there is an error.
   //
   UsbBot->CbwTag++;
 
@@ -376,7 +373,7 @@ UsbBotGetStatus (
 
 
 /**
-  Call the Usb mass storage class transport protocol to issue
+  Call the USB Mass Storage Class BOT protocol to issue
   the command/data/status circle to execute the commands.
 
   @param  Context               The context of the BOT protocol, that is,
@@ -390,7 +387,7 @@ UsbBotGetStatus (
   @param  Timeout               The time to wait command
   @param  CmdStatus             The result of high level command execution
 
-  @retval EFI_SUCCESS           The command is executed OK, and result in CmdStatus
+  @retval EFI_SUCCESS           The command is executed successfully.
   @retval Other                 Failed to excute command
 
 **/
@@ -428,7 +425,7 @@ UsbBotExecCommand (
   //
   // Transfer the data. Don't return immediately even data transfer
   // failed. The host should attempt to receive the CSW no matter
-  // whether it succeeds or failed.
+  // whether it succeeds or fails.
   //
   TransLen = (UINTN) DataLen;
   UsbBotDataTransfer (UsbBot, DataDir, Data, &TransLen, Timeout);
@@ -451,11 +448,12 @@ UsbBotExecCommand (
 
 
 /**
-  Reset the mass storage device by BOT protocol.
+  Reset the USB mass storage device by BOT protocol.
 
   @param  Context               The context of the BOT protocol, that is,
                                 USB_BOT_PROTOCOL.
-  @param  ExtendedVerification  The flag controlling the rule of reset dev.
+  @param  ExtendedVerification  If FALSE, just issue Bulk-Only Mass Storage Reset request.
+                                If TRUE, additionally reset parent hub port.
 
   @retval EFI_SUCCESS           The device is reset.
   @retval Others                Failed to reset the device..
@@ -464,7 +462,7 @@ UsbBotExecCommand (
 EFI_STATUS
 UsbBotResetDevice (
   IN  VOID                    *Context,
-  IN  BOOLEAN                  ExtendedVerification
+  IN  BOOLEAN                 ExtendedVerification
   )
 {
   USB_BOT_PROTOCOL        *UsbBot;
@@ -486,10 +484,10 @@ UsbBotResetDevice (
   }
 
   //
-  // Issue a class specific Bulk-Only Mass Storage Reset reqest.
-  // See the spec section 3.1
+  // Issue a class specific Bulk-Only Mass Storage Reset request,
+  // according to section 3.1 of USB Mass Storage Class Bulk-Only Transport Spec, v1.0.
   //
-  Request.RequestType = 0x21; // Class, Interface, Host to Device
+  Request.RequestType = 0x21;
   Request.Request     = USB_BOT_RESET_REQUEST;
   Request.Value       = 0;
   Request.Index       = UsbBot->Interface.InterfaceNumber;
@@ -507,14 +505,13 @@ UsbBotResetDevice (
                             );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBotResetDevice: (%r)\n", Status));
     return Status;
   }
 
   //
   // The device shall NAK the host's request until the reset is
   // complete. We can use this to sync the device and host. For
-  // now just stall 100ms to wait the device.
+  // now just stall 100ms to wait for the device.
   //
   gBS->Stall (USB_BOT_RESET_DEVICE_STALL);
 
@@ -523,25 +520,26 @@ UsbBotResetDevice (
   //
   UsbClearEndpointStall (UsbBot->UsbIo, UsbBot->BulkInEndpoint->EndpointAddress);
   UsbClearEndpointStall (UsbBot->UsbIo, UsbBot->BulkOutEndpoint->EndpointAddress);
+
   return Status;
 }
 
 
 /**
-  Get the max lun of mass storage device.
+  Get the max LUN (Logical Unit Number) of USB mass storage device.
 
   @param  Context          The context of the BOT protocol, that is, USB_BOT_PROTOCOL
-  @param  MaxLun           Return pointer to the max number of lun. Maxlun=1 means lun0 and
-                           lun1 in all.
+  @param  MaxLun           Return pointer to the max number of LUN. (e.g. MaxLun=1 means LUN0 and
+                           LUN1 in all.)
 
-  @retval EFI_SUCCESS      Get max lun success.
-  @retval Others           Failed to execute this request.
+  @retval EFI_SUCCESS      Max LUN is got successfully.
+  @retval Others           Fail to execute this request.
 
 **/
 EFI_STATUS
 UsbBotGetMaxLun (
   IN  VOID                    *Context,
-  IN  UINT8                   *MaxLun
+  OUT UINT8                   *MaxLun
   )
 {
   USB_BOT_PROTOCOL        *UsbBot;
@@ -556,9 +554,9 @@ UsbBotGetMaxLun (
 
   //
   // Issue a class specific Bulk-Only Mass Storage get max lun reqest.
-  // See the spec section 3.2
+  // according to section 3.2 of USB Mass Storage Class Bulk-Only Transport Spec, v1.0.
   //
-  Request.RequestType = 0xA1; // Class, Interface, Device to Host
+  Request.RequestType = 0xA1;
   Request.Request     = USB_BOT_GETLUN_REQUEST;
   Request.Value       = 0;
   Request.Index       = UsbBot->Interface.InterfaceNumber;
@@ -570,14 +568,10 @@ UsbBotGetMaxLun (
                             &Request,
                             EfiUsbDataIn,
                             Timeout,
-                            (VOID *)MaxLun,
+                            (VOID *) MaxLun,
                             1,
                             &Result
                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBotGetMaxLun: (%r)\n", Status));
-  }
 
   return Status;
 }
@@ -585,28 +579,17 @@ UsbBotGetMaxLun (
 /**
   Clean up the resource used by this BOT protocol.
 
-  @param  Context               The context of the BOT protocol, that is,
-                                USB_BOT_PROTOCOL.
+  @param  Context         The context of the BOT protocol, that is, USB_BOT_PROTOCOL.
 
-  @retval EFI_SUCCESS           The resource is cleaned up.
+  @retval EFI_SUCCESS     The resource is cleaned up.
 
 **/
 EFI_STATUS
-UsbBotFini (
+UsbBotCleanUp (
   IN  VOID                    *Context
   )
 {
   gBS->FreePool (Context);
   return EFI_SUCCESS;
 }
-
-USB_MASS_TRANSPORT
-mUsbBotTransport = {
-  USB_MASS_STORE_BOT,
-  UsbBotInit,
-  UsbBotExecCommand,
-  UsbBotResetDevice,
-  UsbBotGetMaxLun,
-  UsbBotFini
-};
 

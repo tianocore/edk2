@@ -37,10 +37,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
 
-#define USB_IS_IN_ENDPOINT(EndPointAddr)      (((EndPointAddr) & 0x80) == 0x80)
-#define USB_IS_OUT_ENDPOINT(EndPointAddr)     (((EndPointAddr) & 0x80) == 0)
-#define USB_IS_BULK_ENDPOINT(Attribute)       (((Attribute) & 0x03) == 0x02)
-#define USB_IS_INTERRUPT_ENDPOINT(Attribute)  (((Attribute) & 0x03) == 0x03)
+#define USB_IS_IN_ENDPOINT(EndPointAddr)      (((EndPointAddr) & BIT7) == BIT7)
+#define USB_IS_OUT_ENDPOINT(EndPointAddr)     (((EndPointAddr) & BIT7) == 0)
+#define USB_IS_BULK_ENDPOINT(Attribute)       (((Attribute) & (BIT0 | BIT1)) == USB_ENDPOINT_BULK)
+#define USB_IS_INTERRUPT_ENDPOINT(Attribute)  (((Attribute) & (BIT0 | BIT1)) == USB_ENDPOINT_INTERRUPT)
 #define USB_IS_ERROR(Result, Error)           (((Result) & (Error)) != 0)
 
 typedef enum {
@@ -52,19 +52,19 @@ typedef enum {
   //
   // Usb mass storage subclass code, specify the command set used.
   //
-  USB_MASS_STORE_RBC      = 0x01, // Reduced Block Commands
-  USB_MASS_STORE_8020I    = 0x02, // SFF-8020i, typically a CD/DVD device
-  USB_MASS_STORE_QIC      = 0x03, // Typically a tape device
-  USB_MASS_STORE_UFI      = 0x04, // Typically a floppy disk driver device
-  USB_MASS_STORE_8070I    = 0x05, // SFF-8070i, typically a floppy disk driver device.
-  USB_MASS_STORE_SCSI     = 0x06, // SCSI transparent command set
+  USB_MASS_STORE_RBC      = 0x01, ///< Reduced Block Commands
+  USB_MASS_STORE_8020I    = 0x02, ///< SFF-8020i, typically a CD/DVD device
+  USB_MASS_STORE_QIC      = 0x03, ///< Typically a tape device
+  USB_MASS_STORE_UFI      = 0x04, ///< Typically a floppy disk driver device
+  USB_MASS_STORE_8070I    = 0x05, ///< SFF-8070i, typically a floppy disk driver device.
+  USB_MASS_STORE_SCSI     = 0x06, ///< SCSI transparent command set
 
   //
   // Usb mass storage protocol code, specify the transport protocol
   //
-  USB_MASS_STORE_CBI0     = 0x00, // CBI protocol with command completion interrupt
-  USB_MASS_STORE_CBI1     = 0x01, // CBI protocol without command completion interrupt
-  USB_MASS_STORE_BOT      = 0x50, // Bulk-Only Transport
+  USB_MASS_STORE_CBI0     = 0x00, ///< CBI protocol with command completion interrupt
+  USB_MASS_STORE_CBI1     = 0x01, ///< CBI protocol without command completion interrupt
+  USB_MASS_STORE_BOT      = 0x50, ///< Bulk-Only Transport
 
   USB_MASS_1_MILLISECOND  = 1000,
   USB_MASS_1_SECOND       = 1000 * USB_MASS_1_MILLISECOND,
@@ -111,25 +111,25 @@ EFI_STATUS
 
 typedef
 EFI_STATUS
-(*USB_MASS_FINI) (
+(*USB_MASS_CLEAN_UP) (
   IN  VOID                    *Context
   );
 
-//
-// This structure contains information necessary to select the
-// proper transport protocol. The mass storage class defines
-// two transport protocols. One is the CBI, and the other is BOT.
-// CBI is being obseleted. The design is made modular by this
-// structure so that the CBI protocol can be easily removed when
-// it is no longer necessary.
-//
+///
+/// This structure contains information necessary to select the
+/// proper transport protocol. The mass storage class defines
+/// two transport protocols. One is the CBI, and the other is BOT.
+/// CBI is being obseleted. The design is made modular by this
+/// structure so that the CBI protocol can be easily removed when
+/// it is no longer necessary.
+///
 typedef struct {
   UINT8                   Protocol;
-  USB_MASS_INIT_TRANSPORT Init;        // Initialize the mass storage transport protocol
-  USB_MASS_EXEC_COMMAND   ExecCommand; // Transport command to the device then get result
-  USB_MASS_RESET          Reset;       // Reset the device
-  USB_MASS_GET_MAX_LUN    GetMaxLun;   // Get max lun, only for bot
-  USB_MASS_FINI           Fini;        // Clean up the resources.
+  USB_MASS_INIT_TRANSPORT Init;        ///< Initialize the mass storage transport protocol
+  USB_MASS_EXEC_COMMAND   ExecCommand; ///< Transport command to the device then get result
+  USB_MASS_RESET          Reset;       ///< Reset the device
+  USB_MASS_GET_MAX_LUN    GetMaxLun;   ///< Get max lun, only for bot
+  USB_MASS_CLEAN_UP       CleanUp;     ///< Clean up the resources.
 } USB_MASS_TRANSPORT;
 
 

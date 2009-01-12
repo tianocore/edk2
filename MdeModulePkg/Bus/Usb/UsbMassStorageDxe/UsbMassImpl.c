@@ -1,8 +1,5 @@
 /** @file
-
-  The implementation of USB mass storage class device driver.
-  The command set supported is "USB Mass Storage Specification
-  for Bootability".
+  USB Mass Storage Driver that manages USB Mass Storage Device and produces Block I/O Protocol.
 
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -17,6 +14,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UsbMassImpl.h"
 
+//
+// Array of USB transport interfaces. 
+//
 USB_MASS_TRANSPORT *mUsbMassTransport[] = {
   &mUsbCbi0Transport,
   &mUsbCbi1Transport,
@@ -24,14 +24,28 @@ USB_MASS_TRANSPORT *mUsbMassTransport[] = {
   NULL
 };
 
+EFI_DRIVER_BINDING_PROTOCOL gUSBMassDriverBinding = {
+  USBMassDriverBindingSupported,
+  USBMassDriverBindingStart,
+  USBMassDriverBindingStop,
+  0x11,
+  NULL,
+  NULL
+};
+
 /**
-  Reset the block device. ExtendedVerification is ignored for this.
+  Reset the block device.
 
-  @param  This                   The BLOCK IO protocol
-  @param  ExtendedVerification   Whether to execute extended verification.
+  This function implements EFI_BLOCK_IO_PROTOCOL.Reset(). 
+  It resets the block device hardware.
+  ExtendedVerification is ignored in this implementation.
 
-  @retval EFI_SUCCESS            The device is successfully reseted.
-  @retval Others                 Failed to reset the device.
+  @param  This                   Indicates a pointer to the calling context.
+  @param  ExtendedVerification   Indicates that the driver may perform a more exhaustive
+                                 verification operation of the device during reset.
+
+  @retval EFI_SUCCESS            The block device was reset.
+  @retval EFI_DEVICE_ERROR       The block device is not functioning correctly and could not be reset.
 
 **/
 EFI_STATUS
@@ -45,9 +59,13 @@ UsbMassReset (
   EFI_TPL         OldTpl;
   EFI_STATUS      Status;
 
-  OldTpl  = gBS->RaiseTPL (USB_MASS_TPL);
+  //
+  // Raise TPL to TPL_NOTIFY to serialize all its operations
+  // to protect shared data structures.
+  //
+  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
 
-  UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (This);
+  UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
   Status  = UsbMass->Transport->Reset (UsbMass->Context, ExtendedVerification);
 
   gBS->RestoreTPL (OldTpl);
@@ -56,22 +74,27 @@ UsbMassReset (
 }
 
 /**
-  Read some blocks of data from the block device.
+  Reads the requested number of blocks from the device.
 
-  @param  This                   The Block IO protocol
-  @param  MediaId                The media's ID of the device for current request
-  @param  Lba                    The start block number
-  @param  BufferSize             The size of buffer to read data in
-  @param  Buffer                 The buffer to read data to
+  This function implements EFI_BLOCK_IO_PROTOCOL.ReadBlocks(). 
+  It reads the requested number of blocks from the device.
+  All the blocks are read, or an error is returned.
 
-  @retval EFI_SUCCESS            The data is successfully read
-  @retval EFI_NO_MEDIA           Media isn't present
-  @retval EFI_MEDIA_CHANGED      The device media has been changed, that is,
-                                 MediaId changed
-  @retval EFI_INVALID_PARAMETER  Some parameters are invalid, such as Buffer is
-                                 NULL.
-  @retval EFI_BAD_BUFFER_SIZE    The buffer size isn't a multiple of media's block
-                                 size,  or overflow the last block number.
+  @param  This                   Indicates a pointer to the calling context.
+  @param  MediaId                The media ID that the read request is for.
+  @param  Lba                    The starting logical block address to read from on the device.
+  @param  BufferSize             The size of the Buffer in bytes.
+                                 This must be a multiple of the intrinsic block size of the device.
+  @param  Buffer                 A pointer to the destination buffer for the data. The caller is
+                                 responsible for either having implicit or explicit ownership of the buffer.
+
+  @retval EFI_SUCCESS            The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR       The device reported an error while attempting to perform the read operation.
+  @retval EFI_NO_MEDIA           There is no media in the device.
+  @retval EFI_MEDIA_CHANGED      The MediaId is not for the current media.
+  @retval EFI_BAD_BUFFER_SIZE    The BufferSize parameter is not a multiple of the intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER  The read request contains LBAs that are not valid,
+                                 or the buffer is not on proper alignment.
 
 **/
 EFI_STATUS
@@ -90,34 +113,35 @@ UsbMassReadBlocks (
   EFI_TPL             OldTpl;
   UINTN               TotalBlock;
 
-  OldTpl  = gBS->RaiseTPL (USB_MASS_TPL);
-  UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (This);
-  Media   = &UsbMass->BlockIoMedia;
-
   //
   // First, validate the parameters
   //
   if ((Buffer == NULL) || (BufferSize == 0)) {
-    Status = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
+    return EFI_INVALID_PARAMETER;
   }
 
   //
+  // Raise TPL to TPL_NOTIFY to serialize all its operations
+  // to protect shared data structures.
+  //
+  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
+  Media   = &UsbMass->BlockIoMedia;
+
+  //
   // If it is a removable media, such as CD-Rom or Usb-Floppy,
-  // need to detect the media before each rw. While some of
+  // need to detect the media before each read/write. While some of
   // Usb-Flash is marked as removable media.
   //
-  //
-  if (Media->RemovableMedia == TRUE) {
+  if (Media->RemovableMedia) {
     Status = UsbBootDetectMedia (UsbMass);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbMassReadBlocks: UsbBootDetectMedia (%r)\n", Status));
       goto ON_EXIT;
     }
   }
 
   //
-  // Make sure BlockSize and LBA is consistent with BufferSize
+  // BufferSize must be a multiple of the intrinsic block size of the device.
   //
   if ((BufferSize % Media->BlockSize) != 0) {
     Status = EFI_BAD_BUFFER_SIZE;
@@ -126,6 +150,9 @@ UsbMassReadBlocks (
 
   TotalBlock = BufferSize / Media->BlockSize;
 
+  //
+  // Make sure the range to read is valid.
+  //
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -154,22 +181,28 @@ ON_EXIT:
 
 
 /**
-  Write some blocks of data to the block device.
+  Writes a specified number of blocks to the device.
 
-  @param  This                   The Block IO protocol
-  @param  MediaId                The media's ID of the device for current request
-  @param  Lba                    The start block number
-  @param  BufferSize             The size of buffer to write data to
-  @param  Buffer                 The buffer to write data to
+  This function implements EFI_BLOCK_IO_PROTOCOL.WriteBlocks(). 
+  It writes a specified number of blocks to the device.
+  All blocks are written, or an error is returned.
 
-  @retval EFI_SUCCESS            The data is successfully written
-  @retval EFI_NO_MEDIA           Media isn't present
-  @retval EFI_MEDIA_CHANGED      The device media has been changed, that is,
-                                 MediaId changed
-  @retval EFI_INVALID_PARAMETER  Some parameters are invalid, such as Buffer is
-                                 NULL.
-  @retval EFI_BAD_BUFFER_SIZE    The buffer size isn't a multiple of media's block
-                                 size,
+  @param  This                   Indicates a pointer to the calling context.
+  @param  MediaId                The media ID that the write request is for.
+  @param  Lba                    The starting logical block address to be written.
+  @param  BufferSize             The size of the Buffer in bytes.
+                                 This must be a multiple of the intrinsic block size of the device.
+  @param  Buffer                 Pointer to the source buffer for the data.
+
+  @retval EFI_SUCCESS            The data were written correctly to the device.
+  @retval EFI_WRITE_PROTECTED    The device cannot be written to.
+  @retval EFI_NO_MEDIA           There is no media in the device.
+  @retval EFI_MEDIA_CHANGED      The MediaId is not for the current media.
+  @retval EFI_DEVICE_ERROR       The device reported an error while attempting to perform the write operation.
+  @retval EFI_BAD_BUFFER_SIZE    The BufferSize parameter is not a multiple of the intrinsic
+                                 block size of the device.
+  @retval EFI_INVALID_PARAMETER  The write request contains LBAs that are not valid,
+                                 or the buffer is not on proper alignment.
 
 **/
 EFI_STATUS
@@ -188,34 +221,35 @@ UsbMassWriteBlocks (
   EFI_TPL             OldTpl;
   UINTN               TotalBlock;
 
-  OldTpl  = gBS->RaiseTPL (USB_MASS_TPL);
-  UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (This);
-  Media   = &UsbMass->BlockIoMedia;
-
   //
   // First, validate the parameters
   //
   if ((Buffer == NULL) || (BufferSize == 0)) {
-    Status = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
+    return EFI_INVALID_PARAMETER;
   }
 
   //
+  // Raise TPL to TPL_NOTIFY to serialize all its operations
+  // to protect shared data structures.
+  //
+  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
+  Media   = &UsbMass->BlockIoMedia;
+
+  //
   // If it is a removable media, such as CD-Rom or Usb-Floppy,
-  // need to detect the media before each rw. While some of
-  // Usb-Flash is marked as removable media.
+  // need to detect the media before each read/write. Some of
+  // USB Flash is marked as removable media.
   //
-  //
-  if (Media->RemovableMedia == TRUE) {
+  if (Media->RemovableMedia) {
     Status = UsbBootDetectMedia (UsbMass);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbMassWriteBlocks: UsbBootDetectMedia (%r)\n", Status));
       goto ON_EXIT;
     }
   }
 
   //
-  // Make sure BlockSize and LBA is consistent with BufferSize
+  // BufferSize must be a multiple of the intrinsic block size of the device.
   //
   if ((BufferSize % Media->BlockSize) != 0) {
     Status = EFI_BAD_BUFFER_SIZE;
@@ -224,6 +258,9 @@ UsbMassWriteBlocks (
 
   TotalBlock = BufferSize / Media->BlockSize;
 
+  //
+  // Make sure the range to write is valid.
+  //
   if (Lba + TotalBlock - 1 > Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -255,12 +292,17 @@ ON_EXIT:
 }
 
 /**
-  Flush the cached writes to disks. USB mass storage device doesn't
-  support write cache, so return EFI_SUCCESS directly.
+  Flushes all modified data to a physical block device.
 
-  @param  This                   The BLOCK IO protocol
+  This function implements EFI_BLOCK_IO_PROTOCOL.FlushBlocks().
+  USB mass storage device doesn't support write cache,
+  so return EFI_SUCCESS directly.
 
-  @retval EFI_SUCCESS            Always returns success
+  @param  This                   Indicates a pointer to the calling context.
+
+  @retval EFI_SUCCESS            All outstanding data were written correctly to the device.
+  @retval EFI_DEVICE_ERROR       The device reported an error while attempting to write data.
+  @retval EFI_NO_MEDIA           There is no media in the device.
 
 **/
 EFI_STATUS
@@ -273,12 +315,11 @@ UsbMassFlushBlocks (
 }
 
 /**
-  Retrieve the media parameters such as disk geometric for the
-  device's BLOCK IO protocol.
+  Initialize the media parameter data for EFI_BLOCK_IO_MEDIA of Block I/O Protocol.
 
   @param  UsbMass                The USB mass storage device
 
-  @retval EFI_SUCCESS            The media parameters is updated successfully.
+  @retval EFI_SUCCESS            The media parameters are updated successfully.
   @retval Others                 Failed to get the media parameters.
 
 **/
@@ -294,18 +335,8 @@ UsbMassInitMedia (
   Media = &UsbMass->BlockIoMedia;
 
   //
-  // Initialize the MediaPrsent/ReadOnly and others to the default.
-  // We are not forced to get it right at this time, check UEFI2.0
-  // spec for more information:
-  //
-  // MediaPresent: This field shows the media present status as
-  //               of the most recent ReadBlocks or WriteBlocks call.
-  //
-  // ReadOnly    : This field shows the read-only status as of the
-  //               recent WriteBlocks call.
-  //
-  // but remember to update MediaId/MediaPresent/ReadOnly status
-  // after ReadBlocks and WriteBlocks
+  // Fields of EFI_BLOCK_IO_MEDIA are defined in UEFI 2.0 spec,
+  // section for Block I/O Protocol.
   //
   Media->MediaPresent     = FALSE;
   Media->LogicalPartition = FALSE;
@@ -323,9 +354,7 @@ UsbMassInitMedia (
   for (Index = 0; Index < USB_BOOT_INIT_MEDIA_RETRY; Index++) {
 
     Status = UsbBootGetParams (UsbMass);
-    if ((Status != EFI_MEDIA_CHANGED)
-        && (Status != EFI_NOT_READY)
-        && (Status != EFI_TIMEOUT)) {
+    if ((Status != EFI_MEDIA_CHANGED) && (Status != EFI_NOT_READY) && (Status != EFI_TIMEOUT)) {
       break;
     }
 
@@ -333,14 +362,16 @@ UsbMassInitMedia (
     if (EFI_ERROR (Status)) {
       gBS->Stall (USB_BOOT_RETRY_UNIT_READY_STALL * (Index + 1));
     }
-
   }
 
   return Status;
 }
 
 /**
-  Initilize the transport.
+  Initilize the USB Mass Storage transport.
+
+  This function tries to find the matching USB Mass Storage transport
+  protocol for USB device. If found, initializes the matching transport.
 
   @param  This            The USB mass driver's driver binding.
   @param  Controller      The device to test.
@@ -349,6 +380,7 @@ UsbMassInitMedia (
   @param  MaxLun          Get the MaxLun if is BOT dev.
 
   @retval EFI_SUCCESS     The initialization is successful.
+  @retval EFI_UNSUPPORTED No matching transport protocol is found.
   @retval Others          Failed to initialize dev.
 
 **/
@@ -376,18 +408,22 @@ UsbMassInitTransport (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbMassInitTransport: OpenUsbIoProtocol By Driver (%r)\n", Status));
     return Status;
   }
   
   Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbMassInitTransport: UsbIo->UsbGetInterfaceDescriptor (%r)\n", Status));
     goto ON_EXIT;
   }
   
   Status = EFI_UNSUPPORTED;
 
+  //
+  // Traverse the USB_MASS_TRANSPORT arrary and try to find the
+  // matching transport protocol.
+  // If not found, return EFI_UNSUPPORTED.
+  // If found, execute USB_MASS_TRANSPORT.Init() to initialize the transport context.
+  //
   for (Index = 0; mUsbMassTransport[Index] != NULL; Index++) {
     *Transport = mUsbMassTransport[Index];
 
@@ -398,17 +434,16 @@ UsbMassInitTransport (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbMassInitTransport: Transport->Init (%r)\n", Status));
     goto ON_EXIT;
   }
 
   //
-  // For bot device, try to get max lun. 
-  // If maxlun=0, then non-lun device, else multi-lun device.
+  // For BOT device, try to get its max LUN. 
+  // If max LUN is 0, then it is a non-lun device.
+  // Otherwise, it is a multi-lun device.
   //
   if ((*Transport)->Protocol == USB_MASS_STORE_BOT) {
     (*Transport)->GetMaxLun (*Context, MaxLun);
-    DEBUG ((EFI_D_INFO, "UsbMassInitTransport: GetMaxLun = %d\n", *MaxLun));
   }
 
 ON_EXIT:
@@ -687,13 +722,12 @@ ON_ERROR:
 /**
   Check whether the controller is a supported USB mass storage.
 
-  @param  This                   The USB mass driver's driver binding.
-  @param  Controller             The device to test against.
-  @param  RemainingDevicePath    The remaining device path
+  @param  This                   The USB mass storage driver binding protocol.
+  @param  Controller             The controller handle to check.
+  @param  RemainingDevicePath    The remaining device path.
 
-  @retval EFI_SUCCESS            This device is a supported USB mass storage.
-  @retval EFI_UNSUPPORTED        The device isn't supported
-  @retval Others                 Some error happened.
+  @retval EFI_SUCCESS            The driver supports this controller.
+  @retval other                  This device isn't supported.
 
 **/
 EFI_STATUS
@@ -708,11 +742,8 @@ USBMassDriverBindingSupported (
   EFI_USB_INTERFACE_DESCRIPTOR  Interface;
   USB_MASS_TRANSPORT            *Transport;
   EFI_STATUS                    Status;
-  INTN                          Index;
+  UINTN                         Index;
 
-  //
-  // Check whether the controller support USB_IO
-  //
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
@@ -726,7 +757,7 @@ USBMassDriverBindingSupported (
   }
 
   //
-  // Get the interface to check the USB class and find a transport
+  // Get the interface descriptor to check the USB class and find a transport
   // protocol handler.
   //
   Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
@@ -740,6 +771,12 @@ USBMassDriverBindingSupported (
     goto ON_EXIT;
   }
 
+  //
+  // Traverse the USB_MASS_TRANSPORT arrary and try to find the
+  // matching transport method.
+  // If not found, return EFI_UNSUPPORTED.
+  // If found, execute USB_MASS_TRANSPORT.Init() to initialize the transport context.
+  //
   for (Index = 0; mUsbMassTransport[Index] != NULL; Index++) {
     Transport = mUsbMassTransport[Index];
     if (Interface.InterfaceProtocol == Transport->Protocol) {
@@ -748,31 +785,34 @@ USBMassDriverBindingSupported (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "Found a USB mass store device %r\n", Status));
-
 ON_EXIT:
   gBS->CloseProtocol (
-        Controller,
-        &gEfiUsbIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiUsbIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   return Status;
 }
 
 
 /**
-  Start the USB mass storage device on the controller. It will
-  install a BLOCK_IO protocol on the device if everything is OK.
+  Starts the USB mass storage device with this driver.
 
-  @param  This                   The USB mass storage driver binding.
+  This function consumes USB I/O Portocol, intializes USB mass storage device,
+  installs Block I/O Protocol, and submits Asynchronous Interrupt
+  Transfer to manage the USB mass storage device.
+
+  @param  This                   The USB mass storage driver binding protocol.
   @param  Controller             The USB mass storage device to start on
   @param  RemainingDevicePath    The remaining device path.
 
-  @retval EFI_SUCCESS            The driver has started on the device.
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
-  @retval Others                 Failed to start the driver on the device.
+  @retval EFI_SUCCESS           This driver supports this device.
+  @retval EFI_UNSUPPORTED       This driver does not support this device.
+  @retval EFI_DEVICE_ERROR      This driver cannot be started due to device Error.
+  @retval EFI_OUT_OF_RESOURCES  Can't allocate memory resources.
+  @retval EFI_ALREADY_STARTED   This driver has been started.
 
 **/
 EFI_STATUS
@@ -831,7 +871,7 @@ USBMassDriverBindingStart (
     //
     // Try best to initialize all LUNs, and return success only if one of LUNs successed to initialized.
     //
-    Status = UsbMassInitMultiLun(This, Controller, Transport, Context, DevicePath, MaxLun);
+    Status = UsbMassInitMultiLun (This, Controller, Transport, Context, DevicePath, MaxLun);
     if (EFI_ERROR (Status)) {
      gBS->CloseProtocol (
             Controller,
@@ -913,7 +953,7 @@ USBMassDriverBindingStop (
     // This is a 1st type handle(non-multi-lun), which only needs uninstall
     // blockio protocol, close usbio protocol and free mass device.
     //
-    UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (BlockIo);
+    UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (BlockIo);
   
     //
     // Uninstall Block I/O protocol from the device handle,
@@ -935,7 +975,7 @@ USBMassDriverBindingStop (
           Controller
           );
   
-    UsbMass->Transport->Fini (UsbMass->Context);
+    UsbMass->Transport->CleanUp (UsbMass->Context);
     gBS->FreePool (UsbMass);
     
     DEBUG ((EFI_D_INFO, "Success to stop non-multi-lun root handle\n"));
@@ -965,7 +1005,7 @@ USBMassDriverBindingStop (
       continue;
     }
 
-    UsbMass = USB_MASS_DEVICE_FROM_BLOCKIO (BlockIo);
+    UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (BlockIo);
 
     gBS->CloseProtocol (
           Controller,
@@ -1003,7 +1043,7 @@ USBMassDriverBindingStop (
       // Success to stop this multi-lun handle, so go on next child.
       //
       if (((Index + 1) == NumberOfChildren) && AllChildrenStopped) {
-        UsbMass->Transport->Fini (UsbMass->Context);
+        UsbMass->Transport->CleanUp (UsbMass->Context);
       }
       gBS->FreePool (UsbMass);
     }
@@ -1016,15 +1056,6 @@ USBMassDriverBindingStop (
   DEBUG ((EFI_D_INFO, "Success to stop all %d multi-lun children handles\n", (UINT32)NumberOfChildren));
   return EFI_SUCCESS;
 }
-
-EFI_DRIVER_BINDING_PROTOCOL gUSBMassDriverBinding = {
-  USBMassDriverBindingSupported,
-  USBMassDriverBindingStart,
-  USBMassDriverBindingStop,
-  0x11,
-  NULL,
-  NULL
-};
 
 /**
   The entry point for the driver, which will install the driver binding and
@@ -1057,6 +1088,7 @@ USBMassStorageEntryPoint (
              &gUsbMassStorageComponentName,
              &gUsbMassStorageComponentName2
              );
+  ASSERT_EFI_ERROR (Status);
 
-  return Status;
+  return EFI_SUCCESS;
 }
