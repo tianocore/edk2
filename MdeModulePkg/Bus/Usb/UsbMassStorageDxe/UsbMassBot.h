@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_USBMASS_BOT_H_
 #define _EFI_USBMASS_BOT_H_
 
+#include "UsbMass.h"
+
 extern USB_MASS_TRANSPORT mUsbBotTransport;
 
 typedef enum {

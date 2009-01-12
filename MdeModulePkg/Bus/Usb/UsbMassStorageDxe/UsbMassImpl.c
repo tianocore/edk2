@@ -376,7 +376,7 @@ UsbMassInitMedia (
   @param  This            The USB mass driver's driver binding.
   @param  Controller      The device to test.
   @param  Transport       The pointer to pointer to USB_MASS_TRANSPORT.
-  @param  Context         The passing parameter.
+  @param  Context         The parameter for USB_MASS_DEVICE.Context.
   @param  MaxLun          Get the MaxLun if is BOT dev.
 
   @retval EFI_SUCCESS     The initialization is successful.
@@ -457,22 +457,23 @@ ON_EXIT:
 }
 
 /**
-  Usb mass storage driver initializes multi lun.
+  Initialize data for device that supports multiple LUNSs.
 
-  @param  This            The USB mass driver's driver binding.
-  @param  Controller      The device to test.
-  @param  Transport       The pointer to USB_MASS_TRANSPORT.
-  @param  Context         The passing parameter.
-  @param  DevicePath      The remaining device path
-  @param  MaxLun          The MaxLun number passed.
+  @param  This                 The Driver Binding Protocol instance.
+  @param  Controller           The device to initialize.
+  @param  Transport            Pointer to USB_MASS_TRANSPORT.
+  @param  Context              Parameter for USB_MASS_DEVICE.Context.
+  @param  DevicePath           The remaining device path.
+  @param  MaxLun               The max LUN number.
 
-  @retval EFI_SUCCESS     Initialization is success.
-  @retval Other           Initialization fails.
+  @retval EFI_SUCCESS          At least one LUN is initialized successfully.
+  @retval EFI_OUT_OF_RESOURCES Out of resource while creating device path node.
+  @retval Other                Initialization fails.
 
 **/
 EFI_STATUS
 UsbMassInitMultiLun (
-  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_DRIVER_BINDING_PROTOCOL   *This,
   IN EFI_HANDLE                    Controller,
   IN USB_MASS_TRANSPORT            *Transport,
   IN VOID                          *Context,
@@ -494,10 +495,7 @@ UsbMassInitMultiLun (
     
     UsbIo   = NULL;
     UsbMass = AllocateZeroPool (sizeof (USB_MASS_DEVICE));
-    if (UsbMass == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto ON_ERROR;
-    }
+    ASSERT (UsbMass != NULL);
       
     UsbMass->Signature            = USB_MASS_SIGNATURE;
     UsbMass->UsbIo                = UsbIo;
@@ -512,11 +510,14 @@ UsbMassInitMultiLun (
     UsbMass->Lun                  = Index;
     
     //
-    // Get the storage's parameters, such as last block number.
-    // then install the BLOCK_IO
+    // Initialize the media parameter data for EFI_BLOCK_IO_MEDIA of Block I/O Protocol.
     //
     Status = UsbMassInitMedia (UsbMass);
     if (!EFI_ERROR (Status)) {
+      //
+      // According to USB Mass Storage Specification for Bootability, only following
+      // 4 Peripheral Device Types are in spec.
+      //
       if ((UsbMass->Pdt != USB_PDT_DIRECT_ACCESS) && 
            (UsbMass->Pdt != USB_PDT_CDROM) &&
            (UsbMass->Pdt != USB_PDT_OPTICAL) && 
@@ -530,7 +531,7 @@ UsbMassInitMultiLun (
     }
 
     //
-    // Create a device path node of device logic unit, and append it 
+    // Create a device path node for device logic unit, and append it.
     //
     LunNode.Header.Type    = MESSAGING_DEVICE_PATH;
     LunNode.Header.SubType = MSG_DEVICE_LOGICAL_UNIT_DP;
@@ -548,7 +549,7 @@ UsbMassInitMultiLun (
     }
 
     //
-    // Create a UsbMass handle for each lun, and install blockio and devicepath protocols.
+    // Create a new handle for each LUN, and install Block I/O Protocol and Device Path Protocol.
     //
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &UsbMass->Controller,
@@ -565,7 +566,7 @@ UsbMassInitMultiLun (
     }
 
     //
-    // Open UsbIo protocol by child to setup a parent-child relationship.
+    // Open USB I/O Protocol by child to setup a parent-child relationship.
     //
     Status = gBS->OpenProtocol (
                     Controller,
@@ -596,10 +597,10 @@ UsbMassInitMultiLun (
 
 ON_ERROR:
   if (UsbMass->DevicePath != NULL) {
-    gBS->FreePool (UsbMass->DevicePath);
+    FreePool (UsbMass->DevicePath);
   }
   if (UsbMass != NULL) {
-    gBS->FreePool (UsbMass);
+    FreePool (UsbMass);
   }
   if (UsbIo != NULL) {
     gBS->CloseProtocol (
@@ -611,7 +612,7 @@ ON_ERROR:
   }
 
   //
-  // If only success to initialize one lun, return success, or else return error
+  // Return EFI_SUCCESS if at least one LUN is initialized successfully.
   //
   if (Index > 0) {
     return EFI_SUCCESS; 
@@ -621,14 +622,14 @@ ON_ERROR:
 }
 
 /**
-  Initialize No/Unsupported LUN device.
+  Initialize data for device that does not support multiple LUNSs.
 
-  @param This             The USB mass driver's driver binding.
-  @param Controller       The device to test.
-  @param Transport        The pointer to USB_MASS_TRANSPORT.
-  @param Context          The passing parameter.
+  @param  This            The Driver Binding Protocol instance.
+  @param  Controller      The device to initialize.
+  @param  Transport       Pointer to USB_MASS_TRANSPORT.
+  @param  Context         Parameter for USB_MASS_DEVICE.Context.
 
-  @retval EFI_SUCCESS     Initialization is success.
+  @retval EFI_SUCCESS     Initialization succeeds.
   @retval Other           Initialization fails.
 
 **/
@@ -646,9 +647,8 @@ UsbMassInitNonLun (
 
   UsbIo   = NULL;
   UsbMass = AllocateZeroPool (sizeof (USB_MASS_DEVICE));
-  if (UsbMass == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (UsbMass != NULL);
+
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsbIoProtocolGuid,
@@ -676,11 +676,14 @@ UsbMassInitNonLun (
   UsbMass->Context              = Context;
   
   //
-  // Get the storage's parameters, such as last block number.
-  // then install the BLOCK_IO
+  // Initialize the media parameter data for EFI_BLOCK_IO_MEDIA of Block I/O Protocol.
   //
   Status = UsbMassInitMedia (UsbMass);
   if (!EFI_ERROR (Status)) {
+    //
+    // According to USB Mass Storage Specification for Bootability, only following
+    // 4 Peripheral Device Types are in spec.
+    //
     if ((UsbMass->Pdt != USB_PDT_DIRECT_ACCESS) && 
          (UsbMass->Pdt != USB_PDT_CDROM) &&
          (UsbMass->Pdt != USB_PDT_OPTICAL) && 
@@ -707,7 +710,7 @@ UsbMassInitNonLun (
 
 ON_ERROR:
   if (UsbMass != NULL) {
-    gBS->FreePool (UsbMass);
+    FreePool (UsbMass);
   }
   gBS->CloseProtocol (
          Controller,
@@ -796,7 +799,6 @@ ON_EXIT:
   return Status;
 }
 
-
 /**
   Starts the USB mass storage device with this driver.
 
@@ -804,9 +806,9 @@ ON_EXIT:
   installs Block I/O Protocol, and submits Asynchronous Interrupt
   Transfer to manage the USB mass storage device.
 
-  @param  This                   The USB mass storage driver binding protocol.
-  @param  Controller             The USB mass storage device to start on
-  @param  RemainingDevicePath    The remaining device path.
+  @param  This                  The USB mass storage driver binding protocol.
+  @param  Controller            The USB mass storage device to start on
+  @param  RemainingDevicePath   The remaining device path.
 
   @retval EFI_SUCCESS           This driver supports this device.
   @retval EFI_UNSUPPORTED       This driver does not support this device.
@@ -833,9 +835,6 @@ USBMassDriverBindingStart (
   Context   = NULL;
   MaxLun    = 0;
 
-  //
-  // Get interface and protocols, initialize transport
-  //
   Status = UsbMassInitTransport (This, Controller, &Transport, &Context, &MaxLun);
 
   if (EFI_ERROR (Status)) {
@@ -844,15 +843,15 @@ USBMassDriverBindingStart (
   }
   if (MaxLun == 0) {
     //
-    // Initialize No/Unsupported LUN device
+    // Initialize data for device that does not support multiple LUNSs.
     //
-    Status = UsbMassInitNonLun(This, Controller, Transport, Context);
+    Status = UsbMassInitNonLun (This, Controller, Transport, Context);
     if (EFI_ERROR (Status)) { 
       DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitNonLun (%r)\n", Status));
     }
   } else {
     //
-    // Open device path to prepare append Device Logic Unit node.
+    // Open device path to prepare for appending Device Logic Unit node.
     //
     Status = gBS->OpenProtocol (
                     Controller,
@@ -869,7 +868,8 @@ USBMassDriverBindingStart (
     }
 
     //
-    // Try best to initialize all LUNs, and return success only if one of LUNs successed to initialized.
+    // Initialize data for device that supports multiple LUNSs.
+    // EFI_SUCCESS is returned if at least 1 LUN is initialized successfully.
     //
     Status = UsbMassInitMultiLun (This, Controller, Transport, Context, DevicePath, MaxLun);
     if (EFI_ERROR (Status)) {
@@ -895,6 +895,8 @@ USBMassDriverBindingStart (
   @param  ChildHandleBuffer      The buffer of children handle.
 
   @retval EFI_SUCCESS            The driver stopped from controlling the device.
+  @retval EFI_DEVICE_ERROR       The device could not be stopped due to a device error.
+  @retval EFI_UNSUPPORTED        Block I/O Protocol is not installed on Controller.
   @retval Others                 Failed to stop the driver
 
 **/
@@ -909,17 +911,17 @@ USBMassDriverBindingStop (
 {
   EFI_STATUS            Status;
   USB_MASS_DEVICE       *UsbMass;
-  EFI_USB_IO_PROTOCOL     *UsbIo;
+  EFI_USB_IO_PROTOCOL   *UsbIo;
   EFI_BLOCK_IO_PROTOCOL *BlockIo;
-  UINTN                   Index;
-  BOOLEAN                 AllChildrenStopped;
+  UINTN                 Index;
+  BOOLEAN               AllChildrenStopped;
 
   //
-  // This a bus driver stop function since multi-lun supported. There are three 
-  // kinds of device handle might be passed, 1st is a handle with devicepath/
-  // usbio/blockio installed(non-multi-lun), 2nd is a handle with devicepath/
-  // usbio installed(multi-lun root), 3rd is a handle with devicepath/blockio
-  // installed(multi-lun).
+  // This is a bus driver stop function since multi-lun is supported.
+  // There are three kinds of device handles that might be passed:
+  // 1st is a handle with Device Path & USB I/O & Block I/O installed (non-multi-lun)
+  // 2nd is a handle with Device Path & USB I/O installed (multi-lun root)
+  // 3rd is a handle with Device Path & Block I/O installed (multi-lun).
   //
   if (NumberOfChildren == 0) {
     //
@@ -936,8 +938,8 @@ USBMassDriverBindingStop (
   
     if (EFI_ERROR(Status)) {
       //
-      // This is a 2nd type handle(multi-lun root), which only needs close 
-      // devicepath protocol.
+      // This is a 2nd type handle(multi-lun root), which only needs to close 
+      // Device Path Protocol.
       //
       gBS->CloseProtocol (
             Controller,
@@ -950,8 +952,8 @@ USBMassDriverBindingStop (
     }
     
     //
-    // This is a 1st type handle(non-multi-lun), which only needs uninstall
-    // blockio protocol, close usbio protocol and free mass device.
+    // This is a 1st type handle(non-multi-lun), which only needs to uninstall
+    // Block I/O Protocol, close USB I/O Protocol and free mass device.
     //
     UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (BlockIo);
   
@@ -976,7 +978,7 @@ USBMassDriverBindingStop (
           );
   
     UsbMass->Transport->CleanUp (UsbMass->Context);
-    gBS->FreePool (UsbMass);
+    FreePool (UsbMass);
     
     DEBUG ((EFI_D_INFO, "Success to stop non-multi-lun root handle\n"));
     return EFI_SUCCESS;
@@ -984,8 +986,8 @@ USBMassDriverBindingStop (
 
   //
   // This is a 3rd type handle(multi-lun), which needs uninstall
-  // blockio and devicepath protocol, close usbio protocol and 
-  // free mass device.
+  // Block I/O Protocol and Device Path Protocol, close USB I/O Protocol and 
+  // free mass device for all children.
   //
   AllChildrenStopped = TRUE;
 
@@ -1008,11 +1010,11 @@ USBMassDriverBindingStop (
     UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (BlockIo);
 
     gBS->CloseProtocol (
-          Controller,
-          &gEfiUsbIoProtocolGuid,
-          This->DriverBindingHandle,
-          ChildHandleBuffer[Index]
-          );
+           Controller,
+           &gEfiUsbIoProtocolGuid,
+           This->DriverBindingHandle,
+           ChildHandleBuffer[Index]
+           );
   
     Status = gBS->UninstallMultipleProtocolInterfaces (
                     ChildHandleBuffer[Index],
@@ -1025,7 +1027,7 @@ USBMassDriverBindingStop (
     
     if (EFI_ERROR (Status)) {
       //
-      // Fail to uninstall blockio and devicepath protocol, so re-open usbio by child.
+      // Fail to uninstall Block I/O Protocol and Device Path Protocol, so re-open USB I/O Protocol by child.
       //
       AllChildrenStopped = FALSE;
       DEBUG ((EFI_D_ERROR, "Fail to stop No.%d multi-lun child handle when uninstalling blockio and devicepath\n", (UINT32)Index));
@@ -1040,12 +1042,12 @@ USBMassDriverBindingStop (
              );
     } else {
       //
-      // Success to stop this multi-lun handle, so go on next child.
+      // Succeed to stop this multi-lun handle, so go on with next child.
       //
       if (((Index + 1) == NumberOfChildren) && AllChildrenStopped) {
         UsbMass->Transport->CleanUp (UsbMass->Context);
       }
-      gBS->FreePool (UsbMass);
+      FreePool (UsbMass);
     }
   }
 
@@ -1053,19 +1055,20 @@ USBMassDriverBindingStop (
     return EFI_DEVICE_ERROR;
   }
   
-  DEBUG ((EFI_D_INFO, "Success to stop all %d multi-lun children handles\n", (UINT32)NumberOfChildren));
+  DEBUG ((EFI_D_INFO, "Success to stop all %d multi-lun children handles\n", (UINT32) NumberOfChildren));
   return EFI_SUCCESS;
 }
 
 /**
-  The entry point for the driver, which will install the driver binding and
-  component name protocol.
+  Entrypoint of USB Mass Storage Driver.
 
-  @param  ImageHandle       The image handle of this driver.
-  @param  SystemTable       The system table.
+  This function is the entrypoint of USB Mass Storage Driver. It installs Driver Binding
+  Protocol together with Component Name Protocols.
 
-  @retval EFI_SUCCESS       The protocols are installed OK.
-  @retval Others            Failed to install protocols.
+  @param  ImageHandle       The firmware allocated handle for the EFI image.
+  @param  SystemTable       A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/
 EFI_STATUS

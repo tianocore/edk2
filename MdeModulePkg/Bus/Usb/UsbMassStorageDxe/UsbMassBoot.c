@@ -788,7 +788,6 @@ UsbBootWriteBlocks (
   return Status;
 }
 
-
 /**
   Use the USB clear feature control transfer to clear the endpoint stall condition.
 

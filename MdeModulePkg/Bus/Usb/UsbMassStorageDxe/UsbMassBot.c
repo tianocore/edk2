@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "UsbMass.h"
+#include "UsbMassBoot.h"
 #include "UsbMassBot.h"
 
 //
@@ -58,9 +58,7 @@ UsbBotInit (
   //
   // Allocate the BOT context for USB_BOT_PROTOCOL and two endpoint descriptors.
   //
-  UsbBot = AllocateZeroPool (
-             sizeof (USB_BOT_PROTOCOL) + 2 * sizeof (EFI_USB_ENDPOINT_DESCRIPTOR)
-             );
+  UsbBot = AllocateZeroPool (sizeof (USB_BOT_PROTOCOL) + 2 * sizeof (EFI_USB_ENDPOINT_DESCRIPTOR));
   ASSERT (UsbBot != NULL);
 
   UsbBot->UsbIo = UsbIo;
@@ -103,7 +101,7 @@ UsbBotInit (
        (UsbBot->BulkOutEndpoint == NULL)) {
 
       UsbBot->BulkOutEndpoint   = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbBot + 1) + 1;
-      CopyMem(UsbBot->BulkOutEndpoint, &EndPoint, sizeof(EndPoint));
+      CopyMem (UsbBot->BulkOutEndpoint, &EndPoint, sizeof(EndPoint));
     }
   }
 

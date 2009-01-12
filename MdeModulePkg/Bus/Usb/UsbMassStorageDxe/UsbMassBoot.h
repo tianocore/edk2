@@ -16,6 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_USB_MASS_BOOT_H_
 #define _EFI_USB_MASS_BOOT_H_
 
+#include "UsbMass.h"
+
 typedef enum {
   //
   // The opcodes of various USB boot commands:
@@ -226,17 +228,18 @@ typedef struct {
 #define USB_BOOT_SENSE_KEY(Key)     ((Key) & 0x0f)
 
 /**
-  Get the parameters for the USB mass storage media, including
-  the RemovableMedia, block size, and last block number. This
-  function is used both to initialize the media during the
-  DriverBindingStart and to re-initialize it when the media is
-  changed. Althought the RemoveableMedia is unlikely to change,
-  I include it here.
+  Get the parameters for the USB mass storage media.
 
-  @param  UsbMass                The device to retireve disk gemotric.
+  This function get the parameters for the USB mass storage media,
+  It is used both to initialize the media during the Start() phase
+  of Driver Binding Protocol and to re-initialize it when the media is
+  changed. Althought the RemoveableMedia is unlikely to change,
+  it is also included here.
+
+  @param  UsbMass                The device to retrieve disk gemotric.
 
   @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
-  @retval Other                  Get the parameters failed.
+  @retval Other                  Failed to get the parameters.
 
 **/
 EFI_STATUS
@@ -244,14 +247,12 @@ UsbBootGetParams (
   IN USB_MASS_DEVICE          *UsbMass
   );
 
-
 /**
-  Use the TEST UNIT READY command to check whether it is ready.
-  If it is ready, update the parameters.
+  Execute TEST UNIT READY command to check if the device is ready.
 
   @param  UsbMass                The device to test
 
-  @retval EFI_SUCCESS            The device is ready and parameters are updated.
+  @retval EFI_SUCCESS            The device is ready.
   @retval Others                 Device not ready.
 
 **/
@@ -260,22 +261,19 @@ UsbBootIsUnitReady (
   IN USB_MASS_DEVICE          *UsbMass
   );
 
-
 /**
   Detect whether the removable media is present and whether it has changed.
-  The Non-removable media doesn't need it.
 
-  @param  UsbMass                The device to retireve disk gemotric.
+  @param  UsbMass                The device to check.
 
-  @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
-  @retval Other                  Decect media fails.
+  @retval EFI_SUCCESS            The media status is successfully checked.
+  @retval Other                  Failed to detect media.
 
 **/
 EFI_STATUS
 UsbBootDetectMedia (
   IN  USB_MASS_DEVICE       *UsbMass
   );
-
 
 /**
   Read some blocks from the device.
@@ -297,14 +295,13 @@ UsbBootReadBlocks (
   OUT UINT8                   *Buffer
   );
 
-
 /**
   Write some blocks to the device.
 
   @param  UsbMass                The USB mass storage device to write to
   @param  Lba                    The start block number
   @param  TotalBlock             Total block number to write
-  @param  Buffer                 The buffer to write to
+  @param  Buffer                 Pointer to the source buffer for the data.
 
   @retval EFI_SUCCESS            Data are written into the buffer
   @retval Others                 Failed to write all the data
@@ -315,7 +312,24 @@ UsbBootWriteBlocks (
   IN  USB_MASS_DEVICE         *UsbMass,
   IN  UINT32                  Lba,
   IN  UINTN                   TotalBlock,
-  OUT UINT8                   *Buffer
+  IN  UINT8                   *Buffer
   );
+
+/**
+  Use the USB clear feature control transfer to clear the endpoint stall condition.
+
+  @param  UsbIo                  The USB I/O Protocol instance
+  @param  EndpointAddr           The endpoint to clear stall for
+
+  @retval EFI_SUCCESS            The endpoint stall condition is cleared.
+  @retval Others                 Failed to clear the endpoint stall condition.
+
+**/
+EFI_STATUS
+UsbClearEndpointStall (
+  IN EFI_USB_IO_PROTOCOL    *UsbIo,
+  IN UINT8                  EndpointAddr
+  );
+
 #endif
 
