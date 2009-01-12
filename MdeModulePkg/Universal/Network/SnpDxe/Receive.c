@@ -1,11 +1,11 @@
 /** @file
  		Implementation of receiving a packet from a network interface.
- 
-Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+
+Copyright (c) 2004 - 2007, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials are licensed
+and made available under the terms and conditions of the BSD License which
+accompanies this distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -23,20 +23,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  BufferSize   Pointer to the length of the buffer on entry and contains
                        the length of the received data on return
   @param  HeaderSize   Pointer to the header portion of the data received.
-  @param  SrcAddr      Pointer to contain the source ethernet address on return 
-  @param  DestAddr     Pointer to contain the destination ethernet address on 
+  @param  SrcAddr      Pointer to contain the source ethernet address on return
+  @param  DestAddr     Pointer to contain the destination ethernet address on
                        return
-  @param  Protocol     Pointer to contain the protocol type from the ethernet 
+  @param  Protocol     Pointer to contain the protocol type from the ethernet
                        header on return
 
 
-  @retval EFI_SUCCESS           The received data was stored in Buffer, and 
-                                BufferSize has been updated to the number of 
+  @retval EFI_SUCCESS           The received data was stored in Buffer, and
+                                BufferSize has been updated to the number of
                                 bytes received.
-  @retval EFI_DEVICE_ERROR      Fail to execute UNDI command. 
-  @retval EFI_NOT_READY         No packets have been received on the network 
+  @retval EFI_DEVICE_ERROR      Fail to execute UNDI command.
+  @retval EFI_NOT_READY         No packets have been received on the network
                                 interface.
-  @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the received 
+  @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the received
                                 packets. BufferSize has been updated to the
                                 required size.
 
@@ -82,7 +82,7 @@ PxeReceive (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive ()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.receive ()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -92,7 +92,7 @@ PxeReceive (
 
   case PXE_STATCODE_NO_DATA:
     DEBUG (
-      (EFI_D_ERROR | EFI_D_NET,
+      (EFI_D_NET,
       "\nsnp->undi.receive ()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -102,7 +102,7 @@ PxeReceive (
 
   default:
     DEBUG (
-      (EFI_D_ERROR | EFI_D_NET,
+      (EFI_D_NET,
       "\nsnp->undi.receive()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -139,44 +139,44 @@ PxeReceive (
   Receives a packet from a network interface.
 
   This function retrieves one packet from the receive queue of a network interface.
-  If there are no packets on the receive queue, then EFI_NOT_READY will be 
+  If there are no packets on the receive queue, then EFI_NOT_READY will be
   returned. If there is a packet on the receive queue, and the size of the packet
   is smaller than BufferSize, then the contents of the packet will be placed in
   Buffer, and BufferSize will be updated with the actual size of the packet.
   In addition, if SrcAddr, DestAddr, and Protocol are not NULL, then these values
-  will be extracted from the media header and returned. EFI_SUCCESS will be 
+  will be extracted from the media header and returned. EFI_SUCCESS will be
   returned if a packet was successfully received.
   If BufferSize is smaller than the received packet, then the size of the receive
   packet will be placed in BufferSize and EFI_BUFFER_TOO_SMALL will be returned.
   If the driver has not been initialized, EFI_DEVICE_ERROR will be returned.
 
   @param This       A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
-  @param HeaderSize The size, in bytes, of the media header received on the network 
-                    interface. If this parameter is NULL, then the media header size 
+  @param HeaderSize The size, in bytes, of the media header received on the network
+                    interface. If this parameter is NULL, then the media header size
                     will not be returned.
-  @param BufferSize On entry, the size, in bytes, of Buffer. On exit, the size, in 
+  @param BufferSize On entry, the size, in bytes, of Buffer. On exit, the size, in
                     bytes, of the packet that was received on the network interface.
   @param Buffer     A pointer to the data buffer to receive both the media
                     header and the data.
   @param SrcAddr    The source HW MAC address. If this parameter is NULL, the HW
-                    MAC source address will not be extracted from the media header. 
-  @param DestAddr   The destination HW MAC address. If this parameter is NULL, 
-                    the HW MAC destination address will not be extracted from 
+                    MAC source address will not be extracted from the media header.
+  @param DestAddr   The destination HW MAC address. If this parameter is NULL,
+                    the HW MAC destination address will not be extracted from
                     the media header.
-  @param Protocol   The media header type. If this parameter is NULL, then the 
-                    protocol will not be extracted from the media header. See 
+  @param Protocol   The media header type. If this parameter is NULL, then the
+                    protocol will not be extracted from the media header. See
                     RFC 1700 section "Ether Types" for examples.
 
-  @retval EFI_SUCCESS           The received data was stored in Buffer, and 
-                                BufferSize has been updated to the number of 
+  @retval EFI_SUCCESS           The received data was stored in Buffer, and
+                                BufferSize has been updated to the number of
                                 bytes received.
   @retval EFI_NOT_STARTED       The network interface has not been started.
   @retval EFI_NOT_READY         No packets have been received on the network interface.
-  @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the received packets. 
+  @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the received packets.
                                 BufferSize has been updated to the required size.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
                                 * The This parameter is NULL
-                                * The This parameter does not point to a valid 
+                                * The This parameter does not point to a valid
                                   EFI_SIMPLE_NETWORK_PROTOCOL structure.
                                 * The BufferSize parameter is NULL
                                 * The Buffer parameter is NULL
