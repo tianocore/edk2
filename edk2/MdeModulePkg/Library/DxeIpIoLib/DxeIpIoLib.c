@@ -1,6 +1,7 @@
 /** @file
+  IpIo Library.
 
-Copyright (c) 2005 - 2007, Intel Corporation
+Copyright (c) 2005 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,19 +9,9 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  IpIo.c
-
-Abstract:
-
-  The implementation of the IpIo layer.
-
-
 **/
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Udp4.h>
 
@@ -28,13 +19,7 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/BaseMemoryLib.h>
 
-
-#define NET_PROTO_HDR(Buf, Type)  ((Type *) ((Buf)->BlockOp[0].Head))
-#define ICMP_ERRLEN(IpHdr) \
-  (sizeof(IP4_ICMP_HEAD) + EFI_IP4_HEADER_LEN(IpHdr) + 8)
 
 LIST_ENTRY  mActiveIpIoList = {
   &mActiveIpIoList,
@@ -71,12 +56,27 @@ ICMP_ERROR_INFO  mIcmpErrMap[10] = {
   {FALSE, TRUE}
 };
 
+
+/**
+  Notify function for IP transmit token.
+
+  @param[in]  Context               The context passed in by the event notifier.
+
+**/
 VOID
 EFIAPI
 IpIoTransmitHandlerDpc (
   IN VOID      *Context
   );
 
+
+/**
+  Notify function for IP transmit token.
+
+  @param[in]  Event                 The event signaled.
+  @param[in]  Context               The context passed in by the event notifier.
+
+**/
 VOID
 EFIAPI
 IpIoTransmitHandler (
@@ -86,17 +86,17 @@ IpIoTransmitHandler (
 
 
 /**
-  This function create an IP child, open the IP protocol and return the opened
+  This function create an IP child ,open the IP protocol, and return the opened
   IP protocol as Interface.
 
-  @param  ControllerHandle      The controller handle.
-  @param  ImageHandle           The image handle.
-  @param  ChildHandle           Pointer to the buffer to save the IP child handle.
-  @param  Interface             Pointer used to get the IP protocol interface.
+  @param[in]    ControllerHandle   The controller handle.
+  @param[in]    ImageHandle        The image handle.
+  @param[in]    ChildHandle        Pointer to the buffer to save the IP child handle.
+  @param[out]   Interface          Pointer used to get the IP protocol interface.
 
-  @retval EFI_SUCCESS           The IP child is created and the IP protocol
-                                interface is retrieved.
-  @retval Other                 The required operation failed.
+  @retval       EFI_SUCCESS        The IP child is created and the IP protocol
+                                   interface is retrieved.
+  @retval       Others             The required operation failed.
 
 **/
 EFI_STATUS
@@ -110,7 +110,7 @@ IpIoCreateIpChildOpenProtocol (
   EFI_STATUS  Status;
 
   //
-  // Create an ip child.
+  // Create an IP child.
   //
   Status = NetLibCreateServiceChild (
              ControllerHandle,
@@ -123,7 +123,7 @@ IpIoCreateIpChildOpenProtocol (
   }
 
   //
-  // Open the ip protocol installed on the *ChildHandle.
+  // Open the IP protocol installed on the *ChildHandle.
   //
   Status = gBS->OpenProtocol (
                   *ChildHandle,
@@ -135,7 +135,7 @@ IpIoCreateIpChildOpenProtocol (
                   );
   if (EFI_ERROR (Status)) {
     //
-    // On failure, destroy the ip child.
+    // On failure, destroy the IP child.
     //
     NetLibDestroyServiceChild (
       ControllerHandle,
@@ -152,13 +152,13 @@ IpIoCreateIpChildOpenProtocol (
 /**
   This function close the previously openned IP protocol and destroy the IP child.
 
-  @param  ControllerHandle      The controller handle.
-  @param  ImageHandle           the image handle.
-  @param  ChildHandle           The child handle of the IP child.
+  @param[in]  ControllerHandle    The controller handle.
+  @param[in]  ImageHandle         The image handle.
+  @param[in]  ChildHandle         The child handle of the IP child.
 
-  @retval EFI_SUCCESS           The IP protocol is closed and the relevant IP child
-                                is destroyed.
-  @retval Other                 The required operation failed.
+  @retval     EFI_SUCCESS         The IP protocol is closed and the relevant IP child
+                                  is destroyed.
+  @retval     Others              The required operation failed.
 
 **/
 EFI_STATUS
@@ -171,7 +171,7 @@ IpIoCloseProtocolDestroyIpChild (
   EFI_STATUS  Status;
 
   //
-  // Close the previously openned ip protocol.
+  // Close the previously openned IP protocol.
   //
   gBS->CloseProtocol (
          ChildHandle,
@@ -181,7 +181,7 @@ IpIoCloseProtocolDestroyIpChild (
          );
 
   //
-  // Destroy the ip child.
+  // Destroy the IP child.
   //
   Status = NetLibDestroyServiceChild (
              ControllerHandle,
@@ -197,19 +197,19 @@ IpIoCloseProtocolDestroyIpChild (
 /**
   This function handles ICMP packets.
 
-  @param  IpIo                  Pointer to the IP_IO instance.
-  @param  Pkt                   Pointer to the ICMP packet.
-  @param  Session               Pointer to the net session of this ICMP packet.
+  @param[in]       IpIo          Pointer to the IP_IO instance.
+  @param[in, out]  Pkt           Pointer to the ICMP packet.
+  @param[in]       Session       Pointer to the net session of this ICMP packet.
 
-  @retval EFI_SUCCESS           The ICMP packet is handled successfully.
-  @retval EFI_ABORTED           This type of ICMP packet is not supported.
+  @retval          EFI_SUCCESS   The ICMP packet is handled successfully.
+  @retval          EFI_ABORTED   This type of ICMP packet is not supported.
 
 **/
 EFI_STATUS
 IpIoIcmpHandler (
-  IN IP_IO                *IpIo,
-  IN NET_BUF              *Pkt,
-  IN EFI_NET_SESSION_DATA *Session
+  IN     IP_IO                *IpIo,
+  IN OUT NET_BUF              *Pkt,
+  IN     EFI_NET_SESSION_DATA *Session
   )
 {
   IP4_ICMP_ERROR_HEAD  *IcmpHdr;
@@ -271,8 +271,6 @@ IpIoIcmpHandler (
 
     default:
       return EFI_ABORTED;
-
-      break;
     }
 
     break;
@@ -306,8 +304,6 @@ IpIoIcmpHandler (
 
   default:
     return EFI_ABORTED;
-
-    break;
   }
 
   //
@@ -330,7 +326,7 @@ IpIoIcmpHandler (
   signal the recycle event to notify IP to recycle the
   data buffer.
 
-  @param  Event                 The event to be signaled.
+  @param[in]  Event                 The event to be signaled.
 
 **/
 VOID
@@ -346,26 +342,27 @@ IpIoExtFree (
   Create a send entry to wrap a packet before sending
   out it through IP.
 
-  @param  IpIo                  Pointer to the IP_IO instance.
-  @param  Pkt                   Pointer to the packet.
-  @param  Sender                Pointer to the IP sender.
-  @param  NotifyData            Pointer to the notify data.
-  @param  Dest                  Pointer to the destination IP address.
-  @param  Override              Pointer to the overriden IP_IO data.
+  @param[in, out]  IpIo                 Pointer to the IP_IO instance.
+  @param[in, out]  Pkt                  Pointer to the packet.
+  @param[in]       Sender               Pointer to the IP sender.
+  @param[in]       Context              Pointer to the context.
+  @param[in]       NotifyData           Pointer to the notify data.
+  @param[in]       Dest                 Pointer to the destination IP address.
+  @param[in]       Override             Pointer to the overriden IP_IO data.
 
   @return Pointer to the data structure created to wrap the packet. If NULL,
-          resource limit occurred.
+  @return resource limit occurred.
 
 **/
 IP_IO_SEND_ENTRY *
 IpIoCreateSndEntry (
-  IN IP_IO             *IpIo,
-  IN NET_BUF           *Pkt,
-  IN EFI_IP4_PROTOCOL  *Sender,
-  IN VOID              *Context    OPTIONAL,
-  IN VOID              *NotifyData OPTIONAL,
-  IN IP4_ADDR          Dest,
-  IN IP_IO_OVERRIDE    *Override
+  IN OUT IP_IO             *IpIo,
+  IN OUT NET_BUF           *Pkt,
+  IN     EFI_IP4_PROTOCOL  *Sender,
+  IN     VOID              *Context    OPTIONAL,
+  IN     VOID              *NotifyData OPTIONAL,
+  IN     IP4_ADDR          Dest,
+  IN     IP_IO_OVERRIDE    *Override
   )
 {
   IP_IO_SEND_ENTRY          *SndEntry;
@@ -455,7 +452,7 @@ IpIoCreateSndEntry (
   // Set the fields of SndEntry
   //
   SndEntry->IpIo        = IpIo;
-  SndEntry->Ip      = Sender;
+  SndEntry->Ip          = Sender;
   SndEntry->Context     = Context;
   SndEntry->NotifyData  = NotifyData;
 
@@ -489,7 +486,7 @@ ReleaseSndEntry:
   
   This function pairs with IpIoCreateSndEntry().
 
-  @param  SndEntry              Pointer to the send entry to be destroyed.
+  @param[in]  SndEntry              Pointer to the send entry to be destroyed.
 
 **/
 VOID
@@ -519,7 +516,7 @@ IpIoDestroySndEntry (
 /**
   Notify function for IP transmit token.
 
-  @param  Context               The context passed in by the event notifier.
+  @param[in]  Context               The context passed in by the event notifier.
 
 **/
 VOID
@@ -547,14 +544,14 @@ IpIoTransmitHandlerDpc (
   IpIoDestroySndEntry (SndEntry);
 }
 
+
 /**
   Notify function for IP transmit token.
 
-  @param  Event                 The event signaled.
-  @param  Context               The context passed in by the event notifier.
+  @param[in]  Event                 The event signaled.
+  @param[in]  Context               The context passed in by the event notifier.
 
 **/
-
 VOID
 EFIAPI
 IpIoTransmitHandler (
@@ -572,7 +569,7 @@ IpIoTransmitHandler (
 /**
   The dummy handler for the dummy IP receive token.
 
-  @param  Context               The context passed in by the event notifier.
+  @param[in]  Context               The context passed in by the event notifier.
 
 **/
 VOID
@@ -593,7 +590,7 @@ IpIoDummyHandlerDpc (
     //
     return;
   } else if (EFI_SUCCESS == DummyToken->Status) {
-    ASSERT (DummyToken->Packet.RxData);
+    ASSERT ((DummyToken->Packet.RxData)!= NULL);
 
     gBS->SignalEvent (DummyToken->Packet.RxData->RecycleSignal);
   }
@@ -603,10 +600,10 @@ IpIoDummyHandlerDpc (
 
 
 /**
-  Request IpIoDummyHandlerDpc as a DPC at TPL_CALLBACK.
+  This function add IpIoDummyHandlerDpc to the end of the DPC queue.
 
-  @param  Event                 The event signaled.
-  @param  Context               The context passed in by the event notifier.
+  @param[in]  Event                 The event signaled.
+  @param[in]  Context               The context passed in by the event notifier.
 
 **/
 VOID
@@ -627,7 +624,7 @@ IpIoDummyHandler (
   Notify function for the IP receive token, used to process
   the received IP packets.
 
-  @param  Context               The context passed in by the event notifier.
+  @param[in]  Context               The context passed in by the event notifier.
 
 **/
 VOID
@@ -658,9 +655,9 @@ IpIoListenHandlerDpc (
 
   if (((EFI_SUCCESS != Status) && (EFI_ICMP_ERROR != Status)) || (NULL == RxData)) {
     //
-    // Only process the normal packets and the icmp error packets, if RxData is NULL
-    // with Status == EFI_SUCCESS or EFI_ICMP_ERROR, just resume the receive although
-    // this should be a bug of the low layer (IP).
+    // @bug Only process the normal packets and the icmp error packets, if RxData is NULL
+    // @bug with Status == EFI_SUCCESS or EFI_ICMP_ERROR, just resume the receive although
+    // @bug this should be a bug of the low layer (IP).
     //
     goto Resume;
   }
@@ -723,12 +720,10 @@ Resume:
 
 
 /**
-  Request IpIoListenHandlerDpc as a DPC at TPL_CALLBACK
+  This function add IpIoListenHandlerDpc to the end of the DPC queue.
 
-  @param  Event                 The event signaled.
-  @param  Context               The context passed in by the event notifier.
-
-  @return None.
+  @param[in]  Event                The event signaled.
+  @param[in]  Context              The context passed in by the event notifier.
 
 **/
 VOID
@@ -751,9 +746,9 @@ IpIoListenHandler (
   This function uses IP4 service binding protocol in Controller to create an IP4
   child (aka IP4 instance).
 
-  @param  Image                 The image handle of the driver or application that
+  @param[in]  Image             The image handle of the driver or application that
                                 consumes IP_IO.
-  @param  Controller            The controller handle that has IP4 service binding
+  @param[in]  Controller        The controller handle that has IP4 service binding
                                 protocol installed.
 
   @return Pointer to a newly created IP_IO instance, or NULL if failed.
@@ -824,20 +819,23 @@ ReleaseIpIo:
   instance and register the callbacks and their context data for sending and
   receiving IP packets.
 
-  @param  IpIo                  Pointer to an IP_IO instance that needs to open.
-  @param  OpenData              The configuration data and callbacks for the IP_IO
-                                instance.
+  @param[in, out]  IpIo               Pointer to an IP_IO instance that needs
+                                      to open.
+  @param[in]       OpenData           The configuration data and callbacks for
+                                      the IP_IO instance.
 
-  @retval EFI_SUCCESS           The IP_IO instance opened with OpenData
-                                successfully.
-  @retval Other                 Error condition occurred.
+  @retval          EFI_SUCCESS        The IP_IO instance opened with OpenData
+                                      successfully.
+  @retval          EFI_ACCESS_DENIED  The IP_IO instance is configured, avoid to 
+                                      reopen it.
+  @retval          Others             Error condition occurred.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoOpen (
-  IN IP_IO           *IpIo,
-  IN IP_IO_OPEN_DATA *OpenData
+  IN OUT IP_IO           *IpIo,
+  IN     IP_IO_OPEN_DATA *OpenData
   )
 {
   EFI_STATUS        Status;
@@ -858,9 +856,9 @@ IpIoOpen (
   }
 
   //
-  // bugbug: to delete the default route entry in this Ip, if it is:
-  // (0.0.0.0, 0.0.0.0, 0.0.0.0). Delete this statement if Ip modified
-  // its code
+  // @bug To delete the default route entry in this Ip, if it is:
+  // @bug (0.0.0.0, 0.0.0.0, 0.0.0.0). Delete this statement if Ip modified
+  // @bug its code
   //
   Status = Ip->Routes (Ip, TRUE, &mZeroIp4Addr, &mZeroIp4Addr, &mZeroIp4Addr);
 
@@ -900,16 +898,16 @@ ErrorExit:
   This function is paired with IpIoOpen(). The IP_IO will be unconfigured and all
   the pending send/receive tokens will be canceled.
 
-  @param  IpIo                  Pointer to the IP_IO instance that needs to stop.
+  @param[in, out]  IpIo            Pointer to the IP_IO instance that needs to stop.
 
-  @retval EFI_SUCCESS           The IP_IO instance stopped successfully.
-  @retval Other                 Error condition occurred.
+  @retval          EFI_SUCCESS     The IP_IO instance stopped successfully.
+  @retval          Others          Error condition occurred.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoStop (
-  IN IP_IO *IpIo
+  IN OUT IP_IO *IpIo
   )
 {
   EFI_STATUS        Status;
@@ -948,7 +946,7 @@ IpIoStop (
   }
 
   //
-  // All pending snd tokens should be flushed by reseting the IP instances.
+  // All pending send tokens should be flushed by reseting the IP instances.
   //
   ASSERT (IsListEmpty (&IpIo->PendingSndList));
 
@@ -967,17 +965,17 @@ IpIoStop (
   This function is paired with IpIoCreate(). The IP_IO will be closed first.
   Resource will be freed afterwards. See IpIoClose().
 
-  @param  IpIo                  Pointer to the IP_IO instance that needs to be
+  @param[in, out]  IpIo         Pointer to the IP_IO instance that needs to be
                                 destroyed.
 
-  @retval EFI_SUCCESS           The IP_IO instance destroyed successfully.
-  @retval Other                 Error condition occurred.
+  @retval          EFI_SUCCESS  The IP_IO instance destroyed successfully.
+  @retval          Others       Error condition occurred.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoDestroy (
-  IN IP_IO *IpIo
+  IN OUT IP_IO *IpIo
   )
 {
   //
@@ -1004,31 +1002,31 @@ IpIoDestroy (
   overriden by Sender. Other sending configs, like source address and gateway
   address etc., are specified in OverrideData.
 
-  @param  IpIo                  Pointer to an IP_IO instance used for sending IP
-                                packet.
-  @param  Pkt                   Pointer to the IP packet to be sent.
-  @param  Sender                The IP protocol instance used for sending.
-  @param  Context               Optional context data
-  @param  NotifyData            Optional notify data
-  @param  Dest                  The destination IP address to send this packet to.
-  @param  OverrideData          The data to override some configuration of the IP
-                                instance used for sending.
+  @param[in, out]  IpIo                  Pointer to an IP_IO instance used for sending IP
+                                         packet.
+  @param[in, out]  Pkt                   Pointer to the IP packet to be sent.
+  @param[in]       Sender                The IP protocol instance used for sending.
+  @param[in]       Context               Optional context data
+  @param[in]       NotifyData            Optional notify data
+  @param[in]       Dest                  The destination IP address to send this packet to.
+  @param[in]       OverrideData          The data to override some configuration of the IP
+                                         instance used for sending.
 
-  @retval EFI_SUCCESS           The operation is completed successfully.
-  @retval EFI_NOT_STARTED       The IpIo is not configured.
-  @retval EFI_OUT_OF_RESOURCES  Failed due to resource limit.
+  @retval          EFI_SUCCESS           The operation is completed successfully.
+  @retval          EFI_NOT_STARTED       The IpIo is not configured.
+  @retval          EFI_OUT_OF_RESOURCES  Failed due to resource limit.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoSend (
-  IN IP_IO           *IpIo,
-  IN NET_BUF         *Pkt,
-  IN IP_IO_IP_INFO   *Sender        OPTIONAL,
-  IN VOID            *Context       OPTIONAL,
-  IN VOID            *NotifyData    OPTIONAL,
-  IN IP4_ADDR        Dest,
-  IN IP_IO_OVERRIDE  *OverrideData  OPTIONAL
+  IN OUT IP_IO          *IpIo,
+  IN OUT NET_BUF        *Pkt,
+  IN     IP_IO_IP_INFO  *Sender        OPTIONAL,
+  IN     VOID           *Context       OPTIONAL,
+  IN     VOID           *NotifyData    OPTIONAL,
+  IN     IP4_ADDR       Dest,
+  IN     IP_IO_OVERRIDE *OverrideData  OPTIONAL
   )
 {
   EFI_STATUS        Status;
@@ -1064,8 +1062,8 @@ IpIoSend (
 /**
   Cancel the IP transmit token which wraps this Packet.
 
-  @param  IpIo                  Pointer to the IP_IO instance.
-  @param  Packet                Pointer to the packet of NET_BUF to cancel.
+  @param[in]  IpIo                  Pointer to the IP_IO instance.
+  @param[in]  Packet                Pointer to the packet of NET_BUF to cancel.
 
 **/
 VOID
@@ -1079,7 +1077,7 @@ IpIoCancelTxToken (
   IP_IO_SEND_ENTRY  *SndEntry;
   EFI_IP4_PROTOCOL  *Ip;
 
-  ASSERT (IpIo && Packet);
+  ASSERT ((IpIo)!= NULL && (Packet)!= NULL);
 
   NET_LIST_FOR_EACH (Node, &IpIo->PendingSndList) {
 
@@ -1104,8 +1102,8 @@ IpIoCancelTxToken (
   can later use IpIoFindSender() to get the IP_IO and call IpIoSend() to send
   data.
 
-  @param  IpIo                  Pointer to a IP_IO instance to add a new IP
-                                instance for sending purpose.
+  @param[in, out]  IpIo               Pointer to a IP_IO instance to add a new IP
+                                      instance for sending purpose.
 
   @return Pointer to the created IP_IO_IP_INFO structure, NULL if failed.
 
@@ -1113,13 +1111,13 @@ IpIoCancelTxToken (
 IP_IO_IP_INFO *
 EFIAPI
 IpIoAddIp (
-  IN IP_IO  *IpIo
+  IN OUT IP_IO  *IpIo
   )
 {
   EFI_STATUS     Status;
   IP_IO_IP_INFO  *IpInfo;
 
-  ASSERT (IpIo);
+  ASSERT (IpIo != NULL);
 
   IpInfo = AllocatePool (sizeof (IP_IO_IP_INFO));
   if (IpInfo == NULL) {
@@ -1190,22 +1188,22 @@ ReleaseIpInfo:
   Configure the IP instance of this IpInfo and start the receiving if Ip4ConfigData
   is not NULL.
 
-  @param  IpInfo                Pointer to the IP_IO_IP_INFO instance.
-  @param  Ip4ConfigData         The IP4 configure data used to configure the IP
-                                instance, if NULL the IP instance is reset. If
-                                UseDefaultAddress is set to TRUE, and the configure
-                                operation succeeds, the default address information
-                                is written back in this Ip4ConfigData.
+  @param[in, out]  IpInfo          Pointer to the IP_IO_IP_INFO instance.
+  @param[in, out]  Ip4ConfigData   The IP4 configure data used to configure the IP
+                                   instance, if NULL the IP instance is reset. If
+                                   UseDefaultAddress is set to TRUE, and the configure
+                                   operation succeeds, the default address information
+                                   is written back in this Ip4ConfigData.
 
-  @retval EFI_STATUS            The status returned by IP4->Configure or
-                                IP4->Receive.
-  @retval Other                 Configuration fails.
+  @retval          EFI_SUCCESS     The IP instance of this IpInfo is configured successfully
+                                   or no need to reconfigure it.
+  @retval          Others          Configuration fails.
 
 **/
 EFI_STATUS
 EFIAPI
 IpIoConfigIp (
-  IN     IP_IO_IP_INFO        *IpInfo,
+  IN OUT IP_IO_IP_INFO        *IpInfo,
   IN OUT EFI_IP4_CONFIG_DATA  *Ip4ConfigData OPTIONAL
   )
 {
@@ -1213,7 +1211,7 @@ IpIoConfigIp (
   EFI_IP4_PROTOCOL   *Ip;
   EFI_IP4_MODE_DATA  Ip4ModeData;
 
-  ASSERT (IpInfo);
+  ASSERT (IpInfo != NULL);
 
   if (IpInfo->RefCnt > 1) {
     //
@@ -1271,8 +1269,8 @@ OnExit:
   IpIoAddIp(). The IP_IO_IP_INFO::RefCnt is decremented and the IP instance
   will be dstroyed if the RefCnt is zero.
 
-  @param  IpIo                  Pointer to the IP_IO instance.
-  @param  IpInfo                Pointer to the IpInfo to be removed.
+  @param[in]  IpIo                  Pointer to the IP_IO instance.
+  @param[in]  IpInfo                Pointer to the IpInfo to be removed.
 
 **/
 VOID
@@ -1310,11 +1308,11 @@ IpIoRemoveIp (
   This function is called when the caller needs the IpIo to send data to the
   specified Src. The IpIo was added previously by IpIoAddIp().
 
-  @param  IpIo                  Pointer to the pointer of the IP_IO instance.
-  @param  Src                   The local IP address.
+  @param[in, out]  IpIo              Pointer to the pointer of the IP_IO instance.
+  @param[in]       Src               The local IP address.
 
   @return Pointer to the IP protocol can be used for sending purpose and its local
-          address is the same with Src.
+  @return address is the same with Src.
 
 **/
 IP_IO_IP_INFO *
@@ -1359,11 +1357,11 @@ IpIoFindSender (
   The ErrorStatus will be returned. The IsHard and Notify are optional. If they
   are not NULL, this routine will fill them.
 
-  @param  IcmpError             IcmpError Type
-  @param  IsHard                Whether it is a hard error
-  @param  Notify                Whether it need to notify SockError
+  @param[in]   IcmpError             IcmpError Type
+  @param[out]  IsHard                Whether it is a hard error
+  @param[out]  Notify                Whether it need to notify SockError
 
-  @return ICMP Error Status
+  @return ICMP Error Status, such as EFI_NETWORK_UNREACHABLE.
 
 **/
 EFI_STATUS
