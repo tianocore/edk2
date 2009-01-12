@@ -1,6 +1,8 @@
 /** @file
+  Definition of the command set of USB Mass Storage Specification
+  for Bootability, Revision 1.0.
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,18 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  UsbMassBoot.h
-
-Abstract:
-
-  The definition of command and data of the USB mass storage for
-  bootability command set.
-
-Revision History
-
-
 **/
 
 #ifndef _EFI_USB_MASS_BOOT_H_
@@ -28,13 +18,11 @@ Revision History
 
 typedef enum {
   //
-  // The opcodes of various usb boot commands:
+  // The opcodes of various USB boot commands:
   // INQUIRY/REQUEST_SENSE are "No Timeout Commands" as specified
-  // by MMC command set. Others are "Group 1 Timeout Commands". That
-  // is they should be retried if driver is ready. 
-  // We can't use the Peripheral Device Type in Inquiry data to 
-  // determine the timeout used. For example, both floppy and flash
-  // are likely set their PDT to 0, or Direct Access Device.
+  // by Multi-Media Commands (MMC) set.
+  // Others are "Group 1 Timeout Commands". That is,
+  // they should be retried if driver is ready. 
   //
   USB_BOOT_INQUIRY_OPCODE         = 0x12,
   USB_BOOT_REQUEST_SENSE_OPCODE   = 0x03,
@@ -50,19 +38,19 @@ typedef enum {
   // The Sense Key part of the sense data. Sense data has three levels:
   // Sense key, Additional Sense Code and Additional Sense Code Qualifier
   //
-  USB_BOOT_SENSE_NO_SENSE         = 0x00, // No sense key
-  USB_BOOT_SENSE_RECOVERED        = 0x01, // Last command succeed with recovery actions
-  USB_BOOT_SENSE_NOT_READY        = 0x02, // Device not ready
-  USB_BOOT_SNESE_MEDIUM_ERROR     = 0X03, // Failed probably because flaw in the media
-  USB_BOOT_SENSE_HARDWARE_ERROR   = 0X04, // Non-recoverable hardware failure
-  USB_BOOT_SENSE_ILLEGAL_REQUEST  = 0X05, // Illegal parameters in the request
-  USB_BOOT_SENSE_UNIT_ATTENTION   = 0X06, // Removable medium may have been changed
-  USB_BOOT_SNESE_DATA_PROTECT     = 0X07, // Write protected
-  USB_BOOT_SENSE_BLANK_CHECK      = 0X08, // Blank/non-blank medium while reading/writing
-  USB_BOOT_SENSE_VENDOR           = 0X09, // Vendor specific sense key
-  USB_BOOT_SENSE_ABORTED          = 0X0B, // Command aborted by the device
-  USB_BOOT_SENSE_VOLUME_OVERFLOW  = 0x0D, // Partition overflow
-  USB_BOOT_SENSE_MISCOMPARE       = 0x0E, // Source data mis-match while verfying.
+  USB_BOOT_SENSE_NO_SENSE         = 0x00, ///< No sense key
+  USB_BOOT_SENSE_RECOVERED        = 0x01, ///< Last command succeed with recovery actions
+  USB_BOOT_SENSE_NOT_READY        = 0x02, ///< Device not ready
+  USB_BOOT_SNESE_MEDIUM_ERROR     = 0X03, ///< Failed probably because flaw in the media
+  USB_BOOT_SENSE_HARDWARE_ERROR   = 0X04, ///< Non-recoverable hardware failure
+  USB_BOOT_SENSE_ILLEGAL_REQUEST  = 0X05, ///< Illegal parameters in the request
+  USB_BOOT_SENSE_UNIT_ATTENTION   = 0X06, ///< Removable medium may have been changed
+  USB_BOOT_SENSE_DATA_PROTECT     = 0X07, ///< Write protected
+  USB_BOOT_SENSE_BLANK_CHECK      = 0X08, ///< Blank/non-blank medium while reading/writing
+  USB_BOOT_SENSE_VENDOR           = 0X09, ///< Vendor specific sense key
+  USB_BOOT_SENSE_ABORTED          = 0X0B, ///< Command aborted by the device
+  USB_BOOT_SENSE_VOLUME_OVERFLOW  = 0x0D, ///< Partition overflow
+  USB_BOOT_SENSE_MISCOMPARE       = 0x0E, ///< Source data mis-match while verfying.
 
   USB_BOOT_ASC_NOT_READY          = 0x04,
   USB_BOOT_ASC_NO_MEDIA           = 0x3A,
@@ -71,10 +59,10 @@ typedef enum {
   //
   // Supported PDT codes, or Peripheral Device Type
   //
-  USB_PDT_DIRECT_ACCESS           = 0x00,       // Direct access device
-  USB_PDT_CDROM                   = 0x05,       // CDROM
-  USB_PDT_OPTICAL                 = 0x07,       // Non-CD optical disks
-  USB_PDT_SIMPLE_DIRECT           = 0x0E,       // Simplified direct access device
+  USB_PDT_DIRECT_ACCESS           = 0x00,       ///< Direct access device
+  USB_PDT_CDROM                   = 0x05,       ///< CDROM
+  USB_PDT_OPTICAL                 = 0x07,       ///< Non-CD optical disks
+  USB_PDT_SIMPLE_DIRECT           = 0x0E,       ///< Simplified direct access device
   
   //
   // Other parameters, Max carried size is 512B * 128 = 64KB
@@ -99,7 +87,6 @@ typedef enum {
   // USB CD-Rom and iPod devices are much slower than USB key when reponse 
   // most of commands, So we set 5s as timeout here.
   // 
-  //
   USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_1_SECOND
 }USB_BOOT_OPTCODE;
 
@@ -112,7 +99,7 @@ typedef enum {
 #pragma pack(1)
 typedef struct {
   UINT8             OpCode;
-  UINT8             Lun;            // Lun (high 3 bits)
+  UINT8             Lun;            ///< Lun (high 3 bits)
   UINT8             Reserved0[2];
   UINT8             AllocLen;
   UINT8             Reserved1;
@@ -120,10 +107,10 @@ typedef struct {
 } USB_BOOT_INQUIRY_CMD;
 
 typedef struct {
-  UINT8             Pdt;            // Peripheral Device Type (low 5 bits)
-  UINT8             Removable;      // Removable Media (highest bit)
+  UINT8             Pdt;            ///< Peripheral Device Type (low 5 bits)
+  UINT8             Removable;      ///< Removable Media (highest bit)
   UINT8             Reserved0[2];
-  UINT8             AddLen;         // Additional length
+  UINT8             AddLen;         ///< Additional length
   UINT8             Reserved1[3];
   UINT8             VendorID[8];
   UINT8             ProductID[16];
@@ -170,10 +157,10 @@ typedef struct {
 
 typedef struct {
   UINT8             OpCode;
-  UINT8             Lun;            // Lun (High 3 bits)
-  UINT8             Lba[4];         // Logical block address
+  UINT8             Lun;            ///< Lun (High 3 bits)
+  UINT8             Lba[4];         ///< Logical block address
   UINT8             Reserved0;
-  UINT8             TransferLen[2]; // Transfer length
+  UINT8             TransferLen[2]; ///< Transfer length
   UINT8             Reserverd1;
   UINT8             Pad[2];
 } USB_BOOT_READ10_CMD;
@@ -190,9 +177,9 @@ typedef struct {
 
 typedef struct {
   UINT8             OpCode;
-  UINT8             Lun;            // Lun (High 3 bits)
+  UINT8             Lun;            ///< Lun (High 3 bits)
   UINT8             Reserved0[2];
-  UINT8             AllocLen;       // Allocation length
+  UINT8             AllocLen;       ///< Allocation length
   UINT8             Reserved1;
   UINT8             Pad[6];
 } USB_BOOT_REQUEST_SENSE_CMD;
@@ -200,12 +187,12 @@ typedef struct {
 typedef struct {
   UINT8             ErrorCode;
   UINT8             Reserved0;
-  UINT8             SenseKey;       // Sense key (low 4 bits)
+  UINT8             SenseKey;       ///< Sense key (low 4 bits)
   UINT8             Infor[4];
-  UINT8             AddLen;         // Additional Sense length, 10
+  UINT8             AddLen;         ///< Additional Sense length, 10
   UINT8             Reserved1[4];
-  UINT8             ASC;            // Additional Sense Code
-  UINT8             ASCQ;           // Additional Sense Code Qualifier
+  UINT8             ASC;            ///< Additional Sense Code
+  UINT8             ASCQ;           ///< Additional Sense Code Qualifier
   UINT8             Reserverd2[4];
 } USB_BOOT_REQUEST_SENSE_DATA;
 
@@ -234,21 +221,9 @@ typedef struct {
 //
 // Get the removable, PDT, and sense key bits from the command data
 //
-#define USB_BOOT_REMOVABLE(RmbByte) (((RmbByte) & 0x80) != 0)
+#define USB_BOOT_REMOVABLE(RmbByte) (((RmbByte) & BIT7) != 0)
 #define USB_BOOT_PDT(Pdt)           ((Pdt) & 0x1f)
 #define USB_BOOT_SENSE_KEY(Key)     ((Key) & 0x0f)
-
-//
-// Swap the byte sequence of a UINT32. Intel CPU uses little endian
-// in UEFI environment, but USB boot uses big endian.
-//
-#define USB_BOOT_SWAP32(Data32) \
-                ((((Data32) & 0x000000ff) << 24) | (((Data32) & 0xff000000) >> 24) | \
-                 (((Data32) & 0x0000ff00) << 8)  | (((Data32) & 0x00ff0000) >> 8)) 
-
-#define USB_BOOT_SWAP16(Data16) \
-                ((((Data16) & 0x00ff) << 8) | (((Data16) & 0xff00) >> 8))
-
 
 /**
   Get the parameters for the USB mass storage media, including

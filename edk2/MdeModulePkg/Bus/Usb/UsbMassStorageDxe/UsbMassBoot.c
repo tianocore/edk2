@@ -1,7 +1,6 @@
 /** @file
-
-  This file implement the command set of "USB Mass Storage Specification
-  for Bootability".
+  Implementation of the command set of USB Mass Storage Specification
+  for Bootability, Revision 1.0.
 
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -16,96 +15,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UsbMassImpl.h"
 
-
 /**
-  Return the current TPL.
+  Execute REQUEST SENSE Command to retrieve sense data from device.
 
-  @return Current TPL.
+  @param  UsbMass                The device whose sense data is requested.
 
-**/
-EFI_TPL
-UsbGetCurrentTpl (
-  VOID
-  )
-{
-  EFI_TPL                 Tpl;
-
-  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  gBS->RestoreTPL (Tpl);
-
-  return Tpl;
-}
-
-/**
-  Read an UINT32 from the buffer to avoid byte alignment problems, then
-  convert that to the little endia. The USB mass storage bootability spec
-  use big endia.
-
-  @param  Buf                    The buffer contains the first byte of the UINT32
-                                 in big endia.
-
-  @return The UINT32 value read from the buffer in little endia.
-
-**/
-UINT32
-UsbBootGetUint32 (
-  IN UINT8                  *Buf
-  )
-{
-  UINT32                    Value;
-
-  CopyMem (&Value, Buf, sizeof (UINT32));
-  return USB_BOOT_SWAP32 (Value);
-}
-
-
-/**
-  Put an UINT32 in little endia to the buffer. The data is converted to
-  big endia before writing.
-
-  @param  Buf                    The buffer to write data to.
-  @param  Data32                 The data to write.
-
-  @return None.
-
-**/
-VOID
-UsbBootPutUint32 (
-  IN UINT8                  *Buf,
-  IN UINT32                 Data32
-  )
-{
-  Data32 = USB_BOOT_SWAP32 (Data32);
-  CopyMem (Buf, &Data32, sizeof (UINT32));
-}
-
-/**
-  Put an UINT16 in little endia to the buffer. The data is converted to
-  big endia before writing.
-
-  @param  Buf                    The buffer to write data to.
-  @param  Data16                 The data to write.
-
-  @return None.
-
-**/
-VOID
-UsbBootPutUint16 (
-  IN UINT8                   *Buf,
-  IN UINT16                  Data16
-  )
-{
-  Data16 = (UINT16) (USB_BOOT_SWAP16 (Data16));
-  CopyMem (Buf, &Data16, sizeof (UINT16));
-}
-
-/**
-  Request sense information via sending Request Sense
-  Packet Command.
-
-  @param  UsbMass                The device to be requested sense data.
-
-  @retval EFI_SUCCESS            The command is excuted OK.
+  @retval EFI_SUCCESS            The command is excuted successfully.
   @retval EFI_DEVICE_ERROR       Failed to request sense.
   @retval EFI_NO_RESPONSE        The device media doesn't response this request.
   @retval EFI_INVALID_PARAMETER  The command has some invalid parameters.
@@ -128,7 +43,7 @@ UsbBootRequestSense (
   Transport = UsbMass->Transport;
 
   //
-  // Request the sense data from the device if command failed
+  // Request the sense data from the device
   //
   ZeroMem (&SenseCmd, sizeof (USB_BOOT_REQUEST_SENSE_CMD));
   ZeroMem (&SenseData, sizeof (USB_BOOT_REQUEST_SENSE_DATA));
@@ -154,7 +69,8 @@ UsbBootRequestSense (
   }
 
   //
-  // Interpret the sense data and update the media status if necessary.
+  // If sense data is retrieved successfully, interpret the sense data
+  // and update the media status if necessary.
   //
   Media = &UsbMass->BlockIoMedia;
 
@@ -174,10 +90,10 @@ UsbBootRequestSense (
   case USB_BOOT_SENSE_NOT_READY:
     Status = EFI_DEVICE_ERROR;
     if (SenseData.ASC == USB_BOOT_ASC_NO_MEDIA) {
-          Media->MediaPresent = FALSE;
-          Status              = EFI_NO_MEDIA;
+      Media->MediaPresent = FALSE;
+      Status = EFI_NO_MEDIA;
     } else if (SenseData.ASC == USB_BOOT_ASC_NOT_READY) {
-      Status              = EFI_NOT_READY;
+      Status = EFI_NOT_READY;
     }
     break;
 
@@ -189,16 +105,16 @@ UsbBootRequestSense (
     Status = EFI_DEVICE_ERROR;
     if (SenseData.ASC == USB_BOOT_ASC_MEDIA_CHANGE) {
       //
-      // If MediaChange, reset ReadOnly and new MediId
+      // If MediaChange, reset ReadOnly and new MediaId
       //
-      Status          = EFI_MEDIA_CHANGED;
+      Status = EFI_MEDIA_CHANGED;
       Media->ReadOnly = FALSE;
       Media->MediaId++;
     }
     break;
 
-  case USB_BOOT_SNESE_DATA_PROTECT:
-    Status          = EFI_WRITE_PROTECTED;
+  case USB_BOOT_SENSE_DATA_PROTECT:
+    Status = EFI_WRITE_PROTECTED;
     Media->ReadOnly = TRUE;
     break;
 
@@ -219,9 +135,11 @@ UsbBootRequestSense (
 
 
 /**
-  Execute the USB mass storage bootability commands. If execution
-  failed, retrieve the error by REQUEST_SENSE then update the device's
-  status, such as ReadyOnly.
+  Execute the USB mass storage bootability commands.
+
+  This function executes the USB mass storage bootability commands.
+  If execution failed, retrieve the error by REQUEST_SENSE, then
+  update the device's status, such as ReadyOnly.
 
   @param  UsbMass                The device to issue commands to
   @param  Cmd                    The command to execute
@@ -231,11 +149,8 @@ UsbBootRequestSense (
   @param  DataLen                The length of expected data
   @param  Timeout                The timeout used to transfer
 
-  @retval EFI_SUCCESS            The command is excuted OK
-  @retval EFI_DEVICE_ERROR       Failed to request sense
-  @retval EFI_INVALID_PARAMETER  The command has some invalid parameters
-  @retval EFI_WRITE_PROTECTED    The device is write protected
-  @retval EFI_MEDIA_CHANGED      The device media has been changed
+  @retval EFI_SUCCESS            Command is excuted successfully
+  @retval Others                 Command execution failed.
 
 **/
 EFI_STATUS
@@ -266,25 +181,31 @@ UsbBootExecCmd (
                            &CmdResult
                            );
   //
-  // ExecCommand return success and get the right CmdResult means
-  // the commnad transfer is OK.
+  // If ExecCommand() returns no error and CmdResult is success,
+  // then the commnad transfer is successful.
   //
-  if ((CmdResult == USB_MASS_CMD_SUCCESS) && !EFI_ERROR(Status)) {
+  if ((CmdResult == USB_MASS_CMD_SUCCESS) && !EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   }
 
   DEBUG ((EFI_D_INFO, "UsbBootExecCmd: Fail to Exec 0x%x Cmd /w %r\n",
           *(UINT8 *)Cmd ,Status));
 
+  //
+  // If command execution failed, then retrieve error info via sense request.
+  //
   return UsbBootRequestSense (UsbMass);
 }
 
 
 /**
-  Execute the USB mass storage bootability commands. If execution
-  failed, retrieve the error by REQUEST_SENSE then update the device's
-  status, such as ReadyOnly.
+  Execute the USB mass storage bootability commands with retrial.
 
+  This function executes USB mass storage bootability commands.
+  If the device isn't ready, wait for it. If the device is ready
+  and error occurs, retry the command again until it exceeds the
+  limit of retrial times.
+  
   @param  UsbMass                The device to issue commands to
   @param  Cmd                    The command to execute
   @param  CmdLen                 The length of the command
@@ -293,11 +214,9 @@ UsbBootExecCmd (
   @param  DataLen                The length of expected data
   @param  Timeout                The timeout used to transfer
 
-  @retval EFI_SUCCESS            The command is excuted OK
-  @retval EFI_DEVICE_ERROR       Failed to request sense
-  @retval EFI_INVALID_PARAMETER  The command has some invalid parameters
-  @retval EFI_WRITE_PROTECTED    The device is write protected
-  @retval EFI_MEDIA_CHANGED      The device media has been changed
+  @retval EFI_SUCCESS            The command is executed successfully.
+  @retval EFI_MEDIA_CHANGED      The device media has been changed.
+  @retval Others                 Command execution failed after retrial.
 
 **/
 EFI_STATUS
@@ -312,18 +231,12 @@ UsbBootExecCmdWithRetry (
   )
 {
   EFI_STATUS                  Status;
-  INT16                       Index;
+  UINTN                       Retry;
 
-  //
-  // If the device isn't ready, wait some time. If the device is ready,
-  // retry the command again.
-  //
   Status  = EFI_SUCCESS;
 
-  for (Index = 0; Index < USB_BOOT_COMMAND_RETRY; Index++) {
-    //
-    // Execute the command with an increasingly larger timeout value.
-    //
+  for (Retry = 0; Retry < USB_BOOT_COMMAND_RETRY; Retry++) {
+
     Status = UsbBootExecCmd (
                UsbMass,
                Cmd,
@@ -333,15 +246,14 @@ UsbBootExecCmdWithRetry (
                DataLen,
                Timeout
                );
-    if (Status == EFI_SUCCESS ||
-        Status == EFI_MEDIA_CHANGED) {
+    if (Status == EFI_SUCCESS || Status == EFI_MEDIA_CHANGED) {
       break;
     }
     //
-    // Need retry once more, so reset index
+    // If the device isn't ready, just wait for it without limit on retrial times.
     //
     if (Status == EFI_NOT_READY) {
-      Index = 0;
+      Retry = 0;
     }
   }
 
@@ -350,12 +262,11 @@ UsbBootExecCmdWithRetry (
 
 
 /**
-  Use the TEST UNIT READY command to check whether it is ready.
-  If it is ready, update the parameters.
+  Execute TEST UNIT READY command to check if the device is ready.
 
   @param  UsbMass                The device to test
 
-  @retval EFI_SUCCESS            The device is ready and parameters are updated.
+  @retval EFI_SUCCESS            The device is ready.
   @retval Others                 Device not ready.
 
 **/
@@ -384,13 +295,13 @@ UsbBootIsUnitReady (
 
 
 /**
-  Inquiry Command requests that information regrarding parameters of
-  the Device be sent to the Host.
+  Execute INQUIRY Command to request information regarding parameters of
+  the device be sent to the host computer.
 
-  @param  UsbMass                The device to inquiry.
+  @param  UsbMass                The device to inquire.
 
-  @retval EFI_SUCCESS            The device is ready and parameters are updated.
-  @retval Others                 Device not ready.
+  @retval EFI_SUCCESS            INQUIRY Command is executed successfully.
+  @retval Others                 INQUIRY Command is not executed successfully.
 
 **/
 EFI_STATUS
@@ -405,9 +316,6 @@ UsbBootInquiry (
 
   Media = &(UsbMass->BlockIoMedia);
 
-  //
-  // Use the Inquiry command to get the RemovableMedia setting.
-  //
   ZeroMem (&InquiryCmd, sizeof (USB_BOOT_INQUIRY_CMD));
   ZeroMem (&InquiryData, sizeof (USB_BOOT_INQUIRY_DATA));
 
@@ -428,10 +336,14 @@ UsbBootInquiry (
     return Status;
   }
 
+  //
+  // Get information from PDT (Peripheral Device Type) field and Removable Medium Bit
+  // from the inquiry data.
+  //
   UsbMass->Pdt          = (UINT8) (USB_BOOT_PDT (InquiryData.Pdt));
   Media->RemovableMedia = (BOOLEAN) (USB_BOOT_REMOVABLE (InquiryData.Removable));
   //
-  // Default value 512 Bytes, in case no media present at first time
+  // Set block size to the default value of 512 Bytes, in case no media is present at first time.
   //
   Media->BlockSize      = 0x0200;
 
@@ -440,17 +352,18 @@ UsbBootInquiry (
 
 
 /**
-  Get the capacity of the USB mass storage media, including
-  the presentation, block size, and last block number. This
-  function is used to get the disk parameters at the start if
-  it is a non-removable media or to detect the media if it is
-  removable.
+  Execute READ CAPACITY command to request information regarding
+  the capacity of the installed medium of the device.
+
+  This function executes READ CAPACITY command to get the capacity
+  of the USB mass storage media, including the presence, block size,
+  and last block number.
 
   @param  UsbMass                The device to retireve disk gemotric.
 
-  @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
-  @retval EFI_DEVICE_ERROR       Something is inconsistent with the disk gemotric.
-  @retval Other                  Read capacity request fails.
+  @retval EFI_SUCCESS            The disk geometry is successfully retrieved.
+  @retval EFI_NOT_READY          The returned block size is zero.
+  @retval Other                  READ CAPACITY command execution failed.
  
 **/
 EFI_STATUS
@@ -465,9 +378,6 @@ UsbBootReadCapacity (
 
   Media   = &UsbMass->BlockIoMedia;
 
-  //
-  // Use the READ CAPACITY command to get the block length and last blockno
-  //
   ZeroMem (&CapacityCmd, sizeof (USB_BOOT_READ_CAPACITY_CMD));
   ZeroMem (&CapacityData, sizeof (USB_BOOT_READ_CAPACITY_DATA));
 
@@ -487,9 +397,13 @@ UsbBootReadCapacity (
     return Status;
   }
 
+  //
+  // Get the information on media presence, block size, and last block number
+  // from READ CAPACITY data.
+  //
   Media->MediaPresent = TRUE;
-  Media->LastBlock    = UsbBootGetUint32 (CapacityData.LastLba);
-  Media->BlockSize    = UsbBootGetUint32 (CapacityData.BlockLen);
+  Media->LastBlock    = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.LastLba));
+  Media->BlockSize    = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.BlockLen));
 
   if (Media->BlockSize == 0) {
     return EFI_NOT_READY;
@@ -502,13 +416,12 @@ UsbBootReadCapacity (
 }
 
 /**
-  Retrieves mode sense information via sending Mode Sense
-  Packet Command.
+  Retrieves SCSI mode sense information via MODE SENSE(6) command.
 
-  @param  UsbMass                The USB_FLOPPY_DEV instance.
+  @param  UsbMass                The device whose sense data is requested.
 
-  @retval EFI_SUCCESS            Success
-  @retval Other                  Execute Request command fails.
+  @retval EFI_SUCCESS            SCSI mode sense information retrieved successfully.
+  @retval Other                  Command execution failed.
 
 **/
 EFI_STATUS
@@ -527,7 +440,7 @@ UsbScsiModeSense (
   ZeroMem (&ModeParaHeader, sizeof (USB_SCSI_MODE_SENSE6_PARA_HEADER));
 
   //
-  // ModeSense6 command is defined in [SCSI2Spec-Page151]
+  // MODE SENSE(6) command is defined in Section 8.2.10 of SCSI-2 Spec
   //
   ModeSenseCmd.OpCode         = USB_SCSI_MODE_SENSE6_OPCODE;
   ModeSenseCmd.Lun            = (UINT8) USB_BOOT_LUN (UsbMass->Lun);
@@ -545,11 +458,12 @@ UsbScsiModeSense (
              );
 
   //
-  // ModeSense(6) is used to get the information of WriteProtected. While only some of
-  // devices support this command, so have a try here.
+  // Format of device-specific parameter byte of the mode parameter header is defined in
+  // Section 8.2.10 of SCSI-2 Spec.
+  // BIT7 of this byte is indicates whether the medium is write protected.
   //
   if (!EFI_ERROR (Status)) {
-    Media->ReadOnly = (BOOLEAN) (((ModeParaHeader.DevicePara & 0x80) != 0) ? TRUE : FALSE);
+    Media->ReadOnly = (BOOLEAN) ((ModeParaHeader.DevicePara & BIT7) != 0);
   }
 
   return Status;
@@ -557,17 +471,18 @@ UsbScsiModeSense (
 
 
 /**
-  Get the parameters for the USB mass storage media, including
-  the RemovableMedia, block size, and last block number. This
-  function is used both to initialize the media during the
-  DriverBindingStart and to re-initialize it when the media is
-  changed. Althought the RemoveableMedia is unlikely to change,
-  I include it here.
+  Get the parameters for the USB mass storage media.
 
-  @param  UsbMass                The device to retireve disk gemotric.
+  This function get the parameters for the USB mass storage media,
+  It is used both to initialize the media during the Start() phase
+  of Driver Binding Protocol and to re-initialize it when the media is
+  changed. Althought the RemoveableMedia is unlikely to change,
+  it is also included here.
+
+  @param  UsbMass                The device to retrieve disk gemotric.
 
   @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
-  @retval Other                  Get the parameters failed.
+  @retval Other                  Failed to get the parameters.
 
 **/
 EFI_STATUS
@@ -589,7 +504,7 @@ UsbBootGetParams (
   }
 
   //
-  // Don't use the Removable bit in inquirydata to test whether the media
+  // Don't use the Removable bit in inquiry data to test whether the media
   // is removable because many flash disks wrongly set this bit.
   //
   if ((UsbMass->Pdt == USB_PDT_CDROM) || (UsbMass->Pdt == USB_PDT_OPTICAL)) {
@@ -620,12 +535,11 @@ UsbBootGetParams (
 
 /**
   Detect whether the removable media is present and whether it has changed.
-  The Non-removable media doesn't need it.
 
-  @param  UsbMass                The device to retireve disk gemotric.
+  @param  UsbMass                The device to check.
 
-  @retval EFI_SUCCESS            The disk gemotric is successfully retrieved.
-  @retval Other                  Decect media fails.
+  @retval EFI_SUCCESS            The media status is successfully checked.
+  @retval Other                  Failed to detect media.
 
 **/
 EFI_STATUS
@@ -641,27 +555,22 @@ UsbBootDetectMedia (
 
   Media    = &UsbMass->BlockIoMedia;
 
-  CopyMem (
-    &OldMedia,
-    &(UsbMass->BlockIoMedia),
-    sizeof (EFI_BLOCK_IO_MEDIA)
-    );
+  CopyMem (&OldMedia, &(UsbMass->BlockIoMedia), sizeof (EFI_BLOCK_IO_MEDIA));
 
   CmdSet = ((EFI_USB_INTERFACE_DESCRIPTOR *) (UsbMass->Context))->InterfaceSubClass;
 
   Status = UsbBootIsUnitReady (UsbMass);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: UsbBootIsUnitReady (%r)\n", Status));
     goto ON_ERROR;
   }
 
   if ((UsbMass->Pdt != USB_PDT_CDROM) && (CmdSet == USB_MASS_STORE_SCSI)) {
     //
-    // ModeSense is required for the device with PDT of 0x00/0x07/0x0E,
-    // which is from [MassStorageBootabilitySpec-Page7].
-    // ModeSense(10) is useless here, while ModeSense(6) defined in SCSI
-    // could get the information of WriteProtected.
-    // Since not all device support this command, so skip if fail.
+    // MODE SENSE is required for the device with PDT of 0x00/0x07/0x0E,
+    // according to Section 4 of USB Mass Storage Specification for Bootability.
+    // MODE SENSE(10) is useless here, while MODE SENSE(6) defined in SCSI
+    // could get the information of Write Protected.
+    // Since not all device support this command, skip if fail.
     //
     UsbScsiModeSense (UsbMass);
   }
@@ -676,7 +585,7 @@ UsbBootDetectMedia (
 
 ON_ERROR:
   //
-  // Detect whether it is necessary to reinstall the BlockIO
+  // Detect whether it is necessary to reinstall the Block I/O Protocol.
   //
   // MediaId may change in RequestSense for MediaChanged
   // MediaPresent may change in RequestSense for NoMedia
@@ -689,9 +598,11 @@ ON_ERROR:
       (Media->BlockSize != OldMedia.BlockSize) ||
       (Media->LastBlock != OldMedia.LastBlock)) {
 
-    OldTpl = UsbGetCurrentTpl ();
-    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL before reinstall BlockIoProtocol is %d\n", (UINT32)OldTpl));
-
+    //
+    // This function is called by Block I/O Protocol APIs, which run at TPL_NOTIFY.
+    // Here we temporarily restore TPL to TPL_CALLBACK to invoke ReinstallProtocolInterface().
+    //
+    OldTpl = EfiGetCurrentTpl ();
     gBS->RestoreTPL (TPL_CALLBACK);
 
     gBS->ReinstallProtocolInterface (
@@ -701,16 +612,14 @@ ON_ERROR:
            &UsbMass->BlockIo
            );
 
-    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: TPL after reinstall is %d\n", (UINT32)UsbGetCurrentTpl()));
-    ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
-
+    ASSERT (EfiGetCurrentTpl () == TPL_CALLBACK);
     gBS->RaiseTPL (OldTpl);
 
     //
-    // Update MediaId after reinstall BLOCK_IO_PROTOCOL
+    // Update MediaId after reinstalling Block I/O Protocol.
     //
     if (Media->MediaPresent != OldMedia.MediaPresent) {
-      if (Media->MediaPresent == TRUE) {
+      if (Media->MediaPresent) {
         Media->MediaId = 1;
       } else {
         Media->MediaId = 0;
@@ -779,8 +688,8 @@ UsbBootReadBlocks (
 
     ReadCmd.OpCode  = USB_BOOT_READ10_OPCODE;
     ReadCmd.Lun     = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
-    UsbBootPutUint32 (ReadCmd.Lba, Lba);
-    UsbBootPutUint16 (ReadCmd.TransferLen, Count);
+    WriteUnaligned32 ((UINT32 *) ReadCmd.Lba, SwapBytes32 (Lba));
+    WriteUnaligned16 ((UINT16 *) ReadCmd.TransferLen, SwapBytes16 (Count));
 
     Status = UsbBootExecCmdWithRetry (
                UsbMass,
@@ -810,7 +719,7 @@ UsbBootReadBlocks (
   @param  UsbMass                The USB mass storage device to write to
   @param  Lba                    The start block number
   @param  TotalBlock             Total block number to write
-  @param  Buffer                 The buffer to write to
+  @param  Buffer                 Pointer to the source buffer for the data.
 
   @retval EFI_SUCCESS            Data are written into the buffer
   @retval Others                 Failed to write all the data
@@ -821,7 +730,7 @@ UsbBootWriteBlocks (
   IN  USB_MASS_DEVICE         *UsbMass,
   IN  UINT32                  Lba,
   IN  UINTN                   TotalBlock,
-  OUT UINT8                   *Buffer
+  IN  UINT8                   *Buffer
   )
 {
   USB_BOOT_WRITE10_CMD  WriteCmd;
@@ -855,8 +764,8 @@ UsbBootWriteBlocks (
 
     WriteCmd.OpCode = USB_BOOT_WRITE10_OPCODE;
     WriteCmd.Lun    = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
-    UsbBootPutUint32 (WriteCmd.Lba, Lba);
-    UsbBootPutUint16 (WriteCmd.TransferLen, Count);
+    WriteUnaligned32 ((UINT32 *) WriteCmd.Lba, SwapBytes32 (Lba));
+    WriteUnaligned16 ((UINT16 *) WriteCmd.TransferLen, SwapBytes16 (Count));
 
     Status = UsbBootExecCmdWithRetry (
                UsbMass,
@@ -881,14 +790,13 @@ UsbBootWriteBlocks (
 
 
 /**
-  Use the USB clear feature control transfer to clear the endpoint
-  stall condition.
+  Use the USB clear feature control transfer to clear the endpoint stall condition.
 
-  @param  UsbIo                  The USB IO protocol to use
+  @param  UsbIo                  The USB I/O Protocol instance
   @param  EndpointAddr           The endpoint to clear stall for
 
-  @retval EFI_SUCCESS            The endpoint stall condtion is clear
-  @retval Others                 Failed to clear the endpoint stall condtion
+  @retval EFI_SUCCESS            The endpoint stall condition is cleared.
+  @retval Others                 Failed to clear the endpoint stall condition.
 
 **/
 EFI_STATUS
