@@ -1,12 +1,6 @@
 /** @file
-
-  Defination for the USB mass storage class driver. The USB mass storage
-  class is specified in two layers: the bottom layer is the transportation
-  protocol. The top layer is the command set. The transportation layer
-  provides the transportation of the command, data and result. The command
-  set defines what the command, data and result. The Bulk-Only-Transport and
-  Control/Bulk/Interrupt transport are two transportation protocol. USB mass
-  storage class adopts various industrial standard as its command set.
+  Definition of USB Mass Storage Class and its value, USB Mass Transport Protocol, 
+  and other common definitions.
 
 Copyright (c) 2007 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -72,8 +66,22 @@ typedef enum {
   USB_MASS_CMD_SUCCESS    = 0,
   USB_MASS_CMD_FAIL,
   USB_MASS_CMD_PERSISTENT
-}USB_MASS_DEV_CLASS_AND_VALUE;
+} USB_MASS_DEV_CLASS_AND_VALUE;
 
+/**
+  Initializes USB transport protocol.
+
+  This function initializes the USB mass storage class transport protocol.
+  It will save its context in the Context if Context isn't NULL.
+
+  @param  UsbIo                 The USB I/O Protocol instance
+  @param  Context               The buffer to save the context to
+
+  @retval EFI_SUCCESS           The device is successfully initialized.
+  @retval EFI_UNSUPPORTED       The transport protocol doesn't support the device.
+  @retval Other                 The USB transport initialization fails.
+
+**/
 typedef
 EFI_STATUS
 (*USB_MASS_INIT_TRANSPORT) (
@@ -81,6 +89,23 @@ EFI_STATUS
   OUT VOID                    **Context    OPTIONAL
   );
 
+/**
+  Execute USB mass storage command through the transport protocol.
+
+  @param  Context               The USB Transport Protocol.
+  @param  Cmd                   The command to transfer to device
+  @param  CmdLen                The length of the command
+  @param  DataDir               The direction of data transfer
+  @param  Data                  The buffer to hold the data
+  @param  DataLen               The length of the buffer
+  @param  Lun                   Should be 0, this field for bot only
+  @param  Timeout               The time to wait
+  @param  CmdStatus             The result of the command execution
+
+  @retval EFI_SUCCESS           The command is executed successfully.
+  @retval Other                 Failed to execute the command
+
+**/
 typedef
 EFI_STATUS
 (*USB_MASS_EXEC_COMMAND) (
@@ -95,6 +120,17 @@ EFI_STATUS
   OUT UINT32                  *CmdStatus
   );
 
+/**
+  Reset the USB mass storage device by Transport protocol.
+
+  @param  Context               The USB Transport Protocol
+  @param  ExtendedVerification  The flag controlling the rule of reset.
+                                Not used here.
+
+  @retval EFI_SUCCESS           The device is reset.
+  @retval Others                Failed to reset the device.
+
+**/
 typedef
 EFI_STATUS
 (*USB_MASS_RESET) (
@@ -102,6 +138,17 @@ EFI_STATUS
   IN  BOOLEAN                 ExtendedVerification
   );
 
+/**
+  Get the max LUN (Logical Unit Number) of USB mass storage device.
+
+  @param  Context          The context of the transport protocol.
+  @param  MaxLun           Return pointer to the max number of LUN. (e.g. MaxLun=1 means LUN0 and
+                           LUN1 in all.)
+
+  @retval EFI_SUCCESS      Max LUN is got successfully.
+  @retval Others           Fail to execute this request.
+
+**/
 typedef
 EFI_STATUS
 (*USB_MASS_GET_MAX_LUN) (
@@ -109,6 +156,14 @@ EFI_STATUS
   IN  UINT8                   *MaxLun
   );
 
+/**
+  Clean up the transport protocol's resource.
+
+  @param  Context               The instance of transport protocol.
+
+  @retval EFI_SUCCESS           The resource is cleaned up.
+
+**/
 typedef
 EFI_STATUS
 (*USB_MASS_CLEAN_UP) (
@@ -132,22 +187,18 @@ typedef struct {
   USB_MASS_CLEAN_UP       CleanUp;     ///< Clean up the resources.
 } USB_MASS_TRANSPORT;
 
-
-/**
-  Use the USB clear feature control transfer to clear the endpoint
-  stall condition.
-
-  @param  UsbIo                  The USB IO protocol to use
-  @param  EndpointAddr           The endpoint to clear stall for
-
-  @retval EFI_SUCCESS            The endpoint stall condtion is clear
-  @retval Others                 Failed to clear the endpoint stall condtion
-
-**/
-EFI_STATUS
-UsbClearEndpointStall (
-  IN EFI_USB_IO_PROTOCOL      *UsbIo,
-  IN UINT8                    EndpointAddr
-  );
+typedef struct {
+  UINT32                    Signature;
+  EFI_HANDLE                Controller;
+  EFI_USB_IO_PROTOCOL       *UsbIo;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_BLOCK_IO_PROTOCOL     BlockIo;
+  EFI_BLOCK_IO_MEDIA        BlockIoMedia;
+  BOOLEAN                   OpticalStorage;
+  UINT8                     Lun;          ///< Logical Unit Number
+  UINT8                     Pdt;          ///< Peripheral Device Type
+  USB_MASS_TRANSPORT        *Transport;   ///< USB mass storage transport protocol
+  VOID                      *Context;     
+} USB_MASS_DEVICE;
 
 #endif

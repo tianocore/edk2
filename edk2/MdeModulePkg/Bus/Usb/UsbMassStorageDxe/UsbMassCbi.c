@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "UsbMass.h"
+#include "UsbMassBoot.h"
 #include "UsbMassCbi.h"
 
 //
