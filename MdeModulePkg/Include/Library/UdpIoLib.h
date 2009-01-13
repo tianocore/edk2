@@ -50,13 +50,11 @@ typedef struct {
   UDP access point, and released by user. When sending, the NetBuf is from user,
   and provided to the callback as a reference.
   
-  @param Packet       Packet received or sent
-  @param Points       The Udp4 address pair corresponds to the Udp4 IO
-  @param IoStatus     Packet receiving or sending status
-  @param Context      User-defined data when calling UdpIoRecvDatagram() or
-                      UdpIoSendDatagram()
-
-  @return None
+  @param[in] Packet       Packet received or sent
+  @param[in] Points       The Udp4 address pair corresponds to the Udp4 IO
+  @param[in] IoStatus     Packet receiving or sending status
+  @param[in] Context      User-defined data when calling UdpIoRecvDatagram() or
+                          UdpIoSendDatagram()
 **/
 typedef
 VOID
@@ -140,8 +138,8 @@ struct _UDP_IO_PORT {
   
   The prototype is set and called when creating a UDP_IO_PORT in UdpIoCreatePort().
   
-  @param UdpIo         The UDP_IO_PORT to configure
-  @param Context       User-defined data when calling UdpIoCreatePort()
+  @param[in] UdpIo         The UDP_IO_PORT to configure
+  @param[in] Context       User-defined data when calling UdpIoCreatePort()
   
   @retval EFI_SUCCESS  The configure process succeeds
   @retval Others       The UDP_IO_PORT fails to configure indicating
@@ -155,10 +153,10 @@ EFI_STATUS
   );
 
 /**
-  The select function to decide whether to cancel the UDP_TX_TOKEN. It is used
+  The select function to decide whether to cancel the UDP_TX_TOKEN. 
   
-  @param Token        The UDP_TX_TOKEN to decide whether to cancel
-  @param Context      User-defined data in UdpIoCancelDgrams()
+  @param[in] Token        The UDP_TX_TOKEN to decide whether to cancel
+  @param[in] Context      User-defined data in UdpIoCancelDgrams()
   
   @retval TRUE        To cancel the UDP_TX_TOKEN
   @retval FALSE       Do not cancel this UDP_TX_TOKEN
@@ -181,11 +179,11 @@ BOOLEAN
   in creating or configure the UDP child will lead to the failure of UDP_IO_PORT
   creation.
 
-  @param  Controller            The controller that has the UDP service binding
-                                protocol installed.
-  @param  Image                 The image handle for the driver.
-  @param  Configure             The function to configure the created UDP child
-  @param  Context               The opaque parameter for the Configure funtion.
+  @param[in]  Controller            The controller that has the UDP service binding.
+                                    protocol installed.
+  @param[in]  Image                 The image handle for the driver.
+  @param[in]  Configure             The function to configure the created UDP child.
+  @param[in]  Context               The opaque parameter for the Configure funtion.
 
   @return Newly-created UDP_IO_PORT or NULL if failed.
 
@@ -204,7 +202,7 @@ UdpIoCreatePort (
   
   The function will cancel all sent datagram and receive request.
 
-  @param  UdpIo                 The UDP_IO_PORT to free.
+  @param[in]  UdpIo                 The UDP_IO_PORT to free.
 
   @retval EFI_SUCCESS           The UDP_IO_PORT is freed.
 
@@ -222,7 +220,7 @@ UdpIoFreePort (
   It will release all the transmitted datagrams and receive request. It will
   also configure NULL for the UDP instance.
 
-  @param  UdpIo                 The UDP_IO_PORT to clean up.
+  @param[in]  UdpIo                 The UDP_IO_PORT to clean up.
 
 **/
 VOID
@@ -238,16 +236,16 @@ UdpIoCleanPort (
   when the packet is sent. The optional parameter EndPoint overrides the default
   address pair if specified.
 
-  @param  UdpIo                 The UDP_IO_PORT to send the packet through
-  @param  Packet                The packet to send
-  @param  EndPoint              The local and remote access point. Override the
-                                default address pair set during configuration.
-  @param  Gateway               The gateway to use
-  @param  CallBack              The function being called when packet is
-                                transmitted or failed.
-  @param  Context               The opaque parameter passed to CallBack
+  @param[in]  UdpIo                 The UDP_IO_PORT to send the packet through.
+  @param[in]  Packet                The packet to send.
+  @param[in]  EndPoint              The local and remote access point. Override the
+                                    default address pair set during configuration.
+  @param[in]  Gateway               The gateway to use.
+  @param[in]  CallBack              The function being called when packet is
+                                    transmitted or failed.
+  @param[in]  Context               The opaque parameter passed to CallBack.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the packet
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the packet.
   @retval EFI_SUCCESS           The packet is successfully delivered to UDP  for
                                 transmission.
 
@@ -257,7 +255,7 @@ EFIAPI
 UdpIoSendDatagram (
   IN  UDP_IO_PORT           *UdpIo,
   IN  NET_BUF               *Packet,
-  IN  UDP_POINTS            *EndPoint  OPTIONAL,
+  IN  UDP_POINTS            *EndPoint, OPTIONAL
   IN  IP4_ADDR              Gateway,
   IN  UDP_IO_CALLBACK       CallBack,
   IN  VOID                  *Context
@@ -266,8 +264,8 @@ UdpIoSendDatagram (
 /**
   Cancel a single sent datagram.
 
-  @param  UdpIo                 The UDP_IO_PORT to cancel the packet from
-  @param  Packet                The packet to cancel
+  @param[in]  UdpIo                 The UDP_IO_PORT to cancel the packet from
+  @param[in]  Packet                The packet to cancel
 
 **/
 VOID
@@ -285,11 +283,11 @@ UdpIoCancelSentDatagram (
   to invoke this function inside its Callback function when the former packet
   is processed.
 
-  @param  UdpIo                 The UDP_IO_PORT to receive the packet from.
-  @param  CallBack              The call back function to execute when the packet
-                                is received.
-  @param  Context               The opaque context passed to Callback
-  @param  HeadLen               The length of the upper-layer's protocol header
+  @param[in]  UdpIo                 The UDP_IO_PORT to receive the packet from.
+  @param[in]  CallBack              The call back function to execute when the packet
+                                    is received.
+  @param[in]  Context               The opaque context passed to Callback.
+  @param[in] HeadLen                The length of the upper-layer's protocol header.
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request. Only
                                 one receive request is supported at a time.

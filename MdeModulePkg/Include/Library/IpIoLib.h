@@ -341,8 +341,8 @@ IpIoOpen (
                                          packet.
   @param[in, out]  Pkt                   Pointer to the IP packet to be sent.
   @param[in]       Sender                The IP protocol instance used for sending.
-  @param[in]       Context               Optional context data
-  @param[in]       NotifyData            Optional notify data
+  @param[in]       Context               Optional context data.
+  @param[in]       NotifyData            Optional notify data.
   @param[in]       Dest                  The destination IP address to send this packet to.
   @param[in]       OverrideData          The data to override some configuration of the IP
                                          instance used for sending.
@@ -466,9 +466,9 @@ IpIoFindSender (
   The ErrorStatus will be returned. The IsHard and Notify are optional. If they
   are not NULL, this routine will fill them.
 
-  @param[in]   IcmpError             IcmpError Type
-  @param[out]  IsHard                Whether it is a hard error
-  @param[out]  Notify                Whether it need to notify SockError
+  @param[in]   IcmpError             IcmpError Type.
+  @param[out]  IsHard                Whether it is a hard error.
+  @param[out]  Notify                Whether it need to notify SockError.
 
   @return ICMP Error Status, such as EFI_NETWORK_UNREACHABLE.
 
