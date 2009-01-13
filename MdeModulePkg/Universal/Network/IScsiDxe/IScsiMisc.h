@@ -1,5 +1,5 @@
 /** @file
-  Miscellaneous definitions for IScsi driver.
+  Miscellaneous definitions for iSCSI driver.
 
 Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials

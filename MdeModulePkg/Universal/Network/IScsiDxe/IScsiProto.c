@@ -1,5 +1,5 @@
 /** @file
-  The implementation of IScsi protocol based on RFC3720.
+  The implementation of iSCSI protocol based on RFC3720.
 
 Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials

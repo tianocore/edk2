@@ -22,7 +22,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL       gIScsiComponentName2;
 extern EFI_COMPONENT_NAME_PROTOCOL        gIScsiComponentName;
 
 //
-// EFI Component Name Protocol for IScsi driver.
+// EFI Component Name Protocol for iSCSI driver.
 //
 
 /**
@@ -36,7 +36,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL        gIScsiComponentName;
   then EFI_UNSUPPORTED is returned.
   
   @param[in]  This        A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
-  @param[in]  Language    A pointer to a three character ISO 639-2 language identifier.
+  @param[in]  Language    A pointer to a three characters ISO 639-2 language identifier.
                           This is the language of the driver name that that the caller
                           is requesting, and it must match one of the languages specified
                           in SupportedLanguages.  The number of languages supported by a
@@ -63,7 +63,7 @@ IScsiComponentNameGetDriverName (
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
-  that is being managed by an EFI Driver.Currently not implemented.
+  that is being managed by an EFI Driver. Currently not implemented.
 
   @param[in]  This             A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
   @param[in]  ControllerHandle The handle of a controller that the driver specified by
@@ -75,7 +75,7 @@ IScsiComponentNameGetDriverName (
                                for a bus drivers that wish to retrieve the name of the
                                bus controller.  It will not be NULL for a bus driver
                                that wishes to retrieve the name of a child controller.
-  @param[in]  Language         A pointer to a three character ISO 639-2 language
+  @param[in]  Language         A pointer to a three characters ISO 639-2 language
                                identifier.  This is the language of the controller name
                                that that the caller is requesting, and it must match one
                                of the languages specified in SupportedLanguages.  The
@@ -111,7 +111,7 @@ IScsiComponentNameGetControllerName (
   );
   
 //
-// EFI IScsi Initiator Name Protocol for IScsi driver.
+// EFI iSCSI Initiator Name Protocol for IScsi driver.
 //
 
 /**

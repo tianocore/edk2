@@ -102,11 +102,12 @@ IScsiDriverBindingSupported (
 }
 
 /**
-  Start this driver on ControllerHandle. The Start() function is designed to be 
-  invoked from the EFI boot service ConnectController(). As a result, much of 
-  the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
-  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  Start this driver on ControllerHandle. 
+  
+  The Start() function is designed to be invoked from the EFI boot service ConnectController(). 
+  As a result, much of the error checking on the parameters to Start() has been moved into this 
+  common boot service. It is legal to call Start() from other locations, but the following calling 
+  restrictions must be followed or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.

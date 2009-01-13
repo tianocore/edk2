@@ -20,11 +20,11 @@ EFI_GUID  mIScsiCHAPAuthInfoGuid = ISCSI_CHAP_AUTH_INFO_GUID;
 /**
   Initator caculates its own expected hash value. 
   
-  @param[in]   ChapIdentifier     ISCSI CHAP identifier sent by authenticator.  
-  @param[in]   ChapSecret         ISCSI CHAP secret of the authenticator.   
-  @param[in]   SecretLength       The length of ISCSI CHAP secret.
+  @param[in]   ChapIdentifier     iSCSI CHAP identifier sent by authenticator.  
+  @param[in]   ChapSecret         iSCSI CHAP secret of the authenticator.   
+  @param[in]   SecretLength       The length of iSCSI CHAP secret.
   @param[in]   ChapChallenge      The challenge message sent by authenticator.  
-  @param[in]   ChallengeLength    The length of ISCSI CHAP challenge message.
+  @param[in]   ChallengeLength    The length of iSCSI CHAP challenge message.
   @param[out]  ChapResponse       The calculation of the expected hash value.
   
   @retval EFI_SUCCESS             The expected hash value was caculatedly successfully.
@@ -77,7 +77,7 @@ IScsiCHAPCalculateResponse (
   The initator checks the CHAP response replied by target against its own
   calculation of the expected hash value. 
   
-  @param[in]   AuthData             ISCSI CHAP authentication data. 
+  @param[in]   AuthData             iSCSI CHAP authentication data. 
   @param[in]   TargetResponse       The response from target.    
 
   @retval EFI_SUCCESS               The response from target passed authentication.

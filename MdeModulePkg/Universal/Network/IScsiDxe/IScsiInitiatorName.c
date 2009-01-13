@@ -28,7 +28,7 @@ EFI_ISCSI_INITIATOR_NAME_PROTOCOL gIScsiInitiatorName = {
   @param[out]      Buffer     Pointer to the buffer for data to be read.
 
   @retval EFI_SUCCESS           Data was successfully retrieved into the provided buffer and the
-                                BufferSize was sufficient to handle the iSCSI initiator name
+                                BufferSize was sufficient to handle the iSCSI initiator name.
   @retval EFI_BUFFER_TOO_SMALL  BufferSize is too small for the result.
   @retval EFI_INVALID_PARAMETER BufferSize or Buffer is NULL.
   @retval EFI_DEVICE_ERROR      The iSCSI initiator name could not be retrieved due to a hardware error.
@@ -73,7 +73,7 @@ IScsiGetInitiatorName (
   @retval EFI_DEVICE_ERROR      The data could not be stored due to a hardware error.
   @retval EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the data.
   @retval EFI_PROTOCOL_ERROR    Input iSCSI initiator name does not adhere to RFC 3720
-                                (and other related protocols)
+                                (and other related protocols).
   @retval Others                Other errors as indicated.
 **/
 EFI_STATUS

@@ -1,5 +1,5 @@
 /** @file
-  The header file of IScsi Protocol that defines many specific data structures.
+  The header file of iSCSI Protocol that defines many specific data structures.
 
 Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
