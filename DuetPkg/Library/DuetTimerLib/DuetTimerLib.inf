@@ -42,11 +42,15 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  DuetPkg/DuetPkg.dec
 
 [LibraryClasses]
   BaseLib
   DebugLib
-  UefiBootServicesTableLib
-
-[Protocols]
-  gEfiMetronomeArchProtocolGuid         # ALWAYS_CONSUMED
+  HobLib
+  IoLib
+  
+[Guids]
+  gEfiAcpiDescriptionGuid
+  
+  
