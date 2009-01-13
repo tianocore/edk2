@@ -1,5 +1,10 @@
 /** @file
-  Timer Library functions built upon local APIC on IA32/x64.
+  Timer Library functions built upon ACPI on IA32/x64.
+  
+  ACPI power management timer is a 24-bit or 32-bit fixed rate free running count-up
+  timer that runs off a 3.579545 MHz clock. 
+  When startup, Duet will check the FADT to determine whether the PM timer is a 
+  32-bit or 25-bit timer.
 
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -16,25 +21,93 @@
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include <Library/HobLib.h>
+#include <Guid/AcpiDescription.h>
+#include <Library/IoLib.h>
+#include <Library/PciLib.h>
 
-#include <Protocol/Metronome.h>
+EFI_ACPI_DESCRIPTION *gAcpiDesc          = NULL;
 
 /**
-EFI_METRONOME_ARCH_PROTOCOL *gDuetMetronome = NULL;
-
-EFI_METRONOME_ARCH_PROTOCOL*
-GetMetronomeArchProtocol (
-    VOID
-    )
+  Internal function to get Acpi information from HOB.
+  
+  @return Pointer to ACPI description structure.
+**/
+EFI_ACPI_DESCRIPTION*
+InternalGetApciDescrptionTable (
+  VOID
+  )
 {
-  if (gDuetMetronome == NULL) {
-     gBS->LocateProtocol (&gEfiMetronomeArchProtocolGuid, NULL, (VOID**) &gDuetMetronome);
+  EFI_PEI_HOB_POINTERS  GuidHob;
+  
+  if (gAcpiDesc != NULL) {
+    return gAcpiDesc;
   }
   
-  return gDuetMetronome;
-}    
+  GuidHob.Raw = GetFirstGuidHob (&gEfiAcpiDescriptionGuid);
+  if (GuidHob.Raw != NULL) {
+    gAcpiDesc = GET_GUID_HOB_DATA (GuidHob.Guid);
+    DEBUG ((EFI_D_INFO, "ACPI Timer: PM_TMR_BLK.RegisterBitWidth = 0x%X\n", gAcpiDesc->PM_TMR_BLK.RegisterBitWidth));
+    DEBUG ((EFI_D_INFO, "ACPI Timer: PM_TMR_BLK.Address = 0x%X\n", gAcpiDesc->PM_TMR_BLK.Address));
+    return gAcpiDesc;
+  } else {
+    DEBUG ((EFI_D_ERROR, "Fail to get Acpi description table from hob\n"));
+    return NULL;
+  }
+}
+
+/**
+  Internal function to read the current tick counter of ACPI.
+
+  @return The tick counter read.
+
 **/
+STATIC
+UINT32
+InternalAcpiGetTimerTick (
+  VOID
+  )
+{
+  return IoRead32 ((UINTN)gAcpiDesc->PM_TMR_BLK.Address);
+}
+
+/**
+  Stalls the CPU for at least the given number of ticks.
+
+  Stalls the CPU for at least the given number of ticks. It's invoked by
+  MicroSecondDelay() and NanoSecondDelay().
+
+  @param  Delay     A period of time to delay in ticks.
+
+**/
+STATIC
+VOID
+InternalAcpiDelay (
+  IN      UINT32                    Delay
+  )
+{
+  UINT32                            Ticks;
+  UINT32                            Times;
+
+  Times    = Delay >> (gAcpiDesc->PM_TMR_BLK.RegisterBitWidth - 2);
+  Delay   &= (1 << (gAcpiDesc->PM_TMR_BLK.RegisterBitWidth - 2)) - 1;
+  do {
+    //
+    // The target timer count is calculated here
+    //
+    Ticks    = InternalAcpiGetTimerTick () + Delay;
+    Delay    = 1 << (gAcpiDesc->PM_TMR_BLK.RegisterBitWidth - 2);
+    //
+    // Wait until time out
+    // Delay >= 2^23 (if ACPI provide 24-bit timer) or Delay >= 2^31 (if ACPI
+    // provide 32-bit timer) could not be handled by this function
+    // Timer wrap-arounds are handled correctly by this function
+    //
+    while (((Ticks - InternalAcpiGetTimerTick ()) & (1 << (gAcpiDesc->PM_TMR_BLK.RegisterBitWidth - 1))) == 0) {
+      CpuPause ();
+    }
+  } while (Times-- > 0);
+}
 
 /**
   Stalls the CPU for at least the given number of microseconds.
@@ -52,36 +125,20 @@ MicroSecondDelay (
   IN      UINTN                     MicroSeconds
   )
 {
-  gBS->Stall (MicroSeconds);
-/**
-  EFI_METRONOME_ARCH_PROTOCOL       *mMetronome;
-  UINT32                            Counter;
-  UINTN                             Remainder;  
-  
-  if ((mMetronome = GetMetronomeArchProtocol()) == NULL) {
+
+  if (InternalGetApciDescrptionTable() == NULL) {
     return MicroSeconds;
   }
-  
-  //
-  // Calculate the number of ticks by dividing the number of microseconds by
-  // the TickPeriod.
-  // Calculation is based on 100ns unit.
-  //
-  Counter = (UINT32) DivU64x32Remainder (
-                       MicroSeconds * 10,
-                       mMetronome->TickPeriod,
-                       &Remainder
-                       );
-  //
-  // Call WaitForTick for Counter + 1 ticks to try to guarantee Counter tick
-  // periods, thus attempting to ensure Microseconds of stall time.
-  //
-  if (Remainder != 0) {
-    Counter++;
-  }
-
-  mMetronome->WaitForTick (mMetronome, Counter);
-**/
+ 
+  InternalAcpiDelay (
+    (UINT32)DivU64x32 (
+              MultU64x32 (
+                MicroSeconds,
+                3579545
+                ),
+              1000000u
+              )
+    );
   return MicroSeconds;
 }
 
@@ -101,11 +158,20 @@ NanoSecondDelay (
   IN      UINTN                     NanoSeconds
   )
 {
-  //
-  // Duet platform need *not* this interface.
-  //
-  //ASSERT (FALSE);
-  return 0;
+  if (InternalGetApciDescrptionTable() == NULL) {
+    return NanoSeconds;
+  }
+  
+  InternalAcpiDelay (
+    (UINT32)DivU64x32 (
+              MultU64x32 (
+                NanoSeconds,
+                3579545
+                ),
+              1000000000u
+              )
+    );
+  return NanoSeconds;
 }
 
 /**
@@ -126,11 +192,11 @@ GetPerformanceCounter (
   VOID
   )
 {
-  //
-  // Duet platform need *not* this interface.
-  //
-  //ASSERT (FALSE);
-  return 0;
+  if (InternalGetApciDescrptionTable() == NULL) {
+    return 0;
+  }
+  
+  return (UINT64)InternalAcpiGetTimerTick ();
 }
 
 /**
@@ -163,9 +229,17 @@ GetPerformanceCounterProperties (
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
-  //
-  // Duet platform need *not* this interface.
-  //
-  //ASSERT (FALSE);
-  return 0;
+  if (InternalGetApciDescrptionTable() == NULL) {
+    return 0;
+  }
+  
+  if (StartValue != NULL) {
+    *StartValue = 0;
+  }
+
+  if (EndValue != NULL) {
+    *EndValue = (1 << gAcpiDesc->PM_TMR_BLK.RegisterBitWidth) - 1;
+  }
+
+  return 3579545;
 }
