@@ -209,7 +209,7 @@ USBKeyboardDriverBindingSupported (
   );
 
 /**
-  Starts the device with this driver.
+  Starts the keyboard device with this driver.
 
   This function produces Simple Text Input Protocol and Simple Text Input Ex Protocol,
   initializes the keyboard device, and submit Asynchronous Interrupt Transfer to manage

@@ -854,7 +854,6 @@ UsbMouseReset (
   return EFI_SUCCESS;
 }
 
-
 /**
   Event notification function for SIMPLE_POINTER.WaitForInput event.
 
@@ -880,7 +879,6 @@ UsbMouseWaitForInput (
     gBS->SignalEvent (Event);
   }
 }
-
 
 /**
   Handler for Delayed Recovery event.

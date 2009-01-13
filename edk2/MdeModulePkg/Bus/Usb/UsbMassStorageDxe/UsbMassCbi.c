@@ -146,13 +146,13 @@ UsbCbiInit (
   if (Context != NULL) {
     *Context = UsbCbi;
   } else {
-    gBS->FreePool (UsbCbi);
+    FreePool (UsbCbi);
   }
  
   return EFI_SUCCESS;
 
 ON_ERROR:
-  gBS->FreePool (UsbCbi);
+  FreePool (UsbCbi);
   return Status;
 }
 
@@ -605,6 +605,6 @@ UsbCbiCleanUp (
   IN  VOID                   *Context
   )
 {
-  gBS->FreePool (Context);
+  FreePool (Context);
   return EFI_SUCCESS;
 }

@@ -121,13 +121,13 @@ UsbBotInit (
   if (Context != NULL) {
     *Context = UsbBot;
   } else {
-    gBS->FreePool (UsbBot);
+    FreePool (UsbBot);
   }
 
   return EFI_SUCCESS;
 
 ON_ERROR:
-  gBS->FreePool (UsbBot);
+  FreePool (UsbBot);
   return Status;
 }
 
@@ -587,7 +587,7 @@ UsbBotCleanUp (
   IN  VOID                    *Context
   )
 {
-  gBS->FreePool (Context);
+  FreePool (Context);
   return EFI_SUCCESS;
 }
 
