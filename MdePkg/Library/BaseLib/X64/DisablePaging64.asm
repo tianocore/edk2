@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation
+; Copyright (c) 2006 - 2008, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -49,6 +49,8 @@ InternalX86DisablePaging64    PROC
     mov     rax, cr0
     btr     eax, 31
     mov     cr0, rax                    ; disable paging
+
+    mov     rbx, rdx                    ; save EntryPoint to rbx, for rdmsr will overwrite rdx
     mov     ecx, 0c0000080h
     rdmsr
     and     ah, NOT 1                   ; clear LME
@@ -58,7 +60,7 @@ InternalX86DisablePaging64    PROC
     mov     cr4, rax
     push    rdi                         ; push Context2
     push    rsi                         ; push Context1
-    call    rdx                         ; transfer control to EntryPoint
+    call    rbx                         ; transfer control to EntryPoint
     hlt                                 ; no one should get here
 InternalX86DisablePaging64    ENDP
 
