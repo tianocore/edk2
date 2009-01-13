@@ -1161,6 +1161,8 @@ KeyboardHandler (
       // Handle repeat key
       //
       KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, CurKeyCodeBuffer[Index]);
+      ASSERT (KeyDescriptor != NULL);
+
       if (KeyDescriptor->Modifier == EFI_NUM_LOCK_MODIFIER || KeyDescriptor->Modifier == EFI_CAPS_LOCK_MODIFIER) {
         //
         // For NumLock or CapsLock pressed, there is no need to handle repeat key for them.
@@ -1302,6 +1304,8 @@ USBParseKey (
     RemoveKeyCode (&(UsbKeyboardDevice->KeyboardBuffer), &UsbKey);
 
     KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, UsbKey.KeyCode);
+    ASSERT (KeyDescriptor != NULL);
+
     if (!UsbKey.Down) {
       //
       // Key is released.
@@ -1546,6 +1550,7 @@ USBParseKey (
   @retval EFI_INVALID_PARAMETER KeyCode is not in the range of 0x4 to 0x65.
   @retval EFI_INVALID_PARAMETER Translated EFI_INPUT_KEY has zero for both ScanCode and UnicodeChar.
   @retval EFI_NOT_READY         KeyCode represents a dead key with EFI_NS_KEY_MODIFIER
+  @retval EFI_DEVICE_ERROR      Keyboard layout is invalid.
 
 **/
 EFI_STATUS
@@ -1569,6 +1574,7 @@ UsbKeyCodeToEfiInputKey (
   }
 
   KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, KeyCode);
+  ASSERT (KeyDescriptor != NULL);
 
   if (KeyDescriptor->Modifier == EFI_NS_KEY_MODIFIER) {
     //
@@ -1585,6 +1591,13 @@ UsbKeyCodeToEfiInputKey (
     //
     KeyDescriptor = FindPhysicalKey (UsbKeyboardDevice->CurrentNsKey, KeyDescriptor);
     UsbKeyboardDevice->CurrentNsKey = NULL;
+  }
+
+  //
+  // Make sure modifier of Key Descriptor is in the valid range according to UEFI spec.
+  //
+  if (KeyDescriptor->Modifier > EFI_FUNCTION_KEY_TWELVE_MODIFIER) {
+    return EFI_DEVICE_ERROR;
   }
 
   Key->ScanCode = ModifierValueToEfiScanCodeConvertionTable[KeyDescriptor->Modifier];
@@ -1804,6 +1817,8 @@ InsertKeyCode (
     RemoveKeyCode (KeyboardBuffer, &UsbKey);
   }
 
+  ASSERT (KeyboardBuffer->BufferTail <= MAX_KEY_ALLOWED);
+
   KeyboardBuffer->Buffer[KeyboardBuffer->BufferTail].KeyCode = Key;
   KeyboardBuffer->Buffer[KeyboardBuffer->BufferTail].Down    = Down;
 
@@ -1834,6 +1849,8 @@ RemoveKeyCode (
   if (IsUSBKeyboardBufferEmpty (KeyboardBuffer)) {
     return EFI_DEVICE_ERROR;
   }
+
+  ASSERT (KeyboardBuffer->BufferHead <= MAX_KEY_ALLOWED);
 
   UsbKey->KeyCode = KeyboardBuffer->Buffer[KeyboardBuffer->BufferHead].KeyCode;
   UsbKey->Down    = KeyboardBuffer->Buffer[KeyboardBuffer->BufferHead].Down;

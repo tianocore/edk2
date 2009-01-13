@@ -161,6 +161,7 @@ USBParseKey (
   @retval EFI_INVALID_PARAMETER KeyCode is not in the range of 0x4 to 0x65.
   @retval EFI_INVALID_PARAMETER Translated EFI_INPUT_KEY has zero for both ScanCode and UnicodeChar.
   @retval EFI_NOT_READY         KeyCode represents a dead key with EFI_NS_KEY_MODIFIER
+  @retval EFI_DEVICE_ERROR      Keyboard layout is invalid.
 
 **/
 EFI_STATUS
