@@ -596,10 +596,10 @@ UsbMassInitMultiLun (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  if (UsbMass->DevicePath != NULL) {
-    FreePool (UsbMass->DevicePath);
-  }
   if (UsbMass != NULL) {
+    if (UsbMass->DevicePath != NULL) {
+      FreePool (UsbMass->DevicePath);
+    }
     FreePool (UsbMass);
   }
   if (UsbIo != NULL) {

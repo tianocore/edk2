@@ -1800,6 +1800,8 @@ ConnectDevicePath (
     // After this call DevicePath points to the next Instance
     //
     Instance  = GetNextDevicePathInstance (&DevicePath, &Size);
+    ASSERT (Instance != NULL);
+
     Next      = Instance;
     while (!IsDevicePathEndType (Next)) {
       Next = NextDevicePathNode (Next);
