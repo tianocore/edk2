@@ -194,7 +194,7 @@ CalculateApertureIo16 (
   UINT64            Aperture;
   LIST_ENTRY        *CurrentLink;
   PCI_RESOURCE_NODE *Node;
-  UINT64            offset;
+  UINT64            Offset;
   BOOLEAN           IsaEnable;
   BOOLEAN           VGAEnable;
 
@@ -231,11 +231,11 @@ CalculateApertureIo16 (
     //
     // Consider the aperture alignment
     //
-    offset = Aperture & (Node->Alignment);
+    Offset = Aperture & (Node->Alignment);
 
-    if (offset != 0) {
+    if (Offset != 0) {
 
-      Aperture = Aperture + (Node->Alignment + 1) - offset;
+      Aperture = Aperture + (Node->Alignment + 1) - Offset;
 
     }
 
@@ -256,18 +256,18 @@ CalculateApertureIo16 (
             &Aperture,
             Node->Length               
             );
-          offset = Aperture & (Node->Alignment);
-          if (offset != 0) {
-            Aperture = Aperture + (Node->Alignment + 1) - offset;
+          Offset = Aperture & (Node->Alignment);
+          if (Offset != 0) {
+            Aperture = Aperture + (Node->Alignment + 1) - Offset;
           }
         } else if (VGAEnable) {
           SkipVGAAperture (
             &Aperture,
             Node->Length
             );
-          offset = Aperture & (Node->Alignment);
-          if (offset != 0) {
-            Aperture = Aperture + (Node->Alignment + 1) - offset;
+          Offset = Aperture & (Node->Alignment);
+          if (Offset != 0) {
+            Aperture = Aperture + (Node->Alignment + 1) - Offset;
           }
         }
       }
@@ -287,10 +287,10 @@ CalculateApertureIo16 (
   // At last, adjust the aperture with the bridge's
   // alignment
   //
-  offset = Aperture & (Bridge->Alignment);
+  Offset = Aperture & (Bridge->Alignment);
 
-  if (offset != 0) {
-    Aperture = Aperture + (Bridge->Alignment + 1) - offset;
+  if (Offset != 0) {
+    Aperture = Aperture + (Bridge->Alignment + 1) - Offset;
   }
 
   Bridge->Length = Aperture;
@@ -326,7 +326,7 @@ CalculateResourceAperture (
   LIST_ENTRY        *CurrentLink;
   PCI_RESOURCE_NODE *Node;
 
-  UINT64            offset;
+  UINT64            Offset;
 
   Aperture = 0;
 
@@ -351,11 +351,11 @@ CalculateResourceAperture (
     // Apply padding resource if available
     //
         
-    offset = Aperture & (Node->Alignment);
+    Offset = Aperture & (Node->Alignment);
 
-    if (offset != 0) {
+    if (Offset != 0) {
 
-      Aperture = Aperture + (Node->Alignment + 1) - offset;
+      Aperture = Aperture + (Node->Alignment + 1) - Offset;
 
     }
 
@@ -381,9 +381,9 @@ CalculateResourceAperture (
   // At last, adjust the aperture with the bridge's
   // alignment
   //
-  offset = Aperture & (Bridge->Alignment);
-  if (offset != 0) {
-    Aperture = Aperture + (Bridge->Alignment + 1) - offset;
+  Offset = Aperture & (Bridge->Alignment);
+  if (Offset != 0) {
+    Aperture = Aperture + (Bridge->Alignment + 1) - Offset;
   }
 
   //
@@ -2017,7 +2017,7 @@ ApplyResourcePadding (
         // prefechable
         //
         if (Ptr->SpecificFlag == 0x6) {
-          if (Ptr->AddrLen) {
+          if (Ptr->AddrLen != 0) {
             Node = CreateResourceNode (
                     PciDev,
                     Ptr->AddrLen,
@@ -2040,7 +2040,7 @@ ApplyResourcePadding (
         // Non-prefechable
         //
         if (Ptr->SpecificFlag == 0) {
-          if (Ptr->AddrLen) {
+          if (Ptr->AddrLen != 0) {
             Node = CreateResourceNode (
                     PciDev,
                     Ptr->AddrLen,
@@ -2066,7 +2066,7 @@ ApplyResourcePadding (
         // prefechable
         //
         if (Ptr->SpecificFlag == 0x6) {
-          if (Ptr->AddrLen) {
+          if (Ptr->AddrLen != 0) {
             Node = CreateResourceNode (
                     PciDev,
                     Ptr->AddrLen,
@@ -2089,7 +2089,7 @@ ApplyResourcePadding (
         // Non-prefechable
         //
         if (Ptr->SpecificFlag == 0) {
-          if (Ptr->AddrLen) {
+          if (Ptr->AddrLen != 0) {
             Node = CreateResourceNode (
                     PciDev,
                     Ptr->AddrLen,

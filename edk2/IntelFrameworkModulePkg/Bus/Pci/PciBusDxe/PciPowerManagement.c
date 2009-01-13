@@ -30,7 +30,7 @@ ResetPowerManagementFeature (
 {
   EFI_STATUS  Status;
   UINT8       PowerManagementRegBlock;
-  UINT16      PMCSR;
+  UINT16      PowerManagementCSR;
 
   PowerManagementRegBlock = 0;
 
@@ -48,7 +48,7 @@ ResetPowerManagementFeature (
   //
   // Turn off the PWE assertion and put the device into D0 State
   //
-  PMCSR = 0x8000;
+  PowerManagementCSR = 0x8000;
 
   //
   // Write PMCSR
@@ -58,7 +58,7 @@ ResetPowerManagementFeature (
                EfiPciIoWidthUint16,
                PowerManagementRegBlock + 4,
                1,
-               &PMCSR
+               &PowerManagementCSR
              );
 
   return EFI_SUCCESS;

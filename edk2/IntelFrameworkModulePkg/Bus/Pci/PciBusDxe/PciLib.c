@@ -1777,7 +1777,7 @@ PciHostBridgeEnumerator (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   *PciRootBridgeIo;
   UINT16                            MinBus;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptors;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *pConfiguration;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Configuration;
   UINT8                             StartBusNumber;
   LIST_ENTRY                        RootBridgeList;
   LIST_ENTRY                        *Link;
@@ -1846,7 +1846,7 @@ PciHostBridgeEnumerator (
         Status = PciResAlloc->StartBusEnumeration (
                                 PciResAlloc,
                                 RootBridgeHandle,
-                                (VOID **) &pConfiguration
+                                (VOID **) &Configuration
                                 );
         if (EFI_ERROR (Status)) {
           return Status;
@@ -1855,14 +1855,14 @@ PciHostBridgeEnumerator (
         //
         // Get the bus number to start with
         //
-        StartBusNumber  = (UINT8) (pConfiguration->AddrRangeMin);
+        StartBusNumber  = (UINT8) (Configuration->AddrRangeMin);
 
         ResetAllPpbBusNumber (
           RootBridgeDev,
           StartBusNumber
         );
 
-        gBS->FreePool (pConfiguration);
+        gBS->FreePool (Configuration);
         Link = GetNextNode (&RootBridgeList, Link);
         DestroyRootBridge (RootBridgeDev);
       }

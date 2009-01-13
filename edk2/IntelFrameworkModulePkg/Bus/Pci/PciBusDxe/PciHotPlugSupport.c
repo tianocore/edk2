@@ -66,7 +66,7 @@ EfiCompareDevicePath (
     return FALSE;
   }
 
-  if (CompareMem (DevicePath1, DevicePath2, Size1)) {
+  if (CompareMem (DevicePath1, DevicePath2, Size1) != 0) {
     return FALSE;
   }
 
