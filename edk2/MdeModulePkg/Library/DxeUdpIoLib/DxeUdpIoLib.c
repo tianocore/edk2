@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Free a UDP_TX_TOKEN. The TX event is closed.
 
-  @param  Token                 The UDP_TX_TOKEN to release.
+  @param[in]  Token                 The UDP_TX_TOKEN to release.
 
 **/
 VOID
@@ -41,7 +41,7 @@ UdpIoFreeTxToken (
 /**
   Free a UDP_RX_TOKEN. The RX event is closed.
 
-  @param  Token                 The UDP_RX_TOKEN to release.
+  @param[in]  Token                 The UDP_RX_TOKEN to release.
 
 **/
 VOID
@@ -59,7 +59,7 @@ UdpIoFreeRxToken (
   It will remove the packet from the local list then call
   the packet owner's callback function set by UdpIoSendDatagram.
 
-  @param  Context               The UDP TX Token.
+  @param[in]  Context               The UDP TX Token.
 
 **/
 VOID
@@ -82,8 +82,8 @@ UdpIoOnDgramSentDpc (
 /**
   Request UdpIoOnDgramSentDpc as a DPC at TPL_CALLBACK.
   
-  @param  Event                 The event signaled.
-  @param  Context               The UDP TX Token.
+  @param[in]  Event                 The event signaled.
+  @param[in]  Context               The UDP TX Token.
 
 **/
 VOID
@@ -102,7 +102,7 @@ UdpIoOnDgramSent (
 /**
   Recycle the received UDP data.
 
-  @param  Context               The UDP_RX_TOKEN
+  @param[in]  Context               The UDP_RX_TOKEN.
 
 **/
 VOID
@@ -123,7 +123,7 @@ UdpIoRecycleDgram (
   It will build a NET_BUF from the recieved UDP data, then deliver it
   to the receiver.
 
-  @param  Context               The UDP RX token.
+  @param[in]  Context               The UDP RX token.
 
 **/
 VOID
@@ -200,8 +200,8 @@ UdpIoOnDgramRcvdDpc (
 /**
   Request UdpIoOnDgramRcvdDpc() as a DPC at TPL_CALLBACK.
 
-  @param  Event                 The UDP receive request event.
-  @param  Context               The UDP RX token.
+  @param[in]  Event                 The UDP receive request event.
+  @param[in]  Context               The UDP RX token.
 
 **/
 VOID
@@ -220,10 +220,10 @@ UdpIoOnDgramRcvd (
 /**
   Create a UDP_RX_TOKEN to wrap the request.
 
-  @param  UdpIo                 The UdpIo to receive packets from
-  @param  CallBack              The function to call when receive finished.
-  @param  Context               The opaque parameter to the CallBack
-  @param  HeadLen               The head length to reserver for the packet.
+  @param[in]  UdpIo                 The UdpIo to receive packets from.
+  @param[in]  CallBack              The function to call when receive finished.
+  @param[in]  Context               The opaque parameter to the CallBack.
+  @param[in]  HeadLen               The head length to reserver for the packet.
 
   @return The Wrapped request or NULL if failed to allocate resources or some errors happened.
 
@@ -273,12 +273,12 @@ UdpIoCreateRxToken (
 /**
   Wrap a transmit request into a UDP_TX_TOKEN.
 
-  @param  UdpIo                 The UdpIo port to send packet to
-  @param  Packet                The user's packet
-  @param  EndPoint              The local and remote access point
-  @param  Gateway               The overrided next hop
-  @param  CallBack              The function to call when transmission completed.
-  @param  Context               The opaque parameter to the call back
+  @param[in]  UdpIo                 The UdpIo port to send packet to.
+  @param[in]  Packet                The user's packet.
+  @param[in]  EndPoint              The local and remote access point.
+  @param[in]  Gateway               The overrided next hop.
+  @param[in]  CallBack              The function to call when transmission completed.
+  @param[in]  Context               The opaque parameter to the call back.
 
   @return The wrapped transmission request or NULL if failed to allocate resources 
           or for some errors.
@@ -375,11 +375,11 @@ UdpIoWrapTx (
   in creating or configure the UDP child will lead to the failure of UDP_IO_PORT
   creation.
 
-  @param  Controller            The controller that has the UDP service binding
-                                protocol installed.
-  @param  Image                 The image handle for the driver.
-  @param  Configure             The function to configure the created UDP child
-  @param  Context               The opaque parameter for the Configure funtion.
+  @param[in]  Controller            The controller that has the UDP service binding.
+                                    protocol installed.
+  @param[in]  Image                 The image handle for the driver.
+  @param[in]  Configure             The function to configure the created UDP child.
+  @param[in]  Context               The opaque parameter for the Configure funtion.
 
   @return Newly-created UDP_IO_PORT or NULL if failed.
 
@@ -474,11 +474,11 @@ FREE_MEM:
   Cancel all the sent datagram that pass the selection criteria of ToCancel.
   If ToCancel is NULL, all the datagrams are cancelled.
 
-  @param  UdpIo                 The UDP_IO_PORT to cancel packet
-  @param  IoStatus              The IoStatus to return to the packet owners.
-  @param  ToCancel              The select funtion to test whether to cancel this
-                                packet or not.
-  @param  Context               The opaque parameter to the ToCancel.
+  @param[in]  UdpIo                 The UDP_IO_PORT to cancel packet.
+  @param[in]  IoStatus              The IoStatus to return to the packet owners.
+  @param[in]  ToCancel              The select funtion to test whether to cancel this
+                                    packet or not.
+  @param[in]  Context               The opaque parameter to the ToCancel.
 
 **/
 VOID
@@ -507,7 +507,7 @@ UdpIoCancelDgrams (
   
   The function will cancel all sent datagram and receive request.
 
-  @param  UdpIo                 The UDP_IO_PORT to free.
+  @param[in]  UdpIo                 The UDP_IO_PORT to free.
 
   @retval EFI_SUCCESS           The UDP_IO_PORT is freed.
 
@@ -567,7 +567,7 @@ UdpIoFreePort (
   It will release all the transmitted datagrams and receive request. It will
   also configure NULL for the UDP instance.
 
-  @param  UdpIo                 The UDP_IO_PORT to clean up.
+  @param[in]  UdpIo                 The UDP_IO_PORT to clean up.
 
 **/
 VOID
@@ -597,16 +597,16 @@ UdpIoCleanPort (
   when the packet is sent. The optional parameter EndPoint overrides the default
   address pair if specified.
 
-  @param  UdpIo                 The UDP_IO_PORT to send the packet through
-  @param  Packet                The packet to send
-  @param  EndPoint              The local and remote access point. Override the
-                                default address pair set during configuration.
-  @param  Gateway               The gateway to use
-  @param  CallBack              The function being called when packet is
-                                transmitted or failed.
-  @param  Context               The opaque parameter passed to CallBack
+  @param[in]  UdpIo                 The UDP_IO_PORT to send the packet through.
+  @param[in]  Packet                The packet to send.
+  @param[in]  EndPoint              The local and remote access point. Override the
+                                    default address pair set during configuration.
+  @param[in]  Gateway               The gateway to use.
+  @param[in]  CallBack              The function being called when packet is
+                                    transmitted or failed.
+  @param[in]  Context               The opaque parameter passed to CallBack.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the packet
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the packet.
   @retval EFI_SUCCESS           The packet is successfully delivered to UDP  for
                                 transmission.
 
@@ -650,8 +650,8 @@ UdpIoSendDatagram (
 /**
   The select function to cancel a single sent datagram.
 
-  @param  Token                 The UDP_TX_TOKEN to test against
-  @param  Context               The NET_BUF of the sent datagram
+  @param[in]  Token                 The UDP_TX_TOKEN to test against
+  @param[in]  Context               The NET_BUF of the sent datagram
 
   @retval TRUE              The packet is to be cancelled.
   @retval FALSE             The packet is not to be cancelled.
@@ -676,8 +676,8 @@ UdpIoCancelSingleDgram (
 /**
   Cancel a single sent datagram.
 
-  @param  UdpIo                 The UDP_IO_PORT to cancel the packet from
-  @param  Packet                The packet to cancel
+  @param[in]  UdpIo                 The UDP_IO_PORT to cancel the packet from
+  @param[in]  Packet                The packet to cancel
 
 **/
 VOID
@@ -698,11 +698,11 @@ UdpIoCancelSentDatagram (
   to invoke this function inside its Callback function when the former packet
   is processed.
 
-  @param  UdpIo                 The UDP_IO_PORT to receive the packet from.
-  @param  CallBack              The call back function to execute when the packet
-                                is received.
-  @param  Context               The opaque context passed to Callback
-  @param  HeadLen               The length of the upper-layer's protocol header
+  @param[in]  UdpIo                 The UDP_IO_PORT to receive the packet from.
+  @param[in]  CallBack              The call back function to execute when the packet
+                                    is received.
+  @param[in]  Context               The opaque context passed to Callback.
+  @param[in] HeadLen                The length of the upper-layer's protocol header.
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request. Only
                                 one receive request is supported at a time.

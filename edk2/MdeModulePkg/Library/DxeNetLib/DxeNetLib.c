@@ -420,7 +420,7 @@ NetListInsertBefore (
   Initializes the count of the <Key, Value> pairs in the netmap to zero.
    
   If Map is NULL, then ASSERT().
-  If the address of Map->Used is NULl, then ASSERT().
+  If the address of Map->Used is NULL, then ASSERT().
   If the address of Map->Recycled is NULl, then ASSERT().
  
   @param[in, out]  Map                   The netmap to initialize.
@@ -1049,7 +1049,7 @@ NetLibDefaultUnload (
   @param[in]       Controller            The controller which has the service installed.
   @param[in]       Image                 The image handle used to open service.
   @param[in]       ServiceBindingGuid    The service's Guid.
-  @param[in, out]  ChildHandle           The handle to receive the create child
+  @param[in, out]  ChildHandle           The handle to receive the create child.
 
   @retval EFI_SUCCESS           The child is successfully created.
   @retval Others                Failed to create the child.
@@ -1104,7 +1104,7 @@ NetLibCreateServiceChild (
   @param[in]   Controller            The controller which has the service installed.
   @param[in]   Image                 The image handle used to open service.
   @param[in]   ServiceBindingGuid    The service's Guid.
-  @param[in]   ChildHandle           The child to destory
+  @param[in]   ChildHandle           The child to destory.
 
   @retval EFI_SUCCESS           The child is successfully destoried.
   @retval Others                Failed to destory the child.
