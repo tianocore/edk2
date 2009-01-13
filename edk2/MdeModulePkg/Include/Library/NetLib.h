@@ -1225,7 +1225,7 @@ NetbufTrim (
   @param[in]   Dest         The destination of the data to copy to.
 
   @return           The length of the actual copied data, or 0 if the offset
-                    specified exceeds exceeds the total size of net buffer.
+                    specified exceeds the total size of net buffer.
 
 **/
 UINT32
