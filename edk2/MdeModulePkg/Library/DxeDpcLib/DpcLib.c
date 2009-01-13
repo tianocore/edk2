@@ -51,10 +51,10 @@ DpcLibConstructor (
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.
 
-  @param  DpcTpl        The EFI_TPL that the DPC should be invoked.
-  @param  DpcProcedure  Pointer to the DPC's function.
-  @param  DpcContext    Pointer to the DPC's context.  Passed to DpcProcedure
-                        when DpcProcedure is invoked.
+  @param[in]  DpcTpl        The EFI_TPL that the DPC should be invoked.
+  @param[in]  DpcProcedure  Pointer to the DPC's function.
+  @param[in]  DpcContext    Pointer to the DPC's context.  Passed to DpcProcedure
+                            when DpcProcedure is invoked.
 
   @retval EFI_SUCCESS            The DPC was queued.
   @retval EFI_INVALID_PARAMETER  DpcTpl is not a valid EFI_TPL.
@@ -68,7 +68,7 @@ EFIAPI
 QueueDpc (
   IN EFI_TPL            DpcTpl,
   IN EFI_DPC_PROCEDURE  DpcProcedure,
-  IN VOID               *DpcContext
+  IN VOID               *DpcContext    OPTIONAL
   )
 {
   //
