@@ -166,13 +166,15 @@ typedef struct {
 #define EFI_IP4_EQUAL(Ip1, Ip2)  (CompareMem ((Ip1), (Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
 
 /**
-  Return the length of the mask. If the mask is invalid,
-  return the invalid length 33, which is IP4_MASK_NUM.
+  Return the length of the mask. 
+  
+  Return the length of the mask, the correct value is from 0 to 32.
+  If the mask is invalid, return the invalid length 33, which is IP4_MASK_NUM.
   NetMask is in the host byte order.
 
   @param[in]  NetMask              The netmask to get the length from.
 
-  @return The length of the netmask, IP4_MASK_NUM if the mask isn't.
+  @return The length of the netmask, IP4_MASK_NUM if the mask is invalid.
   
 **/
 INTN
@@ -182,9 +184,21 @@ NetGetMaskLength (
   );
 
 /**
-  Return the class of the address, such as class a, b, c.
+  Return the class of the IP address, such as class A, B, C.
   Addr is in host byte order.
+  
+  The address of class A  starts with 0.
+  If the address belong to class A, return IP4_ADDR_CLASSA.
+  The address of class B  starts with 10. 
+  If the address belong to class B, return IP4_ADDR_CLASSB.
+  The address of class C  starts with 110. 
+  If the address belong to class C, return IP4_ADDR_CLASSC.
+  The address of class D  starts with 1110. 
+  If the address belong to class D, return IP4_ADDR_CLASSD.
+  The address of class E  starts with 1111.
+  If the address belong to class E, return IP4_ADDR_CLASSE.
 
+  
   @param[in]   Addr                  The address to get the class from.
 
   @return IP address class, such as IP4_ADDR_CLASSA.
@@ -198,8 +212,12 @@ NetGetIpClass (
 
 /**
   Check whether the IP is a valid unicast address according to
-  the netmask. If NetMask is zero, use the IP address's class to
-  get the default mask.
+  the netmask. If NetMask is zero, use the IP address's class to get the default mask.
+  
+  If Ip is 0, IP is not a valid unicast address.
+  Class D address is used for multicasting and class E address is reserved for future. If Ip
+  belongs to class D or class E, IP is not a valid unicast address. 
+  If all bits of the host address of IP are 0 or 1, IP is also not a valid unicast address.
 
   @param[in]  Ip                    The IP to check against.
   @param[in]  NetMask               The mask of the IP.
@@ -230,8 +248,10 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 #define NET_RANDOM(Seed)        ((UINT32) ((UINT32) (Seed) * 1103515245UL + 12345) % 4294967295UL)
 
 /**
-  Extract a UINT32 from a byte stream, then convert it to host
-  byte order. Use this function to avoid alignment error.
+  Extract a UINT32 from a byte stream.
+  
+  Copy a UINT32 from a byte stream, then converts it from Network 
+  byte order to host byte order. Use this function to avoid alignment error.
 
   @param[in]  Buf                 The buffer to extract the UINT32.
 
@@ -245,8 +265,10 @@ NetGetUint32 (
   );
 
 /**
-  Put a UINT32 to the byte stream. Convert it from host byte order
-  to network byte order before putting.
+  Put a UINT32 to the byte stream in network byte order. 
+  
+  Converts a UINT32 from host byte order to network byte order. Then copy it to the 
+  byte stream.
 
   @param[in, out]  Buf          The buffer to put the UINT32.
   @param[in]      Data          The data to put.
@@ -261,7 +283,11 @@ NetPutUint32 (
 
 /**
   Initialize a random seed using current time.
-
+  
+  Get current time first. Then initialize a random seed based on some basic 
+  mathematics operation on the hour, day, minute, second, nanosecond and year 
+  of the current time.
+  
   @return The random seed initialized with current time.
 
 **/
@@ -307,11 +333,21 @@ NetRandomInitSeed (
 
 
 /**
-  Remove the first entry on the list.
+  Remove the first node entry on the list, and return the removed node entry.
+  
+  Removes the first node Entry from a doubly linked list. It is up to the caller of
+  this function to release the memory used by the first node if that is required. On
+  exit, the removed node is returned. 
+
+  If Head is NULL, then ASSERT().
+  If Head was not initialized, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
+  linked list including the head node is greater than or equal to PcdMaximumLinkedListLength,
+  then ASSERT().    
 
   @param[in, out]  Head                  The list header.
 
-  @return The entry that is removed from the list, NULL if the list is empty.
+  @return The first node entry that is removed from the list, NULL if the list is empty.
 
 **/
 LIST_ENTRY *
@@ -321,11 +357,21 @@ NetListRemoveHead (
   );
 
 /**
-  Remove the last entry on the list.
+  Remove the last node entry on the list and and return the removed node entry.
 
+  Removes the last node entry from a doubly linked list. It is up to the caller of
+  this function to release the memory used by the first node if that is required. On
+  exit, the removed node is returned. 
+
+  If Head is NULL, then ASSERT().
+  If Head was not initialized, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
+  linked list including the head node is greater than or equal to PcdMaximumLinkedListLength,
+  then ASSERT(). 
+  
   @param[in, out]  Head                  The list head.
 
-  @return The entry that is removed from the list, NULL if the list is empty.
+  @return The last node entry that is removed from the list, NULL if the list is empty.
 
 **/
 LIST_ENTRY *
@@ -335,8 +381,11 @@ NetListRemoveTail (
   );
 
 /**
-  Insert the NewEntry after the PrevEntry.
-
+  Insert a new node entry after a designated node entry of a doubly linked list.
+  
+  Inserts a new node entry donated by NewEntry after the node entry donated by PrevEntry
+  of the doubly linked list.
+ 
   @param[in, out]  PrevEntry             The previous entry to insert after.
   @param[in, out]  NewEntry              The new entry to insert.
 
@@ -349,8 +398,11 @@ NetListInsertAfter (
   );
 
 /**
-  Insert the NewEntry before the PostEntry.
-
+  Insert a new node entry before a designated node entry of a doubly linked list.
+  
+  Inserts a new node entry donated by NewEntry after the node entry donated by PostEntry
+  of the doubly linked list.
+ 
   @param[in, out]  PostEntry             The entry to insert before.
   @param[in, out]  NewEntry              The new entry to insert.
 
@@ -383,7 +435,15 @@ typedef struct {
 
 /**
   Initialize the netmap. Netmap is a reposity to keep the <Key, Value> pairs.
-
+ 
+  Initialize the forward and backward links of two head nodes donated by Map->Used 
+  and Map->Recycled of two doubly linked lists.
+  Initializes the count of the <Key, Value> pairs in the netmap to zero.
+   
+  If Map is NULL, then ASSERT().
+  If the address of Map->Used is NULL, then ASSERT().
+  If the address of Map->Recycled is NULl, then ASSERT().
+ 
   @param[in, out]  Map                   The netmap to initialize.
 
 **/
@@ -395,7 +455,13 @@ NetMapInit (
 
 /**
   To clean up the netmap, that is, release allocated memories.
-
+  
+  Removes all nodes of the Used doubly linked list and free memory of all related netmap items.
+  Removes all nodes of the Recycled doubly linked list and free memory of all related netmap items.
+  The number of the <Key, Value> pairs in the netmap is set to be zero.
+  
+  If Map is NULL, then ASSERT().
+  
   @param[in, out]  Map                   The netmap to clean up.
 
 **/
@@ -406,8 +472,13 @@ NetMapClean (
   );
 
 /**
-  Test whether the netmap is empty.
-
+  Test whether the netmap is empty and return true if it is.
+  
+  If the number of the <Key, Value> pairs in the netmap is zero, return TRUE.
+   
+  If Map is NULL, then ASSERT().
+ 
+  
   @param[in]  Map                   The net map to test.
 
   @return TRUE if the netmap is empty, otherwise FALSE.
@@ -435,7 +506,13 @@ NetMapGetCount (
 
 /**
   Allocate an item to save the <Key, Value> pair to the head of the netmap.
+  
+  Allocate an item to save the <Key, Value> pair and add corresponding node entry
+  to the beginning of the Used doubly linked list. The number of the <Key, Value> 
+  pairs in the netmap increase by 1.
 
+  If Map is NULL, then ASSERT().
+  
   @param[in, out]  Map                   The netmap to insert into.
   @param[in]       Key                   The user's key.
   @param[in]       Value                 The user's value for the key.
@@ -455,6 +532,12 @@ NetMapInsertHead (
 /**
   Allocate an item to save the <Key, Value> pair to the tail of the netmap.
 
+  Allocate an item to save the <Key, Value> pair and add corresponding node entry
+  to the tail of the Used doubly linked list. The number of the <Key, Value> 
+  pairs in the netmap increase by 1.
+
+  If Map is NULL, then ASSERT().
+  
   @param[in, out]  Map                   The netmap to insert into.
   @param[in]       Key                   The user's key.
   @param[in]       Value                 The user's value for the key.
@@ -472,8 +555,13 @@ NetMapInsertTail (
   );
 
 /**
-  Find the key in the netmap.
+  Find the key in the netmap and returns the point to the item contains the Key.
+  
+  Iterate the Used doubly linked list of the netmap to get every item. Compare the key of every 
+  item with the key to search. It returns the point to the item contains the Key if found.
 
+  If Map is NULL, then ASSERT().
+  
   @param[in]  Map                   The netmap to search within.
   @param[in]  Key                   The key to search.
 
@@ -488,8 +576,17 @@ NetMapFindKey (
   );
 
 /**
-  Remove the item from the netmap.
-
+  Remove the node entry of the item from the netmap and return the key of the removed item.
+  
+  Remove the node entry of the item from the Used doubly linked list of the netmap. 
+  The number of the <Key, Value> pairs in the netmap decrease by 1. Then add the node 
+  entry of the item to the Recycled doubly linked list of the netmap. If Value is not NULL,
+  Value will point to the value of the item. It returns the key of the removed item.
+  
+  If Map is NULL, then ASSERT().
+  If Item is NULL, then ASSERT().
+  if item in not in the netmap, then ASSERT().
+  
   @param[in, out]  Map                   The netmap to remove the item from.
   @param[in, out]  Item                  The item to remove.
   @param[out]      Value                 The variable to receive the value if not NULL.
@@ -506,8 +603,16 @@ NetMapRemoveItem (
   );
 
 /**
-  Remove the first entry on the netmap.
+  Remove the first node entry on the netmap and return the key of the removed item.
 
+  Remove the first node entry from the Used doubly linked list of the netmap. 
+  The number of the <Key, Value> pairs in the netmap decrease by 1. Then add the node 
+  entry to the Recycled doubly linked list of the netmap. If parameter Value is not NULL,
+  parameter Value will point to the value of the item. It returns the key of the removed item.
+  
+  If Map is NULL, then ASSERT().
+  If the Used doubly linked list is empty, then ASSERT().
+  
   @param[in, out]  Map                   The netmap to remove the head from.
   @param[out]      Value                 The variable to receive the value if not NULL.
 
@@ -522,8 +627,16 @@ NetMapRemoveHead (
   );
 
 /**
-  Remove the last entry on the netmap.
+  Remove the last node entry on the netmap and return the key of the removed item.
 
+  Remove the last node entry from the Used doubly linked list of the netmap. 
+  The number of the <Key, Value> pairs in the netmap decrease by 1. Then add the node 
+  entry to the Recycled doubly linked list of the netmap. If parameter Value is not NULL,
+  parameter Value will point to the value of the item. It returns the key of the removed item.
+  
+  If Map is NULL, then ASSERT().
+  If the Used doubly linked list is empty, then ASSERT().
+  
   @param[in, out]  Map                   The netmap to remove the tail from.
   @param[out]      Value                 The variable to receive the value if not NULL.
 
@@ -546,11 +659,15 @@ EFI_STATUS
   );
 
 /**
-  Iterate through the netmap and call CallBack for each item. It will
-  contiue the traverse if CallBack returns EFI_SUCCESS, otherwise, break
-  from the loop. It returns the CallBack's last return value. This
-  function is delete safe for the current item.
+  Iterate through the netmap and call CallBack for each item.
+  
+  It will contiue the traverse if CallBack returns EFI_SUCCESS, otherwise, break
+  from the loop. It returns the CallBack's last return value. This function is 
+  delete safe for the current item.
 
+  If Map is NULL, then ASSERT().
+  If CallBack is NULL, then ASSERT().
+  
   @param[in]  Map                   The Map to iterate through.
   @param[in]  CallBack              The callback function to call for each item.
   @param[in]  Arg                   The opaque parameter to the callback.
@@ -574,11 +691,16 @@ NetMapIterate (
 //
 /**
   Create a child of the service that is identified by ServiceBindingGuid.
+  
+  Get the ServiceBinding Protocol first, then use it to create a child.
 
+  If ServiceBindingGuid is NULL, then ASSERT().
+  If ChildHandle is NULL, then ASSERT().
+  
   @param[in]       Controller            The controller which has the service installed.
   @param[in]       Image                 The image handle used to open service.
   @param[in]       ServiceBindingGuid    The service's Guid.
-  @param[in, out]  ChildHandle           The handle to receive the create child
+  @param[in, out]  ChildHandle           The handle to receive the create child.
 
   @retval EFI_SUCCESS           The child is successfully created.
   @retval Others                Failed to create the child.
@@ -595,11 +717,15 @@ NetLibCreateServiceChild (
 
 /**
   Destory a child of the service that is identified by ServiceBindingGuid.
-
+  
+  Get the ServiceBinding Protocol first, then use it to destroy a child.
+  
+  If ServiceBindingGuid is NULL, then ASSERT().
+  
   @param[in]   Controller            The controller which has the service installed.
   @param[in]   Image                 The image handle used to open service.
   @param[in]   ServiceBindingGuid    The service's Guid.
-  @param[in]   ChildHandle           The child to destory
+  @param[in]   ChildHandle           The child to destory.
 
   @retval EFI_SUCCESS           The child is successfully destoried.
   @retval Others                Failed to destory the child.
@@ -618,6 +744,11 @@ NetLibDestroyServiceChild (
   Convert the mac address of the simple network protocol installed on
   SnpHandle to a unicode string. Callers are responsible for freeing the
   string storage.
+
+  Get the mac address of the Simple Network protocol from the SnpHandle. Then convert
+  the mac address into a unicode string. It takes 2 unicode characters to represent 
+  a 1 byte binary buffer. Plus one unicode character for the null-terminator.
+
 
   @param[in]   SnpHandle             The handle where the simple network protocol is
                                      installed on.
@@ -641,6 +772,11 @@ NetLibGetMacString (
 
 /**
   Create an IPv4 device path node.
+  
+  The header type of IPv4 device path node is MESSAGING_DEVICE_PATH.
+  The header subtype of IPv4 device path node is MSG_IPv4_DP.
+  The length of the IPv4 device path node in bytes is 19.
+  Get other info from parameters to make up the whole IPv4 device path node.
 
   @param[in, out]  Node                  Pointer to the IPv4 device path node.
   @param[in]       Controller            The handle where the NIC IP4 config protocol resides.
@@ -667,6 +803,7 @@ NetLibCreateIPv4DPathNode (
 
 /**
   Find the UNDI/SNP handle from controller and protocol GUID.
+  
   For example, IP will open a MNP child to transmit/receive
   packets, when MNP is stopped, IP should also be stopped. IP
   needs to find its own private data which is related the IP's
@@ -730,6 +867,9 @@ NetLibDispatchDpc (
 /**
   This is the default unload handle for all the network drivers.
 
+  Disconnect the driver specified by ImageHandle from all the devices in the handle database.
+  Uninstall all the protocols installed in the driver entry point.
+  
   @param[in]  ImageHandle       The drivers' driver image.
 
   @retval EFI_SUCCESS           The image is unloaded.

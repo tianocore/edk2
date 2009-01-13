@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2007, Intel Corporation
+  DpcLib.h
+  
+Copyright (c) 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,14 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  DpcLib.h
-
-Abstract:
-
-  Library for Deferred Procedure Calls.
 
 **/
 
@@ -27,10 +20,10 @@ Abstract:
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.
 
-  @param  DpcTpl        The EFI_TPL that the DPC should be invoked.
-  @param  DpcProcedure  Pointer to the DPC's function.
-  @param  DpcContext    Pointer to the DPC's context.  Passed to DpcProcedure
-                        when DpcProcedure is invoked.
+  @param[in]  DpcTpl        The EFI_TPL that the DPC should be invoked.
+  @param[in]  DpcProcedure  Pointer to the DPC's function.
+  @param[in]  DpcContext    Pointer to the DPC's context.  Passed to DpcProcedure
+                            when DpcProcedure is invoked.
 
   @retval EFI_SUCCESS            The DPC was queued.
   @retval EFI_INVALID_PARAMETER  DpcTpl is not a valid EFI_TPL.
