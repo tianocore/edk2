@@ -189,15 +189,19 @@ Returns:
   UINT16  Start[18];
   UINT16  *Pointer;
   UINT16  Index3;
-  UINT16  Index;
+  volatile UINT16  Index;
   UINT16  Len;
   UINT16  Char;
   UINT16  JuBits;
   UINT16  Avail;
   UINT16  NextCode;
   UINT16  Mask;
+  UINT16  WordOfStart;
+  UINT16  WordOfCount;
 
-  SetMem (&Count[1], sizeof(UINT16) * 16, 0);
+  for (Index = 1; Index <= 16; Index++) {
+    Count[Index] = 0;
+  }  
 
   for (Index = 0; Index < NumOfChar; Index++) {
     Count[BitLen[Index]]++;
@@ -206,7 +210,9 @@ Returns:
   Start[1] = 0;
 
   for (Index = 1; Index <= 16; Index++) {
-    Start[Index + 1] = (UINT16) (Start[Index] + (Count[Index] << (16 - Index)));
+    WordOfStart = Start[Index];
+    WordOfCount = Count[Index];
+    Start[Index + 1] = (UINT16) (WordOfStart + (WordOfCount << (16 - Index)));
   }
 
   if (Start[17] != 0) {
@@ -222,14 +228,17 @@ Returns:
   }
 
   while (Index <= 16) {
-    Weight[Index++] = (UINT16) (1U << (16 - Index));
+    Weight[Index] = (UINT16) (1U << (16 - Index));
+    Index++;
   }
 
   Index = (UINT16) (Start[TableBits + 1] >> JuBits);
 
   if (Index != 0) {
     Index3 = (UINT16) (1U << TableBits);
-    SetMem(&Table[Index], sizeof(UINT16) * (Index3 - Index + 1), 0);
+    while (Index != Index3) {
+      Table[Index++] = 0;
+    }
   }
 
   Avail = NumOfChar;
@@ -366,7 +375,7 @@ Returns:
 {
   UINT16  Number;
   UINT16  CharC;
-  UINT16  Index;
+  volatile UINT16  Index;
   UINT32  Mask;
 
   Number = (UINT16) GetBits (Sd, nbit);
@@ -378,7 +387,9 @@ Returns:
       Sd->mPTTable[Index] = CharC;
     }
 
-    SetMem ((VOID*) &Sd->mPTLen, nn * sizeof(UINT8), 0);
+    for (Index = 0; Index < nn; Index++) {
+      Sd->mPTLen[Index] = 0;
+    }
 
     return 0;
   }
@@ -409,7 +420,10 @@ Returns:
     }
   }
 
-  SetMem ((VOID*) &Sd->mPTLen[Index], (nn - Index) * sizeof(UINT8), 0);
+  while (Index < nn) {
+    Sd->mPTLen[Index++] = 0;
+  }
+
   return MakeTable (Sd, nn, Sd->mPTLen, 8, Sd->mPTTable);
 }
 
@@ -433,7 +447,7 @@ Returns: (VOID)
 {
   UINT16  Number;
   UINT16  CharC;
-  UINT16  Index;
+  volatile UINT16  Index;
   UINT32  Mask;
 
   Number = (UINT16) GetBits (Sd, CBIT);
@@ -441,7 +455,9 @@ Returns: (VOID)
   if (Number == 0) {
     CharC = (UINT16) GetBits (Sd, CBIT);
 
-    SetMem ((VOID*)&Sd->mCLen, sizeof(UINT8) * NC, 0);
+    for (Index = 0; Index < NC; Index++) {
+      Sd->mCLen[Index] = 0;
+    }
 
     for (Index = 0; Index < 4096; Index++) {
       Sd->mCTable[Index] = CharC;
@@ -495,7 +511,9 @@ Returns: (VOID)
     }
   }
 
-  SetMem ((VOID*) &Sd->mCLen[Index], sizeof(UINT8) * (NC - Index), 0);
+  while (Index < NC) {
+    Sd->mCLen[Index++] = 0;
+  }
 
   MakeTable (Sd, NC, Sd->mCLen, 12, Sd->mCTable);
 
@@ -596,7 +614,7 @@ Returns: (VOID)
   for (;;) {
     CharC = DecodeC (Sd);
     if (Sd->mBadTableFlag != 0) {
-      return ;
+      goto Done ;
     }
 
     if (CharC < 256) {
@@ -604,7 +622,7 @@ Returns: (VOID)
       // Process an Original character
       //
       if (Sd->mOutBuf >= Sd->mOrigSize) {
-        return ;
+        goto Done ;
       } else {
         Sd->mDstBase[Sd->mOutBuf++] = (UINT8) CharC;
       }
@@ -623,7 +641,7 @@ Returns: (VOID)
       while ((INT16) (BytesRemain) >= 0) {
         Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
         if (Sd->mOutBuf >= Sd->mOrigSize) {
-          return ;
+          goto Done ;
         }
 
         BytesRemain--;
@@ -631,6 +649,8 @@ Returns: (VOID)
     }
   }
 
+Done:
+  return ;
 }
 
 EFI_STATUS
@@ -714,7 +734,8 @@ Returns:
   SCRATCH_DATA  *Sd;
   UINT8         *Src;
   UINT8         *Dst;
-
+  volatile UINT32  Index;
+  
   Status  = EFI_SUCCESS;
   Src     = Source;
   Dst     = Destination;
@@ -749,8 +770,10 @@ Returns:
 
   Src = Src + 8;
 
-  SetMem ((VOID*) Sd, sizeof(SCRATCH_DATA), 0);
-
+  for (Index = 0; Index < sizeof (SCRATCH_DATA); Index++) {
+    ((UINT8 *) Sd)[Index] = 0;
+  }
+  
   //
   // The length of the field 'Position Set Code Length Array Size' in Block Header.
   // For EFI 1.1 de/compression algorithm(Version 1), mPBit = 4
