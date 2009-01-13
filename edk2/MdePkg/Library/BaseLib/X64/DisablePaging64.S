@@ -51,6 +51,8 @@ L1:
     mov    %cr0,%rax
     btr    $0x1f,%eax
     mov    %rax,%cr0                      # disable paging
+
+    mov    %rdx,%rbx                      # save EntryPoint to rbx, for rdmsr will overwrite rdx
     mov    $0xc0000080,%ecx
     rdmsr  
     and    $0xfe,%ah                      # clear LME
@@ -60,6 +62,6 @@ L1:
     mov    %rax,%cr4
     push   %rdi                           # push Context2
     push   %rsi                           # push Context1
-    callq  *%rdx                          # transfer control to EntryPoint
+    callq  *%rbx                          # transfer control to EntryPoint
     jmp    .                              # no one should get here
 
