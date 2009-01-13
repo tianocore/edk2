@@ -120,7 +120,7 @@ USBKeyboardDriverBindingSupported (
 }
 
 /**
-  Starts the device with this driver.
+  Starts the keyboard device with this driver.
 
   This function produces Simple Text Input Protocol and Simple Text Input Ex Protocol,
   initializes the keyboard device, and submit Asynchronous Interrupt Transfer to manage
@@ -219,7 +219,7 @@ USBKeyboardDriverBindingStart (
   EndpointNumber = UsbKeyboardDevice->InterfaceDescriptor.NumEndpoints;
 
   //
-  // Traverse endpoints to find interrupt endpoints
+  // Traverse endpoints to find interrupt endpoint
   //
   Found = FALSE;
   for (Index = 0; Index < EndpointNumber; Index++) {
@@ -230,7 +230,7 @@ USBKeyboardDriverBindingStart (
              &EndpointDescriptor
              );
 
-    if ((EndpointDescriptor.Attributes & 0x03) == USB_ENDPOINT_INTERRUPT) {
+    if ((EndpointDescriptor.Attributes & (BIT0 | BIT1)) == USB_ENDPOINT_INTERRUPT) {
       //
       // We only care interrupt endpoint here
       //
@@ -392,7 +392,7 @@ ErrorExit:
     if (UsbKeyboardDevice->SimpleInputEx.WaitForKeyEx != NULL) {
       gBS->CloseEvent (UsbKeyboardDevice->SimpleInputEx.WaitForKeyEx);
     }
-    gBS->FreePool (UsbKeyboardDevice);
+    FreePool (UsbKeyboardDevice);
     UsbKeyboardDevice = NULL;
   }
   gBS->CloseProtocol (
@@ -515,7 +515,7 @@ USBKeyboardDriverBindingStop (
     FreeUnicodeStringTable (UsbKeyboardDevice->ControllerNameTable);
   }
 
-  gBS->FreePool (UsbKeyboardDevice);
+  FreePool (UsbKeyboardDevice);
 
   return Status;
 }
@@ -815,7 +815,7 @@ KbdFreeNotifyList (
     Link = GetFirstNode (NotifyList);
     NotifyNode = CR (Link, KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
     RemoveEntryList (Link);
-    gBS->FreePool (NotifyNode);
+    FreePool (NotifyNode);
   }
   
   return EFI_SUCCESS;
@@ -1165,7 +1165,7 @@ USBKeyboardUnregisterKeyNotify (
                       NULL
                       );
       ASSERT_EFI_ERROR (Status);
-      gBS->FreePool (CurrentNotify);            
+      FreePool (CurrentNotify);            
       return EFI_SUCCESS;
     }
   }

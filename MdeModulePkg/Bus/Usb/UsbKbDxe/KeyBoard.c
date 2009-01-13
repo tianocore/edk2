@@ -413,7 +413,7 @@ GetCurrentKeyboardLayout (
                             KeyboardLayout
                             );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (KeyboardLayout);
+      FreePool (KeyboardLayout);
       KeyboardLayout = NULL;
     }
   }
@@ -814,7 +814,6 @@ InitUSBKeyboard (
   //
   // Set boot protocol for the USB Keyboard.
   // This driver only supports boot protocol.
-  // The device that does not support boot protocol is not supported.
   //
   if (Protocol != BOOT_PROTOCOL) {
     UsbSetProtocolRequest (
@@ -871,33 +870,36 @@ InitUSBKeyboard (
   ZeroMem (UsbKeyboardDevice->LastKeyCodeArray, sizeof (UINT8) * 8);
 
   //
-  // Set a timer for repeat keys' generation.
+  // Create event for repeat keys' generation.
   //
   if (UsbKeyboardDevice->RepeatTimer != NULL) {
     gBS->CloseEvent (UsbKeyboardDevice->RepeatTimer);
     UsbKeyboardDevice->RepeatTimer = NULL;
   }
 
-  Status = gBS->CreateEvent (
-                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  USBKeyboardRepeatHandler,
-                  UsbKeyboardDevice,
-                  &UsbKeyboardDevice->RepeatTimer
-                  );
+  gBS->CreateEvent (
+         EVT_TIMER | EVT_NOTIFY_SIGNAL,
+         TPL_NOTIFY,
+         USBKeyboardRepeatHandler,
+         UsbKeyboardDevice,
+         &UsbKeyboardDevice->RepeatTimer
+         );
 
+  //
+  // Create event for delayed recovery, which deals with device error.
+  //
   if (UsbKeyboardDevice->DelayedRecoveryEvent != NULL) {
     gBS->CloseEvent (UsbKeyboardDevice->DelayedRecoveryEvent);
     UsbKeyboardDevice->DelayedRecoveryEvent = NULL;
   }
 
-  Status = gBS->CreateEvent (
-                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  USBKeyboardRecoveryHandler,
-                  UsbKeyboardDevice,
-                  &UsbKeyboardDevice->DelayedRecoveryEvent
-                  );
+  gBS->CreateEvent (
+         EVT_TIMER | EVT_NOTIFY_SIGNAL,
+         TPL_NOTIFY,
+         USBKeyboardRecoveryHandler,
+         UsbKeyboardDevice,
+         &UsbKeyboardDevice->DelayedRecoveryEvent
+         );
 
   return EFI_SUCCESS;
 }
