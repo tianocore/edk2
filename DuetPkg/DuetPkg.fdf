@@ -61,10 +61,6 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-APRIORI DXE {
-  INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-  }
-
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
@@ -73,7 +69,6 @@ INF  DuetPkg/FSVariable/FSVariable.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
 INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
@@ -101,28 +96,28 @@ INF  IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
 INF  IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 
   # IDE Support
-  #IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
+#IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   
   # Usb Support
-INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+#INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+#INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+#INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+#INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   
   # ISA Support
 INF  DuetPkg/IsaAcpiDxe/IsaAcpi.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
-#INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
+INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 
-#INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-#INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-#INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 
-#FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-#  SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
-#  }
+FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
+  SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
+  }
 
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {

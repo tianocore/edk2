@@ -109,7 +109,11 @@ EfiLoader (
     PrintString (PrintBuffer);
     SystemHang();
   }
-
+  
+  AsciiSPrint (PrintBuffer, 256, "BFV decompress: DestinationSize=0x%X, ScratchSize=0x%X!\n",
+               DestinationSize, ScratchSize);
+  PrintString (PrintBuffer);
+  
   Status = TianoDecompress (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
