@@ -2493,9 +2493,9 @@ DoAtaUdma (
                         );
 
     if (UdmaOp == AtaUdmaReadExtOp || UdmaOp == AtaUdmaReadOp) {
-      RegisterValue |= BMIC_nREAD;
+      RegisterValue |= BMIC_NREAD;
     } else {
-      RegisterValue &= ~((UINT8) BMIC_nREAD);
+      RegisterValue &= ~((UINT8) BMIC_NREAD);
     }
 
     IdeDev->PciIo->Io.Write (

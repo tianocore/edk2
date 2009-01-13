@@ -144,7 +144,7 @@ LoadOpRomImage (
   UINT16                    OffsetPcir;
   UINT32                    RomBarOffset;
   UINT32                    RomBar;
-  EFI_STATUS                retStatus;
+  EFI_STATUS                RetStatus;
   BOOLEAN                   FirstCheck;
   UINT8                     *Image;
   PCI_EXPANSION_ROM_HEADER  *RomHeader;
@@ -201,7 +201,7 @@ LoadOpRomImage (
   RomDecode (PciDevice, RomBarIndex, RomBar, TRUE);
 
   RomBarOffset  = RomBar;
-  retStatus     = EFI_NOT_FOUND;
+  RetStatus     = EFI_NOT_FOUND;
   FirstCheck    = TRUE;
 
   do {
@@ -249,7 +249,7 @@ LoadOpRomImage (
   }
 
   if (RomImageSize > 0) {
-    retStatus = EFI_SUCCESS;
+    RetStatus = EFI_SUCCESS;
     Image     = AllocatePool ((UINT32) RomImageSize);
     if (Image == NULL) {
       RomDecode (PciDevice, RomBarIndex, RomBar, FALSE);
@@ -296,7 +296,7 @@ LoadOpRomImage (
   gBS->FreePool (RomHeader);
   gBS->FreePool (RomPcir);
 
-  return retStatus;
+  return RetStatus;
 }
 
 /**
@@ -401,7 +401,7 @@ ProcessOpRomImage (
   UINT8                         *RomBarOffset;
   EFI_HANDLE                    ImageHandle;
   EFI_STATUS                    Status;
-  EFI_STATUS                    retStatus;
+  EFI_STATUS                    RetStatus;
   BOOLEAN                       FirstCheck;
   BOOLEAN                       SkipImage;
   UINT32                        DestinationSize;
@@ -422,7 +422,7 @@ ProcessOpRomImage (
   //
   RomBar        = PciDevice->PciIo.RomImage;
   RomBarOffset  = (UINT8 *) RomBar;
-  retStatus     = EFI_NOT_FOUND;
+  RetStatus     = EFI_NOT_FOUND;
   FirstCheck    = TRUE;
 
   do {
@@ -542,7 +542,7 @@ ProcessOpRomImage (
                 (UINT64) (UINTN) PciDevice->PciIo.RomImage,
                 PciDevice->PciIo.RomSize
                 );
-              retStatus = EFI_SUCCESS;
+              RetStatus = EFI_SUCCESS;
             }
           }
         }
@@ -557,7 +557,7 @@ ProcessOpRomImage (
 
   } while (((Indicator & 0x80) == 0x00) && ((UINTN) (RomBarOffset - (UINT8 *) RomBar) < PciDevice->RomSize));
 
-  return retStatus;
+  return RetStatus;
 
 }
 

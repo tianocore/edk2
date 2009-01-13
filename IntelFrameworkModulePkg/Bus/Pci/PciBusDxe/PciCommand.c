@@ -89,7 +89,7 @@ PciCapabilitySupport (
   )
 {
 
-  if (PciIoDevice->Pci.Hdr.Status & EFI_PCI_STATUS_CAPABILITY) {
+  if ((PciIoDevice->Pci.Hdr.Status & EFI_PCI_STATUS_CAPABILITY) != 0) {
     return TRUE;
   }
 
