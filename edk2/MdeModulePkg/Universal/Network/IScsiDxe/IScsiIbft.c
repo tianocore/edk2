@@ -436,7 +436,7 @@ IScsiFillNICAndTargetSections (
 **/
 VOID
 IScsiPublishIbft (
-  VOID  
+  VOID
   )
 {
   EFI_STATUS                                Status;

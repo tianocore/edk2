@@ -51,10 +51,10 @@ extern UINT8  IScsiDxeStrings[];
   If ISCSI_FORM_CALLBACK_INFO_SIGNATURE does not contain a field called Signature, 
   then the module will not compile.
 
-  @param  Callback       Pointer to the specified field within the data 
+  @param   Callback      Pointer to the specified field within the data 
                          structure ISCSI_FORM_CALLBACK_INFO.
-  @return                a pointer to the pointer to a data structure ISCSI_FORM_CALLBACK_INFO.
-  @return  Others        Some unexpected error happened.
+  @return  A pointer to the pointer to a data structure ISCSI_FORM_CALLBACK_INFO.
+  @retval  Others        Some unexpected error happened.
 **/
 
 #define ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK(Callback) \

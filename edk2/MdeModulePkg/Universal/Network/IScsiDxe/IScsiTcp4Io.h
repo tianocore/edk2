@@ -1,5 +1,5 @@
 /** @file
-  IScsi Tcp4 IO related definitions.
+  iSCSI Tcp4 IO related definitions.
 
 Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials

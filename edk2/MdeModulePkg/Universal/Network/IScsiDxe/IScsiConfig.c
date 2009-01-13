@@ -1,5 +1,5 @@
 /** @file
-  Helper functions for configuring or getting the parameters relating to ISCSI.
+  Helper functions for configuring or getting the parameters relating to iSCSI.
 
 Copyright (c) 2004 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -398,7 +398,7 @@ IScsiFormExtractConfig (
   driver followed by name / value configuration pairs. The driver
   must apply those pairs to its configurable storage. If the
   driver's configuration is stored in a linear block of data
-  and the driver????s name / value pairs are in <BlockConfig>
+  and the driver's name / value pairs are in <BlockConfig>
   format, it may use the ConfigToBlock helper function (above) to
   simplify the job. Currently not implemented.
 

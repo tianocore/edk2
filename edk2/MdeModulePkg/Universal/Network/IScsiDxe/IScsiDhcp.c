@@ -1,5 +1,5 @@
 /** @file
-  ISci DHCP related configuration routines.
+  iSCSI DHCP related configuration routines.
 
 Copyright (c) 2004 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
