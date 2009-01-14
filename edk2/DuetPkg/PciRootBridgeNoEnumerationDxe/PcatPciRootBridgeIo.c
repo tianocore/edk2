@@ -290,7 +290,9 @@ PcatRootBridgeIoPollMem (
     return EFI_SUCCESS;
   }
 
-  if ( Delay != 0 ) {
+  if (Delay == 0) {
+    return EFI_SUCCESS;
+  } else {
 
     NumberOfTicks = DivU64x32Remainder (Delay, 100, &Remainder);
     if ( Remainder !=0 ) {
@@ -351,7 +353,9 @@ PcatRootBridgeIoPollIo (
     return EFI_SUCCESS;
   }
 
-  if (Delay != 0) {
+  if (Delay == 0) {
+    return EFI_SUCCESS;
+  } else {
 
     NumberOfTicks = DivU64x32Remainder (Delay, 100, &Remainder);
     if ( Remainder !=0 ) {
