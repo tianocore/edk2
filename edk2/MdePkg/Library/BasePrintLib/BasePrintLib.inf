@@ -40,4 +40,4 @@
 [LibraryClasses]
   DebugLib
   BaseLib
-
+  BaseMemoryLib
