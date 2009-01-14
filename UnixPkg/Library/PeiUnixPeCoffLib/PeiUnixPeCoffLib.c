@@ -68,7 +68,7 @@ PeiUnixPeCoffLibConstructor (
                &gEfiPeiPeCoffLoaderGuid,
                0,
                NULL,
-               &mPeiEfiPeiPeCoffLoader
+               (VOID **) &mPeiEfiPeiPeCoffLoader
                );
      //
     // PeCofferLoader guid structure must be installed before this library runs.
