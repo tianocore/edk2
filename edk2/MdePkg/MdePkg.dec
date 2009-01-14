@@ -2,7 +2,7 @@
 #
 # This Package provides all definitions(including functions, MACROs, structures and library classes)
 # and libraries instances, which are defined in MDE Specification.
-# It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of 
+# It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
 # EFI1.10/UEFI2.0/UEFI2.1/PI1.0 and some Industry Standards.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation.
@@ -12,7 +12,7 @@
 # the terms and conditions of the BSD License which accompanies this distribution.
 # The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
-# 
+#
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -42,7 +42,7 @@
   Include/Ebc
 
 [LibraryClasses.common]
-  ##  @libraryclass  Provides most usb APIs to support the Hid requests defined in Usb Hid 1.1 spec 
+  ##  @libraryclass  Provides most usb APIs to support the Hid requests defined in Usb Hid 1.1 spec
   #                  and the standard requests defined in Usb 1.1 spec.
   ##
   UefiUsbLib|Include/Library/UefiUsbLib.h
@@ -77,7 +77,7 @@
   TimerLib|Include/Library/TimerLib.h
 
   ##  @libraryclass  Provides library functions to access SMBUS devices.
-  #                  Libraries of this class must be ported to a specific SMBUS controller. 
+  #                  Libraries of this class must be ported to a specific SMBUS controller.
   SmbusLib|Include/Library/SmbusLib.h
 
   ##  @libraryclass  Provides the functions to submit Scsi commands defined in SCSI-2 specification for scsi device.
@@ -164,7 +164,7 @@
   ##  @libraryclass  Provides services to maintain instruction and data caches.
   CacheMaintenanceLib|Include/Library/CacheMaintenanceLib.h
 
-  ##  @libraryclass  Provides copy memory, fill memory, zero memory, and GUID functions. 
+  ##  @libraryclass  Provides copy memory, fill memory, zero memory, and GUID functions.
   BaseMemoryLib|Include/Library/BaseMemoryLib.h
 
   ##  @libraryclass  Provides string functions, linked list functions, math functions, synchronization functions
@@ -180,7 +180,7 @@
 
   ##  @libraryclass  Provides a set of PI library functions and macros for DXE phase.
   DxeServicesLib|Include/Library/DxeServicesLib.h
-  
+
 [LibraryClasses.IPF]
   ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
   SalLib|Include/Library/SalLib.h
@@ -227,6 +227,8 @@
   gEfiEventMemoryMapChangeGuid   = { 0x78BEE926, 0x692F, 0x48FD, { 0x9E, 0xDB, 0x01, 0x42, 0x2E, 0xF0, 0xD7, 0xAB }}
   gEfiEventVirtualAddressChangeGuid = { 0x13FA7698, 0xC831, 0x49C7, { 0x87, 0xEA, 0x8F, 0x43, 0xFC, 0xC2, 0x51, 0x96 }}
   gEfiEventExitBootServicesGuid  = { 0x27ABF055, 0xB1B8, 0x4C26, { 0x80, 0x48, 0x74, 0x8F, 0x37, 0xBA, 0xA2, 0xDF }}
+  gEfiDebugPortVariableGuid      = { 0xEBA4E8D2, 0x3858, 0x41EC, { 0xA2, 0x81, 0x26, 0x47, 0xBA, 0x96, 0x60, 0xD0 }}
+  gEfiDebugPortDevicePathGuid    = { 0xEBA4E8D2, 0x3858, 0x41EC, { 0xA2, 0x81, 0x26, 0x47, 0xBA, 0x96, 0x60, 0xD0 }}
 
   #
   # GUID defined in PI1.0
@@ -383,16 +385,16 @@
 [PcdsFeatureFlag.common]
   ## If TRUE, the component name protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
-  
+
   ## If TRUE, the driver diagnostics protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE|BOOLEAN|0x0000000e
-  
+
   ## If TRUE, the component name2 protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE|BOOLEAN|0x000000010
-  
+
   ## If TRUE, the driver diagnostics2 protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE|BOOLEAN|0x00000011
-  
+
   ## Indicates whether EFI 1.1 ISO 639-2 language supports are obsolete
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE|BOOLEAN|0x00000012             .
 
@@ -402,25 +404,25 @@
 [PcdsFixedAtBuild.common]
   ## Indicates the maximum length of unicode string
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
-  
+
   ## Indicates the maximum length of ascii string
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000|UINT32|0x00000002
-  
+
   ## Indicates the maximum node number of linked list
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000|UINT32|0x00000003
-  
+
   ## Indicates the timeout tick of holding spin lock
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000|UINT32|0x00000004
-  
+
   ## The mask is used to control DebugLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0|UINT8|0x00000005
-  
+
   ## This flag is used to control the printout of DebugLib
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0|UINT32|0x00000006
-  
+
   ## The mask is used to control ReportStatusCodeLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0|UINT8|0x00000007
-  
+
   ## This value is used to fill a segment of memory
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF|UINT8|0x00000008
 
@@ -429,18 +431,18 @@
 
   ## This value is used to set the base address of pci express hierarchy
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
-  
+
   ## The mask is used to control PostCodeLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
-  
+
   ## This value is used to set the FSB clock
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
-  
+
   ## The maxium allowable size of formatted unicode string
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320|UINT32|0x101
-  
+
   ## Status code value for indicating a watchdog timer is expired
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003|UINT32|0x00000013   
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003|UINT32|0x00000013
 
   ## Status code value for indicating the invocation of SetVirtualAddressMap()
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap|0x03101004|UINT32|0x00000014
@@ -468,7 +470,7 @@
 
   ## Status code value for indicating the enable of mouse device
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable|0x01020004|UINT32|0x30001001
-  
+
   ## Status code value for indicating the disable of mouse device
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable|0x01020002|UINT32|0x30001002
 
@@ -507,32 +509,32 @@
 
   ## Default current ISO 639-2 language: English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-  
+
   ## Default platform supported RFC 3066 languages: (American) English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
-  
+
   ## Defualt current RFC 3066 language: (American) English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
-  
+
   ## Default current ISO 639-2 language: English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
-  
+
   ## Indicates the default baud rate of UART
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
-  
+
   ## Indicates the number of efficient data bit in UART transaction
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
-  
+
   ## Indicates the setting of data parity in UART transaction
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
-  
+
   ## Indicates the setting of stop bit in UART transaction
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
-  
+
   ## Indicates the usable type of terminal
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024  
-  
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
+
   ## Status code value for indicating the handoff from Pei phase to Dxe phase
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3031001|UINT32|0x3000100d
 
@@ -570,16 +572,16 @@
 
   ## Default current ISO 639-2 language: English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
-  
+
   ## Default current ISO 639-2 language: English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-  
+
   ## Default platform supported RFC 3066 languages: (American) English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
-  
+
   ## Defualt current RFC 3066 language: (American) English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
-  
+
   ## Indicates the default baud rate of UART
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
 
@@ -605,7 +607,7 @@
 
   ## Default current ISO 639-2 language: English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-  
+
   ## Default platform supported RFC 3066 languages: (American) English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
 
@@ -627,6 +629,6 @@
   ## Indicates the usable type of terminal
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
-  
+
   ## This value is used to set the base address of pci express hierarchy
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a

@@ -21,7 +21,7 @@
   BASE_NAME                      = DebugPortDxe
   FILE_GUID                      = 73E9457A-CEA1-4917-9A9C-9F1F0F0FD322
   MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.0 
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializeDebugPortDriver
   UNLOAD_IMAGE                   = ImageUnloadHandler
 
@@ -57,13 +57,12 @@
   UefiDriverEntryPoint
   DebugLib
 
+[Guids]
+  gEfiDebugPortVariableGuid                     ## SOMETIMES_CONSUMES ## Variable:L"DEBUGPORT"
+  gEfiDebugPortDevicePathGuid                   ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]
-  gEfiSerialIoProtocolGuid                      # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
-  gEfiDebugPortProtocolGuid                     # PROTOCOL BY_START
-
-
-[Depex]
-  TRUE
+  gEfiSerialIoProtocolGuid                      ## TO_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+  gEfiDebugPortProtocolGuid                     ## BY_START
 
