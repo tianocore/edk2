@@ -44,6 +44,7 @@
 [LibraryClasses]
   DebugLib
   HobLib
+  PeiServicesLib
 
 [Guids]
   gEfiPeiPeCoffLoaderGuid                # ALWAYS_CONSUMED
