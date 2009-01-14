@@ -49,6 +49,7 @@
 [LibraryClasses.IA32, LibraryClasses.X64]
   PcdLib
   IoLib
+  DebugLib
 
 [LibraryClasses.IPF]
   PalLib
