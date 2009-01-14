@@ -105,6 +105,7 @@ InternalX86Delay (
   )
 {
   INT32                             Ticks;
+  UINT32                            PowerOfTwoCounter;
 
   //
   // The target timer count is calculated here
@@ -116,7 +117,8 @@ InternalX86Delay (
   // Delay > 2^31 could not be handled by this function
   // Timer wrap-arounds are handled correctly by this function
   //
-  while (((UINT32)(InternalX86GetTimerTick (ApicBase) - Ticks) & GetPowerOfTwo32 ((MmioRead32 (ApicBase + APIC_TMICT)))) == 0) {
+  PowerOfTwoCounter = GetPowerOfTwo32 (MmioRead32 (ApicBase + APIC_TMICT));
+  while (((UINT32)(InternalX86GetTimerTick (ApicBase) - Ticks) & PowerOfTwoCounter) == 0) {
     CpuPause ();
   }
 }
