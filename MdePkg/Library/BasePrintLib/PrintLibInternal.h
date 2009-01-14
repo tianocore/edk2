@@ -19,6 +19,7 @@
 #include <Library/PrintLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
 
 
 //
@@ -138,7 +139,7 @@ BasePrintLibFillBuffer (
   Print worker function that convert a decimal number to a string in Buffer.
 
   @param  Buffer    Location to place the Unicode or ASCII string of Value.
-  @param  Value     Value to convert to a Decimal or Hexidecimal string in Buffer.
+  @param  Value     Value to convert to a Decimal or Hexadecimal string in Buffer.
   @param  Radix     Radix of the value
 
   @return Number of characters printed.
