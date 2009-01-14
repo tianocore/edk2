@@ -1425,7 +1425,7 @@ ConSplitterTextInSetState (
                                    successfully.
   @retval EFI_OUT_OF_RESOURCES     Unable to allocate resources for necesssary data
                                    structures.
-  @retval EFI_INVALID_PARAMETER    KeyData or NotifyHandle is NULL.
+  @retval EFI_INVALID_PARAMETER    KeyData or KeyNotificationFunction or NotifyHandle is NULL.
 
 **/
 EFI_STATUS
@@ -1459,7 +1459,8 @@ ConSplitterTextInUnregisterKeyNotify (
   );
 
 /**
-  This event agregates all the events of the ConIn devices in the spliter.
+  This event aggregates all the events of the ConIn devices in the spliter.
+
   If the ConIn is password locked then return.
   If any events of physical ConIn devices are signaled, signal the ConIn
   spliter event. This will cause the calling code to call
@@ -1490,10 +1491,12 @@ ConSpliterConssoleControlStdInLocked (
   );
 
 /**
-  This timer event will fire when StdIn is locked. It will check the key
-  sequence on StdIn to see if it matches the password. Any error in the
-  password will cause the check to reset. As long a mConIn.PasswordEnabled is
-  TRUE the StdIn splitter will not report any input.
+  Record and check key sequence on StdIn.
+
+  This timer event will fire when StdIn is locked. It will record the key sequence
+  on StdIn and also check to see if it matches the password. Any error in the
+  password will cause the check to reset. As long as a mConIn.PasswordEnabled is
+  TRUE, the StdIn splitter will not report any input.
 
   @param  Event                  The Event this notify function registered to.
   @param  Context                Pointer to the context data registerd to the
@@ -2197,20 +2200,17 @@ DevNullTextOutClearScreen (
   );
 
 /**
-  Sets the current coordinates of the cursor position.
+  Sets the current coordinates of the cursor position on NULL device.
 
-  @param  Private                 Text Out Splitter pointer.
-  @param  Column
-  @param  Row                     the position to set the cursor to. Must be
-                                  greater than or equal to zero and less than the
-                                  number of columns and rows by QueryMode ().
+  @param  Private                  Text Out Splitter pointer.
+  @param  Column                   The column position to set the cursor to. Must be
+                                   greater than or equal to zero and less than the
+                                   number of columns by QueryMode ().
+  @param  Row                      The row position to set the cursor to. Must be
+                                   greater than or equal to zero and less than the
+                                   number of rows by QueryMode ().
 
-  @retval EFI_SUCCESS             The operation completed successfully.
-  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
-                                  the request.
-  @retval EFI_UNSUPPORTED         The output device is not in a valid text mode, or
-                                  the cursor position is invalid for the current
-                                  mode.
+  @retval EFI_SUCCESS              Always returned.
 
 **/
 EFI_STATUS
@@ -2221,13 +2221,13 @@ DevNullTextOutSetCursorPosition (
   );
 
 /**
-  Set cursor visibility property.
+  Set cursor visibility property on NULL device.
 
   @param  Private                 Text Out Splitter pointer.
   @param  Visible                 If TRUE, the cursor is set to be visible, If
                                   FALSE, the cursor is set to be invisible.
 
-  @retval EFI_SUCCESS             Returns always.
+  @retval EFI_SUCCESS             Always returned.
 
 **/
 EFI_STATUS

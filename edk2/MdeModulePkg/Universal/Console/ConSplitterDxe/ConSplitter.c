@@ -2686,9 +2686,13 @@ ConSplitterAddGraphicsOutputMode (
         //
         // This is the first Graphics Output device added
         //
-        CopyMem (CurrentGraphicsOutputMode, GraphicsOutput->Mode, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE));
+        CurrentGraphicsOutputMode->MaxMode = GraphicsOutput->Mode->MaxMode;
+        CurrentGraphicsOutputMode->Mode = GraphicsOutput->Mode->Mode;
         CopyMem (CurrentGraphicsOutputMode->Info, GraphicsOutput->Mode->Info, GraphicsOutput->Mode->SizeOfInfo);
-
+        CurrentGraphicsOutputMode->SizeOfInfo = GraphicsOutput->Mode->SizeOfInfo;
+        CurrentGraphicsOutputMode->FrameBufferBase = GraphicsOutput->Mode->FrameBufferBase;
+        CurrentGraphicsOutputMode->FrameBufferSize = GraphicsOutput->Mode->FrameBufferSize;
+  
         //
         // Allocate resource for the private mode buffer
         //
@@ -3389,10 +3393,12 @@ ConSpliterConssoleControlStdInLocked (
 
 
 /**
-  This timer event will fire when StdIn is locked. It will check the key
-  sequence on StdIn to see if it matches the password. Any error in the
-  password will cause the check to reset. As long a mConIn.PasswordEnabled is
-  TRUE the StdIn splitter will not report any input.
+  Record and check key sequence on StdIn.
+
+  This timer event will fire when StdIn is locked. It will record the key sequence
+  on StdIn and also check to see if it matches the password. Any error in the
+  password will cause the check to reset. As long as a mConIn.PasswordEnabled is
+  TRUE, the StdIn splitter will not report any input.
 
   @param  Event                  The Event this notify function registered to.
   @param  Context                Pointer to the context data registerd to the
@@ -3414,9 +3420,12 @@ ConSpliterConsoleControlLockStdInEvent (
     Status = ConSplitterTextInPrivateReadKeyStroke (&mConIn, &Key);
     if (!EFI_ERROR (Status)) {
       //
-      // if it's an ENTER, match password
+      // If key read successfully
       //
       if ((Key.UnicodeChar == CHAR_CARRIAGE_RETURN) && (Key.ScanCode == SCAN_NULL)) {
+        //
+        // If it's an ENTER, match password
+        //
         mConIn.PwdAttempt[mConIn.PwdIndex] = CHAR_NULL;
         if (StrCmp (mConIn.Password, mConIn.PwdAttempt) != 0) {
           //
@@ -3451,7 +3460,8 @@ ConSpliterConsoleControlLockStdInEvent (
         }
       } else if ((Key.ScanCode == SCAN_NULL) && (Key.UnicodeChar >= 32)) {
         //
-        // If it's not an ENTER, neigher a function key, nor a CTRL-X or ALT-X, record the input
+        // If it's not an ENTER, neigher a function key, nor a CTRL-X or ALT-X, record the input,
+        // value 32 stands for a Blank Space key.
         //
         if (mConIn.PwdIndex < (MAX_STD_IN_PASSWORD - 1)) {
           if (mConIn.PwdIndex == 0) {
@@ -3504,7 +3514,7 @@ ConSpliterConsoleControlLockStdIn (
   mConIn.PasswordEnabled  = TRUE;
   mConIn.PwdIndex         = 0;
   //
-  // Timer Periodic is 25ms.
+  // Lock Timer Periodic is 25ms.
   //
   gBS->SetTimer (mConIn.LockEvent, TimerPeriodic, 10000 * 25);
 
@@ -3550,7 +3560,8 @@ ConSplitterTextInReadKeyStroke (
 
 
 /**
-  This event agregates all the events of the ConIn devices in the spliter.
+  This event aggregates all the events of the ConIn devices in the spliter.
+
   If the ConIn is password locked then return.
   If any events of physical ConIn devices are signaled, signal the ConIn
   spliter event. This will cause the calling code to call
@@ -3572,6 +3583,7 @@ ConSplitterTextInWaitForKey (
   UINTN                         Index;
 
   Private = (TEXT_IN_SPLITTER_PRIVATE_DATA *) Context;
+
   if (Private->PasswordEnabled) {
     //
     // If StdIn Locked return not ready
@@ -3579,15 +3591,16 @@ ConSplitterTextInWaitForKey (
     return ;
   }
 
-  //
-  // if KeyEventSignalState is flagged before, and not cleared by Reset() or ReadKeyStroke()
-  //
   if (Private->KeyEventSignalState) {
+    //
+    // If KeyEventSignalState is flagged before, and not cleared by Reset() or ReadKeyStroke()
+    //
     gBS->SignalEvent (Event);
     return ;
   }
+
   //
-  // if any physical console input device has key input, signal the event.
+  // If any physical console input device has key input, signal the event.
   //
   for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
     Status = gBS->CheckEvent (Private->TextInList[Index]->WaitForKey);
@@ -3822,7 +3835,7 @@ ConSplitterTextInSetState (
                                    successfully.
   @retval EFI_OUT_OF_RESOURCES     Unable to allocate resources for necesssary data
                                    structures.
-  @retval EFI_INVALID_PARAMETER    KeyData or NotifyHandle is NULL.
+  @retval EFI_INVALID_PARAMETER    KeyData or KeyNotificationFunction or NotifyHandle is NULL.
 
 **/
 EFI_STATUS
@@ -3849,7 +3862,7 @@ ConSplitterTextInRegisterKeyNotify (
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   //
-  // if no physical console input device exists,
+  // If no physical console input device exists,
   // return EFI_SUCCESS directly.
   //
   if (Private->CurrentNumberOfExConsoles <= 0) {
