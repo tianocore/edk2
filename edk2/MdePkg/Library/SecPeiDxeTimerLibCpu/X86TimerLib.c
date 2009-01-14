@@ -17,9 +17,10 @@
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
+#include <Library/DebugLib.h>
 
 #define APIC_LVTERR     0x370
-#define APIC_TMICT      0x380   
+#define APIC_TMICT      0x380
 #define APIC_TMCCT      0x390
 #define APIC_TDCR       0x3e0
 
@@ -115,7 +116,9 @@ InternalX86Delay (
   // Delay > 2^31 could not be handled by this function
   // Timer wrap-arounds are handled correctly by this function
   //
-  while (InternalX86GetTimerTick (ApicBase) - Ticks >= 0);
+  while (((UINT32)(InternalX86GetTimerTick (ApicBase) - Ticks) & GetPowerOfTwo32 ((MmioRead32 (ApicBase + APIC_TMICT)))) == 0) {
+    CpuPause ();
+  }
 }
 
 /**
@@ -238,6 +241,10 @@ GetPerformanceCounterProperties (
 
   if (StartValue != NULL) {
     *StartValue = MmioRead32 (ApicBase + APIC_TMICT);
+    //
+    // make sure StartValue is all 1s from High Bit
+    //
+    ASSERT ((*StartValue & (*StartValue + 1)) == 0);
   }
 
   if (EndValue != NULL) {
