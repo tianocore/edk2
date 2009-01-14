@@ -106,7 +106,7 @@ Returns:
         // For the first area register it as PEI tested memory
         //
         Status = MemoryTestPpi->BaseMemoryTest (
-                                  PeiServices,
+                                  (EFI_PEI_SERVICES **) PeiServices,
                                   MemoryTestPpi,
                                   MemoryBase,
                                   MemorySize,
