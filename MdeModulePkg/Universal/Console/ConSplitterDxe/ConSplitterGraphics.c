@@ -1471,7 +1471,7 @@ DevNullTextOutSetMode (
   Row     = Mode->Rows;
   Column  = Mode->Columns;
 
-  if (Row <= 0 && Column <= 0) {
+  if (Row == 0 || Column == 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1558,20 +1558,17 @@ DevNullTextOutClearScreen (
 
 
 /**
-  Sets the current coordinates of the cursor position.
+  Sets the current coordinates of the cursor position on NULL device.
 
-  @param  Private                 Text Out Splitter pointer.
-  @param  Column
-  @param  Row                     the position to set the cursor to. Must be
-                                  greater than or equal to zero and less than the
-                                  number of columns and rows by QueryMode ().
+  @param  Private                  Text Out Splitter pointer.
+  @param  Column                   The column position to set the cursor to. Must be
+                                   greater than or equal to zero and less than the
+                                   number of columns by QueryMode ().
+  @param  Row                      The row position to set the cursor to. Must be
+                                   greater than or equal to zero and less than the
+                                   number of rows by QueryMode ().
 
-  @retval EFI_SUCCESS             The operation completed successfully.
-  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
-                                  the request.
-  @retval EFI_UNSUPPORTED         The output device is not in a valid text mode, or
-                                  the cursor position is invalid for the current
-                                  mode.
+  @retval EFI_SUCCESS              Always returned.
 
 **/
 EFI_STATUS
@@ -1594,13 +1591,13 @@ DevNullTextOutSetCursorPosition (
 
 
 /**
-  Set cursor visibility property.
+  Set cursor visibility property on NULL device.
 
   @param  Private                 Text Out Splitter pointer.
   @param  Visible                 If TRUE, the cursor is set to be visible, If
                                   FALSE, the cursor is set to be invisible.
 
-  @retval EFI_SUCCESS             Returns always.
+  @retval EFI_SUCCESS             Always returned.
 
 **/
 EFI_STATUS
