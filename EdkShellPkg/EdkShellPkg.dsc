@@ -24,6 +24,10 @@
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
+# 
+# Change the macro to the directory containing the source code from EDK Shell Project.
+#  
+DEFINE EDK_SHELL_DIR             = Shell
 
 [Libraries]
   #
@@ -68,63 +72,63 @@
   #
   # Shell Library
   #
-  EdkShellPkg/Shell/Library/EfiShellLib.inf
+  $(EDK_SHELL_DIR)/Library/EfiShellLib.inf
 
 
 [Components]
   #
   # Shell.inf & ShellFull.inf can not be included at once to avoid over
   #
-  EdkShellPkg/Shell/Shell.inf
-  EdkShellPkg/Shell/ShellFull.inf
-  EdkShellPkg/Shell/attrib/attrib.inf
-  EdkShellPkg/Shell/cls/cls.inf
-  EdkShellPkg/Shell/comp/comp.inf
-  EdkShellPkg/Shell/cp/cp.inf
-  EdkShellPkg/Shell/date/date.inf
-  EdkShellPkg/Shell/dblk/dblk.inf
-  EdkShellPkg/Shell/devices/devices.inf
-  EdkShellPkg/Shell/DeviceTree/devicetree.inf
-  EdkShellPkg/Shell/dmem/dmem.inf
-  EdkShellPkg/Shell/dmpstore/dmpstore.inf
-  EdkShellPkg/Shell/drivers/drivers.inf
-  EdkShellPkg/Shell/drvcfg/drvcfg.inf
-  EdkShellPkg/Shell/drvdiag/drvdiag.inf
-  EdkShellPkg/Shell/edit/edit.inf
-  EdkShellPkg/Shell/EfiCompress/compress.inf
-  EdkShellPkg/Shell/EfiDecompress/Decompress.inf
-  EdkShellPkg/Shell/err/err.inf
-  EdkShellPkg/Shell/guid/guid.inf
-  EdkShellPkg/Shell/hexedit/hexedit.inf
-  EdkShellPkg/Shell/IfConfig/IfConfig.inf
-  EdkShellPkg/Shell/IpConfig/IpConfig.inf
-  EdkShellPkg/Shell/load/load.inf
-  EdkShellPkg/Shell/LoadPciRom/LoadPciRom.inf
-  EdkShellPkg/Shell/ls/ls.inf
-  EdkShellPkg/Shell/mem/mem.inf
-  EdkShellPkg/Shell/memmap/memmap.inf
-  EdkShellPkg/Shell/mkdir/mkdir.inf
-  EdkShellPkg/Shell/mm/mm.inf
-  EdkShellPkg/Shell/mode/mode.inf
-  EdkShellPkg/Shell/mount/mount.inf
-  EdkShellPkg/Shell/mv/mv.inf
-  EdkShellPkg/Shell/newshell/nshell.inf
-  EdkShellPkg/Shell/openinfo/openinfo.inf
-  EdkShellPkg/Shell/pci/pci.inf
-  EdkShellPkg/Shell/Ping/Ping.inf
-  EdkShellPkg/Shell/reset/reset.inf
-  EdkShellPkg/Shell/rm/rm.inf
-  EdkShellPkg/Shell/sermode/sermode.inf
-  EdkShellPkg/Shell/SmbiosView/Smbiosview.inf
-  EdkShellPkg/Shell/stall/stall.inf
-  EdkShellPkg/Shell/TelnetMgmt/TelnetMgmt.inf
-  EdkShellPkg/Shell/time/time.inf
-  EdkShellPkg/Shell/touch/touch.inf
-  EdkShellPkg/Shell/type/type.inf
-  EdkShellPkg/Shell/tzone/timezone.inf
-  EdkShellPkg/Shell/unload/unload.inf
-  EdkShellPkg/Shell/ver/Ver.inf
-  EdkShellPkg/Shell/vol/Vol.inf
+  $(EDK_SHELL_DIR)/Shell.inf
+  $(EDK_SHELL_DIR)/ShellFull.inf
+  $(EDK_SHELL_DIR)/attrib/attrib.inf
+  $(EDK_SHELL_DIR)/cls/cls.inf
+  $(EDK_SHELL_DIR)/comp/comp.inf
+  $(EDK_SHELL_DIR)/cp/cp.inf
+  $(EDK_SHELL_DIR)/date/date.inf
+  $(EDK_SHELL_DIR)/dblk/dblk.inf
+  $(EDK_SHELL_DIR)/devices/devices.inf
+  $(EDK_SHELL_DIR)/DeviceTree/devicetree.inf
+  $(EDK_SHELL_DIR)/dmem/dmem.inf
+  $(EDK_SHELL_DIR)/dmpstore/dmpstore.inf
+  $(EDK_SHELL_DIR)/drivers/drivers.inf
+  $(EDK_SHELL_DIR)/drvcfg/drvcfg.inf
+  $(EDK_SHELL_DIR)/drvdiag/drvdiag.inf
+  $(EDK_SHELL_DIR)/edit/edit.inf
+  $(EDK_SHELL_DIR)/EfiCompress/compress.inf
+  $(EDK_SHELL_DIR)/EfiDecompress/Decompress.inf
+  $(EDK_SHELL_DIR)/err/err.inf
+  $(EDK_SHELL_DIR)/guid/guid.inf
+  $(EDK_SHELL_DIR)/hexedit/hexedit.inf
+  $(EDK_SHELL_DIR)/IfConfig/IfConfig.inf
+  $(EDK_SHELL_DIR)/IpConfig/IpConfig.inf
+  $(EDK_SHELL_DIR)/load/load.inf
+  $(EDK_SHELL_DIR)/LoadPciRom/LoadPciRom.inf
+  $(EDK_SHELL_DIR)/ls/ls.inf
+  $(EDK_SHELL_DIR)/mem/mem.inf
+  $(EDK_SHELL_DIR)/memmap/memmap.inf
+  $(EDK_SHELL_DIR)/mkdir/mkdir.inf
+  $(EDK_SHELL_DIR)/mm/mm.inf
+  $(EDK_SHELL_DIR)/mode/mode.inf
+  $(EDK_SHELL_DIR)/mount/mount.inf
+  $(EDK_SHELL_DIR)/mv/mv.inf
+  $(EDK_SHELL_DIR)/newshell/nshell.inf
+  $(EDK_SHELL_DIR)/openinfo/openinfo.inf
+  $(EDK_SHELL_DIR)/pci/pci.inf
+  $(EDK_SHELL_DIR)/Ping/Ping.inf
+  $(EDK_SHELL_DIR)/reset/reset.inf
+  $(EDK_SHELL_DIR)/rm/rm.inf
+  $(EDK_SHELL_DIR)/sermode/sermode.inf
+  $(EDK_SHELL_DIR)/SmbiosView/Smbiosview.inf
+  $(EDK_SHELL_DIR)/stall/stall.inf
+  $(EDK_SHELL_DIR)/TelnetMgmt/TelnetMgmt.inf
+  $(EDK_SHELL_DIR)/time/time.inf
+  $(EDK_SHELL_DIR)/touch/touch.inf
+  $(EDK_SHELL_DIR)/type/type.inf
+  $(EDK_SHELL_DIR)/tzone/timezone.inf
+  $(EDK_SHELL_DIR)/unload/unload.inf
+  $(EDK_SHELL_DIR)/ver/Ver.inf
+  $(EDK_SHELL_DIR)/vol/Vol.inf
 
 [BuildOptions]
   *_*_IA32_CC_FLAGS    = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00010000 /D TIANO_RELEASE_VERSION=0x00080006 /D EFI32
