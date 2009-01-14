@@ -61,17 +61,17 @@
 
 
 [Protocols]
-  gEfiDriverBindingProtocolGuid                 ## PRODUCES
-  gEfiSimpleTextOutProtocolGuid                 ## CONSUMES
-  gEfiGraphicsOutputProtocolGuid                ## CONSUMES
-  gEfiHiiFontProtocolGuid                       ## CONSUMES
-  gEfiUgaDrawProtocolGuid                       ## SOMETIMES_CONSUMES (Consumed if gEfiGraphicsOutputProtocolGuid not installed AND PcdUgaConsumeSupport set TRUE)
-  gEfiComponentNameProtocolGuid                 ## SOMETIMES_PRODUCES (User chooses to produce it AND PcdComponentNameDisable is set FALSE)
-  gEfiComponentName2ProtocolGuid                ## SOMETIMES_PRODUCES (User chooses to produce it AND PcdComponentName2Disable is set FALSE)
-  gEfiDriverConfigurationProtocolGuid           ## SOMETIMES_CONSUMES (User chooses to produce it)
-  gEfiDriverConfiguration2ProtocolGuid          ## SOMETIMES_CONSUMES (User chooses to produce it)
-  gEfiDriverDiagnosticsProtocolGuid             ## SOMETIMES_CONSUMES (User chooses to produce it AND PcdDriverDiagnosticsDisable is set FALSE)
-  gEfiDriverDiagnostics2ProtocolGuid            ## SOMETIMES_CONSUMES (User chooses to produce it AND PcdDriverDiagnostics2Disable is set FALSE)
+  gEfiDriverBindingProtocolGuid                   ## PRODUCES
+  gEfiSimpleTextOutProtocolGuid                   ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid                  ## CONSUMES
+  gEfiHiiFontProtocolGuid                         ## CONSUMES
+  gEfiUgaDrawProtocolGuid | PcdUgaConsumeSupport                 ## SOMETIMES_CONSUMES (Consumes if gEfiGraphicsOutputProtocolGuid uninstalled)
+  gEfiComponentNameProtocolGuid  | NOT PcdComponentNameDisable   ## SOMETIMES_PRODUCES (User chooses to produce it)
+  gEfiComponentName2ProtocolGuid | NOT PcdComponentName2Disable  ## SOMETIMES_PRODUCES (User chooses to produce it)
+  gEfiDriverConfigurationProtocolGuid                            ## SOMETIMES_CONSUMES (User chooses to produce it)
+  gEfiDriverConfiguration2ProtocolGuid                           ## SOMETIMES_CONSUMES (User chooses to produce it)
+  gEfiDriverDiagnosticsProtocolGuid | NOT PcdDriverDiagnosticsDisable  ## SOMETIMES_CONSUMES (User chooses to produce it)
+  gEfiDriverDiagnostics2ProtocolGuid| NOT PcdDriverDiagnostics2Disable ## SOMETIMES_CONSUMES (User chooses to produce it)
 
 
 [Pcd.common]
