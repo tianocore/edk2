@@ -80,8 +80,8 @@
 
 
 [Protocols]
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiDebugSupportProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
+  gEfiLoadedImageProtocolGuid                   ## CONSUMED
+  gEfiDebugSupportProtocolGuid                  ## PRODUCED
 
 
 [FeaturePcd.IA32]

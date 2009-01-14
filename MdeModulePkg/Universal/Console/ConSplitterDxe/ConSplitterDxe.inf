@@ -1,13 +1,13 @@
 #/** @file
 # This driver provides multi console supports.
 #
-# This driver acts as a virtual console, takes over the console I/O control from selected 
+# This driver acts as a virtual console, takes over the console I/O control from selected
 # standard console devices, and transmits console I/O to related console device drivers.
 # Consplitter could install Graphics Output protocol and/or UGA Draw protocol in system
 # table according PCD settings(PcdConOutGopSupport, and PcdConOutUgaSupport). It always
-# consumes Graphics Output protocol which is produced by display device, and consumes UGA Draw 
-# protocol which is produced by display device according to PcdUgaConsumeSupport value. 
-# Note: If only UGA Draw protocol is installed in system table, PcdUgaConsumeSupport 
+# consumes Graphics Output protocol which is produced by display device, and consumes UGA Draw
+# protocol which is produced by display device according to PcdUgaConsumeSupport value.
+# Note: If only UGA Draw protocol is installed in system table, PcdUgaConsumeSupport
 # should be set to TRUE.
 #
 # Copyright (c) 2006 - 2008, Intel Corporation
@@ -27,7 +27,7 @@
   BASE_NAME                      = ConSplitterDxe
   FILE_GUID                      = 408edcec-cf6d-477c-a5a8-b4844e3de281
   MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.0  
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = ConSplitterDriverEntry
 
 #
@@ -71,24 +71,25 @@
   PcdLib
 
 [Guids]
-  gEfiConsoleInDeviceGuid                       # ALWAYS_CONSUMED
-  gEfiStandardErrorDeviceGuid                   # ALWAYS_CONSUMED
-  gEfiConsoleOutDeviceGuid                      # ALWAYS_CONSUMED
-  gEfiPrimaryConsoleOutDeviceGuid               # ALWAYS_PRODUCED
-  gEfiPrimaryConsoleInDeviceGuid                # ALWAYS_PRODUCED
-  gEfiPrimaryStandardErrorDeviceGuid            # ALWAYS_PRODUCED
-  gSimpleTextInExNotifyGuid                     # ALWAYS_PRODUCED
-  gEfiGenericPlatformVariableGuid               # ALWAYS_CONSUMED
+  gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMED
+  gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMED
+  gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMED
+  gEfiPrimaryConsoleOutDeviceGuid               ## PRODUCED
+  gEfiPrimaryConsoleInDeviceGuid                ## PRODUCED
+  gEfiPrimaryStandardErrorDeviceGuid            ## PRODUCED
+  gSimpleTextInExNotifyGuid                     ## PRODUCED
+  gEfiGenericPlatformVariableGuid               ## SOMETIMES_CONSUMED ## Variable:L"ConOutMode"
 
 [Protocols]
-  gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
-  gEfiSimplePointerProtocolGuid                 # PROTOCOL ALWAYS_PRODUCED
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
-  gEfiSimpleTextOutProtocolGuid                 # PROTOCOL ALWAYS_PRODUCED
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
-  gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
-  gEfiAbsolutePointerProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
+  gEfiConsoleControlProtocolGuid                ## PRODUCED
+  gEfiSimplePointerProtocolGuid                 ## BY_START
+  gEfiAbsolutePointerProtocolGuid               ## BY_START
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiSimpleTextOutProtocolGuid                 ## BY_START
+  gEfiGraphicsOutputProtocolGuid                ## BY_START
+  gEfiUgaDrawProtocolGuid                       ## BY_START
+
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport
