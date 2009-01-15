@@ -96,3 +96,14 @@ EDK_r4960: Non-Compatible: qhuang8
        	[BuildOptions]
           *_*_*_CC_FLAGS = /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xC0000000
  
+
+EDK_r7286: Compatible: qhuang8
+	
+	Class_HFile: Add several new UEFI definition to build with newest EFI shell source.
+
+	Code Change:
+	1) Add new UEFI Load File 2 protocol defininition.
+	2) Add MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH device path type. 
+
+	Possible impact:
+  None.
