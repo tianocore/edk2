@@ -39,7 +39,6 @@ DEFINE EDK_SHELL_DIR             = Shell
   EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib.inf
   EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
   EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIA64Lib/CpuIA64Lib.inf
-  EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
   EdkCompatibilityPkg/Foundation/Library/CustomizedDecompress/CustomizedDecompress.inf
   EdkCompatibilityPkg/Foundation/Library/Dxe/Hob/HobLib.inf
   #
@@ -74,11 +73,10 @@ DEFINE EDK_SHELL_DIR             = Shell
   #
   $(EDK_SHELL_DIR)/Library/EfiShellLib.inf
 
+[Libraries.IA32, Libraries.X64]
+  EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
 
 [Components]
-  #
-  # Shell.inf & ShellFull.inf can not be included at once to avoid over
-  #
   $(EDK_SHELL_DIR)/Shell.inf
   $(EDK_SHELL_DIR)/ShellFull.inf
   $(EDK_SHELL_DIR)/attrib/attrib.inf
