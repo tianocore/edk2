@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core dispatch services
   
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -474,7 +474,7 @@ PeiDispatcher (
               // But if new stack is smaller than the size of old stack, we also reserve
               // the size of old stack at bottom of permenent memory.
               //
-              DEBUG ((EFI_D_ERROR, "Old Stack Size%d, New stack size%d\n", (INT32) Private->StackSize, (INT32) OldPeiStackSize));
+              DEBUG ((EFI_D_INFO, "Old Stack size %d, New stack size %d\n", (INT32) OldPeiStackSize, (INT32) Private->StackSize));
               ASSERT (Private->StackSize >= OldPeiStackSize);
               StackGap = Private->StackSize - OldPeiStackSize;
 
