@@ -48,6 +48,7 @@ CoreInitializeDebugImageInfoTable (
   // See comments in the CoreUpdateDebugTableCrc32() function below for details.
   //
   mDebugTable = AllocateAlignedPages (EFI_SIZE_TO_PAGES (sizeof (EFI_SYSTEM_TABLE_POINTER)), FOUR_MEG_ALIGNMENT); 
+  ASSERT (mDebugTable != NULL);
   mDebugTable->Signature = EFI_SYSTEM_TABLE_SIGNATURE;
   mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) gDxeCoreST;
   mDebugTable->Crc32 = 0;

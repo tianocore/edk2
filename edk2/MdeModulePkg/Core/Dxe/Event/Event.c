@@ -399,18 +399,16 @@ CoreCreateEventEx (
   }
 
   //
-  // Allcoate and initialize a new event structure.
+  // Allocate and initialize a new event structure.
   //
-  Status = CoreAllocatePool (
-             ((Type & EVT_RUNTIME) != 0) ? EfiRuntimeServicesData: EfiBootServicesData,
-             sizeof (IEVENT),
-             (VOID **)&IEvent
-             );
-  if (EFI_ERROR (Status)) {
+  if ((Type & EVT_RUNTIME) != 0) {
+    IEvent = AllocateRuntimeZeroPool (sizeof (IEVENT));
+  } else {
+    IEvent = AllocateZeroPool (sizeof (IEVENT));
+  }
+  if (IEvent == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  ZeroMem (IEvent, sizeof (IEVENT));
 
   IEvent->Signature = EVENT_SIGNATURE;
   IEvent->Type = Type;
