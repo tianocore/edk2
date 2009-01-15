@@ -1370,6 +1370,11 @@ EbcExecuteInstructions (
   UINTN       InstructionsLeft;
   UINTN       SavedInstructionCount;
 
+  if ((*VmPtr->Ip & 0x3F) >= sizeof(mVmOpcodeTable)) {
+    EbcDebugSignalException (EXCEPT_EBC_INVALID_OPCODE, EXCEPTION_FLAG_FATAL, VmPtr);
+    return EFI_UNSUPPORTED;
+  }
+
   Status = EFI_SUCCESS;
 
   if (*InstructionCount == 0) {
