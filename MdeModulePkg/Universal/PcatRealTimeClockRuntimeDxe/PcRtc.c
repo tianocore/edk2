@@ -143,7 +143,7 @@ PcRtcInit (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-  	//BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
+    //BugBug: the EfiAtRuntime should be encapsulated in EfiAcquireLock or
     //        provide a new instance for EfiAcquireLock, say, RtEfiAcquireLock
     if (!EfiAtRuntime ()) {
       EfiReleaseLock (&Global->RtcLock);
