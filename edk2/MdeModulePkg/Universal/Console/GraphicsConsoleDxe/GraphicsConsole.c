@@ -288,7 +288,7 @@ GraphicsConsoleControllerDriverStart (
     goto Error;
   }
 
-  NarrowFontSize  = ReturnNarrowFontSize ();
+  NarrowFontSize  = mNarrowFontSize;
 
   if (mFirstAccessFlag) {
     //

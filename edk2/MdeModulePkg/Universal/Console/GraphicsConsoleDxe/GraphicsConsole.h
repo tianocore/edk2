@@ -41,7 +41,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gGraphicsConsoleComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL   gGraphicsConsoleDriverBinding;
 extern EFI_NARROW_GLYPH              gUsStdNarrowGlyphData[];
 
-
+extern UINT32 mNarrowFontSize;
 //
 // User can define valid graphic resolution here
 // e.g. 640x480, 800x600, 1024x768...
@@ -215,19 +215,6 @@ GraphicsConsoleComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
-
-
-
-/**
-  Returns available Unicode glyphs narrow fonts(8*19 pixels) size.
-
-  @return Narrow font size.
-
-**/
-UINT32
-ReturnNarrowFontSize (
-  VOID
-  );
 
 /**
   Reset the text output device hardware and optionally run diagnostics.
