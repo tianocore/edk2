@@ -129,6 +129,8 @@ COMPONENT_TYPE=   LIBRARY
   LoadedImageDevicePath/LoadedImageDevicePath.c
   LoadFile/LoadFile.h
   LoadFile/LoadFile.c
+  LoadFile2/LoadFile2.h
+  LoadFile2/LoadFile2.c
   ManagedNetwork/ManagedNetwork.h
   ManagedNetwork/ManagedNetwork.c
   Mtftp4/Mtftp4.h

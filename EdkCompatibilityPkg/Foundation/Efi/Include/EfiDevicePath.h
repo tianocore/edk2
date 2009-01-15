@@ -241,6 +241,8 @@ typedef struct {
   UINT16                          Lun;
 } SATA_DEVICE_PATH;
 
+#define SATA_HBA_DIRECT_CONNECT_FLAG 0x8000
+
 #define MSG_I2O_DP                0x06
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
@@ -427,6 +429,12 @@ typedef struct {
   EFI_GUID                  NameGuid;
 } MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
 
+#define MEDIA_RELATIVE_OFFSET_RANGE_DP 0x08
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  UINT64                    StartingOffset;
+  UINT64                    EndingOffset;
+} MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH;
 #endif
 
 //
@@ -511,6 +519,8 @@ typedef union {
   #if (EFI_SPECIFICATION_VERSION >= 0x0002000A)
   MEDIA_FW_VOL_DEVICE_PATH             PiwgFirmwareVolume;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH    PiwgFirmwareFile;
+  MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH
+                                       Offset;
   #endif
 
   BBS_BBS_DEVICE_PATH                  Bbs;
