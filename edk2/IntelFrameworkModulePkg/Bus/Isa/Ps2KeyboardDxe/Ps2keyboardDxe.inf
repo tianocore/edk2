@@ -60,8 +60,7 @@
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
   gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gSimpleTextInExNotifyGuid                     # PROTOCOL SOMETIMES_CONSUMED
 
-[Guids]
-  gSimpleTextInExNotifyGuid                     # SOMETIMES_CONSUMED
 
 
