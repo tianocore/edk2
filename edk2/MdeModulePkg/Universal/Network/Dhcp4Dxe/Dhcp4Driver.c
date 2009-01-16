@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,14 +8,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Dhcp4Driver.c
-
-Abstract:
-
 
 **/
 
@@ -43,8 +35,8 @@ EFI_SERVICE_BINDING_PROTOCOL mDhcp4ServiceBindingTemplate = {
   
   Entry point of the DHCP driver to install various protocols.
 
-  @param  ImageHandle           The firmware allocated handle for the UEFI image.
-  @param  SystemTable           A pointer to the EFI System Table.
+  @param[in]  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param[in]  SystemTable           A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
@@ -76,10 +68,10 @@ Dhcp4DriverEntryPoint (
   follow these calling restrictions. If any other agent wishes to call
   Supported() it must also follow these calling restrictions.
 
-  @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test
-  @param  RemainingDevicePath Optional parameter use to pick a specific child
-                              device to start.
+  @param[in]  This                Protocol instance pointer.
+  @param[in]  ControllerHandle    Handle of device to test
+  @param[in]  RemainingDevicePath Optional parameter use to pick a specific child
+                                  device to start.
 
   @retval EFI_SUCCESS         This driver supports this device
   @retval EFI_ALREADY_STARTED This driver is already running on this device
@@ -114,8 +106,8 @@ Dhcp4DriverBindingSupported (
   Configure the default UDP child to receive all the DHCP traffics
   on this network interface.
 
-  @param  UdpIo                  The UDP IO port to configure
-  @param  Context                The context to the function
+  @param[in]  UdpIo                  The UDP IO port to configure
+  @param[in]  Context                The context to the function
 
   @retval EFI_SUCCESS            The UDP IO port is successfully configured.
   @retval Others                 Failed to configure the UDP child.
@@ -157,7 +149,7 @@ DhcpConfigUdpIo (
   or partly destroyed. If a resource is destroyed, it is marked as so in
   case the destroy failed and being called again later.
 
-  @param  DhcpSb                 The DHCP service instance to destory.
+  @param[in]  DhcpSb                 The DHCP service instance to destory.
 
   @retval EFI_SUCCESS            Always return success.
 
@@ -189,11 +181,11 @@ Dhcp4CloseService (
 /**
   Create a new DHCP service binding instance for the controller.
 
-  @param  Controller             The controller to install DHCP service binding
-                                 protocol onto
-  @param  ImageHandle            The driver's image handle
-  @param  Service                The variable to receive the created DHCP service
-                                 instance.
+  @param[in]  Controller             The controller to install DHCP service binding
+                                     protocol onto
+  @param[in]  ImageHandle            The driver's image handle
+  @param[out] Service                The variable to receive the created DHCP service
+                                     instance.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resource .
   @retval EFI_SUCCESS            The DHCP service instance is created.
@@ -275,10 +267,10 @@ ON_ERROR:
   calling restrictions. If any other agent wishes to call Start() it
   must also follow these calling restrictions.
 
-  @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to bind driver to
-  @param  RemainingDevicePath  Optional parameter use to pick a specific child
-                               device to start.
+  @param[in]  This                 Protocol instance pointer.
+  @param[in]  ControllerHandle     Handle of device to bind driver to
+  @param[in]  RemainingDevicePath  Optional parameter use to pick a specific child
+                                   device to start.
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle
   @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
@@ -355,11 +347,11 @@ ON_ERROR:
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
   
-  @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
-  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
-                            children is zero stop the entire bus driver.
-  @param  ChildHandleBuffer List of Child Handles to Stop.
+  @param[in]  This              Protocol instance pointer.
+  @param[in]  ControllerHandle  Handle of device to stop driver on
+  @param[in]  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                                children is zero stop the entire bus driver.
+  @param[in]  ChildHandleBuffer List of Child Handles to Stop.
 
   @retval EFI_SUCCESS       This driver is removed ControllerHandle
   @retval other             This driver was not removed from this device
@@ -453,8 +445,6 @@ Dhcp4DriverBindingStop (
   @param  DhcpSb                 The dhcp service instance
   @param  Instance               The dhcp instance to initialize
 
-  @return None
-
 **/
 VOID
 DhcpInitProtocol (
@@ -477,14 +467,18 @@ DhcpInitProtocol (
 
 
 /**
-  Creates a child handle with a set of I/O services.
+  Creates a child handle and installs a protocol.
+  
+  The CreateChild() function installs a protocol on ChildHandle. 
+  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
+  If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
 
-  @param  This        Protocol instance pointer.
-  @param  ChildHandle Pointer to the handle of the child to create.  If it is NULL,
-                      then a new handle is created.  If it is not NULL, then the
-                      I/O services are added to the existing child handle.
+  @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
+  @param  ChildHandle Pointer to the handle of the child to create. If it is NULL,
+                      then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                      then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The child handle was created with the I/O services
+  @retval EFI_SUCCES            The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources availabe to create
                                 the child
@@ -569,17 +563,20 @@ Dhcp4ServiceBindingCreateChild (
 
 
 /**
-  Destroys a child handle with a set of I/O services.
+  Destroys a child handle with a protocol installed on it.
+  
+  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
+  that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
+  last protocol on ChildHandle, then ChildHandle is destroyed.
 
-  @param  This        Protocol instance pointer.
+  @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param  ChildHandle Handle of the child to destroy
 
-  @retval EFI_SUCCES            The I/O services were removed from the child handle
-  @retval EFI_UNSUPPORTED       The child handle does not support the I/O services
-                                that are being removed.
-  @retval EFI_INVALID_PARAMETER Child handle is not a valid EFI Handle.
-  @retval EFI_ACCESS_DENIED     The child handle could not be destroyed because its
-                                I/O services are being used.
+  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
+  @retval EFI_INVALID_PARAMETER Child handle is not a valid UEFI Handle.
+  @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
+                                because its services are being used.
   @retval other                 The child handle was not destroyed
 
 **/

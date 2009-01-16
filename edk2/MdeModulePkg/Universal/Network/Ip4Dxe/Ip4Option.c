@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+  IP4 option support functions.
+  
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Ip4Option.c
-
-Abstract:
-
-  IP4 option support functions
-
 
 **/
 
@@ -28,9 +20,9 @@ Abstract:
   and will transmit. It will compute the ICMP error message fields
   if the option is mal-formated. But this information isn't used.
 
-  @param  Option                The first byte of the option
-  @param  OptionLen             The length of the whole option
-  @param  Rcvd                  The option is from the packet we received if TRUE,
+  @param[in]  Option            The first byte of the option
+  @param[in]  OptionLen         The length of the whole option
+  @param[in]  Rcvd              The option is from the packet we received if TRUE,
                                 otherwise the option we wants to transmit.
 
   @retval TRUE     The option is properly formatted
@@ -127,11 +119,11 @@ Ip4OptionIsValid (
      fragments.
   2. Pad the options copied over to aligned to 4 bytes.
 
-  @param  Option                The original option to copy from
-  @param  OptionLen             The length of the original option
-  @param  FirstFragment         Whether it is the first fragment
-  @param  Buf                   The buffer to copy options to. NULL 
-  @param  BufLen                The length of the buffer
+  @param[in]       Option            The original option to copy from
+  @param[in]       OptionLen         The length of the original option
+  @param[in]       FirstFragment     Whether it is the first fragment
+  @param[in, out]  Buf               The buffer to copy options to. NULL 
+  @param[in, out]  BufLen            The length of the buffer
 
   @retval EFI_SUCCESS           The options are copied over
   @retval EFI_BUFFER_TOO_SMALL  Buf is NULL or BufLen provided is too small.

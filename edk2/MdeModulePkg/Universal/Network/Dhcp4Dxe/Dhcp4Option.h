@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2006, Intel Corporation
+  To validate, parse and process the DHCP options.
+  
+Copyright (c) 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,16 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Dhcp4Option.h
-
-Abstract:
-
-  To validate, parse and process the DHCP options
-
 
 **/
 
@@ -233,10 +224,10 @@ EFI_STATUS
   the options in FILENAME and SERVERNAME fields. One option may be
   encoded in several places. See RFC 3396 Encoding Long Options in DHCP
 
-  @param  Packet                 The DHCP packet to check the options for
-  @param  Check                  The callback function to be called for each option
-                                 found
-  @param  Context                The opaque parameter for Check
+  @param[in]  Packet                 The DHCP packet to check the options for
+  @param[in]  Check                  The callback function to be called for each option
+                                     found
+  @param[in]  Context                The opaque parameter for Check
 
   @retval EFI_SUCCESS            The DHCP packet's options are well formated
   @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formated
@@ -253,8 +244,8 @@ DhcpIterateOptions (
   Validate the packet's options. If necessary, allocate
   and fill in the interested parameters.
 
-  @param  Packet                 The packet to validate the options
-  @param  Para                   The variable to save the DHCP parameters.
+  @param[in]  Packet                 The packet to validate the options
+  @param[out] Para                   The variable to save the DHCP parameters.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to validate the packet.
   @retval EFI_INVALID_PARAMETER  The options are mal-formated
@@ -283,11 +274,11 @@ DhcpValidateOptions (
   with DhcpFillOption to fill each option's data to its position in the
   buffer.
 
-  @param  Packet                 The DHCP packet to parse the options
-  @param  Count                  The number of valid dhcp options present in the
-                                 packet
-  @param  OptionPoint            The array that contains the DHCP options. Caller
-                                 should free it.
+  @param[in]  Packet                 The DHCP packet to parse the options
+  @param[out] Count                  The number of valid dhcp options present in the
+                                     packet
+  @param[out] OptionPoint            The array that contains the DHCP options. Caller
+                                     should free it.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
   @retval EFI_INVALID_PARAMETER  The options are mal-formated
@@ -305,10 +296,10 @@ DhcpParseOption (
   Append an option to the memory, if the option is longer than
   255 bytes, splits it into several options.
 
-  @param  Buf                    The buffer to append the option to
-  @param  Tag                    The option's tag
-  @param  DataLen                The length of the option's data
-  @param  Data                   The option's data
+  @param[out] Buf                    The buffer to append the option to
+  @param[in]  Tag                    The option's tag
+  @param[in]  DataLen                The length of the option's data
+  @param[in]  Data                   The option's data
 
   @return The position to append the next option
 
@@ -325,13 +316,13 @@ DhcpAppendOption (
   Build a new DHCP packet from a seed packet. Options may be deleted or
   appended. The caller should free the NewPacket when finished using it.
 
-  @param  SeedPacket             The seed packet to start with
-  @param  DeleteCount            The number of options to delete
-  @param  DeleteList             The options to delete from the packet
-  @param  AppendCount            The number of options to append
-  @param  AppendList             The options to append to the packet
-  @param  NewPacket              The new packet, allocated and built by this
-                                 function.
+  @param[in]  SeedPacket             The seed packet to start with
+  @param[in]  DeleteCount            The number of options to delete
+  @param[in]  DeleteList             The options to delete from the packet
+  @param[in]  AppendCount            The number of options to append
+  @param[in]  AppendList             The options to append to the packet
+  @param[out] NewPacket              The new packet, allocated and built by this
+                                     function.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
   @retval EFI_INVALID_PARAMETER  The options in SeekPacket are mal-formated

@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2007, Intel Corporation                                                         
+  Ip4 internal functions and type defintions.
+  
+Copyright (c) 2005 - 2007, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Ip4Impl.h
-
-Abstract:
-
-  Ip4 internal functions and type defintions.
-
 
 **/
 
@@ -227,8 +219,8 @@ extern EFI_IP4_PROTOCOL mEfiIp4ProtocolTemplete;
   reconfigure the MNP. If Force is TRUE, the MNP is configured no
   matter whether that is changed or not.
 
-  @param  IpSb                   The IP4 service instance that is to be changed.
-  @param  Force                  Force the configuration or not.
+  @param[in]  IpSb               The IP4 service instance that is to be changed.
+  @param[in]  Force              Force the configuration or not.
 
   @retval EFI_SUCCESS            The MNP is successfully configured/reconfigured.
   @retval Others                 Configuration failed.
@@ -246,8 +238,6 @@ Ip4ServiceConfigMnp (
   @param  IpSb                   The IP4 service instance.
   @param  IpInstance             The IP4 child instance.
 
-  @return None
-
 **/
 VOID
 Ip4InitProtocol (
@@ -258,7 +248,7 @@ Ip4InitProtocol (
 /**
   Clean up the IP4 child, release all the resources used by it.
 
-  @param  IpInstance             The IP4 child to clean up.
+  @param[in]  IpInstance         The IP4 child to clean up.
 
   @retval EFI_SUCCESS            The IP4 child is cleaned up
   @retval EFI_DEVICE_ERROR       Some resources failed to be released
@@ -272,8 +262,8 @@ Ip4CleanProtocol (
 /**
   Cancel the user's receive/transmit request.
 
-  @param  IpInstance             The IP4 child
-  @param  Token                  The token to cancel. If NULL, all token will be
+  @param[in]  IpInstance         The IP4 child
+  @param[in]  Token              The token to cancel. If NULL, all token will be
                                  cancelled.
 
   @retval EFI_SUCCESS            The token is cancelled
@@ -292,9 +282,9 @@ Ip4Cancel (
   Change the IP4 child's multicast setting. The caller
   should make sure that the parameters is valid.
 
-  @param  IpInstance             The IP4 child to change the setting.
-  @param  JoinFlag               TRUE to join the group, otherwise leave it
-  @param  GroupAddress           The target group address
+  @param[in]  IpInstance             The IP4 child to change the setting.
+  @param[in]  JoinFlag               TRUE to join the group, otherwise leave it
+  @param[in]  GroupAddress           The target group address
 
   @retval EFI_ALREADY_STARTED    Want to join the group, but already a member of it
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
@@ -316,10 +306,8 @@ Ip4Groups (
   transmitted-but-not-recycle packets, and provides time input
   for its IGMP protocol.
 
-  @param  Event                  The IP4 service instance's heart beat timer.
-  @param  Context                The IP4 service instance.
-
-  @return None
+  @param[in]  Event                  The IP4 service instance's heart beat timer.
+  @param[in]  Context                The IP4 service instance.
 
 **/
 VOID
@@ -336,9 +324,9 @@ Ip4TimerTicking (
   received-but-not-delivered and transmitted-but-not-recycle
   packets.
 
-  @param  Map                    The IP4 child's transmit map.
-  @param  Item                   Current transmitted packet
-  @param  Context                Not used.
+  @param[in]  Map                    The IP4 child's transmit map.
+  @param[in]  Item                   Current transmitted packet
+  @param[in]  Context                Not used.
 
   @retval EFI_SUCCESS            Always returns EFI_SUCCESS
 

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,13 +8,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Ip4Input.h
-
-Abstract:
-
 
 **/
 
@@ -95,9 +88,7 @@ typedef struct {
   Initialize an already allocated assemble table. This is generally
   the assemble table embedded in the IP4 service instance.
 
-  @param  Table                  The assemble table to initialize.
-
-  @return NONE
+  @param[in, out]  Table                  The assemble table to initialize.
 
 **/
 VOID
@@ -109,9 +100,7 @@ Ip4InitAssembleTable (
   Clean up the assemble table: remove all the fragments
   and assemble entries.
 
-  @param  Table                  The assemble table to clean up
-
-  @return None
+  @param[in]  Table                  The assemble table to clean up
 
 **/
 VOID
@@ -123,15 +112,13 @@ Ip4CleanAssembleTable (
   The IP4 input routine. It is called by the IP4_INTERFACE when a
   IP4 fragment is received from MNP.
 
-  @param  Ip4Instance            The IP4 child that request the receive, most like
+  @param[in]  Ip4Instance        The IP4 child that request the receive, most like
                                  it is NULL.
-  @param  Packet                 The IP4 packet received.
-  @param  IoStatus               The return status of receive request.
-  @param  Flag                   The link layer flag for the packet received, such
+  @param[in]  Packet             The IP4 packet received.
+  @param[in]  IoStatus           The return status of receive request.
+  @param[in]  Flag               The link layer flag for the packet received, such
                                  as multicast.
-  @param  Context                The IP4 service instance that own the MNP.
-
-  @return None
+  @param[in]  Context            The IP4 service instance that own the MNP.
 
 **/
 VOID
@@ -152,9 +139,9 @@ Ip4AccpetFrame (
   child wants to consume the packet because each IP child needs
   its own copy of the packet to make changes.
 
-  @param  IpSb                   The IP4 service instance that received the packet
-  @param  Head                   The header of the received packet
-  @param  Packet                 The data of the received packet
+  @param[in]  IpSb                   The IP4 service instance that received the packet
+  @param[in]  Head                   The header of the received packet
+  @param[in]  Packet                 The data of the received packet
 
   @retval EFI_NOT_FOUND          No IP child accepts the packet
   @retval EFI_SUCCESS            The packet is enqueued or delivered to some IP
@@ -172,10 +159,10 @@ Ip4Demultiplex (
   Enqueue a received packet to all the IP children that share
   the same interface.
 
-  @param  IpSb                   The IP4 service instance that receive the packet
-  @param  Head                   The header of the received packet
-  @param  Packet                 The data of the received packet
-  @param  IpIf                   The interface to enqueue the packet to
+  @param[in]  IpSb                   The IP4 service instance that receive the packet
+  @param[in]  Head                   The header of the received packet
+  @param[in]  Packet                 The data of the received packet
+  @param[in]  IpIf                   The interface to enqueue the packet to
 
   @return The number of the IP4 children that accepts the packet
 
@@ -194,7 +181,7 @@ Ip4InterfaceEnquePacket (
   duplicate it to a non-shared packet, release the shared packet, then
   deliver the non-shared packet up.
 
-  @param  IpInstance             The IP child to deliver the packet up.
+  @param[in]  IpInstance         The IP child to deliver the packet up.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources to deliver the
                                  packets.
@@ -210,9 +197,7 @@ Ip4InstanceDeliverPacket (
 /**
   Timeout the fragment and enqueued packets.
 
-  @param  IpSb                   The IP4 service instance to timeout
-
-  @return None
+  @param[in]  IpSb                   The IP4 service instance to timeout
 
 **/
 VOID

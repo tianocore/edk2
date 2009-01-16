@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+  Transmit the IP4 packet.
+  
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Ip4Output.c
-
-Abstract:
-
-  Transmit the IP4 packet
-
 
 **/
 
@@ -29,14 +21,14 @@ UINT16  mIp4Id;
   Prepend an IP4 head to the Packet. It will copy the options and
   build the IP4 header fields. Used for IP4 fragmentation.
 
-  @param  Packet               The packet to prepend IP4 header to
-  @param  Head                 The caller supplied header. The caller should set
-                               the following header fields: Tos, TotalLen, Id,
-                               Fragment, Ttl, Protocol, Src and Dst. All the fields
-                               are in host byte order. This function will fill in
-                               the Ver, HeadLen, and checksum.
-  @param  Option               The orginal IP4 option to copy from
-  @param  OptLen               The length of the IP4 option
+  @param  Packet           The packet to prepend IP4 header to
+  @param  Head             The caller supplied header. The caller should set
+                           the following header fields: Tos, TotalLen, Id,
+                           Fragment, Ttl, Protocol, Src and Dst. All the fields
+                           are in host byte order. This function will fill in
+                           the Ver, HeadLen, and checksum.
+  @param  Option           The orginal IP4 option to copy from
+  @param  OptLen           The length of the IP4 option
 
   @retval EFI_BAD_BUFFER_SIZE  There is no enought room in the head space of
                                Packet.
@@ -101,9 +93,9 @@ Ip4PrependHead (
   itself, that is, not by the requests of IP4 child's consumer. Such
   packets include the ICMP echo replies, and other ICMP error packets.
 
-  @param  IpSb                 The IP4 service that wants to send the packets.
-  @param  Dst                  The destination of the packet
-  @param  Src                  The source of the packet
+  @param[in]  IpSb                 The IP4 service that wants to send the packets.
+  @param[in]  Dst                  The destination of the packet
+  @param[in]  Src                  The source of the packet
 
   @return NULL if no proper interface is found, otherwise the interface that
           can be used to send the system packet from.
@@ -170,8 +162,6 @@ Ip4SelectInterface (
                                for reference.
   @param  Context              The context provided by us
 
-  @return None
-
 **/
 VOID
 Ip4SysPacketSent (
@@ -192,24 +182,24 @@ Ip4SysPacketSent (
   (IpInstance == NULL). It will route the packet, fragment it,
   then transmit all the fragments through some interface.
 
-  @param  IpSb                 The IP4 service instance to transmit the packet
-  @param  IpInstance           The IP4 child that issues the transmission.  It is
+  @param[in]  IpSb             The IP4 service instance to transmit the packet
+  @param[in]  IpInstance       The IP4 child that issues the transmission.  It is
                                NULL if the packet is from the system.
-  @param  Packet               The user data to send, excluding the IP header.
-  @param  Head                 The caller supplied header. The caller should set
+  @param[in]  Packet           The user data to send, excluding the IP header.
+  @param[in]  Head             The caller supplied header. The caller should set
                                the following header fields: Tos, TotalLen, Id, tl,
                                Fragment, Protocol, Src and Dst. All the fields are
                                in host byte  order. This function will fill in the
                                Ver, HeadLen,  Fragment, and checksum. The Fragment
                                only need to include the DF flag. Ip4Output will
                                compute the MF and offset for  you.
-  @param  Option               The original option to append to the IP headers
-  @param  OptLen               The length of the option
-  @param  GateWay              The next hop address to transmit packet to.
+  @param[in]  Option           The original option to append to the IP headers
+  @param[in]  OptLen           The length of the option
+  @param[in]  GateWay          The next hop address to transmit packet to.
                                255.255.255.255 means broadcast.
-  @param  Callback             The callback function to issue when transmission
+  @param[in]  Callback         The callback function to issue when transmission
                                completed.
-  @param  Context              The opaque context for the callback
+  @param[in]  Context          The opaque context for the callback
 
   @retval EFI_NO_MAPPING       There is no interface to the destination.
   @retval EFI_NOT_FOUND        There is no route to the destination
@@ -414,8 +404,8 @@ ON_ERROR:
   The filter function to find a packet and all its fragments.
   The packet's fragments have their Context set to the packet.
 
-  @param  Frame                The frames hold by the low level interface
-  @param  Context              Context to the function, which is the packet.
+  @param[in]  Frame            The frames hold by the low level interface
+  @param[in]  Context          Context to the function, which is the packet.
 
   @retval TRUE                 This is the packet to cancel or its fragments.
   @retval FALSE                This is unrelated packet.
@@ -441,8 +431,6 @@ Ip4CancelPacketFragments (
   @param  IpIf                 The interface from which the Packet is sent
   @param  Packet               The Packet to cancel
   @param  IoStatus             The status returns to the sender.
-
-  @return None
 
 **/
 VOID

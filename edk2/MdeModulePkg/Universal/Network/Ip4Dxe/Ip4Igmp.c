@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+  This file implements the RFC2236: IGMP v2.
+  
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,16 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Ip4Igmp.c
-
-Abstract:
-
-  This file implements the RFC2236: IGMP v2
-
 
 **/
 
@@ -34,7 +25,7 @@ UINT32  mRouteAlertOption = 0x00000494;
   Init the IGMP control data of the IP4 service instance, configure
   MNP to receive ALL SYSTEM multicast.
 
-  @param  IpSb                   The IP4 service whose IGMP is to be initialized.
+  @param[in, out]  IpSb          The IP4 service whose IGMP is to be initialized.
 
   @retval EFI_SUCCESS            IGMP of the IpSb is successfully initialized.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resource to initialize IGMP.
@@ -94,8 +85,8 @@ ON_ERROR:
   Find the IGMP_GROUP structure which contains the status of multicast
   group Address in this IGMP control block
 
-  @param  IgmpCtrl               The IGMP control block to search from
-  @param  Address                The multicast address to search
+  @param[in]  IgmpCtrl               The IGMP control block to search from
+  @param[in]  Address                The multicast address to search
 
   @return NULL if the multicast address isn't in the IGMP control block. Otherwise
           the point to the IGMP_GROUP which contains the status of multicast group
@@ -128,8 +119,8 @@ Ip4FindGroup (
   same MAC address. Several IP4 multicast address may be mapped to
   the same MAC address.
 
-  @param  IgmpCtrl               The IGMP control block to search in
-  @param  Mac                    The MAC address to search
+  @param[in]  IgmpCtrl               The IGMP control block to search in
+  @param[in]  Mac                    The MAC address to search
 
   @return The number of the IP4 multicast group that mapped to the same
           multicast group Mac.
@@ -162,12 +153,12 @@ Ip4FindMac (
 /**
   Send an IGMP protocol message to the Dst, such as IGMP v1 membership report.
 
-  @param  IpSb                   The IP4 service instance that requests the
+  @param[in]  IpSb               The IP4 service instance that requests the
                                  transmission
-  @param  Dst                    The destinaton to send to
-  @param  Type                   The IGMP message type, such as IGMP v1 membership
+  @param[in]  Dst                The destinaton to send to
+  @param[in]  Type               The IGMP message type, such as IGMP v1 membership
                                  report
-  @param  Group                  The group address in the IGMP message head.
+  @param[in]  Group              The group address in the IGMP message head.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to build the message
   @retval EFI_SUCCESS            The IGMP message is successfully send
@@ -233,9 +224,9 @@ Ip4SendIgmpMessage (
   Send an IGMP membership report. Depends on whether the server is
   v1 or v2, it will send either a V1 or V2 membership report.
 
-  @param  IpSb                   The IP4 service instance that requests the
+  @param[in]  IpSb               The IP4 service instance that requests the
                                  transmission.
-  @param  Group                  The group address to report
+  @param[in]  Group              The group address to report
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to build the message
   @retval EFI_SUCCESS            The IGMP report message is successfully send
@@ -259,8 +250,8 @@ Ip4SendIgmpReport (
 /**
   Join the multicast group on behalf of this IP4 child
 
-  @param  IpInstance             The IP4 child that wants to join the group
-  @param  Address                The group to join
+  @param[in]  IpInstance         The IP4 child that wants to join the group
+  @param[in]  Address            The group to join
 
   @retval EFI_SUCCESS            Successfully join the multicast group
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources
@@ -339,9 +330,9 @@ ON_ERROR:
 /**
   Leave the IP4 multicast group on behalf of IpInstance.
 
-  @param  IpInstance             The IP4 child that wants to leave the group
+  @param[in]  IpInstance         The IP4 child that wants to leave the group
                                  address
-  @param  Address                The group address to leave
+  @param[in]  Address            The group address to leave
 
   @retval EFI_NOT_FOUND          The IP4 service instance isn't in the group
   @retval EFI_SUCCESS            Successfully leave the multicast group.
@@ -409,9 +400,9 @@ Ip4LeaveGroup (
 /**
   Handle the received IGMP message for the IP4 service instance.
 
-  @param  IpSb                   The IP4 service instance that received the message
-  @param  Head                   The IP4 header of the received message
-  @param  Packet                 The IGMP message, without IP4 header
+  @param[in]  IpSb               The IP4 service instance that received the message
+  @param[in]  Head               The IP4 header of the received message
+  @param[in]  Packet             The IGMP message, without IP4 header
 
   @retval EFI_INVALID_PARAMETER  The IGMP message is malformated.
   @retval EFI_SUCCESS            The IGMP message is successfully processed.
@@ -515,9 +506,7 @@ Ip4IgmpHandle (
   2. Decrease the report timer for each IGMP group in "delaying
      member" state.
 
-  @param  IpSb                   The IP4 service instance that is ticking
-
-  @return None
+  @param[in]  IpSb                   The IP4 service instance that is ticking
 
 **/
 VOID
@@ -561,9 +550,9 @@ Ip4IgmpTicking (
   assume the byte order of the both Source and Addr, the
   network byte order is used by the caller.
 
-  @param  Source                 The array of group addresses to add to
-  @param  Count                  The number of group addresses in the Source
-  @param  Addr                   The IP4 multicast address to add
+  @param[in]  Source                 The array of group addresses to add to
+  @param[in]  Count                  The number of group addresses in the Source
+  @param[in]  Addr                   The IP4 multicast address to add
 
   @return NULL if failed to allocate memory for the new groups,
           otherwise the new combined group addresses.
@@ -597,9 +586,9 @@ Ip4CombineGroups (
   both Groups and Addr, the network byte order is used by
   the caller.
 
-  @param  Groups                 The array of group addresses to remove from
-  @param  Count                  The number of group addresses in the Groups
-  @param  Addr                   The IP4 multicast address to remove
+  @param  Groups            The array of group addresses to remove from
+  @param  Count             The number of group addresses in the Groups
+  @param  Addr              The IP4 multicast address to remove
 
   @return The nubmer of group addresses in the Groups after remove.
           It is Count if the Addr isn't in the Groups.

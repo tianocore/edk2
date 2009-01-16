@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,13 +8,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Udp4Main.c
-
-Abstract:
-
 
 **/
 
@@ -114,8 +107,8 @@ Udp4GetModeData (
   With different parameters in UdpConfigData, Configure() can be used to bind
   this instance to specified port.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  UdpConfigData  Pointer to the buffer to receive the current configuration data.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  UdpConfigData     Pointer to the buffer to receive the current configuration data.
 
   @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
   @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
@@ -305,10 +298,10 @@ ON_EXIT:
   filtering. If the JoinFlag is FALSE and the MulticastAddress is NULL, then all
   currently joined groups are left.
 
-  @param  This             Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  JoinFlag         Set to TRUE to join a multicast group. Set to FALSE to leave one
-                           or all multicast groups.
-  @param  MulticastAddress Pointer to multicast group address to join or leave.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  JoinFlag          Set to TRUE to join a multicast group. Set to FALSE to leave one
+                                or all multicast groups.
+  @param[in]  MulticastAddress  Pointer to multicast group address to join or leave.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_NOT_STARTED       The EFI UDPv4 Protocol instance has not been started.
@@ -420,12 +413,12 @@ ON_EXIT:
   copies will be updated automatically whenever the IP driver reconfigures its
   instances; as a result, the previous modification to these copies will be lost.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  DeleteRoute    Set to TRUE to delete this route from the routing table.
-                         Set to FALSE to add this route to the routing table.
-  @param  SubnetAddress  The destination network address that needs to be routed.
-  @param  SubnetMask     The subnet mask of SubnetAddress.
-  @param  GatewayAddress The gateway IP address for this route.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  DeleteRoute       Set to TRUE to delete this route from the routing table.
+                                Set to FALSE to add this route to the routing table.
+  @param[in]  SubnetAddress     The destination network address that needs to be routed.
+  @param[in]  SubnetMask        The subnet mask of SubnetAddress.
+  @param[in]  GatewayAddress    The gateway IP address for this route.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_NOT_STARTED       The EFI UDPv4 Protocol instance has not been started.
@@ -483,9 +476,9 @@ Udp4Routes (
   and context for the event will enable the user to receive the notification and
   transmitting status.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to the completion token that will be placed into the
-                transmit queue.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  Token             Pointer to the completion token that will be placed into the
+                                transmit queue.
 
   @retval EFI_SUCCESS           The data has been queued for transmission.
   @retval EFI_NOT_STARTED       This EFI UDPv4 Protocol instance has not been started.
@@ -710,9 +703,9 @@ ON_EXIT:
   will enable the user to receive the notification and receiving status. That
   notification function is guaranteed to not be re-entered.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to a token that is associated with the receive data
-                descriptor.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  Token             Pointer to a token that is associated with
+                                the receive data descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
   @retval EFI_NOT_STARTED       This EFI UDPv4 Protocol instance has not been started.
@@ -808,11 +801,11 @@ ON_EXIT:
   the asynchronous operation has completed, this function will not signal the
   token and EFI_NOT_FOUND is returned.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
-                EFI_UDP4_PROTOCOL.Transmit() or
-                EFI_UDP4_PROTOCOL.Receive().If NULL, all pending
-                tokens are aborted.
+  @param[in]  This  Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  Token Pointer to a token that has been issued by
+                    EFI_UDP4_PROTOCOL.Transmit() or
+                    EFI_UDP4_PROTOCOL.Receive().If NULL, all pending
+                    tokens are aborted.
 
   @retval  EFI_SUCCESS           The asynchronous I/O request was aborted and Token.Event
                                  was signaled. When Token is NULL, all pending requests are
@@ -881,7 +874,7 @@ Udp4Cancel (
   Drivers and applications that are experiencing packet loss should try calling
   the Poll() function more often.
 
-  @param  This Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  This  Pointer to the EFI_UDP4_PROTOCOL instance.
 
   @retval EFI_SUCCESS           Incoming or outgoing data was processed.
   @retval EFI_INVALID_PARAMETER This is NULL.

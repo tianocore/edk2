@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2007, Intel Corporation
+  Implement IP4 pesudo interface.
+  
+Copyright (c) 2005 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,16 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Ip4If.c
-
-Abstract:
-
-  Implement IP4 pesudo interface.
-
 
 **/
 
@@ -33,9 +24,7 @@ EFI_MAC_ADDRESS  mZeroMacAddress;
   Callback funtion when frame transmission is finished. It will
   call the frame owner's callback function to tell it the result.
 
-  @param  Context               Context which is point to the token.
-
-  @return None.
+  @param[in]  Context            Context which is point to the token.
 
 **/
 VOID
@@ -47,10 +36,8 @@ Ip4OnFrameSentDpc (
 /**
   Request Ip4OnFrameSentDpc as a DPC at TPL_CALLBACK.
 
-  @param  Event                 The transmit token's event.
-  @param  Context               Context which is point to the token.
-
-  @return None
+  @param[in]  Event              The transmit token's event.
+  @param[in]  Context            Context which is point to the token.
 
 **/
 VOID
@@ -65,10 +52,8 @@ Ip4OnFrameSent (
   all the queued frame if the ARP requests failed. Or transmit them
   if the request succeed.
 
-  @param  Context               The context of the callback, a point to the ARP
+  @param[in]  Context           The context of the callback, a point to the ARP
                                 queue
-
-  @return None
 
 **/
 VOID
@@ -80,12 +65,10 @@ Ip4OnArpResolvedDpc (
 /**
   Request Ip4OnArpResolvedDpc as a DPC at TPL_CALLBACK.
 
-  @param  Event                 The Arp request event.
-  @param  Context               The context of the callback, a point to the ARP
-                                queue.
-
-  @return None
-
+  @param  Event             The Arp request event.
+  @param  Context           The context of the callback, a point to the ARP
+                            queue.
+                                
 **/
 VOID
 EFIAPI
@@ -104,8 +87,6 @@ Ip4OnArpResolved (
 
   @param  Context               Context for the callback.
 
-  @return None.
-
 **/
 VOID
 EFIAPI
@@ -114,13 +95,10 @@ Ip4OnFrameReceivedDpc (
   );
 
 /**
-
   Request Ip4OnFrameReceivedDpc as a DPC at TPL_CALLBACK.
 
   @param Event      The receive event delivered to MNP for receive.
   @param Context    Context for the callback.
-  
-  @return None.
 
 **/
 VOID
@@ -134,13 +112,11 @@ Ip4OnFrameReceived (
   Remove all the frames on the ARP queue that pass the FrameToCancel,
   that is, either FrameToCancel is NULL or it returns true for the frame.
 
-  @param  ArpQue                ARP frame to remove the frames from.
-  @param  IoStatus              The status returned to the cancelled frames'
+  @param[in]  ArpQue            ARP frame to remove the frames from.
+  @param[in]  IoStatus          The status returned to the cancelled frames'
                                 callback function.
-  @param  FrameToCancel         Function to select which frame to cancel.
-  @param  Context               Opaque parameter to the FrameToCancel.
-
-  @return NONE
+  @param[in]  FrameToCancel     Function to select which frame to cancel.
+  @param[in]  Context           Opaque parameter to the FrameToCancel.
 
 **/
 VOID
@@ -155,15 +131,16 @@ Ip4CancelFrameArp (
 /**
   Wrap a transmit request into a newly allocated IP4_LINK_TX_TOKEN.
 
-  @param  Interface             The interface to send out to.
-  @param  IpInstance            The IpInstance that transmit the packet.  NULL if
+  @param[in]  Interface         The interface to send out to.
+  @param[in]  IpInstance        The IpInstance that transmit the packet.  NULL if
                                 the packet is sent by the IP4 driver itself.
-  @param  Packet                The packet to transmit
-  @param  CallBack              Call back function to execute if transmission
+  @param[in]  Packet            The packet to transmit
+  @param[in]  CallBack          Call back function to execute if transmission
                                 finished.
-  @param  Context               Opaque parameter to the call back.
+  @param[in]  Context           Opaque parameter to the call back.
 
-  @return The wrapped token if succeed or NULL
+  @retval   Token               The wrapped token if succeed 
+  @retval   NULL                The wrapped token if NULL
 
 **/
 IP4_LINK_TX_TOKEN *
@@ -237,9 +214,7 @@ Ip4WrapLinkTxToken (
   Free the link layer transmit token. It will close the event
   then free the memory used.
 
-  @param  Token                 Token to free
-
-  @return NONE
+  @param[in]  Token                 Token to free
 
 **/
 VOID
@@ -257,8 +232,8 @@ Ip4FreeLinkTxToken (
 /**
   Create an IP_ARP_QUE structure to request ARP service.
 
-  @param  Interface             The interface to send ARP from.
-  @param  DestIp                The destination IP (host byte order) to request MAC
+  @param[in]  Interface         The interface to send ARP from.
+  @param[in]  DestIp            The destination IP (host byte order) to request MAC
                                 for
 
   @return Point to newly created IP4_ARP_QUE if succeed, otherwise NULL.
@@ -308,11 +283,9 @@ Ip4CreateArpQue (
 /**
   Remove all the transmit requests queued on the ARP queue, then free it.
 
-  @param  ArpQue                Arp queue to free
-  @param  IoStatus              The transmit status returned to transmit requests'
+  @param[in]  ArpQue            Arp queue to free
+  @param[in]  IoStatus          The transmit status returned to transmit requests'
                                 callback.
-
-  @return NONE
 
 **/
 VOID
@@ -336,11 +309,11 @@ Ip4FreeArpQue (
 /**
   Create a link layer receive token to wrap the receive request
 
-  @param  Interface             The interface to receive from
-  @param  IpInstance            The instance that request the receive (NULL for IP4
+  @param[in]  Interface         The interface to receive from
+  @param[in]  IpInstance        The instance that request the receive (NULL for IP4
                                 driver itself)
-  @param  CallBack              Call back function to execute when finished.
-  @param  Context               Opaque parameters to the callback
+  @param[in]  CallBack          Call back function to execute when finished.
+  @param[in]  Context           Opaque parameters to the callback
 
   @return Point to created IP4_LINK_RX_TOKEN if succeed, otherwise NULL.
 
@@ -393,9 +366,7 @@ Ip4CreateLinkRxToken (
   Free the link layer request token. It will close the event
   then free the memory used.
 
-  @param  Token                 Request token to free
-
-  @return NONE
+  @param[in]  Token                 Request token to free.
 
 **/
 VOID
@@ -415,13 +386,11 @@ Ip4FreeFrameRxToken (
   Remove all the frames on the ARP queue that pass the FrameToCancel,
   that is, either FrameToCancel is NULL or it returns true for the frame.
 
-  @param  ArpQue                ARP frame to remove the frames from.
-  @param  IoStatus              The status returned to the cancelled frames'
+  @param[in]  ArpQue            ARP frame to remove the frames from.
+  @param[in]  IoStatus          The status returned to the cancelled frames'
                                 callback function.
-  @param  FrameToCancel         Function to select which frame to cancel.
-  @param  Context               Opaque parameter to the FrameToCancel.
-
-  @return NONE
+  @param[in]  FrameToCancel     Function to select which frame to cancel.
+  @param[in]  Context           Opaque parameter to the FrameToCancel.
 
 **/
 VOID
@@ -454,14 +423,12 @@ Ip4CancelFrameArp (
   either queued on ARP queues or that have already been delivered to
   MNP and not yet recycled.
 
-  @param  Interface             Interface to remove the frames from
-  @param  IoStatus              The transmit status returned to the frames'
+  @param[in]  Interface         Interface to remove the frames from
+  @param[in]  IoStatus          The transmit status returned to the frames'
                                 callback
-  @param  FrameToCancel         Function to select the frame to cancel, NULL to
+  @param[in]  FrameToCancel     Function to select the frame to cancel, NULL to
                                 select all
-  @param  Context               Opaque parameters passed to FrameToCancel
-
-  @return NONE
+  @param[in]  Context           Opaque parameters passed to FrameToCancel
 
 **/
 VOID
@@ -508,11 +475,11 @@ Ip4CancelFrames (
   Create an IP4_INTERFACE. Delay the creation of ARP instance until
   the interface is configured.
 
-  @param  Mnp                   The shared MNP child of this IP4 service binding
+  @param[in]  Mnp               The shared MNP child of this IP4 service binding
                                 instance
-  @param  Controller            The controller this IP4 service binding instance
+  @param[in]  Controller        The controller this IP4 service binding instance
                                 is installed. Most like the UNDI handle.
-  @param  ImageHandle           This driver's image handle
+  @param[in]  ImageHandle       This driver's image handle
 
   @return Point to the created IP4_INTERFACE, otherwise NULL.
 
@@ -575,9 +542,9 @@ Ip4CreateInterface (
   Set the interface's address, create and configure
   the ARP child if necessary.
 
-  @param  Interface             The interface to set the address
-  @param  IpAddr                The interface's IP address
-  @param  SubnetMask            The interface's netmask
+  @param  Interface         The interface to set the address
+  @param  IpAddr            The interface's IP address
+  @param  SubnetMask        The interface's netmask
 
   @retval EFI_SUCCESS           The interface is configured with Ip/netmask pair,
                                 and a ARP is created for it.
@@ -690,8 +657,8 @@ ON_ERROR:
 /**
   Filter function to cancel all the frame related to an IP instance.
 
-  @param  Frame                 The transmit request to test whether to cancel
-  @param  Context               The context which is the Ip instance that issued
+  @param[in]  Frame             The transmit request to test whether to cancel
+  @param[in]  Context           The context which is the Ip instance that issued
                                 the transmit.
 
   @retval TRUE                  The frame belongs to this instance and is to be
@@ -723,9 +690,7 @@ Ip4CancelInstanceFrame (
   packet and update the upper layer's transmit request status, say
   that from the UDP.
 
-  @param  Interface             The interface used by the IpInstance
-
-  @return None
+  @param[in]  Interface         The interface used by the IpInstance
 
 **/
 VOID
@@ -754,8 +719,8 @@ Ip4CancelReceive (
   Because the IpInstance is optional, the caller must remove
   IpInstance from the interface's instance list itself.
 
-  @param  Interface             The interface used by the IpInstance
-  @param  IpInstance            The Ip instance that free the interface. NULL if
+  @param[in]  Interface         The interface used by the IpInstance
+  @param[in]  IpInstance        The Ip instance that free the interface. NULL if
                                 the Ip driver is releasing the default interface.
 
   @retval EFI_SUCCESS           The interface use IpInstance is freed.
@@ -820,10 +785,8 @@ Ip4FreeInterface (
   all the queued frame if the ARP requests failed. Or transmit them
   if the request succeed.
 
-  @param  Context               The context of the callback, a point to the ARP
+  @param[in]  Context           The context of the callback, a point to the ARP
                                 queue
-
-  @return None
 
 **/
 VOID
@@ -893,12 +856,10 @@ Ip4OnArpResolvedDpc (
 /**
   Request Ip4OnArpResolvedDpc as a DPC at TPL_CALLBACK.
 
-  @param  Event                 The Arp request event.
-  @param  Context               The context of the callback, a point to the ARP
-                                queue.
-
-  @return None
-
+  @param  Event             The Arp request event.
+  @param  Context           The context of the callback, a point to the ARP
+                            queue.
+                                
 **/
 VOID
 EFIAPI
@@ -919,9 +880,7 @@ Ip4OnArpResolved (
   Callback funtion when frame transmission is finished. It will
   call the frame owner's callback function to tell it the result.
 
-  @param  Context               Context which is point to the token.
-
-  @return None.
+  @param[in]  Context            Context which is point to the token.
 
 **/
 VOID
@@ -951,10 +910,8 @@ Ip4OnFrameSentDpc (
 /**
   Request Ip4OnFrameSentDpc as a DPC at TPL_CALLBACK.
 
-  @param  Event                 The transmit token's event.
-  @param  Context               Context which is point to the token.
-
-  @return None
+  @param[in]  Event              The transmit token's event.
+  @param[in]  Context            Context which is point to the token.
 
 **/
 VOID
@@ -979,14 +936,14 @@ Ip4OnFrameSent (
   If some error happened, the CallBack won't be called. So, the caller
   must test the return value, and take action when there is an error.
 
-  @param  Interface             The interface to send the frame from
-  @param  IpInstance            The IP child that request the transmission.  NULL
+  @param[in]  Interface         The interface to send the frame from
+  @param[in]  IpInstance        The IP child that request the transmission.  NULL
                                 if it is the IP4 driver itself.
-  @param  Packet                The packet to transmit.
-  @param  NextHop               The immediate destination to transmit the packet
+  @param[in]  Packet            The packet to transmit.
+  @param[in]  NextHop           The immediate destination to transmit the packet
                                 to.
-  @param  CallBack              Function to call back when transmit finished.
-  @param  Context               Opaque parameter to the call back.
+  @param[in]  CallBack          Function to call back when transmit finished.
+  @param[in]  Context           Opaque parameter to the call back.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to send the frame
   @retval EFI_NO_MAPPING        Can't resolve the MAC for the nexthop
@@ -1127,9 +1084,7 @@ ON_ERROR:
   Call back function when the received packet is freed.
   Check Ip4OnFrameReceived for information.
 
-  @param  Context               Context, which is the IP4_LINK_RX_TOKEN.
-
-  @return None.
+  @param  Context          Context, which is the IP4_LINK_RX_TOKEN.
 
 **/
 VOID
@@ -1156,8 +1111,6 @@ Ip4RecycleFrame (
   the token used.
 
   @param  Context               Context for the callback.
-
-  @return None.
 
 **/
 VOID
@@ -1218,13 +1171,10 @@ Ip4OnFrameReceivedDpc (
 }
 
 /**
-
   Request Ip4OnFrameReceivedDpc as a DPC at TPL_CALLBACK.
 
   @param Event      The receive event delivered to MNP for receive.
   @param Context    Context for the callback.
-  
-  @return None.
 
 **/
 VOID
@@ -1244,11 +1194,11 @@ Ip4OnFrameReceived (
 /**
   Request to receive the packet from the interface.
 
-  @param  Interface             The interface to receive the frames from
-  @param  IpInstance            The instance that requests the receive. NULL for
+  @param[in]  Interface         The interface to receive the frames from
+  @param[in]  IpInstance        The instance that requests the receive. NULL for
                                 the driver itself.
-  @param  CallBack              Function to call when receive finished.
-  @param  Context               Opaque parameter to the callback
+  @param[in]  CallBack          Function to call when receive finished.
+  @param[in]  Context           Opaque parameter to the callback
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to receive

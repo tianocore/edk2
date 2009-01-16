@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2006 - 2008, Intel Corporation
+  Function to validate, parse, process the DHCP options.
+  
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Dhcp4Option.c
-
-Abstract:
-
-  Function to validate, parse, process the DHCP options
-
 
 **/
 
@@ -120,7 +112,7 @@ DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
   Binary search the DhcpOptionFormats array to find the format
   information about a specific option.
 
-  @param  Tag                    The option's tag.
+  @param[in]  Tag                    The option's tag.
 
   @return The point to the option's format, NULL if not found.
 
@@ -158,9 +150,9 @@ DhcpFindOptionFormat (
 /**
   Validate whether a single DHCP option is valid according to its format.
 
-  @param  Format                 The option's format
-  @param  OptValue               The value of the option
-  @param  Len                    The length of the option value
+  @param[in]  Format                 The option's format
+  @param[in]  OptValue               The value of the option
+  @param[in]  Len                    The length of the option value
 
   @retval TRUE     The option is valid.
   @retval FALSE    Otherwise.
@@ -238,10 +230,10 @@ DhcpOptionIsValid (
   Extract the client interested options, all the parameters are
   converted to host byte order.
 
-  @param  Tag                    The DHCP option tag
-  @param  Len                    The length of the option
-  @param  Data                   The value of the DHCP option
-  @param  Para                   The variable to save the interested parameter
+  @param[in]  Tag                    The DHCP option tag
+  @param[in]  Len                    The length of the option
+  @param[in]  Data                   The value of the DHCP option
+  @param[out] Para                   The variable to save the interested parameter
 
   @retval EFI_SUCCESS            The DHCP option is successfully extracted.
   @retval EFI_INVALID_PARAMETER  The DHCP option is mal-formated
@@ -309,12 +301,12 @@ DhcpGetParameter (
   in several buffers, such as the BOOTP options filed, boot file or server
   name. Each option buffer is required to end with DHCP_TAG_EOP.
 
-  @param  Buffer                 The buffer which contains DHCP options
-  @param  BufLen                 The length of the buffer
-  @param  Check                  The callback function for each option found
-  @param  Context                The opaque parameter for the Check
-  @param  Overload               Variable to save the value of DHCP_TAG_OVERLOAD
-                                 option.
+  @param[in]  Buffer                 The buffer which contains DHCP options
+  @param[in]  BufLen                 The length of the buffer
+  @param[in]  Check                  The callback function for each option found
+  @param[in]  Context                The opaque parameter for the Check
+  @param[out] Overload               Variable to save the value of DHCP_TAG_OVERLOAD
+                                     option.
 
   @retval EFI_SUCCESS            All the options are valid
   @retval EFI_INVALID_PARAMETER  The options are mal-formated.
@@ -324,7 +316,7 @@ EFI_STATUS
 DhcpIterateBufferOptions (
   IN  UINT8                 *Buffer,
   IN  INTN                  BufLen,
-  IN  DHCP_CHECK_OPTION     Check,            OPTIONAL
+  IN  DHCP_CHECK_OPTION     Check             OPTIONAL,
   IN  VOID                  *Context,
   OUT UINT8                 *Overload         OPTIONAL
   )
@@ -385,10 +377,10 @@ DhcpIterateBufferOptions (
   the options in FILENAME and SERVERNAME fields. One option may be
   encoded in several places. See RFC 3396 Encoding Long Options in DHCP
 
-  @param  Packet                 The DHCP packet to check the options for
-  @param  Check                  The callback function to be called for each option
-                                 found
-  @param  Context                The opaque parameter for Check
+  @param[in]  Packet                 The DHCP packet to check the options for
+  @param[in]  Check                  The callback function to be called for each option
+                                     found
+  @param[in]  Context                The opaque parameter for Check
 
   @retval EFI_SUCCESS            The DHCP packet's options are well formated
   @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formated
@@ -455,11 +447,11 @@ DhcpIterateOptions (
   length. It just adds the data length of all the occurances of this
   Tag. Context is an array of 256 DHCP_OPTION_COUNT.
 
-  @param  Tag                    The current option to check
-  @param  Len                    The length of the option data
-  @param  Data                   The option data
-  @param  Context                The context, which is a array of 256
-                                 DHCP_OPTION_COUNT.
+  @param[in]  Tag                    The current option to check
+  @param[in]  Len                    The length of the option data
+  @param[in]  Data                   The option data
+  @param[in]  Context                The context, which is a array of 256
+                                     DHCP_OPTION_COUNT.
 
   @retval EFI_SUCCESS            It always returns EFI_SUCCESS.
 
@@ -485,11 +477,11 @@ DhcpGetOptionLen (
   Call back function to DhcpIterateOptions to consolidate each option's
   data. There are maybe several occurrence of the same option.
 
-  @param  Tag                    The option to consolidate its data
-  @param  Len                    The length of option data
-  @param  Data                   The data of the option's current occurance
-  @param  Context                The context, which is DHCP_OPTION_CONTEXT. This
-                                 array is  just a wrap to pass THREE parameters.
+  @param[in]  Tag                    The option to consolidate its data
+  @param[in]  Len                    The length of option data
+  @param[in]  Data                   The data of the option's current occurance
+  @param[in]  Context                The context, which is DHCP_OPTION_CONTEXT. This
+                                     array is  just a wrap to pass THREE parameters.
 
   @retval EFI_SUCCESS            It always returns EFI_SUCCESS
 
@@ -544,11 +536,11 @@ DhcpFillOption (
   with DhcpFillOption to fill each option's data to its position in the
   buffer.
 
-  @param  Packet                 The DHCP packet to parse the options
-  @param  Count                  The number of valid dhcp options present in the
-                                 packet
-  @param  OptionPoint            The array that contains the DHCP options. Caller
-                                 should free it.
+  @param[in]  Packet                 The DHCP packet to parse the options
+  @param[out] Count                  The number of valid dhcp options present in the
+                                     packet
+  @param[out] OptionPoint            The array that contains the DHCP options. Caller
+                                     should free it.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
   @retval EFI_INVALID_PARAMETER  The options are mal-formated
@@ -648,8 +640,8 @@ ON_EXIT:
   Validate the packet's options. If necessary, allocate
   and fill in the interested parameters.
 
-  @param  Packet                 The packet to validate the options
-  @param  Para                   The variable to save the DHCP parameters.
+  @param[in]  Packet                 The packet to validate the options
+  @param[out] Para                   The variable to save the DHCP parameters.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to validate the packet.
   @retval EFI_INVALID_PARAMETER  The options are mal-formated
@@ -735,10 +727,10 @@ ON_EXIT:
   Append an option to the memory, if the option is longer than
   255 bytes, splits it into several options.
 
-  @param  Buf                    The buffer to append the option to
-  @param  Tag                    The option's tag
-  @param  DataLen                The length of the option's data
-  @param  Data                   The option's data
+  @param[out] Buf                    The buffer to append the option to
+  @param[in]  Tag                    The option's tag
+  @param[in]  DataLen                The length of the option's data
+  @param[in]  Data                   The option's data
 
   @return The position to append the next option
 
@@ -774,13 +766,13 @@ DhcpAppendOption (
   Build a new DHCP packet from a seed packet. Options may be deleted or
   appended. The caller should free the NewPacket when finished using it.
 
-  @param  SeedPacket             The seed packet to start with
-  @param  DeleteCount            The number of options to delete
-  @param  DeleteList             The options to delete from the packet
-  @param  AppendCount            The number of options to append
-  @param  AppendList             The options to append to the packet
-  @param  NewPacket              The new packet, allocated and built by this
-                                 function.
+  @param[in]  SeedPacket             The seed packet to start with
+  @param[in]  DeleteCount            The number of options to delete
+  @param[in]  DeleteList             The options to delete from the packet
+  @param[in]  AppendCount            The number of options to append
+  @param[in]  AppendList             The options to append to the packet
+  @param[out] NewPacket              The new packet, allocated and built by this
+                                     function.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
   @retval EFI_INVALID_PARAMETER  The options in SeekPacket are mal-formated

@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2006 - 2007, Intel Corporation
+  EFI UDPv4 protocol implementation.
+   
+Copyright (c) 2006 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Udp4Impl.h
-
-Abstract:
-
-  EFI UDPv4 protocol implementation
-
 
 **/
 
@@ -171,8 +163,8 @@ Udp4GetModeData (
   With different parameters in UdpConfigData, Configure() can be used to bind
   this instance to specified port.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  UdpConfigData  Pointer to the buffer to receive the current configuration data.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  UdpConfigData     Pointer to the buffer to receive the current configuration data.
 
   @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
   @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
@@ -203,10 +195,10 @@ Udp4Configure (
   filtering. If the JoinFlag is FALSE and the MulticastAddress is NULL, then all
   currently joined groups are left.
 
-  @param  This             Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  JoinFlag         Set to TRUE to join a multicast group. Set to FALSE to leave one
-                           or all multicast groups.
-  @param  MulticastAddress Pointer to multicast group address to join or leave.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  JoinFlag          Set to TRUE to join a multicast group. Set to FALSE to leave one
+                                or all multicast groups.
+  @param[in]  MulticastAddress  Pointer to multicast group address to join or leave.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_NOT_STARTED       The EFI UDPv4 Protocol instance has not been started.
@@ -254,12 +246,12 @@ Udp4Groups (
   copies will be updated automatically whenever the IP driver reconfigures its
   instances; as a result, the previous modification to these copies will be lost.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  DeleteRoute    Set to TRUE to delete this route from the routing table.
-                         Set to FALSE to add this route to the routing table.
-  @param  SubnetAddress  The destination network address that needs to be routed.
-  @param  SubnetMask     The subnet mask of SubnetAddress.
-  @param  GatewayAddress The gateway IP address for this route.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  DeleteRoute       Set to TRUE to delete this route from the routing table.
+                                Set to FALSE to add this route to the routing table.
+  @param[in]  SubnetAddress     The destination network address that needs to be routed.
+  @param[in]  SubnetMask        The subnet mask of SubnetAddress.
+  @param[in]  GatewayAddress    The gateway IP address for this route.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_NOT_STARTED       The EFI UDPv4 Protocol instance has not been started.
@@ -291,9 +283,9 @@ Udp4Routes (
   and context for the event will enable the user to receive the notification and
   transmitting status.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to the completion token that will be placed into the
-                transmit queue.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  Token             Pointer to the completion token that will be placed into the
+                                transmit queue.
 
   @retval EFI_SUCCESS           The data has been queued for transmission.
   @retval EFI_NOT_STARTED       This EFI UDPv4 Protocol instance has not been started.
@@ -330,9 +322,9 @@ Udp4Transmit (
   will enable the user to receive the notification and receiving status. That
   notification function is guaranteed to not be re-entered.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to a token that is associated with the receive data
-                descriptor.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  Token             Pointer to a token that is associated with
+                                the receive data descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
   @retval EFI_NOT_STARTED       This EFI UDPv4 Protocol instance has not been started.
@@ -364,11 +356,11 @@ Udp4Receive (
   the asynchronous operation has completed, this function will not signal the
   token and EFI_NOT_FOUND is returned.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
-                EFI_UDP4_PROTOCOL.Transmit() or
-                EFI_UDP4_PROTOCOL.Receive().If NULL, all pending
-                tokens are aborted.
+  @param[in]  This  Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  Token Pointer to a token that has been issued by
+                    EFI_UDP4_PROTOCOL.Transmit() or
+                    EFI_UDP4_PROTOCOL.Receive().If NULL, all pending
+                    tokens are aborted.
 
   @retval  EFI_SUCCESS           The asynchronous I/O request was aborted and Token.Event
                                  was signaled. When Token is NULL, all pending requests are
@@ -401,7 +393,7 @@ Udp4Cancel (
   Drivers and applications that are experiencing packet loss should try calling
   the Poll() function more often.
 
-  @param  This Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[in]  This  Pointer to the EFI_UDP4_PROTOCOL instance.
 
   @retval EFI_SUCCESS           Incoming or outgoing data was processed.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -438,9 +430,7 @@ Udp4CreateService (
 /**
   Clean the Udp service context data.
 
-  @param  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
-
-  @return None.
+  @param[in]  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
 
 **/
 VOID
@@ -454,8 +444,6 @@ Udp4CleanService (
   @param  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
   @param  Instance               Pointer to the un-initialized UDP4_INSTANCE_DATA.
 
-  @return None.
-
 **/
 VOID
 Udp4InitInstance (
@@ -466,9 +454,7 @@ Udp4InitInstance (
 /**
   This function cleans the udp instance.
 
-  @param  Instance               Pointer to the UDP4_INSTANCE_DATA to clean.
-
-  @return None.
+  @param[in]  Instance               Pointer to the UDP4_INSTANCE_DATA to clean.
 
 **/
 VOID
@@ -502,9 +488,9 @@ Udp4Bind (
   This function is used to check whether the NewConfigData has any un-reconfigurable
   parameters changed compared to the OldConfigData.
 
-  @param  OldConfigData          Pointer to the current ConfigData the udp instance
+  @param[in]  OldConfigData      Pointer to the current ConfigData the udp instance
                                  uses.
-  @param  NewConfigData          Pointer to the new ConfigData.
+  @param[in]  NewConfigData      Pointer to the new ConfigData.
 
   @retval TRUE     The instance is reconfigurable.
   @retval FALSE    Otherwise.
@@ -519,10 +505,8 @@ Udp4IsReconfigurable (
 /**
   This function builds the Ip4 configdata from the Udp4ConfigData.
 
-  @param  Udp4ConfigData         Pointer to the EFI_UDP4_CONFIG_DATA.
-  @param  Ip4ConfigData          Pointer to the EFI_IP4_CONFIG_DATA.
-
-  @return None.
+  @param[in]       Udp4ConfigData    Pointer to the EFI_UDP4_CONFIG_DATA.
+  @param[in, out]  Ip4ConfigData     Pointer to the EFI_IP4_CONFIG_DATA.
 
 **/
 VOID
@@ -534,8 +518,8 @@ Udp4BuildIp4ConfigData (
 /**
   This function validates the TxToken, it returns the error code according to the spec.
 
-  @param  Instance               Pointer to the udp instance context data.
-  @param  TxToken                Pointer to the token to be checked.
+  @param[in]  Instance           Pointer to the udp instance context data.
+  @param[in]  TxToken            Pointer to the token to be checked.
 
   @retval EFI_SUCCESS            The TxToken is valid.
   @retval EFI_INVALID_PARAMETER  One or more of the following are TRUE: This is
@@ -566,10 +550,10 @@ Udp4ValidateTxToken (
 /**
   This function checks whether the specified Token duplicates with the one in the Map.
 
-  @param  Map                    Pointer to the NET_MAP.
-  @param  Item                   Pointer to the NET_MAP_ITEM contain the pointer to
+  @param[in]  Map                Pointer to the NET_MAP.
+  @param[in]  Item               Pointer to the NET_MAP_ITEM contain the pointer to
                                  the Token.
-  @param  Context                Pointer to the Token to be checked.
+  @param[in]  Context            Pointer to the Token to be checked.
 
   @retval EFI_SUCCESS            The Token specified by Context differs from the
                                  one in the Item.
@@ -587,11 +571,11 @@ Udp4TokenExist (
   This function calculates the checksum for the Packet, utilizing the pre-calculated
   pseudo HeadSum to reduce some overhead.
 
-  @param  Packet                 Pointer to the NET_BUF contains the udp datagram.
-  @param  HeadSum                Checksum of the pseudo header execpt the length
+  @param[in]  Packet             Pointer to the NET_BUF contains the udp datagram.
+  @param[in]  HeadSum            Checksum of the pseudo header execpt the length
                                  field.
 
-  @return The 16-bit checksum of this udp datagram.
+  @retval The 16-bit checksum of this udp datagram.
 
 **/
 UINT16
@@ -603,8 +587,8 @@ Udp4Checksum (
 /**
   This function removes the specified Token from the TokenMap.
 
-  @param  TokenMap               Pointer to the NET_MAP containing the tokens.
-  @param  Token                  Pointer to the Token to be removed.
+  @param  TokenMap           Pointer to the NET_MAP containing the tokens.
+  @param  Token              Pointer to the Token to be removed.
 
   @retval EFI_SUCCESS            The specified Token is removed from the TokenMap.
   @retval EFI_NOT_FOUND          The specified Token is not found in the TokenMap.
@@ -639,9 +623,7 @@ Udp4LeaveGroup (
 /**
   This function removes all the Wrap datas in the RcvdDgramQue.
 
-  @param  Instance           Pointer to the udp instance context data.
-
-  @return None.
+  @param[in]  Instance           Pointer to the udp instance context data.
 
 **/
 VOID
@@ -652,8 +634,8 @@ Udp4FlushRcvdDgram (
 /**
   Cancel Udp4 tokens from the Udp4 instance.
 
-  @param  Instance               Pointer to the udp instance context data.
-  @param  Token                  Pointer to the token to be canceled, if NULL, all
+  @param[in]  Instance           Pointer to the udp instance context data.
+  @param[in]  Token              Pointer to the token to be canceled, if NULL, all
                                  tokens in this instance will be cancelled.
 
   @retval EFI_SUCCESS            The Token is cancelled.
@@ -669,9 +651,7 @@ Udp4InstanceCancelToken (
 /**
   This function delivers the received datagrams for the specified instance.
 
-  @param  Instance               Pointer to the instance context data.
-
-  @return None.
+  @param[in]  Instance               Pointer to the instance context data.
 
 **/
 VOID
@@ -682,9 +662,7 @@ Udp4InstanceDeliverDgram (
 /**
   This function reports the received ICMP error.
 
-  @param  Instance               Pointer to the udp instance context data.
-
-  @return None.
+  @param[in]  Instance               Pointer to the udp instance context data.
 
 **/
 VOID
@@ -696,9 +674,7 @@ Udp4ReportIcmpError (
   This function is a dummy ext-free function for the NET_BUF created for the output
   udp datagram.
 
-  @param  Context                Pointer to the context data.
-
-  @return None.
+  @param[in]  Context                Pointer to the context data.
 
 **/
 VOID
@@ -725,9 +701,7 @@ Udp4SetVariableData (
 /**
   Clear the variable and free the resource.
 
-  @param  Udp4Service            Udp4 service data.
-
-  @return None.
+  @param[[in]  Udp4Service            Udp4 service data.
 
 **/
 VOID

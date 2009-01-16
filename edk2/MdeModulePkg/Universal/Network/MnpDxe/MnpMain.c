@@ -1,7 +1,8 @@
 /** @file
-    Implementation of Managed Network Protocol public services.
+  Implementation of Managed Network Protocol public services.
+  
+Copyright (c) 2005 - 2007, Intel Corporation.<BR>
 
-Copyright (c) 2005 - 2007, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,13 +25,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   The GetModeData() function is used to read the current mode data (operational
   parameters) from the MNP or the underlying SNP. 
 
-  @param This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param MnpConfigData Pointer to storage for MNP operational parameters. Type
-                       EFI_MANAGED_NETWORK_CONFIG_DATA is defined in "Related
-                       Definitions" below.
-  @param SnpModeData   Pointer to storage for SNP operational parameters. This
-                       feature may be unsupported. Type EFI_SIMPLE_NETWORK_MODE
-                       is defined in the EFI_SIMPLE_NETWORK_PROTOCOL.
+  @param[in]  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[out] MnpConfigData Pointer to storage for MNP operational parameters. Type
+                            EFI_MANAGED_NETWORK_CONFIG_DATA is defined in "Related
+                            Definitions" below.
+  @param[out] SnpModeData   Pointer to storage for SNP operational parameters. This
+                            feature may be unsupported. Type EFI_SIMPLE_NETWORK_MODE
+                            is defined in the EFI_SIMPLE_NETWORK_PROTOCOL.
  
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -113,14 +114,13 @@ MnpGetModeData (
   Note: Warning: Receive filter settings that overlap will consume extra
   processor and/or DMA resources and degrade system and network performance.
 
-  @param  This             Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  MnpConfigData    Pointer to configuration data that will be assigned
-                           to the MNP child driver instance. If NULL, the MNP
-                           child driver instance is reset to startup defaults
-                           and all pending transmit and receive requests are
-                           flushed. Type EFI_MANAGED_NETWORK_CONFIG_DATA is
-                           defined in
-                           EFI_MANAGED_NETWORK_PROTOCOL.GetModeData().
+  @param[in]  This             Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  MnpConfigData    Pointer to configuration data that will be assigned
+                               to the MNP child driver instance. If NULL, the MNP
+                               child driver instance is reset to startup defaults
+                               and all pending transmit and receive requests are
+                               flushed. Type EFI_MANAGED_NETWORK_CONFIG_DATA is
+                               defined in EFI_MANAGED_NETWORK_PROTOCOL.GetModeData().
 
   @retval EFI_SUCCESS            The operation completed successfully.
   @retval EFI_INVALID_PARAMETER  One or more of the following conditions is
@@ -196,12 +196,12 @@ ON_EXIT:
   underlying EFI_SIMPLE_NETWORK.MCastIpToMac() function, which may also be
   unsupported in some MNP implementations.
 
-  @param This       Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param Ipv6Flag   Set to TRUE to if IpAddress is an IPv6 multicast address.
-                    Set to FALSE if IpAddress is an IPv4 multicast address.
-  @param IpAddress  Pointer to the multicast IP address (in network byte order)
-                    to convert.
-  @param MacAddress Pointer to the resulting multicast MAC address. 
+  @param[in]  This       Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Ipv6Flag   Set to TRUE to if IpAddress is an IPv6 multicast address.
+                         Set to FALSE if IpAddress is an IPv4 multicast address.
+  @param[in]  IpAddress  Pointer to the multicast IP address (in network byte order)
+                         to convert.
+  @param[out] MacAddress Pointer to the resulting multicast MAC address. 
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER One of the following conditions is TRUE:
@@ -303,11 +303,11 @@ ON_EXIT:
   Management Protocol (IGMP) packets. If JoinFlag is FALSE and MacAddress is
   NULL, then all joined groups are left.
    
-  @param  This        Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  JoinFlag    Set to TRUE to join this multicast group.
-                      Set to FALSE to leave this multicast group.
-  @param  MacAddress  Pointer to the multicast MAC group (address) to join or
-                      leave.
+  @param[in]  This        Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  JoinFlag    Set to TRUE to join this multicast group.
+                          Set to FALSE to leave this multicast group.
+  @param[in]  MacAddress  Pointer to the multicast MAC group (address) to join or
+                          leave.
 
   @retval EFI_SUCCESS           The requested operation completed successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
@@ -455,10 +455,10 @@ ON_EXIT:
   the underlying communications device and drivers.
  
  
-  @param  This    Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token   Pointer to a token associated with the transmit data
-                  descriptor. Type EFI_MANAGED_NETWORK_COMPLETION_TOKEN is
-                  defined in "Related Definitions" below.
+  @param[in]  This    Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Token   Pointer to a token associated with the transmit data
+                      descriptor. Type EFI_MANAGED_NETWORK_COMPLETION_TOKEN is
+                      defined in "Related Definitions" below.
 
   @retval EFI_SUCCESS            The transmit completion token was cached.
   @retval EFI_NOT_STARTED        This MNP child driver instance has not been
@@ -562,11 +562,11 @@ ON_EXIT:
   updates the Token.Status and Token.RxData fields and the Token.Event is
   signaled.
    
-  @param  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token         Pointer to a token associated with the receive
-                        data descriptor. Type
-                        EFI_MANAGED_NETWORK_COMPLETION_TOKEN is defined in
-                        EFI_MANAGED_NETWORK_PROTOCOL.Transmit().
+  @param[in]  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Token         Pointer to a token associated with the receive
+                            data descriptor. Type
+                            EFI_MANAGED_NETWORK_COMPLETION_TOKEN is defined in
+                            EFI_MANAGED_NETWORK_PROTOCOL.Transmit().
 
   @retval EFI_SUCCESS            The receive completion token was cached.
   @retval EFI_NOT_STARTED        This MNP child driver instance has not been
@@ -655,11 +655,11 @@ ON_EXIT:
   the asynchronous operation has completed, this function will not signal the
   token and EFI_NOT_FOUND is returned.
 
-  @param  This     Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token    Pointer to a token that has been issued by
-                   EFI_MANAGED_NETWORK_PROTOCOL.Transmit() or
-                   EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If NULL, all pending
-                   tokens are aborted.
+  @param[in]  This     Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Token    Pointer to a token that has been issued by
+                       EFI_MANAGED_NETWORK_PROTOCOL.Transmit() or
+                       EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If NULL, all pending
+                       tokens are aborted.
 
   @retval EFI_SUCCESS            The asynchronous I/O request was aborted and
                                  Token.Event was signaled. When Token is NULL,
@@ -733,7 +733,7 @@ ON_EXIT:
   applications that are experiencing packet loss should try calling the Poll()
   function more often.
 
-  @param  This            Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  This            Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
 
   @retval EFI_SUCCESS      Incoming or outgoing data was processed.
   @retval EFI_NOT_STARTED  This MNP child driver instance has not been

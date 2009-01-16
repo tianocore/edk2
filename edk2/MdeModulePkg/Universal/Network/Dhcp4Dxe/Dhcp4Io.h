@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2006 - 2008, Intel Corporation
+  The DHCP4 protocol implementation.
+  
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,16 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Dhcp4Io.h
-
-Abstract:
-
-  The DHCP4 protocol implementation.
-
 
 **/
 
@@ -104,12 +95,12 @@ DhcpSetState (
   the state (as defined in Figure 5. of the same RFC) before sending
   a DHCP message. The table is adjusted accordingly.
 
-  @param  DhcpSb                The DHCP service instance
-  @param  Seed                  The seed packet which the new packet is based on
-  @param  Para                  The DHCP parameter of the Seed packet
-  @param  Type                  The message type to send
-  @param  Msg                   The human readable message to include in the packet
-                                sent.
+  @param[in]  DhcpSb                The DHCP service instance
+  @param[in]  Seed                  The seed packet which the new packet is based on
+  @param[in]  Para                  The DHCP parameter of the Seed packet
+  @param[in]  Type                  The message type to send
+  @param[in]  Msg                   The human readable message to include in the packet
+                                    sent.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resources for the packet
   @retval EFI_ACCESS_DENIED     Failed to transmit the packet through UDP
@@ -133,10 +124,8 @@ DhcpSendMessage (
   and lease to determine the time to renew and rebind the lease.
   DhcpOnTimerTick will be called once every second.
 
-  @param  Event                 The timer event
-  @param  Context               The context, which is the DHCP service instance.
-
-  @return None
+  @param[in]  Event                 The timer event
+  @param[in]  Context               The context, which is the DHCP service instance.
 
 **/
 VOID
@@ -155,8 +144,6 @@ DhcpOnTimerTick (
   @param  IoStatus              The status of the UDP receive
   @param  Context               The opaque parameter to the function.
 
-  @return None
-
 **/
 VOID
 DhcpInput (
@@ -170,7 +157,7 @@ DhcpInput (
   Send an initial DISCOVER or REQUEST message according to the
   DHCP service's current state.
 
-  @param  DhcpSb                The DHCP service instance
+  @param[in]  DhcpSb                The DHCP service instance
 
   @retval EFI_SUCCESS           The request has been sent
   @retval other                 Some error occurs when sending the request.
@@ -186,8 +173,6 @@ DhcpInitRequest (
 
   @param  DhcpSb                The DHCP instance service.
 
-  @return None
-
 **/
 VOID
 DhcpCleanLease (
@@ -201,8 +186,6 @@ DhcpCleanLease (
   @param  Points                The local/remote UDP access points
   @param  IoStatus              The status of the UDP receive
   @param  Context               The opaque parameter to the function.
-
-  @return None
 
 **/
 VOID

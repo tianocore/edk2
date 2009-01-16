@@ -1,5 +1,5 @@
 /** @file
-  Routines used to operate the Ip4 configure variable
+  Routines used to operate the Ip4 configure variable.
 
 Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
@@ -261,7 +261,7 @@ Ip4ConfigFindNicVariable (
 **/
 IP4_CONFIG_VARIABLE *
 Ip4ConfigModifyVariable (
-  IN IP4_CONFIG_VARIABLE    *Variable,    OPTIONAL
+  IN IP4_CONFIG_VARIABLE    *Variable     OPTIONAL,
   IN NIC_ADDR               *NicAddr,
   IN NIC_IP4_CONFIG_INFO    *Config       OPTIONAL
   )

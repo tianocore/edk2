@@ -204,7 +204,7 @@ EFI_STATUS
 EFIAPI
 EfiNicIp4ConfigSetInfo (
   IN EFI_NIC_IP4_CONFIG_PROTOCOL  *This,
-  IN NIC_IP4_CONFIG_INFO          *NicConfig,     OPTIONAL
+  IN NIC_IP4_CONFIG_INFO          *NicConfig     OPTIONAL,
   IN BOOLEAN                      Reconfig
   )
 {

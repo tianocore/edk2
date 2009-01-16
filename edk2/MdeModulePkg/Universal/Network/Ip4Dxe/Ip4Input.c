@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2007, Intel Corporation
+  IP4 input process.
+  
+Copyright (c) 2005 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Ip4Input.c
-
-Abstract:
-
-  IP4 input process.
-
 
 **/
 
@@ -28,13 +20,13 @@ Abstract:
   (Dst, Src, Id, Protocol). The default life for the packet is
   120 seconds.
 
-  @param  Dst                    The destination address
-  @param  Src                    The source address
-  @param  Id                     The ID field in IP header
-  @param  Protocol               The protocol field in IP header
+  @param[in]  Dst                    The destination address
+  @param[in]  Src                    The source address
+  @param[in]  Id                     The ID field in IP header
+  @param[in]  Protocol               The protocol field in IP header
 
   @return NULL if failed to allocate memory for the entry, otherwise
-  @return the point to just created reassemble entry.
+          the point to just created reassemble entry.
 
 **/
 IP4_ASSEMBLE_ENTRY *
@@ -74,9 +66,7 @@ Ip4CreateAssembleEntry (
 /**
   Release all the fragments of a packet, then free the assemble entry.
 
-  @param  Assemble               The assemble entry to free
-
-  @return None
+  @param[in]  Assemble               The assemble entry to free
 
 **/
 VOID
@@ -103,9 +93,7 @@ Ip4FreeAssembleEntry (
   Initialize an already allocated assemble table. This is generally
   the assemble table embedded in the IP4 service instance.
 
-  @param  Table                  The assemble table to initialize.
-
-  @return NONE
+  @param[in, out]  Table                  The assemble table to initialize.
 
 **/
 VOID
@@ -125,9 +113,7 @@ Ip4InitAssembleTable (
   Clean up the assemble table: remove all the fragments
   and assemble entries.
 
-  @param  Table                  The assemble table to clean up
-
-  @return None
+  @param[in]  Table                  The assemble table to clean up
 
 **/
 VOID
@@ -158,8 +144,6 @@ Ip4CleanAssembleTable (
   @param  Packet                 Packet to trim
   @param  Start                  The sequence of the first byte to fit in
   @param  End                    One beyond the sequence of last byte to fit in.
-
-  @return None
 
 **/
 VOID
@@ -200,9 +184,7 @@ Ip4TrimPacket (
   the assembled packet's OnFree. It will free the assemble entry,
   which in turn will free all the fragments of the packet.
 
-  @param  Arg                    The assemble entry to free
-
-  @return None
+  @param[in]  Arg                    The assemble entry to free
 
 **/
 VOID
@@ -448,15 +430,13 @@ DROP:
   The IP4 input routine. It is called by the IP4_INTERFACE when a
   IP4 fragment is received from MNP.
 
-  @param  Ip4Instance            The IP4 child that request the receive, most like
+  @param[in]  Ip4Instance        The IP4 child that request the receive, most like
                                  it is NULL.
-  @param  Packet                 The IP4 packet received.
-  @param  IoStatus               The return status of receive request.
-  @param  Flag                   The link layer flag for the packet received, such
+  @param[in]  Packet             The IP4 packet received.
+  @param[in]  IoStatus           The return status of receive request.
+  @param[in]  Flag               The link layer flag for the packet received, such
                                  as multicast.
-  @param  Context                The IP4 service instance that own the MNP.
-
-  @return None
+  @param[in]  Context            The IP4 service instance that own the MNP.
 
 **/
 VOID
@@ -625,9 +605,9 @@ DROP:
 /**
   Check whether this IP child accepts the packet.
 
-  @param  IpInstance             The IP child to check
-  @param  Head                   The IP header of the packet
-  @param  Packet                 The data of the packet
+  @param[in]  IpInstance             The IP child to check
+  @param[in]  Head                   The IP header of the packet
+  @param[in]  Packet                 The data of the packet
 
   @retval TRUE   If the child wants to receive the packet.
   @retval FALSE  Otherwise.
@@ -730,9 +710,9 @@ Ip4InstanceFrameAcceptable (
   packet is acceptable to it. Here the data of the packet is
   shared, but the net buffer isn't.
 
-  @param  IpInstance             The IP4 child to enqueue the packet to
-  @param  Head                   The IP header of the received packet
-  @param  Packet                 The data of the received packet
+  @param[in]  IpInstance             The IP4 child to enqueue the packet to
+  @param[in]  Head                   The IP header of the received packet
+  @param[in]  Packet                 The data of the received packet
 
   @retval EFI_NOT_STARTED        The IP child hasn't been configured.
   @retval EFI_INVALID_PARAMETER  The child doesn't want to receive the packet
@@ -786,11 +766,9 @@ Ip4InstanceEnquePacket (
   The signal handle of IP4's recycle event. It is called back
   when the upper layer release the packet.
 
-  @param  Event                  The IP4's recycle event.
-  @param  Context                The context of the handle, which is a
-                                 IP4_RXDATA_WRAP
-
-  @return None
+  @param  Event              The IP4's recycle event.
+  @param  Context            The context of the handle, which is a
+                             IP4_RXDATA_WRAP
 
 **/
 VOID
@@ -824,10 +802,11 @@ Ip4OnRecyclePacket (
   to the upper layer. Upper layer will signal the recycle event in
   it when it is done with the packet.
 
-  @param  IpInstance             The IP4 child to receive the packet
-  @param  Packet                 The packet to deliver up.
+  @param[in]  IpInstance             The IP4 child to receive the packet
+  @param[in]  Packet                 The packet to deliver up.
 
-  @return NULL if failed to wrap the packet, otherwise the wrapper.
+  @retval Wrap              if warp the packet succeed.
+  @retval NULL              failed to wrap the packet .
 
 **/
 IP4_RXDATA_WRAP *
@@ -900,7 +879,7 @@ Ip4WrapRxData (
   duplicate it to a non-shared packet, release the shared packet, then
   deliver the non-shared packet up.
 
-  @param  IpInstance             The IP child to deliver the packet up.
+  @param[in]  IpInstance         The IP child to deliver the packet up.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources to deliver the
                                  packets.
@@ -996,10 +975,10 @@ Ip4InstanceDeliverPacket (
   Enqueue a received packet to all the IP children that share
   the same interface.
 
-  @param  IpSb                   The IP4 service instance that receive the packet
-  @param  Head                   The header of the received packet
-  @param  Packet                 The data of the received packet
-  @param  IpIf                   The interface to enqueue the packet to
+  @param[in]  IpSb                   The IP4 service instance that receive the packet
+  @param[in]  Head                   The header of the received packet
+  @param[in]  Packet                 The data of the received packet
+  @param[in]  IpIf                   The interface to enqueue the packet to
 
   @return The number of the IP4 children that accepts the packet
 
@@ -1087,8 +1066,8 @@ Ip4InterfaceEnquePacket (
 /**
   Deliver the packet for each IP4 child on the interface.
 
-  @param  IpSb                   The IP4 service instance that received the packet
-  @param  IpIf                   The IP4 interface to deliver the packet.
+  @param[in]  IpSb               The IP4 service instance that received the packet
+  @param[in]  IpIf               The IP4 interface to deliver the packet.
 
   @retval EFI_SUCCESS            It always returns EFI_SUCCESS now
 
@@ -1120,9 +1099,9 @@ Ip4InterfaceDeliverPacket (
   child wants to consume the packet because each IP child needs
   its own copy of the packet to make changes.
 
-  @param  IpSb                   The IP4 service instance that received the packet
-  @param  Head                   The header of the received packet
-  @param  Packet                 The data of the received packet
+  @param[in]  IpSb                   The IP4 service instance that received the packet
+  @param[in]  Head                   The header of the received packet
+  @param[in]  Packet                 The data of the received packet
 
   @retval EFI_NOT_FOUND          No IP child accepts the packet
   @retval EFI_SUCCESS            The packet is enqueued or delivered to some IP
@@ -1180,9 +1159,7 @@ Ip4Demultiplex (
 /**
   Timeout the fragment and enqueued packets.
 
-  @param  IpSb                   The IP4 service instance to timeout
-
-  @return None
+  @param[in]  IpSb                   The IP4 service instance to timeout
 
 **/
 VOID

@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+  Header file for ICMP protocol.
+  
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,16 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Ip4Icmp.h
-
-Abstract:
-
-  Header file for ICMP protocol.
-
 
 **/
 
@@ -95,9 +86,9 @@ extern EFI_IP4_ICMP_TYPE  mIp4SupportedIcmp[];
   then according to the message types, process it as query or
   error packet.
 
-  @param  IpSb                   The IP service that receivd the packet
-  @param  Head                   The IP head of the ICMP query packet
-  @param  Packet                 The content of the ICMP query with IP head
+  @param[in]  IpSb               The IP service that receivd the packet
+  @param[in]  Head               The IP head of the ICMP query packet
+  @param[in]  Packet             The content of the ICMP query with IP head
                                  removed.
 
   @retval EFI_INVALID_PARAMETER  The packet is malformated.

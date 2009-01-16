@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2005 - 2006, Intel Corporation
+  Definition for IP4 pesudo interface structure.
+  
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,16 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Ip4If.h
-
-Abstract:
-
-  Definition for IP4 pesudo interface structure.
-
 
 **/
 
@@ -40,24 +31,24 @@ typedef enum {
   When transmitting, the Netbuf is from IP4, and provided
   to the callback as a reference. Flag isn't used.
 
-  @param IpInstance The instance that sent or received the packet.
-                    IpInstance can be NULL which means that it is the IP4 driver
-                    itself sending the packets. IP4 driver may send packets that
-                    don't belong to any instance, such as ICMP errors, ICMP echo
-                    responses, or IGMP packets. IpInstance is used as a tag in
-                    this module.
-  @param Packet     The sent or received packet.
-  @param IoStatus   Status of sending or receiving.
-  @param LinkFlag   Indicate if the frame is received as link broadcast/multicast.
-                    When transmitting, it is not used.
-  @param Context    Additional data for callback.
+  @param[in] IpInstance The instance that sent or received the packet.
+                        IpInstance can be NULL which means that it is the IP4 driver
+                        itself sending the packets. IP4 driver may send packets that
+                        don't belong to any instance, such as ICMP errors, ICMP echo
+                        responses, or IGMP packets. IpInstance is used as a tag in
+                        this module.
+  @param[in] Packet     The sent or received packet.
+  @param[in] IoStatus   Status of sending or receiving.
+  @param[in] LinkFlag   Indicate if the frame is received as link broadcast/multicast.
+                        When transmitting, it is not used.
+  @param[in] Context    Additional data for callback.
 
-  @return None.
+  @retval None.
 **/
 typedef
 VOID
 (*IP4_FRAME_CALLBACK)(
-  IN IP4_PROTOCOL              *IpInstance,       OPTIONAL
+  IN IP4_PROTOCOL              *IpInstance       OPTIONAL,
   IN NET_BUF                   *Packet,
   IN EFI_STATUS                IoStatus,
   IN UINT32                    LinkFlag,
@@ -202,11 +193,11 @@ struct _IP4_INTERFACE {
   Create an IP4_INTERFACE. Delay the creation of ARP instance until
   the interface is configured.
 
-  @param  Mnp                   The shared MNP child of this IP4 service binding
+  @param[in]  Mnp               The shared MNP child of this IP4 service binding
                                 instance
-  @param  Controller            The controller this IP4 service binding instance
+  @param[in]  Controller        The controller this IP4 service binding instance
                                 is installed. Most like the UNDI handle.
-  @param  ImageHandle           This driver's image handle
+  @param[in]  ImageHandle       This driver's image handle
 
   @return Point to the created IP4_INTERFACE, otherwise NULL.
 
@@ -222,9 +213,9 @@ Ip4CreateInterface (
   Set the interface's address, create and configure
   the ARP child if necessary.
 
-  @param  Interface             The interface to set the address
-  @param  IpAddr                The interface's IP address
-  @param  SubnetMask            The interface's netmask
+  @param  Interface         The interface to set the address
+  @param  IpAddr            The interface's IP address
+  @param  SubnetMask        The interface's netmask
 
   @retval EFI_SUCCESS           The interface is configured with Ip/netmask pair,
                                 and a ARP is created for it.
@@ -245,8 +236,8 @@ Ip4SetAddress (
   Because the IpInstance is optional, the caller must remove
   IpInstance from the interface's instance list itself.
 
-  @param  Interface             The interface used by the IpInstance
-  @param  IpInstance            The Ip instance that free the interface. NULL if
+  @param[in]  Interface         The interface used by the IpInstance
+  @param[in]  IpInstance        The Ip instance that free the interface. NULL if
                                 the Ip driver is releasing the default interface.
 
   @retval EFI_SUCCESS           The interface use IpInstance is freed.
@@ -265,14 +256,14 @@ Ip4FreeInterface (
   If some error happened, the CallBack won't be called. So, the caller
   must test the return value, and take action when there is an error.
 
-  @param  Interface             The interface to send the frame from
-  @param  IpInstance            The IP child that request the transmission.  NULL
+  @param[in]  Interface         The interface to send the frame from
+  @param[in]  IpInstance        The IP child that request the transmission.  NULL
                                 if it is the IP4 driver itself.
-  @param  Packet                The packet to transmit.
-  @param  NextHop               The immediate destination to transmit the packet
+  @param[in]  Packet            The packet to transmit.
+  @param[in]  NextHop           The immediate destination to transmit the packet
                                 to.
-  @param  CallBack              Function to call back when transmit finished.
-  @param  Context               Opaque parameter to the call back.
+  @param[in]  CallBack          Function to call back when transmit finished.
+  @param[in]  Context           Opaque parameter to the call back.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to send the frame
   @retval EFI_NO_MAPPING        Can't resolve the MAC for the nexthop
@@ -295,14 +286,12 @@ Ip4SendFrame (
   either queued on ARP queues or that have already been delivered to
   MNP and not yet recycled.
 
-  @param  Interface             Interface to remove the frames from
-  @param  IoStatus              The transmit status returned to the frames'
+  @param[in]  Interface         Interface to remove the frames from
+  @param[in]  IoStatus          The transmit status returned to the frames'
                                 callback
-  @param  FrameToCancel         Function to select the frame to cancel, NULL to
+  @param[in]  FrameToCancel     Function to select the frame to cancel, NULL to
                                 select all
-  @param  Context               Opaque parameters passed to FrameToCancel
-
-  @return NONE
+  @param[in]  Context           Opaque parameters passed to FrameToCancel
 
 **/
 VOID
@@ -322,9 +311,7 @@ Ip4CancelFrames (
   packet and update the upper layer's transmit request status, say
   that from the UDP.
 
-  @param  Interface             The interface used by the IpInstance
-
-  @return None
+  @param[in]  Interface         The interface used by the IpInstance
 
 **/
 VOID
@@ -335,11 +322,11 @@ Ip4CancelReceive (
 /**
   Request to receive the packet from the interface.
 
-  @param  Interface             The interface to receive the frames from
-  @param  IpInstance            The instance that requests the receive. NULL for
+  @param[in]  Interface         The interface to receive the frames from
+  @param[in]  IpInstance        The instance that requests the receive. NULL for
                                 the driver itself.
-  @param  CallBack              Function to call when receive finished.
-  @param  Context               Opaque parameter to the callback
+  @param[in]  CallBack          Function to call when receive finished.
+  @param[in]  Context           Opaque parameter to the callback
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to receive
