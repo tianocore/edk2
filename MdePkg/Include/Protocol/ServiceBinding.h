@@ -26,6 +26,7 @@ typedef struct _EFI_SERVICE_BINDING_PROTOCOL EFI_SERVICE_BINDING_PROTOCOL;
 
 /**
   Creates a child handle and installs a protocol.
+  
   The CreateChild() function installs a protocol on ChildHandle. 
   If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
   If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
@@ -51,6 +52,7 @@ EFI_STATUS
 
 /**
   Destroys a child handle with a protocol installed on it.
+  
   The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
   that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
   last protocol on ChildHandle, then ChildHandle is destroyed.
