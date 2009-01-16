@@ -1,95 +1,37 @@
 /** @file
-
-Copyright (c) 2006, Intel Corporation
+  Routines to process Wrq (upload).
+  
+Copyright (c) 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Mtftp4Wrq.c
-
-Abstract:
-
-  Routines to process Wrq (upload)
-
 
 **/
 
 #include "Mtftp4Impl.h"
 
-VOID
-Mtftp4WrqInput (
-  IN NET_BUF                *UdpPacket,
-  IN UDP_POINTS             *Points,
-  IN EFI_STATUS             IoStatus,
-  IN VOID                   *Context
-  );
-
-
-/**
-  Start the MTFTP session for pload. It will first init some states,
-  then send the WRQ request packet, and start receiving the  packet.
-
-  @param  Instance              The MTFTP session
-  @param  Operation             Redundant parameter, which is always
-                                EFI_MTFTP4_OPCODE_WRQ here.
-
-  @retval EFI_SUCCESS           The upload process has been started.
-  @retval Others                Failed to start the upload.
-
-**/
-EFI_STATUS
-Mtftp4WrqStart (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN UINT16                 Operation
-  )
-{
-  EFI_STATUS                Status;
-
-  //
-  // The valid block number range are [0, 0xffff]. For example:
-  // the client sends an WRQ request to the server, the server
-  // ACK with an ACK0 to let client start transfer the first
-  // packet.
-  //
-  Status = Mtftp4InitBlockRange (&Instance->Blocks, 0, 0xffff);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = Mtftp4SendRequest (Instance);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return UdpIoRecvDatagram (Instance->UnicastPort, Mtftp4WrqInput, Instance, 0);
-}
 
 
 /**
   Build then send a MTFTP data packet for the MTFTP upload session.
 
-  @param  Instance              The MTFTP upload session
-  @param  BlockNum              The block number to send
+  @param  Instance              The MTFTP upload session.
+  @param  BlockNum              The block number to send.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to build the packet
+  @retval EFI_OUT_OF_RESOURCES  Failed to build the packet.
   @retval EFI_ABORTED           The consumer of this child directs to abort the
-                                transmission by return an error through
-                                PacketNeeded
+                                transmission by return an error through PacketNeeded.
   @retval EFI_SUCCESS           The data is sent.
 
 **/
 EFI_STATUS
 Mtftp4WrqSendBlock (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN UINT16                 BlockNum
+  IN OUT MTFTP4_PROTOCOL        *Instance,
+  IN     UINT16                 BlockNum
   )
 {
   EFI_MTFTP4_PACKET         *Packet;
@@ -109,7 +51,7 @@ Mtftp4WrqSendBlock (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Packet = (EFI_MTFTP4_PACKET *)NetbufAllocSpace (UdpPacket, MTFTP4_DATA_HEAD_LEN, FALSE);
+  Packet = (EFI_MTFTP4_PACKET *) NetbufAllocSpace (UdpPacket, MTFTP4_DATA_HEAD_LEN, FALSE);
 
   Packet->Data.OpCode = HTONS (EFI_MTFTP4_OPCODE_DATA);
   Packet->Data.Block  = HTONS (BlockNum);
@@ -139,7 +81,12 @@ Mtftp4WrqSendBlock (
     // Get data from PacketNeeded
     //
     DataBuf = NULL;
-    Status  = Token->PacketNeeded (&Instance->Mtftp4, Token, &DataLen, (VOID **) &DataBuf);
+    Status  = Token->PacketNeeded (
+                       &Instance->Mtftp4,
+                       Token,
+                       &DataLen,
+                       (VOID **) &DataBuf
+                       );
 
     if (EFI_ERROR (Status) || (DataLen > Instance->BlkSize)) {
       if (DataBuf != NULL) {
@@ -172,9 +119,10 @@ Mtftp4WrqSendBlock (
 
 
 /**
-  Function to handle received ACK packet. If the ACK number matches the
-  expected block number, and there are more data pending, send the next
-  block. Otherwise tell the caller that we are done.
+  Function to handle received ACK packet. 
+  
+  If the ACK number matches the expected block number, and there are more 
+  data pending, send the next block. Otherwise tell the caller that we are done.
 
   @param  Instance              The MTFTP upload session
   @param  Packet                The MTFTP packet received
@@ -188,10 +136,10 @@ Mtftp4WrqSendBlock (
 **/
 EFI_STATUS
 Mtftp4WrqHandleAck (
-  IN  MTFTP4_PROTOCOL       *Instance,
-  IN  EFI_MTFTP4_PACKET     *Packet,
-  IN  UINT32                Len,
-  OUT BOOLEAN               *Completed
+  IN     MTFTP4_PROTOCOL       *Instance,
+  IN     EFI_MTFTP4_PACKET     *Packet,
+  IN     UINT32                Len,
+     OUT BOOLEAN               *Completed
   )
 {
   UINT16                    AckNum;
@@ -221,6 +169,7 @@ Mtftp4WrqHandleAck (
   Expected = Mtftp4GetNextBlockNum (&Instance->Blocks);
 
   if (Expected < 0) {
+  
     //
     // The block range is empty. It may either because the the last
     // block has been ACKed, or the sequence number just looped back,
@@ -247,17 +196,19 @@ Mtftp4WrqHandleAck (
 
 
 /**
-  Check whether the received OACK is valid. The OACK is valid
-  only if:
+  Check whether the received OACK is valid. 
+  
+  The OACK is valid only if:
   1. It only include options requested by us
   2. It can only include a smaller block size
   3. It can't change the proposed time out value.
-  4. Other requirements of the individal MTFTP options as required.s
+  4. Other requirements of the individal MTFTP options as required.
 
   @param  Reply                 The options included in the OACK
   @param  Request               The options we requested
 
-  @return TRUE if the options included in OACK is valid, otherwise FALSE.
+  @retval TRUE                  The options included in OACK is valid.
+  @retval FALSE                 The options included in OACK is invalid.
 
 **/
 BOOLEAN
@@ -269,7 +220,7 @@ Mtftp4WrqOackValid (
   //
   // It is invalid for server to return options we don't request
   //
-  if ((Reply->Exist &~Request->Exist) != 0) {
+  if ((Reply->Exist & ~Request->Exist) != 0) {
     return FALSE;
   }
 
@@ -277,8 +228,8 @@ Mtftp4WrqOackValid (
   // Server can only specify a smaller block size to be used and
   // return the timeout matches that requested.
   //
-  if (((Reply->Exist & MTFTP4_BLKSIZE_EXIST) && (Reply->BlkSize > Request->BlkSize)) ||
-      ((Reply->Exist & MTFTP4_TIMEOUT_EXIST) && (Reply->Timeout != Request->Timeout))) {
+  if ((((Reply->Exist & MTFTP4_BLKSIZE_EXIST) != 0) && (Reply->BlkSize > Request->BlkSize)) ||
+      (((Reply->Exist & MTFTP4_TIMEOUT_EXIST) != 0) && (Reply->Timeout != Request->Timeout))) {
     return FALSE;
   }
 
@@ -287,8 +238,9 @@ Mtftp4WrqOackValid (
 
 
 /**
-  Function to handle the MTFTP OACK packet. It parses the packet's
-  options, and update the internal states of the session
+  Function to handle the MTFTP OACK packet. 
+  
+  It parses the packet's options, and update the internal states of the session.
 
   @param  Instance              The MTFTP session
   @param  Packet                The received OACK packet
@@ -302,10 +254,10 @@ Mtftp4WrqOackValid (
 **/
 EFI_STATUS
 Mtftp4WrqHandleOack (
-  IN  MTFTP4_PROTOCOL       *Instance,
-  IN  EFI_MTFTP4_PACKET     *Packet,
-  IN  UINT32                Len,
-  OUT BOOLEAN               *Completed
+  IN OUT MTFTP4_PROTOCOL       *Instance,
+  IN     EFI_MTFTP4_PACKET     *Packet,
+  IN     UINT32                Len,
+     OUT BOOLEAN               *Completed
   )
 {
   MTFTP4_OPTION             Reply;
@@ -361,7 +313,14 @@ Mtftp4WrqHandleOack (
   Bogus.Ack.OpCode    = HTONS (EFI_MTFTP4_OPCODE_ACK);
   Bogus.Ack.Block[0]  = 0;
 
-  return Mtftp4WrqHandleAck (Instance, &Bogus, sizeof (EFI_MTFTP4_ACK_HEADER), Completed);
+  Status = Mtftp4WrqHandleAck (
+             Instance,
+             &Bogus,
+             sizeof (EFI_MTFTP4_ACK_HEADER),
+             Completed
+             );
+
+  return Status;
 }
 
 
@@ -373,9 +332,6 @@ Mtftp4WrqHandleOack (
   @param  IoStatus              The result of the packet receiving
   @param  Context               Opaque parameter for the callback, which is the
                                 MTFTP session.
-
-  @return None
-
 **/
 VOID
 Mtftp4WrqInput (
@@ -494,6 +450,9 @@ Mtftp4WrqInput (
   case EFI_MTFTP4_OPCODE_ERROR:
     Status = EFI_TFTP_ERROR;
     break;
+    
+  default:
+    break;
   }
 
 ON_EXIT:
@@ -520,3 +479,49 @@ ON_EXIT:
     Mtftp4CleanOperation (Instance, Status);
   }
 }
+
+
+
+/**
+  Start the MTFTP session for upload.
+  
+  It will first init some states, then send the WRQ request packet, 
+  and start receiving the packet.
+
+  @param  Instance              The MTFTP session
+  @param  Operation             Redundant parameter, which is always
+                                EFI_MTFTP4_OPCODE_WRQ here.
+
+  @retval EFI_SUCCESS           The upload process has been started.
+  @retval Others                Failed to start the upload.
+
+**/
+EFI_STATUS
+Mtftp4WrqStart (
+  IN MTFTP4_PROTOCOL        *Instance,
+  IN UINT16                 Operation
+  )
+{
+  EFI_STATUS                Status;
+
+  //
+  // The valid block number range are [0, 0xffff]. For example:
+  // the client sends an WRQ request to the server, the server
+  // ACK with an ACK0 to let client start transfer the first
+  // packet.
+  //
+  Status = Mtftp4InitBlockRange (&Instance->Blocks, 0, 0xffff);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = Mtftp4SendRequest (Instance);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return UdpIoRecvDatagram (Instance->UnicastPort, Mtftp4WrqInput, Instance, 0);
+}
+

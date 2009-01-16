@@ -1,22 +1,14 @@
 /** @file
-
-Copyright (c) 2006 - 2007, Intel Corporation
+  Support routines for Mtftp.
+  
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Mtftp4Support.c
-
-Abstract:
-
-  Support routines for Mtftp
-
 
 **/
 
@@ -24,13 +16,12 @@ Abstract:
 
 
 /**
-  Allocate a MTFTP4 block range, then init it to the
-  range of [Start, End]
+  Allocate a MTFTP4 block range, then init it to the range of [Start, End]
 
   @param  Start                 The start block number
   @param  End                   The last block number in the range
 
-  @return NULL if failed to allocate memory, otherwise the created block range.
+  @return Pointer to the created block range, NULL if failed to allocate memory.
 
 **/
 MTFTP4_BLOCK_RANGE *
@@ -56,16 +47,17 @@ Mtftp4AllocateRange (
 
 
 /**
-  Initialize the block range for either RRQ or WRQ. RRQ and WRQ have
-  different requirements for Start and End. For example, during start
-  up, WRQ initializes its whole valid block range to [0, 0xffff]. This
-  is bacause the server will send us a ACK0 to inform us to start the
-  upload. When the client received ACK0, it will remove 0 from the range,
-  get the next block number, which is 1, then upload the BLOCK1. For RRQ
-  without option negotiation, the server will directly send us the BLOCK1
-  in response to the client's RRQ. When received BLOCK1, the client will
-  remove it from the block range and send an ACK. It also works if there
-  is option negotiation.
+  Initialize the block range for either RRQ or WRQ. 
+  
+  RRQ and WRQ have different requirements for Start and End. 
+  For example, during start up, WRQ initializes its whole valid block range 
+  to [0, 0xffff]. This is bacause the server will send us a ACK0 to inform us 
+  to start the upload. When the client received ACK0, it will remove 0 from the 
+  range, get the next block number, which is 1, then upload the BLOCK1. For RRQ
+  without option negotiation, the server will directly send us the BLOCK1 in 
+  response to the client's RRQ. When received BLOCK1, the client will remove 
+  it from the block range and send an ACK. It also works if there is option 
+  negotiation.
 
   @param  Head                  The block range head to initialize
   @param  Start                 The Start block number.
@@ -100,7 +92,7 @@ Mtftp4InitBlockRange (
 
   @param  Head                  The block range head
 
-  @return -1: if the block range is empty. Otherwise the first valid block number.
+  @return The first valid block number, -1 if the block range is empty. 
 
 **/
 INTN
@@ -120,16 +112,14 @@ Mtftp4GetNextBlockNum (
 
 
 /**
-  Set the last block number of the block range list. It will
-  remove all the blocks after the Last. MTFTP initialize the
-  block range to the maximum possible range, such as [0, 0xffff]
-  for WRQ. When it gets the last block number, it will call
-  this function to set the last block number.
+  Set the last block number of the block range list. 
+  
+  It will remove all the blocks after the Last. MTFTP initialize the block range
+  to the maximum possible range, such as [0, 0xffff] for WRQ. When it gets the 
+  last block number, it will call this function to set the last block number.
 
   @param  Head                  The block range list
   @param  Last                  The last block number
-
-  @return None
 
 **/
 VOID
@@ -321,10 +311,11 @@ Mtftp4SendRequest (
 
 
 /**
-  Build then send an error message
+  Build then send an error message.
 
   @param  Instance              The MTFTP session
-  @param  ErrInfo               The error code and message
+  @param  ErrCode               The error code  
+  @param  ErrInfo               The error message
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for the error packet
   @retval EFI_SUCCESS           The error packet is transmitted.
@@ -335,7 +326,7 @@ EFI_STATUS
 Mtftp4SendError (
   IN MTFTP4_PROTOCOL        *Instance,
   IN UINT16                 ErrCode,
-  IN UINT8*                 ErrInfo
+  IN UINT8                  *ErrInfo
   )
 {
   NET_BUF                   *Packet;
@@ -361,14 +352,13 @@ Mtftp4SendError (
 
 /**
   The callback function called when the packet is transmitted.
+  
   It simply frees the packet.
 
   @param  Packet                The transmitted (or failed to) packet
   @param  Points                The local and remote UDP access point
   @param  IoStatus              The result of the transmission
   @param  Context               Opaque parameter to the callback
-
-  @return None
 
 **/
 VOID
@@ -384,17 +374,14 @@ Mtftp4OnPacketSent (
 
 
 /**
-  Set the timeout for the instance. User a longer time for
-  passive instances.
+  Set the timeout for the instance. User a longer time for passive instances.
 
   @param  Instance              The Mtftp session to set time out
-
-  @return None
 
 **/
 VOID
 Mtftp4SetTimeout (
-  IN MTFTP4_PROTOCOL        *Instance
+  IN OUT MTFTP4_PROTOCOL        *Instance
   )
 {
   if (Instance->Master) {
@@ -406,10 +393,11 @@ Mtftp4SetTimeout (
 
 
 /**
-  Send the packet for the instance. It will first save a reference to
-  the packet for later retransmission. then determine the destination
-  port, listen port for requests, and connected port for others. At last,
-  send the packet out.
+  Send the packet for the instance. 
+  
+  It will first save a reference to the packet for later retransmission. 
+  Then determine the destination port, listen port for requests, and connected 
+  port for others. At last, send the packet out.
 
   @param  Instance              The Mtftp instance
   @param  Packet                The packet to send
@@ -420,8 +408,8 @@ Mtftp4SetTimeout (
 **/
 EFI_STATUS
 Mtftp4SendPacket (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN NET_BUF                *Packet
+  IN OUT MTFTP4_PROTOCOL        *Instance,
+  IN OUT NET_BUF                *Packet
   )
 {
   UDP_POINTS                UdpPoint;
@@ -452,7 +440,8 @@ Mtftp4SendPacket (
   Value = *((UINT16 *) NetbufGetByte (Packet, 0, NULL));
   OpCode = NTOHS (Value);
 
-  if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
+  if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || 
+      (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
       (OpCode == EFI_MTFTP4_OPCODE_WRQ)) {
     UdpPoint.RemotePort = Instance->ListeningPort;
   } else {
@@ -479,7 +468,7 @@ Mtftp4SendPacket (
 
 
 /**
-  Retransmit the last packet for the instance
+  Retransmit the last packet for the instance.
 
   @param  Instance              The Mtftp instance
 
@@ -540,8 +529,6 @@ Mtftp4Retransmit (
 
   @param  Event                 The ticking event
   @param  Context               The Mtftp service instance
-
-  @return None
 
 **/
 VOID

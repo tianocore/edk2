@@ -1,4 +1,5 @@
 /** @file
+  Socket header file.
 
 Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
@@ -24,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
 
 #define SOCK_SND_BUF        0
@@ -81,55 +83,224 @@ typedef enum {
   SO_NO_MAPPING
 } SOCK_CONFIGURE_STATE;
 
+/**
+  Set socket SO_NO_MORE_DATA flag.
+  
+  @param Sock               Pointer to the socket
+  
+**/
 #define SOCK_NO_MORE_DATA(Sock)     ((Sock)->Flag |= SO_NO_MORE_DATA)
 
+/**
+  Check whether the socket is unconfigured.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is unconfigued
+  @retval False              The socket is not unconfigued
+  
+**/
 #define SOCK_IS_UNCONFIGURED(Sock)  ((Sock)->ConfigureState == SO_UNCONFIGURED)
 
+/**
+  Check whether the socket is configured.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is configued
+  @retval False              The socket is not configued
+  
+**/
 #define SOCK_IS_CONFIGURED(Sock) \
     (((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE) || \
     ((Sock)->ConfigureState == SO_CONFIGURED_PASSIVE))
 
+/**
+  Check whether the socket is configured to active mode.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is configued to active mode
+  @retval False              The socket is not configued to active mode
+  
+**/
 #define SOCK_IS_CONFIGURED_ACTIVE(Sock) \
   ((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE)
 
+/**
+  Check whether the socket is configured to passive mode.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is configued to passive mode
+  @retval False              The socket is not configued to passive mode
+  
+**/
 #define SOCK_IS_CONNECTED_PASSIVE(Sock) \
   ((Sock)->ConfigureState == SO_CONFIGURED_PASSIVE)
 
+/**
+  Check whether the socket is mapped.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is no mapping
+  @retval False              The socket is mapped
+  
+**/
 #define SOCK_IS_NO_MAPPING(Sock) \
   ((Sock)->ConfigureState == SO_NO_MAPPING)
 
+/**
+  Check whether the socket is closed.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is closed
+  @retval False              The socket is not closed
+  
+**/
 #define SOCK_IS_CLOSED(Sock)          ((Sock)->State == SO_CLOSED)
 
+/**
+  Check whether the socket is listening.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is listening
+  @retval False              The socket is not listening
+  
+**/
 #define SOCK_IS_LISTENING(Sock)       ((Sock)->State == SO_LISTENING)
 
+/**
+  Check whether the socket is connecting.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is connecting
+  @retval False              The socket is not connecting
+  
+**/
 #define SOCK_IS_CONNECTING(Sock)      ((Sock)->State == SO_CONNECTING)
 
+/**
+  Check whether the socket has connected.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket has connected
+  @retval False              The socket has not connected
+  
+**/
 #define SOCK_IS_CONNECTED(Sock)       ((Sock)->State == SO_CONNECTED)
 
+/**
+  Check whether the socket is disconnecting.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is disconnecting
+  @retval False              The socket is not disconnecting
+  
+**/
 #define SOCK_IS_DISCONNECTING(Sock)   ((Sock)->State == SO_DISCONNECTING)
 
+/**
+  Check whether the socket is no more data.
+  
+  @param  Sock               Pointer to the socket
+  
+  @retval True               The socket is no more data
+  @retval False              The socket still has data
+  
+**/
 #define SOCK_IS_NO_MORE_DATA(Sock)    (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
 
-#define SOCK_SIGNATURE                SIGNATURE_32 ('S', 'O', 'C', 'K')
+/**
+  Set the size of the receive buffer.
+  
+  @param  Sock               Pointer to the socket
+  @param  Size               The size to set
 
-#define SOCK_FROM_THIS(a)             CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
-
+**/
 #define SET_RCV_BUFFSIZE(Sock, Size)  ((Sock)->RcvBuffer.HighWater = (Size))
 
+/**
+  Get the size of the receive buffer.
+  
+  @param  Sock               Pointer to the socket
+  
+  @return The receive buffer size
+
+**/
 #define GET_RCV_BUFFSIZE(Sock)        ((Sock)->RcvBuffer.HighWater)
 
+/**
+  Get the size of the receive data.
+  
+  @param  Sock               Pointer to the socket
+  
+  @return The received data size
+
+**/
 #define GET_RCV_DATASIZE(Sock)        (((Sock)->RcvBuffer.DataQueue)->BufSize)
 
+/**
+  Set the size of the send buffer.
+  
+  @param  Sock               Pointer to the socket
+  @param  Size               The size to set
+
+**/
 #define SET_SND_BUFFSIZE(Sock, Size)  ((Sock)->SndBuffer.HighWater = (Size))
 
+/**
+  Get the size of the send buffer.
+  
+  @param  Sock               Pointer to the socket
+  
+  @return The send buffer size
+
+**/
 #define GET_SND_BUFFSIZE(Sock)        ((Sock)->SndBuffer.HighWater)
 
+/**
+  Get the size of the send data.
+  
+  @param  Sock               Pointer to the socket
+  
+  @return The send data size
+
+**/
 #define GET_SND_DATASIZE(Sock)        (((Sock)->SndBuffer.DataQueue)->BufSize)
 
+/**
+  Set the backlog value of the socket.
+  
+  @param  Sock               Pointer to the socket
+  @param  Value              The value to set
+
+**/
 #define SET_BACKLOG(Sock, Value)      ((Sock)->BackLog = (Value))
 
+/**
+  Get the backlog value of the socket.
+  
+  @param  Sock               Pointer to the socket
+  
+  @return The backlog value
+
+**/
 #define GET_BACKLOG(Sock)             ((Sock)->BackLog)
 
+/**
+  Set the socket with error state.
+  
+  @param  Sock               Pointer to the socket
+  @param  Error              The error state
+
+**/
 #define SOCK_ERROR(Sock, Error)       ((Sock)->SockError = (Error))
 
 #define SND_BUF_HDR_LEN(Sock) \
@@ -137,6 +308,10 @@ typedef enum {
 
 #define RCV_BUF_HDR_LEN(Sock) \
   ((SockBufFirst (&((Sock)->RcvBuffer)))->TotalSize)
+
+#define SOCK_SIGNATURE                SIGNATURE_32 ('S', 'O', 'C', 'K')
+
+#define SOCK_FROM_THIS(a)             CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
 
 #define SOCK_FROM_TOKEN(Token)        (((SOCK_TOKEN *) (Token))->Sock)
 

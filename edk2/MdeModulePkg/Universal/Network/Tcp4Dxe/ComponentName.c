@@ -1,4 +1,5 @@
 /** @file
+  UEFI Component Name(2) protocol implementation for Tcp4Dxe driver.
 
 Copyright (c) 2005 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials

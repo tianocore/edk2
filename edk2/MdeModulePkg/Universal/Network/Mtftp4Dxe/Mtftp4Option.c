@@ -1,21 +1,14 @@
 /** @file
-
-Copyright (c) 2006, Intel Corporation
+  Routines to process MTFTP4 options.
+  
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Mtftp4Option.c
-
-Abstract:
-  routines to process MTFTP4 options
-
 
 **/
 
@@ -46,10 +39,10 @@ CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
 **/
 EFI_STATUS
 Mtftp4FillOptions (
-  IN  EFI_MTFTP4_PACKET     *Packet,
-  IN  UINT32                PacketLen,
-  IN  OUT UINT32            *Count,
-  OUT EFI_MTFTP4_OPTION     *Options          OPTIONAL
+  IN     EFI_MTFTP4_PACKET     *Packet,
+  IN     UINT32                PacketLen,
+  IN OUT UINT32                *Count,
+     OUT EFI_MTFTP4_OPTION     *Options          OPTIONAL
   )
 {
   UINT8                     *Cur;
@@ -103,8 +96,9 @@ Mtftp4FillOptions (
 
 
 /**
-  Allocate and fill in a array of Mtftp options from the Packet. It
-  first calls Mtftp4FillOption to get the option number, then allocate
+  Allocate and fill in a array of Mtftp options from the Packet. 
+  
+  It first calls Mtftp4FillOption to get the option number, then allocate
   the array, at last, call Mtftp4FillOption again to save the options.
 
   @param  Packet                 The packet to parse
@@ -120,10 +114,10 @@ Mtftp4FillOptions (
 **/
 EFI_STATUS
 Mtftp4ExtractOptions (
-  IN  EFI_MTFTP4_PACKET     *Packet,
-  IN  UINT32                PacketLen,
-  IN  OUT UINT32            *OptionCount,
-  OUT EFI_MTFTP4_OPTION     **OptionList        OPTIONAL
+  IN     EFI_MTFTP4_PACKET     *Packet,
+  IN     UINT32                PacketLen,
+     OUT UINT32                *OptionCount,
+     OUT EFI_MTFTP4_OPTION     **OptionList        OPTIONAL
   )
 {
   EFI_STATUS                Status;
@@ -189,8 +183,8 @@ Mtftp4ExtractOptions (
 **/
 BOOLEAN
 NetStringEqualNoCase (
-  IN  UINT8                 *Str1,
-  IN  UINT8                 *Str2
+  IN UINT8                 *Str1,
+  IN UINT8                 *Str2
   )
 {
   UINT8                     Ch1;
@@ -232,7 +226,7 @@ NetStringEqualNoCase (
 **/
 UINT32
 NetStringToU32 (
-  IN  UINT8                 *Str
+  IN UINT8                 *Str
   )
 {
   UINT32                    Num;
@@ -261,8 +255,8 @@ NetStringToU32 (
 **/
 EFI_STATUS
 NetStringToIp (
-  IN  UINT8                 *Str,
-  OUT IP4_ADDR              *Ip
+  IN     UINT8                 *Str,
+     OUT IP4_ADDR              *Ip
   )
 {
   UINT32                    Byte;
@@ -317,8 +311,8 @@ NetStringToIp (
 **/
 EFI_STATUS
 Mtftp4ExtractMcast (
-  IN UINT8                  *Value,
-  IN MTFTP4_OPTION          *Option
+  IN     UINT8                  *Value,
+  IN OUT MTFTP4_OPTION          *Option
   )
 {
   EFI_STATUS                Status;
@@ -337,7 +331,7 @@ Mtftp4ExtractMcast (
       return Status;
     }
 
-    while (*Value && (*Value != ',')) {
+    while ((*Value != 0) && (*Value != ',')) {
       Value++;
     }
   }
@@ -361,7 +355,7 @@ Mtftp4ExtractMcast (
       return EFI_INVALID_PARAMETER;
     }
 
-    Option->McastPort = (UINT16)Num;
+    Option->McastPort = (UINT16) Num;
 
     while (NET_IS_DIGIT (*Value)) {
       Value++;
@@ -383,7 +377,7 @@ Mtftp4ExtractMcast (
     return EFI_INVALID_PARAMETER;
   }
 
-  Option->Master = (BOOLEAN)(Num == 1);
+  Option->Master = (BOOLEAN) (Num == 1);
 
   while (NET_IS_DIGIT (*Value)) {
     Value++;
@@ -402,7 +396,7 @@ Mtftp4ExtractMcast (
   can access directly.
 
   @param  Options                The option array, which contains addresses of each
-                                  option's name/value string.
+                                 option's name/value string.
   @param  Count                  The number of options in the Options
   @param  Request                Whether this is a request or OACK. The format of
                                  multicast is different according to this setting.
@@ -415,10 +409,10 @@ Mtftp4ExtractMcast (
 **/
 EFI_STATUS
 Mtftp4ParseOption (
-  IN  EFI_MTFTP4_OPTION     *Options,
-  IN  UINT32                Count,
-  IN  BOOLEAN               Request,
-  OUT MTFTP4_OPTION         *MtftpOption
+  IN     EFI_MTFTP4_OPTION     *Options,
+  IN     UINT32                Count,
+  IN     BOOLEAN               Request,
+     OUT MTFTP4_OPTION         *MtftpOption
   )
 {
   EFI_STATUS                Status;
@@ -515,9 +509,9 @@ Mtftp4ParseOption (
 **/
 EFI_STATUS
 Mtftp4ParseOptionOack (
-  IN  EFI_MTFTP4_PACKET     *Packet,
-  IN  UINT32                PacketLen,
-  OUT MTFTP4_OPTION         *MtftpOption
+  IN     EFI_MTFTP4_PACKET     *Packet,
+  IN     UINT32                PacketLen,
+     OUT MTFTP4_OPTION         *MtftpOption
   )
 {
   EFI_MTFTP4_OPTION *OptionList;

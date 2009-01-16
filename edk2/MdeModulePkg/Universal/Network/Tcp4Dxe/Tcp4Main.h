@@ -1,4 +1,5 @@
 /** @file
+  TCP4 protocol services header file.
 
 Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
@@ -17,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Socket.h"
 
 #include "Tcp4Proto.h"
+#include "Tcp4Func.h"
 #include "Tcp4Driver.h"
 
 

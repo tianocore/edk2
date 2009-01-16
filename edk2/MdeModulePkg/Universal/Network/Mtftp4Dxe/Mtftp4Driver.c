@@ -1,20 +1,14 @@
 /** @file
-
-Copyright (c) 2006 - 2007, Intel Corporation
+  Implementation of Mtftp drivers.
+  
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Mtftp4Driver.c
-
-Abstract:
-
 
 **/
 
@@ -34,29 +28,23 @@ EFI_SERVICE_BINDING_PROTOCOL  gMtftp4ServiceBindingTemplete = {
   Mtftp4ServiceBindingDestroyChild
 };
 
+
+/**
+  The driver entry point which installs multiple protocols to the ImageHandle.
+
+  @param ImageHandle    The MTFTP's image handle.
+  @param SystemTable    The system table.
+
+  @retval EFI_SUCCESS  The handles are successfully installed on the image. 
+  @retval others       some EFI_ERROR occured.
+
+**/
 EFI_STATUS
 EFIAPI
 Mtftp4DriverEntryPoint (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_SYSTEM_TABLE       *SystemTable
   )
-/*++
-
-Routine Description:
-
-  The driver entry point which installs multiple protocols to the ImageHandle.
-
-Arguments:
-
-  ImageHandle - The MTFTP's image handle
-  SystemTable - The system table
-
-Returns:
-
-  EFI_SUCCESS - The handles are successfully installed on the image. Otherwise
-  some EFI_ERROR.
-
---*/
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
@@ -82,6 +70,7 @@ Returns:
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4DriverBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN EFI_HANDLE                     Controller,
@@ -104,9 +93,10 @@ Mtftp4DriverBindingSupported (
 
 
 /**
-  Config a NULL UDP that is used to keep the connection between UDP
-  and MTFTP. Just leave the Udp child unconfigured. When UDP is
-  unloaded, MTFTP will be informed with DriverBinding Stop.
+  Config a NULL UDP that is used to keep the connection between UDP and MTFTP. 
+  
+  Just leave the Udp child unconfigured. When UDP is unloaded, 
+    MTFTP will be informed with DriverBinding Stop.
 
   @param  UdpIo                  The UDP port to configure
   @param  Context                The opaque parameter to the callback
@@ -142,9 +132,9 @@ Mtftp4ConfigNullUdp (
 **/
 EFI_STATUS
 Mtftp4CreateService (
-  IN  EFI_HANDLE            Controller,
-  IN  EFI_HANDLE            Image,
-  OUT MTFTP4_SERVICE        **Service
+  IN     EFI_HANDLE            Controller,
+  IN     EFI_HANDLE            Image,
+     OUT MTFTP4_SERVICE        **Service
   )
 {
   MTFTP4_SERVICE            *MtftpSb;
@@ -221,8 +211,6 @@ Mtftp4CreateService (
 
   @param  MtftpSb                The MTFTP service binding instance.
 
-  @return None
-
 **/
 VOID
 Mtftp4CleanService (
@@ -236,8 +224,9 @@ Mtftp4CleanService (
 
 
 /**
-  Start the MTFTP driver on this controller. MTFTP driver will
-  install a MTFTP SERVICE BINDING protocol on the supported
+  Start the MTFTP driver on this controller. 
+  
+  MTFTP driver will install a MTFTP SERVICE BINDING protocol on the supported
   controller, which can be used to create/destroy MTFTP children.
 
   @param  This                   The MTFTP driver binding protocol.
@@ -251,6 +240,7 @@ Mtftp4CleanService (
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4DriverBindingStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
@@ -326,11 +316,12 @@ ON_ERROR:
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4DriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN  EFI_HANDLE                  Controller,
-  IN  UINTN                       NumberOfChildren,
-  IN  EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL *This,
+  IN EFI_HANDLE                  Controller,
+  IN UINTN                       NumberOfChildren,
+  IN EFI_HANDLE                  *ChildHandleBuffer
   )
 {
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
@@ -408,13 +399,11 @@ Mtftp4DriverBindingStop (
   @param  MtftpSb                The MTFTP service binding protocol.
   @param  Instance               The MTFTP instance to initialize.
 
-  @return None
-
 **/
 VOID
 Mtftp4InitProtocol (
-  IN MTFTP4_SERVICE         *MtftpSb,
-  IN MTFTP4_PROTOCOL        *Instance
+  IN     MTFTP4_SERVICE         *MtftpSb,
+     OUT MTFTP4_PROTOCOL        *Instance
   )
 {
   ZeroMem (Instance, sizeof (MTFTP4_PROTOCOL));
@@ -423,7 +412,7 @@ Mtftp4InitProtocol (
   InitializeListHead (&Instance->Link);
   CopyMem (&Instance->Mtftp4, &gMtftp4ProtocolTemplate, sizeof (Instance->Mtftp4));
   Instance->State     = MTFTP4_STATE_UNCONFIGED;
-  Instance->Indestory = FALSE;
+  Instance->InDestory = FALSE;
   Instance->Service   = MtftpSb;
 
   InitializeListHead (&Instance->Blocks);
@@ -443,9 +432,10 @@ Mtftp4InitProtocol (
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4ServiceBindingCreateChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN OUT EFI_HANDLE                *ChildHandle
+  IN EFI_HANDLE                *ChildHandle
   )
 {
   MTFTP4_SERVICE            *MtftpSb;
@@ -552,6 +542,7 @@ ON_ERROR:
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL *This,
   IN EFI_HANDLE                   ChildHandle
@@ -590,11 +581,11 @@ Mtftp4ServiceBindingDestroyChild (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Instance->Indestory) {
+  if (Instance->InDestory) {
     return EFI_SUCCESS;
   }
 
-  Instance->Indestory = TRUE;
+  Instance->InDestory = TRUE;
 
   //
   // Close the Udp4 protocol.
@@ -616,7 +607,7 @@ Mtftp4ServiceBindingDestroyChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    Instance->Indestory = FALSE;
+    Instance->InDestory = FALSE;
     return Status;
   }
 
