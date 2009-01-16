@@ -35,8 +35,8 @@ EFI_STATUS
 EFIAPI
 EfiIp4GetModeData (
   IN  CONST EFI_IP4_PROTOCOL                *This,
-  OUT       EFI_IP4_MODE_DATA               *Ip4ModeData,    OPTIONAL
-  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData,  OPTIONAL
+  OUT       EFI_IP4_MODE_DATA               *Ip4ModeData     OPTIONAL,
+  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData   OPTIONAL,
   OUT       EFI_SIMPLE_NETWORK_MODE         *SnpModeData     OPTIONAL
   );
   
@@ -366,8 +366,8 @@ EFI_STATUS
 EFIAPI
 EfiIp4GetModeData (
   IN  CONST EFI_IP4_PROTOCOL                *This,
-  OUT       EFI_IP4_MODE_DATA               *Ip4ModeData,    OPTIONAL
-  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData,  OPTIONAL
+  OUT       EFI_IP4_MODE_DATA               *Ip4ModeData     OPTIONAL,
+  OUT       EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData   OPTIONAL,
   OUT       EFI_SIMPLE_NETWORK_MODE         *SnpModeData     OPTIONAL
   )
 {

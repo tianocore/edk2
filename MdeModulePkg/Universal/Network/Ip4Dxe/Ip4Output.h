@@ -70,7 +70,7 @@ Ip4SysPacketSent (
 EFI_STATUS
 Ip4Output (
   IN IP4_SERVICE            *IpSb,
-  IN IP4_PROTOCOL           *IpInstance, OPTIONAL
+  IN IP4_PROTOCOL           *IpInstance  OPTIONAL,
   IN NET_BUF                *Packet,
   IN IP4_HEAD               *Head,
   IN UINT8                  *Option,
