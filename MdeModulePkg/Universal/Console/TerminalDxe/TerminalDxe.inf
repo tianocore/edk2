@@ -65,8 +65,6 @@
   gEfiVT100Guid                                 ## SOMETIMES_CONSUMES ## GUID
   gEfiVT100PlusGuid                             ## SOMETIMES_CONSUMES ## GUID 
   gEfiPcAnsiGuid                                ## SOMETIMES_CONSUMES ## GUID
-  gSimpleTextInExNotifyGuid                     ## SOMETIMES_CONSUMES ##
-  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES ##
   
 [Protocols]
   gEfiSerialIoProtocolGuid                      ## TO_START
@@ -74,6 +72,8 @@
   gEfiSimpleTextInProtocolGuid                  ## BY_START
   gEfiSimpleTextInputExProtocolGuid             ## BY_START
   gEfiSimpleTextOutProtocolGuid                 ## BY_START
+  gSimpleTextInExNotifyGuid                     ## SOMETIMES_CONSUMES 
+  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES 
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError

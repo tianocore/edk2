@@ -71,17 +71,16 @@
   PcdLib
 
 [Guids]
-  gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMED
-  gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMED
-  gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMED
-  gEfiPrimaryConsoleOutDeviceGuid               ## PRODUCED
-  gEfiPrimaryConsoleInDeviceGuid                ## PRODUCED
-  gEfiPrimaryStandardErrorDeviceGuid            ## PRODUCED
-  gSimpleTextInExNotifyGuid                     ## PRODUCED
-  gEfiGenericPlatformVariableGuid               ## SOMETIMES_CONSUMED ## Variable:L"ConOutMode"
+  gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMES
+  gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMES
+  gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMES
+  gEfiPrimaryConsoleOutDeviceGuid               ## PRODUCES
+  gEfiPrimaryConsoleInDeviceGuid                ## PRODUCES
+  gEfiPrimaryStandardErrorDeviceGuid            ## PRODUCES
+  gEfiGenericPlatformVariableGuid               ## SOMETIMES_CONSUMES ## Variable:L"ConOutMode"
 
 [Protocols]
-  gEfiConsoleControlProtocolGuid                ## PRODUCED
+  gEfiConsoleControlProtocolGuid                ## PRODUCES
   gEfiSimplePointerProtocolGuid                 ## BY_START
   gEfiAbsolutePointerProtocolGuid               ## BY_START
   gEfiSimpleTextInProtocolGuid                  ## BY_START
@@ -89,6 +88,7 @@
   gEfiSimpleTextOutProtocolGuid                 ## BY_START
   gEfiGraphicsOutputProtocolGuid                ## BY_START
   gEfiUgaDrawProtocolGuid                       ## BY_START
+  gSimpleTextInExNotifyGuid                     ## PRODUCES
 
 
 [FeaturePcd.common]

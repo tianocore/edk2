@@ -54,16 +54,14 @@
   DebugLib
 
 [Guids]
-  gEfiGlobalVariableGuid                        # SOMETIMES_CONSUMED L"ErrOut"
-
-[Protocols]
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL TO_START
-  gEfiSimpleTextOutProtocolGuid                 # PROTOCOL TO_START
-
-[Guids]
-  gEfiHotPlugDeviceGuid
+  gEfiGlobalVariableGuid                        ## SOMETIMES_CONSUMES ## Variable:L"ErrOut"
   gEfiStandardErrorDeviceGuid
   gEfiConsoleOutDeviceGuid
   gEfiConsoleInDeviceGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiSimpleTextInProtocolGuid                  ## TO_START
+  gEfiSimpleTextOutProtocolGuid                 ## TO_START
+  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES
   

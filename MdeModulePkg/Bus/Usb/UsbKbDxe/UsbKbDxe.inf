@@ -59,17 +59,15 @@
   UefiUsbLib
   BaseLib
 
-[Guids]
-  gEfiHotPlugDeviceGuid                         # ALWAYS_CONSUMED
-  gSimpleTextInExNotifyGuid                     # ALWAYS_CONSUMED
-
 [Protocols]
   gEfiUsbIoProtocolGuid                         # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
   gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiHiiDatabaseProtocolGuid                   # PROTOCOL TO_START
-
+  gSimpleTextInExNotifyGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiHotPlugDeviceGuid                         # PROTOCOL ALWAYS_CONSUMED
+  
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver
   

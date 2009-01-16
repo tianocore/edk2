@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
+#include <Protocol/SimpleTextInExNotify.h>
 
 #include <Guid/PrimaryStandardErrorDevice.h>
 #include <Guid/PrimaryConsoleOutDevice.h>
@@ -67,7 +68,6 @@ extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterStdErrDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterStdErrComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
 
-extern EFI_GUID                     gSimpleTextInExNotifyGuid;
 
 //
 // These definitions were in the old Hii protocol, but are not in the new UEFI
