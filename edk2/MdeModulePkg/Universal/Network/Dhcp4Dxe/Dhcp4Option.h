@@ -236,7 +236,7 @@ EFI_STATUS
 EFI_STATUS
 DhcpIterateOptions (
   IN  EFI_DHCP4_PACKET      *Packet,
-  IN  DHCP_CHECK_OPTION     Check,        OPTIONAL
+  IN  DHCP_CHECK_OPTION     Check         OPTIONAL,
   IN  VOID                  *Context
   );
 

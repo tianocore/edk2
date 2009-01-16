@@ -274,7 +274,7 @@ Ip4FreeInterface (
 EFI_STATUS
 Ip4SendFrame (
   IN  IP4_INTERFACE         *Interface,
-  IN  IP4_PROTOCOL          *IpInstance,      OPTIONAL
+  IN  IP4_PROTOCOL          *IpInstance       OPTIONAL,
   IN  NET_BUF               *Packet,
   IN  IP4_ADDR              NextHop,
   IN  IP4_FRAME_CALLBACK    CallBack,
@@ -298,7 +298,7 @@ VOID
 Ip4CancelFrames (
   IN IP4_INTERFACE          *Interface,
   IN EFI_STATUS             IoStatus,
-  IN IP4_FRAME_TO_CANCEL    FrameToCancel,   OPTIONAL
+  IN IP4_FRAME_TO_CANCEL    FrameToCancel    OPTIONAL,
   IN VOID                   *Context
   );
 
@@ -337,7 +337,7 @@ Ip4CancelReceive (
 EFI_STATUS
 Ip4ReceiveFrame (
   IN  IP4_INTERFACE         *Interface,
-  IN  IP4_PROTOCOL          *IpInstance,      OPTIONAL
+  IN  IP4_PROTOCOL          *IpInstance       OPTIONAL,
   IN  IP4_FRAME_CALLBACK    CallBack,
   IN  VOID                  *Context
   );
