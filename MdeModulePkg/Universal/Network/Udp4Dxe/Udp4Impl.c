@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  The implementation of the Udp4 protocol.
+  
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,15 +9,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Udp4Impl.c
-
-Abstract:
-
-  The implementation of the Udp4 protocol.
-
 
 **/
 
@@ -29,11 +21,9 @@ UINT16  mUdp4RandomPort;
   This function checks and timeouts the I/O datagrams holding by the corresponding
   service context.
 
-  @param  Event                  The event this function registered to.
-  @param  Context                The context data registered during the creation of
-                                 the Event.
-
-  @return None.
+  @param[in]  Event                  The event this function registered to.
+  @param[in]  Context                The context data registered during the creation of
+                                     the Event.
 
 **/
 VOID
@@ -46,10 +36,10 @@ Udp4CheckTimeout (
 /**
   This function finds the udp instance by the specified <Address, Port> pair.
 
-  @param  InstanceList           Pointer to the head of the list linking the udp
-                                 instances.
-  @param  Address                Pointer to the specified IPv4 address.
-  @param  Port                   The udp port number.
+  @param[in]  InstanceList           Pointer to the head of the list linking the udp
+                                     instances.
+  @param[in]  Address                Pointer to the specified IPv4 address.
+  @param[in]  Port                   The udp port number.
 
   @retval TRUE     The specified <Address, Port> pair is found.
   @retval FALSE    Otherwise.
@@ -67,12 +57,10 @@ Udp4FindInstanceByPort (
   interface. It's called to signal the udp TxToken when IpIo layer completes the
   transmitting of the udp datagram.
 
-  @param  Status                 The completion status of the output udp datagram.
-  @param  Context                Pointer to the context data.
-  @param  Sender                 Pointer to the Ip sender of the udp datagram.
-  @param  NotifyData             Pointer to the notify data.
-
-  @return None.
+  @param[in]  Status                 The completion status of the output udp datagram.
+  @param[in]  Context                Pointer to the context data.
+  @param[in]  Sender                 Pointer to the Ip sender of the udp datagram.
+  @param[in]  NotifyData             Pointer to the notify data.
 
 **/
 VOID
@@ -86,15 +74,13 @@ Udp4DgramSent (
 /**
   This function processes the received datagram passed up by the IpIo layer.
 
-  @param  Status                 The status of this udp datagram.
-  @param  IcmpError              The IcmpError code, only available when Status is
+  @param[in]  Status             The status of this udp datagram.
+  @param[in]  IcmpError          The IcmpError code, only available when Status is
                                  EFI_ICMP_ERROR.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA.
-  @param  Packet                 Pointer to the NET_BUF containing the received udp
+  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA.
+  @param[in]  Packet             Pointer to the NET_BUF containing the received udp
                                  datagram.
-  @param  Context                Pointer to the context data.
-
-  @return None.
+  @param[in]  Context            Pointer to the context data.
 
 **/
 VOID
@@ -110,9 +96,9 @@ Udp4DgramRcvd (
   This function cancels the token specified by Arg in the Map. This is a callback
   used by Udp4InstanceCancelToken().
 
-  @param  Map                    Pointer to the NET_MAP.
-  @param  Item                   Pointer to the NET_MAP_ITEM.
-  @param  Arg                    Pointer to the token to be cancelled, if NULL,
+  @param[in]  Map                Pointer to the NET_MAP.
+  @param[in]  Item               Pointer to the NET_MAP_ITEM.
+  @param[in]  Arg                Pointer to the token to be cancelled, if NULL,
                                  the token specified by Item is cancelled.
 
   @retval EFI_SUCCESS            The token is cancelled if Arg is NULL or the token
@@ -132,8 +118,8 @@ Udp4CancelTokens (
 /**
   This function matches the received udp datagram with the Instance.
 
-  @param  Instance               Pointer to the udp instance context data.
-  @param  Udp4Session            Pointer to the EFI_UDP4_SESSION_DATA abstracted
+  @param[in]  Instance           Pointer to the udp instance context data.
+  @param[in]  Udp4Session        Pointer to the EFI_UDP4_SESSION_DATA abstracted
                                  from the received udp datagram.
 
   @retval TRUE       The udp datagram matches the receiving requirments of the
@@ -150,10 +136,8 @@ Udp4MatchDgram (
 /**
   This function removes the Wrap specified by Context and release relevant resources.
 
-  @param  Event                  The Event this notify function registered to.
-  @param  Context                Pointer to the context data.
-
-  @return None.
+  @param[in]  Event              The Event this notify function registered to.
+  @param[in]  Context            Pointer to the context data.
 
 **/
 VOID
@@ -166,11 +150,11 @@ Udp4RecycleRxDataWrap (
 /**
   This function wraps the Packet and the RxData.
 
-  @param  Instance               Pointer to the instance context data.
-  @param  Packet                 Pointer to the buffer containing the received
-                                 datagram.
-  @param  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
-                                 datagram.
+  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]  Packet                 Pointer to the buffer containing the received
+                                     datagram.
+  @param[in]  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
+                                     datagram.
 
   @return Pointer to the structure wrapping the RxData and the Packet.
 
@@ -185,11 +169,11 @@ Udp4WrapRxData (
 /**
   This function enqueues the received datagram into the instances' receiving queues.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-  @param  Packet                 Pointer to the buffer containing the received
-                                 datagram.
-  @param  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
-                                 datagram.
+  @param[in]  Udp4Service            Pointer to the udp service context data.
+  @param[in]  Packet                 Pointer to the buffer containing the received
+                                     datagram.
+  @param[in]  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
+                                     datagram.
 
   @return The times this datagram is enqueued.
 
@@ -204,9 +188,7 @@ Udp4EnqueueDgram (
 /**
   This function delivers the datagrams enqueued in the instances.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-
-  @return None.
+  @param[in]  Udp4Service            Pointer to the udp service context data.
 
 **/
 VOID
@@ -217,13 +199,11 @@ Udp4DeliverDgram (
 /**
   This function demultiplexes the received udp datagram to the apropriate instances.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA abstrated from
-                                 the received datagram.
-  @param  Packet                 Pointer to the buffer containing the received udp
-                                 datagram.
-
-  @return None.
+  @param[in]  Udp4Service            Pointer to the udp service context data.
+  @param[in]  NetSession             Pointer to the EFI_NET_SESSION_DATA abstrated from
+                                     the received datagram.
+  @param[in]  Packet                 Pointer to the buffer containing the received udp
+                                     datagram.
 
 **/
 VOID
@@ -237,13 +217,11 @@ Udp4Demultiplex (
   This function handles the received Icmp Error message and demultiplexes it to the
   instance.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-  @param  IcmpError              The icmp error code.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA abstracted
+  @param[in]  Udp4Service            Pointer to the udp service context data.
+  @param[in]  IcmpError              The icmp error code.
+  @param[in]  NetSession             Pointer to the EFI_NET_SESSION_DATA abstracted
                                  from the received Icmp Error packet.
-  @param  Packet                 Pointer to the Icmp Error packet.
-
-  @return None.
+  @param[in]  Packet                 Pointer to the Icmp Error packet.
 
 **/
 VOID
@@ -257,13 +235,11 @@ Udp4IcmpHandler (
 /**
   This function builds and sends out a icmp port unreachable message.
 
-  @param  IpIo                   Pointer to the IP_IO instance.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA of the packet
-                                 causes this icmp error message.
-  @param  Udp4Header             Pointer to the udp header of the datagram causes
-                                 this icmp error message.
-
-  @return None.
+  @param[in]  IpIo                   Pointer to the IP_IO instance.
+  @param[in]  NetSession             Pointer to the EFI_NET_SESSION_DATA of the packet
+                                     causes this icmp error message.
+  @param[in]  Udp4Header             Pointer to the udp header of the datagram causes
+                                     this icmp error message.
 
 **/
 VOID
@@ -376,9 +352,7 @@ ON_ERROR:
 /**
   Clean the Udp service context data.
 
-  @param  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
-
-  @return None.
+  @param[in]  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
 
 **/
 VOID
@@ -407,11 +381,9 @@ Udp4CleanService (
   This function checks and timeouts the I/O datagrams holding by the corresponding
   service context.
 
-  @param  Event                  The event this function registered to.
-  @param  Context                The context data registered during the creation of
-                                 the Event.
-
-  @return None.
+  @param[in]  Event                  The event this function registered to.
+  @param[in]  Context                The context data registered during the creation of
+                                     the Event.
 
 **/
 VOID
@@ -473,8 +445,6 @@ Udp4CheckTimeout (
   @param  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
   @param  Instance               Pointer to the un-initialized UDP4_INSTANCE_DATA.
 
-  @return None.
-
 **/
 VOID
 Udp4InitInstance (
@@ -516,9 +486,7 @@ Udp4InitInstance (
 /**
   This function cleans the udp instance.
 
-  @param  Instance               Pointer to the UDP4_INSTANCE_DATA to clean.
-
-  @return None.
+  @param[in]  Instance               Pointer to the UDP4_INSTANCE_DATA to clean.
 
 **/
 VOID
@@ -535,10 +503,10 @@ Udp4CleanInstance (
 /**
   This function finds the udp instance by the specified <Address, Port> pair.
 
-  @param  InstanceList           Pointer to the head of the list linking the udp
-                                 instances.
-  @param  Address                Pointer to the specified IPv4 address.
-  @param  Port                   The udp port number.
+  @param[in]  InstanceList           Pointer to the head of the list linking the udp
+                                     instances.
+  @param[in]  Address                Pointer to the specified IPv4 address.
+  @param[in]  Port                   The udp port number.
 
   @retval TRUE     The specified <Address, Port> pair is found.
   @retval FALSE    Otherwise.
@@ -672,9 +640,9 @@ Udp4Bind (
   This function is used to check whether the NewConfigData has any un-reconfigurable
   parameters changed compared to the OldConfigData.
 
-  @param  OldConfigData          Pointer to the current ConfigData the udp instance
+  @param[in]  OldConfigData      Pointer to the current ConfigData the udp instance
                                  uses.
-  @param  NewConfigData          Pointer to the new ConfigData.
+  @param[in]  NewConfigData      Pointer to the new ConfigData.
 
   @retval TRUE     The instance is reconfigurable.
   @retval FALSE    Otherwise.
@@ -753,10 +721,8 @@ Udp4IsReconfigurable (
 /**
   This function builds the Ip4 configdata from the Udp4ConfigData.
 
-  @param  Udp4ConfigData         Pointer to the EFI_UDP4_CONFIG_DATA.
-  @param  Ip4ConfigData          Pointer to the EFI_IP4_CONFIG_DATA.
-
-  @return None.
+  @param[in]       Udp4ConfigData    Pointer to the EFI_UDP4_CONFIG_DATA.
+  @param[in, out]  Ip4ConfigData     Pointer to the EFI_IP4_CONFIG_DATA.
 
 **/
 VOID
@@ -784,8 +750,8 @@ Udp4BuildIp4ConfigData (
 /**
   This function validates the TxToken, it returns the error code according to the spec.
 
-  @param  Instance               Pointer to the udp instance context data.
-  @param  TxToken                Pointer to the token to be checked.
+  @param[in]  Instance           Pointer to the udp instance context data.
+  @param[in]  TxToken            Pointer to the token to be checked.
 
   @retval EFI_SUCCESS            The TxToken is valid.
   @retval EFI_INVALID_PARAMETER  One or more of the following are TRUE: This is
@@ -911,10 +877,10 @@ Udp4ValidateTxToken (
 /**
   This function checks whether the specified Token duplicates with the one in the Map.
 
-  @param  Map                    Pointer to the NET_MAP.
-  @param  Item                   Pointer to the NET_MAP_ITEM contain the pointer to
+  @param[in]  Map                Pointer to the NET_MAP.
+  @param[in]  Item               Pointer to the NET_MAP_ITEM contain the pointer to
                                  the Token.
-  @param  Context                Pointer to the Token to be checked.
+  @param[in]  Context            Pointer to the Token to be checked.
 
   @retval EFI_SUCCESS            The Token specified by Context differs from the
                                  one in the Item.
@@ -950,11 +916,11 @@ Udp4TokenExist (
   This function calculates the checksum for the Packet, utilizing the pre-calculated
   pseudo HeadSum to reduce some overhead.
 
-  @param  Packet                 Pointer to the NET_BUF contains the udp datagram.
-  @param  HeadSum                Checksum of the pseudo header execpt the length
+  @param[in]  Packet             Pointer to the NET_BUF contains the udp datagram.
+  @param[in]  HeadSum            Checksum of the pseudo header execpt the length
                                  field.
 
-  @return The 16-bit checksum of this udp datagram.
+  @retval The 16-bit checksum of this udp datagram.
 
 **/
 UINT16
@@ -977,8 +943,8 @@ Udp4Checksum (
 /**
   This function removes the specified Token from the TokenMap.
 
-  @param  TokenMap               Pointer to the NET_MAP containing the tokens.
-  @param  Token                  Pointer to the Token to be removed.
+  @param  TokenMap           Pointer to the NET_MAP containing the tokens.
+  @param  Token              Pointer to the Token to be removed.
 
   @retval EFI_SUCCESS            The specified Token is removed from the TokenMap.
   @retval EFI_NOT_FOUND          The specified Token is not found in the TokenMap.
@@ -1015,12 +981,10 @@ Udp4RemoveToken (
   interface. It's called to signal the udp TxToken when IpIo layer completes the
   transmitting of the udp datagram.
 
-  @param  Status                 The completion status of the output udp datagram.
-  @param  Context                Pointer to the context data.
-  @param  Sender                 Pointer to the Ip sender of the udp datagram.
-  @param  NotifyData             Pointer to the notify data.
-
-  @return None.
+  @param[in]  Status                 The completion status of the output udp datagram.
+  @param[in]  Context                Pointer to the context data.
+  @param[in]  Sender                 Pointer to the Ip sender of the udp datagram.
+  @param[in]  NotifyData             Pointer to the notify data.
 
 **/
 VOID
@@ -1051,15 +1015,13 @@ Udp4DgramSent (
 /**
   This function processes the received datagram passed up by the IpIo layer.
 
-  @param  Status                 The status of this udp datagram.
-  @param  IcmpError              The IcmpError code, only available when Status is
+  @param[in]  Status             The status of this udp datagram.
+  @param[in]  IcmpError          The IcmpError code, only available when Status is
                                  EFI_ICMP_ERROR.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA.
-  @param  Packet                 Pointer to the NET_BUF containing the received udp
+  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA.
+  @param[in]  Packet             Pointer to the NET_BUF containing the received udp
                                  datagram.
-  @param  Context                Pointer to the context data.
-
-  @return None.
+  @param[in]  Context            Pointer to the context data.
 
 **/
 VOID
@@ -1148,9 +1110,9 @@ Udp4LeaveGroup (
   This function cancels the token specified by Arg in the Map. This is a callback
   used by Udp4InstanceCancelToken().
 
-  @param  Map                    Pointer to the NET_MAP.
-  @param  Item                   Pointer to the NET_MAP_ITEM.
-  @param  Arg                    Pointer to the token to be cancelled, if NULL,
+  @param[in]  Map                Pointer to the NET_MAP.
+  @param[in]  Item               Pointer to the NET_MAP_ITEM.
+  @param[in]  Arg                Pointer to the token to be cancelled, if NULL,
                                  the token specified by Item is cancelled.
 
   @retval EFI_SUCCESS            The token is cancelled if Arg is NULL or the token
@@ -1208,9 +1170,7 @@ Udp4CancelTokens (
 /**
   This function removes all the Wrap datas in the RcvdDgramQue.
 
-  @param  Instance           Pointer to the udp instance context data.
-
-  @return None.
+  @param[in]  Instance           Pointer to the udp instance context data.
 
 **/
 VOID
@@ -1238,8 +1198,8 @@ Udp4FlushRcvdDgram (
 /**
   Cancel Udp4 tokens from the Udp4 instance.
 
-  @param  Instance               Pointer to the udp instance context data.
-  @param  Token                  Pointer to the token to be canceled, if NULL, all
+  @param[in]  Instance           Pointer to the udp instance context data.
+  @param[in]  Token              Pointer to the token to be canceled, if NULL, all
                                  tokens in this instance will be cancelled.
 
   @retval EFI_SUCCESS            The Token is cancelled.
@@ -1291,8 +1251,8 @@ Udp4InstanceCancelToken (
 /**
   This function matches the received udp datagram with the Instance.
 
-  @param  Instance               Pointer to the udp instance context data.
-  @param  Udp4Session            Pointer to the EFI_UDP4_SESSION_DATA abstracted
+  @param[in]  Instance           Pointer to the udp instance context data.
+  @param[in]  Udp4Session        Pointer to the EFI_UDP4_SESSION_DATA abstracted
                                  from the received udp datagram.
 
   @retval TRUE       The udp datagram matches the receiving requirments of the
@@ -1371,10 +1331,8 @@ Udp4MatchDgram (
 /**
   This function removes the Wrap specified by Context and release relevant resources.
 
-  @param  Event                  The Event this notify function registered to.
-  @param  Context                Pointer to the context data.
-
-  @return None.
+  @param[in]  Event              The Event this notify function registered to.
+  @param[in]  Context            Pointer to the context data.
 
 **/
 VOID
@@ -1410,11 +1368,11 @@ Udp4RecycleRxDataWrap (
 /**
   This function wraps the Packet and the RxData.
 
-  @param  Instance               Pointer to the instance context data.
-  @param  Packet                 Pointer to the buffer containing the received
-                                 datagram.
-  @param  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
-                                 datagram.
+  @param[in]  Instance               Pointer to the instance context data.
+  @param[in]  Packet                 Pointer to the buffer containing the received
+                                     datagram.
+  @param[in]  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
+                                     datagram.
 
   @return Pointer to the structure wrapping the RxData and the Packet.
 
@@ -1467,11 +1425,11 @@ Udp4WrapRxData (
 /**
   This function enqueues the received datagram into the instances' receiving queues.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-  @param  Packet                 Pointer to the buffer containing the received
-                                 datagram.
-  @param  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
-                                 datagram.
+  @param[in]  Udp4Service            Pointer to the udp service context data.
+  @param[in]  Packet                 Pointer to the buffer containing the received
+                                     datagram.
+  @param[in]  RxData                 Pointer to the EFI_UDP4_RECEIVE_DATA of this
+                                     datagram.
 
   @return The times this datagram is enqueued.
 
@@ -1524,9 +1482,7 @@ Udp4EnqueueDgram (
 /**
   This function delivers the received datagrams for the specified instance.
 
-  @param  Instance               Pointer to the instance context data.
-
-  @return None.
+  @param[in]  Instance               Pointer to the instance context data.
 
 **/
 VOID
@@ -1590,9 +1546,7 @@ Udp4InstanceDeliverDgram (
 /**
   This function delivers the datagrams enqueued in the instances.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-
-  @return None.
+  @param[in]  Udp4Service            Pointer to the udp service context data.
 
 **/
 VOID
@@ -1624,13 +1578,11 @@ Udp4DeliverDgram (
 /**
   This function demultiplexes the received udp datagram to the apropriate instances.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA abstrated from
-                                 the received datagram.
-  @param  Packet                 Pointer to the buffer containing the received udp
-                                 datagram.
-
-  @return None.
+  @param[in]  Udp4Service            Pointer to the udp service context data.
+  @param[in]  NetSession             Pointer to the EFI_NET_SESSION_DATA abstrated from
+                                     the received datagram.
+  @param[in]  Packet                 Pointer to the buffer containing the received udp
+                                     datagram.
 
 **/
 VOID
@@ -1715,13 +1667,11 @@ Udp4Demultiplex (
 /**
   This function builds and sends out a icmp port unreachable message.
 
-  @param  IpIo                   Pointer to the IP_IO instance.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA of the packet
-                                 causes this icmp error message.
-  @param  Udp4Header             Pointer to the udp header of the datagram causes
-                                 this icmp error message.
-
-  @return None.
+  @param[in]  IpIo                   Pointer to the IP_IO instance.
+  @param[in]  NetSession             Pointer to the EFI_NET_SESSION_DATA of the packet
+                                     causes this icmp error message.
+  @param[in]  Udp4Header             Pointer to the udp header of the datagram causes
+                                     this icmp error message.
 
 **/
 VOID
@@ -1817,13 +1767,11 @@ Udp4SendPortUnreach (
   This function handles the received Icmp Error message and demultiplexes it to the
   instance.
 
-  @param  Udp4Service            Pointer to the udp service context data.
-  @param  IcmpError              The icmp error code.
-  @param  NetSession             Pointer to the EFI_NET_SESSION_DATA abstracted
+  @param[in]  Udp4Service            Pointer to the udp service context data.
+  @param[in]  IcmpError              The icmp error code.
+  @param[in]  NetSession             Pointer to the EFI_NET_SESSION_DATA abstracted
                                  from the received Icmp Error packet.
-  @param  Packet                 Pointer to the Icmp Error packet.
-
-  @return None.
+  @param[in]  Packet                 Pointer to the Icmp Error packet.
 
 **/
 VOID
@@ -1892,9 +1840,7 @@ Udp4IcmpHandler (
 /**
   This function reports the received ICMP error.
 
-  @param  Instance               Pointer to the udp instance context data.
-
-  @return None.
+  @param[in]  Instance               Pointer to the udp instance context data.
 
 **/
 VOID
@@ -1937,9 +1883,7 @@ Udp4ReportIcmpError (
   This function is a dummy ext-free function for the NET_BUF created for the output
   udp datagram.
 
-  @param  Context                Pointer to the context data.
-
-  @return None.
+  @param[in]  Context                Pointer to the context data.
 
 **/
 VOID
@@ -2089,9 +2033,7 @@ ON_ERROR:
 /**
   Clear the variable and free the resource.
 
-  @param  Udp4Service            Udp4 service data.
-
-  @return None.
+  @param[[in]  Udp4Service            Udp4 service data.
 
 **/
 VOID

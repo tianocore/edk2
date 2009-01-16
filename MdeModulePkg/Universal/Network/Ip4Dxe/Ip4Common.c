@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,14 +8,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Ip4Common.c
-
-Abstract:
-
 
 **/
 
@@ -26,8 +18,8 @@ Abstract:
   Return the cast type (Unicast/Boradcast) specific to an
   interface. All the addresses are host byte ordered.
 
-  @param  IpAddr                The IP address to classify in host byte order
-  @param  IpIf                  The interface that IpAddr received from
+  @param[in]  IpAddr                The IP address to classify in host byte order
+  @param[in]  IpIf                  The interface that IpAddr received from
 
   @return The cast type of this IP address specific to the interface.
   @retval IP4_LOCAL_HOST        The IpAddr equals to the interface's address
@@ -63,11 +55,11 @@ Ip4GetNetCast (
   This isn't the same as link layer cast type. For example, DHCP
   server may send local broadcast to the local unicast MAC.
 
-  @param  IpSb                  The IP4 service binding instance that received the
-                                packet
-  @param  Dst                   The destination address in the packet (host byte
-                                order)
-  @param  Src                   The source address in the packet (host byte order)
+  @param[in]  IpSb                  The IP4 service binding instance that received the
+                                    packet
+  @param[in]  Dst                   The destination address in the packet (host byte
+                                    order)
+  @param[in]  Src                   The source address in the packet (host byte order)
 
   @return The cast type for the Dst, it will return on the first non-promiscuous
           cast type to a configured interface. If the packet doesn't match any of
@@ -135,8 +127,8 @@ Ip4GetHostCast (
 /**
   Find an interface whose configured IP address is Ip.
 
-  @param  IpSb                  The IP4 service binding instance
-  @param  Ip                    The Ip address (host byte order) to find
+  @param[in]  IpSb                  The IP4 service binding instance
+  @param[in]  Ip                    The Ip address (host byte order) to find
 
   @return The IP4_INTERFACE point if found, otherwise NULL
 
@@ -165,8 +157,8 @@ Ip4FindInterface (
 /**
   Find an interface that Ip is on that connected network.
 
-  @param  IpSb                  The IP4 service binding instance
-  @param  Ip                    The Ip address (host byte order) to find
+  @param[in]  IpSb                  The IP4 service binding instance
+  @param[in]  Ip                    The Ip address (host byte order) to find
 
   @return The IP4_INTERFACE point if found, otherwise NULL
 
@@ -195,9 +187,9 @@ Ip4FindNet (
 /**
   Find an interface of the service with the same Ip/Netmask pair.
 
-  @param  IpSb                  Ip4 service binding instance
-  @param  Ip                    The Ip adress to find (host byte order)
-  @param  Netmask               The network to find (host byte order)
+  @param[in]  IpSb                  Ip4 service binding instance
+  @param[in]  Ip                    The Ip adress to find (host byte order)
+  @param[in]  Netmask               The network to find (host byte order)
 
   @return The IP4_INTERFACE point if found, otherwise NULL
 
@@ -229,9 +221,9 @@ Ip4FindStationAddress (
   Mnp's McastIpToMac to find the MAC address in stead of
   hard code the NIC to be Ethernet.
 
-  @param  Mnp                   The Mnp instance to get the MAC address.
-  @param  Multicast             The multicast IP address to translate.
-  @param  Mac                   The buffer to hold the translated address.
+  @param[in]  Mnp                   The Mnp instance to get the MAC address.
+  @param[in]  Multicast             The multicast IP address to translate.
+  @param[out] Mac                   The buffer to hold the translated address.
 
   @retval EFI_SUCCESS if the multicast IP is successfully translated to a
                       multicast MAC address.
@@ -257,7 +249,7 @@ Ip4GetMulticastMac (
   In spite of its name, it can also be used to convert from
   host to network byte order.
 
-  @param  Head                  The IP head to convert
+  @param[in]  Head                  The IP head to convert
 
   @return Point to the converted IP head
 
@@ -283,7 +275,7 @@ Ip4NtohHead (
   Save the list of all of the IPv4 addresses and subnet masks that are currently
   being used to volatile variable storage.
 
-  @param  IpSb                  Ip4 service binding instance
+  @param[in]  IpSb                  Ip4 service binding instance
 
   @retval EFI_SUCCESS           Successfully set variable.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the variable.
@@ -402,9 +394,7 @@ ON_ERROR:
 /**
   Clear the variable and free the resource.
 
-  @param  IpSb                  Ip4 service binding instance
-
-  @return None.
+  @param[in]  IpSb                  Ip4 service binding instance
 
 **/
 VOID

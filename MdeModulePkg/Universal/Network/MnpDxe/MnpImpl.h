@@ -1,7 +1,7 @@
 /** @file
     Declaration of structures and functions of MnpDxe driver.
     
-Copyright (c) 2005 - 2008, Intel Corporation. <BR>
+Copyright (c) 2005 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -93,9 +93,9 @@ typedef struct _MNP_RXDATA_WRAP {
 /**
   Initialize the mnp service context data.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  ImageHandle           The driver image handle.
-  @param  ControllerHandle      Handle of device to bind driver to.
+  @param[in]  MnpServiceData        Pointer to the mnp service context data.
+  @param[in]  ImageHandle           The driver image handle.
+  @param[in]  ControllerHandle      Handle of device to bind driver to.
 
   @retval EFI_SUCCESS           The mnp service context is initialized.
   @retval Other                 Some error occurs.
@@ -113,7 +113,7 @@ MnpInitializeServiceData (
 
   @param  MnpServiceData        Pointer to the mnp service context data.
   @param  ImageHandle           The driver image handle.
-
+  
 **/
 VOID
 MnpFlushServiceData (
@@ -124,8 +124,8 @@ MnpFlushServiceData (
 /**
   Initialize the mnp instance context data.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  Instance              Pointer to the mnp instance context data to
+  @param[in]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in]  Instance          Pointer to the mnp instance context data to
                                 initialize.
 
 **/
@@ -138,9 +138,9 @@ MnpInitializeInstanceData (
 /**
   Check whether the token specified by Arg maches the token in Item.
 
-  @param  Map                   Pointer to the NET_MAP.
-  @param  Item                  Pointer to the NET_MAP_ITEM
-  @param  Arg                   Pointer to the Arg, it's a pointer to the token to
+  @param[in]  Map               Pointer to the NET_MAP.
+  @param[in]  Item              Pointer to the NET_MAP_ITEM
+  @param[in]  Arg               Pointer to the Arg, it's a pointer to the token to
                                 check.
 
   @retval EFI_SUCCESS           The token specified by Arg is different from the
@@ -159,16 +159,16 @@ MnpTokenExist (
 /**
   Cancel the token specified by Arg if it matches the token in Item.
 
-  @param  Map                   Pointer to the NET_MAP.
-  @param  Item                  Pointer to the NET_MAP_ITEM
-  @param  Arg                   Pointer to the Arg, it's a pointer to the token to
+  @param[in, out]  Map          Pointer to the NET_MAP.
+  @param[in]       Item         Pointer to the NET_MAP_ITEM
+  @param[in]       Arg          Pointer to the Arg, it's a pointer to the token to
                                 cancel.
 
-  @retval EFI_SUCCESS           The Arg is NULL, and the token in Item is
-                                cancelled, or the Arg isn't NULL, and the token in
-                                Item is different from the Arg.
-  @retval EFI_ABORTED           The Arg isn't NULL, the token in Item mathces the
-                                Arg, and the token is cancelled.
+  @retval EFI_SUCCESS       The Arg is NULL, and the token in Item is cancelled, 
+                            or the Arg isn't NULL, and the token in Item is
+                            different from the Arg.
+  @retval EFI_ABORTED       The Arg isn't NULL, the token in Item mathces the
+                            Arg, and the token is cancelled.
 
 **/
 EFI_STATUS
@@ -192,8 +192,8 @@ MnpFlushRcvdDataQueue (
 /**
   Configure the Instance using ConfigData.
 
-  @param  Instance              Pointer to the mnp instance context data.
-  @param  ConfigData            Pointer to the configuration data used to configure
+  @param[in]  Instance          Pointer to the mnp instance context data.
+  @param[in]  ConfigData        Pointer to the configuration data used to configure
                                 the isntance.
 
   @retval EFI_SUCCESS           The Instance is configured.
@@ -211,11 +211,11 @@ MnpConfigureInstance (
 /**
   Do the group operations for this instance.
 
-  @param  Instance              Pointer to the instance context data.
-  @param  JoinFlag              Set to TRUE to join a group. Set to TRUE to leave a
+  @param[in]  Instance          Pointer to the instance context data.
+  @param[in]  JoinFlag          Set to TRUE to join a group. Set to TRUE to leave a
                                 group/groups.
-  @param  MacAddress            Pointer to the group address to join or leave.
-  @param  CtrlBlk               Pointer to the group control block if JoinFlag if
+  @param[in]  MacAddress        Pointer to the group address to join or leave.
+  @param[in]  CtrlBlk           Pointer to the group control block if JoinFlag if
                                 FALSE.
 
   @retval EFI_SUCCESS           The group operation finished.
@@ -226,15 +226,15 @@ EFI_STATUS
 MnpGroupOp (
   IN MNP_INSTANCE_DATA        *Instance,
   IN BOOLEAN                  JoinFlag,
-  IN EFI_MAC_ADDRESS          *MacAddr OPTIONAL,
+  IN EFI_MAC_ADDRESS          *MacAddress OPTIONAL,
   IN MNP_GROUP_CONTROL_BLOCK  *CtrlBlk OPTIONAL
   );
 
 /**
   Validates the Mnp transmit token.
 
-  @param  Instance              Pointer to the Mnp instance context data.
-  @param  Token                 Pointer to the transmit token to check.
+  @param[in]  Instance              Pointer to the Mnp instance context data.
+  @param[in]  Token                 Pointer to the transmit token to check.
 
   @return The Token is valid or not.
 
@@ -254,7 +254,7 @@ MnpIsValidTxToken (
   @param  PktBuf                Pointer to record the address of the packet.
   @param  PktLen                Pointer to a UINT32 variable used to record the
                                 packet's length.
-
+   
 **/
 VOID
 MnpBuildTxPacket (
@@ -267,10 +267,10 @@ MnpBuildTxPacket (
 /**
   Synchronously send out the packet.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  Packet                Pointer to the pakcet buffer.
-  @param  Length                The length of the packet.
-  @param  Token                 Pointer to the token the packet generated from.
+  @param[in]  MnpServiceData        Pointer to the mnp service context data.
+  @param[in]  Packet                Pointer to the pakcet buffer.
+  @param[in]  Length                The length of the packet.
+  @param[in]  Token                 Pointer to the token the packet generated from.
 
   @retval EFI_SUCCESS           The packet is sent out.
   @retval EFI_TIMEOUT           Time out occurs, the packet isn't sent.
@@ -288,7 +288,7 @@ MnpSyncSendPacket (
 /**
   Try to deliver the received packet to the instance.
 
-  @param  Instance              Pointer to the mnp instance context data.
+  @param[in]  Instance          Pointer to the mnp instance context data.
 
   @retval EFI_SUCCESS           The received packet is delivered, or there is no
                                 packet to deliver, or there is no available receive
@@ -305,9 +305,9 @@ MnpInstanceDeliverPacket (
   Recycle the RxData and other resources used to hold and deliver the received
   packet.
 
-  @param  Event                 The event this notify function registered to.
-  @param  Context               Pointer to the context data registerd to the Event.
-
+  @param  Event             The event this notify function registered to.
+  @param  Context           Pointer to the context data registerd to the Event.
+  
 **/
 VOID
 EFIAPI
@@ -319,7 +319,7 @@ MnpRecycleRxData (
 /**
   Try to receive a packet and deliver it.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
+  @param[in]  MnpServiceData    Pointer to the mnp service context data.
 
   @retval EFI_SUCCESS           add return value to function comment
   @retval EFI_NOT_STARTED       The simple network protocol is not started.
@@ -337,9 +337,10 @@ MnpReceivePacket (
   in the queue, first try to allocate some and add them into the queue, then
   fetch the NET_BUF from the updated FreeNbufQue.
 
-  @param  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
+  @param[in]  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
 
-  @return Pointer to the allocated free NET_BUF structure, if NULL the operation is failed.
+  @return     Pointer to the allocated free NET_BUF structure, if NULL the 
+              operation is failed.
 
 **/
 NET_BUF *
@@ -352,7 +353,7 @@ MnpAllocNbuf (
 
   @param  MnpServiceData        Pointer to the mnp service context data.
   @param  Nbuf                  Pointer to the NET_BUF to free.
-
+  
 **/
 VOID
 MnpFreeNbuf (
@@ -363,10 +364,10 @@ MnpFreeNbuf (
 /**
   Remove the received packets if timeout occurs.
 
-  @param  Event                 The event this notify function registered to.
-  @param  Context               Pointer to the context data registered to the
-                                event.
-   
+  @param  Event             The event this notify function registered to.
+  @param  Context           Pointer to the context data registered to the
+                            event.
+  
 **/
 VOID
 EFIAPI
@@ -379,9 +380,9 @@ MnpCheckPacketTimeout (
   Poll to receive the packets from Snp. This function is either called by upperlayer
   protocols/applications or the system poll timer notify mechanism.
 
-  @param  Event                 The event this notify function registered to.
-  @param  Context               Pointer to the context data registered to the
-                                event.
+  @param  Event             The event this notify function registered to.
+  @param  Context           Pointer to the context data registered to the
+                            event.
 
 **/
 VOID
@@ -398,13 +399,13 @@ MnpSystemPoll (
   The GetModeData() function is used to read the current mode data (operational
   parameters) from the MNP or the underlying SNP. 
 
-  @param This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param MnpConfigData Pointer to storage for MNP operational parameters. Type
-                       EFI_MANAGED_NETWORK_CONFIG_DATA is defined in "Related
-                       Definitions" below.
-  @param SnpModeData   Pointer to storage for SNP operational parameters. This
-                       feature may be unsupported. Type EFI_SIMPLE_NETWORK_MODE
-                       is defined in the EFI_SIMPLE_NETWORK_PROTOCOL.
+  @param[in]  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[out] MnpConfigData Pointer to storage for MNP operational parameters. Type
+                            EFI_MANAGED_NETWORK_CONFIG_DATA is defined in "Related
+                            Definitions" below.
+  @param[out] SnpModeData   Pointer to storage for SNP operational parameters. This
+                            feature may be unsupported. Type EFI_SIMPLE_NETWORK_MODE
+                            is defined in the EFI_SIMPLE_NETWORK_PROTOCOL.
  
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -446,14 +447,13 @@ MnpGetModeData (
   Note: Warning: Receive filter settings that overlap will consume extra
   processor and/or DMA resources and degrade system and network performance.
 
-  @param  This             Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  MnpConfigData    Pointer to configuration data that will be assigned
-                           to the MNP child driver instance. If NULL, the MNP
-                           child driver instance is reset to startup defaults
-                           and all pending transmit and receive requests are
-                           flushed. Type EFI_MANAGED_NETWORK_CONFIG_DATA is
-                           defined in
-                           EFI_MANAGED_NETWORK_PROTOCOL.GetModeData().
+  @param[in]  This             Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  MnpConfigData    Pointer to configuration data that will be assigned
+                               to the MNP child driver instance. If NULL, the MNP
+                               child driver instance is reset to startup defaults
+                               and all pending transmit and receive requests are
+                               flushed. Type EFI_MANAGED_NETWORK_CONFIG_DATA is
+                               defined in EFI_MANAGED_NETWORK_PROTOCOL.GetModeData().
 
   @retval EFI_SUCCESS            The operation completed successfully.
   @retval EFI_INVALID_PARAMETER  One or more of the following conditions is
@@ -493,12 +493,12 @@ MnpConfigure (
   underlying EFI_SIMPLE_NETWORK.MCastIpToMac() function, which may also be
   unsupported in some MNP implementations.
 
-  @param This       Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param Ipv6Flag   Set to TRUE to if IpAddress is an IPv6 multicast address.
-                    Set to FALSE if IpAddress is an IPv4 multicast address.
-  @param IpAddress  Pointer to the multicast IP address (in network byte order)
-                    to convert.
-  @param MacAddress Pointer to the resulting multicast MAC address. 
+  @param[in]  This       Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Ipv6Flag   Set to TRUE to if IpAddress is an IPv6 multicast address.
+                         Set to FALSE if IpAddress is an IPv4 multicast address.
+  @param[in]  IpAddress  Pointer to the multicast IP address (in network byte order)
+                         to convert.
+  @param[out] MacAddress Pointer to the resulting multicast MAC address. 
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER One of the following conditions is TRUE:
@@ -532,11 +532,11 @@ MnpMcastIpToMac (
   Management Protocol (IGMP) packets. If JoinFlag is FALSE and MacAddress is
   NULL, then all joined groups are left.
    
-  @param  This        Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  JoinFlag    Set to TRUE to join this multicast group.
-                      Set to FALSE to leave this multicast group.
-  @param  MacAddress  Pointer to the multicast MAC group (address) to join or
-                      leave.
+  @param[in]  This        Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  JoinFlag    Set to TRUE to join this multicast group.
+                          Set to FALSE to leave this multicast group.
+  @param[in]  MacAddress  Pointer to the multicast MAC group (address) to join or
+                          leave.
 
   @retval EFI_SUCCESS           The requested operation completed successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
@@ -582,10 +582,10 @@ MnpGroups (
   the underlying communications device and drivers.
  
  
-  @param  This    Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token   Pointer to a token associated with the transmit data
-                  descriptor. Type EFI_MANAGED_NETWORK_COMPLETION_TOKEN is
-                  defined in "Related Definitions" below.
+  @param[in]  This    Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Token   Pointer to a token associated with the transmit data
+                      descriptor. Type EFI_MANAGED_NETWORK_COMPLETION_TOKEN is
+                      defined in "Related Definitions" below.
 
   @retval EFI_SUCCESS            The transmit completion token was cached.
   @retval EFI_NOT_STARTED        This MNP child driver instance has not been
@@ -639,11 +639,11 @@ MnpTransmit (
   the asynchronous operation has completed, this function will not signal the
   token and EFI_NOT_FOUND is returned.
 
-  @param  This     Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token    Pointer to a token that has been issued by
-                   EFI_MANAGED_NETWORK_PROTOCOL.Transmit() or
-                   EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If NULL, all pending
-                   tokens are aborted.
+  @param[in]  This     Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Token    Pointer to a token that has been issued by
+                       EFI_MANAGED_NETWORK_PROTOCOL.Transmit() or
+                       EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If NULL, all pending
+                       tokens are aborted.
 
   @retval EFI_SUCCESS            The asynchronous I/O request was aborted and
                                  Token.Event was signaled. When Token is NULL,
@@ -675,11 +675,11 @@ MnpCancel (
   updates the Token.Status and Token.RxData fields and the Token.Event is
   signaled.
    
-  @param  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token         Pointer to a token associated with the receive
-                        data descriptor. Type
-                        EFI_MANAGED_NETWORK_COMPLETION_TOKEN is defined in
-                        EFI_MANAGED_NETWORK_PROTOCOL.Transmit().
+  @param[in]  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  Token         Pointer to a token associated with the receive
+                            data descriptor. Type
+                            EFI_MANAGED_NETWORK_COMPLETION_TOKEN is defined in
+                            EFI_MANAGED_NETWORK_PROTOCOL.Transmit().
 
   @retval EFI_SUCCESS            The receive completion token was cached.
   @retval EFI_NOT_STARTED        This MNP child driver instance has not been
@@ -719,7 +719,7 @@ MnpReceive (
   applications that are experiencing packet loss should try calling the Poll()
   function more often.
 
-  @param  This            Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param[in]  This            Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
 
   @retval EFI_SUCCESS      Incoming or outgoing data was processed.
   @retval EFI_NOT_STARTED  This MNP child driver instance has not been

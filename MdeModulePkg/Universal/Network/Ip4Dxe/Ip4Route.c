@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation
+Copyright (c) 2005 - 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,14 +8,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Ip4Route.c
-
-Abstract:
-
 
 **/
 
@@ -26,9 +18,9 @@ Abstract:
   Allocate a route entry then initialize it with the Dest/Netmaks
   and Gateway.
 
-  @param  Dest                  The destination network
-  @param  Netmask               The destination network mask
-  @param  GateWay               The nexthop address
+  @param[in]  Dest                  The destination network
+  @param[in]  Netmask               The destination network mask
+  @param[in]  GateWay               The nexthop address
 
   @return NULL if failed to allocate memeory, otherwise the newly created
           route entry.
@@ -66,8 +58,6 @@ Ip4CreateRouteEntry (
 
   @param  RtEntry               The route entry to free.
 
-  @return NONE
-
 **/
 VOID
 Ip4FreeRouteEntry (
@@ -85,11 +75,11 @@ Ip4FreeRouteEntry (
 /**
   Allocate and initialize an IP4 route cache entry.
 
-  @param  Dst                   The destination address
-  @param  Src                   The source address
-  @param  GateWay               The next hop address
-  @param  Tag                   The tag from the caller. This marks all the cache
-                                entries spawned from one route table entry.
+  @param[in]  Dst                   The destination address
+  @param[in]  Src                   The source address
+  @param[in]  GateWay               The next hop address
+  @param[in]  Tag                   The tag from the caller. This marks all the cache
+                                    entries spawned from one route table entry.
 
   @return NULL if failed to allocate memory for the cache, other point
           to the created route cache entry.
@@ -128,8 +118,6 @@ Ip4CreateRouteCacheEntry (
 
   @param  RtCacheEntry          The route cache entry to free.
 
-  @return None
-
 **/
 VOID
 Ip4FreeRouteCacheEntry (
@@ -147,9 +135,7 @@ Ip4FreeRouteCacheEntry (
 /**
   Initialize an empty route cache table.
 
-  @param  RtCache               The rotue cache table to initialize.
-
-  @return NONE
+  @param[in, out]  RtCache               The rotue cache table to initialize.
 
 **/
 VOID
@@ -169,9 +155,7 @@ Ip4InitRouteCache (
   Clean up a route cache, that is free all the route cache
   entries enqueued in the cache.
 
-  @param  RtCache               The route cache table to clean up
-
-  @return None
+  @param[in]  RtCache               The route cache table to clean up
 
 **/
 VOID
@@ -235,9 +219,7 @@ Ip4CreateRouteTable (
   Free the route table and its associated route cache. Route
   table is reference counted.
 
-  @param  RtTable               The route table to free.
-
-  @return None
+  @param[in]  RtTable               The route table to free.
 
 **/
 VOID
@@ -284,8 +266,6 @@ Ip4FreeRouteTable (
   @param  RtCache               Route cache to remove the entries from
   @param  Tag                   The Tag of the entries to remove
 
-  @return None
-
 **/
 VOID
 Ip4PurgeRouteCache (
@@ -316,10 +296,10 @@ Ip4PurgeRouteCache (
   Add a route entry to the route table. All the IP4_ADDRs are in
   host byte order.
 
-  @param  RtTable               Route table to add route to
-  @param  Dest                  The destination of the network
-  @param  Netmask               The netmask of the destination
-  @param  Gateway               The next hop address
+  @param[in, out]  RtTable      Route table to add route to
+  @param[in]       Dest         The destination of the network
+  @param[in]       Netmask      The netmask of the destination
+  @param[in]       Gateway      The next hop address
 
   @retval EFI_ACCESS_DENIED     The same route already exists
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for the entry
@@ -378,10 +358,10 @@ Ip4AddRoute (
 /**
   Remove a route entry and all the route caches spawn from it.
 
-  @param  RtTable               The route table to remove the route from
-  @param  Dest                  The destination network
-  @param  Netmask               The netmask of the Dest
-  @param  Gateway               The next hop address
+  @param  RtTable           The route table to remove the route from
+  @param  Dest              The destination network
+  @param  Netmask           The netmask of the Dest
+  @param  Gateway           The next hop address
 
   @retval EFI_SUCCESS           The route entry is successfully removed
   @retval EFI_NOT_FOUND         There is no route entry in the table with that
@@ -426,9 +406,9 @@ Ip4DelRoute (
   host redirect according to RFC1122. So, only route cache entries
   are modified according to the ICMP redirect message.
 
-  @param  RtTable               The route table to search the cache for
-  @param  Dest                  The destination address
-  @param  Src                   The source address
+  @param[in]  RtTable               The route table to search the cache for
+  @param[in]  Dest                  The destination address
+  @param[in]  Src                   The source address
 
   @return NULL if no route entry to the (Dest, Src). Otherwise the point
           to the correct route cache entry.
@@ -469,11 +449,11 @@ Ip4FindRouteCache (
   1. IP search the route table for a most specific match
   2. The local route entries have precedence over the default route entry.
 
-  @param  RtTable               The route table to search from
-  @param  Dst                   The destionation address to search
+  @param[in]  RtTable               The route table to search from
+  @param[in]  Dst                   The destionation address to search
 
   @return NULL if no route matches the Dst, otherwise the point to the
-  @return most specific route to the Dst.
+          most specific route to the Dst.
 
 **/
 IP4_ROUTE_ENTRY *
@@ -511,9 +491,9 @@ Ip4FindRouteEntry (
   Search the route table to route the packet. Return/create a route
   cache if there is a route to the destination.
 
-  @param  RtTable               The route table to search from
-  @param  Dest                  The destination address to search for
-  @param  Src                   The source address to search for
+  @param[in]  RtTable               The route table to search from
+  @param[in]  Dest                  The destination address to search for
+  @param[in]  Src                   The source address to search for
 
   @return NULL if failed to route packet, otherwise a route cache
           entry that can be used to route packet.
@@ -610,7 +590,7 @@ Ip4Route (
   GetModeData. The EFI_IP4_ROUTE_TABLE is clumsy to use in the
   internal operation of the IP4 driver.
 
-  @param  IpInstance            The IP4 child that requests the route table.
+  @param[in]  IpInstance        The IP4 child that requests the route table.
 
   @retval EFI_SUCCESS           The route table is successfully build
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the rotue table.

@@ -1,6 +1,12 @@
 /** @file
-
-Copyright (c) 2006 - 2008, Intel Corporation
+  EFI DHCP protocol implementation.
+  RFCs supported are:
+  RFC 2131: Dynamic Host Configuration Protocol
+  RFC 2132: DHCP Options and BOOTP Vendor Extensions
+  RFC 1534: Interoperation Between DHCP and BOOTP
+  RFC 3396: Encoding Long Options in DHCP.
+  
+Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,20 +14,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Module Name:
-
-  Dhcp4Impl.h
-
-Abstract:
-
-  EFI DHCP protocol implementation
-  RFCs supported are:
-  RFC 2131: Dynamic Host Configuration Protocol
-  RFC 2132: DHCP Options and BOOTP Vendor Extensions
-  RFC 1534: Interoperation Between DHCP and BOOTP
-  RFC 3396: Encoding Long Options in DHCP
-
 
 **/
 
@@ -160,8 +152,6 @@ extern EFI_DHCP4_PROTOCOL mDhcp4ProtocolTemplate;
 
   @param  DhcpSb                 The DHCP service instance.
 
-  @return None
-
 **/
 VOID
 DhcpYieldControl (
@@ -172,8 +162,6 @@ DhcpYieldControl (
   Complete a Dhcp4 transaction and signal the upper layer.
   
   @param Instance      Dhcp4 instance.
-  
-  @return None.
 
 **/
 VOID

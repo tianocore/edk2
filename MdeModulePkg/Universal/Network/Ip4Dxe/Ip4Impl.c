@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2007, Intel Corporation
+Copyright (c) 2005 - 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -8,14 +8,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-
-Module Name:
-
-  Ip4Impl.c
-
-Abstract:
-
 
 **/
 
@@ -29,10 +21,10 @@ Abstract:
   function is used optionally to retrieve the operational mode data of underlying
   networks or drivers.
 
-  @param  This          Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
-  @param  MnpConfigData Pointer to the managed network configuration data structure.
-  @param  SnpModeData   Pointer to the simple network mode data structure.
+  @param[in]   This          Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[out]  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
+  @param[out]  MnpConfigData Pointer to the managed network configuration data structure.
+  @param[out]  SnpModeData   Pointer to the simple network mode data structure.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -71,8 +63,8 @@ EfiIp4GetModeData (
   requests will be cancelled. Their completion token status will be set to EFI_ABORTED
   and their events will be signaled.
 
-  @param  This         Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  IpConfigData Pointer to the EFI IPv4 Protocol configuration data structure.
+  @param[in]  This              Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  IpConfigData      Pointer to the EFI IPv4 Protocol configuration data structure.
 
   @retval EFI_SUCCESS           The driver instance was successfully opened.
   @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
@@ -107,9 +99,9 @@ EfiIp4Configure (
   
   If JoinFlag is FALSE and GroupAddress is NULL, all joined groups will be left.
 
-  @param  This                  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
-  @param  GroupAddress          Pointer to the IPv4 multicast address.
+  @param[in]  This                  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
+  @param[in]  GroupAddress          Pointer to the IPv4 multicast address.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following is TRUE:
@@ -160,13 +152,13 @@ EfiIp4Groups (
   copies will be updated whenever the EIF IPv4 Protocol driver reconfigures its
   instances. As a result, client modification to the routing table will be lost.
 
-  @param  This                   Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
-                                 FALSE to add this route to the routing table. SubnetAddress
-                                 and SubnetMask are used as the key to each route entry.
-  @param  SubnetAddress          The address of the subnet that needs to be routed.
-  @param  SubnetMask             The subnet mask of SubnetAddress.
-  @param  GatewayAddress         The unicast gateway IPv4 address for this route.
+  @param[in]  This                   Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
+                                     FALSE to add this route to the routing table. SubnetAddress
+                                     and SubnetMask are used as the key to each route entry.
+  @param[in]  SubnetAddress          The address of the subnet that needs to be routed.
+  @param[in]  SubnetMask             The subnet mask of SubnetAddress.
+  @param[in]  GatewayAddress         The unicast gateway IPv4 address for this route.
 
   @retval EFI_SUCCESS            The operation completed successfully.
   @retval EFI_NOT_STARTED        The driver instance has not been started.
@@ -203,8 +195,8 @@ EfiIp4Routes (
   EFI IPv4 Protocol instance. Whenever the packet in the token is sent out or some
   errors occur, the event in the token will be signaled and the status is updated.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to the transmit token.
+  @param[in]  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  Token Pointer to the transmit token.
 
   @retval  EFI_SUCCESS           The data has been queued for transmission.
   @retval  EFI_NOT_STARTED       This instance has not been started.
@@ -243,8 +235,8 @@ EfiIp4Transmit (
   driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event
   is signaled.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to a token that is associated with the receive data descriptor.
+  @param[in]  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  Token Pointer to a token that is associated with the receive data descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
   @retval EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
@@ -281,12 +273,12 @@ EfiIp4Receive (
   asynchronous operation has completed, this function will not signal the token
   and EFI_NOT_FOUND is returned.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
-                EFI_IP4_PROTOCOL.Transmit() or
-                EFI_IP4_PROTOCOL.Receive(). If NULL, all pending
-                tokens are aborted. Type EFI_IP4_COMPLETION_TOKEN is
-                defined in EFI_IP4_PROTOCOL.Transmit().
+  @param[in]  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  Token Pointer to a token that has been issued by
+                    EFI_IP4_PROTOCOL.Transmit() or
+                    EFI_IP4_PROTOCOL.Receive(). If NULL, all pending
+                    tokens are aborted. Type EFI_IP4_COMPLETION_TOKEN is
+                    defined in EFI_IP4_PROTOCOL.Transmit().
 
   @retval EFI_SUCCESS           The asynchronous I/O request was aborted and
                                 Token.->Event was signaled. When Token is NULL, all
@@ -321,7 +313,7 @@ EfiIp4Cancel (
   experiencing packet loss should try calling the EFI_IP4_PROTOCOL.Poll() function
   more often.
 
-  @param  This Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  This               Pointer to the EFI_IP4_PROTOCOL instance.
 
   @retval  EFI_SUCCESS           Incoming or outgoing data was processed.
   @retval  EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
@@ -360,10 +352,10 @@ mEfiIp4ProtocolTemplete = {
   function is used optionally to retrieve the operational mode data of underlying
   networks or drivers.
 
-  @param  This          Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
-  @param  MnpConfigData Pointer to the managed network configuration data structure.
-  @param  SnpModeData   Pointer to the simple network mode data structure.
+  @param[in]   This          Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[out]  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
+  @param[out]  MnpConfigData Pointer to the managed network configuration data structure.
+  @param[out]  SnpModeData   Pointer to the simple network mode data structure.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -468,8 +460,8 @@ EfiIp4GetModeData (
   reconfigure the MNP. If Force is TRUE, the MNP is configured no
   matter whether that is changed or not.
 
-  @param  IpSb                   The IP4 service instance that is to be changed.
-  @param  Force                  Force the configuration or not.
+  @param[in]  IpSb               The IP4 service instance that is to be changed.
+  @param[in]  Force              Force the configuration or not.
 
   @retval EFI_SUCCESS            The MNP is successfully configured/reconfigured.
   @retval Others                 Configuration failed.
@@ -547,9 +539,7 @@ Ip4ServiceConfigMnp (
   it will configure the default interface and default route table
   with the configuration information retrieved by IP4_CONFIGURE.
 
-  @param  Context                The IP4 service binding instance.
-
-  @return None
+  @param[in]  Context                The IP4 service binding instance.
 
 **/
 VOID
@@ -692,13 +682,10 @@ ON_EXIT:
 }
 
 /**
-
   Request Ip4AutoConfigCallBackDpc as a DPC at TPL_CALLBACK.
   
   @param Event     The event that is signalled.
   @param Context   The IP4 service binding instance.
-  
-  @return None.
 
 **/
 VOID
@@ -725,7 +712,7 @@ Ip4AutoConfigCallBack (
   It will locates the EFI_IP4_CONFIG_PROTOCOL, then start the
   auto configuration.
 
-  @param  IpSb                   The IP4 service instance to configure
+  @param[in]  IpSb               The IP4 service instance to configure
 
   @retval EFI_SUCCESS            The auto configuration is successfull started
   @retval Others                 Failed to start auto configuration.
@@ -822,8 +809,6 @@ CLOSE_DONE_EVENT:
   @param  IpSb                   The IP4 service instance.
   @param  IpInstance             The IP4 child instance.
 
-  @return None
-
 **/
 VOID
 Ip4InitProtocol (
@@ -857,8 +842,8 @@ Ip4InitProtocol (
   for the first time. The caller should validate the configuration
   before deliver them to it. It also don't do configure NULL.
 
-  @param  IpInstance             The IP4 child to configure.
-  @param  Config                 The configure data.
+  @param[in, out]  IpInstance         The IP4 child to configure.
+  @param[in]       Config             The configure data.
 
   @retval EFI_SUCCESS            The IP4 child is successfully configured.
   @retval EFI_DEVICE_ERROR       Failed to free the pending transive or to
@@ -1012,7 +997,7 @@ ON_ERROR:
 /**
   Clean up the IP4 child, release all the resources used by it.
 
-  @param  IpInstance             The IP4 child to clean up.
+  @param[in]  IpInstance         The IP4 child to clean up.
 
   @retval EFI_SUCCESS            The IP4 child is cleaned up
   @retval EFI_DEVICE_ERROR       Some resources failed to be released
@@ -1080,8 +1065,8 @@ Ip4CleanProtocol (
   address. Only continuous netmasks are supported. and check
   that StationAddress is a unicast address on the newtwork.
 
-  @param  Ip                     The IP address to validate
-  @param  Netmask                The netmaks of the IP
+  @param[in]  Ip                 The IP address to validate
+  @param[in]  Netmask            The netmaks of the IP
 
   @retval TRUE                   The Ip/Netmask pair is valid
   @retval FALSE                  The Ip/Netmask pair is invalid
@@ -1158,8 +1143,8 @@ Ip4StationAddressValid (
   requests will be cancelled. Their completion token status will be set to EFI_ABORTED
   and their events will be signaled.
 
-  @param  This         Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  IpConfigData Pointer to the EFI IPv4 Protocol configuration data structure.
+  @param[in]  This              Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  IpConfigData      Pointer to the EFI IPv4 Protocol configuration data structure.
 
   @retval EFI_SUCCESS           The driver instance was successfully opened.
   @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
@@ -1301,9 +1286,9 @@ ON_EXIT:
   Change the IP4 child's multicast setting. The caller
   should make sure that the parameters is valid.
 
-  @param  IpInstance             The IP4 child to change the setting.
-  @param  JoinFlag               TRUE to join the group, otherwise leave it
-  @param  GroupAddress           The target group address
+  @param[in]  IpInstance             The IP4 child to change the setting.
+  @param[in]  JoinFlag               TRUE to join the group, otherwise leave it
+  @param[in]  GroupAddress           The target group address
 
   @retval EFI_ALREADY_STARTED    Want to join the group, but already a member of it
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
@@ -1400,9 +1385,9 @@ Ip4Groups (
   
   If JoinFlag is FALSE and GroupAddress is NULL, all joined groups will be left.
 
-  @param  This                  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
-  @param  GroupAddress          Pointer to the IPv4 multicast address.
+  @param[in]  This                  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
+  @param[in]  GroupAddress          Pointer to the IPv4 multicast address.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following is TRUE:
@@ -1491,13 +1476,13 @@ ON_EXIT:
   copies will be updated whenever the EIF IPv4 Protocol driver reconfigures its
   instances. As a result, client modification to the routing table will be lost.
 
-  @param  This                   Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
-                                 FALSE to add this route to the routing table. SubnetAddress
-                                 and SubnetMask are used as the key to each route entry.
-  @param  SubnetAddress          The address of the subnet that needs to be routed.
-  @param  SubnetMask             The subnet mask of SubnetAddress.
-  @param  GatewayAddress         The unicast gateway IPv4 address for this route.
+  @param[in]  This                   Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
+                                     FALSE to add this route to the routing table. SubnetAddress
+                                     and SubnetMask are used as the key to each route entry.
+  @param[in]  SubnetAddress          The address of the subnet that needs to be routed.
+  @param[in]  SubnetMask             The subnet mask of SubnetAddress.
+  @param[in]  GatewayAddress         The unicast gateway IPv4 address for this route.
 
   @retval EFI_SUCCESS            The operation completed successfully.
   @retval EFI_NOT_STARTED        The driver instance has not been started.
@@ -1598,10 +1583,10 @@ ON_EXIT:
   Check whether the user's token or event has already
   been enqueued on IP4's list.
 
-  @param  Map                    The container of either user's transmit or receive
-                                 token.
-  @param  Item                   Current item to check against
-  @param  Context                The Token to check againist.
+  @param[in]  Map                    The container of either user's transmit or receive
+                                     token.
+  @param[in]  Item                   Current item to check against
+  @param[in]  Context                The Token to check againist.
 
   @retval EFI_ACCESS_DENIED      The token or event has already been enqueued in IP
   @retval EFI_SUCCESS            The current item isn't the same token/event as the
@@ -1632,8 +1617,8 @@ Ip4TokenExist (
 /**
   Validate the user's token against current station address.
 
-  @param  Token                  User's token to validate
-  @param  IpIf                   The IP4 child's interface.
+  @param[in]  Token                  User's token to validate
+  @param[in]  IpIf                   The IP4 child's interface.
 
   @retval EFI_INVALID_PARAMETER  Some parameters are invalid
   @retval EFI_BAD_BUFFER_SIZE    The user's option/data is too long.
@@ -1762,9 +1747,7 @@ Ip4TxTokenValid (
   are bound together. Check the comments in Ip4Output for information
   about IP fragmentation.
 
-  @param  Context                The token's wrap
-
-  @return None
+  @param[in]  Context                The token's wrap
 
 **/
 VOID
@@ -1809,8 +1792,6 @@ Ip4FreeTxToken (
   @param  Flag                   Not used during transmission
   @param  Context                The token's wrap.
 
-  @return None
-
 **/
 VOID
 Ip4OnPacketSent (
@@ -1850,8 +1831,8 @@ Ip4OnPacketSent (
   EFI IPv4 Protocol instance. Whenever the packet in the token is sent out or some
   errors occur, the event in the token will be signaled and the status is updated.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to the transmit token.
+  @param[in]  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  Token Pointer to the transmit token.
 
   @retval  EFI_SUCCESS           The data has been queued for transmission.
   @retval  EFI_NOT_STARTED       This instance has not been started.
@@ -2052,8 +2033,8 @@ ON_EXIT:
   driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event
   is signaled.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to a token that is associated with the receive data descriptor.
+  @param[in]  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  Token Pointer to a token that is associated with the receive data descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
   @retval EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
@@ -2142,9 +2123,9 @@ ON_EXIT:
   Because Ip4CancelPacket and other functions are all called in
   line, so, after Ip4CancelPacket returns, the Item has been freed.
 
-  @param  Map                    The IP4 child's transmit queue
-  @param  Item                   The current transmitted packet to test.
-  @param  Context                The user's token to cancel.
+  @param[in]  Map                    The IP4 child's transmit queue
+  @param[in]  Item                   The current transmitted packet to test.
+  @param[in]  Context                The user's token to cancel.
 
   @retval EFI_SUCCESS            Continue to check the next Item.
   @retval EFI_ABORTED            The user's Token (Token != NULL) is cancelled.
@@ -2195,9 +2176,9 @@ Ip4CancelTxTokens (
   Cancel the receive request. This is quiet simple, because
   it is only enqueued in our local receive map.
 
-  @param  Map                    The IP4 child's receive queue
-  @param  Item                   Current receive request to cancel.
-  @param  Context                The user's token to cancel
+  @param[in]  Map                    The IP4 child's receive queue
+  @param[in]  Item                   Current receive request to cancel.
+  @param[in]  Context                The user's token to cancel
 
   @retval EFI_SUCCESS            Continue to check the next receive request on the
                                  queue.
@@ -2239,8 +2220,8 @@ Ip4CancelRxTokens (
 /**
   Cancel the user's receive/transmit request.
 
-  @param  IpInstance             The IP4 child
-  @param  Token                  The token to cancel. If NULL, all token will be
+  @param[in]  IpInstance         The IP4 child
+  @param[in]  Token              The token to cancel. If NULL, all token will be
                                  cancelled.
 
   @retval EFI_SUCCESS            The token is cancelled
@@ -2322,12 +2303,12 @@ Ip4Cancel (
   asynchronous operation has completed, this function will not signal the token
   and EFI_NOT_FOUND is returned.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
-                EFI_IP4_PROTOCOL.Transmit() or
-                EFI_IP4_PROTOCOL.Receive(). If NULL, all pending
-                tokens are aborted. Type EFI_IP4_COMPLETION_TOKEN is
-                defined in EFI_IP4_PROTOCOL.Transmit().
+  @param[in]  This  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  Token Pointer to a token that has been issued by
+                    EFI_IP4_PROTOCOL.Transmit() or
+                    EFI_IP4_PROTOCOL.Receive(). If NULL, all pending
+                    tokens are aborted. Type EFI_IP4_COMPLETION_TOKEN is
+                    defined in EFI_IP4_PROTOCOL.Transmit().
 
   @retval EFI_SUCCESS           The asynchronous I/O request was aborted and
                                 Token.->Event was signaled. When Token is NULL, all
@@ -2392,7 +2373,7 @@ ON_EXIT:
   experiencing packet loss should try calling the EFI_IP4_PROTOCOL.Poll() function
   more often.
 
-  @param  This Pointer to the EFI_IP4_PROTOCOL instance.
+  @param[in]  This               Pointer to the EFI_IP4_PROTOCOL instance.
 
   @retval  EFI_SUCCESS           Incoming or outgoing data was processed.
   @retval  EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
@@ -2440,9 +2421,9 @@ EfiIp4Poll (
   received-but-not-delivered and transmitted-but-not-recycle
   packets.
 
-  @param  Map                    The IP4 child's transmit map.
-  @param  Item                   Current transmitted packet
-  @param  Context                Not used.
+  @param[in]  Map                    The IP4 child's transmit map.
+  @param[in]  Item                   Current transmitted packet
+  @param[in]  Context                Not used.
 
   @retval EFI_SUCCESS            Always returns EFI_SUCCESS
 
@@ -2473,10 +2454,8 @@ Ip4SentPacketTicking (
   transmitted-but-not-recycle packets, and provides time input
   for its IGMP protocol.
 
-  @param  Event                  The IP4 service instance's heart beat timer.
-  @param  Context                The IP4 service instance.
-
-  @return None
+  @param[in]  Event                  The IP4 service instance's heart beat timer.
+  @param[in]  Context                The IP4 service instance.
 
 **/
 VOID

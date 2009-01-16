@@ -1,11 +1,11 @@
 /** @file
   Implementation of Managed Network Protocol private services.
-
-Copyright (c) 2005 - 2008, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+  
+Copyright (c) 2005 - 2008, Intel Corporation.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -48,7 +48,7 @@ EFI_MANAGED_NETWORK_CONFIG_DATA mMnpDefaultConfigData = {
   Configure the Snp receive filters according to the instances' receive filter
   settings.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
+  @param[in]  MnpServiceData    Pointer to the mnp service context data.
 
   @retval EFI_SUCCESS           The receive filters is configured.
   @retval EFI_OUT_OF_RESOURCES  The receive filters can't be configured due to 
@@ -205,8 +205,8 @@ MnpConfigReceiveFilters (
   Add Count of net buffers to MnpServiceData->FreeNbufQue. The length of the net
   buffer is specified by MnpServiceData->BufferLength. 
 
-  @param  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
-  @param  Count                 Number of NET_BUFFERs to add.
+  @param[in]  MnpServiceData    Pointer to the MNP_SERVICE_DATA.
+  @param[in]  Count             Number of NET_BUFFERs to add.
 
   @retval EFI_SUCCESS           The specified amount of NET_BUFs are allocated 
                                 and added to MnpServiceData->FreeNbufQue.
@@ -260,7 +260,7 @@ MnpAddFreeNbuf (
   in the queue, first try to allocate some and add them into the queue, then
   fetch the NET_BUF from the updated FreeNbufQue.
 
-  @param  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
+  @param[in]  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
 
   @return     Pointer to the allocated free NET_BUF structure, if NULL the 
               operation is failed.
@@ -335,7 +335,7 @@ ON_EXIT:
 
   @param  MnpServiceData        Pointer to the mnp service context data.
   @param  Nbuf                  Pointer to the NET_BUF to free.
-
+  
 **/
 VOID
 MnpFreeNbuf (
@@ -367,9 +367,9 @@ MnpFreeNbuf (
 /**
   Initialize the mnp service context data.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  ImageHandle           The driver image handle.
-  @param  ControllerHandle      Handle of device to bind driver to.
+  @param[in]  MnpServiceData        Pointer to the mnp service context data.
+  @param[in]  ImageHandle           The driver image handle.
+  @param[in]  ControllerHandle      Handle of device to bind driver to.
 
   @retval EFI_SUCCESS           The mnp service context is initialized.
   @retval Other                 Some error occurs.
@@ -555,7 +555,7 @@ ERROR:
 
   @param  MnpServiceData        Pointer to the mnp service context data.
   @param  ImageHandle           The driver image handle.
-
+  
 **/
 VOID
 MnpFlushServiceData (
@@ -616,8 +616,8 @@ MnpFlushServiceData (
 /**
   Initialize the mnp instance context data.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  Instance              Pointer to the mnp instance context data to
+  @param[in]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in]  Instance          Pointer to the mnp instance context data to
                                 initialize.
 
 **/
@@ -667,9 +667,9 @@ MnpInitializeInstanceData (
 /**
   Check whether the token specified by Arg maches the token in Item.
 
-  @param  Map                   Pointer to the NET_MAP.
-  @param  Item                  Pointer to the NET_MAP_ITEM
-  @param  Arg                   Pointer to the Arg, it's a pointer to the token to
+  @param[in]  Map               Pointer to the NET_MAP.
+  @param[in]  Item              Pointer to the NET_MAP_ITEM
+  @param[in]  Arg               Pointer to the Arg, it's a pointer to the token to
                                 check.
 
   @retval EFI_SUCCESS           The token specified by Arg is different from the
@@ -705,10 +705,10 @@ MnpTokenExist (
 /**
   Cancel the token specified by Arg if it matches the token in Item.
 
-  @param  Map               Pointer to the NET_MAP.
-  @param  Item              Pointer to the NET_MAP_ITEM
-  @param  Arg               Pointer to the Arg, it's a pointer to the token to 
-                            cancel.
+  @param[in, out]  Map          Pointer to the NET_MAP.
+  @param[in]       Item         Pointer to the NET_MAP_ITEM
+  @param[in]       Arg          Pointer to the Arg, it's a pointer to the token to
+                                cancel.
 
   @retval EFI_SUCCESS       The Arg is NULL, and the token in Item is cancelled, 
                             or the Arg isn't NULL, and the token in Item is
@@ -760,7 +760,7 @@ MnpCancelTokens (
 /**
   Start and initialize the simple network.
 
-  @param  Snp                   Pointer to the simple network protocol.
+  @param[in]  Snp               Pointer to the simple network protocol.
 
   @retval EFI_SUCCESS           The simple network protocol is started.
   @retval Other                 Some error occurs.
@@ -794,7 +794,7 @@ MnpStartSnp (
 /**
   Stop the simple network.
 
-  @param  Snp                   Pointer to the simple network protocol.
+  @param[in]  Snp               Pointer to the simple network protocol.
 
   @retval EFI_SUCCESS           The simple network is stopped.
   @retval Other                 Some error occurs.
@@ -829,10 +829,10 @@ MnpStopSnp (
   Start the managed network, this function is called when one instance is configured
   or reconfigured.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  IsConfigUpdate        The instance is reconfigured or it's the first time
+  @param[in]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in]  IsConfigUpdate    The instance is reconfigured or it's the first time
                                 the instanced is configured.
-  @param  EnableSystemPoll      Enable the system polling or not.
+  @param[in]  EnableSystemPoll  Enable the system polling or not.
 
   @retval EFI_SUCCESS           The managed network is started and some
                                 configuration is updated.
@@ -921,7 +921,7 @@ ErrorExit:
 /**
   Stop the managed network.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
+  @param[in]  MnpServiceData    Pointer to the mnp service context data.
 
   @retval EFI_SUCCESS           The managed network is stopped.
   @retval Other                 Some error occurs.
@@ -1021,8 +1021,8 @@ MnpFlushRcvdDataQueue (
 /**
   Configure the Instance using ConfigData.
 
-  @param  Instance              Pointer to the mnp instance context data.
-  @param  ConfigData            Pointer to the configuration data used to configure
+  @param[in]  Instance          Pointer to the mnp instance context data.
+  @param[in]  ConfigData        Pointer to the configuration data used to configure
                                 the isntance.
 
   @retval EFI_SUCCESS           The Instance is configured.
@@ -1162,11 +1162,11 @@ MnpConfigureInstance (
   Add a group address control block which controls the MacAddress for
   this instance.
 
-  @param  Instance              Pointer to the mnp instance context data.
-  @param  CtrlBlk               Pointer to the group address control block.
-  @param  GroupAddress          Pointer to the group adress.
-  @param  MacAddress            Pointer to the mac address.
-  @param  HwAddressSize         The hardware address size.
+  @param[in]  Instance              Pointer to the mnp instance context data.
+  @param[in]  CtrlBlk               Pointer to the group address control block.
+  @param[in]  GroupAddress          Pointer to the group adress.
+  @param[in]  MacAddress            Pointer to the mac address.
+  @param[in]  HwAddressSize         The hardware address size.
 
   @retval EFI_SUCCESS           The group address control block is added.
   @retval EFI_OUT_OF_RESOURCE   Failed due to lack of memory resources.
@@ -1231,8 +1231,8 @@ MnpGroupOpAddCtrlBlk (
   Delete a group control block from the instance. If the controlled group address's
   reference count reaches zero, the group address is removed too.
 
-  @param  Instance              Pointer to the instance context data.
-  @param  CtrlBlk               Pointer to the group control block to delete.
+  @param[in]  Instance              Pointer to the instance context data.
+  @param[in]  CtrlBlk               Pointer to the group control block to delete.
 
   @return The group address controlled by the control block is no longer used or not.
 
@@ -1283,11 +1283,11 @@ MnpGroupOpDelCtrlBlk (
 /**
   Do the group operations for this instance.
 
-  @param  Instance              Pointer to the instance context data.
-  @param  JoinFlag              Set to TRUE to join a group. Set to TRUE to leave a
+  @param[in]  Instance          Pointer to the instance context data.
+  @param[in]  JoinFlag          Set to TRUE to join a group. Set to TRUE to leave a
                                 group/groups.
-  @param  MacAddress            Pointer to the group address to join or leave.
-  @param  CtrlBlk               Pointer to the group control block if JoinFlag if
+  @param[in]  MacAddress        Pointer to the group address to join or leave.
+  @param[in]  CtrlBlk           Pointer to the group control block if JoinFlag if
                                 FALSE.
 
   @retval EFI_SUCCESS           The group operation finished.
