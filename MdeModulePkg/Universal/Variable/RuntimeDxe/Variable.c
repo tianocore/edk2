@@ -141,6 +141,7 @@ UpdateVariableInfo (
 
       CopyGuid (&gVariableInfo->VendorGuid, VendorGuid);
       gVariableInfo->Name = AllocatePool (StrLen (VariableName));
+      ASSERT (gVariableInfo->Name != NULL);
       StrCpy (gVariableInfo->Name, VariableName);
       gVariableInfo->Volatile = Volatile;
 
@@ -178,6 +179,7 @@ UpdateVariableInfo (
 
         CopyGuid (&Entry->Next->VendorGuid, VendorGuid);
         Entry->Next->Name = AllocatePool (StrLen (VariableName));
+        ASSERT (Entry->Next->Name != NULL);
         StrCpy (Entry->Next->Name, VariableName);
         Entry->Next->Volatile = Volatile;
       }
