@@ -1,27 +1,30 @@
 /** @file
-
-Copyright (c) 2006 - 2007, Intel Corporation
+  Routines to process Rrq (download).
+  
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Mtftp4Rrq.c
-
-Abstract:
-
-  Routines to process Rrq (download)
-
-
 **/
+
 
 #include "Mtftp4Impl.h"
 
+
+/**
+  The packet process callback for MTFTP download.
+
+  @param  UdpPacket             The packet received
+  @param  Points                The local/remote access point of the packet
+  @param  IoStatus              The status of the receiving
+  @param  Context               Opaque parameter, which is the MTFTP session
+
+**/
 VOID
 Mtftp4RrqInput (
   IN NET_BUF                *UdpPacket,
@@ -32,9 +35,10 @@ Mtftp4RrqInput (
 
 
 /**
-  Start the MTFTP session to download. It will first initialize some
-  of the internal states then build and send a RRQ reqeuest packet, at
-  last, it will start receive for the downloading.
+  Start the MTFTP session to download. 
+  
+  It will first initialize some of the internal states then build and send a RRQ 
+  reqeuest packet, at last, it will start receive for the downloading.
 
   @param  Instance              The Mtftp session
   @param  Operation             The MTFTP opcode, it may be a EFI_MTFTP4_OPCODE_RRQ
@@ -130,9 +134,9 @@ Mtftp4RrqSendAck (
 **/
 EFI_STATUS
 Mtftp4RrqSaveBlock (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN EFI_MTFTP4_PACKET      *Packet,
-  IN UINT32                 Len
+  IN OUT MTFTP4_PROTOCOL        *Instance,
+  IN     EFI_MTFTP4_PACKET      *Packet,
+  IN     UINT32                 Len
   )
 {
   EFI_MTFTP4_TOKEN          *Token;
@@ -215,8 +219,9 @@ Mtftp4RrqSaveBlock (
 
 
 /**
-  Function to process the received data packets. It will save the block
-  then send back an ACK if it is active.
+  Function to process the received data packets. 
+  
+  It will save the block then send back an ACK if it is active.
 
   @param  Instance              The downloading MTFTP session
   @param  Packet                The packet received
@@ -231,11 +236,11 @@ Mtftp4RrqSaveBlock (
 **/
 EFI_STATUS
 Mtftp4RrqHandleData (
-  IN  MTFTP4_PROTOCOL       *Instance,
-  IN  EFI_MTFTP4_PACKET     *Packet,
-  IN  UINT32                Len,
-  IN  BOOLEAN               Multicast,
-  OUT BOOLEAN               *Completed
+  IN     MTFTP4_PROTOCOL       *Instance,
+  IN     EFI_MTFTP4_PACKET     *Packet,
+  IN     UINT32                Len,
+  IN     BOOLEAN               Multicast,
+     OUT BOOLEAN               *Completed
   )
 {
   EFI_STATUS                Status;
@@ -304,6 +309,7 @@ Mtftp4RrqHandleData (
 
 /**
   Validate whether the options received in the server's OACK packet is valid.
+  
   The options are valid only if:
   1. The server doesn't include options not requested by us
   2. The server can only use smaller blksize than that is requested
@@ -314,7 +320,8 @@ Mtftp4RrqHandleData (
   @param  Reply                 The options in the OACK packet
   @param  Request               The requested options
 
-  @return TRUE if the options in the OACK is OK, otherwise FALSE.
+  @retval TRUE                  The options in the OACK is OK.
+  @retval FALSE                 The options in the OACK is invalid.
 
 **/
 BOOLEAN
@@ -336,8 +343,8 @@ Mtftp4RrqOackValid (
   // Server can only specify a smaller block size to be used and
   // return the timeout matches that requested.
   //
-  if (((Reply->Exist & MTFTP4_BLKSIZE_EXIST) && (Reply->BlkSize > Request->BlkSize)) ||
-      ((Reply->Exist & MTFTP4_TIMEOUT_EXIST) && (Reply->Timeout != Request->Timeout))) {
+  if ((((Reply->Exist & MTFTP4_BLKSIZE_EXIST) != 0)&& (Reply->BlkSize > Request->BlkSize)) ||
+      (((Reply->Exist & MTFTP4_TIMEOUT_EXIST) != 0) && (Reply->Timeout != Request->Timeout))) {
     return FALSE;
   }
 
@@ -346,7 +353,7 @@ Mtftp4RrqOackValid (
   // setting. But if it use the specific multicast channel, it can't
   // change the setting.
   //
-  if ((Reply->Exist & MTFTP4_MCAST_EXIST) && (This->McastIp != 0)) {
+  if (((Reply->Exist & MTFTP4_MCAST_EXIST) != 0) && (This->McastIp != 0)) {
     if ((Reply->McastIp != 0) && (Reply->McastIp != This->McastIp)) {
       return FALSE;
     }
@@ -367,7 +374,7 @@ Mtftp4RrqOackValid (
   @param  Context               The opaque parameter to the function which is the
                                 MTFTP session.
 
-  @retval EFI_SUCCESS           The udp child is successfully configured.
+  @retval EFI_SUCCESS           The UDP child is successfully configured.
   @retval Others                Failed to configure the UDP child.
 
 **/
@@ -411,12 +418,20 @@ Mtftp4RrqConfigMcastPort (
     return Status;
   }
 
-  if (!Config->UseDefaultSetting && !EFI_IP4_EQUAL (&mZeroIp4Addr, &Config->GatewayIp)) {
+  if (!Config->UseDefaultSetting && 
+      !EFI_IP4_EQUAL (&mZeroIp4Addr, &Config->GatewayIp)) {
     //
     // The station IP address is manually configured and the Gateway IP is not 0.
     // Add the default route for this UDP instance.
     //
-    Status = McastIo->Udp->Routes (McastIo->Udp, FALSE, &mZeroIp4Addr, &mZeroIp4Addr, &Config->GatewayIp);
+    Status = McastIo->Udp->Routes (
+                             McastIo->Udp, 
+                             FALSE,
+                             &mZeroIp4Addr,
+                             &mZeroIp4Addr,
+                             &Config->GatewayIp
+                             );
+                             
     if (EFI_ERROR (Status)) {
       McastIo->Udp->Configure (McastIo->Udp, NULL);
       return Status;
@@ -434,8 +449,9 @@ Mtftp4RrqConfigMcastPort (
 
 
 /**
-  Function to process the OACK. It will first validate the OACK
-  packet, then update the various negotiated parameters.
+  Function to process the OACK. 
+  
+  It will first validate the OACK packet, then update the various negotiated parameters.
 
   @param  Instance              The download MTFTP session
   @param  Packet                The packet received
@@ -451,11 +467,11 @@ Mtftp4RrqConfigMcastPort (
 **/
 EFI_STATUS
 Mtftp4RrqHandleOack (
-  IN  MTFTP4_PROTOCOL       *Instance,
-  IN  EFI_MTFTP4_PACKET     *Packet,
-  IN  UINT32                Len,
-  IN  BOOLEAN               Multicast,
-  OUT BOOLEAN               *Completed
+  IN OUT MTFTP4_PROTOCOL       *Instance,
+  IN     EFI_MTFTP4_PACKET     *Packet,
+  IN     UINT32                Len,
+  IN     BOOLEAN               Multicast,
+     OUT BOOLEAN               *Completed
   )
 {
   MTFTP4_OPTION             Reply;
@@ -498,7 +514,7 @@ Mtftp4RrqHandleOack (
     return EFI_TFTP_ERROR;
   }
 
-  if (Reply.Exist & MTFTP4_MCAST_EXIST) {
+  if ((Reply.Exist & MTFTP4_MCAST_EXIST) != 0) {
 
     //
     // Save the multicast info. Always update the Master, only update the
@@ -585,8 +601,6 @@ Mtftp4RrqHandleOack (
   @param  Points                The local/remote access point of the packet
   @param  IoStatus              The status of the receiving
   @param  Context               Opaque parameter, which is the MTFTP session
-
-  @return None
 
 **/
 VOID
@@ -715,6 +729,9 @@ Mtftp4RrqInput (
 
   case EFI_MTFTP4_OPCODE_ERROR:
     Status = EFI_TFTP_ERROR;
+    break;
+    
+  default:
     break;
   }
 

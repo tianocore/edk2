@@ -1,50 +1,41 @@
 /** @file
-
-Copyright (c) 2006 - 2007, Intel Corporation
+  Interface routine for Mtftp4.
+  
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Mtftp4Impl.c
-
-Abstract:
-
-  Interface routine for Mtftp4
-
-
 **/
+
 
 #include "Mtftp4Impl.h"
 
-EFI_STATUS
-EFIAPI
-EfiMtftp4ReadFile (
-  IN EFI_MTFTP4_PROTOCOL    *This,
-  IN EFI_MTFTP4_TOKEN       *Token
-  );
-
 
 /**
-  Get the current operation parameter for the MTFTP session
+  Reads the current operational settings.
 
-  @param  This                   The MTFTP protocol instance
-  @param  ModeData               The MTFTP mode data
+  The GetModeData()function reads the current operational settings of this 
+  EFI MTFTPv4 Protocol driver instance.
 
-  @retval EFI_INVALID_PARAMETER  This or ModeData is NULL
-  @retval EFI_SUCCESS            The operation parameter is saved in ModeData
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance.
+  @param  ModeData               Pointer to storage for the EFI MTFTPv4 Protocol
+                                 driver mode data. 
 
+  @retval EFI_SUCCESS            The configuration data was successfully returned.
+  @retval EFI_OUT_OF_RESOURCES   The required mode data could not be allocated.
+  @retval EFI_INVALID_PARAMETER  This is NULL or ModeData is NULL.
+  
 **/
 EFI_STATUS
 EFIAPI
 EfiMtftp4GetModeData (
-  IN EFI_MTFTP4_PROTOCOL    *This,
-  OUT EFI_MTFTP4_MODE_DATA  *ModeData
+  IN     EFI_MTFTP4_PROTOCOL    *This,
+     OUT EFI_MTFTP4_MODE_DATA  *ModeData
   )
 {
   MTFTP4_PROTOCOL  *Instance;
@@ -75,14 +66,11 @@ EfiMtftp4GetModeData (
   @param  Instance               The MTFTP session to clean up
   @param  Result                 The result to return to the caller who initiated
                                  the operation.
-
-  @return None
-
 **/
 VOID
 Mtftp4CleanOperation (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN EFI_STATUS             Result
+  IN OUT MTFTP4_PROTOCOL        *Instance,
+  IN     EFI_STATUS             Result
   )
 {
   LIST_ENTRY                *Entry;
@@ -145,15 +133,50 @@ Mtftp4CleanOperation (
 
 
 /**
-  Configure the MTFTP session for new operation or reset the current
-  operation if ConfigData is NULL.
+  Initializes, changes, or resets the default operational setting for this 
+  EFI MTFTPv4 Protocol driver instance.
+  
+  The Configure() function is used to set and change the configuration data for 
+  this EFI MTFTPv4 Protocol driver instance. The configuration data can be reset 
+  to startup defaults by calling Configure() with MtftpConfigData set to NULL. 
+  Whenever the instance is reset, any pending operation is aborted. By changing 
+  the EFI MTFTPv4 Protocol driver instance configuration data, the client can 
+  connect to different MTFTPv4 servers. The configuration parameters in 
+  MtftpConfigData are used as the default parameters in later MTFTPv4 operations 
+  and can be overridden in later operations.
+  
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance
+  @param  ConfigData             MtftpConfigDataPointer to the configuration data 
+                                 structure
 
-  @param  This                   The MTFTP session to configure
-  @param  ConfigData             The configure parameters
-
-  @retval EFI_INVALID_PARAMETER  Some of the parameter is invalid.
-  @retval EFI_ACCESS_DENIED      There is pending operation
-  @retval EFI_SUCCESS            The instance is configured for operation.
+  @retval EFI_SUCCESS            The EFI MTFTPv4 Protocol driver was configured 
+                                 successfully.
+  @retval EFI_INVALID_PARAMETER  One or more following conditions are TRUE:
+                                 1.This is NULL.
+                                 2.MtftpConfigData.UseDefaultSetting is FALSE and 
+                                   MtftpConfigData.StationIp is not a valid IPv4 
+                                   unicast address.
+                                 3.MtftpCofigData.UseDefaultSetting is FALSE and 
+                                   MtftpConfigData.SubnetMask is invalid.
+                                 4.MtftpCofigData.ServerIp is not a valid IPv4 
+                                   unicast address.
+                                 5.MtftpConfigData.UseDefaultSetting is FALSE and 
+                                   MtftpConfigData.GatewayIp is not a valid IPv4 
+                                   unicast address or is not in the same subnet 
+                                   with station address.
+  @retval EFI_ACCESS_DENIED      The EFI configuration could not be changed at this 
+                                 time because there is one MTFTP background operation 
+                                 in progress.
+  @retval EFI_NO_MAPPING         When using a default address, configuration 
+                                 (DHCP, BOOTP, RARP, etc.) has not finished yet.
+  @retval EFI_UNSUPPORTED        A configuration protocol (DHCP, BOOTP, RARP, etc.) 
+                                 could not be located when clients choose to use 
+                                 the default address settings.
+  @retval EFI_OUT_OF_RESOURCES   The EFI MTFTPv4 Protocol driver instance data could 
+                                 not be allocated.
+  @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred. 
+                                 The EFI MTFTPv4 Protocol driver instance is not 
+                                 configured.
 
 **/
 EFI_STATUS
@@ -213,7 +236,7 @@ EfiMtftp4Configure (
     }
 
     if ((Gateway != 0) &&
-       (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || !Ip4IsUnicast (Gateway, Netmask))) {
+        (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || !Ip4IsUnicast (Gateway, Netmask))) {
 
       return EFI_INVALID_PARAMETER;
     }
@@ -236,9 +259,10 @@ EfiMtftp4Configure (
 
 
 /**
-  Check packet for GetInfo. GetInfo is implemented with EfiMtftp4ReadFile.
-  It use Mtftp4GetInfoCheckPacket to inspect the first packet from server,
-  then abort the session.
+  Check packet for GetInfo. 
+  
+  GetInfo is implemented with EfiMtftp4ReadFile. It use Mtftp4GetInfoCheckPacket 
+  to inspect the first packet from server, then abort the session.
 
   @param  This                   The MTFTP4 protocol instance
   @param  Token                  The user's token
@@ -300,108 +324,43 @@ Mtftp4GetInfoCheckPacket (
 
 
 /**
-  Get the information of the download from the server. It is implemented
-  with EfiMtftp4ReadFile: build a token, then pass it to EfiMtftp4ReadFile.
-  In its check packet callback abort the opertions.
+  Parses the options in an MTFTPv4 OACK packet.
+  
+  The ParseOptions() function parses the option fields in an MTFTPv4 OACK packet 
+  and returns the number of options that were found and optionally a list of 
+  pointers to the options in the packet.
+  If one or more of the option fields are not valid, then EFI_PROTOCOL_ERROR is 
+  returned and *OptionCount and *OptionList stop at the last valid option.
+  The OptionList is allocated by this function, and caller should free it when used.
 
-  @param  This                   The MTFTP protocol instance
-  @param  OverrideData           The MTFTP override data
-  @param  Filename               The file to get information
-  @param  ModeStr                The mode to use
-  @param  OptionCount            The number of options to append
-  @param  OptionList             The options to append
-  @param  PacketLength           The variable to receive the packet length
-  @param  Packet                 The variable to receive the packet.
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance.
+  @param  PacketLen              Length of the OACK packet to be parsed.
+  @param  Packet                 Pointer to the OACK packet to be parsed. 
+  @param  OptionCount            Pointer to the number of options in following OptionList.
+  @param  OptionList             Pointer to EFI_MTFTP4_OPTION storage. Call the 
+                                 EFI Boot Service FreePool() to release theOptionList
+                                 if the options in this OptionList are not needed 
+                                 any more
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invaid
-  @retval EFI_SUCCESS            The information is got
-  @retval Others                 Failed to get the information.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiMtftp4GetInfo (
-  IN EFI_MTFTP4_PROTOCOL      *This,
-  IN EFI_MTFTP4_OVERRIDE_DATA *OverrideData,        OPTIONAL
-  IN UINT8                    *Filename,
-  IN UINT8                    *ModeStr,             OPTIONAL
-  IN UINT8                    OptionCount,
-  IN EFI_MTFTP4_OPTION        *OptionList,
-  OUT UINT32                  *PacketLength,
-  OUT EFI_MTFTP4_PACKET       **Packet OPTIONAL
-  )
-{
-  EFI_MTFTP4_TOKEN          Token;
-  MTFTP4_PROTOCOL           *Instance;
-  MTFTP4_GETINFO_STATE      *State;
-  EFI_STATUS                Status;
-
-  if ((This == NULL) || (Filename == NULL) || (PacketLength == NULL) ||
-      (OptionCount && (OptionList == NULL))) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Packet != NULL) {
-    *Packet = NULL;
-  }
-
-  *PacketLength         = 0;
-  Instance              = MTFTP4_PROTOCOL_FROM_THIS (This);
-  State                 = &Instance->GetInfoState;
-  State->Packet          = Packet;
-  State->PacketLen       = PacketLength;
-  State->Status          = EFI_SUCCESS;
-
-  //
-  // Fill in the Token to issue an synchronous ReadFile operation
-  //
-  Token.Status          = EFI_SUCCESS;
-  Token.Event           = NULL;
-  Token.OverrideData    = OverrideData;
-  Token.Filename        = Filename;
-  Token.ModeStr         = ModeStr;
-  Token.OptionCount     = OptionCount;
-  Token.OptionList      = OptionList;
-  Token.BufferSize      = 0;
-  Token.Buffer          = NULL;
-  Token.CheckPacket     = Mtftp4GetInfoCheckPacket;
-  Token.TimeoutCallback = NULL;
-  Token.PacketNeeded    = NULL;
-
-  Status                = EfiMtftp4ReadFile (This, &Token);
-
-  if (EFI_ABORTED == Status) {
-    return State->Status;
-  }
-
-  return Status;
-}
-
-
-/**
-  Parse the packet into an array of options. The OptionList is allocated
-  by this function, and caller should free it when used.
-
-  @param  This                   The MTFTP protocol instance
-  @param  PacketLen              The length of the packet
-  @param  Packet                 The packet to parse
-  @param  OptionCount            The size of the OptionList array allocated.
-  @param  OptionList             The allocated option array to save the option
-                                 addresses.
-
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
-  @retval EFI_NOT_FOUND          There is no valid option in the packet
-  @retval EFI_SUCCESS            The packet is parsed.
+  @retval EFI_SUCCESS            The OACK packet was valid and the OptionCount and
+                                 OptionList parameters have been updated.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 1.PacketLen is 0.
+                                 2.Packet is NULL or Packet is not a valid MTFTPv4 packet.
+                                 3.OptionCount is NULL.
+  @retval EFI_NOT_FOUND          No options were found in the OACK packet.
+  @retval EFI_OUT_OF_RESOURCES   Storage for the OptionList array cannot be allocated.
+  @retval EFI_PROTOCOL_ERROR     One or more of the option fields is invalid.
 
 **/
 EFI_STATUS
 EFIAPI
 EfiMtftp4ParseOptions (
-  IN EFI_MTFTP4_PROTOCOL    *This,
-  IN UINT32                 PacketLen,
-  IN EFI_MTFTP4_PACKET      *Packet,
-  IN OUT UINT32             *OptionCount,
-  OUT EFI_MTFTP4_OPTION     **OptionList          OPTIONAL
+  IN     EFI_MTFTP4_PROTOCOL    *This,
+  IN     UINT32                 PacketLen,
+  IN     EFI_MTFTP4_PACKET      *Packet,
+     OUT UINT32                 *OptionCount,
+     OUT EFI_MTFTP4_OPTION      **OptionList          OPTIONAL
   )
 {
   EFI_STATUS                Status;
@@ -427,16 +386,18 @@ EfiMtftp4ParseOptions (
 
 
 /**
-  Check whether the override data is valid. It will first
-  validate whether the server is a valid unicast. If a gateway
-  is provided in the Override, it also check that it is a
-  unicast on the connected network.
+  Check whether the override data is valid. 
+  
+  It will first validate whether the server is a valid unicast. If a gateway
+  is provided in the Override, it also check that it is a unicast on the 
+  connected network.
 
   @param  Instance               The MTFTP instance
   @param  Override               The override data to validate.
 
-  @return TRUE if the override data is valid, otherwise FALSE.
-
+  @retval TRUE                   The override data is valid
+  @retval FALSE                  The override data is invalid
+  
 **/
 BOOLEAN
 Mtftp4OverrideValid (
@@ -477,16 +438,18 @@ Mtftp4OverrideValid (
 
 /**
   Poll the UDP to get the IP4 default address, which may be retrieved
-  by DHCP. The default time out value is 5 seconds. If IP has retrieved
-  the default address, the UDP is reconfigured.
+  by DHCP. 
+  
+  The default time out value is 5 seconds. If IP has retrieved the default address, 
+  the UDP is reconfigured.
 
   @param  Instance               The Mtftp instance
   @param  UdpPort                The UDP port to poll
   @param  UdpCfgData             The UDP configure data to reconfigure the UDP
                                  port.
 
-  @return TRUE if the default address is retrieved and UDP is reconfigured.
-  @return Otherwise FALSE.
+  @retval TRUE                   The default address is retrieved and UDP is reconfigured.
+  @retval FALSE                  Some error occured.
 
 **/
 BOOLEAN
@@ -781,15 +744,32 @@ ON_ERROR:
 
 
 /**
-  Read a file from the server.
+  Downloads a file from an MTFTPv4 server.
+  
+  The ReadFile() function is used to initialize and start an MTFTPv4 download 
+  process and optionally wait for completion. When the download operation completes, 
+  whether successfully or not, the Token.Status field is updated by the EFI MTFTPv4 
+  Protocol driver and then Token.Event is signaled (if it is not NULL).
+  Data can be downloaded from the MTFTPv4 server into either of the following locations:
+  1.A fixed buffer that is pointed to by Token.Buffer
+  2.A download service function that is pointed to by Token.CheckPacket
+  If both Token.Buffer and Token.CheckPacket are used, then Token.CheckPacket 
+  will be called first. If the call is successful, the packet will be stored in 
+  Token.Buffer.
 
-  @param  This                   The Mtftp protocol instance.
-  @param  Token                  The user's request wrap token.
+  @param  This                  Pointer to the EFI_MTFTP4_PROTOCOL instance
+  @param  Token                 Pointer to the token structure to provide the 
+                                parameters that are used in this operation.
 
-  @retval EFI_SUCCESS            The ReadFile has finished, the file has been
-                                 downloaded if it is synchronous operation,
-                                 otherwise it has been  initated.
-  @retval Others                 Some error happened.
+  @retval EFI_SUCCESS           The data file has been transferred successfully.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval EFI_BUFFER_TOO_SMALL  BufferSize is not large enough to hold the downloaded 
+                                data in downloading process.
+  @retval EFI_ABORTED           Current operation is aborted by user.
+  @retval EFI_ICMP_ERROR        An ICMP ERROR packet was received.
+  @retval EFI_TIMEOUT           No responses were received from the MTFTPv4 server.
+  @retval EFI_TFTP_ERROR        An MTFTPv4 ERROR packet was received.
+  @retval EFI_DEVICE_ERROR      An unexpected network error or system error occurred.
 
 **/
 EFI_STATUS
@@ -804,15 +784,53 @@ EfiMtftp4ReadFile (
 
 
 /**
-  Upload a file to the server.
+  Sends a data file to an MTFTPv4 server. May be unsupported in some EFI implementations
 
-  @param  This                   The MTFTP protocol session
-  @param  Token                  The user's request wrap token.
+  The WriteFile() function is used to initialize an uploading operation with the 
+  given option list and optionally wait for completion. If one or more of the 
+  options is not supported by the server, the unsupported options are ignored and 
+  a standard TFTP process starts instead. When the upload process completes, 
+  whether successfully or not, Token.Event is signaled, and the EFI MTFTPv4 Protocol 
+  driver updates Token.Status.
+  The caller can supply the data to be uploaded in the following two modes:
+  1.Through the user-provided buffer
+  2.Through a callback function
+  With the user-provided buffer, the Token.BufferSize field indicates the length
+  of the buffer, and the driver will upload the data in the buffer. With an 
+  EFI_MTFTP4_PACKET_NEEDED callback function, the driver will call this callback 
+  function to get more data from the user to upload. See the definition of 
+  EFI_MTFTP4_PACKET_NEEDED for more information. These two modes cannot be used at 
+  the same time. The callback function will be ignored if the user provides the buffer.
 
-  @retval EFI_SUCCESS            The WriteFile has finished, the file has been
-                                 uploaded if it is synchronous operation, otherwise
-                                 it has been  initated.
-  @retval Others                 Some error happened.
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance.
+  @param  Token                  Pointer to the token structure to provide the 
+                                 parameters that are used in this function
+
+  @retval EFI_SUCCESS            The upload session has started.
+  @retval EFI_UNSUPPORTED        The operation is not supported by this implementation.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 1. This is NULL.
+                                 2. Token is NULL.
+                                 3. Token.Filename is NULL.
+                                 4. Token.OptionCount is not zero and
+                                    Token.OptionList is NULL.
+                                 5. One or more options in Token.OptionList have wrong
+                                    format.
+                                 6. Token.Buffer and Token.PacketNeeded are both
+                                    NULL.
+                                 7. One or more IPv4 addresses in Token.OverrideData 
+                                    are not valid unicast IPv4 addresses if 
+                                    Token.OverrideData is not NULL.
+  @retval EFI_UNSUPPORTED        One or more options in the Token.OptionList are in the
+                                 unsupported list of structure EFI_MTFTP4_MODE_DATA.
+  @retval EFI_NOT_STARTED        The EFI MTFTPv4 Protocol driver has not been started.
+  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP, 
+                                 BOOTP, RARP, etc.) is not finished yet.
+  @retval EFI_ALREADY_STARTED    This Token is already being used in another MTFTPv4 
+                                 session.
+  @retval EFI_OUT_OF_RESOURCES   Required system resources could not be allocated.
+  @retval EFI_ACCESS_DENIED      The previous operation has not completed yet.
+  @retval EFI_DEVICE_ERROR       An unexpected network error or system error occurred.
 
 **/
 EFI_STATUS
@@ -827,16 +845,62 @@ EfiMtftp4WriteFile (
 
 
 /**
-  Read a directory from the server. The only difference
-  between ReadFile and ReadDirectory is the opcode used.
+  Downloads a data file "directory" from an MTFTPv4 server. 
+  May be unsupported in some EFI implementations
+  
+  The ReadDirectory() function is used to return a list of files on the MTFTPv4 
+  server that are logically (or operationally) related to Token.Filename. The 
+  directory request packet that is sent to the server is built with the option 
+  list that was provided by caller, if present.
+  The file information that the server returns is put into either of the following 
+  locations:
+  1.A fixed buffer that is pointed to by Token.Buffer
+  2.A download service function that is pointed to by Token.CheckPacket
+  If both Token.Buffer and Token.CheckPacket are used, then Token.CheckPacket will 
+  be called first. If the call is successful, the packet will be stored in Token.Buffer.
+  The returned directory listing in the Token.Buffer or EFI_MTFTP4_PACKET consists 
+  of a list of two or three variable-length ASCII strings, each terminated by a 
+  null character, for each file in the directory. If the multicast option is involved, 
+  the first field of each directory entry is the static multicast IP address and 
+  UDP port number that is associated with the file name. The format of the field 
+  is ip:ip:ip:ip:port. If the multicast option is not involved, this field and its 
+  terminating null character are not present.
+  The next field of each directory entry is the file name and the last field is 
+  the file information string. The information string contains the file size and 
+  the create/modify timestamp. The format of the information string is filesize 
+  yyyy-mm-dd hh:mm:ss:ffff. The timestamp is Coordinated Universal Time 
+  (UTC; also known as Greenwich Mean Time [GMT]).
+  The only difference between ReadFile and ReadDirectory is the opcode used.
 
-  @param  This                   The MTFTP protocol session
-  @param  Token                  The user's request wrap token.
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance
+  @param  Token                  Pointer to the token structure to provide the 
+                                 parameters that are used in this function
 
-  @retval EFI_SUCCESS            The ReadDirectory has finished, the directory has
-                                 been  downloaded as a file if it is synchronous
-                                 operation,  otherwise it has been initated.
-  @retval Others                 Some error happened.
+  @retval EFI_SUCCESS            The MTFTPv4 related file "directory" has been downloaded.
+  @retval EFI_UNSUPPORTED        The operation is not supported by this implementation.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 1. This is NULL.
+                                 2. Token is NULL.
+                                 3. Token.Filename is NULL.
+                                 4. Token.OptionCount is not zero and
+                                    Token.OptionList is NULL.
+                                 5. One or more options in Token.OptionList have wrong
+                                    format.
+                                 6. Token.Buffer and Token.PacketNeeded are both
+                                    NULL.
+                                 7. One or more IPv4 addresses in Token.OverrideData 
+                                    are not valid unicast IPv4 addresses if 
+                                    Token.OverrideData is not NULL.
+  @retval EFI_UNSUPPORTED        One or more options in the Token.OptionList are in the
+                                 unsupported list of structure EFI_MTFTP4_MODE_DATA.
+  @retval EFI_NOT_STARTED        The EFI MTFTPv4 Protocol driver has not been started.
+  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP, 
+                                 BOOTP, RARP, etc.) is not finished yet.
+  @retval EFI_ALREADY_STARTED    This Token is already being used in another MTFTPv4 
+                                 session.
+  @retval EFI_OUT_OF_RESOURCES   Required system resources could not be allocated.
+  @retval EFI_ACCESS_DENIED      The previous operation has not completed yet.
+  @retval EFI_DEVICE_ERROR       An unexpected network error or system error occurred.
 
 **/
 EFI_STATUS
@@ -851,13 +915,139 @@ EfiMtftp4ReadDirectory (
 
 
 /**
-  Poll the network stack to accelerate the packet process.
+  Gets information about a file from an MTFTPv4 server. 
+  
+  The GetInfo() function assembles an MTFTPv4 request packet with options; 
+  sends it to the MTFTPv4 server; and may return an MTFTPv4 OACK, MTFTPv4 ERROR, 
+  or ICMP ERROR packet. Retries occur only if no response packets are received 
+  from the MTFTPv4 server before the timeout expires.
+  It is implemented with EfiMtftp4ReadFile: build a token, then pass it to 
+  EfiMtftp4ReadFile. In its check packet callback abort the opertions.
 
-  @param  This                   The MTFTP protocol instance.
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance
+  @param  OverrideData           Data that is used to override the existing 
+                                 parameters. If NULL, the default parameters that 
+                                 were set in the EFI_MTFTP4_PROTOCOL.Configure() 
+                                 function are used
+  @param  Filename               Pointer to ASCIIZ file name string
+  @param  ModeStr                Pointer to ASCIIZ mode string. If NULL, "octet" 
+                                 will be used
+  @param  OptionCount            Number of option/value string pairs in OptionList
+  @param  OptionList             Pointer to array of option/value string pairs. 
+                                 Ignored if OptionCount is zero
+  @param  PacketLength           The number of bytes in the returned packet
+  @param  Packet                 PacketThe pointer to the received packet. This 
+                                 buffer must be freed by the caller.
 
+  @retval EFI_SUCCESS            An MTFTPv4 OACK packet was received and is in 
+                                 the Buffer.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 1.This is NULL.
+                                 2.Filename is NULL.
+                                 3.OptionCount is not zero and OptionList is NULL.
+                                 4.One or more options in OptionList have wrong format.
+                                 5.PacketLength is NULL.
+                                 6.One or more IPv4 addresses in OverrideData are 
+                                   not valid unicast IPv4 addresses if OverrideData 
+                                   is not NULL.
+  @retval EFI_UNSUPPORTED        One or more options in the OptionList are in the
+                                 unsupported list of structure EFI_MTFTP4_MODE_DATA
+  @retval EFI_NOT_STARTED        The EFI MTFTPv4 Protocol driver has not been started.
+  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP, 
+                                 BOOTP, RARP, etc.) has not finished yet.
+  @retval EFI_ACCESS_DENIED      The previous operation has not completed yet.
+  @retval EFI_OUT_OF_RESOURCES   Required system resources could not be allocated.
+  @retval EFI_TFTP_ERROR         An MTFTPv4 ERROR packet was received and is in 
+                                 the Buffer.
+  @retval EFI_ICMP_ERROR         An ICMP ERROR packet was received and the Packet 
+                                 is set to NULL.
+  @retval EFI_PROTOCOL_ERROR     An unexpected MTFTPv4 packet was received and is 
+                                 in the Buffer.
+  @retval EFI_TIMEOUT            No responses were received from the MTFTPv4 server.
+  @retval EFI_DEVICE_ERROR       An unexpected network error or system error occurred.
+  
+**/
+EFI_STATUS
+EFIAPI
+EfiMtftp4GetInfo (
+  IN     EFI_MTFTP4_PROTOCOL      *This,
+  IN     EFI_MTFTP4_OVERRIDE_DATA *OverrideData        OPTIONAL,
+  IN     UINT8                    *Filename,
+  IN     UINT8                    *ModeStr             OPTIONAL,
+  IN     UINT8                    OptionCount,
+  IN     EFI_MTFTP4_OPTION        *OptionList          OPTIONAL,
+     OUT UINT32                   *PacketLength,
+     OUT EFI_MTFTP4_PACKET        **Packet             OPTIONAL
+  )
+{
+  EFI_MTFTP4_TOKEN          Token;
+  MTFTP4_PROTOCOL           *Instance;
+  MTFTP4_GETINFO_STATE      *State;
+  EFI_STATUS                Status;
+
+  if ((This == NULL) || (Filename == NULL) || (PacketLength == NULL) ||
+      ((OptionCount != 0) && (OptionList == NULL))) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Packet != NULL) {
+    *Packet = NULL;
+  }
+
+  *PacketLength         = 0;
+  Instance              = MTFTP4_PROTOCOL_FROM_THIS (This);
+  State                 = &Instance->GetInfoState;
+  State->Packet         = Packet;
+  State->PacketLen      = PacketLength;
+  State->Status         = EFI_SUCCESS;
+
+  //
+  // Fill in the Token to issue an synchronous ReadFile operation
+  //
+  Token.Status          = EFI_SUCCESS;
+  Token.Event           = NULL;
+  Token.OverrideData    = OverrideData;
+  Token.Filename        = Filename;
+  Token.ModeStr         = ModeStr;
+  Token.OptionCount     = OptionCount;
+  Token.OptionList      = OptionList;
+  Token.BufferSize      = 0;
+  Token.Buffer          = NULL;
+  Token.CheckPacket     = Mtftp4GetInfoCheckPacket;
+  Token.TimeoutCallback = NULL;
+  Token.PacketNeeded    = NULL;
+
+  Status                = EfiMtftp4ReadFile (This, &Token);
+
+  if (EFI_ABORTED == Status) {
+    return State->Status;
+  }
+
+  return Status;
+}
+
+/**
+  Polls for incoming data packets and processes outgoing data packets.
+
+  The Poll() function can be used by network drivers and applications to increase 
+  the rate that data packets are moved between the communications device and the 
+  transmit and receive queues.
+  In some systems, the periodic timer event in the managed network driver may not 
+  poll the underlying communications device fast enough to transmit and/or receive 
+  all data packets without missing incoming packets or dropping outgoing packets. 
+  Drivers and applications that are experiencing packet loss should try calling 
+  the Poll() function more often.
+  
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance
+
+  @retval EFI_SUCCESS            Incoming or outgoing data was processed.
+  @retval EFI_NOT_STARTED        This EFI MTFTPv4 Protocol instance has not been started.
+  @retval EFI_NO_MAPPING         When using a default address, configuration (DHCP,
+                                 BOOTP, RARP, etc.) is not finished yet.
   @retval EFI_INVALID_PARAMETER  This is NULL.
-  @retval EFI_NOT_STARTED        The MTFTP session hasn't been configured.
-  @retval EFI_DEVICE_ERROR       The MTFTP session has been destoried.
+  @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred.
+  @retval EFI_TIMEOUT            Data was dropped out of the transmit and/or receive 
+                                 queue. Consider increasing the polling rate.
 
 **/
 EFI_STATUS

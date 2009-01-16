@@ -1,5 +1,6 @@
 /** @file
-        
+  Tcp Protocol header file.
+
 Copyright (c) 2005 - 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -311,18 +312,25 @@ extern UINT32         mTcpTick;
 //
 #define TCP_SUB_SEQ(Seq1, Seq2)     ((UINT32) ((Seq1) - (Seq2)))
 
+//
+// Check whether Flag is on
+//
 #define TCP_FLG_ON(Value, Flag)     ((BOOLEAN) (((Value) & (Flag)) != 0))
+
+//
+// Set and Clear operation on a Flag
+//
 #define TCP_SET_FLG(Value, Flag)    ((Value) |= (Flag))
 #define TCP_CLEAR_FLG(Value, Flag)  ((Value) &= ~(Flag))
 
 //
-// test whether two peers are equal
+// Test whether two peers are equal
 //
 #define TCP_PEER_EQUAL(Pa, Pb) \
   (((Pa)->Ip == (Pb)->Ip) && ((Pa)->Port == (Pb)->Port))
 
 //
-// test whether Pa matches Pb, or Pa is more specific
+// Test whether Pa matches Pb, or Pa is more specific
 // than pb. Zero means wildcard.
 //
 #define TCP_PEER_MATCH(Pa, Pb) \
@@ -342,8 +350,7 @@ extern UINT32         mTcpTick;
 typedef
 VOID
 (*TCP_TIMER_HANDLER) (
-  IN TCP_CB *Tcb
+  IN OUT TCP_CB *Tcb
   );
 
-#include "Tcp4Func.h"
 #endif

@@ -1,46 +1,39 @@
 /** @file
-
-Copyright (c) 2006 - 2007, Intel Corporation
+  
+  Mtftp4 Implementation.
+  
+  Mtftp4 Implementation, it supports the following RFCs:
+  RFC1350 - THE TFTP PROTOCOL (REVISION 2)
+  RFC2090 - TFTP Multicast Option
+  RFC2347 - TFTP Option Extension
+  RFC2348 - TFTP Blocksize Option
+  RFC2349 - TFTP Timeout Interval and Transfer Size Options
+  
+Copyright (c) 2006 - 2007, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php<BR>
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Mtftp4Impl.h
-
-Abstract:
-
- Mtftp4 Implementation, it supports the following RFCs:
-   RFC1350 - THE TFTP PROTOCOL (REVISION 2)
-   RFC2090 - TFTP Multicast Option
-   RFC2347 - TFTP Option Extension
-   RFC2348 - TFTP Blocksize Option
-   RFC2349 - TFTP Timeout Interval and Transfer Size Options
-
-
 **/
+
 
 #ifndef __EFI_MTFTP4_IMPL_H__
 #define __EFI_MTFTP4_IMPL_H__
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Udp4.h>
 #include <Protocol/Mtftp4.h>
 
 #include <Library/DebugLib.h>
-#include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiLib.h>
-#include <Library/BaseLib.h>
 #include <Library/UdpIoLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/BaseMemoryLib.h>
+
+extern EFI_MTFTP4_PROTOCOL  gMtftp4ProtocolTemplate;
 
 typedef struct _MTFTP4_SERVICE  MTFTP4_SERVICE;
 typedef struct _MTFTP4_PROTOCOL MTFTP4_PROTOCOL;
@@ -49,7 +42,11 @@ typedef struct _MTFTP4_PROTOCOL MTFTP4_PROTOCOL;
 #include "Mtftp4Option.h"
 #include "Mtftp4Support.h"
 
-enum {
+
+///
+/// Some constant value of Mtftp service.
+///
+typedef enum {
   MTFTP4_SERVICE_SIGNATURE   = SIGNATURE_32 ('T', 'F', 'T', 'P'),
   MTFTP4_PROTOCOL_SIGNATURE  = SIGNATURE_32 ('t', 'f', 't', 'p'),
 
@@ -62,8 +59,11 @@ enum {
   MTFTP4_STATE_UNCONFIGED    = 0,
   MTFTP4_STATE_CONFIGED,
   MTFTP4_STATE_DESTORY
-};
+} MTFTP4_SERVICE_CONST_VALUE;
 
+///
+/// Mtftp service block
+///
 struct _MTFTP4_SERVICE {
   UINT32                        Signature;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
@@ -86,6 +86,7 @@ struct _MTFTP4_SERVICE {
   UDP_IO_PORT                   *ConnectUdp;
 };
 
+
 typedef struct {
   EFI_MTFTP4_PACKET             **Packet;
   UINT32                        *PacketLen;
@@ -98,7 +99,7 @@ struct _MTFTP4_PROTOCOL {
   EFI_MTFTP4_PROTOCOL           Mtftp4;
 
   INTN                          State;
-  BOOLEAN                       Indestory;
+  BOOLEAN                       InDestory;
 
   MTFTP4_SERVICE                *Service;
   EFI_HANDLE                    Handle;
@@ -150,22 +151,57 @@ struct _MTFTP4_PROTOCOL {
   MTFTP4_GETINFO_STATE          GetInfoState;
 };
 
+/**
+  Clean up the MTFTP session to get ready for new operation.
+
+  @param  Instance               The MTFTP session to clean up
+  @param  Result                 The result to return to the caller who initiated
+                                 the operation.
+**/
 VOID
 Mtftp4CleanOperation (
-  IN MTFTP4_PROTOCOL            *Instance,
-  IN EFI_STATUS                 Result
+  IN OUT MTFTP4_PROTOCOL        *Instance,
+  IN     EFI_STATUS             Result
   );
 
+/**
+  Start the MTFTP session for upload.
+  
+  It will first init some states, then send the WRQ request packet, 
+  and start receiving the packet.
+
+  @param  Instance              The MTFTP session
+  @param  Operation             Redundant parameter, which is always
+                                EFI_MTFTP4_OPCODE_WRQ here.
+
+  @retval EFI_SUCCESS           The upload process has been started.
+  @retval Others                Failed to start the upload.
+
+**/
 EFI_STATUS
 Mtftp4WrqStart (
-  IN MTFTP4_PROTOCOL            *Instance,
-  IN UINT16                     Operation
+  IN MTFTP4_PROTOCOL        *Instance,
+  IN UINT16                 Operation
   );
 
+/**
+  Start the MTFTP session to download. 
+  
+  It will first initialize some of the internal states then build and send a RRQ 
+  reqeuest packet, at last, it will start receive for the downloading.
+
+  @param  Instance              The Mtftp session
+  @param  Operation             The MTFTP opcode, it may be a EFI_MTFTP4_OPCODE_RRQ
+                                or EFI_MTFTP4_OPCODE_DIR.
+
+  @retval EFI_SUCCESS           The mtftp download session is started.
+  @retval Others                Failed to start downloading.
+
+**/
 EFI_STATUS
 Mtftp4RrqStart (
-  IN MTFTP4_PROTOCOL            *Instance,
-  IN UINT16                     Operation
+  IN MTFTP4_PROTOCOL        *Instance,
+  IN UINT16                 Operation
   );
 
 #define MTFTP4_SERVICE_FROM_THIS(a)   \
@@ -174,5 +210,4 @@ Mtftp4RrqStart (
 #define MTFTP4_PROTOCOL_FROM_THIS(a)  \
   CR (a, MTFTP4_PROTOCOL, Mtftp4, MTFTP4_PROTOCOL_SIGNATURE)
 
-extern EFI_MTFTP4_PROTOCOL  gMtftp4ProtocolTemplate;
 #endif
