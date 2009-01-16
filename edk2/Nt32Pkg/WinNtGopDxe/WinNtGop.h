@@ -34,6 +34,7 @@ Abstract:
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/GraphicsOutput.h>
+#include <Protocol/SimpleTextInExNotify.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
@@ -171,7 +172,6 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gWinNtGopDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gWinNtGopComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gWinNtGopComponentName2;
 
-extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 
 //
 // Gop Hardware abstraction internal worker functions
