@@ -17,14 +17,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include <Uefi.h>
+
+#include <Guid/GlobalVariable.h>
+#include <Guid/PcAnsi.h>
+
+#include <Protocol/SimpleTextInExNotify.h>
+#include <Protocol/HotPlugDevice.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SerialIo.h>
-#include <Guid/GlobalVariable.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
-#include <Guid/HotPlugDevice.h>
-#include <Guid/PcAnsi.h>
+
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
@@ -163,8 +167,6 @@ typedef struct {
 extern EFI_DRIVER_BINDING_PROTOCOL   gTerminalDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gTerminalComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gTerminalComponentName2;
-
-extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 
 /**
   The user Entry Point for module Terminal. The user code starts with this function.
