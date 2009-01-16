@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/IsaIo.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/Ps2Policy.h>
+#include <Protocol/SimpleTextInExNotify.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
@@ -126,7 +127,6 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gKeyboardControllerDriver;
 extern EFI_COMPONENT_NAME_PROTOCOL   gPs2KeyboardComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2KeyboardComponentName2;
 
-extern EFI_GUID                      gSimpleTextInExNotifyGuid;
 
 //
 // Driver entry point
