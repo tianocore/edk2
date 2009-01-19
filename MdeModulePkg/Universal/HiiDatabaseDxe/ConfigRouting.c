@@ -302,8 +302,8 @@ AppendToMultiString (
                                   MultiStringSize + AppendStringSize,
                                   (VOID *) (*MultiString)
                                   );
+    ASSERT (*MultiString != NULL);
   }
-
   //
   // Append the incoming string
   //
