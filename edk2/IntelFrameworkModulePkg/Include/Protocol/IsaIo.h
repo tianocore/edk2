@@ -1,4 +1,4 @@
-/**@file
+/** @file
   EFI ISA I/O Protocol
 
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _EFI_ISA_IO_H
-#define _EFI_ISA_IO_H
+#ifndef _EFI_ISA_IO_H_
+#define _EFI_ISA_IO_H_
 
 
 #include <Protocol/IsaAcpi.h>

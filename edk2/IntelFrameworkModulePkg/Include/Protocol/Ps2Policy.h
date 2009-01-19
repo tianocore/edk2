@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Protocol used for PS/2 Policy definition.
 
 Copyright (c) 2006 - 2007, Intel Corporation                                                         

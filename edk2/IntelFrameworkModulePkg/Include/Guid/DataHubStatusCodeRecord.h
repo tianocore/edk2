@@ -1,4 +1,4 @@
-/**@file
+/** @file
   GUID used to identify Data Hub records that originate from the Tiano 
   ReportStatusCode API.
   

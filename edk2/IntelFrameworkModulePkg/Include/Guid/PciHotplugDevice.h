@@ -1,4 +1,4 @@
-/**@file
+/** @file
   GUIDs used to indicate the device is Pccard hotplug device
   
 Copyright (c) 2006, Intel Corporation                                                         

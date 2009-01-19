@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _MAX_BBS_ENTRIES_H
-#define _MAX_BBS_ENTRIES_H
+#ifndef _MAX_BBS_ENTRIES_H_
+#define _MAX_BBS_ENTRIES_H_
 
 //
 // BUGBUG: This entry maybe changed to PCD in future and wait for
