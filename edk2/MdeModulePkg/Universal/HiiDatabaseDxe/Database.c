@@ -877,13 +877,13 @@ InsertStringPackage (
 
 Error:
 
-  if (StringPackage->StringBlock != NULL) {
-    FreePool (StringPackage->StringBlock);
-  }
-  if (StringPackage->StringPkgHdr != NULL) {
-    FreePool (StringPackage->StringPkgHdr);
-  }
   if (StringPackage != NULL) {
+    if (StringPackage->StringBlock != NULL) {
+      FreePool (StringPackage->StringBlock);
+    }
+    if (StringPackage->StringPkgHdr != NULL) {
+      FreePool (StringPackage->StringPkgHdr);
+    }
     FreePool (StringPackage);
   }
   return Status;
@@ -1182,10 +1182,10 @@ Error:
   if (FontInfo != NULL) {
     FreePool (FontInfo);
   }
-  if (FontPackage->GlyphBlock != NULL) {
-    FreePool (FontPackage->GlyphBlock);
-  }
   if (FontPackage != NULL) {
+    if (FontPackage->GlyphBlock != NULL) {
+      FreePool (FontPackage->GlyphBlock);
+    }
     FreePool (FontPackage);
   }
   if (GlobalFont != NULL) {
@@ -1713,10 +1713,10 @@ InsertSimpleFontPackage (
 
 Error:
 
-  if (SimpleFontPackage->SimpleFontPkgHdr != NULL) {
-    FreePool (SimpleFontPackage->SimpleFontPkgHdr);
-  }
   if (SimpleFontPackage != NULL) {
+    if (SimpleFontPackage->SimpleFontPkgHdr != NULL) {
+      FreePool (SimpleFontPackage->SimpleFontPkgHdr);
+    }
     FreePool (SimpleFontPackage);
   }
   return Status;
@@ -2158,10 +2158,11 @@ InsertKeyboardLayoutPackage (
 
 Error:
 
-  if (KeyboardLayoutPackage->KeyboardPkg != NULL) {
-    FreePool (KeyboardLayoutPackage->KeyboardPkg);
-  }
+
   if (KeyboardLayoutPackage != NULL) {
+    if (KeyboardLayoutPackage->KeyboardPkg != NULL) {
+      FreePool (KeyboardLayoutPackage->KeyboardPkg);
+    }
     FreePool (KeyboardLayoutPackage);
   }
 
