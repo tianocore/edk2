@@ -61,6 +61,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mStatusString[] = {
   @param  EndBuffer   The end of the input Buffer. No characters will be
                       placed after that. 
   @param  Length      Count of character to be placed into Buffer.
+                      (Negative value indicates no buffer fill.)
   @param  Character   Character to be placed into Buffer.
   @param  Increment   Character increment in Buffer.
 
@@ -76,17 +77,17 @@ BasePrintLibFillBuffer (
   IN  INTN    Increment
   )
 {
-  UINTN       FillBufferSize;
-
-  if(Increment == 1) {
-    FillBufferSize = MIN (Length, (EndBuffer - Buffer));
-    Buffer = SetMem (Buffer, FillBufferSize, (UINT8) Character);
-  } else {
-    FillBufferSize = MIN (Length << 1, (EndBuffer - Buffer));
-    Buffer = SetMem16 (Buffer, FillBufferSize, (UINT16) Character);
-  }
+  INTN  Index;
   
-  return Buffer + FillBufferSize;
+  for (Index = 0; Index < Length && Buffer < EndBuffer; Index++) {
+    *Buffer = (CHAR8) Character;
+    if (Increment != 1) {
+      *(Buffer + 1) = (CHAR8)(Character >> 8);
+    }
+    Buffer += Increment;
+  }
+
+  return Buffer;
 }
 
 /**

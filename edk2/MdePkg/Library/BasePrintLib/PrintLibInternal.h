@@ -19,7 +19,6 @@
 #include <Library/PrintLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
 
 
 //
@@ -118,6 +117,7 @@ BasePrintLibSPrint (
   @param  EndBuffer   The end of the input Buffer. No characters will be
                       placed after that. 
   @param  Length      Count of character to be placed into Buffer.
+                      (Negative value indicates no buffer fill.)
   @param  Character   Character to be placed into Buffer.
   @param  Increment   Character increment in Buffer.
 
