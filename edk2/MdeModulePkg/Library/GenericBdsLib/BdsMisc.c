@@ -270,7 +270,7 @@ BdsLibRegisterNewOption (
                     &gEfiGlobalVariableGuid,
                     &TempOptionSize
                     );
-
+  ASSERT (TempOptionPtr != NULL);
   //
   // Compare with current option variable
   //
@@ -600,6 +600,7 @@ BdsLibBuildOptionFromVar (
     }
 
     Option              = BdsLibVariableToOption (BdsCommonOptionList, OptionName);
+    ASSERT (Option != NULL);
     Option->BootCurrent = OptionOrder[Index];
 
   }
