@@ -89,8 +89,8 @@ BdsLibDoLegacyBoot (
 EFI_STATUS
 EFIAPI
 BdsLibBootViaBootOption (
-  IN  BDS_COMMON_OPTION             * Option,
-  IN  EFI_DEVICE_PATH_PROTOCOL      * DevicePath,
+  IN  BDS_COMMON_OPTION             *Option,
+  IN  EFI_DEVICE_PATH_PROTOCOL      *DevicePath,
   OUT UINTN                         *ExitDataSize,
   OUT CHAR16                        **ExitData OPTIONAL
   )
@@ -157,6 +157,7 @@ BdsLibBootViaBootOption (
         &Option->BootCurrent
         );
 
+  ASSERT (Option->DevicePath != NULL);
   if ((DevicePathType (Option->DevicePath) == BBS_DEVICE_PATH) &&
       (DevicePathSubType (Option->DevicePath) == BBS_BBS_DP)
     ) {
@@ -459,6 +460,7 @@ BdsExpandPartitionPartialDevicePathToFull (
         // If the user try to boot many OS in different HDs or partitions, in theory, the 'HDDP' variable maybe become larger and larger.
         //
         InstanceNum = 0;
+        ASSERT (CachedDevicePath != NULL);
         TempNewDevicePath = CachedDevicePath;
         while (!IsDevicePathEnd (TempNewDevicePath)) {
           TempNewDevicePath = NextDevicePathNode (TempNewDevicePath);
@@ -1225,6 +1227,7 @@ BdsLibBootNext (
     //
     UnicodeSPrint (Buffer, sizeof (Buffer), L"Boot%04x", *BootNext);
     BootOption = BdsLibVariableToOption (&TempList, Buffer);
+    ASSERT (BootOption != NULL);
     BdsLibConnectDevicePath (BootOption->DevicePath);
     BdsLibBootViaBootOption (BootOption, BootOption->DevicePath, &ExitDataSize, &ExitData);
   }
