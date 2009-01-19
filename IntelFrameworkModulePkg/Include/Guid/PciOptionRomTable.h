@@ -1,4 +1,4 @@
-/**@file
+/** @file
   GUID and data structure used to describe the list of PCI Option ROMs present in a system.
   
 Copyright (c) 2006, Intel Corporation                                                         

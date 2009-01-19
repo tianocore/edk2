@@ -1,4 +1,4 @@
-/**@file
+/** @file
   GUID used to identify status code records HOB that originate from the PEI status code    
   
 Copyright (c) 2006, Intel Corporation                                                         

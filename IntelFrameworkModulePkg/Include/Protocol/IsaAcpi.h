@@ -1,4 +1,4 @@
-/**@file
+/** @file
   EFI ISA Acpi Protocol
 
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
