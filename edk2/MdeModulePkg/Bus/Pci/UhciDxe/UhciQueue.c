@@ -136,7 +136,6 @@ UhciMapUserData (
     }
 
     *PktId      = OUTPUT_PACKET_ID;
-    *Len        = 0;
     *MappedAddr = NULL;
     *Map        = NULL;
     break;
