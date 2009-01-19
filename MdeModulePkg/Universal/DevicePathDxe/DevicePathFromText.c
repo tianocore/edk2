@@ -2763,6 +2763,7 @@ ConvertTextToDeviceNode (
   ParamStr      = NULL;
   DumpNode      = NULL;
   DeviceNodeStr = StrDuplicate (TextDeviceNode);
+  ASSERT (DeviceNodeStr != NULL);
 
   for (Index = 0; DevPathFromTextTable[Index].Function; Index++) {
     ParamStr = GetParamByNodeName (DeviceNodeStr, DevPathFromTextTable[Index].DevicePathNodeText);
@@ -2822,6 +2823,7 @@ ConvertTextToDevicePath (
   }
 
   DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
+  ASSERT (DevicePath != NULL);
   SetDevicePathEndNode (DevicePath);
 
   ParamStr            = NULL;
@@ -2857,6 +2859,7 @@ ConvertTextToDevicePath (
 
     if (IsInstanceEnd != 0) {
       DeviceNode = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
+      ASSERT (DeviceNode != NULL);
       SET_DEVICE_PATH_INSTANCE_END_NODE (DeviceNode);
 
       NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);

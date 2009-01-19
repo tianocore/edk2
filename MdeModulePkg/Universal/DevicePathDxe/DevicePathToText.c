@@ -708,6 +708,7 @@ DevPathToTextUsbWWID (
     // In case no NULL terminator in SerialNumber, create a new one with NULL terminator
     //
     NewStr = AllocateCopyPool ((Length + 1) * sizeof (CHAR16), SerialNumberStr);
+    ASSERT (NewStr != NULL);
     NewStr [Length] = 0;
     SerialNumberStr = NewStr;
   }
