@@ -36,12 +36,12 @@
   DxeLoad.c
 
 [Sources.Ia32]
-  Ia32/VirtualMemory.h
-  Ia32/VirtualMemory.c
+  Ia32/VirtualMemory.h ||||PcdDxeIplSwitchToLongMode
+  Ia32/VirtualMemory.c ||||PcdDxeIplSwitchToLongMode
   Ia32/DxeLoadFunc.c
   Ia32/ImageRead.c
-  Ia32/IdtVectorAsm.asm
-  Ia32/IdtVectorAsm.S | GCC
+  Ia32/IdtVectorAsm.asm||||PcdDxeIplSwitchToLongMode AND PcdDxeIplEnableIdt
+  Ia32/IdtVectorAsm.S  ||||PcdDxeIplSwitchToLongMode AND PcdDxeIplEnableIdt
 
 [Sources.X64]
   X64/VirtualMemory.h
@@ -79,16 +79,17 @@
   RecoveryLib
 
 [Ppis]
-  gEfiEndOfPeiSignalPpiGuid                     # PPI SOMETIMES_PRODUCED
-  gEfiDxeIplPpiGuid                             # PPI SOMETIMES_PRODUCED
-  gEfiPeiDecompressPpiGuid                      # PPI SOMETIMES_PRODUCED
-  gEfiPeiReadOnlyVariable2PpiGuid               # PPI SOMETIMES_CONSUMED
+  gEfiDxeIplPpiGuid                 ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid         ## SOMETIMES_PRODUCES(Not produced on S3 boot path)
+  gEfiPeiDecompressPpiGuid          ## SOMETIMES_PRODUCES
+  gEfiPeiReadOnlyVariable2PpiGuid   ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiMemoryTypeInformationGuid
+  gEfiMemoryTypeInformationGuid     ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
+  gEfiMemoryTypeInformationGuid     ## SOMETIMES_PRODUCES ## HOB
 
 [FeaturePcd.IA32]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt|PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 [FixedPcd.common]
@@ -97,3 +98,23 @@
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid
 
+#
+# [BootMode] 
+#   S3_RESUME                       ## SOMETIMES_CONSUMES
+#   RECOVERY                        ## SOMETIMES_CONSUMES
+#
+#  
+# [Hob]
+#   ##
+#   # New Stack HoB
+#   MEMORY_ALLOCATION               ## PRODUCES
+#   ##
+#   # Old Stack HOB
+#   MEMORY_ALLOCATION               ## CONSUMES
+#
+# [Hob.IPF]
+#   ##
+#   # BSP Stack HOB for IPF
+#   MEMORY_ALLOCATION               ## PRODUCES
+#
+# 
