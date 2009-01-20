@@ -26,6 +26,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define SUBTITLE_INDENT  2
 
+
+//
+// It take 23 characters including the NULL to print a 64 bits number with "[" and "]".
+// pow(2, 64) = [18446744073709551616]
+//
+#define MAX_NUMERIC_INPUT_WIDTH 23
+
 typedef enum {
   UiNoOperation,
   UiDefault,

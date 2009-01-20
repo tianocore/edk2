@@ -188,6 +188,8 @@ DisplayPageFrame (
   CHAR16                 *StrFrontPageBanner;
   UINTN                  Row;
   EFI_SCREEN_DESCRIPTOR  LocalScreen;
+  UINTN                  RowIdx;
+  UINTN                  ColumnIdx;
 
   ZeroMem (&LocalScreen, sizeof (EFI_SCREEN_DESCRIPTOR));
   gST->ConOut->QueryMode (gST->ConOut, gST->ConOut->Mode->Mode, &LocalScreen.RightColumn, &LocalScreen.BottomRow);
@@ -229,9 +231,15 @@ DisplayPageFrame (
            Alignment < BANNER_COLUMNS + (UINT8) LocalScreen.LeftColumn;
            Alignment++
           ) {
-        if (BannerData->Banner[Line - (UINT8) LocalScreen.TopRow][Alignment - (UINT8) LocalScreen.LeftColumn] != 0x0000) {
+        RowIdx = Line - (UINT8) LocalScreen.TopRow;
+        ColumnIdx = Alignment - (UINT8) LocalScreen.LeftColumn;
+
+        ASSERT (RowIdx < BANNER_HEIGHT);
+        ASSERT (ColumnIdx < BANNER_COLUMNS);
+        
+        if (BannerData->Banner[RowIdx][ColumnIdx] != 0x0000) {
           StrFrontPageBanner = GetToken (
-                                BannerData->Banner[Line - (UINT8) LocalScreen.TopRow][Alignment - (UINT8) LocalScreen.LeftColumn],
+                                BannerData->Banner[RowIdx][ColumnIdx],
                                 FrontPageHandle
                                 );
         } else {

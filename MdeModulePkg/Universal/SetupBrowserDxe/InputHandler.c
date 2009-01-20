@@ -235,9 +235,9 @@ GetNumericInput (
   EFI_STATUS              Status;
   UINTN                   Column;
   UINTN                   Row;
-  CHAR16                  InputText[23];
-  CHAR16                  FormattedNumber[22];
-  UINT64                  PreviousNumber[20];
+  CHAR16                  InputText[MAX_NUMERIC_INPUT_WIDTH];
+  CHAR16                  FormattedNumber[MAX_NUMERIC_INPUT_WIDTH - 1];
+  UINT64                  PreviousNumber[MAX_NUMERIC_INPUT_WIDTH - 3];
   UINTN                   Count;
   UINTN                   Loop;
   BOOLEAN                 ManualInput;
@@ -387,6 +387,7 @@ GetNumericInput (
 
     InputText[0] = LEFT_NUMERIC_DELIMITER;
     SetUnicodeMem (InputText + 1, InputWidth, L' ');
+    ASSERT (InputWidth < MAX_NUMERIC_INPUT_WIDTH); 
     InputText[InputWidth + 1] = RIGHT_NUMERIC_DELIMITER;
     InputText[InputWidth + 2] = L'\0';
 
@@ -640,6 +641,7 @@ EnterCarriageReturn:
 
         if (EditValue > Maximum) {
           UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, TRUE);
+          ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
           EditValue = PreviousNumber[Count];
           break;
         } else {
@@ -970,6 +972,7 @@ TheKey:
         if (HighlightOptionIndex > 0) {
           HighlightOptionIndex--;
 
+          ASSERT (CurrentOption != NULL);
           SwapListEntries (CurrentOption->Link.BackLink, &CurrentOption->Link);
         }
       }
@@ -997,6 +1000,7 @@ TheKey:
         if (HighlightOptionIndex < (PopUpMenuLines - 1)) {
           HighlightOptionIndex++;
 
+          ASSERT (CurrentOption != NULL);
           SwapListEntries (&CurrentOption->Link, CurrentOption->Link.ForwardLink);
         }
       }
@@ -1096,6 +1100,7 @@ TheKey:
           Link = GetNextNode (&Question->OptionListHead, Link);
         }
       } else {
+        ASSERT (CurrentOption != NULL);
         CopyMem (&Question->HiiValue, &CurrentOption->Value, sizeof (EFI_HII_VALUE));
       }
 
