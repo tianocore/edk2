@@ -166,7 +166,7 @@ typedef struct{
 /**
   Function Pointer type for PeiCore function.
   @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
-  											 and location of temporary RAM, the stack location and the BFV location.
+                         and location of temporary RAM, the stack location and the BFV location.
   @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
                          An empty PPI list consists of a single descriptor with the end-tag
                          EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
@@ -214,7 +214,7 @@ typedef struct {
 
 
   @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
-  											 and location of temporary RAM, the stack location and the BFV location.
+                         and location of temporary RAM, the stack location and the BFV location.
   @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
                          An empty PPI list consists of a single descriptor with the end-tag
                          EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST. As part of its initialization
@@ -706,7 +706,7 @@ PeiFvFindNextVolume (
 
   @param PrivateData     PeiCore's private data structure
   @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
-  											 and location of temporary RAM, the stack location and the BFV location.
+                         and location of temporary RAM, the stack location and the BFV location.
   @param OldCoreData     Pointer to the PEI Core data.
                          NULL if being run in non-permament memory mode.
 
@@ -1026,12 +1026,12 @@ ProcessFvFile (
 /**
   The wrapper function of PeiLoadImageLoadImage().
 
-  @param This            - Pointer to EFI_PEI_LOAD_FILE_PPI.
-  @param FileHandle      - Pointer to the FFS file header of the image.
-  @param ImageAddressArg - Pointer to PE/TE image.
-  @param ImageSizeArg    - Size of PE/TE image.
-  @param EntryPoint      - Pointer to entry point of specified image file for output.
-  @param AuthenticationState - Pointer to attestation authentication state of image.
+  @param This                 Pointer to EFI_PEI_LOAD_FILE_PPI.
+  @param FileHandle           Pointer to the FFS file header of the image.
+  @param ImageAddressArg      Pointer to PE/TE image.
+  @param ImageSizeArg         Size of PE/TE image.
+  @param EntryPoint           Pointer to entry point of specified image file for output.
+  @param AuthenticationState  Pointer to attestation authentication state of image.
 
   @return Status of PeiLoadImageLoadImage().
 
