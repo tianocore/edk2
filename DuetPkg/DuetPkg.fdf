@@ -61,6 +61,7 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
+INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
@@ -119,6 +120,11 @@ FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
   SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
   }
 
+
+FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
+  }
+      
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
     PE32     PE32           |.efi
