@@ -54,8 +54,8 @@
   BaseLib
 
 [Protocols]
-  gEfiRuntimeArchProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiRuntimeArchProtocolGuid                   ## PRODUCES
+  gEfiLoadedImageProtocolGuid                   ## CONSUMES
 
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap

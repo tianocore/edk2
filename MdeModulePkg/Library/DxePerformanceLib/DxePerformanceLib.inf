@@ -47,7 +47,7 @@
 
 
 [Protocols]
-  gPerformanceProtocolGuid
+  gPerformanceProtocolGuid  ## CONSUMES
 
 
 [Pcd.common]
