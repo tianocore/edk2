@@ -452,6 +452,7 @@ ProcessOptions (
 
         FreePool (*OptionString);
         *OptionString = NULL;
+        return EFI_NOT_FOUND;
       }
 
       if ((OneOfOption->SuppressExpression != NULL) &&
@@ -722,6 +723,8 @@ ProcessOptions (
           }
 
           TempString = AllocateCopyPool ((Maximum + 1) * sizeof (CHAR16), Question->BufferValue);
+          ASSERT (TempString != NULL);
+          
           TempString[Maximum] = L'\0';
 
           if (StrCmp (StringPtr, TempString) != 0) {
@@ -877,6 +880,7 @@ ProcessHelpString (
   //
   AllocateSize  = 0x20;
   IndexArray    = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
+  ASSERT (IndexArray != NULL);
 
   if (*FormattedString != NULL) {
     FreePool (*FormattedString);
@@ -1012,6 +1016,7 @@ ProcessHelpString (
 
   VirtualLineCount = RowCount * (LineCount / RowCount + (LineCount % RowCount > 0));
   *FormattedString = AllocateZeroPool (VirtualLineCount * (BlockWidth + 1) * sizeof (CHAR16) * 2);
+  ASSERT (*FormattedString != NULL);
 
   for (CurrIndex = 0; CurrIndex < LineCount; CurrIndex ++) {
     *(*FormattedString + CurrIndex * 2 * (BlockWidth + 1)) = (CHAR16) ((IndexArray[CurrIndex*3+2] == 2) ? WIDE_CHAR : NARROW_CHAR);
