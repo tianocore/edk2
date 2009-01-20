@@ -2556,7 +2556,7 @@ ExportPackageList (
   UINTN                               ResultSize;
   EFI_HII_PACKAGE_HEADER              EndofPackageList;
 
-  ASSERT (Private != NULL || PackageList != NULL || UsedSize != NULL);
+  ASSERT (Private != NULL && PackageList != NULL && UsedSize != NULL);
   ASSERT (Private->Signature == HII_DATABASE_PRIVATE_DATA_SIGNATURE);
   ASSERT (IsHiiHandleValid (Handle));
 

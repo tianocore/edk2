@@ -1566,6 +1566,7 @@ HiiStringToImage (
   Status        = EFI_SUCCESS;
   StringIn2     = NULL;
   SystemDefault = NULL;
+  StringIn      = NULL;
 
   //
   // Calculate the string output information, including specified color and font .
@@ -1596,11 +1597,13 @@ HiiStringToImage (
       Foreground  = ((EFI_FONT_DISPLAY_INFO *) StringInfo)->ForegroundColor;
       Background  = ((EFI_FONT_DISPLAY_INFO *) StringInfo)->BackgroundColor;
 
-    } else {
+    } else if (Status == EFI_SUCCESS) {
       FontInfo   = &StringInfoOut->FontInfo;
       Height     = StringInfoOut->FontInfo.FontSize;
       Foreground = StringInfoOut->ForegroundColor;
       Background = StringInfoOut->BackgroundColor;
+    } else {
+      goto Exit;
     }
   }
 
@@ -1609,7 +1612,6 @@ HiiStringToImage (
   //
 
   StringPtr = String;
-  StringIn  = NULL;
 
   //
   // Ignore line-break characters only. Hyphens or dash character will be displayed
