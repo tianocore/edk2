@@ -593,6 +593,10 @@ PcRtcSetWakeupTime (
     // Just support set alarm time within 24 hours
     //
     PcRtcGetTime (&RtcTime, &Capabilities, Global);
+    Status = RtcTimeFieldsValid (&RtcTime);
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    }
     if (!IsWithinOneDay (&RtcTime, Time)) {
       return EFI_UNSUPPORTED;
     }
