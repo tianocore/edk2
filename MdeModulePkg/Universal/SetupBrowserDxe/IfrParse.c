@@ -966,6 +966,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_THIS_OP:
+        ASSERT (CurrentStatement != NULL);
         ExpressionOpCode->QuestionId = CurrentStatement->QuestionId;
         break;
 
@@ -1058,6 +1059,7 @@ ParseOpCodes (
           //
           // Evaluate DisableIf expression
           //
+          ASSERT (CurrentExpression != NULL);
           Status = EvaluateExpression (FormSet, CurrentForm, CurrentExpression);
           if (EFI_ERROR (Status)) {
             return Status;
@@ -1574,6 +1576,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_FORM_OP:
+        ASSERT (CurrentForm != NULL);
         ImageId = &CurrentForm->ImageId;
         break;
 
