@@ -33,8 +33,8 @@
 
 [Sources.common]
   DevicePathUtilities.c
-  DevicePathToText.c
-  DevicePathFromText.c
+  DevicePathToText.c   ||||PcdDevicePathSupportDevicePathToText
+  DevicePathFromText.c ||||PcdDevicePathSupportDevicePathFromText
   DevicePath.h
   DevicePath.c
 
@@ -54,18 +54,18 @@
   DebugLib
 
 [Guids]
-  gEfiVTUTF8Guid                                # ALWAYS_CONSUMED
-  gEfiVT100Guid                                 # ALWAYS_CONSUMED
-  gEfiVT100PlusGuid                             # ALWAYS_CONSUMED
-  gEfiPcAnsiGuid                                # ALWAYS_CONSUMED
-  gEfiUartDevicePathGuid                        # ALWAYS_CONSUMED
-  gEfiSasDevicePathGuid                         # ALWAYS_CONSUMED
+  gEfiVTUTF8Guid                                ## SOMETIMES_CONSUMES ## GUID
+  gEfiVT100Guid                                 ## SOMETIMES_CONSUMES ## GUID
+  gEfiVT100PlusGuid                             ## SOMETIMES_CONSUMES ## GUID
+  gEfiPcAnsiGuid                                ## SOMETIMES_CONSUMES ## GUID
+  gEfiUartDevicePathGuid                        ## SOMETIMES_CONSUMES ## GUID
+  gEfiSasDevicePathGuid                         ## SOMETIMES_CONSUMES ## GUID
   
 [Protocols]
-  gEfiDevicePathToTextProtocolGuid              # PROTOCOL ALWAYS_PRODUCED
-  gEfiDevicePathFromTextProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
-  gEfiDevicePathUtilitiesProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
-  gEfiDebugPortProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathToTextProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiDevicePathFromTextProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiDevicePathUtilitiesProtocolGuid           ## CONSUMES
+  gEfiDebugPortProtocolGuid                     ## SOMETIMES_CONSUMES
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText
