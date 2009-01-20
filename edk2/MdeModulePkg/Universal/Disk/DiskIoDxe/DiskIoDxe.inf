@@ -58,6 +58,6 @@
 
 
 [Protocols]
-  gEfiDiskIoProtocolGuid                        # PROTOCOL BY_START
-  gEfiBlockIoProtocolGuid                       # PROTOCOL TO_START
+  gEfiDiskIoProtocolGuid                        ## BY_START
+  gEfiBlockIoProtocolGuid                       ## TO_START
 
