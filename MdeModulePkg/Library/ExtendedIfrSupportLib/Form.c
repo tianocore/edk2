@@ -376,15 +376,21 @@ IfrLibUpdateForm (
   BufferSize = 0;
   HiiPackageList   = NULL;
   Status = HiiDatabase->ExportPackageLists (HiiDatabase, Handle, &BufferSize, HiiPackageList);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    HiiPackageList = AllocatePool (BufferSize);
-    ASSERT (HiiPackageList != NULL);
+  //
+  // Handle is a invalid handle. Check if Handle is corrupted.
+  //
+  ASSERT (Status != EFI_NOT_FOUND);
+  //
+  // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
+  //
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  HiiPackageList = AllocatePool (BufferSize);
+  ASSERT (HiiPackageList != NULL);
 
-    Status = HiiDatabase->ExportPackageLists (HiiDatabase, Handle, &BufferSize, HiiPackageList);
-    if (EFI_ERROR (Status)) {
-      FreePool (HiiPackageList);
-      return Status;
-    }
+  Status = HiiDatabase->ExportPackageLists (HiiDatabase, Handle, &BufferSize, HiiPackageList);
+  if (EFI_ERROR (Status)) {
+    FreePool (HiiPackageList);
+    return Status;
   }
 
   //
