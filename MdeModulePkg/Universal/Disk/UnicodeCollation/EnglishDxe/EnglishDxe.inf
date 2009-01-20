@@ -52,6 +52,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support
 
 [Protocols]
-  gEfiUnicodeCollationProtocolGuid              # PROTOCOL ALWAYS_PRODUCED
-  gEfiUnicodeCollation2ProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
+  gEfiUnicodeCollationProtocolGuid              ## PRODUCES
+  gEfiUnicodeCollation2ProtocolGuid             ## PRODUCES
 
