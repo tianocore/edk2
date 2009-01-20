@@ -124,7 +124,7 @@ ConvertToUnicodeText (
   ASSERT (StringSrc != NULL && BufferSize != NULL);
 
   StringSize = AsciiStrSize (StringSrc) * 2;
-  if (*BufferSize < StringSize) {
+  if (*BufferSize < StringSize || StringDest == NULL) {
     *BufferSize = StringSize;
     return EFI_BUFFER_TOO_SMALL;
   }
