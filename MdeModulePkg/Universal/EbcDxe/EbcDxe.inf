@@ -2,7 +2,7 @@
 #  Module that produces EBC Interprete and EBC Debug Support protocols.
 #  
 #  This module implements EFI Byte Code (EBC) Virtual Machine that can provide 
-#  platformand processor-independent mechanisms for loading and executing EFI
+#  platform and processor-independent mechanisms forloading and executing EFI
 #  device drivers.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
@@ -66,8 +66,19 @@
 
 
 [Protocols]
-  gEfiDebugSupportProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
-  gEfiEbcProtocolGuid                           # PROTOCOL ALWAYS_PRODUCED
+  gEfiDebugSupportProtocolGuid                  ## PRODUCES
+  gEfiEbcProtocolGuid                           ## PRODUCES
 
 [Depex]
   TRUE
+
+# [Event]
+#   ##
+#   # Periodic timer event to support EFI debug support protocol for EBC image.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+#
+#
+#
+#
+#
