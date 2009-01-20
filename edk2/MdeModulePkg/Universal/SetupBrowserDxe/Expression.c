@@ -703,7 +703,7 @@ IfrCatenate (
     }
 
     String[Index] = GetToken (Value.Value.string, FormSet->HiiHandle);
-    if (String== NULL) {
+    if (String[Index] == NULL) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
@@ -850,7 +850,7 @@ IfrFind (
     }
 
     String[Index] = GetToken (Value.Value.string, FormSet->HiiHandle);
-    if (String== NULL) {
+    if (String[Index] == NULL) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
@@ -1006,7 +1006,7 @@ IfrToken (
     }
 
     String[Index] = GetToken (Value.Value.string, FormSet->HiiHandle);
-    if (String== NULL) {
+    if (String[Index] == NULL) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
