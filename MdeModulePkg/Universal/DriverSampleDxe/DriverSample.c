@@ -33,7 +33,7 @@ CHAR16     VariableName[] = L"MyIfrNVData";
 VOID
 EncodePassword (
   IN  CHAR16                      *Password,
-  IN  UINT8                       MaxSize
+  IN  UINTN                       MaxSize
   )
 {
   UINTN   Index;
@@ -167,6 +167,7 @@ SetPassword (
   EFI_STATUS                      Status;
   UINTN                           BufferSize;
   CHAR16                          *Password;
+  UINTN                           PasswordSize;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
 
   //
@@ -188,7 +189,9 @@ SetPassword (
   // Get user input password
   //
   Password = &PrivateData->Configuration.WhatIsThePassword2[0];
-  ZeroMem (Password, 20 * sizeof (CHAR16));
+  PasswordSize = sizeof (PrivateData->Configuration.WhatIsThePassword2);
+  
+  ZeroMem (Password, PasswordSize);
   Status = HiiLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -205,7 +208,7 @@ SetPassword (
     //
     // Update password's clear text in the screen
     //
-    CopyMem (Configuration->PasswordClearText, Password, 20 * sizeof (CHAR16));
+    CopyMem (Configuration->PasswordClearText, Password, PasswordSize);
 
     //
     // Update uncommitted data of Browser
@@ -224,7 +227,7 @@ SetPassword (
   //
   // Set password
   //
-  EncodePassword (Password, 20 * sizeof (CHAR16));
+  EncodePassword (Password, PasswordSize);
   Status = gRT->SetVariable(
                   VariableName,
                   &mFormSetGuid,
