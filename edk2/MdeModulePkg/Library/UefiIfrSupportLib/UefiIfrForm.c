@@ -342,10 +342,10 @@ ExtractBlockName (
   //                 |   8  | 4 |  7   | 4 |
   //
   StringPtr = AllocateZeroPool ((BlockNameNumber * (8 + 4 + 7 + 4) + 1) * sizeof (CHAR16));
-  *BlockName = StringPtr;
   if (StringPtr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+  *BlockName = StringPtr;
 
   Buffer += sizeof (UINT32);
   for (Index = 0; Index < BlockNameNumber; Index++) {
@@ -522,6 +522,13 @@ ConstructConfigAltResp (
   if (ConfigAltResp == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+  
+  DescHdr = NULL;
+  StringPtr = NULL;
+  AltCfg    = NULL;
+  ConfigResp = NULL;
+  BlockName = NULL;
+  NeedFreeConfigRequest = FALSE;
 
   //
   // Construct <ConfigHdr> : "GUID=...&NAME=...&PATH=..."
@@ -535,39 +542,47 @@ ConstructConfigAltResp (
              Name,
              DriverHandle
              );
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    ConfigHdr = AllocateZeroPool (StrBufferLen);
-    Status = ConstructConfigHdr (
-               ConfigHdr,
-               &StrBufferLen,
-               Guid,
-               Name,
-               DriverHandle
-               );
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  ConfigHdr = AllocateZeroPool (StrBufferLen);
+  if (ConfigHdr == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
   }
+  Status = ConstructConfigHdr (
+             ConfigHdr,
+             &StrBufferLen,
+             Guid,
+             Name,
+             DriverHandle
+             );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   //
   // Construct <ConfigResp>
   //
-  NeedFreeConfigRequest = FALSE;
   if (ConfigRequest == NULL) {
     //
     // If ConfigRequest is set to NULL, export all configurable elements in BlockNameArray
     //
     Status = ExtractBlockName (BlockNameArray, &BlockName);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Exit;
     }
     
     Len = StrSize (ConfigHdr);
     ConfigRequest = AllocateZeroPool (Len + StrSize (BlockName) - sizeof (CHAR16));
+    if (ConfigRequest == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+    
     StrCpy (ConfigRequest, ConfigHdr);
     StrCat (ConfigRequest, BlockName);
     NeedFreeConfigRequest = TRUE;
+
   }
 
   Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &HiiConfigRouting);
@@ -587,36 +602,48 @@ ConstructConfigAltResp (
     return Status;
   }
 
+  AltRespLen = 0;
   //
   // Construct <AltResp>
   //
-  DescHdr = AllocateZeroPool (NumberAltCfg * 16 * sizeof (CHAR16));
-  StringPtr = DescHdr;
-  AltCfg = AllocateZeroPool (NumberAltCfg * sizeof (CHAR16 *));
-  AltRespLen = 0;
-  VA_START (Args, NumberAltCfg);
-  for (Index = 0; Index < NumberAltCfg; Index++) {
-    AltCfgId = (UINT16) VA_ARG (Args, UINT16);
-    DefaultValueArray = (UINT8 *) VA_ARG (Args, VOID *);
-
-    //
-    // '&' <ConfigHdr>
-    //
-    AltRespLen += (StrLen (ConfigHdr) + 1);
-
-    StringPtr = DescHdr + Index * 16;
-    StrCpy (StringPtr, L"&ALTCFG=");
-    AltRespLen += (8 + sizeof (UINT16) * 2);
-
-    StrBufferLen = 5;
-    BufToHexString (StringPtr + 8, &StrBufferLen, (UINT8 *) &AltCfgId, sizeof (UINT16));
-    Status = ExtractBlockConfig (DefaultValueArray, &AltCfg[Index]);
-    if (EFI_ERROR (Status)) {
-      return Status;
+  if (NumberAltCfg > 0) {
+    DescHdr = AllocateZeroPool (NumberAltCfg * 16 * sizeof (CHAR16));
+    if (DescHdr == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
     }
-    AltRespLen += StrLen (AltCfg[Index]);
+    
+    StringPtr = DescHdr;
+    AltCfg = AllocateZeroPool (NumberAltCfg * sizeof (CHAR16 *));
+    if (AltCfg == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+
+    VA_START (Args, NumberAltCfg);
+    for (Index = 0; Index < NumberAltCfg; Index++) {
+      AltCfgId = (UINT16) VA_ARG (Args, UINT16);
+      DefaultValueArray = (UINT8 *) VA_ARG (Args, VOID *);
+    
+      //
+      // '&' <ConfigHdr>
+      //
+      AltRespLen += (StrLen (ConfigHdr) + 1);
+    
+      StringPtr = DescHdr + Index * 16;
+      StrCpy (StringPtr, L"&ALTCFG=");
+      AltRespLen += (8 + sizeof (UINT16) * 2);
+    
+      StrBufferLen = 5;
+      BufToHexString (StringPtr + 8, &StrBufferLen, (UINT8 *) &AltCfgId, sizeof (UINT16));
+      Status = ExtractBlockConfig (DefaultValueArray, &AltCfg[Index]);
+      if (EFI_ERROR (Status)) {
+        goto Exit;
+      }
+      AltRespLen += StrLen (AltCfg[Index]);
+    }
+    VA_END (Args);
   }
-  VA_END (Args);
 
   //
   // Generate the final <ConfigAltResp>
@@ -625,7 +652,7 @@ ConstructConfigAltResp (
   TempStr = AllocateZeroPool (StrBufferLen);
   *ConfigAltResp = TempStr;
   if (TempStr == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    goto Exit;
   }
 
   //
@@ -641,13 +668,23 @@ ConstructConfigAltResp (
     FreePool (AltCfg[Index]);
   }
 
+Exit:
   if (NeedFreeConfigRequest) {
     FreePool (ConfigRequest);
   }
   FreePool (ConfigHdr);
-  FreePool (ConfigResp);
-  FreePool (DescHdr);
-  FreePool (AltCfg);
+  if (ConfigResp != NULL) {
+    FreePool (ConfigResp);
+  }
+
+  if (BlockName != NULL) {
+    FreePool (BlockName);
+  }
+
+  if (NumberAltCfg > 0) {
+    FreePool (DescHdr);
+    FreePool (AltCfg);
+  }
 
   return EFI_SUCCESS;
 }
@@ -1213,7 +1250,7 @@ GetBrowserData (
   BufferLen = 0x4000;
   ConfigResp = AllocateZeroPool (BufferLen + HeaderLen);
   if (ConfigResp == NULL) {
-    BufferLen = 0;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   StringPtr = ConfigResp + HeaderLen;
@@ -1229,9 +1266,7 @@ GetBrowserData (
                            VariableName
                            );
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    if (ConfigResp != NULL) {
-      FreePool (ConfigResp);
-    }
+    FreePool (ConfigResp);
 
     ConfigResp = AllocateZeroPool (BufferLen + HeaderLen);
     if (ConfigResp == NULL) {

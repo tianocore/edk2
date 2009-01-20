@@ -281,13 +281,13 @@ HiiLibGetHiiHandles (
   OUT    EFI_HII_HANDLE            **HiiHandleBuffer
   )
 {
-  UINTN       BufferLength;
   EFI_STATUS  Status;
 
   ASSERT (HandleBufferLength != NULL);
   ASSERT (HiiHandleBuffer != NULL);
 
-  BufferLength = 0;
+  *HandleBufferLength = 0;
+  *HiiHandleBuffer = NULL;
 
   //
   // Try to find the actual buffer size for HiiHandle Buffer.
@@ -296,27 +296,26 @@ HiiLibGetHiiHandles (
                                  mHiiDatabaseProt,
                                  EFI_HII_PACKAGE_TYPE_ALL,
                                  NULL,
-                                 &BufferLength,
+                                 HandleBufferLength,
                                  *HiiHandleBuffer
                                  );
-
+  
   if (Status == EFI_BUFFER_TOO_SMALL) {
-      *HiiHandleBuffer = AllocateZeroPool (BufferLength);
+      *HiiHandleBuffer = AllocateZeroPool (*HandleBufferLength);
       ASSERT (*HiiHandleBuffer != NULL);
       Status = mHiiDatabaseProt->ListPackageLists (
                                      mHiiDatabaseProt,
                                      EFI_HII_PACKAGE_TYPE_ALL,
                                      NULL,
-                                     &BufferLength,
+                                     HandleBufferLength,
                                      *HiiHandleBuffer
                                      );
-      //
-      // we should not fail here.
-      //
-      ASSERT_EFI_ERROR (Status);
-  }
 
-  *HandleBufferLength = BufferLength;
+      if (EFI_ERROR (Status)) {
+        FreePool (*HiiHandleBuffer);
+        *HiiHandleBuffer = NULL;
+      }
+  }
 
   return Status;
 }

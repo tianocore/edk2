@@ -100,14 +100,19 @@ IfrLibExtractClassFromHiiHandle (
   BufferSize = 0;
   HiiPackageList = NULL;
   Status = gIfrLibHiiDatabase->ExportPackageLists (gIfrLibHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  //
+  // Handle is a invalid handle. Check if Handle is corrupted.
+  //
   ASSERT (Status != EFI_NOT_FOUND);
+  //
+  // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
+  //
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
   
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    HiiPackageList = AllocatePool (BufferSize);
-    ASSERT (HiiPackageList != NULL);
+  HiiPackageList = AllocatePool (BufferSize);
+  ASSERT (HiiPackageList != NULL);
 
-    Status = gIfrLibHiiDatabase->ExportPackageLists (gIfrLibHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  }
+  Status = gIfrLibHiiDatabase->ExportPackageLists (gIfrLibHiiDatabase, Handle, &BufferSize, HiiPackageList);
   if (EFI_ERROR (Status)) {
     return Status;
   }
