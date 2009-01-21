@@ -23,7 +23,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = FvFileLoaderToLoadFileThunk
+  BASE_NAME                      = FvFileLoaderOnLoadFileThunk
   FILE_GUID                      = 6CDDBF28-89AC-4e01-9692-616B8A1009C8
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -39,7 +39,7 @@
 #
 
 [Sources.common]
-  FvFileLoaderToLoadFileThunk.c
+  FvFileLoaderOnLoadFileThunk.c
 
 [Packages]
   MdePkg/MdePkg.dec

@@ -23,7 +23,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DeviceIoToPciRootBridgeIoThunk
+  BASE_NAME                      = DeviceIoOnPciRootBridgeIoThunk
   FILE_GUID                      = 6E5ED30F-EC52-4136-8A41-3F4324218E41
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -38,7 +38,7 @@
 #
 
 [Sources.common]
-  DeviceIoToPciRootBridgeIoThunk.c
+  DeviceIoOnPciRootBridgeIoThunk.c
 
 [Packages]
   MdePkg/MdePkg.dec
