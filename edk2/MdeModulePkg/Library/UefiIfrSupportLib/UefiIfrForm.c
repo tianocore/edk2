@@ -1562,6 +1562,8 @@ BufToHexString (
   If String has N valid hexadecimal characters for conversion,  the caller must make sure Buffer is at least 
   N/2 (if N is even) or (N+1)/2 (if N if odd) bytes. 
 
+  If either Buffer, BufferSizeInBytes or String is NULL, then ASSERT ().
+
   @param Buffer                      The output buffer allocated by the caller.
   @param BufferSizeInBytes           On input, the size in bytes of Buffer. On output, it is updated to 
                                      contain the size of the Buffer which is actually used for the converstion.
@@ -1591,6 +1593,10 @@ HexStringToBuf (
   UINTN       BufferLength;
   UINT8       Digit;
   UINT8       Byte;
+
+  ASSERT (Buffer != NULL);
+  ASSERT (BufferSizeInBytes != NULL);
+  ASSERT (String != NULL);
 
   //
   // Find out how many hex characters the string has.
