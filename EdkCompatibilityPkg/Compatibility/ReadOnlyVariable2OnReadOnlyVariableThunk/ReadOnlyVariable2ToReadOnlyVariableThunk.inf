@@ -27,7 +27,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ReadOnlyVariable2ToReadOnlyVariableThunk
+  BASE_NAME                      = ReadOnlyVariable2OnReadOnlyVariableThunk
   FILE_GUID                      = 950216A2-A621-479c-A13D-2990617BDFE7
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -43,7 +43,7 @@
 #
 
 [Sources.common]
-  ReadOnlyVariable2ToReadOnlyVariableThunk.c
+  ReadOnlyVariable2OnReadOnlyVariableThunk.c
 
 [Packages]
   MdePkg/MdePkg.dec
