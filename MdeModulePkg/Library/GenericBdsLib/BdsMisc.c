@@ -270,11 +270,14 @@ BdsLibRegisterNewOption (
                     &gEfiGlobalVariableGuid,
                     &TempOptionSize
                     );
-  ASSERT (TempOptionPtr != NULL);
   //
-  // Compare with current option variable
+  // Compare with current option variable if the previous option is set in global variable.
   //
   for (Index = 0; Index < TempOptionSize / sizeof (UINT16); Index++) {
+    //
+    // TempOptionPtr must not be NULL if we have non-zero TempOptionSize.
+    //
+    ASSERT (TempOptionPtr != NULL);
 
     if (*VariableName == 'B') {
       UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", TempOptionPtr[Index]);
@@ -336,8 +339,10 @@ BdsLibRegisterNewOption (
 
   if (UpdateDescription) {
     //
-    // The number in option#### to be updated
+    // The number in option#### to be updated. 
+    // In this case, we must have non-NULL TempOptionPtr.
     //
+    ASSERT (TempOptionPtr != NULL);
     RegisterOptionNumber = TempOptionPtr[Index];
   } else {
     //
@@ -393,14 +398,17 @@ BdsLibRegisterNewOption (
     }
     return Status;
   }
-
+  
+  //
+  // TempOptionPtr must not be NULL if TempOptionSize is not zero.
+  //
+  ASSERT (TempOptionPtr != NULL);
   //
   // Append the new option number to the original option order
   //
   OrderItemNum = (TempOptionSize / sizeof (UINT16)) + 1 ;
   OptionOrderPtr = AllocateZeroPool ( OrderItemNum * sizeof (UINT16));
   ASSERT (OptionOrderPtr!= NULL);
-  
   CopyMem (OptionOrderPtr, TempOptionPtr, (OrderItemNum - 1) * sizeof (UINT16));
 
   OptionOrderPtr[Index] = RegisterOptionNumber;
