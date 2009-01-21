@@ -62,10 +62,10 @@
   gEfiSasDevicePathGuid  | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
   
 [Protocols]
-  gEfiDevicePathToTextProtocolGuid   | PcdDevicePathSupportDevicePathFromText ## SOMETIMES_CONSUMES
-  gEfiDevicePathFromTextProtocolGuid | PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES
+  gEfiDevicePathToTextProtocolGuid   | PcdDevicePathSupportDevicePathFromText ## PRODUCES
+  gEfiDevicePathFromTextProtocolGuid | PcdDevicePathSupportDevicePathToText ## PRODUCES
   gEfiDevicePathUtilitiesProtocolGuid ## CONSUMES
-  gEfiDebugPortProtocolGuid          | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES
+  gEfiDebugPortProtocolGuid          | PcdDevicePathSupportDevicePathFromText OR PcdDevicePathSupportDevicePathToText ## SOMETIMES_CONSUMES ## GUID
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText
