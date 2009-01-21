@@ -325,8 +325,8 @@ HiiLibGetStringFromToken (
   EFI_GUID        Guid;
 
   Status = HiiLibGetHiiHandles (&HandleBufferLen, &HiiHandleBuffer);
-  if (EFI_ERROR(Status)) {
-    return Status;
+  if (HiiHandleBuffer == NULL) {
+    return EFI_NOT_FOUND;
   }
   for (Index = 0; Index < (HandleBufferLen / sizeof (EFI_HII_HANDLE)); Index++) {
     Status = HiiLibExtractGuidFromHiiHandle (HiiHandleBuffer[Index], &Guid);
@@ -350,9 +350,8 @@ HiiLibGetStringFromToken (
   Status = HiiLibGetStringFromHandle (HiiHandleBuffer[Index], StringId, String);
 
 Out:
-  if (HiiHandleBuffer != NULL) {
-    FreePool (HiiHandleBuffer);
-  }
+  FreePool (HiiHandleBuffer);
+
   return Status;
 }
 
