@@ -23,7 +23,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = FvToFv2Thunk
+  BASE_NAME                      = FvOnFv2Thunk
   FILE_GUID                      = 5007A40E-A5E0-44f7-86AE-662F9A91DA26
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -38,7 +38,7 @@
 #
 
 [Sources.common]
-  FvToFv2Thunk.c
+  FvOnFv2Thunk.c
 
 [Packages]
   MdePkg/MdePkg.dec

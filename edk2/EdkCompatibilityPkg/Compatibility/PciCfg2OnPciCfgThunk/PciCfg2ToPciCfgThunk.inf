@@ -72,7 +72,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PciCfg2ToPciCfgThunk
+  BASE_NAME                      = PciCfg2OnPciCfgThunk
   FILE_GUID                      = 41401688-2862-431b-BAAC-6ECADAC384AB
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -88,7 +88,7 @@
 #
 
 [Sources.common]
-  PciCfg2ToPciCfgThunk.c
+  PciCfg2OnPciCfgThunk.c
 
 [Packages]
   MdePkg/MdePkg.dec
