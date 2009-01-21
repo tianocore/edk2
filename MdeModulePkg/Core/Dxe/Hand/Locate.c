@@ -129,7 +129,7 @@ CoreLocateHandle (
   VOID                *Interface;
 
   if (BufferSize == NULL) {
-    Status = EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   if ((*BufferSize > 0) && (Buffer == NULL)) {
