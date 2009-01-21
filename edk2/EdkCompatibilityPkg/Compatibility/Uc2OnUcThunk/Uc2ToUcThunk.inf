@@ -23,7 +23,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = Uc2ToUcThunk
+  BASE_NAME                      = Uc2OnUcThunk
   FILE_GUID                      = 69282DF3-778F-4269-91AA-D7DF6E193317
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -38,7 +38,7 @@
 #
 
 [Sources.common]
-  Uc2ToUcThunk.c
+  Uc2OnUcThunk.c
 
 [Packages]
   MdePkg/MdePkg.dec
