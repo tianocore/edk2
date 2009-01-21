@@ -89,7 +89,7 @@
   gEfiMemoryTypeInformationGuid     ## SOMETIMES_PRODUCES ## HOB
 
 [FeaturePcd.IA32]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt|PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt||PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 [FixedPcd.common]
