@@ -57,11 +57,11 @@
 
 
 [Guids]
-  gPeiPerformanceHobGuid                        # ALWAYS_CONSUMED
+  gPeiPerformanceHobGuid                        ## CONSUMES ## HOB
 
 
 [Protocols]
-  gPerformanceProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
+  gPerformanceProtocolGuid                      # PRODUCES
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries

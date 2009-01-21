@@ -50,9 +50,8 @@
 
 
 [Guids]
-  gPeiPerformanceHobGuid
+  gPeiPerformanceHobGuid ## HOB
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
-
