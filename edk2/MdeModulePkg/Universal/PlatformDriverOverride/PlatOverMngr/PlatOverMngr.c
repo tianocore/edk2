@@ -789,6 +789,7 @@ UpdateBindingDriverSelectPage (
     DriverName = DevicePathToStr (LoadedImageDevicePath);
 
     NewString = AllocateZeroPool (StrSize (DriverName));
+    ASSERT (NewString != NULL); 
     StrCat (NewString, DriverName);
     NewStringHelpToken = mDriverImageFilePathToken[Index];
     if (NewStringHelpToken == 0) {
@@ -1227,7 +1228,7 @@ PlatOverMngrCallback (
     ASSERT_EFI_ERROR (Status);
   }
 
-  if (((KEY_VALUE_DEVICE_OFFSET <= KeyValue) && (KeyValue < KEY_VALUE_DEVICE_MAX)) || (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS)) {
+  if (((KeyValue >= KEY_VALUE_DEVICE_OFFSET) && (KeyValue < KEY_VALUE_DEVICE_MAX)) || (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS)) {
     if (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS) {
       KeyValue = (EFI_QUESTION_ID) (mSelectedCtrIndex + KEY_VALUE_DEVICE_OFFSET);
     }
