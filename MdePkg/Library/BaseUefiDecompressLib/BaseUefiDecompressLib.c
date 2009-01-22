@@ -153,14 +153,15 @@ MakeTable (
   UINT16  WordOfCount;
 
 
-  for (Index = 1; Index <= 16; Index++) {
+  for (Index = 0; Index <= 16; Index++) {
     Count[Index] = 0;
   }
 
   for (Index = 0; Index < NumOfChar; Index++) {
     Count[BitLen[Index]]++;
   }
-
+  
+  Start[0] = 0;
   Start[1] = 0;
 
   for (Index = 1; Index <= 16; Index++) {
@@ -175,7 +176,8 @@ MakeTable (
   }
 
   JuBits = (UINT16) (16 - TableBits);
-
+  
+  Weight[0] = 0;
   for (Index = 1; Index <= TableBits; Index++) {
     Start[Index] >>= JuBits;
     Weight[Index] = (UINT16) (1U << (TableBits - Index));
@@ -201,7 +203,7 @@ MakeTable (
   for (Char = 0; Char < NumOfChar; Char++) {
 
     Len = BitLen[Char];
-    if (Len == 0) {
+    if (Len == 0 || Len >= 17) {
       continue;
     }
 
@@ -221,7 +223,7 @@ MakeTable (
 
       while (Index != 0) {
         if (*Pointer == 0) {
-          Sd->mRight[Avail]                     = Sd->mLeft[Avail] = 0;
+          Sd->mRight[Avail] = Sd->mLeft[Avail] = 0;
           *Pointer = Avail++;
         }
 
@@ -347,7 +349,7 @@ ReadPTLen (
 
   Index = 0;
 
-  while (Index < Number) {
+  while (Index < Number && Index < NPT) {
 
     CharC = (UINT16) (Sd->mBitBuf >> (BITBUFSIZ - 3));
 
@@ -382,7 +384,7 @@ ReadPTLen (
     }
   }
 
-  while (Index < nn) {
+  while (Index < nn && Index < NPT) {
     Sd->mPTLen[Index++] = 0;
   }
   
@@ -428,7 +430,7 @@ ReadCLen (
   }
 
   Index = 0;
-  while (Index < Number) {
+  while (Index < Number && Index < NC) {
     CharC = Sd->mPTTable[Sd->mBitBuf >> (BITBUFSIZ - 8)];
     if (CharC >= NT) {
       Mask = 1U << (BITBUFSIZ - 1 - 8);
