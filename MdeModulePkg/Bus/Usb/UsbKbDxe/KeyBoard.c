@@ -1196,6 +1196,7 @@ KeyboardHandler (
     RemoveKeyCode (&(UsbKeyboardDevice->KeyboardBuffer), &UsbKey);
 
     KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, UsbKey.KeyCode);
+    ASSERT (KeyDescriptor != NULL);
 
     switch (KeyDescriptor->Modifier) {
 
