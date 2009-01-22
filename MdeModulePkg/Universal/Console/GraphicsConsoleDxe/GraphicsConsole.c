@@ -535,29 +535,28 @@ Error:
     //
     if (Private->GraphicsOutput != NULL) {
       gBS->CloseProtocol (
-            Controller,
-            &gEfiGraphicsOutputProtocolGuid,
-            This->DriverBindingHandle,
-            Controller
-            );
+             Controller,
+             &gEfiGraphicsOutputProtocolGuid,
+             This->DriverBindingHandle,
+             Controller
+             );
     } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
       gBS->CloseProtocol (
-            Controller,
-            &gEfiUgaDrawProtocolGuid,
-            This->DriverBindingHandle,
-            Controller
-            );
+             Controller,
+             &gEfiUgaDrawProtocolGuid,
+             This->DriverBindingHandle,
+             Controller
+             );
+    }
+
+    if (Private->LineBuffer != NULL) {
+      FreePool (Private->LineBuffer);
     }
 
     //
     // Free private data
     //
-    if (Private != NULL) {
-      if (Private->LineBuffer != NULL) {
-        FreePool (Private->LineBuffer);
-      }
-      FreePool (Private);
-    }
+    FreePool (Private);
   }
 
   return Status;
@@ -642,13 +641,14 @@ GraphicsConsoleControllerDriverStop (
       mFirstAccessFlag = TRUE;
     }
 
+    if (Private->LineBuffer != NULL) {
+      FreePool (Private->LineBuffer);
+    }
+
     //
     // Free our instance data
     //
-    if (Private != NULL) {
-      FreePool (Private->LineBuffer);
-      FreePool (Private);
-    }
+    FreePool (Private);
   }
 
   return Status;
