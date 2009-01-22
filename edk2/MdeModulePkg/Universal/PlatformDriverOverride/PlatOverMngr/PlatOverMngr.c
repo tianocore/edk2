@@ -588,6 +588,7 @@ GetDriverBindingHandleFromImageHandle (
 
   @param  Private        Pointer to EFI_CALLBACK_INFO.
   @param  KeyValue       The callback key value of device controller item in first page.
+                         KeyValue is larger than or equal to KEY_VALUE_DEVICE_OFFSET.
   @param  FakeNvData     Pointer to PLAT_OVER_MNGR_DATA.
 
   @retval EFI_SUCCESS    Always returned.
