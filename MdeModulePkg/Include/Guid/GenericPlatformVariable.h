@@ -1,7 +1,8 @@
 /** @file
   This file defines the genenic platform guid for EFI variable.
-  Generic drivers can use this guid with its variable name to specify 
-  its EFI variable without defining another new guid.
+  Common drivers without specific requirement 
+  can use this guid with their variable name to specify 
+  their EFI variable without defining another new guid.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

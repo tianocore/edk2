@@ -206,7 +206,7 @@ InitOverridesMapping (
       VariableIndex += ((sizeof(UINT32) - ((UINTN) (VariableIndex))) & (sizeof(UINT32) - 1));
 
       //
-      // Get all DriverDevicePath[]
+      // Get all DriverImageDevicePath[]
       //
       for (Index = 0; Index < DriverNumber; Index++) {
         //
@@ -240,10 +240,9 @@ InitOverridesMapping (
     // NotEnd indicates whether current variable is the end variable.
     //
     if (NotEnd != 0) {
-      UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", VariableNum);
+      UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", VariableNum++);
       VariableBuffer = GetVariableAndSize (OverrideVariableName, &gEfiOverrideVariableGuid, &BufferSize);
       ASSERT ((UINTN) VariableBuffer % sizeof(UINTN) == 0);
-      VariableNum++;
       if (VariableBuffer == NULL) {
         FreeMappingDatabase (MappingDataBase);
         return EFI_VOLUME_CORRUPTED;

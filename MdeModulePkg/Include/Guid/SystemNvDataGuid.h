@@ -1,11 +1,15 @@
 /** @file
-  This file defines NvData Hob GUIDs for System Non Volatile HOB entries and the corresponding hob data structure.
-  NvData Hob is used to report the region of the system non volatile data 
-  for the specific purpose, such as FTW region, Error log region.
+  This file defines NvData Hob GUIDs for System Non Volatile HOB entries 
+  and the corresponding hob data structure. NvData Hob can be used to report 
+  the region of the system non volatile data for the specific purpose, 
+  such as FTW region, Error log region.
   
-  It also defines NvDataFv GUID used as the signature of FTW working block header.
+  It also defines NvDataFv GUID. 
+  This guid can be used as FileSystemGuid in EFI_FIRMWARE_VOLUME_HEADER if 
+  this FV image contains NV data, such as NV variable data.
+  This guid can also be used as the signature of FTW working block header.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        

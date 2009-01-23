@@ -1,8 +1,9 @@
 /** @file
   This file defines performance guid for the performance entry in the HOB list, 
-  and define the PEI Performance HOB data structures.
+  and define the PEI Performance HOB data structures. 
+  This hob can be used to store the boot performance data of pei phase.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,17 +31,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   /// Measured token string name 
-  CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];  /// Module string name
-  UINT64                StartTimeStamp;                       /// Start time point
-  UINT64                EndTimeStamp;                         /// End time point
+  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   ///> Measured token string name 
+  CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];  ///> Module string name
+  UINT64                StartTimeStamp;                       ///> Start time point
+  UINT64                EndTimeStamp;                         ///> End time point
 } PEI_PERFORMANCE_LOG_ENTRY;
 
 //
 // The header must be aligned at 8 bytes.
 // 
 typedef struct {
-  UINT32                NumberOfEntries;  /// The number of all performance log entries
+  UINT32                NumberOfEntries;  ///> The number of all performance log entries
   UINT32                Reserved;
 } PEI_PERFORMANCE_LOG_HEADER;
 

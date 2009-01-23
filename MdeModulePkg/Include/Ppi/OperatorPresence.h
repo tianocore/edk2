@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _PEI_OPERATOR_PRESENCE_PPI PEI_OPERATOR_PRESENCE_PPI;
 
 struct _PEI_OPERATOR_PRESENCE_PPI {
-  BOOLEAN                           OperatorPresent; /// TRUE if TPM Operator is detected.
+  BOOLEAN                           OperatorPresent; ///> TRUE if TPM Operator is detected.
 };
 
 extern EFI_GUID                     gPeiOperatorPresencePpiGuid;

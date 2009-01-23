@@ -2,7 +2,7 @@
   This file defines PeCoffLoader guid for PeCoffLoader entry in the HOB list.
   It also defines PE/COFF Loader APIs in PeCoffLoader Hob entry shared between SEC, PEI and DXE
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __PEI_PE_COFF_LOADER_H__
 
 //
-// MdePkg/Include/Common/PeCoffLoaderImageContext.h
+// Depend on PE_COFF_LOADER_IMAGE_CONTEXT structure definition in PeCoff library class.
 //
 #include <Library/PeCoffLib.h>
 
