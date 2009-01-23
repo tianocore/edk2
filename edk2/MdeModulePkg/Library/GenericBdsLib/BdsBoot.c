@@ -411,7 +411,7 @@ BdsExpandPartitionPartialDevicePathToFull (
   //
   BdsLibConnectAllDriversToAllControllers ();
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoHandleCount, &BlockIoBuffer);
-  if (EFI_ERROR (Status) || BlockIoHandleCount == 0) {
+  if (EFI_ERROR (Status) || BlockIoHandleCount == 0 || BlockIoBuffer == NULL) {
     //
     // If there was an error or there are no device handles that support
     // the BLOCK_IO Protocol, then return.
