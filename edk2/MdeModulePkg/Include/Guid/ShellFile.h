@@ -1,5 +1,5 @@
 /** @file
-  This file defines FFS GUID Filename for EFI Shell.
+  This file defines File GUID for EFI Shell.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

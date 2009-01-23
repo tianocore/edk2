@@ -23,9 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _PEI_FLASH_MAP_PPI PEI_FLASH_MAP_PPI;
 
-//
-// Functions
-//
 /**
   Get flash region information.
   
@@ -49,7 +46,6 @@ EFI_STATUS
   OUT UINT32                      *NumEntries,
   OUT EFI_FLASH_SUBAREA_ENTRY     **Entries
   );
-
 
 struct _PEI_FLASH_MAP_PPI {
   PEI_GET_FLASH_AREA_INFO GetAreaInfo;

@@ -1,8 +1,8 @@
 /** @file
   This guid is used to specify the primary console in device.
-  It will be installed into the virtual device handle for ConIn Splitter.
+  It will be installed as the protocol guid into the virtual device handle for ConIn Splitter.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at

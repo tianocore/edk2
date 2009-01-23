@@ -1,5 +1,7 @@
 /** @file
   This file defines variable name and variable GUID for boot state.
+  This variable is to mark if the machine has complete one boot cycle before.
+  After the complete boot, the variable BootState will be set to 1.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
