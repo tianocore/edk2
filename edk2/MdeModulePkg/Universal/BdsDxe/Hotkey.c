@@ -308,7 +308,7 @@ UnregisterHotkey (
                          information for the key that was pressed.
 
   @retval  EFI_SUCCESS   KeyData is successfully processed.
-
+  @return  EFI_NOT_FOUND Fail to find boot option variable.
 **/
 EFI_STATUS
 HotkeyCallback (
@@ -344,6 +344,7 @@ HotkeyCallback (
     //
     // Is this Key Stroke we are waiting for?
     //
+    ASSERT (Hotkey->WaitingKey < (sizeof (Hotkey->KeyData) / sizeof (Hotkey->KeyData[0])));
     HotkeyData = &Hotkey->KeyData[Hotkey->WaitingKey];
     if ((KeyData->Key.ScanCode == HotkeyData->Key.ScanCode) &&
        (KeyData->Key.UnicodeChar == HotkeyData->Key.UnicodeChar) &&
@@ -389,6 +390,9 @@ HotkeyCallback (
 
       UnicodeSPrint (Buffer, sizeof (Buffer), L"Boot%04x", Hotkey->BootOptionNumber);
       BootOption = BdsLibVariableToOption (&BootLists, Buffer);
+      if (BootOption == NULL) {
+        return EFI_NOT_FOUND;
+      }
       BootOption->BootCurrent = Hotkey->BootOptionNumber;
       BdsLibConnectDevicePath (BootOption->DevicePath);
 

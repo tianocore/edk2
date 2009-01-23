@@ -162,6 +162,7 @@ BootThisFile (
   BDS_COMMON_OPTION *Option;
 
   Option = (BDS_COMMON_OPTION *) AllocatePool (sizeof (BDS_COMMON_OPTION));
+  ASSERT (Option != NULL);
   Option->Description     = FileContext->FileName;
   Option->DevicePath      = FileContext->DevicePath;
   Option->LoadOptionsSize = 0;
@@ -236,6 +237,7 @@ UpdateBootDelPage (
   UpdatePageStart (CallbackData);
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, &BootOptionMenu);
 
+  ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.BootOptionDel) / sizeof (CallbackData->BmmFakeNvData.BootOptionDel[0])));
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
     NewLoadContext  = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
@@ -316,7 +318,8 @@ UpdateDrvDelPage (
   UpdatePageStart (CallbackData);
 
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, &DriverOptionMenu);
-
+  
+  ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.DriverOptionDel) / sizeof (CallbackData->BmmFakeNvData.DriverOptionDel[0])));
   for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
     NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
 
@@ -434,6 +437,7 @@ UpdateConsolePage (
 
   UpdatePageStart (CallbackData);
 
+  ASSERT (ConsoleMenu->MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.ConsoleCheck) / sizeof (CallbackData->BmmFakeNvData.ConsoleCheck[0])));
   for (Index = 0; Index < ConsoleMenu->MenuNumber; Index++) {
     NewMenuEntry      = BOpt_GetMenuEntry (ConsoleMenu, Index);
     NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
@@ -518,10 +522,11 @@ UpdateOrderPage (
   ZeroMem (CallbackData->BmmFakeNvData.OptionOrder, 100);
 
   IfrOptionList = AllocateZeroPool (sizeof (IFR_OPTION) * OptionMenu->MenuNumber);
-  if (NULL == IfrOptionList) {
+  if (IfrOptionList == NULL) {
     return ;
   }
-
+  
+  ASSERT (OptionMenu->MenuNumber <= (sizeof (IfrOptionList) / sizeof (IfrOptionList[0])));
   for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (OptionMenu, Index);
     IfrOptionList[Index].StringToken = NewMenuEntry->DisplayStringToken;
@@ -736,12 +741,15 @@ UpdateConModePage (
     if (EFI_ERROR (Status)) {
       continue;
     }
+    
     //
     // Build mode string Column x Row
     //
     UnicodeValueToString (ModeString, 0, Col, 0);
+    ASSERT ((StrLen (ModeString)  + 1) < (sizeof (ModeString) / sizeof (ModeString[0])));
     StrCat (ModeString, L" x ");
     UnicodeValueToString (RowString, 0, Row, 0);
+    ASSERT ((StrLen (ModeString)  + StrLen(RowString)) < (sizeof (ModeString) / sizeof (ModeString[0])));
     StrCat (ModeString, RowString);
 
     HiiLibNewString (CallbackData->BmmHiiHandle, &ModeToken[Index], ModeString);
@@ -1023,7 +1031,11 @@ GetLegacyBootOptionVar (
                   &gEfiGlobalVariableGuid,
                   &OrderSize
                   );
-
+                  
+  if (OrderBuffer == NULL) {
+    return NULL;
+  }
+  
   for (Index = 0; Index < OrderSize / sizeof (UINT16); Index++) {
     UnicodeSPrint (StrTemp, 100, L"Boot%04x", OrderBuffer[Index]);
     OptionBuffer = BdsLibGetVariableAndSize (
@@ -1177,6 +1189,9 @@ UpdateSetLegacyDeviceOrderPage (
     OldData     = CallbackData->BmmOldFakeNVData.LegacyBEV;
     break;
 
+  default:
+    DEBUG ((EFI_D_ERROR, "Invalid command ID for updating page!\n"));
+    return;
   }
 
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, OptionMenu);

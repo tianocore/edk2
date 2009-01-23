@@ -847,7 +847,8 @@ BOpt_FreeLegacyOptions (
 
   @param CallbackData The BMM context data.
 
-  @return The number of the Var Boot####.
+  @return EFI_NOT_FOUND Fail to find "BootOrder" variable.
+  @return EFI_SUCESS    Success build boot option menu.
 
 **/
 EFI_STATUS
@@ -892,7 +893,10 @@ BOpt_GetBootOptions (
                     &gEfiGlobalVariableGuid,
                     &BootOrderListSize
                     );
-
+  if (BootOrderList == NULL) {
+    return EFI_NOT_FOUND;
+  }
+  
   //
   // Get the BootNext from the Var
   //
@@ -1067,7 +1071,7 @@ BOpt_GetBootOptions (
     FreePool (BootOrderList);
   }
   BootOptionMenu.MenuNumber = MenuCount;
-  return MenuCount;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1493,9 +1497,9 @@ BOpt_GetDriverOptionNumber (
 
   @param CallbackData The BMM context data.
 
-  @return EFI_SUCESS The functin completes successfully.
+  @retval EFI_SUCESS           The functin completes successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory to compete the operation.
-  
+  @retval EFI_NOT_FOUND        Fail to get "DriverOrder" variable.
 
 **/
 EFI_STATUS
@@ -1532,7 +1536,10 @@ BOpt_GetDriverOptions (
                       &gEfiGlobalVariableGuid,
                       &DriverOrderListSize
                       );
-
+  if (DriverOrderList == NULL) {
+    return EFI_NOT_FOUND;
+  }
+  
   for (Index = 0; Index < DriverOrderListSize / sizeof (UINT16); Index++) {
     UnicodeSPrint (
       DriverString,

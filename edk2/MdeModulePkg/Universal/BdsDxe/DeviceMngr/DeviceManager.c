@@ -234,7 +234,7 @@ CallDeviceManager (
   // Get all the Hii handles
   //
   Status = HiiLibGetHiiHandles (&HandleBufferLength, &HiiHandles);
-  ASSERT_EFI_ERROR (Status);
+  ASSERT_EFI_ERROR (Status && (HiiHandles != NULL));
 
   HiiHandle = gDeviceManagerPrivate.HiiHandle;
 

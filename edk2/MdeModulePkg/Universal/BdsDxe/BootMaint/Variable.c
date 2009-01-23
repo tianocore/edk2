@@ -437,6 +437,8 @@ Var_UpdateConsoleOption (
         ) {
       Vendor.Header.Type    = MESSAGING_DEVICE_PATH;
       Vendor.Header.SubType = MSG_VENDOR_DP;
+      
+      ASSERT (NewTerminalContext->TerminalType < (sizeof (TerminalTypeGuid) / sizeof (TerminalTypeGuid[0])));
       CopyMem (
         &Vendor.Guid,
         &TerminalTypeGuid[NewTerminalContext->TerminalType],
@@ -977,6 +979,7 @@ Var_UpdateBootOrder (
     FreePool (BootOrderList);
   }
 
+  ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.OptionOrder) / sizeof (CallbackData->BmmFakeNvData.OptionOrder[0])));
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
     NewBootOrderList[Index] = (UINT16) (CallbackData->BmmFakeNvData.OptionOrder[Index] - 1);
   }
@@ -1048,6 +1051,7 @@ Var_UpdateDriverOrder (
     FreePool (DriverOrderList);
   }
 
+  ASSERT (DriverOrderListSize <= (sizeof (CallbackData->BmmFakeNvData.OptionOrder) / sizeof (CallbackData->BmmFakeNvData.OptionOrder[0])));
   for (Index = 0; Index < DriverOrderListSize; Index++) {
     NewDriverOrderList[Index] = (UINT16) (CallbackData->BmmFakeNvData.OptionOrder[Index] - 1);
   }

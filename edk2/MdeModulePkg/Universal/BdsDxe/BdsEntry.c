@@ -138,6 +138,14 @@ BdsBootDeviceSelect (
     //
     UnicodeSPrint (Buffer, sizeof (Buffer), L"Boot%04x", *mBootNext);
     BootOption = BdsLibVariableToOption (&BootLists, Buffer);
+    
+    //
+    // If fail to get boot option from variable, just return and do nothing.
+    //
+    if (BootOption == NULL) {
+      return;
+    }
+    
     BootOption->BootCurrent = *mBootNext;
   }
   //
