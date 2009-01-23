@@ -1170,7 +1170,7 @@ BdsSetMemoryTypeInformationVariable (
              &gEfiMemoryTypeInformationGuid,
              (VOID **) &CurrentMemoryTypeInformation
              );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || CurrentMemoryTypeInformation == NULL) {
     return;
   }
 
