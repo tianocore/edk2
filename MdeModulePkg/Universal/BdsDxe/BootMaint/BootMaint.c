@@ -580,6 +580,7 @@ ApplyChangeHandler (
     break;
 
   case FORM_BOOT_DEL_ID:
+    ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->BootOptionDel) / sizeof (UINT8)));
     for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&BootOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
@@ -590,6 +591,7 @@ ApplyChangeHandler (
     break;
 
   case FORM_DRV_DEL_ID:
+    ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->DriverOptionDel) / sizeof (UINT8)));
     for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
@@ -638,12 +640,16 @@ ApplyChangeHandler (
     NewTerminalContext                = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
 
     NewTerminalContext->BaudRateIndex = CurrentFakeNVMap->COMBaudRate;
+    ASSERT (CurrentFakeNVMap->COMBaudRate < (sizeof (BaudRateList) / sizeof (BaudRateList[0])));
     NewTerminalContext->BaudRate      = BaudRateList[CurrentFakeNVMap->COMBaudRate].Value;
     NewTerminalContext->DataBitsIndex = CurrentFakeNVMap->COMDataRate;
+    ASSERT (CurrentFakeNVMap->COMDataRate < (sizeof (DataBitsList) / sizeof (DataBitsList[0])));
     NewTerminalContext->DataBits      = (UINT8) DataBitsList[CurrentFakeNVMap->COMDataRate].Value;
     NewTerminalContext->StopBitsIndex = CurrentFakeNVMap->COMStopBits;
+    ASSERT (CurrentFakeNVMap->COMStopBits < (sizeof (StopBitsList) / sizeof (StopBitsList[0])));
     NewTerminalContext->StopBits      = (UINT8) StopBitsList[CurrentFakeNVMap->COMStopBits].Value;
     NewTerminalContext->ParityIndex   = CurrentFakeNVMap->COMParity;
+    ASSERT (CurrentFakeNVMap->COMParity < (sizeof (ParityList) / sizeof (ParityList[0])));
     NewTerminalContext->Parity        = (UINT8) ParityList[CurrentFakeNVMap->COMParity].Value;
     NewTerminalContext->TerminalType  = CurrentFakeNVMap->COMTerminalType;
 
@@ -658,6 +664,7 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_IN_ID:
+    ASSERT ((ConsoleInpMenu.MenuNumber + TerminalMenu.MenuNumber) <= (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)));
     for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
@@ -674,6 +681,7 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_OUT_ID:
+    ASSERT ((ConsoleOutMenu.MenuNumber + TerminalMenu.MenuNumber) <= (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)));
     for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
@@ -690,6 +698,7 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_ERR_ID:
+    ASSERT ((ConsoleErrMenu.MenuNumber + TerminalMenu.MenuNumber) <= (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)));
     for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
@@ -752,12 +761,14 @@ DiscardChangeHandler (
     break;
 
   case FORM_BOOT_DEL_ID:
+    ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->BootOptionDel) / sizeof (CurrentFakeNVMap->BootOptionDel[0])));
     for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
       CurrentFakeNVMap->BootOptionDel[Index] = 0x00;
     }
     break;
 
   case FORM_DRV_DEL_ID:
+    ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->DriverOptionDel) / sizeof (CurrentFakeNVMap->DriverOptionDel[0])));
     for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
       CurrentFakeNVMap->DriverOptionDel[Index] = 0x00;
     }

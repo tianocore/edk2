@@ -15,21 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BootMaint.h"
 
 /**
-  Function creates a device path data structure that identically matches the
-  device path passed in.
-
-  @param DevPath         A pointer to a device path data structure.
-
-  @return        The new copy of DevPath is created to identically match the input.
-  @retval  NULL  Otherwise, NULL is returned.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL  *
-DevicePathInstanceDup (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
-  );
-
-/**
   Update Com Ports attributes from DevicePath
 
   @param DevicePath      DevicePath that contains Com ports
@@ -423,7 +408,7 @@ LocateSerialIo (
 
       NewTerminalContext = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
       CopyMem (&NewMenuEntry->OptionNumber, &Acpi->UID, sizeof (UINT32));
-      NewTerminalContext->DevicePath = DevicePathInstanceDup (DevicePath);
+      NewTerminalContext->DevicePath = DuplicateDevicePath (DevicePath);
       //
       // BugBug: I have no choice, calling EfiLibStrFromDatahub will hang the system!
       // coz' the misc data for each platform is not correct, actually it's the device path stored in
@@ -547,7 +532,6 @@ LocateSerialIo (
 /**
   Update Com Ports attributes from DevicePath
 
-
   @param DevicePath      DevicePath that contains Com ports
 
   @retval EFI_SUCCESS   The update is successful.
@@ -666,54 +650,6 @@ UpdateComAttributeFromVariable (
 }
 
 /**
-  Function creates a device path data structure that identically matches the
-  device path passed in.
-
-
-  @param DevPath         A pointer to a device path data structure.
-
-  @return        The new copy of DevPath is created to identically match the input.
-  @retval  NULL  Otherwise, NULL is returned.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-DevicePathInstanceDup (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL  *NewDevPath;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePathInst;
-  EFI_DEVICE_PATH_PROTOCOL  *Temp;
-  UINT8                     *Ptr;
-  UINTN                     Size;
-
-  //
-  // get the size of an instance from the input
-  //
-  Temp            = DevPath;
-  DevicePathInst  = GetNextDevicePathInstance (&Temp, &Size);
-
-  //
-  // Make a copy and set proper end type
-  //
-  NewDevPath = NULL;
-  if (Size != 0) {
-    NewDevPath = AllocateZeroPool (Size);
-    ASSERT (NewDevPath != NULL);
-  }
-
-  if (NewDevPath != NULL) {
-    CopyMem (NewDevPath, DevicePathInst, Size);
-    Ptr = (UINT8 *) NewDevPath;
-    Ptr += Size - sizeof (EFI_DEVICE_PATH_PROTOCOL);
-    Temp = (EFI_DEVICE_PATH_PROTOCOL *) Ptr;
-    SetDevicePathEndNode (Temp);
-  }
-
-  return NewDevPath;
-}
-
-/**
   Build up Console Menu based on types passed in. The type can
   be BM_CONSOLE_IN_CONTEXT_SELECT, BM_CONSOLE_OUT_CONTEXT_SELECT
   and BM_CONSOLE_ERR_CONTEXT_SELECT.
@@ -818,7 +754,7 @@ GetConsoleMenu (
     NewConsoleContext             = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
     NewMenuEntry->OptionNumber    = Index2;
 
-    NewConsoleContext->DevicePath = DevicePathInstanceDup (DevicePathInst);
+    NewConsoleContext->DevicePath = DuplicateDevicePath (DevicePathInst);
     NewMenuEntry->DisplayString   = EfiLibStrFromDatahub (NewConsoleContext->DevicePath);
     if (NULL == NewMenuEntry->DisplayString) {
       NewMenuEntry->DisplayString = DevicePathToStr (NewConsoleContext->DevicePath);

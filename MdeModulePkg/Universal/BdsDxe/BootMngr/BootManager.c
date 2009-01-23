@@ -230,6 +230,7 @@ CallBootManager (
     TempStr = DevicePathToStr (Option->DevicePath);
     TempSize = StrSize (TempStr);
     HelpString = AllocateZeroPool (TempSize + StrSize (L"Device Path : "));
+    ASSERT (HelpString != NULL);
     StrCat (HelpString, L"Device Path : ");
     StrCat (HelpString, TempStr);
 

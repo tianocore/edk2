@@ -86,7 +86,7 @@ PlatformBdsShowProgress (
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
     SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+  } else if (UgaDraw != NULL) {
     Status = UgaDraw->GetMode (
                         UgaDraw,
                         &SizeOfX,
