@@ -53,8 +53,6 @@
 [Guids]
   gEfiSystemNvDataHobGuid                       # ALWAYS_CONSUMED
   gEfiFirmwareFileSystemGuid                    # ALWAYS_CONSUMED
-  gEfiFlashMapHobGuid                           # ALWAYS_CONSUMED
-
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
@@ -62,8 +60,6 @@
 
 [Ppis]
   gUnixFwhPpiGuid                               # PPI ALWAYS_CONSUMED
-  gPeiFlashMapPpiGuid                           # PPI ALWAYS_PRODUCED
-
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
