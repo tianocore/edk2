@@ -102,8 +102,8 @@ UefiPalLibConstructor (
              &gEfiSalSystemTableGuid,
              (VOID **) &SalSystemTable
              );
-
   ASSERT_EFI_ERROR (Status);
+  ASSERT (SalSystemTable != NULL);
 
   //
   // Check the first entry of SAL System Table,
