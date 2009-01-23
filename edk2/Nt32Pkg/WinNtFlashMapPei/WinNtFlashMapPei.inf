@@ -56,8 +56,6 @@
 
 [Ppis]
   gNtFwhPpiGuid                                 # PPI ALWAYS_CONSUMED
-  gPeiFlashMapPpiGuid                           # PPI ALWAYS_PRODUCED
-
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
