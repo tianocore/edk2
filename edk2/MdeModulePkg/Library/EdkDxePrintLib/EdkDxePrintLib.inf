@@ -41,5 +41,5 @@
 
 
 [Protocols]
-  gEfiPrint2ProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiPrint2ProtocolGuid                         ## CONSUMES
 

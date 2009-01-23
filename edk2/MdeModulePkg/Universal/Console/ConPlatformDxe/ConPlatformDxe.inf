@@ -1,5 +1,6 @@
 #/** @file
-# Console Platfrom DXE Driver, install Console protocols and updates environment variables.
+# Console Platfrom DXE Driver that specifies whether device can be used as console
+# input/output device or error output device and update global variables accordingly.
 #
 # Copyright (c) 2006 - 2008, Intel Corporation
 #
@@ -54,14 +55,37 @@
   DebugLib
 
 [Guids]
-  gEfiGlobalVariableGuid                        ## SOMETIMES_CONSUMES ## Variable:L"ErrOut"
-  gEfiStandardErrorDeviceGuid
-  gEfiConsoleOutDeviceGuid
-  gEfiConsoleInDeviceGuid
+  ##
+  # This is the VendorGuid of all architecturally defined variables in UEFI spec.
+  #
+  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConIn"
+  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConOut"
+  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ErrOut"
+  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConInDev"
+  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ConOutDev"
+  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable:L"ErrOutDev"
+  ##
+  # This GUID is used to specify the device is the standard error device.
+  # If the device is a standard error device, this GUID as the protocol GUID will be installed
+  # onto this device handle.
+  #
+  gEfiStandardErrorDeviceGuid                   ## PROTOCOL
+  ##
+  # This GUID is used to specify the device is the console output device.
+  # If the device is a console output device, this GUID as the protocol GUID will be installed
+  # onto this device handle.
+  #
+  gEfiConsoleOutDeviceGuid                      ## PROTOCOL
+  ##
+  # This GUID is used to specify the device is the console input device.
+  # If the device is a console input device, this GUID as the protocol GUID will be installed
+  # onto this device handle.
+  #
+  gEfiConsoleInDeviceGuid                       ## PROTOCOL
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSimpleTextInProtocolGuid                  ## TO_START
   gEfiSimpleTextOutProtocolGuid                 ## TO_START
-  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES
+  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES (Used to check if it's a hot-plug device)
   

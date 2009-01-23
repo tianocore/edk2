@@ -42,7 +42,7 @@
   DebugLib
 
 [Protocols]
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+  gEfiGenericMemTestProtocolGuid                ## PRODUCES
 
 [Depex]
   TRUE

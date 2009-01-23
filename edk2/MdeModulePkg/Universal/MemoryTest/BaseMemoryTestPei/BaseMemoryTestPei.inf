@@ -1,5 +1,5 @@
 #/** @file
-#  This PEIM provides memory test PPI for memory test in PEI Phase.
+#  This PEIM provides Base Memory Test PPI for memory test in PEI Phase.
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
@@ -41,7 +41,7 @@
   PeiServicesLib
 
 [Ppis]
-  gPeiBaseMemoryTestPpiGuid                     # PPI ALWAYS_PRODUCED
+  gPeiBaseMemoryTestPpiGuid                     ## PRODUCES
 
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted
