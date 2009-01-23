@@ -38,4 +38,5 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  BaseMemoryLib
 
