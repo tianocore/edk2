@@ -73,14 +73,13 @@
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   PlatformBdsLib|MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
-  GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   PlatformBdsLib|MdeModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
-  GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   PlatDriOverLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
   OemHookStatusCodeLib|IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-
+  GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  
 [LibraryClasses.IA32]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
@@ -281,7 +280,6 @@
   MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
   MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
   MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
-  MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
@@ -290,7 +288,6 @@
   MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   MdeModulePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
 
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
