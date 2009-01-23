@@ -14,11 +14,10 @@
 
 
 #include <Base.h>
-
-
 #include <Library/BaseLib.h>
-#include <Library/UefiDecompressLib.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiDecompressLib.h>
 
 #include "BaseUefiDecompressLibInternals.h"
 
@@ -142,7 +141,7 @@ MakeTable (
   UINT16  Start[18];
   UINT16  *Pointer;
   UINT16  Index3;
-  volatile UINT16  Index;
+  UINT16  Index;
   UINT16  Len;
   UINT16  Char;
   UINT16  JuBits;
@@ -192,8 +191,8 @@ MakeTable (
 
   if (Index != 0) {
     Index3 = (UINT16) (1U << TableBits);
-    while (Index != Index3) {
-      Table[Index++] = 0;
+    if (Index < Index3) {
+      SetMem16 (Table + Index, (Index3 - Index) * sizeof (*Table), 0);
     }
   }
 
@@ -322,7 +321,7 @@ ReadPTLen (
 {
   UINT16  Number;
   UINT16  CharC;
-  volatile UINT16  Index;
+  UINT16  Index;
   UINT32  Mask;
 
   //
@@ -340,9 +339,7 @@ ReadPTLen (
       Sd->mPTTable[Index] = CharC;
     }
 
-    for (Index = 0; Index < nn; Index++) {
-      Sd->mPTLen[Index] = 0;
-    }
+    SetMem (Sd->mPTLen, nn, 0);
 
     return 0;
   }
@@ -407,7 +404,7 @@ ReadCLen (
 {
   UINT16           Number;
   UINT16           CharC;
-  volatile UINT16  Index;
+  UINT16           Index;
   UINT32           Mask;
 
   Number = (UINT16) GetBits (Sd, CBIT);
@@ -418,9 +415,7 @@ ReadCLen (
     //
     CharC = (UINT16) GetBits (Sd, CBIT);
 
-    for (Index = 0; Index < NC; Index++) {
-      Sd->mCLen[Index] = 0;
-    }
+    SetMem (Sd->mCLen, NC, 0);
 
     for (Index = 0; Index < 4096; Index++) {
       Sd->mCTable[Index] = CharC;
@@ -473,9 +468,7 @@ ReadCLen (
     }
   }
 
-  while (Index < NC) {
-    Sd->mCLen[Index++] = 0;
-  }
+  SetMem (Sd->mCLen + Index, NC - Index, 0);
 
   MakeTable (Sd, NC, Sd->mCLen, 12, Sd->mCTable);
 
@@ -743,7 +736,6 @@ UefiDecompress (
   IN OUT VOID    *Scratch  OPTIONAL
   )
 {
-  volatile UINT32  Index;
   UINT32           CompSize;
   UINT32           OrigSize;
   SCRATCH_DATA     *Sd;
@@ -770,10 +762,8 @@ UefiDecompress (
   }
 
   Src = Src + 8;
+  SetMem (Sd, sizeof (SCRATCH_DATA), 0);
 
-  for (Index = 0; Index < sizeof (SCRATCH_DATA); Index++) {
-    ((UINT8 *) Sd)[Index] = 0;
-  }
   //
   // The length of the field 'Position Set Code Length Array Size' in Block Header.
   // For UEFI 2.0 de/compression algorithm(Version 1), mPBit = 4
