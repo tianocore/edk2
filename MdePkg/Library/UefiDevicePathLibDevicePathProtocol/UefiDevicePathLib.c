@@ -82,7 +82,7 @@ GetDevicePathSize (
 }
 
 /**
-  Creates a new device path by appending a second device path to a first device path.
+  Creates a new copy of an existing device path.
 
   This function allocates space for a new copy of the device path specified by DevicePath.  If
   DevicePath is NULL, then NULL is returned.  If the memory is successfully allocated, then the
