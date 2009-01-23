@@ -1,5 +1,9 @@
 #/** @file
-# Instance of Platform Driver Override Library.
+# Instance of Platform Driver Override Library to manage driver overriding relationship.
+#
+# This library instance provides functions to manage the database of overriding relationship
+# between controllers and drivers. Each entry of the database contains the mapping that Controller
+# Device Path to a set of Driver Device Paths. The database is stored in non-volatile variables.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.
 #
@@ -49,12 +53,15 @@
   PrintLib
 
 [Guids]
-  gEfiOverrideVariableGuid                      # ALWAYS_CONSUMED
+  ##
+  # There could be more than one variables, from PlatDriOver, PlatDriOver1, PlatDriOver2,...
+  #
+  gEfiOverrideVariableGuid                      ## CONSUMES ## Variable:L"PlatDriOver"
 
 [Protocols]
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
-  gEfiDriverBindingProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadedImageDevicePathProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## CONSUMES
+  gEfiBusSpecificDriverOverrideProtocolGuid     ## CONSUMES
+  gEfiDriverBindingProtocolGuid                 ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid         ## CONSUMES

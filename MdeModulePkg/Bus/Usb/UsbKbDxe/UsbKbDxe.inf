@@ -2,6 +2,17 @@
 # USB Keyboard Driver that manages USB keyboard and produces Simple Text Input
 # Protocol and Simple Text Input Ex Protocol.
 #
+# USB Keyboard Driver consumes USB I/O Protocol and Device Path Protocol, and produces
+# Simple Text Input Protocol and Simple Text Input Ex Protocol on USB keyboard devices.
+# It initializes the keyboard layout according to info retrieved from HII database.
+# If HII cannot provide the info, this module uses its carried default one if PCD allows.
+# It manages the USB keyboard device via Asynchronous Interrupt Transfer of USB I/O Protocol,
+# and parses the data according to USB HID documents.
+# This module refers to following specifications:
+# 1. Universal Serial Bus HID Firmware Specification, ver 1.11
+# 2. Universal Serial Bus HID Usage Tables, ver 1.12
+# 3. UEFI Specification, v2.1
+#
 # Copyright (c) 2006 - 2008, Intel Corporation. 
 #
 #  All rights reserved. This program and the accompanying materials
@@ -21,7 +32,6 @@
   FILE_GUID                      = 2D2E62CF-9ECF-43b7-8219-94E7FC713DFE
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-
   ENTRY_POINT                    = USBKeyboardDriverBindingEntryPoint
 
 #
@@ -45,7 +55,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
 [LibraryClasses]
   MemoryAllocationLib
   UefiLib
@@ -57,19 +66,32 @@
   DebugLib
   PcdLib
   UefiUsbLib
-  BaseLib
+
+[Guids]
+  ##
+  # Event registered to EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID group,
+  # which will be triggered by EFI_HII_DATABASE_PROTOCOL.SetKeyboardLayout().
+  #
+  gEfiHiiKeyBoardLayoutGuid                     ## SOMETIME_CONSUMES  ## Event
 
 [Protocols]
-  gEfiUsbIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
-  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL TO_START
-  gSimpleTextInExNotifyGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiHotPlugDeviceGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiUsbIoProtocolGuid                         ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiHotPlugDeviceGuid                         ## BY_START
+  ##
+  # If HII Database Protocol exists, then keyboard layout from HII database is used.
+  # Otherwise, USB keyboard module tries to use its carried default layout.
+  #
+  gEfiHiiDatabaseProtocolGuid                   ## SOMETIMES_CONSUMES (Default value is used if it's absent.)
+  ##
+  # SimpleTextInExNotify is installed on the handle created by EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.RegisterKeyNotify().
+  #
+  gSimpleTextInExNotifyGuid                     ## PRODUCES
   
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver ## SOMETIME_CONSUMES (Checked when no layout is provided by HII.)
   
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable
@@ -80,3 +102,24 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardSelfTest
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInterfaceError
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError
+  
+
+# [Event]
+#   ##
+#   # Periodic timer event for generation of repeat key
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+#   ##
+#   # Periodic timer event for delayed recovery, which deals with device error.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+#   ##
+#   # Event for EFI_SIMPLE_TEXT_INPUT_PROTOCOL.WaitForKey
+#   #
+#   EVENT_TYPE_NOTIFY_WAIT                      ## PRODUCES
+#   ##
+#   # Event for EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.WaitForKeyEx
+#   #
+#   EVENT_TYPE_NOTIFY_WAIT                      ## PRODUCES
+#
+#

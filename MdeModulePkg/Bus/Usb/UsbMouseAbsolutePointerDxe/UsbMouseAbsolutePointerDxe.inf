@@ -1,6 +1,14 @@
 #/** @file
 # USB Mouse Driver that manages USB mouse and produces Absolute Pointer Protocol.
 #
+# USB Mouse Driver consumes USB I/O Protocol and Device Path Protocol, and produces
+# Absolute Pointer Protocol on USB mouse devices.
+# It manages the USB mouse device via Asynchronous Interrupt Transfer of USB I/O Protocol,
+# and parses the data according to USB HID Specification.
+# This module refers to following specifications:
+# 1. Universal Serial Bus HID Firmware Specification, ver 1.11
+# 2. UEFI Specification, v2.1
+#
 # Copyright (c) 2006 - 2008, Intel Corporation. 
 #
 #  All rights reserved. This program and the accompanying materials
@@ -20,7 +28,6 @@
   FILE_GUID                      = 4EA43463-747C-46eb-97FB-B0E5C5F05306
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-
   ENTRY_POINT                    = USBMouseAbsolutePointerDriverBindingEntryPoint
 
 #
@@ -53,9 +60,9 @@
   UefiUsbLib
 
 [Protocols]
-  gEfiUsbIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiAbsolutePointerProtocolGuid               # PROTOCOL BY_START
+  gEfiUsbIoProtocolGuid                         ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiAbsolutePointerProtocolGuid               ## BY_START
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError
@@ -64,4 +71,15 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset
 
+# [Event]
+#   ##
+#   # Periodic timer event for delayed recovery, which deals with device error.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+#   ##
+#   # Event for EFI_ABSOLUTE_POINTER_PROTOCOL.WaitForInput
+#   #
+#   EVENT_TYPE_NOTIFY_WAIT                      ## PRODUCES
+#
+#
 

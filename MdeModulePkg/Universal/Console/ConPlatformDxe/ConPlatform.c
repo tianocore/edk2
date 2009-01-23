@@ -317,7 +317,7 @@ ConPlatformTextInDriverBindingStart (
   Device GUID on ControllerHandle.
 
   If this devcie is not one hot-plug devce, append its device path into the 
-  console environment variables ConOutDev, StdErrDev.
+  console environment variables ConOutDev, ErrOutDev.
   
   @param  This                 Protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to
@@ -374,7 +374,7 @@ ConPlatformTextOutDriverBindingStart (
   }
   //
   // Check the device handle, if it is a hot plug device,
-  // do not put the device path into ConOutDev and StdErrDev,
+  // do not put the device path into ConOutDev and ErrOutDev,
   // and install gEfiConsoleOutDeviceGuid to the device handle directly.
   // The policy is, make hot plug device plug in and play immediately.
   //
@@ -396,7 +396,7 @@ ConPlatformTextOutDriverBindingStart (
       APPEND
       );
     //
-    // Then append the device path to the StdErrDev environment variable
+    // Then append the device path to the ErrOutDev environment variable
     //
     ConPlatformUpdateDeviceVariable (
       L"ErrOutDev",
@@ -424,7 +424,7 @@ ConPlatformTextOutDriverBindingStart (
                       );
     }
     //
-    // If the device path is successfully added to the StdErr environment variable,
+    // If the device path is successfully added to the ErrOut environment variable,
     // then install EfiStandardErrorDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
@@ -557,7 +557,7 @@ ConPlatformTextOutDriverBindingStop (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   //
-  // If it is not a hot-plug device, first delete it from the ConOutDev and StdErrDev variable.
+  // If it is not a hot-plug device, first delete it from the ConOutDev and ErrOutDev variable.
   //
   if (!IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     //
@@ -573,7 +573,7 @@ ConPlatformTextOutDriverBindingStop (
                     );
     if (!EFI_ERROR (Status)) {
       //
-      // Remove DevicePath from ConOutDev, and StdErrDev
+      // Remove DevicePath from ConOutDev, and ErrOutDev
       //
       ConPlatformUpdateDeviceVariable (
         L"ConOutDev",
@@ -655,7 +655,7 @@ ConPlatformUnInstallProtocol (
 }
 
 /**
-  Get the necessary size of buffer and read the variabe.
+  Get the necessary size of buffer and read the variable.
 
   First get the necessary size of buffer. Then read the
   EFI variable (Name) and return a dynamically allocated
@@ -824,7 +824,7 @@ ConPlatformMatchDevicePaths (
   Update console environment variables. 
 
   @param  VariableName    Console environment variables, ConOutDev, ConInDev
-                          StdErrDev, ConIn or ConOut.
+                          ErrOutDev, ConIn ,ConOut or ErrOut.
   @param  DevicePath      Console devcie's device path.
   @param  Operation       Variable operations, including APPEND, CHECK and DELETE.
 

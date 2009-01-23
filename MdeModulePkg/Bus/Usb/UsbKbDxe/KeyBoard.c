@@ -286,8 +286,6 @@ UINT8 ModifierValueToEfiScanCodeConvertionTable[] = {
   SCAN_F12,        // EFI_FUNCTION_KEY_TWELVE_MODIFIER
 };
 
-EFI_GUID  mKeyboardLayoutEventGuid = EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID;
-
 /**
   Initialize Key Convertion Table by using default keyboard layout.
 
@@ -719,7 +717,7 @@ InitKeyboardLayout (
                   TPL_NOTIFY,
                   SetKeyboardLayoutEvent,
                   UsbKeyboardDevice,
-                  &mKeyboardLayoutEventGuid,
+                  &gEfiHiiKeyBoardLayoutGuid,
                   &UsbKeyboardDevice->KeyboardLayoutEvent
                   );
   if (EFI_ERROR (Status)) {
