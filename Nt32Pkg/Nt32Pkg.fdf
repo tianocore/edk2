@@ -185,7 +185,7 @@ INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
 INF  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
-INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
 INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
 INF  Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
