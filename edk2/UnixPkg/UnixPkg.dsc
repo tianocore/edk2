@@ -66,7 +66,7 @@
   RecoveryLib|MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
   IfrSupportLib|MdeModulePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
   ExtendedIfrSupportLib|MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
-  GenericBdsLib|MdeModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   PlatformBdsLib|UnixPkg/Library/UnixBdsLib/PlatformBds.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
@@ -453,7 +453,7 @@
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
