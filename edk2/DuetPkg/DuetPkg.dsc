@@ -136,7 +136,7 @@
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   }
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   DuetPkg/CpuIoDxe/CpuIo.inf
   DuetPkg/CpuDxe/Cpu.inf
   IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
