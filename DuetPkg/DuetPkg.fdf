@@ -82,7 +82,7 @@ INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 
 INF  DuetPkg/DataHubGenDxe/DataHubGen.inf
 #INF  DuetPkg/FvbRuntimeService/DUETFwh.inf
-INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  DuetPkg/CpuIoDxe/CpuIo.inf
 INF  DuetPkg/CpuDxe/Cpu.inf
   
