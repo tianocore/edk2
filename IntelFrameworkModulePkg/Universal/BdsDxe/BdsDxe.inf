@@ -1,0 +1,164 @@
+#/** @file
+#
+#  BDSDxe module is core driver for BDS phase. 
+#  When DxeCore dispatching all DXE driver, this module will produce architecture protocol 
+#  gEfiBdsArchProtocolGuid. After DxeCore finish dispatching, DxeCore will invoke Entry
+#  interface of protocol gEfiBdsArchProtocolGuid, then BDS phase is entered.
+#
+#  Generally, this module take reposiblity to connect all necessary devices for platform boot, 
+#  these boot device path  are hold in PlatformBdsLib library instance produced by platform.
+#  For legacy boot, BDS will transfer control to legacy BIOS after legacy boot device is select.
+#  For EFI boot, BDS will load boot loader file EFI\BOOT\BOOTIA32.EFI, EFI\BOOT\BOOTX64.EFI, 
+#  EFI\BOOT\BOOTIA64.EFI file from selected boot device and transfer control to boot loader.
+#
+#  BDSDxe also maintain the UI for "Boot Manager, Boot Maintaince Manager, Device Manager" which
+#  is used for user to configure boot option or maintain hardware device.
+#  
+#  Copyright (c) 2008, Intel Corporation. <BR>
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BdsDxe
+  FILE_GUID                      = FC5C7020-1A48-4198-9BE2-EAD5ABC8CF2F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0 
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+  ENTRY_POINT                    = BdsInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  FrontPage.h
+  Language.h
+  Bds.h
+  Hotkey.h
+  BootMaint/BBSsupport.h
+  BootMngr/BootManager.h
+  BootMaint/BootMaint.h
+  String.h
+  BootMaint/FormGuid.h
+  HwErrRecSupport.c
+  HwErrRecSupport.h
+
+  DeviceMngr/DeviceManager.h
+  DeviceMngr/DeviceManagerVfr.Vfr
+  DeviceMngr/DeviceManagerStrings.uni
+  DeviceMngr/DeviceManager.c
+  BootMngr/BootManagerVfr.Vfr
+  BootMngr/BootManagerStrings.uni
+  BootMngr/BootManager.c
+  BootMaint/FE.vfr
+  BootMaint/FileExplorer.c
+  BootMaint/BootMaint.c
+  BootMaint/BBSsupport.c
+  BootMaint/UpdatePage.c
+  BootMaint/Variable.c
+  BootMaint/Data.c
+  BootMaint/ConsoleOption.c
+  BootMaint/BootOption.c
+  BootMaint/BmLib.c
+  BootMaint/Bm.vfr
+  BootMaint/Bmstring.uni
+  Hotkey.c
+  MemoryTest.c
+  Capsules.c
+  Strings.uni
+  String.c
+  Language.c
+  FrontPageVfr.Vfr
+  FrontPageStrings.uni
+  FrontPage.c
+  BdsEntry.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  #
+  #This dependency is because of gEfiLegacyBiosProtocolGuid and gEfiDataHubProtocolGuid. It may be removed if a Library class is created to
+  #abstract away definition in Framework specification or PI spec incorporates the Legacy Booting Protocols and Data Hub Protocols.
+  #
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+
+[LibraryClasses]
+  DevicePathLib
+  BaseLib
+  HobLib
+  UefiRuntimeServicesTableLib
+  IfrSupportLib
+  ExtendedIfrSupportLib
+  GenericBdsLib
+  ReportStatusCodeLib
+  PerformanceLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  HiiLib
+  ExtendedHiiLib
+  UefiDriverEntryPoint
+  PlatformBdsLib
+  CapsuleLib
+
+[Guids]
+  gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
+  gEfiBootStateGuid                             # ALWAYS_CONSUMED
+  gEfiFileSystemVolumeLabelInfoIdGuid           # ALWAYS_CONSUMED
+  gEfiFileInfoGuid                              # ALWAYS_CONSUMED
+  gEfiGenericPlatformVariableGuid
+  gEfiMiscSubClassGuid
+  gEfiMemorySubClassGuid
+  gEfiProcessorSubClassGuid
+  gEfiCapsuleVendorGuid
+
+[Protocols]
+  gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
+  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+
+[FeaturePcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHardwareErrorRecord
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+
+[Pcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid
+
