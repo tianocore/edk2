@@ -221,7 +221,7 @@ MakeTable (
       Index   = (UINT16) (Len - TableBits);
 
       while (Index != 0) {
-        if (*Pointer == 0) {
+        if (*Pointer == 0 && Avail < (2 * NC - 1)) {
           Sd->mRight[Avail] = Sd->mLeft[Avail] = 0;
           *Pointer = Avail++;
         }
@@ -375,7 +375,7 @@ ReadPTLen (
     //
     if (Index == Special) {
       CharC = (UINT16) GetBits (Sd, 2);
-      while ((INT16) (--CharC) >= 0) {
+      while ((INT16) (--CharC) >= 0 && Index < NPT) {
         Sd->mPTLen[Index++] = 0;
       }
     }
@@ -457,7 +457,7 @@ ReadCLen (
         CharC = (UINT16) (GetBits (Sd, CBIT) + 20);
       }
 
-      while ((INT16) (--CharC) >= 0) {
+      while ((INT16) (--CharC) >= 0 && Index < NC) {
         Sd->mCLen[Index++] = 0;
       }
 
