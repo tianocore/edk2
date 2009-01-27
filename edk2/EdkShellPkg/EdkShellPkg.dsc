@@ -28,7 +28,7 @@
 # Change the macro to the directory containing the source code from EDK Shell Project.  
 # This is a workspace relative directory
 #  
-DEFINE EDK_SHELL_DIR             = EdkShellPkg/Shell
+DEFINE EDK_SHELL_DIR             = Shell
 
 [Libraries]
   #
