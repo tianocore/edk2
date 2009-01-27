@@ -25,9 +25,10 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 # 
-# Change the macro to the directory containing the source code from EDK Shell Project.
+# Change the macro to the directory containing the source code from EDK Shell Project.  
+# This is a workspace relative directory
 #  
-DEFINE EDK_SHELL_DIR             = Shell
+DEFINE EDK_SHELL_DIR             = EdkShellPkg/Shell
 
 [Libraries]
   #
