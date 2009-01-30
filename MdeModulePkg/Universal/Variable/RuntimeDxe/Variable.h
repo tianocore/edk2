@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
+#include <Library/SynchronizationLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Guid/VariableInfo.h>
 #include <Guid/GlobalVariable.h>
