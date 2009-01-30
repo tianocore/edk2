@@ -1,5 +1,5 @@
 /** @file
-  Declaration of internal functions in BaseLib.
+  Declaration of internal functions in BaseSynchronizationLib.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef __BASE_LIB_INTERNALS__
-#define __BASE_LIB_INTERNALS__
+#ifndef __BASE_SYNCHRONIZATION_LIB_INTERNALS__
+#define __BASE_SYNCHRONIZATION_LIB_INTERNALS__
 
 #include <Base.h>
 #include <Library/SynchronizationLib.h>
