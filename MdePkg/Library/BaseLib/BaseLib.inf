@@ -134,10 +134,6 @@
   Ia32/LRotU64.c | MSFT 
   Ia32/LongJump.c | MSFT 
   Ia32/Invd.c | MSFT 
-  Ia32/InterlockedCompareExchange64.c | MSFT 
-  Ia32/InterlockedCompareExchange32.c | MSFT 
-  Ia32/InterlockedDecrement.c | MSFT 
-  Ia32/InterlockedIncrement.c | MSFT 
   Ia32/FxRestore.c | MSFT 
   Ia32/FxSave.c | MSFT 
   Ia32/FlushCacheLine.c | MSFT 
@@ -158,7 +154,6 @@
   Ia32/EnablePaging64.asm | MSFT
   Ia32/EnableCache.c | MSFT
   Ia32/DisableCache.c | MSFT
-  SynchronizationMsc.c  | MSFT
 
   Ia32/Wbinvd.asm | INTEL 
   Ia32/WriteMm7.asm | INTEL 
@@ -232,10 +227,6 @@
   Ia32/LRotU64.asm | INTEL 
   Ia32/LongJump.asm | INTEL 
   Ia32/Invd.asm | INTEL 
-  Ia32/InterlockedCompareExchange64.asm | INTEL 
-  Ia32/InterlockedCompareExchange32.asm | INTEL 
-  Ia32/InterlockedDecrement.asm | INTEL 
-  Ia32/InterlockedIncrement.asm | INTEL 
   Ia32/FxRestore.asm | INTEL 
   Ia32/FxSave.asm | INTEL 
   Ia32/FlushCacheLine.asm | INTEL 
@@ -256,7 +247,6 @@
   Ia32/EnablePaging64.asm | INTEL
   Ia32/EnableCache.asm | INTEL
   Ia32/DisableCache.asm | INTEL
-  Synchronization.c | INTEL
 
   Ia32/Thunk16.S | GCC 
   Ia32/CpuBreakpoint.S | GCC 
@@ -264,10 +254,6 @@
   Ia32/EnableDisableInterrupts.S | GCC 
   Ia32/DisableInterrupts.S | GCC 
   Ia32/EnableInterrupts.S | GCC 
-  Ia32/InterlockedCompareExchange64.S | GCC 
-  Ia32/InterlockedCompareExchange32.S | GCC 
-  Ia32/InterlockedDecrement.S | GCC 
-  Ia32/InterlockedIncrement.S | GCC 
   Ia32/FlushCacheLine.S | GCC 
   Ia32/Invd.S | GCC 
   Ia32/Wbinvd.S | GCC 
@@ -354,7 +340,6 @@
   Ia32/LShiftU64.S | GCC 
   Ia32/EnableCache.S | GCC
   Ia32/DisableCache.S | GCC
-  SynchronizationGcc.c  | GCC
 
   Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c
@@ -451,24 +436,16 @@
   X64/LongJump.asm
   X64/SetJump.asm
   X64/SwitchStack.asm
-  X64/InterlockedCompareExchange64.asm 
-  X64/InterlockedCompareExchange32.asm 
   X64/EnableCache.asm
   X64/DisableCache.asm
 
-  X64/InterlockedDecrement.c | MSFT 
-  X64/InterlockedIncrement.c | MSFT 
   X64/CpuBreakpoint.c | MSFT 
   X64/WriteMsr64.c | MSFT 
   X64/ReadMsr64.c | MSFT 
-  SynchronizationMsc.c | MSFT 
 
-  X64/InterlockedDecrement.asm | INTEL 
-  X64/InterlockedIncrement.asm | INTEL 
   X64/CpuBreakpoint.asm | INTEL 
   X64/WriteMsr64.asm | INTEL 
   X64/ReadMsr64.asm | INTEL 
-  Synchronization.c | INTEL 
 
   X64/Non-existing.c
   Math64.c
@@ -553,10 +530,6 @@
   X64/Monitor.S | GCC 
   X64/LongJump.S | GCC 
   X64/Invd.S | GCC 
-  X64/InterlockedIncrement.S | GCC 
-  X64/InterlockedDecrement.S | GCC 
-  X64/InterlockedCompareExchange64.S | GCC 
-  X64/InterlockedCompareExchange32.S | GCC 
   X64/FxSave.S | GCC 
   X64/FxRestore.S | GCC 
   X64/FlushCacheLine.S | GCC 
@@ -569,7 +542,6 @@
   X64/CpuId.S | GCC 
   X64/CpuIdEx.S | GCC 
   X64/CpuBreakpoint.S | GCC 
-  SynchronizationGcc.c  | GCC 
   X64/EnableCache.S | GCC
   X64/DisableCache.S | GCC
   ChkStkGcc.c  | GCC 
@@ -592,9 +564,6 @@
   Ipf/InternalSwitchStack.c
   Ipf/GetInterruptState.s
   Ipf/CpuPause.s
-  Ipf/Synchronization.c
-  Ipf/InterlockedCompareExchange64.s
-  Ipf/InterlockedCompareExchange32.s
   Ipf/CpuBreakpoint.c    | INTEL
   Ipf/CpuBreakpointMsc.c | MSFT
   Ipf/AsmCpuMisc.s       | GCC
@@ -607,13 +576,8 @@
   Ipf/Ia64gen.h
   Ipf/Asm.h
   Math64.c
-  Synchronization.c     | INTEL 
-  SynchronizationMsc.c  | MSFT 
-  SynchronizationGcc.c  | GCC 
 
 [Sources.EBC]
-  Synchronization.c
-  Ebc/Synchronization.c
   Ebc/CpuBreakpoint.c
   Ebc/SetJumpLongJump.c
   Ebc/SwitchStack.c
@@ -623,16 +587,12 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-
 [LibraryClasses]
   PcdLib
-  TimerLib
   DebugLib
   BaseMemoryLib
 
-
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength

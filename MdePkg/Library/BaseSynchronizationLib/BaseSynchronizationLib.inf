@@ -1,0 +1,88 @@
+#/** @file
+#  Base Synchronization Library implementation.
+#
+#  Copyright (c) 2007 - 2008, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseSynchronizationLib
+  FILE_GUID                      = FC9990DF-C5FF-44cf-8799-CBB45B577F87
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SynchronizationLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.Ia32]
+  Ia32/InterlockedCompareExchange64.c | MSFT 
+  Ia32/InterlockedCompareExchange32.c | MSFT 
+  Ia32/InterlockedDecrement.c | MSFT 
+  Ia32/InterlockedIncrement.c | MSFT 
+  SynchronizationMsc.c  | MSFT
+
+  Ia32/InterlockedCompareExchange64.asm | INTEL 
+  Ia32/InterlockedCompareExchange32.asm | INTEL 
+  Ia32/InterlockedDecrement.asm | INTEL 
+  Ia32/InterlockedIncrement.asm | INTEL 
+  Synchronization.c | INTEL
+
+  Ia32/InterlockedCompareExchange64.S | GCC 
+  Ia32/InterlockedCompareExchange32.S | GCC 
+  Ia32/InterlockedDecrement.S | GCC 
+  Ia32/InterlockedIncrement.S | GCC 
+  SynchronizationGcc.c  | GCC
+
+[Sources.X64]
+  X64/InterlockedCompareExchange64.asm 
+  X64/InterlockedCompareExchange32.asm 
+
+  X64/InterlockedDecrement.c | MSFT 
+  X64/InterlockedIncrement.c | MSFT 
+  SynchronizationMsc.c | MSFT 
+
+  X64/InterlockedDecrement.asm | INTEL 
+  X64/InterlockedIncrement.asm | INTEL 
+  Synchronization.c | INTEL 
+
+  X64/InterlockedIncrement.S | GCC 
+  X64/InterlockedDecrement.S | GCC 
+  X64/InterlockedCompareExchange64.S | GCC 
+  X64/InterlockedCompareExchange32.S | GCC 
+  SynchronizationGcc.c  | GCC 
+
+[Sources.IPF]
+  Ipf/Synchronization.c
+  Ipf/InterlockedCompareExchange64.s
+  Ipf/InterlockedCompareExchange32.s
+
+  Synchronization.c     | INTEL 
+  SynchronizationMsc.c  | MSFT 
+  SynchronizationGcc.c  | GCC 
+
+[Sources.EBC]
+  Synchronization.c
+  Ebc/Synchronization.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  TimerLib
+  DebugLib
+  BaseMemoryLib
+
+[Pcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout

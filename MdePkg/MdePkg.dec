@@ -181,6 +181,10 @@
   ##  @libraryclass  Provides a set of PI library functions and macros for DXE phase.
   DxeServicesLib|Include/Library/DxeServicesLib.h
 
+  ##  @libraryclass  Provides synchronization functions.
+  ##
+  SynchronizationLib|Include/Library/SynchronizationLib.h
+
 [LibraryClasses.IPF]
   ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
   SalLib|Include/Library/SalLib.h
