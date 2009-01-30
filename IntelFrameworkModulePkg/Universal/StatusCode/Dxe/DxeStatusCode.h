@@ -25,6 +25,7 @@
 #include <Guid/StatusCodeDataTypeId.h>
 
 #include <Library/BaseLib.h>
+#include <Library/SynchronizationLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
