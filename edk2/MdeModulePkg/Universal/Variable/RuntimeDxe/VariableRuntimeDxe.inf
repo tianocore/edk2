@@ -42,6 +42,7 @@
 [LibraryClasses]
   MemoryAllocationLib
   BaseLib
+  SynchronizationLib
   UefiLib
   UefiBootServicesTableLib
   FvbServiceLib
