@@ -73,6 +73,7 @@
   DebugLib
   BaseMemoryLib
   BaseLib
+  SynchronizationLib
 
 
 [Guids]
