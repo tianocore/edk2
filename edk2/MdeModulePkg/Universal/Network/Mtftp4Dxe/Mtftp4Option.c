@@ -23,6 +23,134 @@ CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
 
 
 /**
+  Check whether two ascii strings are equel, ignore the case.
+
+  @param  Str1                   The first ascii string
+  @param  Str2                   The second ascii string
+
+  @retval TRUE                   Two strings are equal when case is ignored.
+  @retval FALSE                  Two string are not equal.
+
+**/
+BOOLEAN
+NetStringEqualNoCase (
+  IN UINT8                 *Str1,
+  IN UINT8                 *Str2
+  )
+{
+  UINT8                     Ch1;
+  UINT8                     Ch2;
+
+  ASSERT ((Str1 != NULL) && (Str2 != NULL));
+
+  for (; (*Str1 != '\0') && (*Str2 != '\0'); Str1++, Str2++) {
+    Ch1 = *Str1;
+    Ch2 = *Str2;
+
+    //
+    // Convert them to lower case then compare two
+    //
+    if (('A' <= Ch1) && (Ch1 <= 'Z')) {
+      Ch1 += 'a' - 'A';
+    }
+
+    if (('A' <= Ch2) && (Ch2 <= 'Z')) {
+      Ch2 += 'a' - 'A';
+    }
+
+    if (Ch1 != Ch2) {
+      return FALSE;
+    }
+  }
+
+  return (BOOLEAN) (*Str1 == *Str2);
+}
+
+
+/**
+  Convert a string to a UINT32 number.
+
+  @param  Str                    The string to convert from
+
+  @return The number get from the string
+
+**/
+UINT32
+NetStringToU32 (
+  IN UINT8                 *Str
+  )
+{
+  UINT32                    Num;
+
+  ASSERT (Str != NULL);
+
+  Num = 0;
+
+  for (; NET_IS_DIGIT (*Str); Str++) {
+    Num = Num * 10 + (*Str - '0');
+  }
+
+  return Num;
+}
+
+
+/**
+  Convert a string of the format "192.168.0.1" to an IP address.
+
+  @param  Str                    The string representation of IP
+  @param  Ip                     The varible to get IP.
+
+  @retval EFI_INVALID_PARAMETER  The IP string is invalid.
+  @retval EFI_SUCCESS            The IP is parsed into the Ip
+
+**/
+EFI_STATUS
+NetStringToIp (
+  IN     UINT8                 *Str,
+     OUT IP4_ADDR              *Ip
+  )
+{
+  UINT32                    Byte;
+  UINT32                    Addr;
+  UINTN                     Index;
+
+  *Ip  = 0;
+  Addr = 0;
+
+  for (Index = 0; Index < 4; Index++) {
+    if (!NET_IS_DIGIT (*Str)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Byte = NetStringToU32 (Str);
+
+    if (Byte > 255) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Addr = (Addr << 8) | Byte;
+
+    //
+    // Skip all the digitals and check whether the sepeator is the dot
+    //
+    while (NET_IS_DIGIT (*Str)) {
+      Str++;
+    }
+
+    if ((Index < 3) && (*Str != '.')) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Str++;
+  }
+
+  *Ip = Addr;
+
+  return EFI_SUCCESS;
+}
+
+
+/**
   Go through the packet to fill the Options array with the start
   addresses of each MTFTP option name/value pair.
 
@@ -167,134 +295,6 @@ Mtftp4ExtractOptions (
   }
 
   Mtftp4FillOptions (Packet, PacketLen, OptionCount, *OptionList);
-  return EFI_SUCCESS;
-}
-
-
-/**
-  Check whether two ascii strings are equel, ignore the case.
-
-  @param  Str1                   The first ascii string
-  @param  Str2                   The second ascii string
-
-  @retval TRUE                   Two strings are equal when case is ignored.
-  @retval FALSE                  Two string are not equal.
-
-**/
-BOOLEAN
-NetStringEqualNoCase (
-  IN UINT8                 *Str1,
-  IN UINT8                 *Str2
-  )
-{
-  UINT8                     Ch1;
-  UINT8                     Ch2;
-
-  ASSERT ((Str1 != NULL) && (Str2 != NULL));
-
-  for (; (*Str1 != '\0') && (*Str2 != '\0'); Str1++, Str2++) {
-    Ch1 = *Str1;
-    Ch2 = *Str2;
-
-    //
-    // Convert them to lower case then compare two
-    //
-    if (('A' <= Ch1) && (Ch1 <= 'Z')) {
-      Ch1 += 'a' - 'A';
-    }
-
-    if (('A' <= Ch2) && (Ch2 <= 'Z')) {
-      Ch2 += 'a' - 'A';
-    }
-
-    if (Ch1 != Ch2) {
-      return FALSE;
-    }
-  }
-
-  return (BOOLEAN) (*Str1 == *Str2);
-}
-
-
-/**
-  Convert a string to a UINT32 number.
-
-  @param  Str                    The string to convert from
-
-  @return The number get from the string
-
-**/
-UINT32
-NetStringToU32 (
-  IN UINT8                 *Str
-  )
-{
-  UINT32                    Num;
-
-  ASSERT (Str != NULL);
-
-  Num = 0;
-
-  for (; NET_IS_DIGIT (*Str); Str++) {
-    Num = Num * 10 + (*Str - '0');
-  }
-
-  return Num;
-}
-
-
-/**
-  Convert a string of the format "192.168.0.1" to an IP address.
-
-  @param  Str                    The string representation of IP
-  @param  Ip                     The varible to get IP.
-
-  @retval EFI_INVALID_PARAMETER  The IP string is invalid.
-  @retval EFI_SUCCESS            The IP is parsed into the Ip
-
-**/
-EFI_STATUS
-NetStringToIp (
-  IN     UINT8                 *Str,
-     OUT IP4_ADDR              *Ip
-  )
-{
-  UINT32                    Byte;
-  UINT32                    Addr;
-  UINTN                     Index;
-
-  *Ip  = 0;
-  Addr = 0;
-
-  for (Index = 0; Index < 4; Index++) {
-    if (!NET_IS_DIGIT (*Str)) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    Byte = NetStringToU32 (Str);
-
-    if (Byte > 255) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    Addr = (Addr << 8) | Byte;
-
-    //
-    // Skip all the digitals and check whether the sepeator is the dot
-    //
-    while (NET_IS_DIGIT (*Str)) {
-      Str++;
-    }
-
-    if ((Index < 3) && (*Str != '.')) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    Str++;
-  }
-
-  *Ip = Addr;
-
   return EFI_SUCCESS;
 }
 
