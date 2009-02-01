@@ -869,6 +869,8 @@ LibPcdCallbackOnSet (
 {
   EFI_STATUS Status;
 
+  ASSERT (NotificationFunction != NULL);
+
   Status = (GetPcdPpiPointer ())->CallbackOnSet (Guid, TokenNumber, NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
@@ -901,6 +903,8 @@ LibPcdCancelCallback (
   )
 {
   EFI_STATUS Status;
+
+  ASSERT (NotificationFunction != NULL);
 
   Status = (GetPcdPpiPointer ())->CancelCallback (Guid, TokenNumber, NotificationFunction);
 
