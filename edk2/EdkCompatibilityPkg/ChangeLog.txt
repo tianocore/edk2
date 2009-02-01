@@ -107,3 +107,27 @@ EDK_r7286: Compatible: qhuang8
 
 	Possible impact:
   None.
+
+EDK_r7342: No-Compatible: qwang12
+  Rename module names in EdkCompatibility/Compatibility directory from ***To*** to ***On***.
+  For example, Fv2ToFvThunk is renamed to Fv2OnFvThunk.
+  AAAOnBBB means this module produce AAA Protocol/PPI based on BBB. This change improves the readability and 
+  help developers to select correct thunk module to use.
+
+  Code Changes:
+  These module directory and module INF file name is updated:
+   DeviceIoToPciRootBridgeIoThunk -> DeviceIoToPciRootBridgeIoThunk
+   FrameworkHiiToUefiHiiThunk  ->  FrameworkHiiToUefiHiiThunk
+   Fv2ToFvThunk  -> Fv2ToFvThunk
+   FvFileLoaderToLoadFileThunk  -> FvFileLoaderToLoadFileThunk
+   FvToFv2Thunk  -> FvToFv2Thunk
+   PciCfg2ToPciCfgThunk  -> PciCfg2ToPciCfgThunk
+   PciCfgToPciCfg2Thunk  -> PciCfgToPciCfg2Thunk
+   ReadOnlyVariable2ToReadOnlyVariableThunk  -> ReadOnlyVariable2ToReadOnlyVariableThunk
+   ReadOnlyVariableToReadOnlyVariable2Thunk  -> ReadOnlyVariableToReadOnlyVariable2Thunk
+   Uc2ToUcThunk  -> Uc2ToUcThunk
+   UcToUc2Thunk  -> UcToUc2Thunk
+   
+  Possible Impact:
+  All DSC and FDF files that reference these module should be updated to use the new module directory
+  and file names.

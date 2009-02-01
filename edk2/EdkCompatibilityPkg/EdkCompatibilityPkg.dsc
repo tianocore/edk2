@@ -224,6 +224,17 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Compatibility/Uc2OnUcThunk/Uc2OnUcThunk.inf
   EdkCompatibilityPkg/Compatibility/UcOnUc2Thunk/UcOnUc2Thunk.inf
 
+  #
+  # User needs to turn on the compatibility switches for VFRC and EDK II build tool for Framework HII modules 
+  # following the example shown below: 
+  #
+  #  $SomePackage/FrameworkHiiModule/FrameworkHiiModule.inf {
+  #    <BuildOptions>
+  #    *_*_*_VFR_FLAGS = -c # for VFR files in the module
+  #    *_*_*_BUILD_FLAGS = -c # for UNI files in the module
+  # }
+
+
 [Components.IA32,Components.X64,Components.IPF]
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib_Edk2.inf
