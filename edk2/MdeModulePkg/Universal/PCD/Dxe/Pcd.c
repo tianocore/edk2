@@ -869,8 +869,9 @@ DxeRegisterCallBackOnSet (
 {
   EFI_STATUS Status;
   
-  ASSERT (CallBackFunction != NULL);
-  
+  if (CallBackFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Aquire lock to prevent reentrance from TPL_CALLBACK level
   //
@@ -905,7 +906,9 @@ DxeUnRegisterCallBackOnSet (
 {
   EFI_STATUS Status;
   
-  ASSERT (CallBackFunction != NULL);
+  if (CallBackFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Aquire lock to prevent reentrance from TPL_CALLBACK level

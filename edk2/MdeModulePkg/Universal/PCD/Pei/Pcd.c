@@ -835,8 +835,10 @@ PeiRegisterCallBackOnSet (
     return EFI_UNSUPPORTED;
   }
 
-  ASSERT (CallBackFunction != NULL);
-  
+  if (CallBackFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, TRUE);
 }
 
@@ -864,8 +866,10 @@ PcdUnRegisterCallBackOnSet (
     return EFI_UNSUPPORTED;
   }
 
-  ASSERT (CallBackFunction != NULL);
-  
+  if (CallBackFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, FALSE);
 }
 
