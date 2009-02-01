@@ -225,11 +225,13 @@ MakeTable (
           Sd->mRight[Avail] = Sd->mLeft[Avail] = 0;
           *Pointer = Avail++;
         }
-
-        if ((Index3 & Mask) != 0) {
-          Pointer = &Sd->mRight[*Pointer];
-        } else {
-          Pointer = &Sd->mLeft[*Pointer];
+        
+        if (*Pointer < (2 * NC - 1)) {
+          if ((Index3 & Mask) != 0) {
+            Pointer = &Sd->mRight[*Pointer];
+          } else {
+            Pointer = &Sd->mLeft[*Pointer];
+          }
         }
 
         Index3 <<= 1;
