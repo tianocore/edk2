@@ -17,50 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  Reads the current operational settings.
-
-  The GetModeData()function reads the current operational settings of this 
-  EFI MTFTPv4 Protocol driver instance.
-
-  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance.
-  @param  ModeData               Pointer to storage for the EFI MTFTPv4 Protocol
-                                 driver mode data. 
-
-  @retval EFI_SUCCESS            The configuration data was successfully returned.
-  @retval EFI_OUT_OF_RESOURCES   The required mode data could not be allocated.
-  @retval EFI_INVALID_PARAMETER  This is NULL or ModeData is NULL.
-  
-**/
-EFI_STATUS
-EFIAPI
-EfiMtftp4GetModeData (
-  IN     EFI_MTFTP4_PROTOCOL    *This,
-     OUT EFI_MTFTP4_MODE_DATA  *ModeData
-  )
-{
-  MTFTP4_PROTOCOL  *Instance;
-  EFI_TPL          OldTpl;
-
-  if ((This == NULL) || (ModeData == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
-  Instance                         = MTFTP4_PROTOCOL_FROM_THIS (This);
-  CopyMem(&ModeData->ConfigData, &Instance->Config, sizeof (Instance->Config));
-  ModeData->SupportedOptionCount   = MTFTP4_SUPPORTED_OPTIONS;
-  ModeData->SupportedOptoins       = (UINT8 **) mMtftp4SupportedOptions;
-  ModeData->UnsupportedOptionCount = 0;
-  ModeData->UnsupportedOptoins     = NULL;
-
-  gBS->RestoreTPL (OldTpl);
-
-  return EFI_SUCCESS;
-}
-
-
-/**
   Clean up the MTFTP session to get ready for new operation.
 
   @param  Instance               The MTFTP session to clean up
@@ -133,132 +89,6 @@ Mtftp4CleanOperation (
 
 
 /**
-  Initializes, changes, or resets the default operational setting for this 
-  EFI MTFTPv4 Protocol driver instance.
-  
-  The Configure() function is used to set and change the configuration data for 
-  this EFI MTFTPv4 Protocol driver instance. The configuration data can be reset 
-  to startup defaults by calling Configure() with MtftpConfigData set to NULL. 
-  Whenever the instance is reset, any pending operation is aborted. By changing 
-  the EFI MTFTPv4 Protocol driver instance configuration data, the client can 
-  connect to different MTFTPv4 servers. The configuration parameters in 
-  MtftpConfigData are used as the default parameters in later MTFTPv4 operations 
-  and can be overridden in later operations.
-  
-  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance
-  @param  ConfigData             MtftpConfigDataPointer to the configuration data 
-                                 structure
-
-  @retval EFI_SUCCESS            The EFI MTFTPv4 Protocol driver was configured 
-                                 successfully.
-  @retval EFI_INVALID_PARAMETER  One or more following conditions are TRUE:
-                                 1.This is NULL.
-                                 2.MtftpConfigData.UseDefaultSetting is FALSE and 
-                                   MtftpConfigData.StationIp is not a valid IPv4 
-                                   unicast address.
-                                 3.MtftpCofigData.UseDefaultSetting is FALSE and 
-                                   MtftpConfigData.SubnetMask is invalid.
-                                 4.MtftpCofigData.ServerIp is not a valid IPv4 
-                                   unicast address.
-                                 5.MtftpConfigData.UseDefaultSetting is FALSE and 
-                                   MtftpConfigData.GatewayIp is not a valid IPv4 
-                                   unicast address or is not in the same subnet 
-                                   with station address.
-  @retval EFI_ACCESS_DENIED      The EFI configuration could not be changed at this 
-                                 time because there is one MTFTP background operation 
-                                 in progress.
-  @retval EFI_NO_MAPPING         When using a default address, configuration 
-                                 (DHCP, BOOTP, RARP, etc.) has not finished yet.
-  @retval EFI_UNSUPPORTED        A configuration protocol (DHCP, BOOTP, RARP, etc.) 
-                                 could not be located when clients choose to use 
-                                 the default address settings.
-  @retval EFI_OUT_OF_RESOURCES   The EFI MTFTPv4 Protocol driver instance data could 
-                                 not be allocated.
-  @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred. 
-                                 The EFI MTFTPv4 Protocol driver instance is not 
-                                 configured.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiMtftp4Configure (
-  IN EFI_MTFTP4_PROTOCOL    *This,
-  IN EFI_MTFTP4_CONFIG_DATA *ConfigData
-  )
-{
-  MTFTP4_PROTOCOL           *Instance;
-  EFI_TPL                   OldTpl;
-  IP4_ADDR                  Ip;
-  IP4_ADDR                  Netmask;
-  IP4_ADDR                  Gateway;
-  IP4_ADDR                  ServerIp;
-
-  if (This == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
-
-  if (ConfigData == NULL) {
-    //
-    // Reset the operation if ConfigData is NULL
-    //
-    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
-    Mtftp4CleanOperation (Instance, EFI_ABORTED);
-    ZeroMem (&Instance->Config, sizeof (EFI_MTFTP4_CONFIG_DATA));
-    Instance->State = MTFTP4_STATE_UNCONFIGED;
-
-    gBS->RestoreTPL (OldTpl);
-
-  } else {
-    //
-    // Configure the parameters for new operation.
-    //
-    CopyMem (&Ip, &ConfigData->StationIp, sizeof (IP4_ADDR));
-    CopyMem (&Netmask, &ConfigData->SubnetMask, sizeof (IP4_ADDR));
-    CopyMem (&Gateway, &ConfigData->GatewayIp, sizeof (IP4_ADDR));
-    CopyMem (&ServerIp, &ConfigData->ServerIp, sizeof (IP4_ADDR));
-
-    Ip       = NTOHL (Ip);
-    Netmask  = NTOHL (Netmask);
-    Gateway  = NTOHL (Gateway);
-    ServerIp = NTOHL (ServerIp);
-
-    if (!Ip4IsUnicast (ServerIp, 0)) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if (!ConfigData->UseDefaultSetting &&
-       ((!IP4_IS_VALID_NETMASK (Netmask) || !Ip4IsUnicast (Ip, Netmask)))) {
-
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if ((Gateway != 0) &&
-        (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || !Ip4IsUnicast (Gateway, Netmask))) {
-
-      return EFI_INVALID_PARAMETER;
-    }
-
-    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
-    if ((Instance->State == MTFTP4_STATE_CONFIGED) && (Instance->Operation != 0)) {
-      gBS->RestoreTPL (OldTpl);
-      return EFI_ACCESS_DENIED;
-    }
-
-    CopyMem(&Instance->Config, ConfigData, sizeof (*ConfigData));;
-    Instance->State = MTFTP4_STATE_CONFIGED;
-
-    gBS->RestoreTPL (OldTpl);
-  }
-
-  return EFI_SUCCESS;
-}
-
-
-/**
   Check packet for GetInfo. 
   
   GetInfo is implemented with EfiMtftp4ReadFile. It use Mtftp4GetInfoCheckPacket 
@@ -320,68 +150,6 @@ Mtftp4GetInfoCheckPacket (
   CopyMem (*(State->Packet), Packet, PacketLen);
 
   return EFI_ABORTED;
-}
-
-
-/**
-  Parses the options in an MTFTPv4 OACK packet.
-  
-  The ParseOptions() function parses the option fields in an MTFTPv4 OACK packet 
-  and returns the number of options that were found and optionally a list of 
-  pointers to the options in the packet.
-  If one or more of the option fields are not valid, then EFI_PROTOCOL_ERROR is 
-  returned and *OptionCount and *OptionList stop at the last valid option.
-  The OptionList is allocated by this function, and caller should free it when used.
-
-  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance.
-  @param  PacketLen              Length of the OACK packet to be parsed.
-  @param  Packet                 Pointer to the OACK packet to be parsed. 
-  @param  OptionCount            Pointer to the number of options in following OptionList.
-  @param  OptionList             Pointer to EFI_MTFTP4_OPTION storage. Call the 
-                                 EFI Boot Service FreePool() to release theOptionList
-                                 if the options in this OptionList are not needed 
-                                 any more
-
-  @retval EFI_SUCCESS            The OACK packet was valid and the OptionCount and
-                                 OptionList parameters have been updated.
-  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
-                                 1.PacketLen is 0.
-                                 2.Packet is NULL or Packet is not a valid MTFTPv4 packet.
-                                 3.OptionCount is NULL.
-  @retval EFI_NOT_FOUND          No options were found in the OACK packet.
-  @retval EFI_OUT_OF_RESOURCES   Storage for the OptionList array cannot be allocated.
-  @retval EFI_PROTOCOL_ERROR     One or more of the option fields is invalid.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiMtftp4ParseOptions (
-  IN     EFI_MTFTP4_PROTOCOL    *This,
-  IN     UINT32                 PacketLen,
-  IN     EFI_MTFTP4_PACKET      *Packet,
-     OUT UINT32                 *OptionCount,
-     OUT EFI_MTFTP4_OPTION      **OptionList          OPTIONAL
-  )
-{
-  EFI_STATUS                Status;
-
-  if ((This == NULL) || (PacketLen < MTFTP4_OPCODE_LEN) ||
-      (Packet == NULL) || (OptionCount == NULL)) {
-
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status = Mtftp4ExtractOptions (Packet, PacketLen, OptionCount, OptionList);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (*OptionCount == 0) {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
 }
 
 
@@ -740,6 +508,240 @@ ON_ERROR:
   gBS->RestoreTPL (OldTpl);
 
   return Status;
+}
+
+
+/**
+  Reads the current operational settings.
+
+  The GetModeData()function reads the current operational settings of this 
+  EFI MTFTPv4 Protocol driver instance.
+
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance.
+  @param  ModeData               Pointer to storage for the EFI MTFTPv4 Protocol
+                                 driver mode data. 
+
+  @retval EFI_SUCCESS            The configuration data was successfully returned.
+  @retval EFI_OUT_OF_RESOURCES   The required mode data could not be allocated.
+  @retval EFI_INVALID_PARAMETER  This is NULL or ModeData is NULL.
+  
+**/
+EFI_STATUS
+EFIAPI
+EfiMtftp4GetModeData (
+  IN     EFI_MTFTP4_PROTOCOL    *This,
+     OUT EFI_MTFTP4_MODE_DATA  *ModeData
+  )
+{
+  MTFTP4_PROTOCOL  *Instance;
+  EFI_TPL          OldTpl;
+
+  if ((This == NULL) || (ModeData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+  Instance                         = MTFTP4_PROTOCOL_FROM_THIS (This);
+  CopyMem(&ModeData->ConfigData, &Instance->Config, sizeof (Instance->Config));
+  ModeData->SupportedOptionCount   = MTFTP4_SUPPORTED_OPTIONS;
+  ModeData->SupportedOptoins       = (UINT8 **) mMtftp4SupportedOptions;
+  ModeData->UnsupportedOptionCount = 0;
+  ModeData->UnsupportedOptoins     = NULL;
+
+  gBS->RestoreTPL (OldTpl);
+
+  return EFI_SUCCESS;
+}
+
+
+
+/**
+  Initializes, changes, or resets the default operational setting for this 
+  EFI MTFTPv4 Protocol driver instance.
+  
+  The Configure() function is used to set and change the configuration data for 
+  this EFI MTFTPv4 Protocol driver instance. The configuration data can be reset 
+  to startup defaults by calling Configure() with MtftpConfigData set to NULL. 
+  Whenever the instance is reset, any pending operation is aborted. By changing 
+  the EFI MTFTPv4 Protocol driver instance configuration data, the client can 
+  connect to different MTFTPv4 servers. The configuration parameters in 
+  MtftpConfigData are used as the default parameters in later MTFTPv4 operations 
+  and can be overridden in later operations.
+  
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance
+  @param  ConfigData             MtftpConfigDataPointer to the configuration data 
+                                 structure
+
+  @retval EFI_SUCCESS            The EFI MTFTPv4 Protocol driver was configured 
+                                 successfully.
+  @retval EFI_INVALID_PARAMETER  One or more following conditions are TRUE:
+                                 1.This is NULL.
+                                 2.MtftpConfigData.UseDefaultSetting is FALSE and 
+                                   MtftpConfigData.StationIp is not a valid IPv4 
+                                   unicast address.
+                                 3.MtftpCofigData.UseDefaultSetting is FALSE and 
+                                   MtftpConfigData.SubnetMask is invalid.
+                                 4.MtftpCofigData.ServerIp is not a valid IPv4 
+                                   unicast address.
+                                 5.MtftpConfigData.UseDefaultSetting is FALSE and 
+                                   MtftpConfigData.GatewayIp is not a valid IPv4 
+                                   unicast address or is not in the same subnet 
+                                   with station address.
+  @retval EFI_ACCESS_DENIED      The EFI configuration could not be changed at this 
+                                 time because there is one MTFTP background operation 
+                                 in progress.
+  @retval EFI_NO_MAPPING         When using a default address, configuration 
+                                 (DHCP, BOOTP, RARP, etc.) has not finished yet.
+  @retval EFI_UNSUPPORTED        A configuration protocol (DHCP, BOOTP, RARP, etc.) 
+                                 could not be located when clients choose to use 
+                                 the default address settings.
+  @retval EFI_OUT_OF_RESOURCES   The EFI MTFTPv4 Protocol driver instance data could 
+                                 not be allocated.
+  @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred. 
+                                 The EFI MTFTPv4 Protocol driver instance is not 
+                                 configured.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiMtftp4Configure (
+  IN EFI_MTFTP4_PROTOCOL    *This,
+  IN EFI_MTFTP4_CONFIG_DATA *ConfigData
+  )
+{
+  MTFTP4_PROTOCOL           *Instance;
+  EFI_TPL                   OldTpl;
+  IP4_ADDR                  Ip;
+  IP4_ADDR                  Netmask;
+  IP4_ADDR                  Gateway;
+  IP4_ADDR                  ServerIp;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
+
+  if (ConfigData == NULL) {
+    //
+    // Reset the operation if ConfigData is NULL
+    //
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+    Mtftp4CleanOperation (Instance, EFI_ABORTED);
+    ZeroMem (&Instance->Config, sizeof (EFI_MTFTP4_CONFIG_DATA));
+    Instance->State = MTFTP4_STATE_UNCONFIGED;
+
+    gBS->RestoreTPL (OldTpl);
+
+  } else {
+    //
+    // Configure the parameters for new operation.
+    //
+    CopyMem (&Ip, &ConfigData->StationIp, sizeof (IP4_ADDR));
+    CopyMem (&Netmask, &ConfigData->SubnetMask, sizeof (IP4_ADDR));
+    CopyMem (&Gateway, &ConfigData->GatewayIp, sizeof (IP4_ADDR));
+    CopyMem (&ServerIp, &ConfigData->ServerIp, sizeof (IP4_ADDR));
+
+    Ip       = NTOHL (Ip);
+    Netmask  = NTOHL (Netmask);
+    Gateway  = NTOHL (Gateway);
+    ServerIp = NTOHL (ServerIp);
+
+    if (!Ip4IsUnicast (ServerIp, 0)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (!ConfigData->UseDefaultSetting &&
+       ((!IP4_IS_VALID_NETMASK (Netmask) || !Ip4IsUnicast (Ip, Netmask)))) {
+
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((Gateway != 0) &&
+        (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || !Ip4IsUnicast (Gateway, Netmask))) {
+
+      return EFI_INVALID_PARAMETER;
+    }
+
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+    if ((Instance->State == MTFTP4_STATE_CONFIGED) && (Instance->Operation != 0)) {
+      gBS->RestoreTPL (OldTpl);
+      return EFI_ACCESS_DENIED;
+    }
+
+    CopyMem(&Instance->Config, ConfigData, sizeof (*ConfigData));;
+    Instance->State = MTFTP4_STATE_CONFIGED;
+
+    gBS->RestoreTPL (OldTpl);
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+
+/**
+  Parses the options in an MTFTPv4 OACK packet.
+  
+  The ParseOptions() function parses the option fields in an MTFTPv4 OACK packet 
+  and returns the number of options that were found and optionally a list of 
+  pointers to the options in the packet.
+  If one or more of the option fields are not valid, then EFI_PROTOCOL_ERROR is 
+  returned and *OptionCount and *OptionList stop at the last valid option.
+  The OptionList is allocated by this function, and caller should free it when used.
+
+  @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance.
+  @param  PacketLen              Length of the OACK packet to be parsed.
+  @param  Packet                 Pointer to the OACK packet to be parsed. 
+  @param  OptionCount            Pointer to the number of options in following OptionList.
+  @param  OptionList             Pointer to EFI_MTFTP4_OPTION storage. Call the 
+                                 EFI Boot Service FreePool() to release theOptionList
+                                 if the options in this OptionList are not needed 
+                                 any more
+
+  @retval EFI_SUCCESS            The OACK packet was valid and the OptionCount and
+                                 OptionList parameters have been updated.
+  @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
+                                 1.PacketLen is 0.
+                                 2.Packet is NULL or Packet is not a valid MTFTPv4 packet.
+                                 3.OptionCount is NULL.
+  @retval EFI_NOT_FOUND          No options were found in the OACK packet.
+  @retval EFI_OUT_OF_RESOURCES   Storage for the OptionList array cannot be allocated.
+  @retval EFI_PROTOCOL_ERROR     One or more of the option fields is invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiMtftp4ParseOptions (
+  IN     EFI_MTFTP4_PROTOCOL    *This,
+  IN     UINT32                 PacketLen,
+  IN     EFI_MTFTP4_PACKET      *Packet,
+     OUT UINT32                 *OptionCount,
+     OUT EFI_MTFTP4_OPTION      **OptionList          OPTIONAL
+  )
+{
+  EFI_STATUS                Status;
+
+  if ((This == NULL) || (PacketLen < MTFTP4_OPCODE_LEN) ||
+      (Packet == NULL) || (OptionCount == NULL)) {
+
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = Mtftp4ExtractOptions (Packet, PacketLen, OptionCount, OptionList);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (*OptionCount == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  return EFI_SUCCESS;
 }
 
 

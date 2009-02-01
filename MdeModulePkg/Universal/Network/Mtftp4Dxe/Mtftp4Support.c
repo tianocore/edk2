@@ -363,10 +363,10 @@ Mtftp4SendError (
 **/
 VOID
 Mtftp4OnPacketSent (
-  NET_BUF                   *Packet,
-  UDP_POINTS                *Points,
-  EFI_STATUS                IoStatus,
-  VOID                      *Context
+  IN NET_BUF                   *Packet,
+  IN UDP_POINTS                *Points,
+  IN EFI_STATUS                IoStatus,
+  IN VOID                      *Context
   )
 {
   NetbufFree (Packet);
