@@ -114,6 +114,12 @@ Abstract:
 //
 #pragma warning ( disable : 1419 )
 
+//
+// Disable ICC's remark #869: "Parameter" was never referenced warning.
+// This is legal ANSI C code so we disable the remark that is turned on with -Wall
+//
+#pragma warning ( disable : 869 )
+
 #endif
 
 
