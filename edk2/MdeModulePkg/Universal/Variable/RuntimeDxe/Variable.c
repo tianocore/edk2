@@ -1614,11 +1614,6 @@ Done:
   InterlockedDecrement (&mVariableModuleGlobal->VariableGlobal.ReentrantState);
   ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
-#if 0
-  if ((StrCmp (VariableName , L"Lang") == 0) && CompareGuid (VendorGuid, gEfiGlobalVariableGuid)) {
-    
-  }
-#endif
   return Status;
 }
 
