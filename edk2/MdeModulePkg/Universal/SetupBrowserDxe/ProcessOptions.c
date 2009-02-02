@@ -896,6 +896,8 @@ ProcessHelpString (
       AllocateSize += 0x10;
       OldIndexArray  = IndexArray;
       IndexArray = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
+      ASSERT (IndexArray != NULL);
+      
       CopyMem (IndexArray, OldIndexArray, LineCount * sizeof (UINTN) * 3);
       FreePool (OldIndexArray);
     }
