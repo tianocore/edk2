@@ -633,6 +633,7 @@ Uhci2ControlTransfer (
   UINT8                   *DataPhy;
   VOID                    *DataMap;
   BOOLEAN                 IsSlowDevice;
+  UINTN                   TransferDataLength;
 
   Uhc         = UHC_FROM_USB2_HC_PROTO (This);
   TDs         = NULL;
@@ -660,8 +661,14 @@ Uhci2ControlTransfer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((TransferDirection != EfiUsbNoData) && (DataLength == NULL)) {
+  if ((TransferDirection != EfiUsbNoData) && (Data == NULL || DataLength == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (TransferDirection == EfiUsbNoData) {
+    TransferDataLength = 0;
+  } else {
+    TransferDataLength = *DataLength;
   }
 
   *TransferResult = EFI_USB_ERR_SYSTEM;
@@ -702,7 +709,7 @@ Uhci2ControlTransfer (
           PktId,
           RequestPhy,
           DataPhy,
-          *DataLength,
+          TransferDataLength,
           (UINT8) MaximumPacketLength,
           IsSlowDevice
           );
