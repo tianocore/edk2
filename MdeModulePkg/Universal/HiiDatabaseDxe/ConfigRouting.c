@@ -1643,7 +1643,7 @@ HiiGetAltCfg (
 
 Exit:
 
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && (Result != NULL)) {
     //
     // Copy the <ConfigHdr> and <ConfigBody>
     //

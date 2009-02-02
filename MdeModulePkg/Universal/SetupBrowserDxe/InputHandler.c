@@ -387,7 +387,7 @@ GetNumericInput (
 
     InputText[0] = LEFT_NUMERIC_DELIMITER;
     SetUnicodeMem (InputText + 1, InputWidth, L' ');
-    ASSERT (InputWidth < MAX_NUMERIC_INPUT_WIDTH); 
+    ASSERT (InputWidth + 2 < MAX_NUMERIC_INPUT_WIDTH); 
     InputText[InputWidth + 1] = RIGHT_NUMERIC_DELIMITER;
     InputText[InputWidth + 2] = L'\0';
 
@@ -649,6 +649,7 @@ EnterCarriageReturn:
         }
 
         Count++;
+        ASSERT (Count < (sizeof (PreviousNumber) / sizeof (PreviousNumber[0])));
         PreviousNumber[Count] = EditValue;
 
         PrintCharAt (Column, Row, Key.UnicodeChar);

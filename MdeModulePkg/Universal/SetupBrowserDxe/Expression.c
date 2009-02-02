@@ -773,7 +773,7 @@ IfrMatch (
     }
 
     String[Index] = GetToken (Value.Value.string, FormSet->HiiHandle);
-    if (String== NULL) {
+    if (String [Index] == NULL) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
@@ -1111,7 +1111,7 @@ IfrSpan (
     }
 
     String[Index] = GetToken (Value.Value.string, FormSet->HiiHandle);
-    if (String== NULL) {
+    if (String [Index] == NULL) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
@@ -1299,7 +1299,9 @@ CompareHiiValue (
 
 
 /**
-  Evaluate the result of a HII expression
+  Evaluate the result of a HII expression.
+
+  If Expression is NULL, then ASSERT.
 
   @param  FormSet                FormSet associated with this expression.
   @param  Form                   Form associated with this expression.
@@ -1341,6 +1343,7 @@ EvaluateExpression (
   //
   ResetExpressionStack ();
 
+  ASSERT (Expression != NULL);
   Expression->Result.Type = EFI_IFR_TYPE_OTHER;
 
   Link = GetFirstNode (&Expression->OpCodeListHead);
