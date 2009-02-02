@@ -367,7 +367,7 @@ FindVariable (
   UINT32                  Count;
   UINT8                   *VariableBase;
 
-  if (VariableName != NULL && VendorGuid == NULL) {
+  if (VariableName[0] != 0 && VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   //
