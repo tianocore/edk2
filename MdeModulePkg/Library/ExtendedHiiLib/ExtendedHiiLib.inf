@@ -44,5 +44,5 @@
   DevicePathLib
   
 [Protocols]
-  gEfiDevicePathProtocolGuid  
+  gEfiDevicePathProtocolGuid  ## SOMETIMES_PRODUCES
   
