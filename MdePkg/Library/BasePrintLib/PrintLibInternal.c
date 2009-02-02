@@ -197,7 +197,7 @@ BasePrintLibConvertValueToString (
   //
   // If both COMMA_TYPE and HEX_RADIX are set, then ASSERT ()
   //
-  ASSERT (((Flags & COMMA_TYPE) != 0 && (Flags & RADIX_HEX) != 0) == FALSE);
+  ASSERT (((Flags & COMMA_TYPE) == 0) || ((Flags & RADIX_HEX) == 0));
 
   OriginalBuffer = Buffer;
   
