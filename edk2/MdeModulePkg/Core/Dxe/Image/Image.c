@@ -477,19 +477,22 @@ CoreLoadPeImage (
 
 
     //
-    // Print Module Name by Pdb file path
+    // Print Module Name by Pdb file path.
+    // Windows and Unix style file path are all trimmed correctly.
     //
     if (Image->ImageContext.PdbPointer != NULL) {
       StartIndex = 0;
       for (Index = 0; Image->ImageContext.PdbPointer[Index] != 0; Index++) {
-        if (Image->ImageContext.PdbPointer[Index] == '\\') {
+        if ((Image->ImageContext.PdbPointer[Index] == '\\') || (Image->ImageContext.PdbPointer[Index] == '/')) {
           StartIndex = Index + 1;
         }
       }
       //
       // Copy the PDB file name to our temporary string, and replace .pdb with .efi
+      // The PDB file name is limited in the range of 0~255.
+      // If the length is bigger than 255, trim the redudant characters to avoid overflow in array boundary.
       //
-      for (Index = 0; Index < sizeof (EfiFileName); Index++) {
+      for (Index = 0; Index < sizeof (EfiFileName) - 4; Index++) {
         EfiFileName[Index] = Image->ImageContext.PdbPointer[Index + StartIndex];
         if (EfiFileName[Index] == 0) {
           EfiFileName[Index] = '.';
@@ -501,6 +504,10 @@ CoreLoadPeImage (
           EfiFileName[Index + 4] = 0;
           break;
         }
+      }
+
+      if (Index == sizeof (EfiFileName) - 4) {
+        EfiFileName[Index] = 0;
       }
       DEBUG ((DEBUG_INFO | DEBUG_LOAD, "%a", EfiFileName)); // &Image->ImageContext.PdbPointer[StartIndex]));
     }
