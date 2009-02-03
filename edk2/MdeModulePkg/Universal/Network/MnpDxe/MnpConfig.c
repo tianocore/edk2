@@ -1,11 +1,11 @@
 /** @file
   Implementation of Managed Network Protocol private services.
-  
-Copyright (c) 2005 - 2008, Intel Corporation.<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+
+Copyright (c) 2005 - 2008, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -48,11 +48,11 @@ EFI_MANAGED_NETWORK_CONFIG_DATA mMnpDefaultConfigData = {
   Configure the Snp receive filters according to the instances' receive filter
   settings.
 
-  @param[in]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in]  MnpServiceData        Pointer to the mnp service context data.
 
-  @retval EFI_SUCCESS           The receive filters is configured.
-  @retval EFI_OUT_OF_RESOURCES  The receive filters can't be configured due to 
-                                lack of memory resource.
+  @retval     EFI_SUCCESS           The receive filters is configured.
+  @retval     EFI_OUT_OF_RESOURCES  The receive filters can't be configured due 
+                                    to lack of memory resource.
 
 **/
 EFI_STATUS
@@ -144,7 +144,7 @@ MnpConfigReceiveFilters (
       // multicast.
       //
 
-      if (Snp->Mode->ReceiveFilterMask & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) {
+      if ((Snp->Mode->ReceiveFilterMask & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) != 0) {
         EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
       } else {
         //
@@ -205,8 +205,8 @@ MnpConfigReceiveFilters (
   Add Count of net buffers to MnpServiceData->FreeNbufQue. The length of the net
   buffer is specified by MnpServiceData->BufferLength. 
 
-  @param[in]  MnpServiceData    Pointer to the MNP_SERVICE_DATA.
-  @param[in]  Count             Number of NET_BUFFERs to add.
+  @param[in, out]  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
+  @param[in]       Count                 Number of NET_BUFFERs to add.
 
   @retval EFI_SUCCESS           The specified amount of NET_BUFs are allocated 
                                 and added to MnpServiceData->FreeNbufQue.
@@ -215,8 +215,8 @@ MnpConfigReceiveFilters (
 **/
 EFI_STATUS
 MnpAddFreeNbuf (
-  IN MNP_SERVICE_DATA  *MnpServiceData,
-  IN UINTN             Count
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData,
+  IN UINTN                 Count
   )
 {
   EFI_STATUS  Status;
@@ -260,7 +260,7 @@ MnpAddFreeNbuf (
   in the queue, first try to allocate some and add them into the queue, then
   fetch the NET_BUF from the updated FreeNbufQue.
 
-  @param[in]  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
+  @param[in, out]  MnpServiceData        Pointer to the MNP_SERVICE_DATA.
 
   @return     Pointer to the allocated free NET_BUF structure, if NULL the 
               operation is failed.
@@ -268,7 +268,7 @@ MnpAddFreeNbuf (
 **/
 NET_BUF *
 MnpAllocNbuf (
-  IN MNP_SERVICE_DATA  *MnpServiceData
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData
   )
 {
   EFI_STATUS    Status;
@@ -333,14 +333,14 @@ ON_EXIT:
 /**
   Try to reclaim the Nbuf into the buffer pool.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  Nbuf                  Pointer to the NET_BUF to free.
-  
+  @param[in,out]  MnpServiceData        Pointer to the mnp service context data.
+  @param[in,out]  Nbuf                  Pointer to the NET_BUF to free.
+
 **/
 VOID
 MnpFreeNbuf (
-  IN MNP_SERVICE_DATA  *MnpServiceData,
-  IN NET_BUF           *Nbuf
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData,
+  IN OUT NET_BUF           *Nbuf
   )
 {
   EFI_TPL  OldTpl;
@@ -367,19 +367,20 @@ MnpFreeNbuf (
 /**
   Initialize the mnp service context data.
 
-  @param[in]  MnpServiceData        Pointer to the mnp service context data.
-  @param[in]  ImageHandle           The driver image handle.
-  @param[in]  ControllerHandle      Handle of device to bind driver to.
+  @param[in, out]  MnpServiceData     Pointer to the mnp service context data.
+  @param[in]       ImageHandle        The driver image handle.
+  @param[in]       ControllerHandle   Handle of device to bind driver to.
 
   @retval EFI_SUCCESS           The mnp service context is initialized.
-  @retval Other                 Some error occurs.
+  @retval EFI_UNSUPPORTED       ControllerHandle does not support Simple Network Protocol.
+  @retval Others                Other errors as indicated.
 
 **/
 EFI_STATUS
 MnpInitializeServiceData (
-  IN MNP_SERVICE_DATA  *MnpServiceData,
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_HANDLE        ControllerHandle
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData,
+  IN EFI_HANDLE            ImageHandle,
+  IN EFI_HANDLE            ControllerHandle
   )
 {
   EFI_STATUS                   Status;
@@ -553,14 +554,14 @@ ERROR:
 /**
   Flush the mnp service context data.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  ImageHandle           The driver image handle.
-  
+  @param[in, out]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in]       ImageHandle       The driver image handle.
+
 **/
 VOID
 MnpFlushServiceData (
-  IN MNP_SERVICE_DATA  *MnpServiceData,
-  IN EFI_HANDLE        ImageHandle
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData,
+  IN EFI_HANDLE            ImageHandle
   )
 {
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
@@ -616,15 +617,15 @@ MnpFlushServiceData (
 /**
   Initialize the mnp instance context data.
 
-  @param[in]  MnpServiceData    Pointer to the mnp service context data.
-  @param[in]  Instance          Pointer to the mnp instance context data to
-                                initialize.
+  @param[in]       MnpServiceData   Pointer to the mnp service context data.
+  @param[in, out]  Instance         Pointer to the mnp instance context data 
+                                    to initialize.
 
 **/
 VOID
 MnpInitializeInstanceData (
-  IN MNP_SERVICE_DATA   *MnpServiceData,
-  IN MNP_INSTANCE_DATA  *Instance
+  IN MNP_SERVICE_DATA       *MnpServiceData,
+  IN OUT MNP_INSTANCE_DATA  *Instance
   )
 {
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
@@ -665,10 +666,10 @@ MnpInitializeInstanceData (
 
 
 /**
-  Check whether the token specified by Arg maches the token in Item.
+  Check whether the token specified by Arg matches the token in Item.
 
   @param[in]  Map               Pointer to the NET_MAP.
-  @param[in]  Item              Pointer to the NET_MAP_ITEM
+  @param[in]  Item              Pointer to the NET_MAP_ITEM.
   @param[in]  Arg               Pointer to the Arg, it's a pointer to the token to
                                 check.
 
@@ -705,10 +706,10 @@ MnpTokenExist (
 /**
   Cancel the token specified by Arg if it matches the token in Item.
 
-  @param[in, out]  Map          Pointer to the NET_MAP.
-  @param[in]       Item         Pointer to the NET_MAP_ITEM
-  @param[in]       Arg          Pointer to the Arg, it's a pointer to the token to
-                                cancel.
+  @param[in, out]  Map               Pointer to the NET_MAP.
+  @param[in, out]  Item              Pointer to the NET_MAP_ITEM.
+  @param[in]       Arg               Pointer to the Arg, it's a pointer to the 
+                                     token to cancel.
 
   @retval EFI_SUCCESS       The Arg is NULL, and the token in Item is cancelled, 
                             or the Arg isn't NULL, and the token in Item is
@@ -719,9 +720,9 @@ MnpTokenExist (
 **/
 EFI_STATUS
 MnpCancelTokens (
-  IN OUT NET_MAP   *Map,
-  IN NET_MAP_ITEM  *Item,
-  IN VOID          *Arg
+  IN OUT NET_MAP       *Map,
+  IN OUT NET_MAP_ITEM  *Item,
+  IN VOID              *Arg
   )
 {
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *TokenToCancel;
@@ -763,7 +764,7 @@ MnpCancelTokens (
   @param[in]  Snp               Pointer to the simple network protocol.
 
   @retval EFI_SUCCESS           The simple network protocol is started.
-  @retval Other                 Some error occurs.
+  @retval Others                Other errors as indicated.
 
 **/
 EFI_STATUS
@@ -797,7 +798,7 @@ MnpStartSnp (
   @param[in]  Snp               Pointer to the simple network protocol.
 
   @retval EFI_SUCCESS           The simple network is stopped.
-  @retval Other                 Some error occurs.
+  @retval Others                Other errors as indicated.
 
 **/
 EFI_STATUS
@@ -829,21 +830,21 @@ MnpStopSnp (
   Start the managed network, this function is called when one instance is configured
   or reconfigured.
 
-  @param[in]  MnpServiceData    Pointer to the mnp service context data.
-  @param[in]  IsConfigUpdate    The instance is reconfigured or it's the first time
-                                the instanced is configured.
-  @param[in]  EnableSystemPoll  Enable the system polling or not.
+  @param[in, out]  MnpServiceData       Pointer to the mnp service context data.
+  @param[in]       IsConfigUpdate       The instance is reconfigured or it's the first
+                                        time the instanced is configured.
+  @param[in]       EnableSystemPoll     Enable the system polling or not.
 
-  @retval EFI_SUCCESS           The managed network is started and some
-                                configuration is updated.
-  @retval Other                 Some error occurs.
+  @retval EFI_SUCCESS                   The managed network is started and some
+                                        configuration is updated.
+  @retval Others                        Other errors as indicated.
 
 **/
 EFI_STATUS
 MnpStart (
-  IN MNP_SERVICE_DATA  *MnpServiceData,
-  IN BOOLEAN           IsConfigUpdate,
-  IN BOOLEAN           EnableSystemPoll
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData,
+  IN BOOLEAN               IsConfigUpdate,
+  IN BOOLEAN               EnableSystemPoll
   )
 {
   EFI_STATUS      Status;
@@ -921,15 +922,15 @@ ErrorExit:
 /**
   Stop the managed network.
 
-  @param[in]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in, out]  MnpServiceData    Pointer to the mnp service context data.
 
-  @retval EFI_SUCCESS           The managed network is stopped.
-  @retval Other                 Some error occurs.
+  @retval EFI_SUCCESS                The managed network is stopped.
+  @retval Others                     Other errors as indicated.
 
 **/
 EFI_STATUS
 MnpStop (
-  IN MNP_SERVICE_DATA  *MnpServiceData
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData
   )
 {
   EFI_STATUS  Status;
@@ -984,12 +985,12 @@ MnpStop (
 /**
   Flush the instance's received data.
 
-  @param  Instance              Pointer to the mnp instance context data.
+  @param[in, out]  Instance              Pointer to the mnp instance context data.
 
 **/
 VOID
 MnpFlushRcvdDataQueue (
-  IN MNP_INSTANCE_DATA  *Instance
+  IN OUT MNP_INSTANCE_DATA  *Instance
   )
 {
   EFI_TPL          OldTpl;
@@ -1021,20 +1022,20 @@ MnpFlushRcvdDataQueue (
 /**
   Configure the Instance using ConfigData.
 
-  @param[in]  Instance          Pointer to the mnp instance context data.
-  @param[in]  ConfigData        Pointer to the configuration data used to configure
+  @param[in, out]  Instance     Pointer to the mnp instance context data.
+  @param[in]       ConfigData   Pointer to the configuration data used to configure
                                 the isntance.
 
   @retval EFI_SUCCESS           The Instance is configured.
   @retval EFI_UNSUPPORTED       EnableReceiveTimestamps is on and the
                                 implementation doesn't support it.
-  @retval Other                 Some error occurs.
+  @retval Others                Other errors as indicated.
 
 **/
 EFI_STATUS
 MnpConfigureInstance (
-  IN MNP_INSTANCE_DATA                *Instance,
-  IN EFI_MANAGED_NETWORK_CONFIG_DATA  *ConfigData OPTIONAL
+  IN OUT MNP_INSTANCE_DATA              *Instance,
+  IN EFI_MANAGED_NETWORK_CONFIG_DATA    *ConfigData OPTIONAL
   )
 {
   EFI_STATUS                      Status;
@@ -1162,23 +1163,23 @@ MnpConfigureInstance (
   Add a group address control block which controls the MacAddress for
   this instance.
 
-  @param[in]  Instance              Pointer to the mnp instance context data.
-  @param[in]  CtrlBlk               Pointer to the group address control block.
-  @param[in]  GroupAddress          Pointer to the group adress.
-  @param[in]  MacAddress            Pointer to the mac address.
-  @param[in]  HwAddressSize         The hardware address size.
+  @param[in, out]  Instance        Pointer to the mnp instance context data.
+  @param[in, out]  CtrlBlk         Pointer to the group address control block.
+  @param[in, out]  GroupAddress    Pointer to the group adress.
+  @param[in]       MacAddress      Pointer to the mac address.
+  @param[in]       HwAddressSize   The hardware address size.
 
-  @retval EFI_SUCCESS           The group address control block is added.
-  @retval EFI_OUT_OF_RESOURCE   Failed due to lack of memory resources.
+  @retval EFI_SUCCESS              The group address control block is added.
+  @retval EFI_OUT_OF_RESOURCES     Failed due to lack of memory resources.
 
 **/
 EFI_STATUS
 MnpGroupOpAddCtrlBlk (
-  IN MNP_INSTANCE_DATA        *Instance,
-  IN MNP_GROUP_CONTROL_BLOCK  *CtrlBlk,
-  IN MNP_GROUP_ADDRESS        *GroupAddress OPTIONAL,
-  IN EFI_MAC_ADDRESS          *MacAddress,
-  IN UINT32                   HwAddressSize
+  IN OUT MNP_INSTANCE_DATA        *Instance,
+  IN OUT MNP_GROUP_CONTROL_BLOCK  *CtrlBlk,
+  IN OUT MNP_GROUP_ADDRESS        *GroupAddress OPTIONAL,
+  IN EFI_MAC_ADDRESS              *MacAddress,
+  IN UINT32                       HwAddressSize
   )
 {
   MNP_SERVICE_DATA  *MnpServiceData;
@@ -1283,20 +1284,21 @@ MnpGroupOpDelCtrlBlk (
 /**
   Do the group operations for this instance.
 
-  @param[in]  Instance          Pointer to the instance context data.
-  @param[in]  JoinFlag          Set to TRUE to join a group. Set to TRUE to leave a
-                                group/groups.
-  @param[in]  MacAddress        Pointer to the group address to join or leave.
-  @param[in]  CtrlBlk           Pointer to the group control block if JoinFlag if
-                                FALSE.
+  @param[in, out]  Instance        Pointer to the instance context data.
+  @param[in]       JoinFlag        Set to TRUE to join a group. Set to TRUE to 
+                                   leave a group/groups.
+  @param[in]       MacAddress      Pointer to the group address to join or leave.
+  @param[in]       CtrlBlk         Pointer to the group control block if JoinFlag 
+                                   is FALSE.
 
-  @retval EFI_SUCCESS           The group operation finished.
-  @retval Other                 Some error occurs.
+  @retval EFI_SUCCESS              The group operation finished.
+  @retval EFI_OUT_OF_RESOURCES     Failed due to lack of memory resources.
+  @retval Others                   Other errors as indicated.
 
 **/
 EFI_STATUS
 MnpGroupOp (
-  IN MNP_INSTANCE_DATA        *Instance,
+  IN OUT MNP_INSTANCE_DATA    *Instance,
   IN BOOLEAN                  JoinFlag,
   IN EFI_MAC_ADDRESS          *MacAddress OPTIONAL,
   IN MNP_GROUP_CONTROL_BLOCK  *CtrlBlk OPTIONAL

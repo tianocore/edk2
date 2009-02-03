@@ -1,11 +1,11 @@
 /** @file
-    Implementation of driver entry point and driver binding protocol.
+  Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2005 - 2008, Intel Corporation.<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2005 - 2008, Intel Corporation. <BR> 
+All rights reserved. This program and the accompanying materials are licensed 
+and made available under the terms and conditions of the BSD License which 
+accompanies this distribution. The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php 
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -33,14 +33,14 @@ EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding = {
   follow these calling restrictions. If any other agent wishes to call
   Supported() it must also follow these calling restrictions.
 
-  @param[in]  This                Protocol instance pointer.
-  @param[in]  ControllerHandle    Handle of device to test
-  @param[in]  RemainingDevicePath Optional parameter use to pick a specific child
-                                  device to start.
+  @param[in]  This                 Protocol instance pointer.
+  @param[in]  ControllerHandle     Handle of device to test.
+  @param[in]  RemainingDevicePath  Optional parameter use to pick a specific 
+                                   child device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval EFI_ALREADY_STARTED This driver is already running on this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS              This driver supports this device.
+  @retval EFI_ALREADY_STARTED      This driver is already running on this device.
+  @retval Others                   This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -101,21 +101,21 @@ MnpDriverBindingSupported (
 
 /**
   Start this driver on ControllerHandle. This service is called by the
-  EFI boot service ConnectController(). In order to make
-  drivers as small as possible, there are a few calling restrictions for
-  this service. ConnectController() must follow these
-  calling restrictions. If any other agent wishes to call Start() it
-  must also follow these calling restrictions.
+  EFI boot service ConnectController(). In order to make drivers as small 
+  as possible, there are a few calling restrictions for this service.
+  ConnectController() must follow these calling restrictions. If any other
+  agent wishes to call Start() it must also follow these calling restrictions.
 
-  @param[in]  This                 Protocol instance pointer.
-  @param[in]  ControllerHandle     Handle of device to bind driver to.
-  @param[in]  RemainingDevicePath  Optional parameter use to pick a specific child
-                                   device to start.
+  @param[in]       This                 Protocol instance pointer.
+  @param[in]       ControllerHandle     Handle of device to bind driver to.
+  @param[in]       RemainingDevicePath  Optional parameter use to pick a specific 
+                                        child device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval other                This driver does not support this device
-
+  @retval EFI_SUCCESS           This driver is added to ControllerHandle.
+  @retval EFI_ALREADY_STARTED   This driver is already running on ControllerHandle.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for Mnp Service Data.
+  @retval Others                This driver does not support this device.
+  
 **/
 EFI_STATUS
 EFIAPI
@@ -179,20 +179,20 @@ ErrorExit:
 
 /**
   Stop this driver on ControllerHandle. This service is called by the
-  EFI boot service DisconnectController(). In order to
-  make drivers as small as possible, there are a few calling
-  restrictions for this service. DisconnectController()
-  must follow these calling restrictions. If any other agent wishes
-  to call Stop() it must also follow these calling restrictions.
+  EFI boot service DisconnectController(). In order to make drivers as 
+  small as possible, there are a few calling restrictions for this service. 
+  DisconnectController() must follow these calling restrictions. If any other 
+  agent wishes to call Stop() it must also follow these calling restrictions.
   
-  @param[in]  This              Protocol instance pointer.
-  @param[in]  ControllerHandle  Handle of device to stop driver on
-  @param[in]  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
-                                children is zero stop the entire bus driver.
-  @param[in]  ChildHandleBuffer List of Child Handles to Stop.
+  @param[in]  This               Protocol instance pointer.
+  @param[in]  ControllerHandle   Handle of device to stop driver on.
+  @param[in]  NumberOfChildren   Number of Handles in ChildHandleBuffer. If 
+                                 number of children is zero stop the entire 
+								 bus driver.
+  @param[in]  ChildHandleBuffer  List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle
-  @retval other             This driver was not removed from this device
+  @retval EFI_SUCCESS            This driver is removed ControllerHandle.
+  @retval EFI_DEVICE_ERROR       The device could not be stopped due to a device error.
 
 **/
 EFI_STATUS
@@ -201,7 +201,7 @@ MnpDriverBindingStop (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN UINTN                        NumberOfChildren,
-  IN EFI_HANDLE                   *ChildHandleBuffer
+  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
   EFI_STATUS                    Status;
@@ -270,22 +270,19 @@ MnpDriverBindingStop (
 
 
 /**
-  Creates a child handle and installs a protocol.
-  
-  The CreateChild() function installs a protocol on ChildHandle. 
-  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
-  If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
+  Creates a child handle with a set of I/O services.
 
-  @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
-  @param  ChildHandle Pointer to the handle of the child to create. If it is NULL,
-                      then a new handle is created. If it is a pointer to an existing UEFI handle, 
-                      then the protocol is added to the existing UEFI handle.
+  @param[in]       This              Protocol instance pointer.
+  @param[in, out]  ChildHandle       Pointer to the handle of the child to create. If
+                                     it is NULL, then a new handle is created. If
+									 it is not NULL, then the I/O services are added 
+									 to the existing child handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
-  @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resources availabe to create
-                                the child
-  @retval other                 The child handle was not created
+  @retval EFI_SUCCES                 The protocol was added to ChildHandle. 
+  @retval EFI_INVALID_PARAMETER      ChildHandle is NULL. 
+  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to 
+                                     create the child.
+  @retval Others                     The child handle was not created.
 
 **/
 EFI_STATUS
@@ -387,21 +384,24 @@ ErrorExit:
 
 
 /**
-  Destroys a child handle with a protocol installed on it.
-  
-  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
-  that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
-  last protocol on ChildHandle, then ChildHandle is destroyed.
+  Destroys a child handle with a set of I/O services.
+   
+  The DestroyChild() function does the opposite of CreateChild(). It removes a 
+  protocol that was installed by CreateChild() from ChildHandle. If the removed 
+  protocol is the last protocol on ChildHandle, then ChildHandle is destroyed. 
+   
+  @param[in]  This               Pointer to the EFI_SERVICE_BINDING_PROTOCOL 
+                                 instance.
+  @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
-  @param  ChildHandle Handle of the child to destroy
-
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
-  @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
-  @retval EFI_INVALID_PARAMETER Child handle is not a valid UEFI Handle.
-  @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
-                                because its services are being used.
-  @retval other                 The child handle was not destroyed
+  @retval EFI_SUCCES             The protocol was removed from ChildHandle. 
+  @retval EFI_UNSUPPORTED        ChildHandle does not support the protocol that
+                                 is being removed.
+  @retval EFI_INVALID_PARAMETER  ChildHandle is not a valid UEFI handle.
+  @retval EFI_ACCESS_DENIED      The protocol could not be removed from the
+                                 ChildHandle because its services are being
+                                 used.
+  @retval Others                 The child handle was not destroyed.
 
 **/
 EFI_STATUS
@@ -520,12 +520,12 @@ MnpServiceBindingDestroyChild (
   The entry point for Mnp driver which installs the driver binding and component
   name protocol on its ImageHandle.
 
-  @param[in]  ImageHandle   The image handle of the driver.
-  @param[in]  SystemTable   The system table.
+  @param[in]  ImageHandle  The image handle of the driver.
+  @param[in]  SystemTable  The system table.
 
   @retval EFI_SUCCES       The driver binding and component name protocols are 
                            successfully installed.
-  @retval other            failed.
+  @retval Others           Other errors as indicated.
 
 **/
 EFI_STATUS

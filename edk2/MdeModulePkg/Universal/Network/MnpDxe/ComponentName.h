@@ -1,50 +1,25 @@
 /** @file
-  UEFI Component Name(2) protocol implementation for MnpDxe driver.
+  The header file of UEFI Component Name(2) protocol.
 
-Copyright (c) 2005 - 2007, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+Copyright (c) 2004 - 2007, Intel Corporation.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#ifndef _COMPONENT_NAME_H_
+#define _COMPONENT_NAME_H_
 
-#include "MnpDriver.h"
+#include <Protocol/ComponentName.h>
+#include <Protocol/ComponentName2.h>
 
-
-//
-// EFI Component Name Protocol
-//
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName = {
-  MnpComponentNameGetDriverName,
-  MnpComponentNameGetControllerName,
-  "eng"
-};
-
-//
-// EFI Component Name 2 Protocol
-//
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gMnpComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) MnpComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) MnpComponentNameGetControllerName,
-  "en"
-};
-
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mMnpDriverNameTable[] = {
-  {
-    "eng;en",
-    L"MNP Network Service Driver"
-  },
-  {
-    NULL,
-    NULL
-  }
-};
+extern EFI_COMPONENT_NAME2_PROTOCOL       gMnpComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL        gMnpComponentName;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -91,16 +66,8 @@ MnpComponentNameGetDriverName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
-  )
-{
-  return LookupUnicodeString2 (
-           Language,
-           This->SupportedLanguages,
-           mMnpDriverNameTable,
-           DriverName,
-           (BOOLEAN) (This == &gMnpComponentName)
-           );
-}
+  );
+
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -178,7 +145,6 @@ MnpComponentNameGetControllerName (
   IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
   IN  CHAR8                                           *Language,
   OUT CHAR16                                          **ControllerName
-  )
-{
-  return EFI_UNSUPPORTED;
-}
+  );
+
+#endif
