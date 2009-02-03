@@ -52,10 +52,10 @@
   PcdLib
 
 [Guids]
-  gPcdDataBaseHobGuid                           # ALWAYS_CONSUMED  Hob: GUID_EXTENSION
+  gPcdDataBaseHobGuid                           # ALWAYS_CONSUMES  Hob: GUID_EXTENSION
 
 [Protocols]
-  gPcdProtocolGuid                              # PROTOCOL ALWAYS_PRODUCED
+  gPcdProtocolGuid                              # PROTOCOL ALWAYS_PRODUCES
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled
