@@ -55,9 +55,9 @@
   PcdLib
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiDatabaseProtocolGuid
-  gEfiHiiStringProtocolGuid
+  gEfiHiiDatabaseProtocolGuid        ## CONSUMES
+  gEfiHiiStringProtocolGuid          ## CONSUMES
 
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+[Depex]
+  gEfiHiiDatabaseProtocolGuid AND
+  gEfiHiiStringProtocolGuid

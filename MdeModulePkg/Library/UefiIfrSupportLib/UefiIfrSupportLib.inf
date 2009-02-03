@@ -52,6 +52,7 @@
   DebugLib
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigRoutingProtocolGuid
-  gEfiFormBrowser2ProtocolGuid   
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  

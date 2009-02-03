@@ -57,11 +57,11 @@
   ExtendedIfrSupportLib
 
 [Protocols]
-  gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiStringProtocolGuid                     ## CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
 
 
 [Depex]
