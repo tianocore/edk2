@@ -43,15 +43,8 @@
 [Sources.common]
   RealTimeClock.c
   RealTimeClock.h
+  RealTimeClockEntry.c
 
-[Sources.ia32]
-  Ia32/RealTimeClock.c
-
-[Sources.x64]
-  X64/RealTimeClock.c
-
-[Sources.ipf]
-  Ipf/RealTimeClock.c
 
 [Protocols]
   gEfiCpuArchProtocolGuid
