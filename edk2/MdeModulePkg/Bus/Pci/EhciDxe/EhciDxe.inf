@@ -72,6 +72,12 @@
   PcdLib
 
 [Protocols]
-  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiUsb2HcProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciIoProtocolGuid                         ## ALWAYS_CONSUMED
+  gEfiUsb2HcProtocolGuid                        ## ALWAYS_PRODUCED
 
+# [Event]
+#   ##
+#   # Periodic timer event for checking the result of interrupt transfer execution.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+#
