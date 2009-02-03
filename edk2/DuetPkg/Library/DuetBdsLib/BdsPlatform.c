@@ -27,6 +27,11 @@ Abstract:
 CHAR16  mFirmwareVendor[] = L"TianoCore.org";
 extern BOOLEAN  gConnectAllHappened;
 extern USB_CLASS_FORMAT_DEVICE_PATH gUsbClassKeyboardDevicePath;
+
+EFI_GUID                    *gTableGuidArray[] = {
+    &gEfiAcpi20TableGuid, &gEfiAcpiTableGuid, &gEfiSmbiosTableGuid, &gEfiMpsTableGuid
+  };
+
 //
 // BDS Platform Functions
 //
@@ -52,9 +57,6 @@ Returns:
   EFI_PEI_HOB_POINTERS        HobStart;
   EFI_PHYSICAL_ADDRESS        *Table;
   UINTN                       Index;
-  EFI_GUID                    *TableGuidArray[] = {
-    &gEfiAcpi20TableGuid, &gEfiAcpiTableGuid, &gEfiSmbiosTableGuid, &gEfiMpsTableGuid
-  };
 
   //
   // Get Hob List
@@ -63,8 +65,8 @@ Returns:
   //
   // Iteratively add ACPI Table, SMBIOS Table, MPS Table to EFI System Table
   //
-  for (Index = 0; Index < sizeof (TableGuidArray) / sizeof (*TableGuidArray); ++Index) {
-    GuidHob.Raw = GetNextGuidHob (TableGuidArray[Index], HobStart.Raw);
+  for (Index = 0; Index < sizeof (gTableGuidArray) / sizeof (*gTableGuidArray); ++Index) {
+    GuidHob.Raw = GetNextGuidHob (gTableGuidArray[Index], HobStart.Raw);
     if (GuidHob.Raw != NULL) {
       Table = GET_GUID_HOB_DATA (GuidHob.Guid);
       if (Table != NULL) {
@@ -73,8 +75,8 @@ Returns:
         // According to UEFI Spec, we should make sure Smbios table, 
         // ACPI table and Mps tables kept in memory of specified type
         //
-        ConvertSystemTable(TableGuidArray[Index], (VOID**)&Table);
-        gBS->InstallConfigurationTable (TableGuidArray[Index], (VOID *)Table);
+        ConvertSystemTable(gTableGuidArray[Index], (VOID**)&Table);
+        gBS->InstallConfigurationTable (gTableGuidArray[Index], (VOID *)Table);
       }
     }
   }
