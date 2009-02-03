@@ -51,8 +51,8 @@
 
 
 [Protocols]
-  gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
-  gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
+  gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
+  gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
@@ -62,3 +62,10 @@
 [Depex]
   TRUE
 
+# [Event]
+#   ##
+#   # Event will be signaled for VIRTUAL_ADDRESS_CHANGE event.
+#   #
+#   EVENT_TYPE_NOTIFY_SIGNAL                    ## PRODUCES
+#
+#

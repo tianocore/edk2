@@ -54,14 +54,14 @@
   PcdLib
 
 [Protocols]
-  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_CONSUMED
-  gEfiFaultTolerantWriteLiteProtocolGuid        # PROTOCOL SOMETIMES_CONSUMED
-  gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
-  gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
+  gEfiFirmwareVolumeBlockProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiFaultTolerantWriteLiteProtocolGuid        ## SOMETIMES_CONSUMES
+  gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
+  gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
 
 [Guids]
-  gEfiVariableInfoGuid
-  gEfiGlobalVariableGuid
+  gEfiVariableInfoGuid                          ## PRODUCES ## Configuration Table Guid 
+  gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
@@ -76,3 +76,10 @@
 [Depex]
   gEfiFirmwareVolumeBlockProtocolGuid AND gEfiFaultTolerantWriteLiteProtocolGuid
 
+# [Event]
+#   ##
+#   # Event will be signaled for VIRTUAL_ADDRESS_CHANGE event.
+#   #
+#   EVENT_TYPE_NOTIFY_SIGNAL                    ## PRODUCES
+#
+#

@@ -42,4 +42,4 @@
   UefiLib
 
 [Guids]
-  gEfiVariableInfoGuid
+  gEfiVariableInfoGuid        ## ALWAYS_CONSUMES # Configuration Table Guid
