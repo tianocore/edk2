@@ -1001,10 +1001,6 @@ ScsiScanCreateDevice (
                                           ScsiIoDevice->Lun,
                                           &ScsiDevicePath
                                           );
-    if (Status == EFI_OUT_OF_RESOURCES) {
-      FreePool (ScsiIoDevice);
-      return Status;
-    }
   } else {
     Status = ScsiIoDevice->ScsiPassThru->BuildDevicePath (
                                           ScsiIoDevice->ScsiPassThru,
@@ -1012,10 +1008,11 @@ ScsiScanCreateDevice (
                                           ScsiIoDevice->Lun,
                                           &ScsiDevicePath
                                           );
-    if (Status == EFI_OUT_OF_RESOURCES) {
-      FreePool (ScsiIoDevice);
-      return Status;
-    }
+  }
+
+  if (Status == EFI_OUT_OF_RESOURCES) {
+    FreePool (ScsiIoDevice);
+    return Status;
   }
 
   ScsiIoDevice->DevicePath = AppendDevicePathNode (
@@ -1043,6 +1040,7 @@ ScsiScanCreateDevice (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
+    FreePool (ScsiIoDevice->DevicePath);
     FreePool (ScsiIoDevice);
     return EFI_OUT_OF_RESOURCES;
   } else {
