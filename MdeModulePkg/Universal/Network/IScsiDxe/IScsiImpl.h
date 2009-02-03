@@ -20,6 +20,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/NetLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+
+#include <Guid/EventGroup.h>
+
 #include "IScsiCommon.h"
 #include "IScsiDriver.h"
 #include "IScsiInitiatorName.h"

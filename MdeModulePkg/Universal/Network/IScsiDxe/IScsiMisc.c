@@ -536,11 +536,12 @@ IScsiCreateDriverData (
   // Create an event to be signal when the BS to RT transition is triggerd so
   // as to abort the iSCSI session.
   //
-  Status = gBS->CreateEvent (
-                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
                   IScsiOnExitBootService,
                   Private,
+                  &gEfiEventExitBootServicesGuid,
                   &Private->ExitBootServiceEvent
                   );
   if (EFI_ERROR (Status)) {

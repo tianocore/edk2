@@ -237,11 +237,12 @@ VariableServiceInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->CreateEvent (
-                  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   VariableClassAddressChangeEvent,
                   NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
                   &mVirtualAddressChangeEvent
                   );
   ASSERT_EFI_ERROR (Status);

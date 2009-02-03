@@ -36,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Guid/VariableInfo.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/EventGroup.h>
 #include <VariableFormat.h>
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)

@@ -94,3 +94,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   gEfiAcpiSupportProtocolGuid
   gEfiDhcp4ProtocolGuid
   gEfiDhcp4ServiceBindingProtocolGuid
+
+[Guids]
+  gEfiEventExitBootServicesGuid

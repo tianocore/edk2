@@ -54,6 +54,9 @@
   gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
   gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
 
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
