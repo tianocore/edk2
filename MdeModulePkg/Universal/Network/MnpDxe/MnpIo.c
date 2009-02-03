@@ -1,8 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol I/O functions.
-  
-Copyright (c) 2005 - 2007, Intel Corporation.<BR>
-
+    
+Copyright (c) 2005 - 2007, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,17 +13,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "MnpImpl.h"
-#include <Library/NetLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/BaseLib.h>
-#include <Library/MemoryAllocationLib.h>
-
 
 /**
   Validates the Mnp transmit token.
 
-  @param[in]  Instance              Pointer to the Mnp instance context data.
-  @param[in]  Token                 Pointer to the transmit token to check.
+  @param[in]  Instance            Pointer to the Mnp instance context data.
+  @param[in]  Token               Pointer to the transmit token to check.
 
   @return The Token is valid or not.
 
@@ -110,13 +104,13 @@ MnpIsValidTxToken (
 /**
   Build the packet to transmit from the TxData passed in.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
-  @param  TxData                Pointer to the transmit data containing the
-                                information to build the packet.
-  @param  PktBuf                Pointer to record the address of the packet.
-  @param  PktLen                Pointer to a UINT32 variable used to record the
-                                packet's length.
-   
+  @param[in]   MnpServiceData      Pointer to the mnp service context data.
+  @param[in]   TxData              Pointer to the transmit data containing the information 
+                                   to build the packet.
+  @param[out]  PktBuf              Pointer to record the address of the packet.
+  @param[out]  PktLen              Pointer to a UINT32 variable used to record the packet's 
+                                   length.
+
 **/
 VOID
 MnpBuildTxPacket (
@@ -180,22 +174,22 @@ MnpBuildTxPacket (
 /**
   Synchronously send out the packet.
 
-  @param[in]  MnpServiceData        Pointer to the mnp service context data.
-  @param[in]  Packet                Pointer to the pakcet buffer.
-  @param[in]  Length                The length of the packet.
-  @param[in]  Token                 Pointer to the token the packet generated from.
+  @param[in]       MnpServiceData      Pointer to the mnp service context data.
+  @param[in]       Packet              Pointer to the pakcet buffer.
+  @param[in]       Length              The length of the packet.
+  @param[in, out]  Token               Pointer to the token the packet generated from.
 
-  @retval EFI_SUCCESS           The packet is sent out.
-  @retval EFI_TIMEOUT           Time out occurs, the packet isn't sent.
-  @retval EFI_DEVICE_ERROR      An unexpected network error occurs.
+  @retval EFI_SUCCESS                  The packet is sent out.
+  @retval EFI_TIMEOUT                  Time out occurs, the packet isn't sent.
+  @retval EFI_DEVICE_ERROR             An unexpected network error occurs.
 
 **/
 EFI_STATUS
 MnpSyncSendPacket (
-  IN MNP_SERVICE_DATA                      *MnpServiceData,
-  IN UINT8                                 *Packet,
-  IN UINT32                                Length,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
+  IN MNP_SERVICE_DATA                          *MnpServiceData,
+  IN UINT8                                     *Packet,
+  IN UINT32                                    Length,
+  IN OUT EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   )
 {
   EFI_STATUS                        Status;
@@ -297,7 +291,7 @@ SIGNAL_TOKEN:
 /**
   Try to deliver the received packet to the instance.
 
-  @param[in]  Instance          Pointer to the mnp instance context data.
+  @param[in, out]  Instance     Pointer to the mnp instance context data.
 
   @retval EFI_SUCCESS           The received packet is delivered, or there is no
                                 packet to deliver, or there is no available receive
@@ -307,7 +301,7 @@ SIGNAL_TOKEN:
 **/
 EFI_STATUS
 MnpInstanceDeliverPacket (
-  IN MNP_INSTANCE_DATA  *Instance
+  IN OUT MNP_INSTANCE_DATA  *Instance
   )
 {
   MNP_SERVICE_DATA                      *MnpServiceData;
@@ -391,7 +385,7 @@ MnpInstanceDeliverPacket (
 /**
   Deliver the received packet for the instances belonging to the MnpServiceData.
 
-  @param  MnpServiceData        Pointer to the mnp service context data.
+  @param[in]  MnpServiceData        Pointer to the mnp service context data.
 
 **/
 VOID
@@ -420,9 +414,9 @@ MnpDeliverPacket (
   Recycle the RxData and other resources used to hold and deliver the received
   packet.
 
-  @param  Event             The event this notify function registered to.
-  @param  Context           Pointer to the context data registerd to the Event.
-  
+  @param[in]  Event               The event this notify function registered to.
+  @param[in]  Context             Pointer to the context data registerd to the Event.
+
 **/
 VOID
 EFIAPI
@@ -467,15 +461,14 @@ MnpRecycleRxData (
 /**
   Queue the received packet into instance's receive queue.
 
-  @param  Instance          Pointer to the mnp instance context data.
-  @param  RxDataWrap        Pointer to the Wrap structure containing the
-                                received data and other information.
-
+  @param[in, out]  Instance        Pointer to the mnp instance context data.
+  @param[in, out]  RxDataWrap      Pointer to the Wrap structure containing the
+                                   received data and other information.
 **/
 VOID
 MnpQueueRcvdPacket (
-  IN MNP_INSTANCE_DATA  *Instance,
-  IN MNP_RXDATA_WRAP    *RxDataWrap
+  IN OUT MNP_INSTANCE_DATA  *Instance,
+  IN OUT MNP_RXDATA_WRAP    *RxDataWrap
   )
 {
   MNP_RXDATA_WRAP *OldRxDataWrap;
@@ -600,25 +593,25 @@ MnpMatchPacket (
 /**
   Analyse the received packets.
 
-  @param  MnpServiceData    Pointer to the mnp service context data.
-  @param  Nbuf              Pointer to the net buffer holding the received
-                            packet.
-  @param  RxData            Pointer to the buffer used to save the analysed
-                            result in EFI_MANAGED_NETWORK_RECEIVE_DATA.
-  @param  GroupAddress      Pointer to pointer to a MNP_GROUP_ADDRESS used to
-                            pass out the address of the multicast address the
-                            received packet destinated to.
-  @param  PktAttr           Pointer to the buffer used to save the analysed
-                            packet attribute.
+  @param[in]       MnpServiceData    Pointer to the mnp service context data.
+  @param[in]       Nbuf              Pointer to the net buffer holding the received
+                                     packet.
+  @param[in, out]  RxData            Pointer to the buffer used to save the analysed
+                                     result in EFI_MANAGED_NETWORK_RECEIVE_DATA.
+  @param[out]      GroupAddress      Pointer to pointer to a MNP_GROUP_ADDRESS used to
+                                     pass out the address of the multicast address the
+                                     received packet destinated to.
+  @param[out]      PktAttr           Pointer to the buffer used to save the analysed
+                                     packet attribute.
 
 **/
 VOID
 MnpAnalysePacket (
-  IN  MNP_SERVICE_DATA                  *MnpServiceData,
-  IN  NET_BUF                           *Nbuf,
-  IN  EFI_MANAGED_NETWORK_RECEIVE_DATA  *RxData,
-  OUT MNP_GROUP_ADDRESS                 **GroupAddress,
-  OUT UINT8                             *PktAttr
+  IN  MNP_SERVICE_DATA                      *MnpServiceData,
+  IN  NET_BUF                               *Nbuf,
+  IN  OUT EFI_MANAGED_NETWORK_RECEIVE_DATA  *RxData,
+  OUT MNP_GROUP_ADDRESS                     **GroupAddress,
+  OUT UINT8                                 *PktAttr
   )
 {
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
@@ -702,8 +695,8 @@ MnpAnalysePacket (
 /**
   Wrap the RxData.
 
-  @param[in]  Instance              Pointer to the mnp instance context data.
-  @param[in]  RxData                Pointer to the receive data to wrap.
+  @param[in]  Instance           Pointer to the mnp instance context data.
+  @param[in]  RxData             Pointer to the receive data to wrap.
 
   @return Pointer to a MNP_RXDATA_WRAP which wraps the RxData.
 
@@ -758,9 +751,9 @@ MnpWrapRxData (
   Enqueue the received the packets to the instances belonging to the
   MnpServiceData.
 
-  @param  MnpServiceData    Pointer to the mnp service context data.
-  @param  Nbuf              Pointer to the net buffer representing the received
-                            packet.
+  @param[in]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in]  Nbuf              Pointer to the net buffer representing the received
+                                packet.
 
 **/
 VOID
@@ -833,7 +826,7 @@ MnpEnqueuePacket (
 /**
   Try to receive a packet and deliver it.
 
-  @param[in]  MnpServiceData    Pointer to the mnp service context data.
+  @param[in, out]  MnpServiceData        Pointer to the mnp service context data.
 
   @retval EFI_SUCCESS           add return value to function comment
   @retval EFI_NOT_STARTED       The simple network protocol is not started.
@@ -843,7 +836,7 @@ MnpEnqueuePacket (
 **/
 EFI_STATUS
 MnpReceivePacket (
-  IN MNP_SERVICE_DATA  *MnpServiceData
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData
   )
 {
   EFI_STATUS                  Status;
@@ -985,10 +978,10 @@ EXIT:
 /**
   Remove the received packets if timeout occurs.
 
-  @param  Event             The event this notify function registered to.
-  @param  Context           Pointer to the context data registered to the
-                            event.
-  
+  @param[in]  Event             The event this notify function registered to.
+  @param[in]  Context           Pointer to the context data registered to the
+                                event.
+   
 **/
 VOID
 EFIAPI
@@ -1052,16 +1045,15 @@ MnpCheckPacketTimeout (
   Poll to receive the packets from Snp. This function is either called by upperlayer
   protocols/applications or the system poll timer notify mechanism.
 
-  @param  Event             The event this notify function registered to.
-  @param  Context           Pointer to the context data registered to the
-                            event.
+  @param[in]       Event        The event this notify function registered to.
+  @param[in, out]  Context      Pointer to the context data registered to the event.
 
 **/
 VOID
 EFIAPI
 MnpSystemPoll (
   IN EFI_EVENT  Event,
-  IN VOID       *Context
+  IN OUT VOID   *Context
   )
 {
   MNP_SERVICE_DATA  *MnpServiceData;
