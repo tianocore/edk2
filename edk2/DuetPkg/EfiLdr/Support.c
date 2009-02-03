@@ -111,7 +111,7 @@ FindSpace (
     if ((EfiMemoryDescriptor[Index].Type == EfiConventionalMemory) && 
         (EfiMemoryDescriptor[Index].NumberOfPages >= NoPages)) {
       if (EfiMemoryDescriptor[Index].PhysicalStart > MaxPhysicalStart) {
-        if (EfiMemoryDescriptor[Index].PhysicalStart + LShiftU64(EfiMemoryDescriptor[Index].NumberOfPages, EFI_PAGE_SHIFT) <= 0x100000000) {
+        if (EfiMemoryDescriptor[Index].PhysicalStart + LShiftU64(EfiMemoryDescriptor[Index].NumberOfPages, EFI_PAGE_SHIFT) <= 0x100000000ULL) {
           MaxPhysicalStart = EfiMemoryDescriptor[Index].PhysicalStart;
           MaxNoPages       = EfiMemoryDescriptor[Index].NumberOfPages;
           CurrentMemoryDescriptor = &EfiMemoryDescriptor[Index];
@@ -206,7 +206,7 @@ GenMemoryMap (
       //
       // Update Memory Ceiling
       //
-      if ((BaseAddress >= 0x100000) && (BaseAddress < 0x100000000)) {
+      if ((BaseAddress >= 0x100000) && (BaseAddress < 0x100000000ULL)) {
         if (Ceiling > BaseAddress) {
           Ceiling = BaseAddress;
         }
@@ -228,7 +228,7 @@ GenMemoryMap (
   for (Index = 0; Index < *NumberOfMemoryMapEntries; Index++) {
     if ((EfiMemoryDescriptor[Index].Type == EfiConventionalMemory) &&
         (EfiMemoryDescriptor[Index].PhysicalStart > 0x100000) && 
-        (EfiMemoryDescriptor[Index].PhysicalStart < 0x100000000)) {
+        (EfiMemoryDescriptor[Index].PhysicalStart < 0x100000000ULL)) {
       if (EfiMemoryDescriptor[Index].PhysicalStart >= Ceiling) {
         EfiMemoryDescriptor[Index].Type = EfiReservedMemoryType;
       }
