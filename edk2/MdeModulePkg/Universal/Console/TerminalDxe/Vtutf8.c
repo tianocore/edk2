@@ -1,7 +1,7 @@
 /** @file
   Implementation of translation upon VT-UTF8.
 
-Copyright (c) 2006, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Terminal.h"
 
 /**
-  Translate all VT-UTF8 characters in the Raw FIFI into unicode characters, 
+  Translate all VT-UTF8 characters in the Raw FIFI into unicode characters,
   and insert them into Unicode FIFO.
 
   @param TerminalDevice          The terminal device.
@@ -55,7 +55,7 @@ VTUTF8RawDataToUnicode (
 
   @param  Utf8Device          The terminal device.
   @param  Utf8Char            Returned valid VT-UTF8 characters set.
-  @param  ValidBytes          The count of returned VT-VTF8 characters. 
+  @param  ValidBytes          The count of returned VT-VTF8 characters.
                               If ValidBytes is zero, no valid VT-UTF8 returned.
 
 **/
@@ -125,6 +125,9 @@ GetOneValidUtf8Char (
       break;
 
     case 2:
+      //
+      // two-byte utf8 char go on
+      //
       if ((Temp & 0xc0) == 0x80) {
 
         Utf8Char->Utf8_2[0] = Temp;
@@ -138,15 +141,20 @@ GetOneValidUtf8Char (
       break;
 
     case 3:
+      //
+      // three-byte utf8 char go on
+      //
       if ((Temp & 0xc0) == 0x80) {
 
         Utf8Char->Utf8_3[2 - Index] = Temp;
         Index++;
-        if (Index == 3) {
+        if (Index > 2) {
           FetchFlag = FALSE;
         }
       } else {
-
+        //
+        // reset *ValidBytes and Index to zero, let valid utf8 char search restart
+        //
         *ValidBytes = 0;
         Index       = 0;
       }
@@ -164,7 +172,7 @@ GetOneValidUtf8Char (
   return ;
 }
 
-/** 
+/**
   Translate VT-UTF8 characters into one Unicode character.
 
   UTF8 Encoding Table
@@ -176,7 +184,7 @@ GetOneValidUtf8Char (
 
   @param  Utf8Char         VT-UTF8 character set needs translating.
   @param  ValidBytes       The count of valid VT-UTF8 characters.
-  @param  UnicodeChar      Returned unicode character. 
+  @param  UnicodeChar      Returned unicode character.
 
 **/
 VOID
@@ -237,7 +245,7 @@ Utf8ToUnicode (
   return ;
 }
 
-/** 
+/**
   Translate one Unicode character into VT-UTF8 characters.
 
   UTF8 Encoding Table
@@ -301,8 +309,8 @@ UnicodeToUtf8 (
   Check if input string is valid VT-UTF8 string.
 
   @param  TerminalDevice          The terminal device.
-  @param  WString                 The input string.          
- 
+  @param  WString                 The input string.
+
   @retval EFI_SUCCESS             If all input characters are valid.
 
 **/

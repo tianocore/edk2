@@ -84,9 +84,9 @@ typedef struct {
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     SimpleTextOutput;
   EFI_SIMPLE_TEXT_OUTPUT_MODE         SimpleTextOutputMode;
   UINTN                               SerialInTimeOut;
-  RAW_DATA_FIFO                       RawFiFo;
-  UNICODE_FIFO                        UnicodeFiFo;
-  EFI_KEY_FIFO                        EfiKeyFiFo;
+  RAW_DATA_FIFO                       *RawFiFo;
+  UNICODE_FIFO                        *UnicodeFiFo;
+  EFI_KEY_FIFO                        *EfiKeyFiFo;
   EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
   EFI_EVENT                           TwoSecondTimeOut;
   UINT32                              InputState;
@@ -491,7 +491,7 @@ TerminalConOutQueryMode (
   @param ModeNumber    The text mode to set.
 
   @retval EFI_SUCCESS       The requested text mode is set.
-  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set 
+  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set
                             because of serial device error.
   @retval EFI_UNSUPPORTED   The text mode number is not valid.
 
@@ -581,7 +581,7 @@ TerminalConOutEnableCursor (
   );
 
 /**
-  Test to see if this driver supports Controller. 
+  Test to see if this driver supports Controller.
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test
@@ -629,7 +629,7 @@ TerminalDriverBindingStart (
 /**
   Stop this driver on Controller by closing Simple Text In, Simple Text
   In Ex, Simple Text Out protocol, and removing parent device path from
-  Console Device Environment Variables.    
+  Console Device Environment Variables.
 
   @param  This              Protocol instance pointer.
   @param  Controller        Handle of device to stop driver on
@@ -847,7 +847,7 @@ TerminalRemoveConsoleDevVariable (
   @param  VariableSize           Returns the size of the EFI variable that was read
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-          Caller is repsoncible freeing the buffer. If variable was not read, 
+          Caller is repsoncible freeing the buffer. If variable was not read,
           NULL regturned.
 
 **/
@@ -875,39 +875,6 @@ SetTerminalDevicePath (
   IN  UINT8                       TerminalType,
   IN  EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath,
   OUT EFI_DEVICE_PATH_PROTOCOL    **TerminalDevicePath
-  );
-
-/**
-  Initialize the Raw Data FIFO.
-
-  @param TerminalDevice          The terminal device.
-
-**/
-VOID
-InitializeRawFiFo (
-  IN  TERMINAL_DEV  *TerminalDevice
-  );
-
-/**
-  Initialize the Unicode FIFO.
-
-  @param TerminalDevice          The terminal device.
-
-**/
-VOID
-InitializeUnicodeFiFo (
-  IN  TERMINAL_DEV  *TerminalDevice
-  );
-
-/**
-  Initialize the EFI Key FIFO.
-
-  @param TerminalDevice          The terminal device.
-
-**/
-VOID
-InitializeEfiKeyFiFo (
-  IN  TERMINAL_DEV  *TerminalDevice
   );
 
 /**
@@ -1125,8 +1092,8 @@ UnicodeFiFoGetKeyCount (
   );
 
 /**
-  Translate raw data into Unicode (according to different encode), and 
-  translate Unicode into key information. (according to different standard). 
+  Translate raw data into Unicode (according to different encode), and
+  translate Unicode into key information. (according to different standard).
 
   @param  TerminalDevice       Terminal driver private structure.
 
@@ -1154,8 +1121,8 @@ AnsiRawDataToUnicode (
 
 /**
   Converts a stream of Unicode characters from a terminal input device into EFI Keys that
-  can be read through the Simple Input Protocol. 
-  
+  can be read through the Simple Input Protocol.
+
   The table below shows the keyboard input mappings that this function supports.
   If the ESC sequence listed in one of the columns is presented, then it is translated
   into the coorespoding EFI Scan Code.  If a matching sequence is not found, then the raw
@@ -1206,7 +1173,7 @@ AnsiRawDataToUnicode (
   | F11     | 0x15 |           | ESC !    |          |
   | F12     | 0x16 |           | ESC @    |          |
   +=========+======+===========+==========+==========+
-  
+
   Special Mappings
   ================
   ESC R ESC r ESC R = Reset System
@@ -1225,8 +1192,8 @@ UnicodeToEfiKey (
   or valid text graphics.
 
   @param  TerminalDevice          The terminal device.
-  @param  WString                 The input string.          
- 
+  @param  WString                 The input string.
+
   @retval EFI_UNSUPPORTED         If not all input characters are valid.
   @retval EFI_SUCCESS             If all input characters are valid.
 
@@ -1242,7 +1209,7 @@ AnsiTestString (
 //
 
 /**
-  Translate all VT-UTF8 characters in the Raw FIFI into unicode characters, 
+  Translate all VT-UTF8 characters in the Raw FIFI into unicode characters,
   and insert them into Unicode FIFO.
 
   @param VtUtf8Device          The terminal device.
@@ -1257,8 +1224,8 @@ VTUTF8RawDataToUnicode (
   Check if input string is valid VT-UTF8 string.
 
   @param  TerminalDevice          The terminal device.
-  @param  WString                 The input string.          
- 
+  @param  WString                 The input string.
+
   @retval EFI_SUCCESS             If all input characters are valid.
 
 **/
@@ -1268,7 +1235,7 @@ VTUTF8TestString (
   IN  CHAR16          *WString
   );
 
-/** 
+/**
   Translate one Unicode character into VT-UTF8 characters.
 
   UTF8 Encoding Table
@@ -1296,7 +1263,7 @@ UnicodeToUtf8 (
 
   @param  Utf8Device          The terminal device.
   @param  Utf8Char            Returned valid VT-UTF8 characters set.
-  @param  ValidBytes          The count of returned VT-VTF8 characters. 
+  @param  ValidBytes          The count of returned VT-VTF8 characters.
                               If ValidBytes is zero, no valid VT-UTF8 returned.
 
 **/
@@ -1307,7 +1274,7 @@ GetOneValidUtf8Char (
   OUT UINT8             *ValidBytes
   );
 
-/** 
+/**
   Translate VT-UTF8 characters into one Unicode character.
 
   UTF8 Encoding Table
@@ -1319,7 +1286,7 @@ GetOneValidUtf8Char (
 
   @param  Utf8Char         VT-UTF8 character set needs translating.
   @param  ValidBytes       The count of valid VT-UTF8 characters.
-  @param  UnicodeChar      Returned unicode character. 
+  @param  UnicodeChar      Returned unicode character.
 
 **/
 VOID
@@ -1356,7 +1323,7 @@ TerminalIsValidTextGraphics (
   Detects if a valid ASCII char.
 
   @param  Ascii        An ASCII character.
-                       
+
   @retval TRUE         If it is a valid ASCII character.
   @retval FALSE        If it is not a valid ASCII character.
 
@@ -1370,7 +1337,7 @@ TerminalIsValidAscii (
   Detects if a valid EFI control character.
 
   @param  CharC        An input EFI Control character.
-                       
+
   @retval TRUE         If it is a valid EFI control character.
   @retval FALSE        If it is not a valid EFI control character.
 

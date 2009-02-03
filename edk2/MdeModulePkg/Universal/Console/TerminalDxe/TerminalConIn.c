@@ -120,11 +120,11 @@ TerminalConInReset (
   Status = TerminalDevice->SerialIo->Reset (TerminalDevice->SerialIo);
 
   //
-  // clear all the internal buffer for keys
+  // Make all the internal buffer empty for keys
   //
-  InitializeRawFiFo (TerminalDevice);
-  InitializeUnicodeFiFo (TerminalDevice);
-  InitializeEfiKeyFiFo (TerminalDevice);
+  TerminalDevice->RawFiFo->Head     = TerminalDevice->RawFiFo->Tail;
+  TerminalDevice->UnicodeFiFo->Head = TerminalDevice->UnicodeFiFo->Tail;
+  TerminalDevice->EfiKeyFiFo->Head  = TerminalDevice->EfiKeyFiFo->Tail;
 
   if (EFI_ERROR (Status)) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
@@ -179,7 +179,7 @@ TerminalConInReadKeyStroke (
 
 /**
   Check if the key already has been registered.
-  
+
   If both RegsiteredData and InputData is NULL, then ASSERT().
 
   @param  RegsiteredData           A pointer to a buffer that is filled in with the
@@ -450,7 +450,7 @@ TerminalConInUnregisterKeyNotify (
   LIST_ENTRY                      *Link;
   TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
   LIST_ENTRY                      *NotifyList;
-  
+
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -498,8 +498,8 @@ TerminalConInUnregisterKeyNotify (
 }
 
 /**
-  Translate raw data into Unicode (according to different encode), and 
-  translate Unicode into key information. (according to different standard). 
+  Translate raw data into Unicode (according to different encode), and
+  translate Unicode into key information. (according to different standard).
 
   @param  TerminalDevice       Terminal driver private structure.
 
@@ -746,7 +746,7 @@ RawFiFoInsertOneKey (
 {
   UINT8 Tail;
 
-  Tail = TerminalDevice->RawFiFo.Tail;
+  Tail = TerminalDevice->RawFiFo->Tail;
 
   if (IsRawFiFoFull (TerminalDevice)) {
     //
@@ -755,9 +755,9 @@ RawFiFoInsertOneKey (
     return FALSE;
   }
 
-  TerminalDevice->RawFiFo.Data[Tail]  = Input;
+  TerminalDevice->RawFiFo->Data[Tail]  = Input;
 
-  TerminalDevice->RawFiFo.Tail        = (UINT8) ((Tail + 1) % (RAW_FIFO_MAX_NUMBER + 1));
+  TerminalDevice->RawFiFo->Tail        = (UINT8) ((Tail + 1) % (RAW_FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -780,7 +780,7 @@ RawFiFoRemoveOneKey (
 {
   UINT8 Head;
 
-  Head = TerminalDevice->RawFiFo.Head;
+  Head = TerminalDevice->RawFiFo->Head;
 
   if (IsRawFiFoEmpty (TerminalDevice)) {
     //
@@ -790,9 +790,9 @@ RawFiFoRemoveOneKey (
     return FALSE;
   }
 
-  *Output                       = TerminalDevice->RawFiFo.Data[Head];
+  *Output                       = TerminalDevice->RawFiFo->Data[Head];
 
-  TerminalDevice->RawFiFo.Head  = (UINT8) ((Head + 1) % (RAW_FIFO_MAX_NUMBER + 1));
+  TerminalDevice->RawFiFo->Head  = (UINT8) ((Head + 1) % (RAW_FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -811,7 +811,7 @@ IsRawFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
   )
 {
-  if (TerminalDevice->RawFiFo.Head == TerminalDevice->RawFiFo.Tail) {
+  if (TerminalDevice->RawFiFo->Head == TerminalDevice->RawFiFo->Tail) {
     return TRUE;
   } else {
     return FALSE;
@@ -835,8 +835,8 @@ IsRawFiFoFull (
   UINT8 Tail;
   UINT8 Head;
 
-  Tail  = TerminalDevice->RawFiFo.Tail;
-  Head  = TerminalDevice->RawFiFo.Head;
+  Tail  = TerminalDevice->RawFiFo->Tail;
+  Head  = TerminalDevice->RawFiFo->Head;
 
   if (((Tail + 1) % (RAW_FIFO_MAX_NUMBER + 1)) == Head) {
 
@@ -865,7 +865,7 @@ EfiKeyFiFoInsertOneKey (
 {
   UINT8 Tail;
 
-  Tail = TerminalDevice->EfiKeyFiFo.Tail;
+  Tail = TerminalDevice->EfiKeyFiFo->Tail;
 
   if (IsEfiKeyFiFoFull (TerminalDevice)) {
     //
@@ -874,9 +874,9 @@ EfiKeyFiFoInsertOneKey (
     return FALSE;
   }
 
-  TerminalDevice->EfiKeyFiFo.Data[Tail] = Key;
+  TerminalDevice->EfiKeyFiFo->Data[Tail] = Key;
 
-  TerminalDevice->EfiKeyFiFo.Tail       = (UINT8) ((Tail + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->EfiKeyFiFo->Tail       = (UINT8) ((Tail + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -899,7 +899,7 @@ EfiKeyFiFoRemoveOneKey (
 {
   UINT8 Head;
 
-  Head = TerminalDevice->EfiKeyFiFo.Head;
+  Head = TerminalDevice->EfiKeyFiFo->Head;
 
   if (IsEfiKeyFiFoEmpty (TerminalDevice)) {
     //
@@ -910,9 +910,9 @@ EfiKeyFiFoRemoveOneKey (
     return FALSE;
   }
 
-  *Output                         = TerminalDevice->EfiKeyFiFo.Data[Head];
+  *Output                         = TerminalDevice->EfiKeyFiFo->Data[Head];
 
-  TerminalDevice->EfiKeyFiFo.Head = (UINT8) ((Head + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->EfiKeyFiFo->Head = (UINT8) ((Head + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -931,7 +931,7 @@ IsEfiKeyFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
   )
 {
-  if (TerminalDevice->EfiKeyFiFo.Head == TerminalDevice->EfiKeyFiFo.Tail) {
+  if (TerminalDevice->EfiKeyFiFo->Head == TerminalDevice->EfiKeyFiFo->Tail) {
     return TRUE;
   } else {
     return FALSE;
@@ -955,8 +955,8 @@ IsEfiKeyFiFoFull (
   UINT8 Tail;
   UINT8 Head;
 
-  Tail  = TerminalDevice->EfiKeyFiFo.Tail;
-  Head  = TerminalDevice->EfiKeyFiFo.Head;
+  Tail  = TerminalDevice->EfiKeyFiFo->Tail;
+  Head  = TerminalDevice->EfiKeyFiFo->Head;
 
   if (((Tail + 1) % (FIFO_MAX_NUMBER + 1)) == Head) {
 
@@ -985,7 +985,7 @@ UnicodeFiFoInsertOneKey (
 {
   UINT8 Tail;
 
-  Tail = TerminalDevice->UnicodeFiFo.Tail;
+  Tail = TerminalDevice->UnicodeFiFo->Tail;
 
   if (IsUnicodeFiFoFull (TerminalDevice)) {
     //
@@ -994,9 +994,9 @@ UnicodeFiFoInsertOneKey (
     return FALSE;
   }
 
-  TerminalDevice->UnicodeFiFo.Data[Tail]  = Input;
+  TerminalDevice->UnicodeFiFo->Data[Tail]  = Input;
 
-  TerminalDevice->UnicodeFiFo.Tail        = (UINT8) ((Tail + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->UnicodeFiFo->Tail        = (UINT8) ((Tail + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -1019,7 +1019,7 @@ UnicodeFiFoRemoveOneKey (
 {
   UINT8 Head;
 
-  Head = TerminalDevice->UnicodeFiFo.Head;
+  Head = TerminalDevice->UnicodeFiFo->Head;
 
   if (IsUnicodeFiFoEmpty (TerminalDevice)) {
     //
@@ -1029,9 +1029,9 @@ UnicodeFiFoRemoveOneKey (
     return FALSE;
   }
 
-  *Output = TerminalDevice->UnicodeFiFo.Data[Head];
+  *Output = TerminalDevice->UnicodeFiFo->Data[Head];
 
-  TerminalDevice->UnicodeFiFo.Head = (UINT8) ((Head + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->UnicodeFiFo->Head = (UINT8) ((Head + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -1050,7 +1050,7 @@ IsUnicodeFiFoEmpty (
   TERMINAL_DEV  *TerminalDevice
   )
 {
-  if (TerminalDevice->UnicodeFiFo.Head == TerminalDevice->UnicodeFiFo.Tail) {
+  if (TerminalDevice->UnicodeFiFo->Head == TerminalDevice->UnicodeFiFo->Tail) {
     return TRUE;
   } else {
     return FALSE;
@@ -1074,8 +1074,8 @@ IsUnicodeFiFoFull (
   UINT8 Tail;
   UINT8 Head;
 
-  Tail  = TerminalDevice->UnicodeFiFo.Tail;
-  Head  = TerminalDevice->UnicodeFiFo.Head;
+  Tail  = TerminalDevice->UnicodeFiFo->Tail;
+  Head  = TerminalDevice->UnicodeFiFo->Head;
 
   if (((Tail + 1) % (FIFO_MAX_NUMBER + 1)) == Head) {
 
@@ -1101,8 +1101,8 @@ UnicodeFiFoGetKeyCount (
   UINT8 Tail;
   UINT8 Head;
 
-  Tail  = TerminalDevice->UnicodeFiFo.Tail;
-  Head  = TerminalDevice->UnicodeFiFo.Head;
+  Tail  = TerminalDevice->UnicodeFiFo->Tail;
+  Head  = TerminalDevice->UnicodeFiFo->Head;
 
   if (Tail >= Head) {
     return (UINT8) (Tail - Head);
@@ -1113,7 +1113,7 @@ UnicodeFiFoGetKeyCount (
 
 /**
   Update the Unicode characters from a terminal input device into EFI Keys FIFO.
-  
+
   @param TerminalDevice   The terminal device to use to translate raw input into EFI Keys
 
 **/
@@ -1124,9 +1124,9 @@ UnicodeToEfiKeyFlushState (
 {
   EFI_INPUT_KEY Key;
   UINT32        InputState;
-  
+
   InputState = TerminalDevice->InputState;
-  
+
   if ((InputState & INPUT_STATE_ESC) != 0) {
     Key.ScanCode    = SCAN_ESC;
     Key.UnicodeChar = 0;
@@ -1172,8 +1172,8 @@ UnicodeToEfiKeyFlushState (
 
 /**
   Converts a stream of Unicode characters from a terminal input device into EFI Keys that
-  can be read through the Simple Input Protocol. 
-  
+  can be read through the Simple Input Protocol.
+
   The table below shows the keyboard input mappings that this function supports.
   If the ESC sequence listed in one of the columns is presented, then it is translated
   into the corresponding EFI Scan Code.  If a matching sequence is not found, then the raw

@@ -69,21 +69,11 @@ TERMINAL_DEV  mTerminalDevTemplate = {
     TRUE                                         // CursorVisible
   },
   0,  // SerialInTimeOut
-  {   // RawFiFo
-    0,
-    0,
-    { 0 }
-  },
-  {  // UnicodeFiFo
-    0,
-    0,
-    { 0 }
-  },
-  {  // EfiKeyFiFo
-    0,
-    0,
-    { {0} }
-  },
+
+  NULL, // RawFifo
+  NULL, // UnicodeFiFo
+  NULL, // EfiKeyFiFo
+
   NULL, // ControllerNameTable
   NULL, // TwoSecondTimeOut
   INPUT_STATE_DEFAULT,
@@ -424,12 +414,21 @@ TerminalDriverBindingStart (
     goto Error;
   }
   //
-  // initialize the FIFO buffer used for accommodating
-  // the pre-read pending characters
+  // Allocates and initializes the FIFO buffer to be zero, used for accommodating
+  // the pre-read pending characters.
   //
-  InitializeRawFiFo (TerminalDevice);
-  InitializeUnicodeFiFo (TerminalDevice);
-  InitializeEfiKeyFiFo (TerminalDevice);
+  TerminalDevice->RawFiFo     = AllocateZeroPool (sizeof (RAW_DATA_FIFO));
+  if (TerminalDevice->RawFiFo == NULL) {
+    goto Error;
+  }
+  TerminalDevice->UnicodeFiFo = AllocateZeroPool (sizeof (UNICODE_FIFO));
+  if (TerminalDevice->UnicodeFiFo == NULL) {
+    goto Error;
+  }
+  TerminalDevice->EfiKeyFiFo  = AllocateZeroPool (sizeof (EFI_KEY_FIFO));
+  if (TerminalDevice->EfiKeyFiFo == NULL) {
+    goto Error;
+  }
 
   //
   // Set the timeout value of serial buffer for
@@ -703,6 +702,16 @@ Error:
       }
 
       TerminalFreeNotifyList (&TerminalDevice->NotifyList);
+
+      if (TerminalDevice->RawFiFo != NULL) {
+        FreePool (TerminalDevice->RawFiFo);
+      }
+      if (TerminalDevice->UnicodeFiFo != NULL) {
+        FreePool (TerminalDevice->UnicodeFiFo);
+      }
+      if (TerminalDevice->EfiKeyFiFo != NULL) {
+        FreePool (TerminalDevice->EfiKeyFiFo);
+      }
 
       if (TerminalDevice->ControllerNameTable != NULL) {
         FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
@@ -1278,58 +1287,6 @@ SetTerminalDevicePath (
 
   return EFI_SUCCESS;
 }
-
-/**
-  Initialize the Raw Data FIFO.
-
-  @param TerminalDevice          The terminal device.
-
-**/
-VOID
-InitializeRawFiFo (
-  IN  TERMINAL_DEV  *TerminalDevice
-  )
-{
-  //
-  // Make the raw FIFO empty.
-  //
-  TerminalDevice->RawFiFo.Head = TerminalDevice->RawFiFo.Tail;
-}
-
-/**
-  Initialize the Unicode FIFO.
-
-  @param TerminalDevice          The terminal device.
-
-**/
-VOID
-InitializeUnicodeFiFo (
-  IN  TERMINAL_DEV  *TerminalDevice
-  )
-{
-  //
-  // Make the unicode FIFO empty
-  //
-  TerminalDevice->UnicodeFiFo.Head = TerminalDevice->UnicodeFiFo.Tail;
-}
-
-/**
-  Initialize the EFI Key FIFO.
-
-  @param TerminalDevice          The terminal device.
-
-**/
-VOID
-InitializeEfiKeyFiFo (
-  IN  TERMINAL_DEV  *TerminalDevice
-  )
-{
-  //
-  // Make the efi key FIFO empty
-  //
-  TerminalDevice->EfiKeyFiFo.Head = TerminalDevice->EfiKeyFiFo.Tail;
-}
-
 
 /**
   The user Entry Point for module Terminal. The user code starts with this function.
