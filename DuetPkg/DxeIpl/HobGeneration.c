@@ -24,7 +24,7 @@ Revision History:
 #include "Debug.h"
 
 #define EFI_DXE_FILE_GUID \
-  { 0xb1644c1a, 0xc16a, 0x4c5b, 0x88, 0xde, 0xea, 0xfb, 0xa9, 0x7e, 0x74, 0xd8 }
+  { 0xb1644c1a, 0xc16a, 0x4c5b, {0x88, 0xde, 0xea, 0xfb, 0xa9, 0x7e, 0x74, 0xd8 }}
 
 #define CPUID_EXTENDED_ADD_SIZE  0x80000008
 
@@ -92,7 +92,7 @@ HOB_TEMPLATE  gHobTemplate = {
       0x0,                                          // EFI_PHYSICAL_ADDRESS  MemoryBaseAddress;
       0x0,                                          // UINT64                MemoryLength;
       EfiBootServicesData,                          // EFI_MEMORY_TYPE       MemoryType;  
-      0, 0, 0, 0                                    // Reserved              Reserved[4]; 
+      {0, 0, 0, 0}                                  // Reserved              Reserved[4]; 
     }
   },
   { // MemoryAllocation for HOB's & Images
@@ -191,10 +191,14 @@ HOB_TEMPLATE  gHobTemplate = {
     0x0                                             //  EFI_PHYSICAL_ADDRESS of EntryPoint;
   },
   { // Memory Map Hints to reduce fragmentation in the memory map
-    EFI_HOB_TYPE_GUID_EXTENSION,                    // Hob type
-    sizeof (MEMORY_TYPE_INFORMATION_HOB),           // Hob size
-    0,                                              // reserved
-    EFI_MEMORY_TYPE_INFORMATION_GUID,
+    {
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,                    // Hob type
+        sizeof (MEMORY_TYPE_INFORMATION_HOB),           // Hob size
+        0,                                              // reserved
+      },
+      EFI_MEMORY_TYPE_INFORMATION_GUID
+    },
     {
       {
         EfiACPIReclaimMemory,
@@ -239,31 +243,47 @@ HOB_TEMPLATE  gHobTemplate = {
     }
   },
   { // Pointer to ACPI Table
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (TABLE_HOB),                // Hob size
-    0,                                 // reserved
-    EFI_ACPI_TABLE_GUID,
+    {
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (TABLE_HOB),                // Hob size
+        0                                  // reserved
+      },
+      EFI_ACPI_TABLE_GUID
+    },
     0
   },
   { // Pointer to ACPI20 Table
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (TABLE_HOB),                // Hob size
-    0,                                 // reserved
-    EFI_ACPI_20_TABLE_GUID,
+    {
+      {  
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (TABLE_HOB),                // Hob size
+        0                                  // reserved
+      },
+      EFI_ACPI_20_TABLE_GUID
+    },
     0
   },
   { // Pointer to SMBIOS Table
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (TABLE_HOB),                // Hob size
-    0,                                 // reserved
-    EFI_SMBIOS_TABLE_GUID,
+    {
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (TABLE_HOB),                // Hob size
+        0                                  // reserved
+      },
+      EFI_SMBIOS_TABLE_GUID
+    },
     0
   },
   { // Pointer to MPS Table
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (TABLE_HOB),                // Hob size
-    0,                                 // reserved
-    EFI_MPS_TABLE_GUID,
+    {
+      {
+         EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (TABLE_HOB),                // Hob size
+        0,                                 // reserved
+      },
+      EFI_MPS_TABLE_GUID
+    },
     0
   },
   /**
@@ -304,25 +324,37 @@ HOB_TEMPLATE  gHobTemplate = {
   },
   **/
   { // Pointer to ReportStatusCode
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (PROTOCOL_HOB),             // Hob size
-    0,                                 // reserved
-    EFI_STATUS_CODE_RUNTIME_PROTOCOL_GUID,
+    {
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (PROTOCOL_HOB),             // Hob size
+        0                                  // reserved
+      },
+      EFI_STATUS_CODE_RUNTIME_PROTOCOL_GUID
+    },
     NULL
   },
   { // EFILDR Memory Descriptor
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (MEMORY_DESC_HOB),          // Hob size
-    0,                                 // reserved
-    EFI_LDR_MEMORY_DESCRIPTOR_GUID,
+    {
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (MEMORY_DESC_HOB),          // Hob size
+        0                                  // reserved
+      },
+      EFI_LDR_MEMORY_DESCRIPTOR_GUID
+    },
     0,
     NULL
   },
   { // Pci Express Base Address Hob
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (PCI_EXPRESS_BASE_HOB),     // Hob size
-    0,                                 // reserved
-    EFI_PCI_EXPRESS_BASE_ADDRESS_GUID,
+    {
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (PCI_EXPRESS_BASE_HOB),     // Hob size
+        0                                  // reserved
+      },
+      EFI_PCI_EXPRESS_BASE_ADDRESS_GUID
+    },
     {
       0,
       0,
@@ -330,12 +362,18 @@ HOB_TEMPLATE  gHobTemplate = {
     }
   },
   { // Acpi Description Hob
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (ACPI_DESCRIPTION_HOB),     // Hob size
-    0,                                 // reserved
-    EFI_ACPI_DESCRIPTION_GUID,
     {
-      0,
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (ACPI_DESCRIPTION_HOB),     // Hob size
+        0                                  // reserved
+      },
+      EFI_ACPI_DESCRIPTION_GUID
+    },
+    {
+      {
+        0,
+      },
     }
   },
   { // NV Storage FV Resource
@@ -356,21 +394,27 @@ HOB_TEMPLATE  gHobTemplate = {
     NV_STORAGE_FVB_SIZE                             // ResourceLength
   },
   { // FVB holding NV Storage
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (FVB_HOB),
-    0,
-    EFI_FLASH_MAP_HOB_GUID,
     {
-      0, 0, 0,                         // Reserved[3]
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (FVB_HOB),
+        0
+      },
+      EFI_FLASH_MAP_HOB_GUID
+    },
+    {
+      {0, 0, 0},                       // Reserved[3]
       EFI_FLASH_AREA_GUID_DEFINED,     // AreaType
       EFI_SYSTEM_NV_DATA_HOB_GUID,     // AreaTypeGuid
       1,
       {
-        EFI_FLASH_AREA_FV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
-        0,                             // SubAreaData.Reserved
-        0,                             // SubAreaData.Base (Fixed later)
-        NV_STORAGE_FVB_SIZE,           // SubAreaData.Length
-        EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        {
+          EFI_FLASH_AREA_FV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
+          0,                             // SubAreaData.Reserved
+          0,                             // SubAreaData.Base (Fixed later)
+          NV_STORAGE_FVB_SIZE,           // SubAreaData.Length
+          EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        }
       }, 
       0,                               // VolumeSignature (Fixed later)
       NV_STORAGE_FILE_PATH,            // Mapped file without padding
@@ -381,21 +425,27 @@ HOB_TEMPLATE  gHobTemplate = {
     }
   },
   { // NV Storage Hob
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (FVB_HOB),                  // Hob size
-    0,                                 // reserved
-    EFI_FLASH_MAP_HOB_GUID,
     {
-      0, 0, 0,                         // Reserved[3]
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (FVB_HOB),                  // Hob size
+        0                                  // reserved
+      },
+      EFI_FLASH_MAP_HOB_GUID
+    },
+    {
+      {0, 0, 0},                       // Reserved[3]
       EFI_FLASH_AREA_EFI_VARIABLES,    // AreaType
       { 0 },                           // AreaTypeGuid
       1,
       {
-        EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
-        0,                             // SubAreaData.Reserved
-        0,                             // SubAreaData.Base (Fixed later)
-        NV_STORAGE_SIZE,               // SubAreaData.Length
-        EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        {
+          EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
+          0,                             // SubAreaData.Reserved
+          0,                             // SubAreaData.Base (Fixed later)
+          NV_STORAGE_SIZE,               // SubAreaData.Length
+          EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        }
       }, 
       0,
       NV_STORAGE_FILE_PATH,
@@ -404,21 +454,27 @@ HOB_TEMPLATE  gHobTemplate = {
     }
   },
   { // FVB holding FTW spaces including Working & Spare space
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (FVB_HOB),
-    0,
-    EFI_FLASH_MAP_HOB_GUID,
     {
-      0, 0, 0,                         // Reserved[3]
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (FVB_HOB),
+        0
+      },
+      EFI_FLASH_MAP_HOB_GUID
+    },
+    {
+      {0, 0, 0},                       // Reserved[3]
       EFI_FLASH_AREA_GUID_DEFINED,     // AreaType
       EFI_SYSTEM_NV_DATA_HOB_GUID,     // AreaTypeGuid
       1,
       {
-        EFI_FLASH_AREA_FV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
-        0,                             // SubAreaData.Reserved
-        0,                             // SubAreaData.Base (Fixed later)
-        NV_FTW_FVB_SIZE,               // SubAreaData.Length
-        EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID   // SubAreaData.FileSystem
+        {
+          EFI_FLASH_AREA_FV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
+          0,                             // SubAreaData.Reserved
+          0,                             // SubAreaData.Base (Fixed later)
+          NV_FTW_FVB_SIZE,               // SubAreaData.Length
+          EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID   // SubAreaData.FileSystem
+        }
       }, 
       0,
       L"",                             // Empty String indicates using memory
@@ -427,21 +483,27 @@ HOB_TEMPLATE  gHobTemplate = {
     }
   },
   { // NV Ftw working Hob
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (FVB_HOB),                  // Hob size
-    0,                                 // reserved
-    EFI_FLASH_MAP_HOB_GUID,
     {
-      0, 0, 0,                         // Reserved[3]
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (FVB_HOB),                  // Hob size
+        0                                  // reserved
+      },
+      EFI_FLASH_MAP_HOB_GUID
+    },
+    {
+      {0, 0, 0},                       // Reserved[3]
       EFI_FLASH_AREA_FTW_STATE,        // AreaType
       { 0 },                           // AreaTypeGuid
       1,
       {
-        EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
-        0,                             // SubAreaData.Reserved
-        0,                             // SubAreaData.Base (Fixed later)
-        NV_FTW_WORKING_SIZE,           // SubAreaData.Length
-        EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        {
+          EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
+          0,                             // SubAreaData.Reserved
+          0,                             // SubAreaData.Base (Fixed later)
+          NV_FTW_WORKING_SIZE,           // SubAreaData.Length
+          EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        }
       }, 
       0,                               // VolumeSignature
       L"",
@@ -450,21 +512,27 @@ HOB_TEMPLATE  gHobTemplate = {
     }
   },
   { // NV Ftw spare Hob
-    EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
-    sizeof (FVB_HOB),                  // Hob size
-    0,                                 // reserved
-    EFI_FLASH_MAP_HOB_GUID,
     {
-      0, 0, 0,                         // Reserved[3]
+      {
+        EFI_HOB_TYPE_GUID_EXTENSION,       // Hob type
+        sizeof (FVB_HOB),                  // Hob size
+        0                                  // reserved
+      },
+      EFI_FLASH_MAP_HOB_GUID
+    },
+    {
+      {0, 0, 0},                       // Reserved[3]
       EFI_FLASH_AREA_FTW_BACKUP,       // AreaType
       { 0 },                           // AreaTypeGuid
       1,
       {
-        EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
-        0,                             // SubAreaData.Reserved
-        0,                             // SubAreaData.Base (Fixed later)
-        NV_FTW_SPARE_SIZE,             // SubAreaData.Length
-        EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        {
+          EFI_FLASH_AREA_SUBFV | EFI_FLASH_AREA_MEMMAPPED_FV, // SubAreaData.Attributes
+          0,                             // SubAreaData.Reserved
+          0,                             // SubAreaData.Base (Fixed later)
+          NV_FTW_SPARE_SIZE,             // SubAreaData.Length
+          EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID // SubAreaData.FileSystem
+        }
       }, 
       0,
       L"",
