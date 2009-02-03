@@ -40,15 +40,7 @@
 [Sources.common]
   Reset.c
   Reset.h
-
-[Sources.ipf]
-  Ipf/IpfReset.c
-
-[Sources.ia32]
-  Ia32/Ia32Reset.c
-
-[Sources.x64]
-  X64/X64Reset.c
+  ResetEntry.c
 
 [Protocols]
   gEfiResetArchProtocolGuid
