@@ -87,12 +87,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  #
-  #This dependency is because of gEfiLegacyBiosProtocolGuid and gEfiDataHubProtocolGuid. It may be removed if a Library class is created to
-  #abstract away definition in Framework specification or PI spec incorporates the Legacy Booting Protocols and Data Hub Protocols.
-  #
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-
 
 [LibraryClasses]
   DevicePathLib
@@ -117,35 +112,51 @@
   CapsuleLib
 
 [Guids]
-  gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
-  gEfiBootStateGuid                             # ALWAYS_CONSUMED
-  gEfiFileSystemVolumeLabelInfoIdGuid           # ALWAYS_CONSUMED
-  gEfiFileInfoGuid                              # ALWAYS_CONSUMED
-  gEfiGenericPlatformVariableGuid
-  gEfiMiscSubClassGuid
-  gEfiMemorySubClassGuid
-  gEfiProcessorSubClassGuid
-  gEfiCapsuleVendorGuid
+  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"PlatformLang" (Platform supported languange in Rfc3066 format)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"Lang" (Platform supported languange in Iso639 format)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"KeyOrder" (Number of hotkey)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"KeyXX" (Hotkey option variable)
+                                                ## PRODUCES           ## Variable:L"HwErrRecSupport" (The level of platform supported hardware Error Record Persistence)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOptionSupport" (The feature supported in boot option menu, value could be: EFI_BOOT_OPTION_SUPPORT_KEY, EFI_BOOT_OPTION_SUPPORT_APP
+                                                ## SOMETIMES_PRODUCES (not PcdUefiVariableDefaultLangDeprecate)## Variable:L"LangCodes" (Value of PcdUefiVariableDefaultLangCodes)
+                                                ## PRODUCES           ## Variable:L"PlatformLangCodes" (Value of PcdUefiVariableDefaultPlatformLangCodes)
+                                                ## PRODUCES           ## Variable:L"Timeout" (The time out value in second of showing progress bar)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOrder" (The boot option array)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"DriverOrder" (The driver order list)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
+  gEfiBootStateGuid                             ## SOMETIMES_PRODUCES (Produce when status has not been set yet) ## Variable:L"BootState" (Indicate the state of last boot)
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
+  gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
+  gEfiGenericPlatformVariableGuid               ## PRODUCES ## Variable:L"ConOutMode" (The mode of console out device)
+                                                ## PRODUCES ## Variable:L"VBIOS" (The option of video BIOS)
+  gEfiMiscSubClassGuid                          ## CONSUMES ## GUID (Indicate the datahub for holding misc sub class record)
+  gEfiMemorySubClassGuid                        ## CONSUMES ## GUID (Indicate the datahub for holding memory record)
+  gEfiProcessorSubClassGuid                     ## CONSUMES ## GUID (Indicate the datahub for holding processor record)
+  gEfiCapsuleVendorGuid                         ## CONSUMES ## GUID (Indicate the hob for holding capsure vendor)
 
 [Protocols]
-  gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
-  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMES
+  gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMES
+  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCES
+  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
+  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
+  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMES
+  gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
+  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMES
+  gEfiUgaDrawProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
+  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
+  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMES
+  gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMES
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMES
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
@@ -162,3 +173,12 @@
 [Depex]
   gEfiHiiDatabaseProtocolGuid
 
+#
+# [BootMode] 
+#   BOOT_ON_FLASH_UPDATE            ## SOMETIMES_CONSUMES
+#
+#  
+# [Hob]
+#   CAPSULE_HOB                     ## SOMETIMES_CONSUMES
+#
+# 
