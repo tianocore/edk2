@@ -237,8 +237,7 @@ Var_DelDriverOption (
   needed.
 
   @retval  EFI_SUCCESS  The driver order is updated successfully.
-  @return               EFI_STATUS other than EFI_SUCCESS if failed to
-                                 Set the "DriverOrder" EFI Variable.
+  @return  Other status than EFI_SUCCESS if failed to set the "DriverOrder" EFI Variable.
 
 **/
 EFI_STATUS
@@ -875,7 +874,7 @@ Var_UpdateBootOption (
 
 /**
   This function update the "BootNext" EFI Variable. If there is 
-  no "BootNex" specified in BMM, this EFI Variable is deleted.
+  no "BootNext" specified in BMM, this EFI Variable is deleted.
   It also update the BMM context data specified the "BootNext"
   vaule.
 
