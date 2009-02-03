@@ -305,7 +305,7 @@ Returns:
   PrintString("                         WELCOME TO EFI WORLD!\n");
   
   EnterDxeMain (StackTop, Handoff->DxeCoreEntryPoint, gHob, PageTableBase);
-  
+ 
   PrintString("Fail to enter DXE main!\n");
   //
   // Should never get here

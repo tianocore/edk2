@@ -27,6 +27,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PrintLib.h>
+#include <Library/IoLib.h>
 
 #include <VariableFormat.h>
 #include <CpuIA32.h>
