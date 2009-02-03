@@ -20,7 +20,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-
+#include <Guid/EventGroup.h>
 extern EFI_RUNTIME_SERVICES   *mRT;
 
 #endif 
