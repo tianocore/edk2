@@ -44,15 +44,6 @@
 [Sources.common]
   CpuIo.c
   CpuIo.h
-  CpuIoAccess.h
-
-[Sources.IA32]
-  Ia32/CpuIoAccess.asm  | MSFT
-  Ia32/CpuIoAccess.asm  | INTEL
-  Ia32/CpuIoAccessGNU.c | GCC
-  
-[Sources.X64]
-  X64/CpuIoAccess.asm
 
 [Protocols]
   gEfiCpuIoProtocolGuid
