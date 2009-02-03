@@ -172,7 +172,7 @@ InstallMemoryDataHub (
   DataRecord.Record.ArrayStartAddress.MemoryArrayStartAddress = LShiftU64(SmbiosTable.Type19->StartingAddress, 10);
   DataRecord.Record.ArrayStartAddress.MemoryArrayEndAddress = LShiftU64((UINT64) SmbiosTable.Type19->EndingAddress + 1, 10) - 1;
   
-  DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName = gEfiMemoryProducerGuid;
+  CopyGuid (&DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName, &gEfiMemoryProducerGuid);
   DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.Instance = 0;
   DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.SubInstance = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
   DataRecord.Record.ArrayStartAddress.MemoryArrayPartitionWidth = (UINT16)(SmbiosTable.Type19->PartitionWidth); 
