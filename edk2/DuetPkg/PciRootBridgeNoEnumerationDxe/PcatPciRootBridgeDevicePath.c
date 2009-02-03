@@ -33,18 +33,24 @@ typedef struct {
 
 EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath = {
   {
-    ACPI_DEVICE_PATH,
-    ACPI_DP,
-    (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
-    (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8),
+    {
+      ACPI_DEVICE_PATH,
+      ACPI_DP,
+      {
+        (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
+        (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8),
+      }
+    },
     EISA_PNP_ID(0x0A03),
     0
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    END_DEVICE_PATH_LENGTH,
-    0
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
   }
 };
 
