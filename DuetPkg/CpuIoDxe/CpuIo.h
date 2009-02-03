@@ -32,6 +32,7 @@ Abstract:
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/IoLib.h>
 
 typedef union {
   UINT8  volatile  *buf;

@@ -23,7 +23,6 @@ Abstract:
 --*/
 
 #include "CpuIo.h"
-#include "CpuIoAccess.h"
 
 #define IA32_MAX_IO_ADDRESS   0xFFFF
 
@@ -313,19 +312,19 @@ Returns:
   switch (Width) {
   case EfiCpuIoWidthUint8:
     for (; Count > 0; Count--, Buffer.buf += OutStride, Address += InStride) {
-      *Buffer.ui8 = CpuIoRead8 ((UINT16) Address);
+      *Buffer.ui8 = IoRead8 ((UINTN) Address);
     }
     break;
 
   case EfiCpuIoWidthUint16:
     for (; Count > 0; Count--, Buffer.buf += OutStride, Address += InStride) {
-      *Buffer.ui16 = CpuIoRead16 ((UINT16) Address);
+      *Buffer.ui16 = IoRead16 ((UINTN) Address);
     }
     break;
 
   case EfiCpuIoWidthUint32:
     for (; Count > 0; Count--, Buffer.buf += OutStride, Address += InStride) {
-      *Buffer.ui32 = CpuIoRead32 ((UINT16) Address);
+      *Buffer.ui32 = IoRead32 ((UINTN) Address);
     }
     break;
 
@@ -406,19 +405,19 @@ Returns:
   switch (Width) {
   case EfiCpuIoWidthUint8:
     for (; Count > 0; Count--, Buffer.buf += OutStride, Address += InStride) {
-      CpuIoWrite8 ((UINT16) Address, *Buffer.ui8);
+      IoWrite8 ((UINTN) Address, *Buffer.ui8);
     }
     break;
 
   case EfiCpuIoWidthUint16:
     for (; Count > 0; Count--, Buffer.buf += OutStride, Address += InStride) {
-      CpuIoWrite16 ((UINT16) Address, *Buffer.ui16);
+      IoWrite16 ((UINTN) Address, *Buffer.ui16);
     }
     break;
 
   case EfiCpuIoWidthUint32:
     for (; Count > 0; Count--, Buffer.buf += OutStride, Address += InStride) {
-      CpuIoWrite32 ((UINT16) Address, *Buffer.ui32);
+      IoWrite32 ((UINTN) Address, *Buffer.ui32);
     }
     break;
 
