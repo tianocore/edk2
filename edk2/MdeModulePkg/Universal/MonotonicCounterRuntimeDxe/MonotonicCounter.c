@@ -54,7 +54,7 @@ EFI_GUID    mEfiMtcGuid = { 0xeb704011, 0x1402, 0x11d3, { 0x8e, 0x77, 0x0, 0xa0,
 
   This function returns a 64-bit value that is numerically larger then the last
   time the function was called.
-  The platform’s monotonic counter is comprised of two parts: the high 32 bits
+  The platform monotonic counter is comprised of two parts: the high 32 bits
   and the low 32 bits. The low 32-bit value is volatile and is reset to zero on
   every system reset. It is increased by 1 on every call to GetNextMonotonicCount().
   The high 32-bit value is nonvolatile and is increased by one on whenever the
