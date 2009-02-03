@@ -53,15 +53,15 @@
   UefiRuntimeServicesTableLib
 
 [Protocols]
-  gEfiHiiDatabaseProtocolGuid  # ALWAYS_CONSUMED
-  gEfiHiiStringProtocolGuid    # ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid  
+  gEfiHiiDatabaseProtocolGuid  ## CONSUMES
+  gEfiHiiStringProtocolGuid    ## CONSUMES
+  gEfiDevicePathProtocolGuid   ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 
 [Guids]  
-  gEfiGlobalVariableGuid 
+  gEfiGlobalVariableGuid        ## SOMETIMES_CONSUMES ## Variable:L"PlatformLang"
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND

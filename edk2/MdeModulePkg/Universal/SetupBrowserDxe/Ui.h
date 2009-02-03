@@ -741,6 +741,8 @@ CompareHiiValue (
 /**
   Evaluate the result of a HII expression
 
+  If Expression is NULL, then ASSERT.
+
   @param  FormSet                FormSet associated with this expression.
   @param  Form                   Form associated with this expression.
   @param  Expression             Expression to be evaluated.

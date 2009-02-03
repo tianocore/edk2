@@ -59,14 +59,14 @@
   UefiRuntimeServicesTableLib
 
 [Protocols]
-  gEfiConsoleControlProtocolGuid                
-  gEfiDevicePathProtocolGuid                    
-  gEfiHiiStringProtocolGuid
-  gEfiHiiImageProtocolGuid
-  gEfiHiiConfigRoutingProtocolGuid
-  gEfiHiiDatabaseProtocolGuid
-  gEfiHiiFontProtocolGuid
-  gEfiHiiConfigAccessProtocolGuid
+  gEfiConsoleControlProtocolGuid                                        ## CONSUMES
+  gEfiDevicePathProtocolGuid                                            ## SOMETIMES_CONSUMES
+  gEfiHiiStringProtocolGuid                                             ## PRODUCES
+  gEfiHiiImageProtocolGuid |PcdSupportHiiImageProtocol                  ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid |PcdSupportFullConfigRoutingProtocol ## PRODUCES
+  gEfiHiiDatabaseProtocolGuid                                           ## PRODUCES
+  gEfiHiiFontProtocolGuid                                               ## PRODUCES
+  gEfiHiiConfigAccessProtocolGuid                                       ## CONSUMES
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol
@@ -76,7 +76,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 
 [Guids]  
-  gEfiGlobalVariableGuid 
+  gEfiGlobalVariableGuid  ## SOMETIMES_CONSUMES ## Variable:"PlatformLang"
   
 [Depex]
   TRUE

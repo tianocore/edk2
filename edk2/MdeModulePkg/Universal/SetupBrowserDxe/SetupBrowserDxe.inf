@@ -64,15 +64,15 @@
   ExtendedHiiLib
 
 [Protocols]
-  gEfiPrintProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
-  gEfiPrint2ProtocolGuid
-  gEfiHiiConfigAccessProtocolGuid
-  gEfiHiiStringProtocolGuid
-  gEfiFormBrowser2ProtocolGuid
-  gEfiHiiConfigRoutingProtocolGuid
-  gEfiHiiDatabaseProtocolGuid
-  gEfiUnicodeCollation2ProtocolGuid
-  gEfiConsoleControlProtocolGuid
+  gEfiPrintProtocolGuid                         ## PRODUCES
+  gEfiPrint2ProtocolGuid                        ## PRODUCES
+  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiHiiStringProtocolGuid                     ## CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid             ## CONSUMES
+  gEfiConsoleControlProtocolGuid                ## CONSUMES
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport
