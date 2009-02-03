@@ -70,7 +70,50 @@ BdsLibDoLegacyBoot (
                       );
 }
 
+/**
+  Internal function to check if the input boot option is a valid EFI NV Boot####.
 
+  @param OptionToCheck  Boot option to be checked.
+
+  @retval TRUE      This boot option matches a valid EFI NV Boot####.
+  @retval FALSE     If not.
+  
+**/
+
+BOOLEAN
+IsBootOptionValidNVVarialbe (
+  IN  BDS_COMMON_OPTION             *OptionToCheck
+  )
+{
+  LIST_ENTRY        TempList;
+  BDS_COMMON_OPTION *BootOption;
+  BOOLEAN           Valid;
+  CHAR16            OptionName[20];
+
+  Valid = FALSE;
+
+  InitializeListHead (&TempList);
+  UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", OptionToCheck->BootCurrent);
+
+  BootOption = BdsLibVariableToOption (&TempList, OptionName);
+  if (BootOption == NULL) {
+    return FALSE;
+  }
+
+  //
+  // If the Boot Option Number and Device Path matches, OptionToCheck matches a 
+  // valid EFI NV Boot####.
+  //
+  if ((OptionToCheck->BootCurrent == BootOption->BootCurrent) &&
+      (CompareMem (OptionToCheck->DevicePath, BootOption->DevicePath, GetDevicePathSize (OptionToCheck->DevicePath)) == 0))
+      {
+    Valid = TRUE;
+  }
+
+  FreePool (BootOption);
+    
+  return Valid;
+}
 /**
   Process the boot option follow the UEFI specification and
   special treat the legacy boot option with BBS_DEVICE_PATH.
@@ -149,13 +192,20 @@ BdsLibBootViaBootOption (
   //
   // Set Boot Current
   //
-  gRT->SetVariable (
-        L"BootCurrent",
-        &gEfiGlobalVariableGuid,
-        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-        sizeof (UINT16),
-        &Option->BootCurrent
-        );
+  if (IsBootOptionValidNVVarialbe (Option)) {
+    //
+    // For a temporary boot (i.e. a boot by selected a EFI Shell using "Boot From File"), Boot Current is actually not valid.
+    // In this case, "BootCurrent" is not created.
+    // Only create the BootCurrent variable when it points to a valid Boot#### variable.
+    //
+    gRT->SetVariable (
+          L"BootCurrent",
+          &gEfiGlobalVariableGuid,
+          EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+          sizeof (UINT16),
+          &Option->BootCurrent
+          );
+  }
 
   ASSERT (Option->DevicePath != NULL);
   if ((DevicePathType (Option->DevicePath) == BBS_DEVICE_PATH) &&
