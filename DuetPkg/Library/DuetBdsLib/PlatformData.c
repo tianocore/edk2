@@ -50,8 +50,10 @@ USB_CLASS_FORMAT_DEVICE_PATH gUsbClassKeyboardDevicePath = {
     {
       MESSAGING_DEVICE_PATH,
       MSG_USB_CLASS_DP,
-      (UINT8) (sizeof (USB_CLASS_DEVICE_PATH)),
-      (UINT8) ((sizeof (USB_CLASS_DEVICE_PATH)) >> 8)
+      {
+        (UINT8) (sizeof (USB_CLASS_DEVICE_PATH)),
+        (UINT8) ((sizeof (USB_CLASS_DEVICE_PATH)) >> 8)
+      }
     },
     0xffff,           // VendorId 
     0xffff,           // ProductId 
@@ -63,8 +65,10 @@ USB_CLASS_FORMAT_DEVICE_PATH gUsbClassKeyboardDevicePath = {
   { 
     END_DEVICE_PATH_TYPE, 
     END_ENTIRE_DEVICE_PATH_SUBTYPE, 
-    END_DEVICE_PATH_LENGTH, 
-    0
+    {
+      END_DEVICE_PATH_LENGTH, 
+      0
+    }
   }
 };
 
