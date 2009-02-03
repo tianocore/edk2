@@ -64,8 +64,15 @@
 
 
 [Protocols]
-  gEfiUsbIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiUsb2HcProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
-  gEfiUsbHcProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiUsbIoProtocolGuid                         ## ALWAYS_PRODUCED
+  gEfiDevicePathProtocolGuid                    ## ALWAYS_CONSUMED
+  gEfiUsb2HcProtocolGuid                        ## SOMETIMES_CONSUMED
+  gEfiUsbHcProtocolGuid                         ## SOMETIMES_CONSUMED
 
+# [Event]
+#   ##
+#   # Periodic timer event for monitoring attach/detach event in port and enumerate attached usb devices.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER                   ## PRODUCES
+#
+#
