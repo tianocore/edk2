@@ -53,8 +53,114 @@ FV_DEVICE mFvDevice = {
 // FFS helper functions
 //
 /**
-  given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
-  copy the volume header into it.
+  Read data from Firmware Block by FVB protocol Read. 
+  The data may cross the multi block ranges.
+
+  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to read data.
+  @param  StartLba              Pointer to StartLba.
+                                On input, the start logical block index from which to read.
+                                On output,the end logical block index after reading.
+  @param  Offset                Pointer to Offset
+                                On input, offset into the block at which to begin reading.
+                                On output, offset into the end block after reading.
+  @param  DataSize              Size of data to be read.
+  @param  Data                  Pointer to Buffer that the data will be read into.
+
+  @retval EFI_SUCCESS           Successfully read data from firmware block.
+  @retval others
+**/
+EFI_STATUS
+ReadFvbData (
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
+  IN OUT EFI_LBA                                *StartLba,
+  IN OUT UINTN                                  *Offset,
+  IN     UINTN                                  DataSize,
+  OUT    UINT8                                  *Data
+  )
+{
+  UINTN                       BlockSize;
+  UINTN                       NumberOfBlocks;
+  UINTN                       BlockIndex;
+  UINTN                       ReadDataSize;
+  EFI_STATUS                  Status;
+  
+  //
+  // Try read data in current block
+  //
+  BlockIndex   = 0;
+  ReadDataSize = DataSize;
+  Status = Fvb->Read (Fvb, *StartLba, *Offset, &ReadDataSize, Data);
+  if (Status == EFI_SUCCESS) {
+    *Offset  += DataSize;
+    return EFI_SUCCESS;
+  } else if (Status != EFI_BAD_BUFFER_SIZE) {
+    //
+    // other error will direct return
+    //
+    return Status;
+  }
+  
+  //
+  // Data crosses the blocks, read data from next block
+  //
+  DataSize -= ReadDataSize;
+  Data     += ReadDataSize;
+  *StartLba = *StartLba + 1;
+  while (DataSize > 0) {
+    Status = Fvb->GetBlockSize (Fvb, *StartLba, &BlockSize, &NumberOfBlocks);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Read data from the crossing blocks
+    //
+    BlockIndex = 0; 
+    while (BlockIndex < NumberOfBlocks && DataSize >= BlockSize) {
+      Status = Fvb->Read (Fvb, *StartLba + BlockIndex, 0, &BlockSize, Data);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+      Data += BlockSize;
+      DataSize -= BlockSize;
+      BlockIndex ++;
+    }
+    
+    //
+    // Data doesn't exceed the current block range.
+    //
+    if (DataSize < BlockSize) {
+      break;
+    }
+    
+    //
+    // Data must be got from the next block range.
+    //
+    *StartLba += NumberOfBlocks;
+  }
+  
+  //
+  // read the remaining data
+  //
+  if (DataSize > 0) {
+    Status = Fvb->Read (Fvb, *StartLba + BlockIndex, 0, &DataSize, Data);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+  
+  //
+  // Update Lba and Offset used by the following read.
+  //
+  *StartLba += BlockIndex;
+  *Offset   = DataSize;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
+  copy the real length volume header into it.
 
   @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to
                                 read the volume header
@@ -75,14 +181,17 @@ GetFwVolHeader (
   EFI_STATUS                  Status;
   EFI_FIRMWARE_VOLUME_HEADER  TempFvh;
   UINTN                       FvhLength;
+  EFI_LBA                     StartLba;
+  UINTN                       Offset;
   UINT8                       *Buffer;
-
-
+  
   //
-  //Determine the real length of FV header
+  // Read the standard FV header
   //
+  StartLba = 0;
+  Offset   = 0;
   FvhLength = sizeof (EFI_FIRMWARE_VOLUME_HEADER);
-  Status = Fvb->Read (Fvb, 0, 0, &FvhLength, (UINT8 *)&TempFvh);
+  Status = ReadFvbData (Fvb, &StartLba, &Offset, FvhLength, (UINT8 *)&TempFvh);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -105,7 +214,7 @@ GetFwVolHeader (
   //
   FvhLength = TempFvh.HeaderLength - sizeof (EFI_FIRMWARE_VOLUME_HEADER);
   Buffer = (UINT8 *)*FwVolHeader + sizeof (EFI_FIRMWARE_VOLUME_HEADER);
-  Status = Fvb->Read (Fvb, 0, sizeof (EFI_FIRMWARE_VOLUME_HEADER), &FvhLength, Buffer);
+  Status = ReadFvbData (Fvb, &StartLba, &Offset, FvhLength, Buffer);
   if (EFI_ERROR (Status)) {
     //
     // Read failed so free buffer
@@ -191,6 +300,7 @@ FvCheck (
   EFI_FFS_FILE_HEADER                   *FfsHeader;
   UINT8                                 *CacheLocation;
   UINTN                                 LbaOffset;
+  UINTN                                 HeaderSize;
   UINTN                                 Index;
   EFI_LBA                               LbaIndex;
   UINTN                                 Size;
@@ -231,24 +341,44 @@ FvCheck (
   BlockMap = FwVolHeader->BlockMap;
   CacheLocation = FvDevice->CachedFv;
   LbaIndex = 0;
-  LbaOffset = FwVolHeader->HeaderLength;
+  LbaOffset = 0;
+  HeaderSize = FwVolHeader->HeaderLength;
   while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
-
-    for (Index = 0; Index < BlockMap->NumBlocks; Index ++) {
-
-      Size = BlockMap->Length;
-      if (Index == 0) {
-        //
-        // Cache does not include FV Header
-        //
-        Size -= LbaOffset;
+    Index = 0;
+    Size  = BlockMap->Length;
+    if (HeaderSize > 0) {
+      //
+      // Skip header size
+      //
+      for (; Index < BlockMap->NumBlocks && HeaderSize >= BlockMap->Length; Index ++) {
+        HeaderSize -= BlockMap->Length;
+        LbaIndex ++;
       }
+
+      //
+      // Check whether FvHeader is crossing the multi block range.
+      //
+      if (HeaderSize > BlockMap->Length) {
+        BlockMap++;
+        continue;
+      } else if (HeaderSize > 0) {
+        LbaOffset = HeaderSize;
+        Size = BlockMap->Length - HeaderSize;
+        HeaderSize = 0;
+      }
+    }
+    
+    //
+    // read the FV data  
+    //
+    for (; Index < BlockMap->NumBlocks; Index ++) {
       Status = Fvb->Read (Fvb,
                       LbaIndex,
                       LbaOffset,
                       &Size,
                       CacheLocation
                       );
+
       //
       // Not check EFI_BAD_BUFFER_SIZE, for Size = BlockMap->Length
       //
@@ -256,14 +386,16 @@ FvCheck (
         goto Done;
       }
 
+      LbaIndex++;
+      CacheLocation += Size;
+
       //
       // After we skip Fv Header always read from start of block
       //
       LbaOffset = 0;
-
-      LbaIndex++;
-      CacheLocation += Size;
+      Size  = BlockMap->Length;
     }
+
     BlockMap++;
   }
 
