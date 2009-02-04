@@ -60,8 +60,6 @@ UhciReadReg (
   @param  Offset       Register offset to USB_BAR_INDEX.
   @param  Data         Data to write.
 
-  @return None.
-
 **/
 VOID
 UhciWriteReg (
@@ -94,8 +92,6 @@ UhciWriteReg (
   @param  Offset       Register offset to USB_BAR_INDEX.
   @param  Bit          The bit to set.
 
-  @return None.
-
 **/
 VOID
 UhciSetRegBit (
@@ -119,8 +115,6 @@ UhciSetRegBit (
   @param  Offset       Register offset to USB_BAR_INDEX.
   @param  Bit          The bit to clear.
 
-  @return None.
-
 **/
 VOID
 UhciClearRegBit (
@@ -142,8 +136,6 @@ UhciClearRegBit (
   are Write-Clean.
 
   @param  Uhc          The UHCI device.
-
-  @return None.
 
 **/
 VOID
@@ -237,8 +229,6 @@ UhciIsHcWorking (
   @param  PciIo        The EFI_PCI_IO_PROTOCOL to use.
   @param  Addr         Address to set.
 
-  @return None.
-
 **/
 VOID
 UhciSetFrameListBaseAddr (
@@ -270,8 +260,6 @@ UhciSetFrameListBaseAddr (
   Disable USB Emulation.
 
   @param  PciIo        The EFI_PCI_IO_PROTOCOL protocol to use.
-
-  @return None.
 
 **/
 VOID

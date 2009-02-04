@@ -1507,8 +1507,6 @@ ON_ERROR:
 
   @param  Uhc     The UHCI device to release.
 
-  @return None.
-
 **/
 VOID
 UhciFreeDev (
@@ -1536,8 +1534,6 @@ UhciFreeDev (
 
   @param  Controller           Controller handle.
   @param  This                 Protocol instance pointer.
-
-  @return None.
 
 **/
 VOID
