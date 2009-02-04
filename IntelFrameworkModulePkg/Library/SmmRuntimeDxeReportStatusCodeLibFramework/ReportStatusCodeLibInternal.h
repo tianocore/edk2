@@ -27,6 +27,7 @@
 #include <Library/DevicePathLib.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/EventGroup.h>
 #include <Protocol/StatusCode.h>
 
 #include <FrameworkModuleBase.h>

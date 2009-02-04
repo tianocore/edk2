@@ -110,11 +110,12 @@ DxeStatusCodeDriverEntry (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->CreateEvent (
-                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   VirtualAddressChangeCallBack,
                   NULL,
+                  &gEfiEventExitBootServicesGuid,
                   &mExitBootServicesEvent
                   );
   ASSERT_EFI_ERROR (Status);

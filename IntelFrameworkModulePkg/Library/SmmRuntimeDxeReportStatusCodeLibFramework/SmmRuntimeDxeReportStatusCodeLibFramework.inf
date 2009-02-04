@@ -56,6 +56,8 @@
 [Guids]
   gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
   gEfiStatusCodeDataTypeDebugGuid               # ALWAYS_CONSUMED
+  gEfiEventExitBootServicesGuid
+  gEfiEventVirtualAddressChangeGuid
 
 
 [Protocols]

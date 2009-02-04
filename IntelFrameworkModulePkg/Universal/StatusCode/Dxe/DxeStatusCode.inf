@@ -80,6 +80,7 @@
   gEfiDataHubStatusCodeRecordGuid               # SOMETIMES_CONSUMED
   gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
   gEfiStatusCodeDataTypeDebugGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiEventExitBootServicesGuid
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL ALWAYS_CONSUMED

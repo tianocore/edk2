@@ -730,11 +730,12 @@ IDEBusDriverBindingStart (
       //
       // Create event to clear pending IDE interrupt
       //
-      Status = gBS->CreateEvent (
-                      EVT_SIGNAL_EXIT_BOOT_SERVICES,
+      Status = gBS->CreateEventEx (
+                      EVT_NOTIFY_SIGNAL,
                       TPL_NOTIFY,
                       ClearInterrupt,
                       IdeBlkIoDevicePtr,
+                      &gEfiEventExitBootServicesGuid,
                       &IdeBlkIoDevicePtr->ExitBootServiceEvent
                       );
 
