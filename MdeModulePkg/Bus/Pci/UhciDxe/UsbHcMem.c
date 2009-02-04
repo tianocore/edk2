@@ -123,8 +123,6 @@ FREE_BITARRAY:
   @param  Pool           The memory pool to free the block from.
   @param  Block          The memory block to free.
 
-  @return None.
-
 **/
 VOID
 UsbHcFreeMemBlock (
@@ -229,8 +227,6 @@ UsbHcAllocMemFromBlock (
   @param  Head           The head of the memory pool's block list.
   @param  Block          The memory block to insert.
 
-  @return None.
-
 **/
 VOID
 UsbHcInsertMemBlockToPool (
@@ -275,8 +271,6 @@ UsbHcIsMemBlockEmpty (
 
   @param  Head           The block list head of the memory's pool.
   @param  BlockToUnlink  The memory block to unlink.
-
-  @return None.
 
 **/
 VOID
@@ -457,8 +451,6 @@ UsbHcAllocateMem (
   @param  Pool           The memory pool of the host controller.
   @param  Mem            The memory to free.
   @param  Size           The size of the memory to free.
-
-  @return None.
 
 **/
 VOID

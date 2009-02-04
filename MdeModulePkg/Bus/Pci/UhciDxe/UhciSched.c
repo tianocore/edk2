@@ -150,8 +150,6 @@ ON_ERROR:
 
   @param  Uhc                    The UHCI device.
 
-  @return None.
-
 **/
 VOID
 UhciDestoryFrameList (
@@ -228,8 +226,6 @@ UhciConvertPollRate (
 
   @param  FrameBase              The base of the frame list.
   @param  Qh                     The queue head to link into.
-
-  @return None.
 
 **/
 VOID
@@ -333,8 +329,6 @@ UhciLinkQhToFrameList (
 
   @param  FrameBase              The base address of the frame list.
   @param  Qh                     The queue head to unlink.
-
-  @return None.
 
 **/
 VOID
@@ -602,8 +596,6 @@ UhciExecuteTransfer (
   @param  Result                 Transfer reslut.
   @param  NextToggle             The toggle of next data.
 
-  @return None.
-
 **/
 VOID
 UhciUpdateAsyncReq (
@@ -720,8 +712,6 @@ UhciCreateAsyncReq (
   @param  Uhc                    The UHCI device.
   @param  AsyncReq               The asynchronous request to free.
 
-  @return None.
-
 **/
 VOID
 UhciFreeAsyncReq (
@@ -757,8 +747,6 @@ UhciFreeAsyncReq (
   @param  AsyncReq               The asynchronous request to free.
   @param  FreeNow                If TRUE, free the resource immediately, otherwise
                                  add the request to recycle wait list.
-
-  @return None.
 
 **/
 VOID
@@ -874,8 +862,6 @@ UhciRemoveAsyncReq (
 
   @param  Uhc                    The UHCI device.
 
-  @return None.
-
 **/
 VOID
 UhciRecycleAsyncReq (
@@ -903,8 +889,6 @@ UhciRecycleAsyncReq (
   Release all the asynchronous transfers on the lsit.
 
   @param  Uhc                    The UHCI device.
-
-  @return None.
 
 **/
 VOID
@@ -941,8 +925,6 @@ UhciFreeAllAsyncReq (
 
   @param  Event                  The event of the time.
   @param  Context                Context of the event, pointer to USB_HC_DEV.
-
-  @return None.
 
 **/
 VOID

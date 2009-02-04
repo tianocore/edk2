@@ -155,8 +155,6 @@ EXIT:
   @param  Qh          The queue head for the TD to link to.
   @param  Td          The TD to link.
 
-  @return None.
-
 **/
 VOID
 UhciLinkTdToQh (
@@ -177,8 +175,6 @@ UhciLinkTdToQh (
   @param  Qh          The queue head to unlink from.
   @param  Td          The TD to unlink.
 
-  @return None.
-
 **/
 VOID
 UhciUnlinkTdFromQh (
@@ -198,8 +194,6 @@ UhciUnlinkTdFromQh (
 
   @param  PrevTd      Previous UHCI_TD_SW to be linked to.
   @param  ThisTd      TD to link.
-
-  @return None.
 
 **/
 VOID
