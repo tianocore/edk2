@@ -56,13 +56,13 @@ typedef struct {
   based on a Null-terminated format string and a VA_LIST argument list.
 
   VSPrint function to process format and place the results in Buffer. Since a 
-  VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
+  VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine.
 
   @param  Buffer      Character buffer to print the results of the parsing
                       of Format into.
   @param  BufferSize  Maximum number of characters to put into buffer.
-  @param  Flags       Intial flags value.
+  @param  Flags       Initial flags value.
                       Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
   @param  Format      Null-terminated format string.
   @param  Marker      Vararg list consumed by processing Format.
@@ -84,14 +84,14 @@ BasePrintLibVSPrint (
   based on a Null-terminated format string and variable argument list.
 
   VSPrint function to process format and place the results in Buffer. Since a 
-  VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
+  VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine
 
   @param  StartOfBuffer Character buffer to print the results of the parsing
                         of Format into.
   @param  BufferSize    Maximum number of characters to put into buffer.
                         Zero means no limit.
-  @param  Flags         Intial flags value.
+  @param  Flags         Initial flags value.
                         Can only have FORMAT_UNICODE and OUTPUT_UNICODE set
   @param  FormatString  Null-terminated format string.
   @param  ...           The variable argument list.
@@ -134,18 +134,18 @@ BasePrintLibFillBuffer (
   );
 
 /**
-  Internal function that convert a decimal number to a string in Buffer.
+  Internal function that convert a number to a string in Buffer.
 
-  Print worker function that convert a decimal number to a string in Buffer.
+  Print worker function that converts a decimal or hexadecimal number to an ASCII string in Buffer.
 
-  @param  Buffer    Location to place the Unicode or ASCII string of Value.
+  @param  Buffer    Location to place the ASCII string of Value.
   @param  Value     Value to convert to a Decimal or Hexadecimal string in Buffer.
   @param  Radix     Radix of the value
 
-  @return Number of characters printed.
+  @return A pointer to the end of buffer filled with ASCII string.
 
 **/
-UINTN
+CHAR8 *
 BasePrintLibValueToString (
   IN OUT CHAR8  *Buffer, 
   IN INT64      Value, 

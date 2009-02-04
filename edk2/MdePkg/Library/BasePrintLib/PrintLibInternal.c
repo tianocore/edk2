@@ -91,42 +91,39 @@ BasePrintLibFillBuffer (
 }
 
 /**
-  Internal function that convert a decimal number to a string in Buffer.
+  Internal function that convert a number to a string in Buffer.
 
-  Print worker function that convert a decimal number to a string in Buffer.
+  Print worker function that converts a decimal or hexadecimal number to an ASCII string in Buffer.
 
-  @param  Buffer    Location to place the Unicode or ASCII string of Value.
+  @param  Buffer    Location to place the ASCII string of Value.
   @param  Value     Value to convert to a Decimal or Hexadecimal string in Buffer.
   @param  Radix     Radix of the value
 
-  @return Number of characters printed.
+  @return A pointer to the end of buffer filled with ASCII string.
 
 **/
-UINTN
+CHAR8 *
 BasePrintLibValueToString (
   IN OUT CHAR8  *Buffer, 
   IN INT64      Value, 
   IN UINTN      Radix
   )
 {
-  UINTN   Digits;
   UINT32  Remainder;
 
   //
   // Loop to convert one digit at a time in reverse order
   //
-  *(Buffer++) = 0;
-  Digits = 0;
+  *Buffer = 0;
   do {
     Value = (INT64)DivU64x32Remainder ((UINT64)Value, (UINT32)Radix, &Remainder);
-    *(Buffer++) = mHexStr[Remainder];
-    Digits++;
+    *(++Buffer) = mHexStr[Remainder];
   } while (Value != 0);
 
   //
-  // the length of Buffer string converted from Value
+  // Return pointer of the end of filled buffer.
   //
-  return Digits;
+  return Buffer;
 }
 
 /**
@@ -179,6 +176,7 @@ BasePrintLibConvertValueToString (
   CHAR8  *OriginalBuffer;
   CHAR8  *EndBuffer;
   CHAR8  ValueBuffer[MAXIMUM_VALUE_CHARACTERS];
+  CHAR8  *ValueBufferPtr;
   UINTN  Count;
   UINTN  Digits;
   UINTN  Index;
@@ -231,7 +229,8 @@ BasePrintLibConvertValueToString (
   // Count the length of the value string.
   //
   Radix = ((Flags & RADIX_HEX) == 0)? 10 : 16;
-  Count = BasePrintLibValueToString (ValueBuffer, Value, Radix);
+  ValueBufferPtr = BasePrintLibValueToString (ValueBuffer, Value, Radix);
+  Count = ValueBufferPtr - ValueBuffer;
   
   //
   // Append Zero
@@ -248,7 +247,7 @@ BasePrintLibConvertValueToString (
     Digits = 3 - Digits;
   }
   for (Index = 0; Index < Count; Index++) {
-    Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ValueBuffer[Count - Index], Increment);
+    Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, *ValueBufferPtr--, Increment);
     if ((Flags & COMMA_TYPE) != 0) {
       Digits++;
       if (Digits == 3) {
@@ -273,13 +272,13 @@ BasePrintLibConvertValueToString (
   based on a Null-terminated format string and a VA_LIST argument list.
 
   VSPrint function to process format and place the results in Buffer. Since a 
-  VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
+  VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine.
 
   @param  Buffer      Character buffer to print the results of the parsing
                       of Format into.
   @param  BufferSize  Maximum number of characters to put into buffer.
-  @param  Flags       Intial flags value.
+  @param  Flags       Initial flags value.
                       Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
   @param  Format      Null-terminated format string.
   @param  Marker      Vararg list consumed by processing Format.
@@ -361,8 +360,6 @@ BasePrintLibVSPrint (
     BytesPerFormatCharacter = 1;
     FormatMask = 0xff;
   }
-
-
 
   //
   // Get the first character from the format string
@@ -526,7 +523,7 @@ BasePrintLibVSPrint (
         //
         // Convert Value to a reversed string
         //
-        Count = BasePrintLibValueToString (ValueBuffer, Value, Radix);
+        Count = BasePrintLibValueToString (ValueBuffer, Value, Radix) - ValueBuffer;
         if (Value == 0 && Precision == 0) {
           Count = 0;
         }
@@ -793,14 +790,14 @@ BasePrintLibVSPrint (
   based on a Null-terminated format string and variable argument list.
 
   VSPrint function to process format and place the results in Buffer. Since a 
-  VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
+  VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine
 
   @param  StartOfBuffer Character buffer to print the results of the parsing
                         of Format into.
   @param  BufferSize    Maximum number of characters to put into buffer.
                         Zero means no limit.
-  @param  Flags         Intial flags value.
+  @param  Flags         Initial flags value.
                         Can only have FORMAT_UNICODE and OUTPUT_UNICODE set
   @param  FormatString  Null-terminated format string.
   @param  ...           The variable argument list.
