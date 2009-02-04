@@ -2,7 +2,7 @@
 
   Provides some data struct used by EHCI controller driver.
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -67,13 +67,11 @@ typedef enum {
 } EHC_TIMEOUT_EXPERIENCE_VALUE;
 
 
-  //
-  // EHC raises TPL to TPL_NOTIFY to serialize all its operations
-  // to protect shared data structures.
-  //
+//
+// EHC raises TPL to TPL_NOTIFY to serialize all its operations
+// to protect shared data structures.
+//
 #define  EHC_TPL                TPL_NOTIFY
-
-#define  USB2_HC_DEV_SIGNATURE  SIGNATURE_32 ('e', 'h', 'c', 'i')
 
 //
 //Iterate through the doule linked list. NOT delete safe
@@ -99,7 +97,8 @@ typedef enum {
 #define EHC_REG_BIT_IS_SET(Ehc, Offset, Bit) \
           (EHC_BIT_IS_SET(EhcReadOpReg ((Ehc), (Offset)), (Bit)))
 
-#define EHC_FROM_THIS(a)   CR(a, USB2_HC_DEV, Usb2Hc, USB2_HC_DEV_SIGNATURE)
+#define USB2_HC_DEV_SIGNATURE  SIGNATURE_32 ('e', 'h', 'c', 'i')
+#define EHC_FROM_THIS(a)       CR(a, USB2_HC_DEV, Usb2Hc, USB2_HC_DEV_SIGNATURE)
 
 struct _USB2_HC_DEV {
   UINTN                     Signature;
