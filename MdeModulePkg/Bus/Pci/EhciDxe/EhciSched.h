@@ -2,7 +2,7 @@
 
   This file contains the definination for host controller schedule routines.
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,8 +37,6 @@ EhcInitSched (
 
   @param  Ehc            The EHCI device.
 
-  @return None
-
 **/
 VOID
 EhcFreeSched (
@@ -56,8 +54,6 @@ EhcFreeSched (
   @param  Ehc            The EHCI device.
   @param  Qh             The queue head to link.
 
-  @return None.
-
 **/
 VOID
 EhcLinkQhToAsync (
@@ -72,8 +68,6 @@ EhcLinkQhToAsync (
 
   @param  Ehc            The EHCI device.
   @param  Qh             The queue head to unlink.
-
-  @return None.
 
 **/
 VOID
@@ -91,8 +85,6 @@ EhcUnlinkQhFromAsync (
   @param  Ehc            The EHCI device.
   @param  Qh             The queue head to link.
 
-  @return None.
-
 **/
 VOID
 EhcLinkQhToPeriod (
@@ -107,8 +99,6 @@ EhcLinkQhToPeriod (
 
   @param  Ehc            The EHCI device.
   @param  Qh             The queue head to unlink.
-
-  @return None.
 
 **/
 VOID
@@ -166,8 +156,6 @@ EhciDelAsyncIntTransfer (
 
   @param  Ehc            The EHCI device.
 
-  @return None.
-
 **/
 VOID
 EhciDelAllAsyncIntTransfers (
@@ -181,11 +169,9 @@ EhciDelAllAsyncIntTransfers (
   @param  Event          Interrupt event.
   @param  Context        Pointer to USB2_HC_DEV.
 
-  @return None.
-
 **/
 VOID
-EhcMoniteAsyncRequests (
+EhcMonitorAsyncRequests (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
   );
