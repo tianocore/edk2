@@ -69,6 +69,7 @@
 
 [Guids]
   gEfiVT100PlusGuid                             ## CONSUMES ## GUID (The type of terminal)
+  gEfiVT100Guid                                 ## CONSUMES ## GUID (The type of terminal)
   gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID (The identifier of memory type information type in system table)
                                                 ## CONSUMES ## GUID HOB (The hob holding memory type information)
   gEfiVTUTF8Guid                                ## CONSUMES ## GUID (The type of terminal)
