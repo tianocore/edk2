@@ -687,8 +687,6 @@ UsbOpenHostProtoByChild (
   @param  Bus              The USB bus driver.
   @param  Child            The child handle.
 
-  @return None.
-
 **/
 VOID
 UsbCloseHostProtoByChild (

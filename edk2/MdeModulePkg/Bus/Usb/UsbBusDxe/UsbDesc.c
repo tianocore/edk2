@@ -21,8 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  Setting               The descriptor to free.
 
-  @return None.
-
 **/
 VOID
 UsbFreeInterfaceDesc (
@@ -56,8 +54,6 @@ UsbFreeInterfaceDesc (
   descriptors. It may be initialized partially.
 
   @param  Config                The configuration descriptor to free.
-
-  @return None.
 
 **/
 VOID
@@ -104,8 +100,6 @@ UsbFreeConfigDesc (
   Free a device descriptor with its configurations.
 
   @param  DevDesc               The device descriptor.
-
-  @return None.
 
 **/
 VOID

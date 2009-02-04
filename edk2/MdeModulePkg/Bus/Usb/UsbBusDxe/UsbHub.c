@@ -774,8 +774,6 @@ UsbHubGetPortStatus (
   @param  HubIf                 The hub interface.
   @param  Port                  The hub port.
 
-  @return None.
-
 **/
 VOID
 UsbHubClearPortChange (
@@ -1067,8 +1065,6 @@ UsbRootHubGetPortStatus (
 
   @param  HubIf                 The root hub interface.
   @param  Port                  The root hub port.
-
-  @return None.
 
 **/
 VOID

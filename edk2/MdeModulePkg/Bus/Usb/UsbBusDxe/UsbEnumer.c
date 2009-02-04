@@ -54,8 +54,6 @@ UsbGetEndpointDesc (
 
   @param  UsbIf                 The USB interface to free.
 
-  @return None.
-
 **/
 VOID
 UsbFreeInterface (
@@ -190,8 +188,6 @@ ON_ERROR:
   Free the resource used by this USB device.
 
   @param  Device                The USB device to free.
-
-  @return None.
 
 **/
 VOID
@@ -449,8 +445,6 @@ UsbSelectConfig (
 
   @param  UsbIf                 The interface to disconnect driver from.
 
-  @return None.
-
 **/
 VOID
 UsbDisconnectDriver (
@@ -494,8 +488,6 @@ UsbDisconnectDriver (
   Remove the current device configuration.
 
   @param  Device                The USB device to remove configuration from.
-
-  @return None.
 
 **/
 VOID
@@ -934,8 +926,6 @@ UsbEnumeratePort (
   @param  Event                 The event that is triggered.
   @param  Context               The context to the event.
 
-  @return None.
-
 **/
 VOID
 EFIAPI
@@ -984,8 +974,6 @@ UsbHubEnumeration (
 
   @param  Event                 The event that is triggered.
   @param  Context               The context to the event.
-
-  @return None.
 
 **/
 VOID
