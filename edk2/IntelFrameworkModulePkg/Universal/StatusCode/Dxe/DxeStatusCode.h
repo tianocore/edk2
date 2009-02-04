@@ -23,6 +23,7 @@
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Protocol/StatusCode.h>
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/EventGroup.h>
 
 #include <Library/BaseLib.h>
 #include <Library/SynchronizationLib.h>
