@@ -526,7 +526,6 @@ UpdateOrderPage (
     return ;
   }
   
-  ASSERT (OptionMenu->MenuNumber <= (sizeof (IfrOptionList) / sizeof (IfrOptionList[0])));
   for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (OptionMenu, Index);
     IfrOptionList[Index].StringToken = NewMenuEntry->DisplayStringToken;
