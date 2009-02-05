@@ -489,6 +489,14 @@ BasePrintLibVSPrint (
         //
       case 'd':
         if ((Flags & LONG_TYPE) == 0) {
+          //
+          // 'd','x', and 'X' that are not preceeded by 'l' or 'L' are assumed to be type "int".
+          // This assumption is made so the format string defintion is compatible with the ANSI C
+          // Specification for formatted strings.  It is recommended that the Base Types be used 
+          // everywhere, but in this one case, compliance with ANSI C is more important, and 
+          // provides an implementation that is compatible with that largest possible set of CPU 
+          // architectures.  This is why the type "int" is used in this one case.
+          //
           Value = (VA_ARG (Marker, int));
         } else {
           Value = VA_ARG (Marker, INT64);
@@ -517,6 +525,14 @@ BasePrintLibVSPrint (
           Radix = 16;
           Comma = FALSE;
           if ((Flags & LONG_TYPE) == 0 && Value < 0) {
+            //
+            // 'd','x', and 'X' that are not preceeded by 'l' or 'L' are assumed to be type "int".
+            // This assumption is made so the format string defintion is compatible with the ANSI C
+            // Specification for formatted strings.  It is recommended that the Base Types be used 
+            // everywhere, but in this one case, compliance with ANSI C is more important, and 
+            // provides an implementation that is compatible with that largest possible set of CPU 
+            // architectures.  This is why the type "unsigned int" is used in this one case.
+            //
             Value = (unsigned int)Value;
           }
         }
