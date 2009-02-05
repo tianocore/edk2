@@ -86,7 +86,7 @@
   BaseLib
   UefiDriverEntryPoint
   DebugLib
-
+  PeCoffLib
 
 [Guids]
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED  System Table
