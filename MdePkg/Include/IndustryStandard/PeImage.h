@@ -39,14 +39,6 @@
 #define IMAGE_FILE_MACHINE_IA64     0x0200
 #define IMAGE_FILE_MACHINE_EBC      0x0EBC
 #define IMAGE_FILE_MACHINE_X64      0x8664
-//
-// Support old names for backward compatible
-//
-#define EFI_IMAGE_MACHINE_IA32      IMAGE_FILE_MACHINE_I386 
-#define EFI_IMAGE_MACHINE_IA64      IMAGE_FILE_MACHINE_IA64  
-#define EFI_IMAGE_MACHINE_IPF       IMAGE_FILE_MACHINE_IA64  
-#define EFI_IMAGE_MACHINE_EBC       IMAGE_FILE_MACHINE_EBC  
-#define EFI_IMAGE_MACHINE_X64       IMAGE_FILE_MACHINE_X64
 
 //
 // EXE file formats
@@ -113,18 +105,6 @@ typedef struct {
 #define EFI_IMAGE_FILE_SYSTEM               BIT12    ///< 0x1000  System File.
 #define EFI_IMAGE_FILE_DLL                  BIT13    ///< 0x2000  File is a DLL.
 #define EFI_IMAGE_FILE_BYTES_REVERSED_HI    BIT15    ///< 0x8000  Bytes of machine word are reversed.
-
-//
-// Other Machine Types
-//
-#define EFI_IMAGE_FILE_MACHINE_UNKNOWN      0       ///< Any machine type
-#define EFI_IMAGE_FILE_MACHINE_I386         0x14c   ///< Intel 386.
-#define EFI_IMAGE_FILE_MACHINE_R3000        0x162   ///< MIPS* little-endian, 0540 big-endian
-#define EFI_IMAGE_FILE_MACHINE_R4000        0x166   ///< MIPS* little-endian
-#define EFI_IMAGE_FILE_MACHINE_POWERPC      0x1F0   ///< IBM* PowerPC Little-Endian
-//
-// * Other names and brands may be claimed as the property of others.
-//
 
 ///
 /// Header Data Directories
@@ -256,7 +236,6 @@ typedef struct {
 ///
 /// @attention
 /// EFI_IMAGE_NT_HEADERS32 is for use ONLY by tools.
-/// All proper EFI code MUST use EFI_IMAGE_NT_HEADERS ONLY!!!
 ///
 typedef struct {
   UINT32                      Signature;
@@ -269,7 +248,6 @@ typedef struct {
 ///
 /// @attention
 /// EFI_IMAGE_HEADERS64 is for use ONLY by tools.
-/// All proper EFI code MUST use EFI_IMAGE_NT_HEADERS ONLY!!!
 ///
 typedef struct {
   UINT32                      Signature;
@@ -278,67 +256,6 @@ typedef struct {
 } EFI_IMAGE_NT_HEADERS64;
 
 #define EFI_IMAGE_SIZEOF_NT_OPTIONAL64_HEADER sizeof (EFI_IMAGE_NT_HEADERS64)
-
-
-///
-/// Processor specific definition of EFI_IMAGE_OPTIONAL_HEADER so the
-/// type name EFI_IMAGE_OPTIONAL_HEADER is appropriate to the build.  Same for
-/// EFI_IMAGE_NT_HEADERS.  These definitions MUST be used by ALL EFI code.
-///
-#if   defined (MDE_CPU_IA32)
-
-#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
-  (((Machine) == EFI_IMAGE_MACHINE_IA32) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
-
-#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_X64) 
-
-typedef EFI_IMAGE_NT_HEADERS32    EFI_IMAGE_NT_HEADERS;
-
-#elif defined (MDE_CPU_IPF)
-
-#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
-  (((Machine) == EFI_IMAGE_MACHINE_IPF) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
-
-#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
-
-typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
-
-#elif defined (MDE_CPU_X64)
-
-#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
-  (((Machine) == EFI_IMAGE_MACHINE_X64) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
-
-#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_IA32) 
-
-typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
-
-#elif defined (MDE_CPU_EBC)
-
-///
-/// This is just to make sure you can cross compile with the EBC compiiler.
-/// It does not make sense to have a PE loader coded in EBC. You need to 
-/// understand the basic 
-///
-#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_EBC)
-
-#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
-
-typedef EFI_IMAGE_NT_HEADERS64    EFI_IMAGE_NT_HEADERS;
-
-#else
-#error Unknown Processor Type
-#endif
-
-
-#define EFI_IMAGE_FIRST_SECTION(ntheader) \
-    ( \
-      (EFI_IMAGE_SECTION_HEADER *) \
-        ( \
-          (UINT32) ntheader + \
-          OFFSET_OF (EFI_IMAGE_NT_HEADERS, OptionalHeader) + \
-          ((EFI_IMAGE_NT_HEADERS *) (ntheader))->FileHeader.SizeOfOptionalHeader \
-        ) \
-    )
 
 //
 // Other Windows Subsystem Values

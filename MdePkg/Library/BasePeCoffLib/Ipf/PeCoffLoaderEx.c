@@ -236,8 +236,8 @@ PeCoffLoaderImageFormatSupported (
   IN  UINT16  Machine
   )
 {
-  if ((Machine == EFI_IMAGE_MACHINE_IPF) || (Machine == EFI_IMAGE_MACHINE_IA32) ||
-      (Machine ==  EFI_IMAGE_MACHINE_EBC) || (Machine == EFI_IMAGE_MACHINE_X64)) {
+  if ((Machine == IMAGE_FILE_MACHINE_IA64) || (Machine == IMAGE_FILE_MACHINE_I386) ||
+      (Machine ==  IMAGE_FILE_MACHINE_EBC) || (Machine == IMAGE_FILE_MACHINE_X64)) {
     return TRUE;
   }
 

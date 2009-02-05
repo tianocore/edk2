@@ -188,5 +188,61 @@ typedef union {
 ///
 #define ISO_639_2_ENTRY_SIZE            3
 
+///
+/// PE32+ Machine type for IA32 UEFI images
+///
+#define EFI_IMAGE_MACHINE_IA32      0x014C
+
+///
+/// PE32+ Machine type for IA64 UEFI images
+///
+#define EFI_IMAGE_MACHINE_IA64      0x0200
+
+///
+/// PE32+ Machine type for EBC UEFI images
+///
+#define EFI_IMAGE_MACHINE_EBC       0x0EBC
+
+///
+/// PE32+ Machine type for X64 UEFI images
+///
+#define EFI_IMAGE_MACHINE_X64       0x8664
+
+
+#if   defined (MDE_CPU_IA32)
+
+#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
+  (((Machine) == EFI_IMAGE_MACHINE_IA32) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
+
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_X64) 
+
+#elif defined (MDE_CPU_IPF)
+
+#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
+  (((Machine) == EFI_IMAGE_MACHINE_IA64) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
+
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
+
+#elif defined (MDE_CPU_X64)
+
+#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
+  (((Machine) == EFI_IMAGE_MACHINE_X64) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
+
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_IA32) 
+
+#elif defined (MDE_CPU_EBC)
+
+///
+/// This is just to make sure you can cross compile with the EBC compiiler.
+/// It does not make sense to have a PE loader coded in EBC. You need to 
+/// understand the basic 
+///
+#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_EBC)
+
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
+
+#else
+#error Unknown Processor Type
+#endif
 
 #endif

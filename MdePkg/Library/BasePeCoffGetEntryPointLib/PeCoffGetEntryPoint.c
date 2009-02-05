@@ -195,16 +195,16 @@ PeCoffLoaderGetPdbPointer (
     //       generate PE32+ image with PE32 Magic.
     //
     switch (Hdr.Pe32->FileHeader.Machine) {
-    case EFI_IMAGE_MACHINE_IA32:
+    case IMAGE_FILE_MACHINE_I386:
       //
       // Assume PE32 image with IA32 Machine field.
       //
       Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
       break;
-    case EFI_IMAGE_MACHINE_X64:
-    case EFI_IMAGE_MACHINE_IPF:
+    case IMAGE_FILE_MACHINE_X64:
+    case IMAGE_FILE_MACHINE_IA64:
       //
-      // Assume PE32+ image with x64 or IPF Machine field
+      // Assume PE32+ image with x64 or IA64 Machine field
       //
       Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
       break;

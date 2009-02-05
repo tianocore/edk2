@@ -35,7 +35,7 @@ PeCoffLoaderGetPeHeaderMagicValue (
   //       Magic value in the OptionalHeader is  EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
   //       then override the returned value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
   //
-  if (Hdr.Pe32->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
   }
   //
