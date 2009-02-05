@@ -50,7 +50,7 @@ Revision History
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
-
+#include <Library/PeCoffLib.h>
 
 //
 // Driver Produced Protocol Prototypes

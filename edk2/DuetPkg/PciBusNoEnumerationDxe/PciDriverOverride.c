@@ -135,9 +135,8 @@ Returns:
 
 {
   EFI_STATUS                    Status;
-  EFI_IMAGE_DOS_HEADER          *DosHdr;
-  EFI_IMAGE_NT_HEADERS          *PeHdr;
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
   PCI_DRIVER_OVERRIDE_LIST      *Node;
 #if (EFI_SPECIFICATION_VERSION < 0x00020000)
   EFI_DRIVER_OS_HANDOFF_HEADER  *DriverOsHandoffHeader;
@@ -167,14 +166,19 @@ Returns:
 
   PciIoDevice->BusOverride  = TRUE;
 
-  DosHdr                    = (EFI_IMAGE_DOS_HEADER *) LoadedImage->ImageBase;
-  if (DosHdr->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
+
+  ImageContext.Handle    = LoadedImage->ImageBase;
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+
+  //
+  // Get information about the image 
+  //
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   }
 
-  PeHdr = (EFI_IMAGE_NT_HEADERS *) ((UINTN) LoadedImage->ImageBase + DosHdr->e_lfanew);
-
-  if (PeHdr->FileHeader.Machine != EFI_IMAGE_MACHINE_EBC) {
+  if (ImageContext.Machine != EFI_IMAGE_MACHINE_EBC) {
     return EFI_SUCCESS;
   }
 
