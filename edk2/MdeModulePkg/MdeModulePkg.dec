@@ -224,13 +224,6 @@
   ## Pei memory test PPI used to Perform memory test in PEI phase.
   gPeiBaseMemoryTestPpiGuid      = { 0xB6EC423C, 0x21D2, 0x490D, { 0x85, 0xC6, 0xDD, 0x58, 0x64, 0xEA, 0xA6, 0x74 }}
 
-  ## FlashMap PPI abstracts access to FlashMap information.
-  #  gPeiFlashMapPpiGuid will be removed in future.
-  gPeiFlashMapPpiGuid            = { 0xf34c2fa0, 0xde88, 0x4270, {0x84, 0x14, 0x96, 0x12, 0x22, 0xf4, 0x52, 0x1c } }
-  
-  ## OperatorPresent PPI responsible for detecting TPM operator presence.
-  gPeiOperatorPresencePpiGuid    = { 0x20a7378c, 0xaa83, 0x4ce1, {0x82, 0x1f, 0x47, 0x40, 0xee, 0x1b, 0x3f, 0x9f } }
-
 [PcdsFeatureFlag.common]
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
