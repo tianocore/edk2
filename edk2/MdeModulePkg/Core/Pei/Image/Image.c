@@ -307,7 +307,7 @@ PeiLoadImageLoadImage (
     //
     // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
     //
-    if (Machine != IMAGE_FILE_MACHINE_IA64) {
+    if (Machine != EFI_IMAGE_MACHINE_IA64) {
       DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)*EntryPoint));
     } else {
       //
