@@ -87,9 +87,11 @@ EFI_STATUS
   @param  SourceBuffer          Optional source buffer in case of the image file
                                 being in memory.
   @param  SourceSize            Size of the source image file, if in memory.
-  @param  ImageHandle           Pointer to the handle that reflects the driver
-                                loaded into SMM.
-  @param  LegacyIA32Binary      The binary image to load is legacy 16 bit code.
+  @param  ImageHandle           The handle that the base driver uses to decode 
+                                the handler. Unique among SMM handlers only, 
+                                not unique across DXE/EFI.
+  @param  LegacyIA32Binary      An optional parameter that details that the associated 
+                                file is a real-mode IA-32 binary.
 
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  There were no additional SMRAM resources to load the handler
@@ -110,12 +112,11 @@ EFI_STATUS
   );
 
 /**
-  Remove a given driver SMRAM.  This is the equivalent of performing
-  the UnloadImage System Management Mode.
+  Removes a handler from execution within SMRAM.  This is the equivalent of performing
+  the UnloadImage in System Management Mode.
 
   @param  This                  Protocol instance pointer.
-  @param  ImageHandle           Pointer to the handle that reflects the driver
-                                loaded into SMM.
+  @param  ImageHandle           The handler to be removed.
 
   @retval EFI_SUCCESS           The operation was successful
   @retval EFI_INVALID_PARAMETER The handler did not exist
@@ -133,13 +134,12 @@ EFI_STATUS
   The SMM Inter-module Communicate Service Communicate() function
   provides a services to send/received messages from a registered
   EFI service.  The BASE protocol driver is responsible for doing
-  any of the copies such that the data lives in boot-service accessible RAM.
+  any of the copies such that the data lives in boot-service-accessible RAM.
 
   @param  This                  Protocol instance pointer.
-  @param  ImageHandle           Pointer to the handle that reflects the driver
-                                loaded into SMM.
+  @param  ImageHandle           The handle of the registered driver.
   @param  CommunicationBuffer   Pointer to the buffer to convey into SMRAM.
-  @param  SourceSize            Size of the contents of buffer..
+  @param  SourceSize            The size of the data buffer being passed in.
 
   @retval EFI_SUCCESS           The message was successfully posted
   @retval EFI_INVALID_PARAMETER The buffer was NULL
@@ -156,14 +156,13 @@ EFI_STATUS
 
 /**
   Register a callback to execute within SMM.
-  This allows receipt of messages created with the Boot Service COMMUNICATE.
+  This allows receipt of messages created with EFI_SMM_BASE_PROTOCOL.Communicate().
 
   @param  This                  Protocol instance pointer.
-  @param  CallbackAddress       Address of the callback service
-  @param  MakeFirst             If present, will stipulate that the handler is posted
-                                to be the first module executed in the dispatch table.
-  @param  MakeLast              If present, will stipulate that the handler is posted
-                                to be last executed in the dispatch table.
+  @param  SmmImageHandle        Handle of the callback service.
+  @param  CallbackAddress       Address of the callback service.
+  @param  MakeLast              If present, will stipulate that the handler is posted to 
+                                be executed last in the dispatch table.
   @param  FloatingPointSave     This is an optional parameter which informs the
                                 EFI_SMM_ACCESS_PROTOCOL Driver core if it needs to save
                                 the floating point register state. If any of the handlers
@@ -172,7 +171,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The operation was successful
   @retval EFI_OUT_OF_RESOURCES  Not enough space in the dispatch queue
   @retval EFI_UNSUPPORTED       In runtime.
-  @retval EFI_UNSUPPORTED       Not in SMM.
+  @retval EFI_UNSUPPORTED       The caller is not in SMM.
 
 **/
 typedef
@@ -194,7 +193,9 @@ EFI_STATUS
   @param  This                  Protocol instance pointer.
   @param  PoolType              The type of pool to allocate.
                                 The only supported type is EfiRuntimeServicesData;
-                                the interface will internally map this runtime request to SMRAM.
+                                the interface will internally map this runtime request to 
+                                SMRAM for IA-32 and leave as this type for the Itanium 
+                                processor family. Other types can be ignored.
   @param  Size                  The number of bytes to allocate from the pool.
   @param  Buffer                A pointer to a pointer to the allocated buffer if the call
                                 succeeds; undefined otherwise.

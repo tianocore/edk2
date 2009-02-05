@@ -37,7 +37,7 @@ typedef struct _EFI_SMM_CONTROL_PROTOCOL              EFI_SMM_CONTROL_PROTOCOL;
   { \
     0x8d12e231, 0xc667, 0x4fd1, {0x98, 0xf2, 0x24, 0x49, 0xa7, 0xe7, 0xb2, 0xe5 } \
   }
-
+//
 // SMM Access specification Data Structures
 //
 typedef struct {
@@ -78,7 +78,8 @@ EFI_STATUS
   Clears any system state that was created in response to the Active call.
 
   @param  This                  The EFI_SMM_CONTROL_PROTOCOL instance.
-  @param  Periodic              Optional parameter to repeat at this period one time
+  @param  Periodic              Optional parameter to repeat at this period one 
+                                time or, if the Periodic Boolean is set, periodically.
 
   @retval EFI_SUCCESS           The SMI/PMI has been engendered.
   @retval EFI_DEVICE_ERROR      The source could not be cleared.
