@@ -26,7 +26,7 @@ Revision History
 EFI_STATUS
 EFIAPI
 GetDriver(
-  IN     struct _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  *This,
+  IN     EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL          *This,
   IN OUT EFI_HANDLE                                         *DriverImageHandle
   );
 
