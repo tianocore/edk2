@@ -39,6 +39,7 @@
   BaseMemoryLib
   ReportStatusCodeLib
   DevicePathLib
+  PeCoffLib
 
 [Sources]
   PciBus.h
