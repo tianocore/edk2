@@ -143,10 +143,10 @@ EFI_STATUS
   Gets information on possible SMRAM regions.
 
   @param LockState
-Indicates the current state of the SMRAM. Set to TRUE if any region is locked.
+  Indicates the current state of the SMRAM. Set to TRUE if any region is locked.
 
   @param OpenState
-Indicates the current state of the SMRAM. Set to TRUE if any region is open.
+  Indicates the current state of the SMRAM. Set to TRUE if any region is open.
 
 **/
 struct _EFI_SMM_ACCESS_PROTOCOL {

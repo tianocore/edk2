@@ -69,7 +69,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS_PPI_EXECUTE_OPERATION)(
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_SMBUS_PPI              *This,
+  IN      EFI_PEI_SMBUS_PPI         *This,
   IN      EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
   IN      EFI_SMBUS_DEVICE_COMMAND  Command,
   IN      EFI_SMBUS_OPERATION       Operation,
@@ -95,7 +95,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS_NOTIFY_FUNCTION)(
   IN      EFI_PEI_SERVICES              **PeiServices,
-  IN EFI_PEI_SMBUS_PPI                  *SmbusPpi,
+  IN      EFI_PEI_SMBUS_PPI             *SmbusPpi,
   IN      EFI_SMBUS_DEVICE_ADDRESS      SlaveAddress,
   IN      UINTN                         Data
   );
@@ -128,7 +128,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS_PPI_ARP_DEVICE)(
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_SMBUS_PPI              *This,
+  IN      EFI_PEI_SMBUS_PPI         *This,
   IN      BOOLEAN                   ArpAll,
   IN      EFI_SMBUS_UDID            *SmbusUdid, OPTIONAL
   IN OUT  EFI_SMBUS_DEVICE_ADDRESS  *SlaveAddress OPTIONAL
@@ -144,14 +144,14 @@ EFI_STATUS
   @param  SmbusDeviceMap The pointer to the device map as enumerated
                          by the SMBus controller driver.
 
-  @retval EFI_SUCCESS           The device map was returned correctly in the buffer.
+  @retval EFI_SUCCESS    The device map was returned correctly in the buffer.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS_PPI_GET_ARP_MAP)(
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_SMBUS_PPI              *This,
+  IN      EFI_PEI_SMBUS_PPI         *This,
   IN OUT  UINTN                     *Length,
   IN OUT  EFI_SMBUS_DEVICE_MAP      **SmbusDeviceMap
   );
@@ -169,17 +169,17 @@ EFI_STATUS
   @param  NotifyFunction The function to call when the bus driver
                          detects the SlaveAddress and Data pair.
 
-  @retval EFI_SUCCESS           NotifyFunction has been registered.
+  @retval EFI_SUCCESS    NotifyFunction has been registered.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS_PPI_NOTIFY)(
   IN      EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_SMBUS_PPI              *This,
+  IN      EFI_PEI_SMBUS_PPI         *This,
   IN      EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
   IN      UINTN                     Data,
-  IN  EFI_PEI_SMBUS_NOTIFY_FUNCTION NotifyFunction
+  IN      EFI_PEI_SMBUS_NOTIFY_FUNCTION NotifyFunction
   );
 
 /**
