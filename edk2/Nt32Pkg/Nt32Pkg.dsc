@@ -531,3 +531,15 @@
   #
   #  EdkCompatibilityPkg\Foundation\Library\Dxe\PrintLite\PrintLib.inf
   #  EdkCompatibilityPkg\Foundation\Library\Dxe\GraphicsLite\Graphics.inf
+
+######################################################################################
+#
+# Following binaries are specified in FDF file and built in Firmware Volumes.
+# The are not included in DSC file because DSC only specifies modules to build.
+#
+######################################################################################
+##
+## EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
+## FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
+## MdeModulePkg/Logo/Logo.bmp
+##

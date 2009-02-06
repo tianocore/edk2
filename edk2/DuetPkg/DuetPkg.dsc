@@ -174,6 +174,17 @@
 [Components.IA32]  
   DuetPkg/BootSector/BootSector.inf
   
+######################################################################################
+#
+# Following binaries are specified in FDF file and built in Firmware Volumes.
+# The are not included in DSC file because DSC only specifies modules to build.
+#
+######################################################################################
+##
+## FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
+## MdeModulePkg/Logo/Logo.bmp
+##
+
 [BuildOptions.common]
   MSFT:*_*_*_CC_FLAGS = /FAsc /FR$(@R).SBR
   MSFT:*_*_IA32_CC_FLAGS = /D EFI32
