@@ -1028,7 +1028,7 @@ MatchUsbWwid (
   //
   // BugBug: only check serial number here, should check Interface Number, Device Vendor Id, Device Product Id  in later version
   //
-  if (StrDesc != NULL && !StrnCmp (StrDesc->String, SnString, StrDesc->Length)) {
+  if (StrDesc != NULL && (StrnCmp (StrDesc->String, SnString, StrDesc->Length) == 0)) {
 
     return TRUE;
   }
