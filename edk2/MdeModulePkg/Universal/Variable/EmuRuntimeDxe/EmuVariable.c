@@ -214,14 +214,14 @@ FindVariable (
 
     while ((Variable[Index] != NULL) && (Variable[Index] <= GetEndPointer (VariableStoreHeader[Index]))) {
       if (Variable[Index]->StartId == VARIABLE_DATA && Variable[Index]->State == VAR_ADDED) {
-        if (!(EfiAtRuntime () && !(Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS))) {
+        if (!(EfiAtRuntime () && (Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS == 0))) {
           if (VariableName[0] == 0) {
             PtrTrack->CurrPtr   = Variable[Index];
             PtrTrack->Volatile  = (BOOLEAN) Index;
             return EFI_SUCCESS;
           } else {
             if (CompareGuid (VendorGuid, &Variable[Index]->VendorGuid)) {
-              if (!CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), Variable[Index]->NameSize)) {
+              if (CompareMem (VariableName, GET_VARIABLE_NAME_PTR (Variable[Index]), Variable[Index]->NameSize) == 0) {
                 PtrTrack->CurrPtr   = Variable[Index];
                 PtrTrack->Volatile  = (BOOLEAN) Index;
                 return EFI_SUCCESS;
@@ -389,7 +389,7 @@ GetNextVariableName (
     // Variable is found
     //
     if (Variable.CurrPtr->StartId == VARIABLE_DATA && Variable.CurrPtr->State == VAR_ADDED) {
-      if (!(EfiAtRuntime () && !(Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS))) {
+      if (!(EfiAtRuntime () && (Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS == 0))) {
         VarNameSize = Variable.CurrPtr->NameSize;
         if (VarNameSize <= *VariableNameSize) {
           CopyMem (
@@ -527,7 +527,7 @@ SetVariable (
       //
       // Only variable have NV attribute can be updated/deleted in Runtime
       //
-      if (!(Variable.CurrPtr->Attributes & EFI_VARIABLE_NON_VOLATILE)) {
+      if ((Variable.CurrPtr->Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -548,7 +548,7 @@ SetVariable (
     // then return to the caller immediately.
     //
     if (Variable.CurrPtr->DataSize == DataSize &&
-        !CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize)
+        CompareMem (Data, GetVariableDataPtr (Variable.CurrPtr), DataSize) == 0
           ) {
       Status = EFI_SUCCESS;
       goto Done;
