@@ -26,17 +26,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HC_HIGH_32BIT(Addr64)    \
           ((UINT32)(RShiftU64((UINTN)(Addr64), 32) & 0XFFFFFFFF))
 
-typedef struct _USBHC_MEM_BLOCK   USBHC_MEM_BLOCK;
 
-struct _USBHC_MEM_BLOCK {
+typedef struct _USBHC_MEM_BLOCK {
   UINT8                   *Bits;    // Bit array to record which unit is allocated
   UINTN                   BitsLen;
   UINT8                   *Buf;
   UINT8                   *BufHost;
   UINTN                   BufLen;   // Memory size in bytes
   VOID                    *Mapping;
-  USBHC_MEM_BLOCK         *Next;
-};
+  struct _USBHC_MEM_BLOCK *Next;
+} USBHC_MEM_BLOCK;
 
 //
 // USBHC_MEM_POOL is used to manage the memory used by USB
