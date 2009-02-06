@@ -389,7 +389,7 @@ GetNextVariableName (
     // Variable is found
     //
     if (Variable.CurrPtr->StartId == VARIABLE_DATA && Variable.CurrPtr->State == VAR_ADDED) {
-      if (!(EfiAtRuntime () && (Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS == 0))) {
+      if (!(EfiAtRuntime () && ((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0))) {
         VarNameSize = Variable.CurrPtr->NameSize;
         if (VarNameSize <= *VariableNameSize) {
           CopyMem (
