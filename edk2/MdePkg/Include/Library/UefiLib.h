@@ -1151,12 +1151,13 @@ EfiLibInstallDriverBindingComponentName2 (
   Configuration, Driver Configuration 2, Driver Diagnostics, and Driver Diagnostics 2 Protocols.
 
   Initializes a driver by installing the Driver Binding Protocol together with the optional
-  Component Name, optional Component Name 2, optional Driver Configuration, optional Driver
-  Configuration 2, optional Driver Diagnostic, and optional Driver Diagnostic 2 Protocols
-  onto the driver's DriverBindingHandle. DriverBindingHandle is typically the same as the
-  driver's ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. 
+  Component Name, optional Component Name 2, optional Driver Configuration, optional Driver Configuration 2,
+  optional Driver Diagnostic, and optional Driver Diagnostic 2 Protocols onto the driver's DriverBindingHandle.
+  DriverBindingHandle is typically the same as the driver's ImageHandle, but it can be different if the driver
+  produces multiple Driver Binding Protocols. 
   If DriverBinding is NULL, then ASSERT(). 
-  If the installation fails, then ASSERT().  
+  If the installation fails, then ASSERT().
+
 
   @param  ImageHandle           The image handle of the driver.
   @param  SystemTable           The EFI System Table that was passed to the driver's entry point.
