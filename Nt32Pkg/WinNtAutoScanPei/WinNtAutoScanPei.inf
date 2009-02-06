@@ -32,7 +32,7 @@
 #
 
 [Sources.common]
-  WinntAutoscan.c
+  WinNtAutoScan.c
 
 [Packages]
   MdePkg/MdePkg.dec
