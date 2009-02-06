@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   order to make drivers as small as possible, there are a few calling
   restrictions for this service. ConnectController() must
   follow these calling restrictions. If any other agent wishes to call
-  Supported() it must also follow these calling restrictions.
+  Supported() it must also follow these calling restrictions.  
   PxeBc requires DHCP4 and MTFTP4 protocols.
 
   @param  This                Protocol instance pointer.
