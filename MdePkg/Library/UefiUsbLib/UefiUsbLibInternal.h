@@ -21,6 +21,7 @@
 #include <Library/UefiUsbLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 #include <IndustryStandard/Usb.h>
 

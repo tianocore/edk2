@@ -20,11 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/UsbIo.h>
 #include <IndustryStandard/Usb.h>
 
-///
-/// define the timeout time as 3ms
-///
-#define TIMEOUT_VALUE 3 * 1000
-
 /**
   Get the descriptor of the specified USB HID interface.
 

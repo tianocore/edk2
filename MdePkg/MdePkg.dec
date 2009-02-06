@@ -518,6 +518,9 @@
   ## Indicates the allowable maximum number in extract handler table
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
 
+  ## Indicates the default timeouts for USB transfers in milliseconds
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
+
   ## Default current ISO 639-2 language: English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
 
@@ -611,6 +614,9 @@
 
   ## Indicates the allowable maximum number in extract handler table
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
+  
+  ## Indicates the default timeouts for USB transfers in milliseconds
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
 
 [PcdsDynamic.common]
   ## Default current ISO 639-2 language: English & French
