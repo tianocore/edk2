@@ -2151,6 +2151,8 @@ CoreInitializeGcdServices (
   // Add and allocate the remaining unallocated system memory to the memory services.
   //
   Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  ASSERT (Status == EFI_SUCCESS);
+
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) {
       if (MemorySpaceMap[Index].ImageHandle == NULL) {
