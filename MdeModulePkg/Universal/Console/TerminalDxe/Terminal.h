@@ -661,8 +661,8 @@ TerminalDriverBindingStop (
 **/
 EFI_STATUS
 TerminalFreeNotifyList (
-                        IN OUT LIST_ENTRY           *ListHead
-                        );
+  IN OUT LIST_ENTRY           *ListHead
+  );
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
