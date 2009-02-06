@@ -24,11 +24,10 @@ extern VOID  *gHobList;
 /**
   The entry point of PE/COFF Image for the DXE Core. 
 
-  This function is the entry point for the DXE Core.  This function is required
-  to call ProcessModuleEntryPointList() and ProcessModuleEntryPointList() is never
-  expected to return.  The DXE Core is responsible for calling ProcessLibraryConstructorList()
-  as soon as the EFI System Table and the image handle for the DXE Core itself have
-  been established.
+  This function is the entry point for the DXE Core. This function is required to call
+  ProcessModuleEntryPointList() and ProcessModuleEntryPointList() is never expected to return.
+  The DXE Core is responsible for calling ProcessLibraryConstructorList() as soon as the EFI
+  System Table and the image handle for the DXE Core itself have been established.
   If ProcessModuleEntryPointList() returns, then ASSERT() and halt the system.
 
   @param  HobStart  Pointer to the beginning of the HOB List passed in from the PEI Phase. 
