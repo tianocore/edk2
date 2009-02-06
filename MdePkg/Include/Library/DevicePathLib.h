@@ -20,60 +20,81 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __DEVICE_PATH_LIB_H__
 #define __DEVICE_PATH_LIB_H__
 
-#include <Library/BaseLib.h>
-
 #define END_DEVICE_PATH_LENGTH               (sizeof (EFI_DEVICE_PATH_PROTOCOL))
 
 /**
-  Macro that returns the Type field of a device path node.
+  Returns the Type field of a device path node.
 
   Returns the Type field of the device path node specified by Node.
+
+  If Node is NULL, then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
 
   @return The Type field of the device path node specified by Node.
 
 **/
-#define DevicePathType(Node)                 (((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Type)
+UINT8
+DevicePathType (
+  IN CONST VOID  *Node
+  );
 
 /**
-  Macro that returns the SubType field of a device path node.
+  Returns the SubType field of a device path node.
 
   Returns the SubType field of the device path node specified by Node.
+
+  If Node is NULL, then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
 
   @return The SubType field of the device path node specified by Node.
 
 **/
-#define DevicePathSubType(Node)              (((EFI_DEVICE_PATH_PROTOCOL *)(Node))->SubType)
+UINT8
+DevicePathSubType (
+  IN CONST VOID  *Node
+  );
 
 /**
-  Macro that returns the 16-bit Length field of a device path node.
+  Returns the 16-bit Length field of a device path node.
 
-  Returns the 16-bit Length field of the device path node specified by Node.
+  Returns the 16-bit Length field of the device path node specified by Node.  
+  Node is not required to be aligned on a 16-bit boundary, so it is recommended
+  that a function such as ReadUnaligned16() be used to extract the contents of 
+  the Length field.
+
+  If Node is NULL, then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
 
   @return The 16-bit Length field of the device path node specified by Node.
 
 **/
-#define DevicePathNodeLength(Node)           ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0])
+UINTN
+DevicePathNodeLength (
+  IN CONST VOID  *Node
+  );
 
 /**
-  Macro that returns a pointer to the next node in a device path.
+  Returns a pointer to the next node in a device path.
 
   Returns a pointer to the device path node that follows the device path node specified by Node.
+
+  If Node is NULL, then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
 
   @return a pointer to the device path node that follows the device path node specified by Node.
 
 **/
-#define NextDevicePathNode(Node)             ((EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength(Node)))
+EFI_DEVICE_PATH_PROTOCOL *
+NextDevicePathNode (
+  IN CONST VOID  *Node
+  );
 
 /**
-  Macro that determines if a device path node is an end node of a device path.
+  Determines if a device path node is an end node of a device path.
   This includes nodes that are the end of a device path instance and nodes that are the end of an entire device path.
 
   Determines if the device path node specified by Node is an end node of a device path.  
@@ -81,19 +102,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   end of an entire device path.  If Node represents an end node of a device path, 
   then TRUE is returned.  Otherwise, FALSE is returned.
 
+  If Node is NULL, then ASSERT().
+
   @param  Node      A pointer to a device path node data structure.
 
   @retval TRUE      The device path node specified by Node is an end node of a device path.
   @retval FALSE     The device path node specified by Node is not an end node of a device path.
   
 **/
-#define IsDevicePathEndType(Node)            ((DevicePathType (Node) & 0x7f) == END_DEVICE_PATH_TYPE)
+BOOLEAN
+IsDevicePathEndType (
+  IN CONST VOID  *Node
+  );
 
 /**
-  Macro that determines if a device path node is an end node of an entire device path.
+  Determines if a device path node is an end node of an entire device path.
 
   Determines if a device path node specified by Node is an end node of an entire device path.
   If Node represents the end of an entire device path, then TRUE is returned.  Otherwise, FALSE is returned.
+
+  If Node is NULL, then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
 
@@ -101,13 +129,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval FALSE     The device path node specified by Node is not the end of an entire device path.
 
 **/
-#define IsDevicePathEnd(Node)                (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_ENTIRE_DEVICE_PATH_SUBTYPE)
+BOOLEAN
+IsDevicePathEnd (
+  IN CONST VOID  *Node
+  );
 
 /**
-  Macro that determines if a device path node is an end node of a device path instance.
+  Determines if a device path node is an end node of a device path instance.
 
   Determines if a device path node specified by Node is an end node of a device path instance.
   If Node represents the end of a device path instance, then TRUE is returned.  Otherwise, FALSE is returned.
+
+  If Node is NULL, then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
 
@@ -115,12 +148,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval FALSE     The device path node specified by Node is not the end of a device path instance.
 
 **/
-#define IsDevicePathEndInstance(Node)        (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_INSTANCE_DEVICE_PATH_SUBTYPE)
+BOOLEAN
+IsDevicePathEndInstance (
+  IN CONST VOID  *Node
+  );
 
 /**
-  Macro that sets the length, in bytes, of a device path node.
+  Sets the length, in bytes, of a device path node.
 
-  Sets the length of the device path node specified by Node to the value specified by Length. Length is returned.
+  Sets the length of the device path node specified by Node to the value specified 
+  by NodeLength.  NodeLength is returned.  Node is not required to be aligned on 
+  a 16-bit boundary, so it is recommended that a function such as WriteUnaligned16()
+  be used to set the contents of the Length field.
+
+  If Node is NULL, then ASSERT().
+  If NodeLength >= 0x10000, then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
   @param  Length    The length, in bytes, of the device path node.
@@ -128,21 +170,32 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return Length
 
 **/
-#define SetDevicePathNodeLength(Node,NodeLength)  WriteUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0], (UINT16)(NodeLength))
+UINT16
+SetDevicePathNodeLength (
+  IN VOID   *Node,
+  IN UINTN  Length
+  );
 
 /**
-  Macro that fills in all the fields of a device path node that is the end of an entire device path.
+  Fills in all the fields of a device path node that is the end of an entire device path.
 
-  Fills in all the fields of a device path node specified by Node so Node represents the end of an entire device path.
+  Fills in all the fields of a device path node specified by Node so Node represents 
+  the end of an entire device path.  The Type field of Node is set to 
+  END_DEVICE_PATH_TYPE, the SubType field of Node is set to 
+  END_ENTIRE_DEVICE_PATH_SUBTYPE, and the Length field of Node is set to 
+  END_DEVICE_PATH_LENGTH.  Node is not required to be aligned on a 16-bit boundary, 
+  so it is recommended that a function such as WriteUnaligned16() be used to set 
+  the contents of the Length field. 
+
+  If Node is NULL, then ASSERT(). 
 
   @param  Node      A pointer to a device path node data structure.
 
 **/
-#define SetDevicePathEndNode(Node)  {                                   \
-          DevicePathType (Node)    = END_DEVICE_PATH_TYPE;              \
-          DevicePathSubType (Node) = END_ENTIRE_DEVICE_PATH_SUBTYPE;    \
-          SetDevicePathNodeLength ((Node), END_DEVICE_PATH_LENGTH);     \
-          }
+VOID
+SetDevicePathEndNode (
+  IN VOID  *Node
+  );
 
 /**
   Returns the size of a device path in bytes.
