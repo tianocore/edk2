@@ -845,7 +845,6 @@ RtcTimeFieldsValid (
       Time->Year > 2099 ||
       Time->Month < 1 ||
       Time->Month > 12 ||
-      (!DayValid (Time)) ||
       Time->Hour > 23 ||
       Time->Minute > 59 ||
       Time->Second > 59 ||
@@ -853,7 +852,9 @@ RtcTimeFieldsValid (
       (!(Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE || (Time->TimeZone >= -1440 && Time->TimeZone <= 1440))) ||
       ((Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT))) != 0)
       ) {
-    return EFI_INVALID_PARAMETER;
+    if (!DayValid (Time)) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   return EFI_SUCCESS;
