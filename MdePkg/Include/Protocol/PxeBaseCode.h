@@ -493,11 +493,11 @@ EFI_STATUS
   For write operations, the data to be sent is in the buffer specified by BufferPtr.
   BufferSize specifies the number of bytes to send. If the write operation completes
   successfully, then EFI_SUCCESS will be returned.
-  For TFTP “get file size” operations, the size of the requested file or directory
+  For TFTP "get file size" operations, the size of the requested file or directory
   is returned in BufferSize, and EFI_SUCCESS will be returned. If the TFTP server
   does not support options, the file will be downloaded into a bit bucket and the
-  length of the downloaded file will be returned. For MTFTP “get file size” operations,
-  if the MTFTP server does not support the “get file size” option, EFI_UNSUPPORTED
+  length of the downloaded file will be returned. For MTFTP "get file size" operations,
+  if the MTFTP server does not support the "get file size" option, EFI_UNSUPPORTED
   will be returned.
   This function can take up to 10 seconds to timeout and return control to the caller.
   If the TFTP sequence does not complete, EFI_TIMEOUT will be returned.
@@ -505,7 +505,7 @@ EFI_STATUS
   then the TFTP sequence is stopped and EFI_ABORTED will be returned.
   The format of the data returned from a TFTP read directory operation is a null-terminated
   filename followed by a null-terminated information string, of the form
-  “size year-month-day hour:minute:second” (i.e. %d %d-%d-%d %d:%d:%f - note that
+  "size year-month-day hour:minute:second" (i.e. %d %d-%d-%d %d:%d:%f - note that
   the seconds field can be a decimal number), where the date and time are UTC. For
   an MTFTP read directory command, there is additionally a null-terminated multicast
   IP address preceding the filename of the form %d.%d.%d.%d for IP v4. The final
@@ -667,7 +667,7 @@ EFI_STATUS
   The software filter is used when the USE_FILTER in OpFlags is set to UdpRead().
   The current hardware filter remains in effect no matter what the settings of OpFlags
   are, so that the meaning of ANY_DEST_IP set in OpFlags to UdpRead() is from those
-  packets whose reception is enabled in hardware – physical NIC address (unicast),
+  packets whose reception is enabled in hardware - physical NIC address (unicast),
   broadcast address, logical address or addresses (multicast), or all (promiscuous).
   UdpRead() does not modify the IP filter settings.
   Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP receive
