@@ -555,8 +555,8 @@ DevPathToTextAtapi (
     CatPrint (
       Str,
       L"Ata(%s,%s,0x%x)",
-      Atapi->PrimarySecondary ? L"Secondary" : L"Primary",
-      Atapi->SlaveMaster ? L"Slave" : L"Master",
+      (Atapi->PrimarySecondary == 1) ? L"Secondary" : L"Primary",
+      (Atapi->SlaveMaster == 1) ? L"Slave" : L"Master",
       Atapi->Lun
       );
   }
@@ -1030,8 +1030,8 @@ DevPathToTextIPv4 (
     IPDevPath->RemoteIpAddress.Addr[1],
     IPDevPath->RemoteIpAddress.Addr[2],
     IPDevPath->RemoteIpAddress.Addr[3],
-    IPDevPath->Protocol ? L"TCP" : L"UDP",
-    (IPDevPath->StaticIpAddress == TRUE) ? L"Static" : L"DHCP",
+    (IPDevPath->Protocol == 1) ? L"TCP" : L"UDP",
+    IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
     IPDevPath->LocalIpAddress.Addr[0],
     IPDevPath->LocalIpAddress.Addr[1],
     IPDevPath->LocalIpAddress.Addr[2],
@@ -1106,8 +1106,8 @@ DevPathToTextIPv6 (
     IPDevPath->RemoteIpAddress.Addr[13],
     IPDevPath->RemoteIpAddress.Addr[14],
     IPDevPath->RemoteIpAddress.Addr[15],
-    IPDevPath->Protocol ? L"TCP" : L"UDP",
-    (IPDevPath->StaticIpAddress == TRUE) ? L"Static" : L"DHCP",
+    (IPDevPath->Protocol == 1) ? L"TCP" : L"UDP",
+    IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
     IPDevPath->LocalIpAddress.Addr[0],
     IPDevPath->LocalIpAddress.Addr[1],
     IPDevPath->LocalIpAddress.Addr[2],
@@ -1769,7 +1769,7 @@ ConvertDevicePathToText (
     // Find the handler to dump this device path node
     //
     DumpNode = NULL;
-    for (Index = 0; DevPathToTextTable[Index].Function; Index += 1) {
+    for (Index = 0; DevPathToTextTable[Index].Function != NULL; Index += 1) {
 
       if (DevicePathType (DevPathNode) == DevPathToTextTable[Index].Type &&
           DevicePathSubType (DevPathNode) == DevPathToTextTable[Index].SubType
