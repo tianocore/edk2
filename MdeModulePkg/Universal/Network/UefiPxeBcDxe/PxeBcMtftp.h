@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2007, Intel Corporation
+  Mtftp routines for PxeBc.
+    
+Copyright (c) 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,42 +10,34 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  PxeBcMtftp.h
-
-Abstract:
-
-  Mtftp routines for PxeBc
-
-
 **/
 
 #ifndef __EFI_PXEBC_MTFTP_H__
 #define __EFI_PXEBC_MTFTP_H__
 
-enum {
+typedef enum {
   PXE_MTFTP_OPTION_BLKSIZE_INDEX,
   PXE_MTFTP_OPTION_TIMEOUT_INDEX,
   PXE_MTFTP_OPTION_TSIZE_INDEX,
   PXE_MTFTP_OPTION_MULTICAST_INDEX,
   PXE_MTFTP_OPTION_MAXIMUM_INDEX
-};
+} PXE_MTFTP_OPTION_ENUM_TYPES;
 
 
 /**
   This function is to get size of a file by Tftp.
-
+  
   @param  Private        Pointer to PxeBc private data
   @param  Config         Pointer to Mtftp configuration data
   @param  Filename       Pointer to file name
   @param  BlockSize      Pointer to block size
   @param  BufferSize     Pointer to buffer size
 
-  @return EFI_SUCCESS
-  @return EFI_NOT_FOUND
-  @return EFI_DEVICE_ERROR
-
+  @retval EFI_SUCCESS        Get the size of file success
+  @retval EFI_NOT_FOUND      Parse the tftp ptions failed.
+  @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
+  @retval Other              Has not get the size of the file.
+  
 **/
 EFI_STATUS
 PxeBcTftpGetFileSize (
@@ -68,9 +61,9 @@ PxeBcTftpGetFileSize (
   @param  BufferSize     Pointer to buffer size
   @param  DontUseBuffer  Indicate whether with a receive buffer
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-
+  @retval EFI_SUCCESS        Read the data success from the special file.
+  @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
+  @retval other              Read data from file failed.
 **/
 EFI_STATUS
 PxeBcTftpReadFile (
@@ -96,8 +89,9 @@ PxeBcTftpReadFile (
   @param  BufferPtr      Pointer to buffer
   @param  BufferSize     Pointer to buffer size
 
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
+  @retval EFI_SUCCESS        Write the data success into the special file.
+  @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
+  @retval other              Write data into file failed.
 
 **/
 EFI_STATUS
@@ -114,19 +108,20 @@ PxeBcTftpWriteFile (
 
 
 /**
-  This function is to get data of a directory by Tftp.
+  This function is to get data(file) from a directory(may be a server) by Tftp.
 
-  @param  Private        Pointer to PxeBc private data
-  @param  Config         Pointer to Mtftp configuration data
-  @param  Filename       Pointer to file name
-  @param  BlockSize      Pointer to block size
-  @param  BufferPtr      Pointer to buffer
-  @param  BufferSize     Pointer to buffer size
-  @param  DontUseBuffer  Indicate whether with a receive buffer
+  @param  Private        Pointer to PxeBc private data.
+  @param  Config         Pointer to Mtftp configuration data.
+  @param  Filename       Pointer to file name.
+  @param  BlockSize      Pointer to block size.
+  @param  BufferPtr      Pointer to buffer.
+  @param  BufferSize     Pointer to buffer size.
+  @param  DontUseBuffer  Indicate whether with a receive buffer.
 
-  @return EFI_SUCCES
-  @return EFI_DEVICE_ERROR
-
+  @retval EFI_SUCCES         Get the data from the file included in directory success. 
+  @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
+  @retval other              Operation failed.
+  
 **/
 EFI_STATUS
 PxeBcTftpReadDirectory (

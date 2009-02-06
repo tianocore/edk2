@@ -1,6 +1,7 @@
 /** @file
-
-Copyright (c) 2007 - 2008, Intel Corporation
+  The driver binding for IP4 CONFIG protocol.
+  
+Copyright (c) 2007 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,30 +10,30 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  PxeBcDriver.c
-
-Abstract:
-
-  The driver binding for IP4 CONFIG protocol.
-
-
 **/
 
 
 #include "PxeBcImpl.h"
 
+EFI_DRIVER_BINDING_PROTOCOL gPxeBcDriverBinding = {
+  PxeBcDriverBindingSupported,
+  PxeBcDriverBindingStart,
+  PxeBcDriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
 
 /**
-  The entry point for PxeBc driver which install the driver
-  binding and component name protocol on its image.
+  This is the declaration of an EFI image entry point. This entry point is
+  the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers including
+  both device drivers and bus drivers.
 
-  @param  ImageHandle          The Image handle of the driver
-  @param  SystemTable          The system table
+  @param  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param  SystemTable           A pointer to the EFI System Table.
 
-  @return EFI_SUCCESS
-  @return Others
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 
 **/
 EFI_STATUS
@@ -53,16 +54,22 @@ PxeBcDriverEntryPoint (
 
 
 /**
-  Test to see if this driver supports ControllerHandle.
+  Test to see if this driver supports ControllerHandle. This service
+  is called by the EFI boot service ConnectController(). In
+  order to make drivers as small as possible, there are a few calling
+  restrictions for this service. ConnectController() must
+  follow these calling restrictions. If any other agent wishes to call
+  Supported() it must also follow these calling restrictions.  
+  PxeBc requires DHCP4 and MTFTP4 protocols.
 
-  @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to test
-  @param  RemainingDevicePath  Optional parameter use to pick a specific child
-                               device to start.
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
 
-  @return EFI_SUCCES
-  @return EFI_ALREADY_STARTED
-  @return Others
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
 
 **/
 EFI_STATUS
@@ -116,17 +123,21 @@ PxeBcDriverBindingSupported (
 
 
 /**
-  Start this driver on ControllerHandle.
+  Start this driver on ControllerHandle. This service is called by the
+  EFI boot service ConnectController(). In order to make
+  drivers as small as possible, there are a few calling restrictions for
+  this service. ConnectController() must follow these
+  calling restrictions. If any other agent wishes to call Start() it
+  must also follow these calling restrictions.
 
   @param  This                 Protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
-  @return EFI_SUCCES
-  @return EFI_ALREADY_STARTED
-  @return EFI_OUT_OF_RESOURCES
-  @return Others
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
 
 **/
 EFI_STATUS
@@ -458,17 +469,21 @@ ON_ERROR:
 
 
 /**
-  Stop this driver on ControllerHandle.
+  Stop this driver on ControllerHandle. This service is called by the
+  EFI boot service DisconnectController(). In order to
+  make drivers as small as possible, there are a few calling
+  restrictions for this service. DisconnectController()
+  must follow these calling restrictions. If any other agent wishes
+  to call Stop() it must also follow these calling restrictions.
+  
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to stop driver on
-  @param  NumberOfChildren     Number of Handles in ChildHandleBuffer. If number of
-                                children is zero stop the entire bus driver.
-  @param  ChildHandleBuffer    List of Child Handles to Stop.
-
-  @return EFI_SUCCESS
-  @return EFI_DEVICE_ERROR
-  @return Others
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
 
 **/
 EFI_STATUS
@@ -615,14 +630,5 @@ PxeBcDriverBindingStop (
 
   return Status;
 }
-
-EFI_DRIVER_BINDING_PROTOCOL gPxeBcDriverBinding = {
-  PxeBcDriverBindingSupported,
-  PxeBcDriverBindingStart,
-  PxeBcDriverBindingStop,
-  0xa,
-  NULL,
-  NULL
-};
 
 
