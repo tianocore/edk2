@@ -182,7 +182,7 @@ IsDevicePathEndType (
   )
 {
   ASSERT (Node != NULL);
-  return ((DevicePathType (Node) & 0x7f) == END_DEVICE_PATH_TYPE);
+  return (BOOLEAN) ((DevicePathType (Node) & 0x7f) == END_DEVICE_PATH_TYPE);
 }
 
 /**
@@ -205,7 +205,7 @@ IsDevicePathEnd (
   )
 {
   ASSERT (Node != NULL);
-  return (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_ENTIRE_DEVICE_PATH_SUBTYPE);
+  return (BOOLEAN) (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_ENTIRE_DEVICE_PATH_SUBTYPE);
 }
 
 /**
@@ -228,7 +228,7 @@ IsDevicePathEndInstance (
   )
 {
   ASSERT (Node != NULL);
-  return (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_INSTANCE_DEVICE_PATH_SUBTYPE);
+  return (BOOLEAN) (IsDevicePathEndType (Node) && DevicePathSubType(Node) == END_INSTANCE_DEVICE_PATH_SUBTYPE);
 }
 
 /**
@@ -250,8 +250,8 @@ IsDevicePathEndInstance (
 **/
 UINT16
 SetDevicePathNodeLength (
-IN VOID   *Node,
-IN UINTN  NodeLength
+  IN VOID   *Node,
+  IN UINTN  NodeLength
   )
 {
   ASSERT (Node != NULL);
