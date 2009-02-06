@@ -250,8 +250,8 @@ IsDevicePathEndInstance (
 **/
 UINT16
 SetDevicePathNodeLength (
-  IN VOID   *Node,
-  IN UINTN  NodeLength
+  IN OUT VOID  *Node,
+  IN UINTN     NodeLength
   )
 {
   ASSERT (Node != NULL);
@@ -277,7 +277,7 @@ SetDevicePathNodeLength (
 **/
 VOID
 SetDevicePathEndNode (
-  IN VOID  *Node
+  OUT VOID  *Node
   )
 {
   ASSERT (Node != NULL);
