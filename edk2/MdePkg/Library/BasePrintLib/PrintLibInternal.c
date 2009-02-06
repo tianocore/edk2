@@ -490,8 +490,8 @@ BasePrintLibVSPrint (
       case 'd':
         if ((Flags & LONG_TYPE) == 0) {
           //
-          // 'd','x', and 'X' that are not preceeded by 'l' or 'L' are assumed to be type "int".
-          // This assumption is made so the format string defintion is compatible with the ANSI C
+          // 'd','x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
+          // This assumption is made so the format string definition is compatible with the ANSI C
           // Specification for formatted strings.  It is recommended that the Base Types be used 
           // everywhere, but in this one case, compliance with ANSI C is more important, and 
           // provides an implementation that is compatible with that largest possible set of CPU 
@@ -526,8 +526,8 @@ BasePrintLibVSPrint (
           Comma = FALSE;
           if ((Flags & LONG_TYPE) == 0 && Value < 0) {
             //
-            // 'd','x', and 'X' that are not preceeded by 'l' or 'L' are assumed to be type "int".
-            // This assumption is made so the format string defintion is compatible with the ANSI C
+            // 'd','x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
+            // This assumption is made so the format string definition is compatible with the ANSI C
             // Specification for formatted strings.  It is recommended that the Base Types be used 
             // everywhere, but in this one case, compliance with ANSI C is more important, and 
             // provides an implementation that is compatible with that largest possible set of CPU 
