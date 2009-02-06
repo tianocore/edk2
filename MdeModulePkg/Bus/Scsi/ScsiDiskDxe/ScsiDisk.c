@@ -1490,7 +1490,7 @@ ParseInquiryData (
   IN OUT SCSI_DISK_DEV   *ScsiDiskDevice
   )
 {
-  ScsiDiskDevice->FixedDevice               = (BOOLEAN) (ScsiDiskDevice->InquiryData.RMB ? 0 : 1);
+  ScsiDiskDevice->FixedDevice               = (BOOLEAN) ((ScsiDiskDevice->InquiryData.RMB == 1) ? 0 : 1);
   ScsiDiskDevice->BlkIoMedia.RemovableMedia = (BOOLEAN) (!ScsiDiskDevice->FixedDevice);
 }
 
