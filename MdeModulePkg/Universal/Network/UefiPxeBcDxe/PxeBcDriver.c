@@ -1,5 +1,5 @@
 /** @file
-  The driver binding for IP4 CONFIG protocol.
+  The driver binding for UEFI PXEBC protocol.
   
 Copyright (c) 2007 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
