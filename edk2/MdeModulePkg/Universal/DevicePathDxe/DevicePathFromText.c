@@ -2765,7 +2765,7 @@ ConvertTextToDeviceNode (
   DeviceNodeStr = StrDuplicate (TextDeviceNode);
   ASSERT (DeviceNodeStr != NULL);
 
-  for (Index = 0; DevPathFromTextTable[Index].Function; Index++) {
+  for (Index = 0; DevPathFromTextTable[Index].Function != NULL; Index++) {
     ParamStr = GetParamByNodeName (DeviceNodeStr, DevPathFromTextTable[Index].DevicePathNodeText);
     if (ParamStr != NULL) {
       DumpNode = DevPathFromTextTable[Index].Function;
@@ -2833,7 +2833,7 @@ ConvertTextToDevicePath (
   Str                 = DevicePathStr;
   while ((DeviceNodeStr = GetNextDeviceNodeStr (&Str, &IsInstanceEnd)) != NULL) {
     DumpNode = NULL;
-    for (Index = 0; DevPathFromTextTable[Index].Function; Index++) {
+    for (Index = 0; DevPathFromTextTable[Index].Function != NULL; Index++) {
       ParamStr = GetParamByNodeName (DeviceNodeStr, DevPathFromTextTable[Index].DevicePathNodeText);
       if (ParamStr != NULL) {
         DumpNode = DevPathFromTextTable[Index].Function;
