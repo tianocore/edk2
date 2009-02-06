@@ -309,8 +309,7 @@ VOID
 PxeBcInitSeedPacket (
   IN EFI_DHCP4_PACKET  *Seed,
   IN EFI_UDP4_PROTOCOL *Udp4
-  )
-;
+  );
 
 
 /**
@@ -318,18 +317,17 @@ PxeBcInitSeedPacket (
 
   @param  CachedPacket  Pointer to cached dhcp packet.
 
-  @retval TRUE          Success to parse and validation.
+  @retval TRUE          Succeed to parse and validation.
   @retval FALSE         Fail to parse or validation.
 
 **/
 BOOLEAN
 PxeBcParseCachedDhcpPacket (
   IN PXEBC_CACHED_DHCP4_PACKET  *CachedPacket
-  )
-;
+  );
 
 /**
-  This function is to check the selected proxy offer(include BINL dhcp offer and
+  This function is to check the selected proxy offer (include BINL dhcp offer and
   DHCP_ONLY offer ) and set the flag and copy the DHCP packets to the Pxe base code
   mode structure.
 
@@ -342,8 +340,7 @@ PxeBcParseCachedDhcpPacket (
 EFI_STATUS
 PxeBcCheckSelectedOffer (
   IN PXEBC_PRIVATE_DATA  *Private
-  )
-;
+  );
 
 
 /**
@@ -383,8 +380,7 @@ PxeBcDhcpCallBack (
   IN EFI_DHCP4_EVENT                   Dhcp4Event,
   IN EFI_DHCP4_PACKET                  * Packet OPTIONAL,
   OUT EFI_DHCP4_PACKET                 **NewPacket OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -393,14 +389,14 @@ PxeBcDhcpCallBack (
   @param  Private               Pointer to PxeBc private data.
   @param  Type                  PxeBc option boot item type
   @param  Layer                 PxeBc option boot item layer
-  @param  UseBis                use bios or not
-  @param  DestIp                ip address for server      
-  @param  IpCount               the total of the server ip address    
-  @param  SrvList               server list
-  @param  IsDiscv               discover the vendor or not
-  @param  Reply                 the dhcp4 packet of Pxe reply
+  @param  UseBis                Use BIS or not
+  @param  DestIp                Ip address for server      
+  @param  IpCount               The total count of the server ip address    
+  @param  SrvList               Server list
+  @param  IsDiscv               Discover the vendor or not
+  @param  Reply                 The dhcp4 packet of Pxe reply
 
-  @retval EFI_SUCCESS           operational success.
+  @retval EFI_SUCCESS           Operation succeeds.
   @retval EFI_OUT_OF_RESOURCES  Allocate memory pool failed.
   @retval EFI_NOT_FOUND         There is no vendor option exists.
   @retval EFI_TIMEOUT           Send Pxe Discover time out. 
@@ -417,8 +413,7 @@ PxeBcDiscvBootService (
   IN EFI_PXE_BASE_CODE_SRVLIST         * SrvList,
   IN BOOLEAN                           IsDiscv,
   OUT EFI_DHCP4_PACKET                 * Reply OPTIONAL
-  )
-;
+  );
 
 
 /**
@@ -437,8 +432,7 @@ PxeBcBuildDhcpOptions (
   IN PXEBC_PRIVATE_DATA            *Private,
   IN EFI_DHCP4_PACKET_OPTION       **OptList,
   IN BOOLEAN                       IsDhcpDiscover
-  )
-;
+  );
 
 
 /**
@@ -458,18 +452,17 @@ PxeBcCreateBootOptions (
   IN  UINT16                           Type,
   IN  UINT16                           *Layer,
   OUT UINT32                           *OptLen
-  )
-;
+  );
 
 
 /**
   Parse interested dhcp options.
 
   @param  Buffer     Pointer to the dhcp options packet.
-  @param  Length     the length of the dhcp options.
-  @param  OptTag     the option OpCode.
+  @param  Length     The length of the dhcp options.
+  @param  OptTag     The option OpCode.
 
-  @return Return NULL if the buffer length is 0 and OpCode is not 
+  @return NULL if the buffer length is 0 and OpCode is not 
           PXEBC_DHCP4_TAG_EOP, or the pointer to the buffer.
 
 **/
@@ -478,8 +471,7 @@ PxeBcParseExtendOptions (
   IN UINT8                         *Buffer,
   IN UINT32                        Length,
   IN UINT8                         OptTag
-  )
-;
+  );
 
 
 /**
@@ -488,15 +480,14 @@ PxeBcParseExtendOptions (
   @param  Dhcp4Option           Pointer to dhcp options
   @param  VendorOption          Pointer to vendor options
 
-  @return Return TRUE if valid for vendor options, or FALSE.
+  @return TRUE if valid for vendor options, or FALSE.
 
 **/
 BOOLEAN
 PxeBcParseVendorOptions (
   IN EFI_DHCP4_PACKET_OPTION       *Dhcp4Option,
-  IN PXEBC_VENDOR_OPTION          *VendorOption
-  )
-;
+  IN PXEBC_VENDOR_OPTION           *VendorOption
+  );
 
 
 /**
@@ -514,8 +505,7 @@ PxeBcParseVendorOptions (
 EFI_STATUS
 PxeBcSelectBootPrompt (
   IN PXEBC_PRIVATE_DATA              *Private
-  )
-;
+  );
 
 
 /**
@@ -535,8 +525,7 @@ PxeBcSelectBootMenu (
   IN  PXEBC_PRIVATE_DATA              *Private,
   OUT UINT16                          *Type,
   IN  BOOLEAN                         UseDefaultItem
-  )
-;
+  );
 
 #endif
 

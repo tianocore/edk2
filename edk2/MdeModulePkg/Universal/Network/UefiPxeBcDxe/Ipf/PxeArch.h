@@ -10,13 +10,6 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-  PxeArch.h
-
-Abstract:
-  Defines PXE Arch type
-
-
 **/
 
 #ifndef _EFI_PXE_ARCH_H_

@@ -46,8 +46,7 @@ PxeBcTftpGetFileSize (
   IN UINT8                      *Filename,
   IN UINTN                      *BlockSize,
   IN OUT UINT64                 *BufferSize
-  )
-;
+  );
 
 
 /**
@@ -64,6 +63,7 @@ PxeBcTftpGetFileSize (
   @retval EFI_SUCCESS        Read the data success from the special file.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval other              Read data from file failed.
+  
 **/
 EFI_STATUS
 PxeBcTftpReadFile (
@@ -74,8 +74,7 @@ PxeBcTftpReadFile (
   IN UINT8                      *BufferPtr,
   IN OUT UINT64                 *BufferSize,
   IN BOOLEAN                    DontUseBuffer
-  )
-;
+  );
 
 
 /**
@@ -92,7 +91,7 @@ PxeBcTftpReadFile (
   @retval EFI_SUCCESS        Write the data success into the special file.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval other              Write data into file failed.
-
+  
 **/
 EFI_STATUS
 PxeBcTftpWriteFile (
@@ -103,8 +102,7 @@ PxeBcTftpWriteFile (
   IN UINTN                      *BlockSize,
   IN UINT8                      *BufferPtr,
   IN OUT UINT64                 *BufferSize
-  )
-;
+  );
 
 
 /**
@@ -132,8 +130,7 @@ PxeBcTftpReadDirectory (
   IN UINT8                         *BufferPtr,
   IN OUT UINT64                    *BufferSize,
   IN BOOLEAN                       DontUseBuffer
-  )
-;
+  );
 
 #endif
 

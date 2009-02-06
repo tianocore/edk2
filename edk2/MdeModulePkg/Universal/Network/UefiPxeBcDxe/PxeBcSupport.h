@@ -45,8 +45,7 @@ VOID
 PxeBcCommonNotify (
   IN EFI_EVENT           Event,
   IN VOID                *Context
-  )
-;
+  );
 
 
 /**
@@ -101,8 +100,8 @@ CvtNum (
 /**
   Convert unsigned int number to decimal number.
 
-  @param  Number      The unsigned int number will be converted.
-  @param  Buffer      Pointer to the buffer to store the decimal number after transform.
+  @param  Number   The unsigned int number will be converted.
+  @param  Buffer   Pointer to the buffer to store the decimal number after transform.
 
   @return the length of the number after transform.
 
@@ -111,23 +110,21 @@ UINTN
 UtoA10 (
   IN UINTN Number,
   IN CHAR8 *Buffer
-  )
-;
+  );
 
 
 /**
   Convert ASCII numeric string to a UINTN value.
 
   @param  Buffer  Pointer to the 8-byte unsigned int value.
-  
+
   @return UINTN value of the ASCII string.
 
 **/
 UINT64
 AtoU64 (
   IN UINT8 *Buffer
-  )
-;
+  );
 
 
 #endif
