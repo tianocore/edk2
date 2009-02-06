@@ -709,11 +709,11 @@ EfiFvbEraseCustomBlockRange (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!(mFvbEntry[Instance].FvbExtension)) {
+  if (mFvbEntry[Instance].FvbExtension == NULL) {
     return EFI_UNSUPPORTED;
   }
 
-  if (!(mFvbEntry[Instance].FvbExtension->EraseFvbCustomBlock)) {
+  if (mFvbEntry[Instance].FvbExtension->EraseFvbCustomBlock == NULL) {
     return EFI_UNSUPPORTED;
   }
 
