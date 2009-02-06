@@ -535,19 +535,19 @@ Ip4AccpetFrame (
   // fragment if its head has MF (more fragment) set, or it starts
   // at non-zero byte.
   //
-  if ((Head->Fragment & IP4_HEAD_MF_MASK) || (Info->Start != 0)) {
+  if (((Head->Fragment & IP4_HEAD_MF_MASK) != 0) || (Info->Start != 0)) {
     //
     // Drop the fragment if DF is set but it is fragmented. Gateway
     // need to send a type 4 destination unreache ICMP message here.
     //
-    if (Head->Fragment & IP4_HEAD_DF_MASK) {
+    if ((Head->Fragment & IP4_HEAD_DF_MASK) != 0) {
       goto RESTART;
     }
 
     //
     // The length of all but the last fragments is in the unit of 8 bytes.
     //
-    if ((Head->Fragment & IP4_HEAD_MF_MASK) && (Info->Length % 8 != 0)) {
+    if (((Head->Fragment & IP4_HEAD_MF_MASK) != 0) && (Info->Length % 8 != 0)) {
       goto RESTART;
     }
 
