@@ -287,3 +287,12 @@ Possible impacts:
 	EFI_FIELD_OFFSET -> OFFSET_OF
 	EFI_MAX_BIT      -> MAX_BIT
 	EFI_MAX_ADDRESS  -> MAX_ADDRESS
+
+EDK_7467:  Non-Compatible: qhuang8
+	Remove the macro value TIME_OUT defined in MdePkg/Include/Uefi/UefiUsbLib.h and replace it with a new PCD entry:
+	gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue  
+	
+Possible impacts:
+	All modules depending on macro TIME_OUT in MdePkg/Include/Uefi/UefiUsbLib.h should use PcdGet32 (PcdUsbTransferTimeoutValue)
+	for the USB transaction, include "PcdLib" in INF [LibraryClasses] section and add "#include <Library/PcdLib.h>" in module
+	source.
