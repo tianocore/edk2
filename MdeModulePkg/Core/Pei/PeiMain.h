@@ -224,8 +224,6 @@ typedef struct {
   @param Data            Pointer to old core data that is used to initialize the
                          core's data areas.
 
-  @retval EFI_NOT_FOUND  Never reach
-
 **/
 VOID
 EFIAPI

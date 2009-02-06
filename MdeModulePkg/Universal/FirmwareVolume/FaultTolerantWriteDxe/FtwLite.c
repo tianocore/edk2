@@ -1,7 +1,6 @@
 /** @file
 
   This is a simple fault tolerant write driver.
-  And it only supports write BufferSize <= SpareAreaLength.
 
   This boot service protocol only provides fault tolerant write capability for 
   block devices.  The protocol has internal non-volatile intermediate storage 
@@ -21,14 +20,27 @@
   2) SPARE_COMPLETED is that the data from write buffer is writed into the spare block as the backup.
   3) WRITE_COMPLETED is that the data is copied from the spare block to the target block.
 
-  This driver operates the data as the whole size of spare block. It also assumes that 
-  working block is an area which contains working space in its last block and has the same size as spare block.
+  This driver operates the data as the whole size of spare block.
   It first read the SpareAreaLength data from the target block into the spare memory buffer.
   Then copy the write buffer data into the spare memory buffer.
   Then write the spare memory buffer into the spare block.
   Final copy the data from the spare block to the target block.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  To make this drive work well, the following conditions must be satisfied:
+  1. The write NumBytes data must be fit within Spare area. 
+     Offset + NumBytes <= SpareAreaLength
+  2. The whole flash range has the same block size.
+  3. Working block is an area which contains working space in its last block and has the same size as spare block.
+  4. Working Block area must be in the single one Firmware Volume Block range which FVB protocol is produced on.  
+  5. Spare area must be in the single one Firmware Volume Block range which FVB protocol is produced on.
+  6. Any write data area (SpareAreaLength Area) which the data will be written into must be 
+     in the single one Firmware Volume Block range which FVB protocol is produced on.
+  7. If write data area (such as Variable range) is enlarged, the spare area range must be enlarged.
+     The spare area must be enough large to store the write data before write them into the target range.
+  If one of them is not satisfied, FtwLiteWrite may fail.
+  Usually, Spare area only takes one block. That's SpareAreaLength = BlockSize, NumberOfSpareBlock = 1.
+
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -89,7 +101,6 @@ FtwLiteWrite (
   UINTN                               Index;
   UINT8                               *Ptr;
   EFI_DEV_PATH_PTR                    DevPtr;
-
   //
   // Refresh work space and get last record
   //
@@ -121,6 +132,7 @@ FtwLiteWrite (
   // Check if the input data can fit within the target block
   //
   if ((Offset +*NumBytes) > FtwLiteDevice->SpareAreaLength) {
+    *NumBytes = FtwLiteDevice->SpareAreaLength - Offset;
     return EFI_BAD_BUFFER_SIZE;
   }
   //
@@ -152,7 +164,7 @@ FtwLiteWrite (
             );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: Allocate record - %r\n", Status));
+    DEBUG ((EFI_D_ERROR, "FtwLite: Allocate record - %r\n", Status));
     return EFI_ABORTED;
   }
 
@@ -168,7 +180,7 @@ FtwLiteWrite (
 
   Status = Fvb->GetPhysicalAddress (Fvb, &FvbPhysicalAddress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: Get FVB physical address - %r\n", Status));
+    DEBUG ((EFI_D_ERROR, "FtwLite: Get FVB physical address - %r\n", Status));
     return EFI_ABORTED;
   }
 
@@ -223,7 +235,7 @@ FtwLiteWrite (
     //
     Ptr = MyBuffer;
     for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-      MyLength = FtwLiteDevice->SizeOfSpareBlock;
+      MyLength = FtwLiteDevice->BlockSize;
       Status = FtwLiteDevice->FtwFvBlock->Read (
                                             FtwLiteDevice->FtwFvBlock,
                                             FtwLiteDevice->FtwWorkBlockLba + Index,
@@ -242,14 +254,14 @@ FtwLiteWrite (
     // Update Offset by adding the offset from the start LBA of working block to
     // the target LBA. The target block can not span working block!
     //
-    Offset = (((UINTN) (Lba - FtwLiteDevice->FtwWorkBlockLba)) * FtwLiteDevice->SizeOfSpareBlock + Offset);
+    Offset = (((UINTN) (Lba - FtwLiteDevice->FtwWorkBlockLba)) * FtwLiteDevice->BlockSize + Offset);
     ASSERT ((Offset +*NumBytes) <= FtwLiteDevice->SpareAreaLength);
 
   } else {
 
     Ptr = MyBuffer;
     for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-      MyLength  = FtwLiteDevice->SizeOfSpareBlock;
+      MyLength  = FtwLiteDevice->BlockSize;
       Status    = Fvb->Read (Fvb, Lba + Index, 0, &MyLength, Ptr);
       if (EFI_ERROR (Status)) {
         FreePool (MyBuffer);
@@ -278,7 +290,7 @@ FtwLiteWrite (
 
   Ptr = SpareBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    MyLength = FtwLiteDevice->SizeOfSpareBlock;
+    MyLength = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Read (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -301,7 +313,7 @@ FtwLiteWrite (
   Status  = FtwEraseSpareBlock (FtwLiteDevice);
   Ptr     = MyBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    MyLength = FtwLiteDevice->SizeOfSpareBlock;
+    MyLength = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Write (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -358,7 +370,7 @@ FtwLiteWrite (
   Status  = FtwEraseSpareBlock (FtwLiteDevice);
   Ptr     = SpareBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    MyLength = FtwLiteDevice->SizeOfSpareBlock;
+    MyLength = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Write (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -379,7 +391,7 @@ FtwLiteWrite (
   FreePool (SpareBuffer);
 
   DEBUG (
-    (EFI_D_FTW_LITE,
+    (EFI_D_ERROR,
     "FtwLite: Write() success, (Lba:Offset)=(%lx:0x%x), NumBytes: 0x%x\n",
     Lba,
     Offset,
@@ -504,7 +516,7 @@ FtwRestart (
   DevPathPtr.MemMap = (MEMMAP_DEVICE_PATH *) &Record->DevPath;
   if (!((DevPathPtr.MemMap->Header.Type == HARDWARE_DEVICE_PATH) && (DevPathPtr.MemMap->Header.SubType == HW_MEMMAP_DP))
       ) {
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: FVB Device Path is not memory mapped\n"));
+    DEBUG ((EFI_D_ERROR, "FtwLite: FVB Device Path is not memory mapped\n"));
     return EFI_ABORTED;
   }
 
@@ -517,7 +529,7 @@ FtwRestart (
   //  guaranteed to be completed with fault tolerant manner.
   //
   Status = FtwWriteRecord (FtwLiteDevice, Fvb);
-  DEBUG ((EFI_D_FTW_INFO, "FtwLite: Restart() - %r\n", Status));
+  DEBUG ((EFI_D_INFO, "FtwLite: Restart() - %r\n", Status));
 
   Record++;
   FtwLiteDevice->FtwLastRecord = Record;
@@ -577,7 +589,7 @@ FtwAbort (
   //
   Status = FtwEraseSpareBlock (FtwLiteDevice);
 
-  DEBUG ((EFI_D_FTW_INFO, "FtwLite: Abort() success \n"));
+  DEBUG ((EFI_D_INFO, "FtwLite: Abort() success \n"));
   return EFI_SUCCESS;
 }
 
@@ -606,22 +618,16 @@ InitializeFtwLite (
   EFI_PHYSICAL_ADDRESS                BaseAddress;
   EFI_FTW_LITE_DEVICE                 *FtwLiteDevice;
   EFI_FTW_LITE_RECORD                 *Record;
-  UINTN                               Length;
   EFI_STATUS                          Status;
   UINTN                               Offset;
+  UINTN                               Length;
   EFI_FV_BLOCK_MAP_ENTRY              *FvbMapEntry;
   UINT32                              LbaIndex;
-
   //
   // Allocate Private data of this driver, including the FtwWorkSpace[FTW_WORK_SPACE_SIZE].
   //
-  Length = FTW_WORK_SPACE_SIZE;
-  if (Length < PcdGet32 (PcdFlashNvStorageFtwWorkingSize)) {
-    Length = PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
-  }
-
   FtwLiteDevice = NULL;
-  FtwLiteDevice = AllocatePool (sizeof (EFI_FTW_LITE_DEVICE) + Length);
+  FtwLiteDevice = AllocatePool (sizeof (EFI_FTW_LITE_DEVICE) + PcdGet32 (PcdFlashNvStorageFtwWorkingSize));
   ASSERT (FtwLiteDevice != NULL);
 
   ZeroMem (FtwLiteDevice, sizeof (EFI_FTW_LITE_DEVICE));
@@ -631,15 +637,7 @@ InitializeFtwLite (
   // Initialize other parameters, and set WorkSpace as FTW_ERASED_BYTE.
   //
   FtwLiteDevice->FtwWorkSpace     = (UINT8 *) (FtwLiteDevice + 1);
-  FtwLiteDevice->FtwWorkSpaceSize = FTW_WORK_SPACE_SIZE;
-  FtwLiteDevice->FtwWorkSpaceBase = FTW_WORK_SPACE_BASE;
-  SetMem (
-    FtwLiteDevice->FtwWorkSpace,
-    FtwLiteDevice->FtwWorkSpaceSize,
-    FTW_ERASED_BYTE
-    );
   FtwLiteDevice->FtwWorkSpaceHeader = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) FtwLiteDevice->FtwWorkSpace;
-
   FtwLiteDevice->FtwLastRecord      = NULL;
 
   FtwLiteDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
@@ -684,7 +682,7 @@ InitializeFtwLite (
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) BaseAddress);
 
     if ((FtwLiteDevice->WorkSpaceAddress >= BaseAddress) &&
-        (FtwLiteDevice->WorkSpaceAddress < (BaseAddress + FwVolHeader->FvLength))
+        ((FtwLiteDevice->WorkSpaceAddress + FtwLiteDevice->WorkSpaceLength) <= (BaseAddress + FwVolHeader->FvLength))
         ) {
       FtwLiteDevice->FtwFvBlock = Fvb;
       //
@@ -726,7 +724,7 @@ InitializeFtwLite (
     }
 
     if ((FtwLiteDevice->SpareAreaAddress >= BaseAddress) &&
-        (FtwLiteDevice->SpareAreaAddress < (BaseAddress + FwVolHeader->FvLength))
+        ((FtwLiteDevice->SpareAreaAddress + FtwLiteDevice->SpareAreaLength) <= (BaseAddress + FwVolHeader->FvLength))
         ) {
       FtwLiteDevice->FtwBackupFvb = Fvb;
       //
@@ -742,13 +740,14 @@ InitializeFtwLite (
             if ((FtwLiteDevice->SpareAreaAddress >= (BaseAddress + FvbMapEntry->Length * (LbaIndex - 1)))
               && (FtwLiteDevice->SpareAreaAddress < (BaseAddress + FvbMapEntry->Length * LbaIndex))) {
               //
-              // Get the NumberOfSpareBlock and SizeOfSpareBlock
+              // Get the NumberOfSpareBlock and BlockSize
               //
               FtwLiteDevice->FtwSpareLba        = LbaIndex - 1;
-              FtwLiteDevice->SizeOfSpareBlock   = FvbMapEntry->Length;
-              FtwLiteDevice->NumberOfSpareBlock = FtwLiteDevice->SpareAreaLength / FtwLiteDevice->SizeOfSpareBlock;
+              FtwLiteDevice->BlockSize   = FvbMapEntry->Length;
+              FtwLiteDevice->NumberOfSpareBlock = FtwLiteDevice->SpareAreaLength / FtwLiteDevice->BlockSize;
               //
               // Check the range of spare area to make sure that it's in FV range
+              // To do delete
               //
               ASSERT ((FtwLiteDevice->FtwSpareLba + FtwLiteDevice->NumberOfSpareBlock) <= FvbMapEntry->NumBlocks);
               break;
@@ -768,6 +767,7 @@ InitializeFtwLite (
       }
     }
   }
+
   //
   // Calculate the start LBA of working block. Working block is an area which
   // contains working space in its last block and has the same size as spare
@@ -776,7 +776,9 @@ InitializeFtwLite (
   //
   FtwLiteDevice->FtwWorkBlockLba = FtwLiteDevice->FtwWorkSpaceLba - FtwLiteDevice->NumberOfSpareBlock + 1;
   if ((INT64) (FtwLiteDevice->FtwWorkBlockLba) < 0) {
-    FtwLiteDevice->FtwWorkBlockLba = 0;
+    DEBUG ((EFI_D_ERROR, "FtwLite: The spare block range is too large than the working block range!\n"));
+    FreePool (FtwLiteDevice);
+    return EFI_ABORTED;
   }
 
   if ((FtwLiteDevice->FtwFvBlock == NULL) ||
@@ -788,6 +790,7 @@ InitializeFtwLite (
     FreePool (FtwLiteDevice);
     return EFI_ABORTED;
   }
+
   //
   // Refresh workspace data from working block
   //
@@ -798,7 +801,7 @@ InitializeFtwLite (
   // If the working block workspace is not valid, try the spare block
   //
   if (!IsValidWorkSpace (FtwLiteDevice->FtwWorkSpaceHeader)) {
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: Workspace invalid, read from backup\n"));
+    DEBUG ((EFI_D_ERROR, "FtwLite: Workspace invalid, read from backup\n"));
     //
     // Read from spare block
     //
@@ -817,7 +820,7 @@ InitializeFtwLite (
     //
     if (IsValidWorkSpace (FtwLiteDevice->FtwWorkSpaceHeader)) {
       Status = FlushSpareBlockToWorkingBlock (FtwLiteDevice);
-      DEBUG ((EFI_D_FTW_LITE, "FtwLite: Restart working block in Init() - %r\n", Status));
+      DEBUG ((EFI_D_ERROR, "FtwLite: Restart working block in Init() - %r\n", Status));
       ASSERT_EFI_ERROR (Status);
 
       FtwAbort (FtwLiteDevice);
@@ -830,7 +833,7 @@ InitializeFtwLite (
         return EFI_ABORTED;
       }
     } else {
-      DEBUG ((EFI_D_FTW_LITE, "FtwLite: Both are invalid, init workspace\n"));
+      DEBUG ((EFI_D_ERROR, "FtwLite: Both are invalid, init workspace\n"));
       //
       // If both are invalid, then initialize work space.
       //
@@ -875,7 +878,7 @@ InitializeFtwLite (
   if ((FtwLiteDevice->FtwLastRecord->WriteAllocated == FTW_VALID_STATE) &&
       (FtwLiteDevice->FtwLastRecord->SpareCompleted != FTW_VALID_STATE)
       ) {
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: Init.. record not SpareCompleted, abort()\n"));
+    DEBUG ((EFI_D_ERROR, "FtwLite: Init.. record not SpareCompleted, abort()\n"));
     FtwAbort (FtwLiteDevice);
   }
   //
@@ -886,7 +889,7 @@ InitializeFtwLite (
       ) {
 
     Status = FtwRestart (FtwLiteDevice);
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: Restart last write - %r\n", Status));
+    DEBUG ((EFI_D_ERROR, "FtwLite: Restart last write - %r\n", Status));
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -906,10 +909,10 @@ InitializeFtwLite (
         FtwLiteDevice->FtwWorkSpace + Offset,
         FtwLiteDevice->FtwWorkSpaceSize - Offset
         )) {
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: Workspace is dirty, call reclaim...\n"));
+    DEBUG ((EFI_D_ERROR, "FtwLite: Workspace is dirty, call reclaim...\n"));
     Status = FtwReclaimWorkSpace (FtwLiteDevice, TRUE);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_FTW_LITE, "FtwLite: Workspace reclaim - %r\n", Status));
+      DEBUG ((EFI_D_ERROR, "FtwLite: Workspace reclaim - %r\n", Status));
       FreePool (FtwLiteDevice);
       return EFI_ABORTED;
     }
