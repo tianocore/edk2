@@ -295,7 +295,7 @@ FlushSpareBlockToTargetBlock (
   //
   Ptr = Buffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Count = FtwLiteDevice->SizeOfSpareBlock;
+    Count = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Read (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -323,10 +323,10 @@ FlushSpareBlockToTargetBlock (
   //
   Ptr = Buffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Count   = FtwLiteDevice->SizeOfSpareBlock;
+    Count   = FtwLiteDevice->BlockSize;
     Status  = FvBlock->Write (FvBlock, Lba + Index, 0, &Count, Ptr);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_FTW_LITE, "FtwLite: FVB Write block - %r\n", Status));
+      DEBUG ((EFI_D_ERROR, "FtwLite: FVB Write block - %r\n", Status));
       FreePool (Buffer);
       return Status;
     }
@@ -381,7 +381,11 @@ FlushSpareBlockToWorkingBlock (
     return EFI_OUT_OF_RESOURCES;
   }
   //
-  // To  guarantee that the WorkingBlockValid is set on spare block
+  // To guarantee that the WorkingBlockValid is set on spare block
+  //
+  //  Offset = OFFSET_OF(EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER,
+  //                            WorkingBlockValid);
+  // To skip Signature and Crc: sizeof(EFI_GUID)+sizeof(UINT32).
   //
   WorkSpaceLbaOffset = FtwLiteDevice->FtwWorkSpaceLba - FtwLiteDevice->FtwWorkBlockLba;
   FtwUpdateFvState (
@@ -395,7 +399,7 @@ FlushSpareBlockToWorkingBlock (
   //
   Ptr = Buffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Count = FtwLiteDevice->SizeOfSpareBlock;
+    Count = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Read (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -413,7 +417,7 @@ FlushSpareBlockToWorkingBlock (
   //
   // Clear the CRC and STATE, copy data from spare to working block.
   //
-  WorkingBlockHeader = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) (Buffer + (UINTN) WorkSpaceLbaOffset * FtwLiteDevice->SizeOfSpareBlock + FtwLiteDevice->FtwWorkSpaceBase);
+  WorkingBlockHeader = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) (Buffer + (UINTN) WorkSpaceLbaOffset * FtwLiteDevice->BlockSize + FtwLiteDevice->FtwWorkSpaceBase);
   InitWorkSpaceHeader (WorkingBlockHeader);
   WorkingBlockHeader->WorkingBlockValid   = FTW_ERASE_POLARITY;
   WorkingBlockHeader->WorkingBlockInvalid = FTW_ERASE_POLARITY;
@@ -457,7 +461,7 @@ FlushSpareBlockToWorkingBlock (
   //
   Ptr = Buffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Count = FtwLiteDevice->SizeOfSpareBlock;
+    Count = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwFvBlock->Write (
                                           FtwLiteDevice->FtwFvBlock,
                                           FtwLiteDevice->FtwWorkBlockLba + Index,
@@ -466,7 +470,7 @@ FlushSpareBlockToWorkingBlock (
                                           Ptr
                                           );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_FTW_LITE, "FtwLite: FVB Write block - %r\n", Status));
+      DEBUG ((EFI_D_ERROR, "FtwLite: FVB Write block - %r\n", Status));
       FreePool (Buffer);
       return Status;
     }

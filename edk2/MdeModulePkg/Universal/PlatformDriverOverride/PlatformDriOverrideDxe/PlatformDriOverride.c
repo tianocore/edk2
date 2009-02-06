@@ -104,9 +104,10 @@ GetDriver (
                                 PROTOCOL instance.                            
   @param  ControllerHandle      The device handle of the controller to check if a driver override
                                 exists.                                                          
-  @param  DriverImageHandle     On input, a pointer to the previous driver image handle returned
-                                by GetDriverPath(). On output, a pointer to the next driver         
-                                device path.
+  @param  DriverImagePath       On input, a pointer to the previous driver device path returned by
+                                GetDriverPath(). On output, a pointer to the next driver
+                                device path. Passing in a pointer to NULL, will return the first
+                                driver device path for ControllerHandle.
   
   @retval EFI_UNSUPPORTED
 **/

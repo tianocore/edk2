@@ -36,12 +36,14 @@ IsValidWorkSpace (
 
   ASSERT (WorkingHeader != NULL);
   if (WorkingHeader->WorkingBlockValid != FTW_VALID_STATE) {
+    DEBUG ((EFI_D_ERROR, "FtwLite: Work block header valid bit check error\n"));
     return FALSE;
   }
   //
   // Check signature with gEfiSystemNvDataFvGuid
   //
   if (!CompareGuid (&gEfiSystemNvDataFvGuid, &WorkingHeader->Signature)) {
+    DEBUG ((EFI_D_ERROR, "FtwLite: Work block header signature check error\n"));
     return FALSE;
   }
   //
@@ -75,7 +77,7 @@ IsValidWorkSpace (
   ASSERT_EFI_ERROR (Status);
 
   if (WorkingBlockHeader.Crc != WorkingHeader->Crc) {
-    DEBUG ((EFI_D_FTW_LITE, "FtwLite: Work block header CRC check error\n"));
+    DEBUG ((EFI_D_ERROR, "FtwLite: Work block header CRC check error\n"));
     return FALSE;
   }
 
@@ -290,7 +292,7 @@ WorkSpaceRefresh (
     //
     Status = FtwReclaimWorkSpace (FtwLiteDevice, TRUE);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_FTW_LITE, "FtwLite: Reclaim workspace - %r\n", Status));
+      DEBUG ((EFI_D_ERROR, "FtwLite: Reclaim workspace - %r\n", Status));
       return EFI_ABORTED;
     }
   }
@@ -327,7 +329,7 @@ FtwReclaimWorkSpace (
   EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingBlockHeader;
   EFI_FTW_LITE_RECORD                     *Record;
 
-  DEBUG ((EFI_D_FTW_LITE, "FtwLite: start to reclaim work space\n"));
+  DEBUG ((EFI_D_ERROR, "FtwLite: start to reclaim work space\n"));
 
   //
   // Read all original data from working block to a memory buffer
@@ -340,7 +342,7 @@ FtwReclaimWorkSpace (
 
   Ptr = TempBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Length = FtwLiteDevice->SizeOfSpareBlock;
+    Length = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwFvBlock->Read (
                                           FtwLiteDevice->FtwFvBlock,
                                           FtwLiteDevice->FtwWorkBlockLba + Index,
@@ -360,7 +362,7 @@ FtwReclaimWorkSpace (
   //
   Ptr = TempBuffer +
     ((UINTN) (FtwLiteDevice->FtwWorkSpaceLba - FtwLiteDevice->FtwWorkBlockLba)) *
-    FtwLiteDevice->SizeOfSpareBlock + FtwLiteDevice->FtwWorkSpaceBase;
+    FtwLiteDevice->BlockSize + FtwLiteDevice->FtwWorkSpaceBase;
 
   //
   // Clear the content of buffer that will save the new work space data
@@ -421,7 +423,7 @@ FtwReclaimWorkSpace (
 
   Ptr = SpareBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Length = FtwLiteDevice->SizeOfSpareBlock;
+    Length = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Read (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -443,7 +445,7 @@ FtwReclaimWorkSpace (
   Status  = FtwEraseSpareBlock (FtwLiteDevice);
   Ptr     = TempBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Length = FtwLiteDevice->SizeOfSpareBlock;
+    Length = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Write (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -478,7 +480,7 @@ FtwReclaimWorkSpace (
   Status  = FtwEraseSpareBlock (FtwLiteDevice);
   Ptr     = SpareBuffer;
   for (Index = 0; Index < FtwLiteDevice->NumberOfSpareBlock; Index += 1) {
-    Length = FtwLiteDevice->SizeOfSpareBlock;
+    Length = FtwLiteDevice->BlockSize;
     Status = FtwLiteDevice->FtwBackupFvb->Write (
                                             FtwLiteDevice->FtwBackupFvb,
                                             FtwLiteDevice->FtwSpareLba + Index,
@@ -496,7 +498,7 @@ FtwReclaimWorkSpace (
 
   FreePool (SpareBuffer);
 
-  DEBUG ((EFI_D_FTW_LITE, "FtwLite: reclaim work space success\n"));
+  DEBUG ((EFI_D_ERROR, "FtwLite: reclaim work space success\n"));
 
   return EFI_SUCCESS;
 }
