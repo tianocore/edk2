@@ -73,7 +73,7 @@ UsbGetHidDescriptor (
                     UsbIo,
                     &Request,
                     EfiUsbDataIn,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     HidDescriptor,
                     sizeof (EFI_USB_HID_DESCRIPTOR),
                     &Status
@@ -133,7 +133,7 @@ UsbGetReportDescriptor (
                     UsbIo,
                     &Request,
                     EfiUsbDataIn,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     DescriptorBuffer,
                     DescriptorLength,
                     &Status
@@ -188,7 +188,7 @@ UsbGetProtocolRequest (
                     UsbIo,
                     &Request,
                     EfiUsbDataIn,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     Protocol,
                     sizeof (UINT8),
                     &Status
@@ -242,7 +242,7 @@ UsbSetProtocolRequest (
                     UsbIo,
                     &Request,
                     EfiUsbNoData,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     NULL,
                     0,
                     &Status
@@ -295,7 +295,7 @@ UsbSetIdleRequest (
                     UsbIo,
                     &Request,
                     EfiUsbNoData,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     NULL,
                     0,
                     &Status
@@ -350,7 +350,7 @@ UsbGetIdleRequest (
                     UsbIo,
                     &Request,
                     EfiUsbDataIn,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     Duration,
                     1,
                     &Status
@@ -413,7 +413,7 @@ UsbSetReportRequest (
                     UsbIo,
                     &Request,
                     EfiUsbDataOut,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     Report,
                     ReportLen,
                     &Status
@@ -478,7 +478,7 @@ UsbGetReportRequest (
                     UsbIo,
                     &Request,
                     EfiUsbDataIn,
-                    TIMEOUT_VALUE,
+                    PcdGet32 (PcdUsbTransferTimeoutValue),
                     Report,
                     ReportLen,
                     &Status

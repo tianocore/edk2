@@ -73,7 +73,7 @@ UsbGetDescriptor (
                   UsbIo,
                   &DevReq,
                   EfiUsbDataIn,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   Descriptor,
                   DescriptorLength,
                   Status
@@ -133,7 +133,7 @@ UsbSetDescriptor (
                   UsbIo,
                   &DevReq,
                   EfiUsbDataOut,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   Descriptor,
                   DescriptorLength,
                   Status
@@ -188,7 +188,7 @@ UsbGetInterface (
                   UsbIo,
                   &DevReq,
                   EfiUsbDataIn,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   AlternateSetting,
                   2,
                   Status
@@ -241,7 +241,7 @@ UsbSetInterface (
                   UsbIo,
                   &DevReq,
                   EfiUsbNoData,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   NULL,
                   0,
                   Status
@@ -293,7 +293,7 @@ UsbGetConfiguration (
                   UsbIo,
                   &DevReq,
                   EfiUsbDataIn,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   ConfigurationValue,
                   2,
                   Status
@@ -343,7 +343,7 @@ UsbSetConfiguration (
                   UsbIo,
                   &DevReq,
                   EfiUsbNoData,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   NULL,
                   0,
                   Status
@@ -420,7 +420,7 @@ UsbSetFeature (
                   UsbIo,
                   &DevReq,
                   EfiUsbNoData,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   NULL,
                   0,
                   Status
@@ -498,7 +498,7 @@ UsbClearFeature (
                   UsbIo,
                   &DevReq,
                   EfiUsbNoData,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   NULL,
                   0,
                   Status
@@ -577,7 +577,7 @@ UsbGetStatus (
                   UsbIo,
                   &DevReq,
                   EfiUsbDataIn,
-                  TIMEOUT_VALUE,
+                  PcdGet32 (PcdUsbTransferTimeoutValue),
                   DeviceStatus,
                   2,
                   Status

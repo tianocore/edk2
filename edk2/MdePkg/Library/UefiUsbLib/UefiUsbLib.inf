@@ -40,4 +40,7 @@
 [LibraryClasses]
   DebugLib
   BaseMemoryLib
+  PcdLib
 
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue
