@@ -86,10 +86,8 @@ PxeBcConfigureUdpWriteInstance (
   Convert number to ASCII value.
 
   @param  Number              Numeric value to convert to decimal ASCII value.
-  @param  Buffer              Buffer to place ASCII version of the Number
+  @param  Buffer              Buffer to place ASCII version of the Number.
   @param  Length              Length of Buffer.
-
-  @return None.
 
 **/
 VOID
