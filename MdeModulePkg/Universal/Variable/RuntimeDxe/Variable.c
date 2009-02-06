@@ -38,14 +38,6 @@ VARIABLE_CACHE_ENTRY mVariableCache[] = {
 
 VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
 
-EFI_STATUS
-FtwVariableSpace (
-  IN EFI_PHYSICAL_ADDRESS   VariableBaseAddress,
-  IN UINT8                  *Buffer,
-  IN UINTN                  BufferSize
-  );
-
-
 /**
   Acquires lock only at boot time. Simply returns at runtime.
 
@@ -929,7 +921,7 @@ FindVariable (
       if (Variable[Index]->State == VAR_ADDED || 
           Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
          ) {
-        if (!EfiAtRuntime () || (Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
+        if (!EfiAtRuntime () || (Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS != 0)) {
           if (VariableName[0] == 0) {
             if (Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
               InDeletedVariable     = Variable[Index];
@@ -947,7 +939,7 @@ FindVariable (
               Point = (VOID *) GetVariableNamePtr (Variable[Index]);
 
               ASSERT (NameSizeOfVariable (Variable[Index]) != 0);
-              if (!CompareMem (VariableName, Point, NameSizeOfVariable (Variable[Index]))) {
+              if (CompareMem (VariableName, Point, NameSizeOfVariable (Variable[Index])) == 0) {
                 if (Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
                   InDeletedVariable     = Variable[Index];
                   InDeletedStorageIndex = Index;
@@ -1136,7 +1128,7 @@ RuntimeServiceGetNextVariableName (
     // Variable is found
     //
     if (IsValidVariableHeader (Variable.CurrPtr) && Variable.CurrPtr->State == VAR_ADDED) {
-      if (!(EfiAtRuntime () && !(Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS))) {
+      if ((EfiAtRuntime () && ((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0)) == 0) {
         VarNameSize = NameSizeOfVariable (Variable.CurrPtr);
         ASSERT (VarNameSize != 0);
 
@@ -1294,7 +1286,7 @@ RuntimeServiceSetVariable (
       //
       // Only variable have NV attribute can be updated/deleted in Runtime
       //
-      if (!(Variable.CurrPtr->Attributes & EFI_VARIABLE_NON_VOLATILE)) {
+      if ((Variable.CurrPtr->Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;      
       }
