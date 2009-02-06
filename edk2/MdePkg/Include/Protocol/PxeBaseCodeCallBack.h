@@ -75,6 +75,16 @@ typedef enum {
   Callback function that is invoked when the PXE Base Code Protocol is about to transmit, has
   received, or is waiting to receive a packet.                                                 
   
+  This function is invoked when the PXE Base Code Protocol is about to transmit, has received,
+  or is waiting to receive a packet. Parameters Function and Received specify the type of event.
+  Parameters PacketLen and Packet specify the packet that generated the event. If these fields
+  are zero and NULL respectively, then this is a status update callback. If the operation specified
+  by Function is to continue, then CALLBACK_STATUS_CONTINUE should be returned. If the operation
+  specified by Function should be aborted, then CALLBACK_STATUS_ABORT should be returned. Due to
+  the polling nature of UEFI device drivers, a callback function should not execute for more than 5 ms.
+  The SetParameters() function must be called after a Callback Protocol is installed to enable the
+  use of callbacks.
+  
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL instance.
   @param  Function              The PXE Base Code Protocol function that is waiting for an event.                                                              
   @param  Received              TRUE if the callback is being invoked due to a receive event. FALSE if

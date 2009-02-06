@@ -1,6 +1,7 @@
 /** @file
+  Dhcp and Discover routines for PxeBc.
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -9,21 +10,12 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  PxeBcDhcp.h
-
-Abstract:
-
-  Dhcp and Discover routines for PxeBc
-
-
 **/
 
 #ifndef __EFI_PXEBC_DHCP_H__
 #define __EFI_PXEBC_DHCP_H__
 
-enum {
+typedef enum {
   PXEBC_DHCP4_MAX_OPTION_NUM        = 16,
   PXEBC_DHCP4_MAX_OPTION_SIZE       = 312,
   PXEBC_DHCP4_MAX_PACKET_SIZE       = 1472,
@@ -105,12 +97,12 @@ enum {
 
   PXEBC_DHCP4_OVERLOAD_FILE         = 1,
   PXEBC_DHCP4_OVERLOAD_SERVER_NAME  = 2
-};
+} PXEBC_ENUM_TYPES;
 
 //
 // The array index of the DHCP4 option tag interested
 //
-enum {
+typedef enum {
   PXEBC_DHCP4_TAG_INDEX_BOOTFILE_LEN,
   PXEBC_DHCP4_TAG_INDEX_VENDOR,
   PXEBC_DHCP4_TAG_INDEX_OVERLOAD,
@@ -119,19 +111,19 @@ enum {
   PXEBC_DHCP4_TAG_INDEX_CLASS_ID,
   PXEBC_DHCP4_TAG_INDEX_BOOTFILE,
   PXEBC_DHCP4_TAG_INDEX_MAX
-};
+} PXEBC_DHCP4_TAG_INDEX_ENUM_TYPES;
 
 //
 // The type of DHCP OFFER, arranged by priority, PXE10 has the highest priority.
 //
-enum {
+typedef enum {
   DHCP4_PACKET_TYPE_PXE10,
   DHCP4_PACKET_TYPE_WFM11A,
   DHCP4_PACKET_TYPE_BINL,
   DHCP4_PACKET_TYPE_DHCP_ONLY,
   DHCP4_PACKET_TYPE_MAX,
   DHCP4_PACKET_TYPE_BOOTP           = DHCP4_PACKET_TYPE_MAX
-};
+} DHCP4_PACKET_TYPE_ENUM_TYPES;
 
 #define BIT(x)  (1 << x)
 #define CTRL(x) (0x1F & (x))
@@ -301,36 +293,33 @@ typedef struct {
 #define GET_NEXT_BOOT_SVR_ENTRY(Ent) \
   (PXEBC_BOOT_SVR_ENTRY *) ((UINT8 *) Ent + sizeof (*(Ent)) + ((Ent)->IpCnt - 1) * sizeof (EFI_IPv4_ADDRESS))
 
+
+/**
+  This function initialize the DHCP4 message instance.
+
+  This function will pad each item of dhcp4 message packet.
+  
+  @param  Seed    Pointer to the message instance of the DHCP4 packet.
+  @param  Udp4    Pointer to the EFI_UDP4_PROTOCOL instance.
+
+  @return none.
+
+**/
 VOID
 PxeBcInitSeedPacket (
   IN EFI_DHCP4_PACKET  *Seed,
   IN EFI_UDP4_PROTOCOL *Udp4
   )
-/*++
-
-Routine Description:
-
-  GC_NOTO: Add function description
-
-Arguments:
-
-  Seed  - GC_NOTO: add argument description
-  Udp4  - GC_NOTO: add argument description
-
-Returns:
-
-  GC_NOTO: add return values
-
---*/
 ;
 
 
 /**
-  GC_NOTO: Add function description
+  Parse the cached dhcp packet.
 
-  @param  CachedPacket    GC_NOTO: add argument description
+  @param  CachedPacket  Pointer to cached dhcp packet.
 
-  @return GC_NOTO: add return values
+  @retval TRUE          Success to parse and validation.
+  @retval FALSE         Fail to parse or validation.
 
 **/
 BOOLEAN
@@ -339,13 +328,15 @@ PxeBcParseCachedDhcpPacket (
   )
 ;
 
-
 /**
-  GC_NOTO: Add function description
+  This function is to check the selected proxy offer(include BINL dhcp offer and
+  DHCP_ONLY offer ) and set the flag and copy the DHCP packets to the Pxe base code
+  mode structure.
 
-  @param  Private         GC_NOTO: add argument description
+  @param  Private          Pointer to PxeBc private data.
 
-  @return GC_NOTO: add return values
+  @retval EFI_SUCCESS      Operational successful.
+  @retval EFI_NO_RESPONSE  Offer dhcp service failed.
 
 **/
 EFI_STATUS
@@ -356,16 +347,32 @@ PxeBcCheckSelectedOffer (
 
 
 /**
-  GC_NOTO: Add function description
+  Callback routine.
+  
+  EFI_DHCP4_CALLBACK is provided by the consumer of the EFI DHCPv4 Protocol driver
+  to intercept events that occurred in the configuration process. This structure
+  provides advanced control of each state transition of the DHCP process. The
+  returned status code determines the behavior of the EFI DHCPv4 Protocol driver.
+  There are three possible returned values, which are described in the following
+  table.
 
-  @param  This            GC_NOTO: add argument description
-  @param  Context         GC_NOTO: add argument description
-  @param  CurrentState    GC_NOTO: add argument description
-  @param  Dhcp4Event      GC_NOTO: add argument description
-  @param  Packet          GC_NOTO: add argument description
-  @param  NewPacket       GC_NOTO: add argument description
+  @param  This                  Pointer to the EFI DHCPv4 Protocol instance that is used to
+                                configure this callback function.
+  @param  Context               Pointer to the context that is initialized by
+                                EFI_DHCP4_PROTOCOL.Configure().
+  @param  CurrentState          The current operational state of the EFI DHCPv4 Protocol
+                                driver.
+  @param  Dhcp4Event            The event that occurs in the current state, which usually means a
+                                state transition.
+  @param  Packet                The DHCP packet that is going to be sent or already received.
+  @param  NewPacket             The packet that is used to replace the above Packet.
 
-  @return GC_NOTO: add return values
+  @retval EFI_SUCCESS           Tells the EFI DHCPv4 Protocol driver to continue the DHCP process.
+  @retval EFI_NOT_READY         Only used in the Dhcp4Selecting state. The EFI DHCPv4 Protocol
+                                driver will continue to wait for more DHCPOFFER packets until the retry
+                                timeout expires.
+  @retval EFI_ABORTED           Tells the EFI DHCPv4 Protocol driver to abort the current process and
+                                return to the Dhcp4Init or Dhcp4InitReboot state.
 
 **/
 EFI_STATUS
@@ -381,20 +388,23 @@ PxeBcDhcpCallBack (
 
 
 /**
-  GC_NOTO: Add function description
+  Discover the boot of service and initialize the vendor option if exists.
 
-  @param  Private         GC_NOTO: add argument description
-  @param  Type            GC_NOTO: add argument description
-  @param  Layer           GC_NOTO: add argument description
-  @param  UseBis          GC_NOTO: add argument description
-  @param  DestIp          GC_NOTO: add argument description
-  @param  IpCount         GC_NOTO: add argument description
-  @param  SrvList         GC_NOTO: add argument description
-  @param  IsDiscv         GC_NOTO: add argument description
-  @param  Reply           GC_NOTO: add argument description
+  @param  Private               Pointer to PxeBc private data.
+  @param  Type                  PxeBc option boot item type
+  @param  Layer                 PxeBc option boot item layer
+  @param  UseBis                use bios or not
+  @param  DestIp                ip address for server      
+  @param  IpCount               the total of the server ip address    
+  @param  SrvList               server list
+  @param  IsDiscv               discover the vendor or not
+  @param  Reply                 the dhcp4 packet of Pxe reply
 
-  @return GC_NOTO: add return values
-
+  @retval EFI_SUCCESS           operational success.
+  @retval EFI_OUT_OF_RESOURCES  Allocate memory pool failed.
+  @retval EFI_NOT_FOUND         There is no vendor option exists.
+  @retval EFI_TIMEOUT           Send Pxe Discover time out. 
+  
 **/
 EFI_STATUS
 PxeBcDiscvBootService (
@@ -412,13 +422,14 @@ PxeBcDiscvBootService (
 
 
 /**
-  GC_NOTO: Add function description
+  Initialize the DHCP options and build the option list.
 
-  @param  Private         GC_NOTO: add argument description
-  @param  OptList         GC_NOTO: add argument description
-  @param  IsDhcpDiscover  GC_NOTO: add argument description
+  @param  Private          Pointer to PxeBc private data.
+  @param  OptList          Pointer to a DHCP option list.
+                           
+  @param  IsDhcpDiscover   Discover dhcp option or not.     
 
-  @return GC_NOTO: add return values
+  @return The index item number of the option list.
 
 **/
 UINT32
@@ -431,14 +442,14 @@ PxeBcBuildDhcpOptions (
 
 
 /**
-  GC_NOTO: Add function description
+  Create the boot options
 
-  @param  OptList         GC_NOTO: add argument description
-  @param  Type            GC_NOTO: add argument description
-  @param  Layer           GC_NOTO: add argument description
-  @param  OptLen          GC_NOTO: add argument description
+  @param  OptList    Pointer to the list of the options
+  @param  Type       the type of option
+  @param  Layer      the layer of the boot options 
+  @param  OptLen     length of opotion
 
-  @return GC_NOTO: add return values
+  @return None.
 
 **/
 VOID
@@ -452,13 +463,14 @@ PxeBcCreateBootOptions (
 
 
 /**
-  GC_NOTO: Add function description
+  Parse interested dhcp options.
 
-  @param  Buffer          GC_NOTO: add argument description
-  @param  Length          GC_NOTO: add argument description
-  @param  OptTag          GC_NOTO: add argument description
+  @param  Buffer     Pointer to the dhcp options packet.
+  @param  Length     the length of the dhcp options.
+  @param  OptTag     the option OpCode.
 
-  @return GC_NOTO: add return values
+  @return Return NULL if the buffer length is 0 and OpCode is not 
+          PXEBC_DHCP4_TAG_EOP, or the pointer to the buffer.
 
 **/
 EFI_DHCP4_PACKET_OPTION *
@@ -471,12 +483,12 @@ PxeBcParseExtendOptions (
 
 
 /**
-  GC_NOTO: Add function description
+  This function is to parse and check vendor options.
 
-  @param  Dhcp4Option     GC_NOTO: add argument description
-  @param  VendorOption    GC_NOTO: add argument description
+  @param  Dhcp4Option           Pointer to dhcp options
+  @param  VendorOption          Pointer to vendor options
 
-  @return GC_NOTO: add return values
+  @return Return TRUE if valid for vendor options, or FALSE.
 
 **/
 BOOLEAN
@@ -488,31 +500,16 @@ PxeBcParseVendorOptions (
 
 
 /**
-  GC_NOTO: Add function description
+  Choose the boot prompt.
 
-  @param  Private         GC_NOTO: add argument description
-  @param  Info            GC_NOTO: add argument description
-  @param  Type            GC_NOTO: add argument description
+  @param  Private              Pointer to PxeBc private data.
 
-  @return GC_NOTO: add return values
-
-**/
-EFI_STATUS
-PxeBcSelectBootServers (
-  IN  PXEBC_PRIVATE_DATA               *Private,
-  OUT EFI_PXE_BASE_CODE_DISCOVER_INFO  **Info,
-  OUT UINT16                           *Type
-  )
-;
-
-
-/**
-  GC_NOTO: Add function description
-
-  @param  Private         GC_NOTO: add argument description
-
-  @return GC_NOTO: add return values
-
+  @retval EFI_SUCCESS          Select boot prompt done.
+  @retval EFI_TIMEOUT          Select boot prompt time out. 
+  @retval EFI_NOT_FOUND        The proxy offer is not Pxe10.
+  @retval EFI_ABORTED          User cancel the operation.
+  @retval EFI_NOT_READY        Read the input key from the keybroad has not finish.
+  
 **/
 EFI_STATUS
 PxeBcSelectBootPrompt (
@@ -522,12 +519,15 @@ PxeBcSelectBootPrompt (
 
 
 /**
-  GC_NOTO: Add function description
+  Select the boot menu.
 
-  @param  Private         GC_NOTO: add argument description
-  @param  Type            GC_NOTO: add argument description
-
-  @return GC_NOTO: add return values
+  @param  Private         Pointer to PxeBc private data.
+  @param  Type            The type of the menu.
+  @param  UseDefaultItem  Use default item or not.
+  
+  @retval EFI_ABORTED     User cancel operation.
+  @retval EFI_SUCCESS     Select the boot menu success.
+  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.    
 
 **/
 EFI_STATUS

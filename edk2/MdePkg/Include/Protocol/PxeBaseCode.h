@@ -281,6 +281,51 @@ typedef struct {
 
 /**                                                                 
   Enables the use of the PXE Base Code Protocol functions.
+
+  This function enables the use of the PXE Base Code Protocol functions. If the
+  Started field of the EFI_PXE_BASE_CODE_MODE structure is already TRUE, then
+  EFI_ALREADY_STARTED will be returned. If UseIpv6 is TRUE, then IPv6 formatted
+  addresses will be used in this session. If UseIpv6 is FALSE, then IPv4 formatted
+  addresses will be used in this session. If UseIpv6 is TRUE, and the Ipv6Supported
+  field of the EFI_PXE_BASE_CODE_MODE structure is FALSE, then EFI_UNSUPPORTED will
+  be returned. If there is not enough memory or other resources to start the PXE
+  Base Code Protocol, then EFI_OUT_OF_RESOURCES will be returned. Otherwise, the
+  PXE Base Code Protocol will be started, and all of the fields of the EFI_PXE_BASE_CODE_MODE
+  structure will be initialized as follows:
+    StartedSet to TRUE.
+    Ipv6SupportedUnchanged.
+    Ipv6AvailableUnchanged.
+    UsingIpv6Set to UseIpv6.
+    BisSupportedUnchanged.
+    BisDetectedUnchanged.
+    AutoArpSet to TRUE.
+    SendGUIDSet to FALSE.
+    TTLSet to DEFAULT_TTL.
+    ToSSet to DEFAULT_ToS.
+    DhcpCompletedSet to FALSE.
+    ProxyOfferReceivedSet to FALSE.
+    StationIpSet to an address of all zeros.
+    SubnetMaskSet to a subnet mask of all zeros.
+    DhcpDiscoverZero-filled.
+    DhcpAckZero-filled.
+    ProxyOfferZero-filled.
+    PxeDiscoverValidSet to FALSE.
+    PxeDiscoverZero-filled.
+    PxeReplyValidSet to FALSE.
+    PxeReplyZero-filled.
+    PxeBisReplyValidSet to FALSE.
+    PxeBisReplyZero-filled.
+    IpFilterSet the Filters field to 0 and the IpCnt field to 0.
+    ArpCacheEntriesSet to 0.
+    ArpCacheZero-filled.
+    RouteTableEntriesSet to 0.
+    RouteTableZero-filled.
+    IcmpErrorReceivedSet to FALSE.
+    IcmpErrorZero-filled.
+    TftpErroReceivedSet to FALSE.
+    TftpErrorZero-filled.
+    MakeCallbacksSet to TRUE if the PXE Base Code Callback Protocol is available.
+    Set to FALSE if the PXE Base Code Callback Protocol is not available.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  UseIpv6               Specifies the type of IP addresses that are to be used during the session
@@ -307,7 +352,12 @@ EFI_STATUS
 
 /**                                                                 
   Disables the use of the PXE Base Code Protocol functions.
-    
+
+  This function stops all activity on the network device. All the resources allocated
+  in Start() are released, the Started field of the EFI_PXE_BASE_CODE_MODE structure is
+  set to FALSE and EFI_SUCCESS is returned. If the Started field of the EFI_PXE_BASE_CODE_MODE
+  structure is already FALSE, then EFI_NOT_STARTED will be returned.
+  
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
  
   @retval EFI_SUCCESS           The PXE Base Code Protocol was stopped.
@@ -326,6 +376,19 @@ EFI_STATUS
 /**                                                                 
   Attempts to complete a DHCPv4 D.O.R.A. (discover / offer / request / acknowledge) or DHCPv6
   S.A.R.R (solicit / advertise / request / reply) sequence.
+
+  This function attempts to complete the DHCP sequence. If this sequence is completed,
+  then EFI_SUCCESS is returned, and the DhcpCompleted, ProxyOfferReceived, StationIp,
+  SubnetMask, DhcpDiscover, DhcpAck, and ProxyOffer fields of the EFI_PXE_BASE_CODE_MODE
+  structure are filled in.
+  If SortOffers is TRUE, then the cached DHCP offer packets will be sorted before
+  they are tried. If SortOffers is FALSE, then the cached DHCP offer packets will
+  be tried in the order in which they are received. Please see the Preboot Execution
+  Environment (PXE) Specification for additional details on the implementation of DHCP.
+  This function can take at least 31 seconds to timeout and return control to the
+  caller. If the DHCP sequence does not complete, then EFI_TIMEOUT will be returned.
+  If the Callback Protocol does not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE,
+  then the DHCP sequence will be stopped and EFI_ABORTED will be returned.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  SortOffers            TRUE if the offers received should be sorted. Set to FALSE to try the
@@ -352,6 +415,26 @@ EFI_STATUS
 
 /**                                                                 
   Attempts to complete the PXE Boot Server and/or boot image discovery sequence.
+
+  This function attempts to complete the PXE Boot Server and/or boot image discovery
+  sequence. If this sequence is completed, then EFI_SUCCESS is returned, and the
+  PxeDiscoverValid, PxeDiscover, PxeReplyReceived, and PxeReply fields of the
+  EFI_PXE_BASE_CODE_MODE structure are filled in. If UseBis is TRUE, then the
+  PxeBisReplyReceived and PxeBisReply fields of the EFI_PXE_BASE_CODE_MODE structure
+  will also be filled in. If UseBis is FALSE, then PxeBisReplyValid will be set to FALSE.
+  In the structure referenced by parameter Info, the PXE Boot Server list, SrvList[],
+  has two uses: It is the Boot Server IP address list used for unicast discovery
+  (if the UseUCast field is TRUE), and it is the list used for Boot Server verification
+  (if the MustUseList field is TRUE). Also, if the MustUseList field in that structure
+  is TRUE and the AcceptAnyResponse field in the SrvList[] array is TRUE, any Boot
+  Server reply of that type will be accepted. If the AcceptAnyResponse field is
+  FALSE, only responses from Boot Servers with matching IP addresses will be accepted.
+  This function can take at least 10 seconds to timeout and return control to the
+  caller. If the Discovery sequence does not complete, then EFI_TIMEOUT will be
+  returned. Please see the Preboot Execution Environment (PXE) Specification for
+  additional details on the implementation of the Discovery sequence.
+  If the Callback Protocol does not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE,
+  then the Discovery sequence is stopped and EFI_ABORTED will be returned.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  Type                  The type of bootstrap to perform.
@@ -385,6 +468,49 @@ EFI_STATUS
 
 /**                                                                 
   Used to perform TFTP and MTFTP services.
+
+  This function is used to perform TFTP and MTFTP services. This includes the
+  TFTP operations to get the size of a file, read a directory, read a file, and
+  write a file. It also includes the MTFTP operations to get the size of a file,
+  read a directory, and read a file. The type of operation is specified by Operation.
+  If the callback function that is invoked during the TFTP/MTFTP operation does
+  not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE, then EFI_ABORTED will
+  be returned.
+  For read operations, the return data will be placed in the buffer specified by
+  BufferPtr. If BufferSize is too small to contain the entire downloaded file,
+  then EFI_BUFFER_TOO_SMALL will be returned and BufferSize will be set to zero
+  or the size of the requested file (the size of the requested file is only returned
+  if the TFTP server supports TFTP options). If BufferSize is large enough for the
+  read operation, then BufferSize will be set to the size of the downloaded file,
+  and EFI_SUCCESS will be returned. Applications using the PxeBc.Mtftp() services
+  should use the get-file-size operations to determine the size of the downloaded
+  file prior to using the read-file operations--especially when downloading large
+  (greater than 64 MB) files--instead of making two calls to the read-file operation.
+  Following this recommendation will save time if the file is larger than expected
+  and the TFTP server does not support TFTP option extensions. Without TFTP option
+  extension support, the client has to download the entire file, counting and discarding
+  the received packets, to determine the file size.
+  For write operations, the data to be sent is in the buffer specified by BufferPtr.
+  BufferSize specifies the number of bytes to send. If the write operation completes
+  successfully, then EFI_SUCCESS will be returned.
+  For TFTP “get file size” operations, the size of the requested file or directory
+  is returned in BufferSize, and EFI_SUCCESS will be returned. If the TFTP server
+  does not support options, the file will be downloaded into a bit bucket and the
+  length of the downloaded file will be returned. For MTFTP “get file size” operations,
+  if the MTFTP server does not support the “get file size” option, EFI_UNSUPPORTED
+  will be returned.
+  This function can take up to 10 seconds to timeout and return control to the caller.
+  If the TFTP sequence does not complete, EFI_TIMEOUT will be returned.
+  If the Callback Protocol does not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE,
+  then the TFTP sequence is stopped and EFI_ABORTED will be returned.
+  The format of the data returned from a TFTP read directory operation is a null-terminated
+  filename followed by a null-terminated information string, of the form
+  “size year-month-day hour:minute:second” (i.e. %d %d-%d-%d %d:%d:%f - note that
+  the seconds field can be a decimal number), where the date and time are UTC. For
+  an MTFTP read directory command, there is additionally a null-terminated multicast
+  IP address preceding the filename of the form %d.%d.%d.%d for IP v4. The final
+  entry is itself null-terminated, so that the final information string is terminated
+  with two null octets.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  Operation             The type of operation to perform.
@@ -428,6 +554,17 @@ EFI_STATUS
 
 /**                                                                 
   Writes a UDP packet to the network interface.
+
+  This function writes a UDP packet specified by the (optional HeaderPtr and)
+  BufferPtr parameters to the network interface. The UDP header is automatically
+  built by this routine. It uses the parameters OpFlags, DestIp, DestPort, GatewayIp,
+  SrcIp, and SrcPort to build this header. If the packet is successfully built and
+  transmitted through the network interface, then EFI_SUCCESS will be returned.
+  If a timeout occurs during the transmission of the packet, then EFI_TIMEOUT will
+  be returned. If an ICMP error occurs during the transmission of the packet, then
+  the IcmpErrorReceived field is set to TRUE, the IcmpError field is filled in and
+  EFI_ICMP_ERROR will be returned. If the Callback Protocol does not return
+  EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE, then EFI_ABORTED will be returned.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  OpFlags               The UDP operation flags. 
@@ -470,12 +607,24 @@ EFI_STATUS
 
 /**                                                                 
   Reads a UDP packet from the network interface.
+
+  This function reads a UDP packet from a network interface. The data contents
+  are returned in (the optional HeaderPtr and) BufferPtr, and the size of the
+  buffer received is returned in BufferSize . If the input BufferSize is smaller
+  than the UDP packet received (less optional HeaderSize), it will be set to the
+  required size, and EFI_BUFFER_TOO_SMALL will be returned. In this case, the
+  contents of BufferPtr are undefined, and the packet is lost. If a UDP packet is
+  successfully received, then EFI_SUCCESS will be returned, and the information
+  from the UDP header will be returned in DestIp, DestPort, SrcIp, and SrcPort if
+  they are not NULL.
+  Depending on the values of OpFlags and the DestIp, DestPort, SrcIp, and SrcPort
+  input values, different types of UDP packet receive filtering will be performed.
+  The following tables summarize these receive filter operations.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  OpFlags               The UDP operation flags. 
   @param  DestIp                The destination IP address.
-  @param  DestPort              The destination UDP port number.                                                                         
-  @param  GatewayIp             The gateway IP address.                                                 
+  @param  DestPort              The destination UDP port number.
   @param  SrcIp                 The source IP address.
   @param  SrcPort               The source UDP port number.
   @param  HeaderSize            An optional field which may be set to the length of a header at
@@ -485,7 +634,7 @@ EFI_STATUS
   @param  BufferSize            A pointer to the size of the data at BufferPtr.
   @param  BufferPtr             A pointer to the data to be read.
                                   
-  @retval EFI_SUCCESS           The UDP Write operation was completed.
+  @retval EFI_SUCCESS           The UDP Read operation was completed.
   @retval EFI_NOT_STARTED       The PXE Base Code Protocol is in the stopped state.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.                                
   @retval EFI_DEVICE_ERROR      The network device encountered an error during this operation.
@@ -511,6 +660,27 @@ EFI_STATUS
 
 /**                                                                 
   Updates the IP receive filters of a network device and enables software filtering.
+  
+  The NewFilter field is used to modify the network device's current IP receive
+  filter settings and to enable a software filter. This function updates the IpFilter
+  field of the EFI_PXE_BASE_CODE_MODE structure with the contents of NewIpFilter.
+  The software filter is used when the USE_FILTER in OpFlags is set to UdpRead().
+  The current hardware filter remains in effect no matter what the settings of OpFlags
+  are, so that the meaning of ANY_DEST_IP set in OpFlags to UdpRead() is from those
+  packets whose reception is enabled in hardware – physical NIC address (unicast),
+  broadcast address, logical address or addresses (multicast), or all (promiscuous).
+  UdpRead() does not modify the IP filter settings.
+  Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP receive
+  filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
+  If an application or driver wishes to preserve the IP receive filter settings,
+  it will have to preserve the IP receive filter settings before these calls, and
+  use SetIpFilter() to restore them after the calls. If incompatible filtering is
+  requested (for example, PROMISCUOUS with anything else) or if the device does not
+  support a requested filter setting and it cannot be accommodated in software
+  (for example, PROMISCUOUS not supported), EFI_INVALID_PARAMETER will be returned.
+  The IPlist field is used to enable IPs other than the StationIP. They may be
+  multicast or unicast. If IPcnt is set as well as EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP,
+  then both the StationIP and the IPs from the IPlist will be used.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  NewFilter             Pointer to the new set of IP receive filters.
@@ -529,6 +699,19 @@ EFI_STATUS
 
 /**                                                                 
   Uses the ARP protocol to resolve a MAC address.
+  
+  This function uses the ARP protocol to resolve a MAC address. The UsingIpv6 field
+  of the EFI_PXE_BASE_CODE_MODE structure is used to determine if IPv4 or IPv6
+  addresses are being used. The IP address specified by IpAddr is used to resolve
+  a MAC address. If the ARP protocol succeeds in resolving the specified address,
+  then the ArpCacheEntries and ArpCache fields of the EFI_PXE_BASE_CODE_MODE structure
+  are updated, and EFI_SUCCESS is returned. If MacAddr is not NULL, the resolved
+  MAC address is placed there as well.
+  If the PXE Base Code protocol is in the stopped state, then EFI_NOT_STARTED is
+  returned. If the ARP protocol encounters a timeout condition while attempting
+  to resolve an address, then EFI_TIMEOUT is returned. If the Callback Protocol
+  does not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE, then EFI_ABORTED is
+  returned.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  IpAddr                Pointer to the IP address that is used to resolve a MAC address.
@@ -553,6 +736,18 @@ EFI_STATUS
 
 /**                                                                 
   Updates the parameters that affect the operation of the PXE Base Code Protocol.
+  
+  This function sets parameters that affect the operation of the PXE Base Code Protocol.
+  The parameter specified by NewAutoArp is used to control the generation of ARP
+  protocol packets. If NewAutoArp is TRUE, then ARP Protocol packets will be generated
+  as required by the PXE Base Code Protocol. If NewAutoArp is FALSE, then no ARP
+  Protocol packets will be generated. In this case, the only mappings that are
+  available are those stored in the ArpCache of the EFI_PXE_BASE_CODE_MODE structure.
+  If there are not enough mappings in the ArpCache to perform a PXE Base Code Protocol
+  service, then the service will fail. This function updates the AutoArp field of
+  the EFI_PXE_BASE_CODE_MODE structure to NewAutoArp.
+  The SetParameters() call must be invoked after a Callback Protocol is installed
+  to enable the use of callbacks.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  NewAutoArp            If not NULL, a pointer to a value that specifies whether to replace the
@@ -584,6 +779,17 @@ EFI_STATUS
 
 /**                                                                 
   Updates the station IP address and/or subnet mask values of a network device.
+  
+  This function updates the station IP address and/or subnet mask values of a network
+  device.
+  The NewStationIp field is used to modify the network device's current IP address.
+  If NewStationIP is NULL, then the current IP address will not be modified. Otherwise,
+  this function updates the StationIp field of the EFI_PXE_BASE_CODE_MODE structure
+  with NewStationIp.
+  The NewSubnetMask field is used to modify the network device's current subnet
+  mask. If NewSubnetMask is NULL, then the current subnet mask will not be modified.
+  Otherwise, this function updates the SubnetMask field of the EFI_PXE_BASE_CODE_MODE
+  structure with NewSubnetMask.
     
   @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  NewStationIp          Pointer to the new IP address to be used by the network device.  
@@ -604,6 +810,9 @@ EFI_STATUS
 
 /**                                                                 
   Updates the contents of the cached DHCP and Discover packets.
+  
+  The pointers to the new packets are used to update the contents of the cached
+  packets in the EFI_PXE_BASE_CODE_MODE structure.
     
   @param  This                   Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  NewDhcpDiscoverValid   Pointer to a value that will replace the current
