@@ -611,7 +611,7 @@ SetKeyboardLayoutEvent (
       NsKey = KeyDescriptor + 1;
       for (Index2 = Index + 1; Index2 < KeyboardLayout->DescriptorCount; Index2++) {
         CopyMem (&TempKey, NsKey, sizeof (EFI_KEY_DESCRIPTOR));
-        if (TempKey.Modifier & EFI_NS_KEY_DEPENDENCY_MODIFIER) {
+        if (TempKey.Modifier == EFI_NS_KEY_DEPENDENCY_MODIFIER) {
           KeyCount++;
         } else {
           break;
@@ -1654,7 +1654,7 @@ UsbKeyCodeToEfiInputKey (
     }
   }
 
-  if (KeyDescriptor->AffectedAttribute & EFI_AFFECTED_BY_NUM_LOCK) {
+  if ((KeyDescriptor->AffectedAttribute & EFI_AFFECTED_BY_NUM_LOCK) != 0) {
     //
     // For key affected by NumLock, if NumLock is on and Shift is not pressed, then it means
     // normal key, instead of original control key. So the ScanCode should be cleaned.
