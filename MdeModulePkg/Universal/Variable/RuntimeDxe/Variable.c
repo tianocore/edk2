@@ -921,7 +921,7 @@ FindVariable (
       if (Variable[Index]->State == VAR_ADDED || 
           Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
          ) {
-        if (!EfiAtRuntime () || (Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS != 0)) {
+        if (!EfiAtRuntime () || ((Variable[Index]->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
           if (VariableName[0] == 0) {
             if (Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
               InDeletedVariable     = Variable[Index];
