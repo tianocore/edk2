@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -852,6 +852,7 @@ ParseOpCodes (
   CurrentDefault           = NULL;
   CurrentOption            = NULL;
   OptionSuppressExpression = NULL;
+  ImageId                  = NULL;
 
   //
   // Get the number of Statements and Expressions
@@ -1063,6 +1064,8 @@ ParseOpCodes (
           if (EFI_ERROR (Status)) {
             return Status;
           }
+
+          ASSERT (CurrentExpression != NULL);
           if (CurrentExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN) {
             return EFI_INVALID_PARAMETER;
           }
@@ -1604,6 +1607,7 @@ ParseOpCodes (
         break;
       }
 
+      ASSERT (ImageId != NULL);
       CopyMem (ImageId, &((EFI_IFR_IMAGE *) OpCodeData)->Id, sizeof (EFI_IMAGE_ID));
       break;
 
@@ -1611,6 +1615,7 @@ ParseOpCodes (
     // Refresh
     //
     case EFI_IFR_REFRESH_OP:
+      ASSERT (CurrentStatement != NULL);
       CurrentStatement->RefreshInterval = ((EFI_IFR_REFRESH *) OpCodeData)->RefreshInterval;
       break;
 
