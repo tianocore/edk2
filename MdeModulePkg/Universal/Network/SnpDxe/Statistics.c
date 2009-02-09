@@ -139,7 +139,7 @@ SnpUndi32Statistics (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.statistics()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.statistics()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 

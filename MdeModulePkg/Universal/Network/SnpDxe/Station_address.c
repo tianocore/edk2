@@ -50,7 +50,7 @@ PxeGetStnAddr (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.station_addr()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -139,7 +139,7 @@ PxeSetStnAddr (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.station_addr()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
