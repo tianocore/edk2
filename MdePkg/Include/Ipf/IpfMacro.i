@@ -1,5 +1,7 @@
-//++
-// Copyright (c) 2006, Intel Corporation
+// @file
+// Contains the macros required by calling procedures in Itanium-based assembly code.
+//
+// Copyright (c) 2006 - 2009, Intel Corporation
 // All rights reserved. This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -8,68 +10,49 @@
 // THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
-// Module Name:
-//  IpfMacro.i
-//
-// Abstract:
-//  Contains the macros needed for calling procedures in Itanium-based assembly code.
-//
-//
-// Revision History:
-//
-//--
 
 #ifndef  __IA64PROC_I__
 #define  __IA64PROC_I__
 
-
+//
+// Delcare the begin of assembly function entry.
+//
+// @param name Name of function in assembly code.
+//
 #define PROCEDURE_ENTRY(name)   .##text;            \
                                 .##type name, @function;    \
                                 .##proc name;           \
 name::
 
+//
+// End of assembly function.
+//
+// @param name Name of function in assembly code.
+//
 #define PROCEDURE_EXIT(name)    .##endp name
 
-// Note: use of NESTED_SETUP requires number of locals (l) >= 3
-
+//
+// NESTED_SETUP Requires number of locals (l) >= 3
+//
 #define NESTED_SETUP(i,l,o,r) \
          alloc loc1=ar##.##pfs,i,l,o,r ;\
          mov loc0=b0
 
+//
+// End of Nested
+//
 #define NESTED_RETURN \
          mov b0=loc0 ;\
          mov ar##.##pfs=loc1 ;;\
          br##.##ret##.##dpnt  b0;;
 
+//
+// Export assembly function as the global function.
+//
+// @param Function Name of function in assembly code.
+//
 #define GLOBAL_FUNCTION(Function) \
          .##type   Function, @function; \
          .##globl Function
-
-#define GLOBAL_OBJECT(Object) \
-         .##type   Object, @object; \
-         .##globl  Object
-
-#define GLOBAL_CONSTANT(Constant) \
-         .##type   Constant, @notype; \
-         .##globl  Constant
-
-#define INTERRUPT_HANDLER_BEGIN(name) \
-PROCEDURE_ENTRY(name##HandlerBegin) \
-;; \
-PROCEDURE_EXIT(name##HandlerBegin)
-
-#define INTERRUPT_HANDLER_END(name) \
-PROCEDURE_ENTRY(name##HandlerEnd) \
-;; \
-PROCEDURE_EXIT(name##HandlerEnd)
-
-
-#define INTERRUPT_HANDLER_BLOCK_BEGIN \
-INTERRUPT_HANDLER_BEGIN(First)
-
-#define INTERRUPT_HANDLER_BLOCK_END \
-INTERRUPT_HANDLER_END(Last)
-
-
 
 #endif

@@ -178,9 +178,8 @@ ReportStatusCode (
   Allocates and fills in the extended data section of a status code with the 
   Device Path Protocol specified by DevicePath.  This function is responsible 
   for allocating a buffer large enough for the standard header and the device 
-  path.  The standard header is filled in with a GUID of 
-  gEfiStatusCodeSpecificDataGuid.  The status code is reported with a zero 
-  instance and a caller ID of gEfiCallerIdGuid.
+  path.  The standard header is filled in with an implementation dependent GUID.
+  The status code is reported with a zero instance and a caller ID of gEfiCallerIdGuid.
 
   ReportStatusCodeWithDevicePath()must actively prevent recursion.  If 
   ReportStatusCodeWithDevicePath() is called while processing another any other 
@@ -220,7 +219,7 @@ ReportStatusCodeWithDevicePath (
   These data structure do not have the standard header, so this function is 
   responsible for allocating a buffer large enough for the standard header and 
   the extended data passed into this function.  The standard header is filled 
-  in with a GUID of  gEfiStatusCodeSpecificDataGuid.  The status code is reported 
+  in with an implementation dependent GUID.  The status code is reported 
   with a zero instance and a caller ID of gEfiCallerIdGuid.
 
   ReportStatusCodeWithExtendedData()must actively prevent recursion.  If 
@@ -285,8 +284,7 @@ ReportStatusCodeWithExtendedData (
                             ID of gEfiCallerIdGuid is used.
   @param  ExtendedDataGuid  Pointer to the GUID for the extended data buffer.  
                             If this parameter is NULL, then a the status code 
-                            standard header is filled in with 
-                            gEfiStatusCodeSpecificDataGuid.
+                            standard header is filled in with an implementation dependent GUID.
   @param  ExtendedData      Pointer to the extended data buffer.  This is an 
                             optional parameter that may be NULL.
   @param  ExtendedDataSize  The size, in bytes, of the extended data buffer.
@@ -368,7 +366,21 @@ ReportDebugCodeEnabled (
   VOID
   );
 
+#ifndef NDEBUG
+#if 0
+//#if __INTEL_COMPILER  
+#define REPORT_STATUS_CODE(Type,Value) ReportStatusCode(Type,Value)
 
+#define REPORT_STATUS_CODE_WITH_DEVICE_PATH(Type,Value,DevicePathParameter)                     \
+  ReportStatusCodeWithDevicePath(Type,Value,DevicePathParameter)
+
+#define REPORT_STATUS_CODE_WITH_EXTENDED_DATA(Type,Value,ExtendedData,ExtendedDataSize)         \
+  ReportStatusCodeWithExtendedData(Type,Value,ExtendedData,ExtendedDataSize) 
+
+#define REPORT_STATUS_CODE_EX(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)  \
+  ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)
+
+#else
 /**
   Reports a status code with minimal parameters if the status code type is enabled.
 
@@ -472,8 +484,7 @@ ReportDebugCodeEnabled (
                             ID of gEfiCallerIdGuid is used.
   @param  ExtendedDataGuid  Pointer to the GUID for the extended data buffer.  
                             If this parameter is NULL, then a the status code 
-                            standard header is filled in with 
-                            gEfiStatusCodeSpecificDataGuid.
+                            standard header is filled in with an implementation dependent GUID.
   @param  ExtendedData      Pointer to the extended data buffer.  This is an 
                             optional parameter that may be NULL.
   @param  ExtendedDataSize  The size, in bytes, of the extended data buffer.
@@ -494,5 +505,13 @@ ReportDebugCodeEnabled (
   (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)                   ?  \
   ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)        :  \
   EFI_UNSUPPORTED
+#endif
+
+#else
+#define REPORT_STATUS_CODE(Type,Value)                                                                   EFI_UNSUPPORTED
+#define REPORT_STATUS_CODE_WITH_DEVICE_PATH(Type,Value,DevicePathParameter)                              EFI_UNSUPPORTED
+#define REPORT_STATUS_CODE_WITH_EXTENDED_DATA(Type,Value,ExtendedData,ExtendedDataSize)                  EFI_UNSUPPORTED
+#define REPORT_STATUS_CODE_EX(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize) EFI_UNSUPPORTED
+#endif
 
 #endif
