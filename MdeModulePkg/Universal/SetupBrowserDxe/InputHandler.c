@@ -1058,7 +1058,7 @@ TheKey:
           HiiValue.Value.u64 = 0;
           for (Index = 0; Index < Question->MaxContainers; Index++) {
             HiiValue.Value.u8 = ValueArray[Index];
-            if (HiiValue.Value.u8) {
+            if (HiiValue.Value.u8 != 0) {
               break;
             }
 

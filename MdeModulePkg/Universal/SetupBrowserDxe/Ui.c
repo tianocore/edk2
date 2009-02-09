@@ -1216,7 +1216,7 @@ UpdateOptionSkipLines (
       //
       // If there is more string to process print on the next row and increment the Skip value
       //
-      if (StrLen (&OptionString[Index])) {
+      if (StrLen (&OptionString[Index]) != 0) {
         if (SkipValue == 0) {
           Row++;
           //
@@ -1633,7 +1633,7 @@ UiDisplayMenu (
             //
             // If there is more string to process print on the next row and increment the Skip value
             //
-            if (StrLen (&MenuOption->Description[Index])) {
+            if (StrLen (&MenuOption->Description[Index]) != 0) {
               if (Temp == 0) {
                 Row++;
               }
@@ -1728,7 +1728,7 @@ UiDisplayMenu (
               //
               // If there is more string to process print on the next row and increment the Skip value
               //
-              if (StrLen (&OptionString[Index])) {
+              if (StrLen (&OptionString[Index]) != 0) {
                 if (Temp2 == 0) {
                   Row++;
                   //
@@ -1771,7 +1771,7 @@ UiDisplayMenu (
               //
               // If there is more string to process print on the next row and increment the Skip value
               //
-              if (StrLen (&StringPtr[Index])) {
+              if (StrLen (&StringPtr[Index]) != 0) {
                 if (Temp2 == 0) {
                   Row++;
                   //
@@ -1945,7 +1945,7 @@ UiDisplayMenu (
               //
               // If there is more string to process print on the next row and increment the Skip value
               //
-              if (StrLen (&OptionString[Index])) {
+              if (StrLen (&OptionString[Index]) != 0) {
                 MenuOption->Row++;
               }
 
@@ -1973,7 +1973,7 @@ UiDisplayMenu (
                 //
                 // If there is more string to process print on the next row and increment the Skip value
                 //
-                if (StrLen (&MenuOption->Description[Index])) {
+                if (StrLen (&MenuOption->Description[Index]) != 0) {
                   MenuOption->Row++;
                 }
 
@@ -2051,7 +2051,7 @@ UiDisplayMenu (
             //
             // If there is more string to process print on the next row and increment the Skip value
             //
-            if (StrLen (&OptionString[Index])) {
+            if (StrLen (&OptionString[Index]) != 0) {
               MenuOption->Row++;
             }
 
@@ -2074,7 +2074,7 @@ UiDisplayMenu (
               //
               // If there is more string to process print on the next row and increment the Skip value
               //
-              if (StrLen (&MenuOption->Description[Index])) {
+              if (StrLen (&MenuOption->Description[Index]) != 0) {
                 MenuOption->Row++;
               }
 
