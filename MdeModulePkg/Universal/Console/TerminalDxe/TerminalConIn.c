@@ -1255,7 +1255,7 @@ UnicodeToEfiKey (
 
     if (TerminalDevice->InputState != INPUT_STATE_DEFAULT) {
       //
-      // Check to see if the 2 second timer has expired
+      // Check to see if the 2 seconds timer has expired
       //
       TimerStatus = gBS->CheckEvent (TerminalDevice->TwoSecondTimeOut);
       if (!EFI_ERROR (TimerStatus)) {

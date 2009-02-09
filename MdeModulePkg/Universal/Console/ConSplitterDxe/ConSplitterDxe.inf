@@ -95,3 +95,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+
+# [Event]
+#   ##
+#   # mConIn.LockEvent, used to record and check key sequence on StdIn. Periodic is 25ms.
+#   #
+#   EVENT_TYPE_PREIODIC_TIMER                   ## PRODUCES
+#
+#
