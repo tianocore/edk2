@@ -61,7 +61,7 @@ SnpUndi32CallbackV2p30 (
   // EFI uses identical mapping
   //
   if ((CpuAddr == 0) || (DeviceAddrPtr == 0)) {
-    DEBUG ((EFI_D_INFO | EFI_D_NET, "\nv2p: Null virtual address or physical pointer.\n"));
+    DEBUG ((EFI_D_NET, "\nv2p: Null virtual address or physical pointer.\n"));
     return ;
   }
 

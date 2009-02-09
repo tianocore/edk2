@@ -43,13 +43,13 @@ PxeStop (
   //
   // Issue UNDI command
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.stop()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.stop()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_ERROR,
+      (EFI_D_WARN,
       "\nsnp->undi.stop()  %xh:%xh\n",
       Snp->Cdb.StatCode,
       Snp->Cdb.StatFlags)

@@ -43,13 +43,13 @@ PxeReset (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.reset()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.reset()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_ERROR | EFI_D_NET,
+      (EFI_D_WARN,
       "\nsnp->undi32.reset()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

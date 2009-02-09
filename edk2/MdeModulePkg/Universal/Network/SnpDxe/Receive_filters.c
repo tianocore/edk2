@@ -79,7 +79,7 @@ PxeRecvFilterEnable (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive_filters()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -167,7 +167,7 @@ PxeRecvFilterDisable (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive_filters()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -176,7 +176,7 @@ PxeRecvFilterDisable (
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
-      (EFI_D_ERROR | EFI_D_NET,
+      (EFI_D_ERROR,
       "\nsnp->undi.receive_filters()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -219,7 +219,7 @@ PxeRecvFilterRead (
   Snp->Cdb.IFnum      = Snp->IfNum;
   Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.receive_filters()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.receive_filters()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 

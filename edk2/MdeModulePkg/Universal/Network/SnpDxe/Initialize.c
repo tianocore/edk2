@@ -95,7 +95,7 @@ PxeInit (
   Snp->Cdb.IFnum      = Snp->IfNum;
   Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nSnp->undi.initialize()  "));
+  DEBUG ((EFI_D_NET, "\nSnp->undi.initialize()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -105,7 +105,7 @@ PxeInit (
     Status          = EFI_SUCCESS;
   } else {
     DEBUG (
-      (EFI_D_ERROR,
+      (EFI_D_WARN,
       "\nSnp->undi.initialize()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

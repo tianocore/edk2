@@ -72,7 +72,7 @@ PxeStart (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_INFO | EFI_D_NET, "\nsnp->undi.start()  "));
+  DEBUG ((EFI_D_NET, "\nsnp->undi.start()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 

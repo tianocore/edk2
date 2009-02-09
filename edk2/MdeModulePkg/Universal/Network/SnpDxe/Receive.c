@@ -102,7 +102,7 @@ PxeReceive (
 
   default:
     DEBUG (
-      (EFI_D_NET,
+      (EFI_D_ERROR,
       "\nsnp->undi.receive()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
