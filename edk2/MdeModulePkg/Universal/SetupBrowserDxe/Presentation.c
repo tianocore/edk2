@@ -525,7 +525,7 @@ DisplayForm (
         //
         // If there is more string to process print on the next row and increment the Skip value
         //
-        if (StrLen (&StringPtr[ArrayEntry])) {
+        if (StrLen (&StringPtr[ArrayEntry]) != 0) {
           NumberOfLines++;
         }
 
