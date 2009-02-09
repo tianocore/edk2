@@ -20,7 +20,7 @@ Abstract:
 #ifndef _BC_H
 #define _BC_H
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Guid/SmBios.h>
 #include <IndustryStandard/SmBios.h>

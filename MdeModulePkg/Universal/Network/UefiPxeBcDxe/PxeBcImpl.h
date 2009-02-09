@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Guid/SmBios.h>
 #include <IndustryStandard/SmBios.h>

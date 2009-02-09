@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _UDP4_DRIVER_H_
 #define _UDP4_DRIVER_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
 #include <Protocol/DriverBinding.h>

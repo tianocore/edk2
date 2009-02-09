@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _ARP_DRIVER_H_
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Arp.h>
 #include <Protocol/ManagedNetwork.h>

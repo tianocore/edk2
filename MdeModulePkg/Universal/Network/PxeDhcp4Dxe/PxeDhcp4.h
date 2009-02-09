@@ -21,7 +21,7 @@ Abstract:
 #define _PXEDHCP4_H
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/PxeBaseCode.h>
 #include <Protocol/SimpleNetwork.h>
