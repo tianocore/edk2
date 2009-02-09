@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _UDP4_IMPL_H_
 #define _UDP4_IMPL_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Ip4.h>
 #include <Protocol/Udp4.h>

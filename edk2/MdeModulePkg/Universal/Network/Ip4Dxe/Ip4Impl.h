@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_IP4_IMPL_H__
 #define __EFI_IP4_IMPL_H__
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Ip4.h>
 #include <Protocol/Ip4Config.h>

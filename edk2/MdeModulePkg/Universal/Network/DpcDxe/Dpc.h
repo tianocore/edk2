@@ -21,7 +21,7 @@ Abstract:
 #ifndef _DPC_H_
 #define _DPC_H_
 
-#include <PiDxe.h>
+#include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>

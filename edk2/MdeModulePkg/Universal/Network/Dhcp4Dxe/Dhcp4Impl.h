@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 
-#include <PiDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/Dhcp4.h>
 #include <Protocol/Udp4.h>
