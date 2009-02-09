@@ -42,7 +42,6 @@
   BaseMemoryLib
   DebugLib
   UefiLib
-  UefiBootServicesTableLib
     
 [Guids]
   gEfiHobListGuid                               ## CONSUMES
