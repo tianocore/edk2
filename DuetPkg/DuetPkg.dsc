@@ -104,6 +104,25 @@
 [PcdsFeatureFlag]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|TRUE
 
+###################################################################################################
+#
+# Components Section - list of the modules and components that will be processed by compilation
+#                      tools and the EDK II tools to generate PE32/PE32+/Coff image files.
+#
+# Note: The EDK II DSC file is not used to specify how compiled binary images get placed
+#       into firmware volume images. This section is just a list of modules to compile from
+#       source into UEFI-compliant binaries.
+#       It is the FDF file that contains information on combining binary files into firmware
+#       volume images, whose concept is beyond UEFI and is described in PI specification.
+#       Binary modules do not need to be listed in this section, as they should be
+#       specified in the FDF file. For example: Shell binary (Shell_Full.efi), FAT binary (Fat.efi),
+#       Logo (Logo.bmp), and etc.
+#       There may also be modules listed in this section that are not required in the FDF file,
+#       When a module listed here is excluded from FDF file, then UEFI-compliant binary will be
+#       generated for it, but the binary will not be put into any firmware volume.
+#
+###################################################################################################
+
 [Components.common]
   DuetPkg/DxeIpl/DxeIpl.inf {
     <LibraryClasses>
@@ -174,17 +193,6 @@
 [Components.IA32]  
   DuetPkg/BootSector/BootSector.inf
   
-######################################################################################
-#
-# Following binaries are specified in FDF file and built in Firmware Volumes.
-# The are not included in DSC file because DSC only specifies modules to build.
-#
-######################################################################################
-##
-## FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
-## MdeModulePkg/Logo/Logo.bmp
-##
-
 [BuildOptions.common]
   MSFT:*_*_*_CC_FLAGS = /FAsc /FR$(@R).SBR
   MSFT:*_*_IA32_CC_FLAGS = /D EFI32
