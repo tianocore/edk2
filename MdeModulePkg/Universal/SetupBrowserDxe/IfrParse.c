@@ -1740,6 +1740,8 @@ ParseOpCodes (
             if (EFI_ERROR (Status)) {
               return Status;
             }
+
+            ASSERT (CurrentExpression != NULL);
             if (CurrentExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN) {
               return EFI_INVALID_PARAMETER;
             }
