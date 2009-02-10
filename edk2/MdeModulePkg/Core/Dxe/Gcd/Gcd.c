@@ -583,10 +583,11 @@ CoreConvertSpace (
   if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreAcquireGcdMemoryLock ();
     Map = &mGcdMemorySpaceMap;
-  }
-  if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
+  } else if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
     CoreAcquireGcdIoLock ();
     Map = &mGcdIoSpaceMap;
+  } else {
+    ASSERT (FALSE);
   }
 
   //
@@ -893,10 +894,11 @@ CoreAllocateSpace (
   if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreAcquireGcdMemoryLock ();
     Map = &mGcdMemorySpaceMap;
-  }
-  if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
+  } else if ((Operation & GCD_IO_SPACE_OPERATION) != 0) {
     CoreAcquireGcdIoLock ();
     Map = &mGcdIoSpaceMap;
+  } else {
+    ASSERT (FALSE);
   }
 
   Found     = FALSE;
