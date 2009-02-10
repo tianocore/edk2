@@ -363,7 +363,7 @@ BdsLibConnectAllDriversToAllControllers (
 /**
   This function will connect all the system driver to controller
   first, and then special connect the default console, this make
-  sure all the system controller avialbe and the platform default
+  sure all the system controller available and the platform default
   console connected.
 
 **/

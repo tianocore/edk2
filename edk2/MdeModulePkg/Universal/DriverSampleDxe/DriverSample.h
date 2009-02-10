@@ -32,6 +32,7 @@ Revision History
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
 
+#include <MdeModuleHii.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -42,9 +43,6 @@ Revision History
 #include <Library/ExtendedIfrSupportLib.h>
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
-
-#include <MdeModuleHii.h>
-
 
 #include "NVDataStruc.h"
 

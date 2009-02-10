@@ -27,7 +27,7 @@
 #endif
 
 //
-// Define GET_PAD_SIZE to optimize compiler
+// GET_PAD_SIZE to calculate miminal pad bytes to make current size satisfy the alignment requirement
 //
 #if ((ALIGNMENT == 0) || (ALIGNMENT == 1))
 #define GET_PAD_SIZE(a) (0)

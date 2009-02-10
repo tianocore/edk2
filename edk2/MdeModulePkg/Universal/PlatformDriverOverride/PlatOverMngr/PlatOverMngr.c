@@ -36,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ComponentName2.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
+#include <Guid/GlobalVariable.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

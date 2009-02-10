@@ -1,9 +1,7 @@
 /** @file
 
   Load Pe32 Image protocol provides capability to load and unload EFI image into memory and execute it.
-
-  This protocol supports the additional new boot devices that do not map well to file system.
-  UEFI can boot from any device (including Network boot) that produces a LoadFile protocol.
+  This protocol bases on File Device Path to get EFI image.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

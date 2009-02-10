@@ -23,8 +23,8 @@ typedef struct _EFI_CONSOLE_CONTROL_PROTOCOL   EFI_CONSOLE_CONTROL_PROTOCOL;
 
 
 typedef enum {
-  EfiConsoleControlScreenText,     /// Text Mode
-  EfiConsoleControlScreenGraphics, /// Graphics Mode
+  EfiConsoleControlScreenText,     ///> Text Mode
+  EfiConsoleControlScreenGraphics, ///> Graphics Mode
   EfiConsoleControlScreenMaxValue
 } EFI_CONSOLE_CONTROL_SCREEN_MODE;
 

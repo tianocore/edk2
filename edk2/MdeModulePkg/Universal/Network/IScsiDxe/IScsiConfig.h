@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _ISCSI_CONFIG_H_
 #define _ISCSI_CONFIG_H_
 
+#include <Protocol/HiiConfigRouting.h>
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
 #include <Library/IfrSupportLib.h>

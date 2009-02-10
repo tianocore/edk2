@@ -35,7 +35,8 @@ HiiLibPreparePackageList (
   IN UINTN                    NumberOfPackages,
   IN CONST EFI_GUID                 *GuidId,
   ...
-  );
+  )
+;
 
 /**
   This function allocates pool for an EFI_HII_PACKAGE_LIST structure
@@ -69,7 +70,8 @@ HiiLibAddPackages (
   IN       EFI_HANDLE          DriverHandle, OPTIONAL
   OUT      EFI_HII_HANDLE      *HiiHandle,
   ...
-  );
+  )
+;
 
 /**
   Removes a package list from the default HII database.
@@ -85,7 +87,8 @@ VOID
 EFIAPI
 HiiLibRemovePackages (
   IN      EFI_HII_HANDLE      HiiHandle
-  );
+  )
+;
 
 /**
   This function adds the string into String Package of each language
@@ -111,7 +114,8 @@ HiiLibNewString (
   IN  EFI_HII_HANDLE                  PackageList,
   OUT EFI_STRING_ID                   *StringId,
   IN  CONST EFI_STRING                String
-  );
+  )
+;
 
 /**
   This function update the specified string in String Package of each language
@@ -136,7 +140,8 @@ HiiLibSetString (
   IN  EFI_HII_HANDLE                  PackageList,
   IN  EFI_STRING_ID                   StringId,
   IN  CONST EFI_STRING                String
-  );
+  )
+;
 
 /**
   This function try to retrieve string from String package of current language.
@@ -169,7 +174,8 @@ HiiLibGetString (
   IN  EFI_STRING_ID                   StringId,
   OUT EFI_STRING                      String,
   IN  OUT UINTN                       *StringSize
-  );
+  )
+;
 
 /**
   Get string specified by StringId form the HiiHandle. The caller
@@ -194,7 +200,8 @@ HiiLibGetStringFromHandle (
   IN  EFI_HII_HANDLE                  HiiHandle,
   IN  EFI_STRING_ID                   StringId,
   OUT EFI_STRING                      *String
-  );
+  )
+;
 
 /**
   Get the string given the StringId and String package Producer's Guid. The caller
@@ -218,7 +225,8 @@ HiiLibGetStringFromToken (
   IN  EFI_GUID                        *ProducerGuid,
   IN  EFI_STRING_ID                   StringId,
   OUT EFI_STRING                      *String
-  );
+  )
+;
 
 /**
   Determines the handles that are currently active in the database.
@@ -240,7 +248,8 @@ EFIAPI
 HiiLibGetHiiHandles (
   IN OUT UINTN                     *HandleBufferLength,
   OUT    EFI_HII_HANDLE            **HiiHandleBuffer
-  );
+  )
+;
 
 /**
   Extract Hii package list GUID for given HII handle.
@@ -259,7 +268,8 @@ EFIAPI
 HiiLibExtractGuidFromHiiHandle (
   IN      EFI_HII_HANDLE      Handle,
   OUT     EFI_GUID            *Guid
-  );
+  )
+;
 
 /**
   Find HII Handle in the default HII database associated with given Device Path.
@@ -278,7 +288,8 @@ EFI_HII_HANDLE
 EFIAPI
 HiiLibDevicePathToHiiHandle (
   IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
-  );
+  )
+;
 
 
 /**
@@ -298,7 +309,8 @@ EFIAPI
 HiiLibGetNextLanguage (
   IN OUT CHAR8      **LangCode,
   OUT CHAR8         *Lang
-  );
+  )
+;
 
 /**
   This function returns the list of supported languages, in the format specified
@@ -316,7 +328,8 @@ CHAR8 *
 EFIAPI
 HiiLibGetSupportedLanguages (
   IN EFI_HII_HANDLE           HiiHandle
-  );
+  )
+;
 
 /**
   This function returns the list of supported 2nd languages, in the format specified
@@ -336,7 +349,8 @@ EFIAPI
 HiiLibGetSupportedSecondaryLanguages (
   IN EFI_HII_HANDLE           HiiHandle,
   IN CONST CHAR8              *FirstLanguage
-  );
+  )
+;
 
 
 /**
@@ -354,7 +368,8 @@ UINT16
 EFIAPI
 HiiLibGetSupportedLanguageNumber (
   IN EFI_HII_HANDLE           HiiHandle
-  );
+  )
+;
 
 /**
   Exports the contents of one or all package lists in the HII database into a buffer.
@@ -380,7 +395,8 @@ HiiLibExportPackageLists (
   IN EFI_HII_HANDLE                    Handle,
   OUT EFI_HII_PACKAGE_LIST_HEADER      **PackageListHeader,
   OUT UINTN                            *PackageListSize
-  );
+  )
+;
 
 /**
   
@@ -426,7 +442,8 @@ HiiLibListPackageLists (
   IN CONST  EFI_GUID                  *PackageGuid,
   IN OUT    UINTN                     *HandleBufferLength,
   OUT       EFI_HII_HANDLE            **Handle
-  );
+  )
+;
 
 /**
   Convert language code from RFC3066 to ISO639-2.
@@ -452,7 +469,8 @@ EFIAPI
 ConvertRfc3066LanguageToIso639Language (
   IN  CHAR8   *LanguageRfc3066,
   OUT CHAR8   *LanguageIso639
-  );
+  )
+;
 
 /**
   Convert language code from ISO639-2 to RFC3066.
@@ -478,7 +496,8 @@ EFIAPI
 ConvertIso639LanguageToRfc3066Language (
   IN  CONST CHAR8   *LanguageIso639,
   OUT CHAR8         *LanguageRfc3066
-  );
+  )
+;
 
 /**
   Convert language code list from RFC3066 to ISO639-2, e.g. "en-US;fr-FR" will
@@ -495,7 +514,8 @@ CHAR8 *
 EFIAPI
 Rfc3066ToIso639 (
   CHAR8  *SupportedLanguages
-  );
+  )
+;
 
 
 /**
@@ -517,6 +537,7 @@ EFI_STATUS
 EFIAPI
 GetCurrentLanguage (
   OUT     CHAR8               *Lang
-  );
+  )
+;
 
 #endif

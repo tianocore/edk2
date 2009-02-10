@@ -33,7 +33,7 @@ IsValidQuestionFlags (
   IN UINT8                   Flags
   )
 {
-  return (BOOLEAN) (((Flags & (~QUESTION_FLAGS)) != 0) ? FALSE : TRUE);
+  return (BOOLEAN) (((Flags & QUESTION_FLAGS_MASK) != 0) ? FALSE : TRUE);
 }
 
 /**

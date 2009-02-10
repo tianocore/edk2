@@ -1,6 +1,6 @@
 /** @file
-  This guid is used to specify the device is the hot plug device.
-  If the device is the hot plug device, this guid as the protocol guid
+  This protocol guid is used to specify the device is the hot plug device.
+  If the device is the hot plug device, this protocol guid
   will be installed into this device handle.
 
 Copyright (c) 2006 - 2008, Intel Corporation

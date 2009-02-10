@@ -87,7 +87,9 @@ EFI_STATUS
 
   @param  This                Protocol instance pointer. 
 
-  @retval EFI_SUCCESS         Successful.  
+  @retval EFI_SUCCESS         Success. Then free all the generic memory test driver
+                              allocated resource and notify to platform memory
+                              test driver that memory test finished.
 
 **/
 typedef
@@ -106,7 +108,7 @@ EFI_STATUS
   @param  Length              The compatible memory range's length. 
   
   @retval EFI_SUCCESS           The compatible memory range pass the memory test. 
-  @retval EFI_INVALID_PARAMETER The compatible memory range must be below 16M.
+  @retval EFI_INVALID_PARAMETER The compatible memory range are not below Low 16M.
 
 **/
 typedef
