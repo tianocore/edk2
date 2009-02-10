@@ -144,7 +144,7 @@ extern EFI_GUID gEfiDiskInfoUsbInterfaceGuid;
 extern EFI_GUID gEfiDiskInfoAhciInterfaceGuid;
 
 struct _EFI_DISK_INFO_PROTOCOL {
-  EFI_GUID                  Interface;  /// The format of the buffers returned by member functions.
+  EFI_GUID                  Interface;  ///> The format of the buffers returned by member functions.
   EFI_DISK_INFO_INQUIRY     Inquiry;
   EFI_DISK_INFO_IDENTIFY    Identify;
   EFI_DISK_INFO_SENSE_DATA  SenseData;

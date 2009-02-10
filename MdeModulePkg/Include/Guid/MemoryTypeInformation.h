@@ -1,7 +1,7 @@
 /** @file
   This file defines the memory type information guid for its variable and guid. 
-  It also defines memory type info varialbe name and data structure for varialbe and hob both,
-  which can be used to store the information for each memory type in EFI varialbe or HOB.
+  It also defines memory type info variable name and data structure for variable and hob both,
+  which can be used to store the information for each memory type in EFI variable or HOB.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials

@@ -16,34 +16,6 @@
 #ifndef _IFR_SUPPORT_LIBRARY_H_
 #define _IFR_SUPPORT_LIBRARY_H_
 
-
-#include <Protocol/HiiFont.h>
-#include <Protocol/HiiImage.h>
-#include <Protocol/HiiString.h>
-#include <Protocol/HiiDatabase.h>
-#include <Protocol/HiiConfigRouting.h>
-#include <Protocol/HiiConfigAccess.h>
-#include <Protocol/FormBrowser2.h>
-#include <Protocol/SimpleTextOut.h>
-
-#include <Guid/GlobalVariable.h>
-
-//
-// The architectural variable "Lang" and "LangCodes" are deprecated in UEFI
-// specification. While, UEFI specification also states that these deprecated
-// variables may be provided for backwards compatibility.
-
-#define EFI_LANGUAGE_VARIABLE           L"Lang"
-#define EFI_LANGUAGE_CODES_VARIABLE     L"LangCodes"
-
-#define UEFI_LANGUAGE_VARIABLE          L"PlatformLang"
-#define UEFI_LANGUAGE_CODES_VARIABLE    L"PlatformLangCodes"
-
-#define INVALID_VARSTORE_ID             0
-
-#define QUESTION_FLAGS              (EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY)
-#define QUESTION_FLAGS_MASK         (~QUESTION_FLAGS)
-
 #pragma pack(1)
 typedef struct {
   EFI_STRING_ID       StringToken;
@@ -632,6 +604,7 @@ ConstructConfigHdr (
 
 **/
 BOOLEAN
+EFIAPI
 IsConfigHdrMatch (
   IN EFI_STRING                ConfigString,
   IN EFI_GUID                  *StorageGuid, OPTIONAL

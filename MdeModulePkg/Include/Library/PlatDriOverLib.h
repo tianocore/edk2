@@ -31,7 +31,8 @@ EFI_STATUS
 EFIAPI
 FreeMappingDatabase (
   IN  OUT  LIST_ENTRY            *MappingDataBase
-  );
+  )
+;
 
 /**
   Read the NV environment variable(s) that contain the override mappings from Controller Device Path to
@@ -49,7 +50,8 @@ EFI_STATUS
 EFIAPI
 InitOverridesMapping (
   OUT  LIST_ENTRY            *MappingDataBase
-  );
+  )
+;
 
 /**
   Save the memory mapping database into NV environment variable(s).
@@ -65,7 +67,8 @@ EFI_STATUS
 EFIAPI
 SaveOverridesMapping (
   IN  LIST_ENTRY              *MappingDataBase
-  );
+  )
+;
 
 /**
   Retrieves the image handle of the platform override driver for a controller in the system from the memory mapping database.
@@ -98,7 +101,8 @@ GetDriverFromMapping (
   IN OUT EFI_HANDLE                                     *DriverImageHandle,
   IN     LIST_ENTRY                                     *MappingDataBase,
   IN     EFI_HANDLE                                     CallerImageHandle
-  );
+  )
+;
 
 /**
   Check mapping database whether already has the mapping info which
@@ -125,7 +129,8 @@ CheckMapping (
   IN     LIST_ENTRY                                     *MappingDataBase,
   OUT    UINT32                                         *DriverInfoNum  OPTIONAL,
   OUT    UINT32                                         *DriverImageNO  OPTIONAL
-  );
+  )
+;
 
 /**
   Insert a driver image as a controller's override driver into the mapping database.
@@ -153,7 +158,8 @@ InsertDriverImage (
   IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath,
   IN     LIST_ENTRY                                     *MappingDataBase,
   IN     UINT32                                         DriverImageNO
-  );
+  )
+;
 
 /**
   Delete a controller's override driver from the mapping database.
@@ -176,6 +182,7 @@ DeleteDriverImage (
   IN     EFI_DEVICE_PATH_PROTOCOL                       *ControllerDevicePath,
   IN     EFI_DEVICE_PATH_PROTOCOL                       *DriverImageDevicePath,
   IN     LIST_ENTRY                                     *MappingDataBase
-  );
+  )
+;
 
 #endif

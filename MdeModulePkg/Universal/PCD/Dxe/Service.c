@@ -1018,7 +1018,7 @@ SetHiiVariable (
   space guid: token number} to local token number.
   
   @param Guid            Token space guid for dynamic-ex PCD entry.
-  @param ExTokenNumber   EDES_TODO: Add parameter description
+  @param ExTokenNumber   Dynamic-ex PCD token number.
 
   @return local token number for dynamic-ex PCD.
 
@@ -1049,7 +1049,6 @@ GetExPcdTokenNumber (
         if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
             (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
             return ExMap[Index].LocalTokenNumber;
-
         }
       }
     }

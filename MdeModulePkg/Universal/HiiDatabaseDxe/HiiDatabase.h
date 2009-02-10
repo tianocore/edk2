@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextOut.h>
 
 #include <Guid/HiiKeyBoardLayout.h>
+#include <Guid/GlobalVariable.h>
 
 
 #include <Library/DebugLib.h>
