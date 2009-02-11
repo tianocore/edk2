@@ -23,13 +23,11 @@ Abstract:
 #include "Thunk16Lib.h"
 #include "EfiCommonLib.h"
 
-#define IA32API EFIAPI
-
 extern CONST UINTN                  mCode16Size;
 
 extern
 IA32_REGISTER_SET *
-IA32API
+EFIAPI
 _Thunk16 (
   IN OUT  IA32_REGISTER_SET         *RegisterSet,
   IN      UINT32                    ThunkFlags,
@@ -38,19 +36,19 @@ _Thunk16 (
 
 extern
 VOID
-IA32API
+EFIAPI
 _Code16Addr (
   VOID
   );
 
 VOID
-IA32API
+EFIAPI
 AsmFxRestore (
   IN CONST IA32_FX_BUFFER *Buffer
   );
 
 VOID
-IA32API
+EFIAPI
 AsmFxSave (
   OUT IA32_FX_BUFFER *Buffer
   );

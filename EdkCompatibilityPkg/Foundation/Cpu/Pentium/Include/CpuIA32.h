@@ -22,8 +22,6 @@ Abstract:
 
 #include "Tiano.h"
 
-#define IA32API __cdecl
-
 typedef struct {
   UINT32  RegEax;
   UINT32  RegEbx;
@@ -139,7 +137,7 @@ typedef struct {
   (((UINT32) (f) << 16) | ((UINT32) (m) << 8) | ((UINT32) (s)))
 
 VOID
-IA32API
+EFIAPI
 EfiHalt (
   VOID
   );
@@ -153,7 +151,7 @@ Returns:
    None                                                
 --*/
 VOID
-IA32API
+EFIAPI
 EfiWbinvd (
   VOID
   );
@@ -167,7 +165,7 @@ Returns:
    None                                                
 --*/
 VOID
-IA32API
+EFIAPI
 EfiInvd (
   VOID
   );
@@ -181,7 +179,7 @@ Returns:
    None                                                
 --*/
 VOID
-IA32API
+EFIAPI
 EfiCpuid (
   IN  UINT32                 RegisterInEax,
   OUT EFI_CPUID_REGISTER     *Regs
@@ -198,7 +196,7 @@ Returns:
 --*/
 
 VOID
-IA32API
+EFIAPI
 EfiCpuidExt (
   IN  UINT32                 RegisterInEax,
   IN  UINT32                 CacheLevel,
@@ -219,7 +217,7 @@ Returns:
 ;
 
 UINT64
-IA32API
+EFIAPI
 EfiReadMsr (
   IN UINT32     Index
   );
@@ -234,7 +232,7 @@ Returns:
    Return the read data                                                
 --*/
 VOID
-IA32API
+EFIAPI
 EfiWriteMsr (
   IN UINT32     Index,
   IN UINT64     Value
@@ -250,7 +248,7 @@ Returns:
    None                                                
 --*/
 UINT64
-IA32API
+EFIAPI
 EfiReadTsc (
   VOID
   );
@@ -264,7 +262,7 @@ Returns:
    Return the read data                                                
 --*/
 VOID
-IA32API
+EFIAPI
 EfiDisableCache (
   VOID
   );
@@ -278,7 +276,7 @@ Returns:
   None                                               
 --*/
 VOID
-IA32API
+EFIAPI
 EfiEnableCache (
   VOID
   );
@@ -292,7 +290,7 @@ Returns:
   None                                               
 --*/
 UINT32
-IA32API
+EFIAPI
 EfiGetEflags (
   VOID
   );
@@ -306,7 +304,7 @@ Returns:
   Return the Eflags value                                               
 --*/
 VOID
-IA32API
+EFIAPI
 EfiDisableInterrupts (
   VOID
   );
@@ -320,7 +318,7 @@ Returns:
   None
 --*/
 VOID
-IA32API
+EFIAPI
 EfiEnableInterrupts (
   VOID
   );
@@ -336,7 +334,7 @@ Returns:
 
 
 VOID
-IA32API
+EFIAPI
 EfiCpuVersion (
   IN   UINT16  *FamilyId,    OPTIONAL
   IN   UINT8   *Model,       OPTIONAL
