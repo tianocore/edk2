@@ -1054,7 +1054,7 @@ IsWithinOneDay (
   Adjacent = FALSE;
 
   //
-  // The validity of Time->Month field should be checked before
+  // The validity of From->Month field should be checked before
   //
   ASSERT (From->Month >=1);
   ASSERT (From->Month <=12);
