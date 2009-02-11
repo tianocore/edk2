@@ -18,6 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/Pcd.h>
+#include <Guid/PcdDataBaseHobGuid.h>
+#include <Guid/PcdPeiCallbackFnTableHobGuid.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -1003,10 +1005,6 @@ SetPtrTypeSize (
   IN    OUT   UINTN             *CurrentSize,
   IN          PEI_PCD_DATABASE  *Database
   );
-
-extern EFI_GUID gPcdDataBaseHobGuid;
-
-extern EFI_GUID gPcdPeiCallbackFnTableHobGuid;
 
 //
 // The init Database created by PCD Database generation tool
