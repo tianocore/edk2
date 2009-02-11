@@ -26,6 +26,7 @@ Abstract:
 #include <Library/DebugLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/HobLib.h>
+#include <Library/PeiServicesLib.h>
 
 EFI_PEI_PE_COFF_LOADER_PROTOCOL  *mPeiEfiPeiPeCoffLoader;
 
@@ -63,13 +64,12 @@ PeiNt32PeCoffLibConstructor (
     //
     // GuidHob is not ready, try to locate PeCoffLoader guid structure.
     //
-    Status = (*PeiServices)->LocatePpi (
-                              PeiServices,
-                              &gEfiPeiPeCoffLoaderGuid,
-                              0,
-                              NULL,
-                              (VOID**)&mPeiEfiPeiPeCoffLoader
-                              );
+    Status = PeiServicesLocatePpi (
+                &gEfiPeiPeCoffLoaderGuid,
+                0,
+                NULL,
+                (VOID**) &mPeiEfiPeiPeCoffLoader
+                );
     
     //
     // PeCofferLoader guid structure must be installed before this library runs.
