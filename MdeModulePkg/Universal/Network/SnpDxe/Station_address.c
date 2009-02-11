@@ -170,7 +170,7 @@ PxeSetStnAddr (
   
   This function modifies or resets the current station address of a network 
   interface, if supported. If Reset is TRUE, then the current station address is
-  set to the network interface’s permanent address. If Reset is FALSE, and the 
+  set to the network interface's permanent address. If Reset is FALSE, and the 
   network interface allows its station address to be modified, then the current 
   station address is changed to the address specified by New. If the network 
   interface does not allow its station address to be modified, then 
@@ -179,12 +179,12 @@ PxeSetStnAddr (
   has not been initialized, EFI_DEVICE_ERROR will be returned.
 
   @param This  A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
-  @param Reset Flag used to reset the station address to the network interface’s 
+  @param Reset Flag used to reset the station address to the network interface's 
                permanent address.
   @param New   New station address to be used for the network interface.
 
 
-  @retval EFI_SUCCESS           The network interface’s station address was updated.
+  @retval EFI_SUCCESS           The network interface's station address was updated.
   @retval EFI_NOT_STARTED       The Simple Network Protocol interface has not been 
                                 started by calling Start().
   @retval EFI_INVALID_PARAMETER The New station address was not accepted by the NIC.
@@ -194,7 +194,7 @@ PxeSetStnAddr (
   @retval EFI_DEVICE_ERROR      An error occurred attempting to set the new 
                                 station address.
   @retval EFI_UNSUPPORTED       The NIC does not support changing the network 
-                                interface’s station address.
+                                interface's station address.
 
 **/
 EFI_STATUS
