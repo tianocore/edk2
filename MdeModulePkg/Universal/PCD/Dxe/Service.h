@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _PCD_DXE_SERVICE_H_
 
 #include <PiDxe.h>
+#include <Guid/PcdDataBaseHobGuid.h>
 #include <Protocol/Pcd.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -1056,8 +1057,6 @@ SetPtrTypeSize (
   IN          UINTN             LocalTokenNumberTableIdx,
   IN    OUT   UINTN             *CurrentSize
   );
-
-extern EFI_GUID gPcdDataBaseHobGuid;
 
 extern PCD_DATABASE * mPcdDatabase;
 
