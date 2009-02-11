@@ -44,7 +44,7 @@
   HobLib
   PeimEntryPoint
   DebugLib
-
+  PeiServicesLib
 
 [Ppis]
   gPeiBaseMemoryTestPpiGuid                     # PPI ALWAYS_CONSUMED
