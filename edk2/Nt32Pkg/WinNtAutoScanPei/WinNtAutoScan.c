@@ -35,12 +35,13 @@ Revision History
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/HobLib.h>
+#include <Library/PeiServicesLib.h>
 
 EFI_STATUS
 EFIAPI
 PeimInitializeWinNtAutoScan (
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE       FileHandle,
+  IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 /*++
 
@@ -72,25 +73,23 @@ Returns:
   //
   // Get the PEI NT Autoscan PPI
   //
-  Status = (**PeiServices).LocatePpi (
-                            (const EFI_PEI_SERVICES **)PeiServices,
-                            &gPeiNtAutoScanPpiGuid, // GUID
-                            0,                      // INSTANCE
-                            &PpiDescriptor,         // EFI_PEI_PPI_DESCRIPTOR
-                            (VOID**)&PeiNtService           // PPI
-                            );
+  Status = PeiServicesLocatePpi (
+             &gPeiNtAutoScanPpiGuid, // GUID
+             0,                      // INSTANCE
+             &PpiDescriptor,         // EFI_PEI_PPI_DESCRIPTOR
+             (VOID**)&PeiNtService           // PPI
+             );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Get the Memory Test PPI
   //
-  Status = (**PeiServices).LocatePpi (
-                            (const EFI_PEI_SERVICES **)PeiServices,
-                            &gPeiBaseMemoryTestPpiGuid,
-                            0,
-                            NULL,
-                            (VOID**)&MemoryTestPpi
-                            );
+  Status = PeiServicesLocatePpi (
+             &gPeiBaseMemoryTestPpiGuid,
+             0,
+             NULL,
+            (VOID**)&MemoryTestPpi
+            );
   ASSERT_EFI_ERROR (Status);
 
   Index = 0;
@@ -112,7 +111,7 @@ Returns:
         // For the first area register it as PEI tested memory
         //
         Status = MemoryTestPpi->BaseMemoryTest (
-                                  PeiServices,
+                                  (EFI_PEI_SERVICES **) PeiServices,
                                   MemoryTestPpi,
                                   MemoryBase,
                                   MemorySize,
@@ -124,7 +123,7 @@ Returns:
         //
         // Register the "tested" memory with the PEI Core
         //
-        Status = (**PeiServices).InstallPeiMemory ((const EFI_PEI_SERVICES **)PeiServices, MemoryBase, MemorySize);
+        Status = PeiServicesInstallPeiMemory (MemoryBase, MemorySize);
         ASSERT_EFI_ERROR (Status);
 
         Attributes |= EFI_RESOURCE_ATTRIBUTE_TESTED;
