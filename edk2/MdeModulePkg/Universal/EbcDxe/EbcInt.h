@@ -106,7 +106,7 @@ EbcCreateThunks (
 
 /**
   Add a thunk to our list of thunks for a given image handle.
-  Also flush the instruction cache since we have written thunk code
+  Also flush the instruction cache since we've written thunk code
   to memory that will be executed eventually.
 
   @param  ImageHandle            The image handle to which the thunk is tied.
@@ -249,7 +249,7 @@ EbcLLGetReturnValue (
   );
 
 /**
-  Returns the stack index and buffer associated with the Handle parameter.
+  Returns the stack index and buffer assosicated with the Handle parameter.
 
   @param  Handle                The EFI handle as the index to the EBC stack.
   @param  StackBuffer           A pointer to hold the returned stack buffer.

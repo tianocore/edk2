@@ -1330,7 +1330,13 @@ CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
   { ExecutePOPn },              // opcode 0x36
   { ExecuteMOVI },              // opcode 0x37 - mov immediate data
   { ExecuteMOVIn },             // opcode 0x38 - mov immediate natural
-  { ExecuteMOVREL }             // opcode 0x39 - move data relative to PC
+  { ExecuteMOVREL },            // opcode 0x39 - move data relative to PC
+  { NULL },                     // opcode 0x3a
+  { NULL },                     // opcode 0x3b 
+  { NULL },                     // opcode 0x3c 
+  { NULL },                     // opcode 0x3d 
+  { NULL },                     // opcode 0x3e 
+  { NULL }                      // opcode 0x3f 
 };
 
 //
@@ -1370,11 +1376,6 @@ EbcExecuteInstructions (
   UINTN       InstructionsLeft;
   UINTN       SavedInstructionCount;
 
-  if ((*VmPtr->Ip & 0x3F) >= sizeof(mVmOpcodeTable)/sizeof(mVmOpcodeTable[0])) {
-    EbcDebugSignalException (EXCEPT_EBC_INVALID_OPCODE, EXCEPTION_FLAG_FATAL, VmPtr);
-    return EFI_UNSUPPORTED;
-  }
-
   Status = EFI_SUCCESS;
 
   if (*InstructionCount == 0) {
@@ -1392,12 +1393,12 @@ EbcExecuteInstructions (
   // call it if it's not null.
   //
   while (InstructionsLeft != 0) {
-    ExecFunc = (UINTN) mVmOpcodeTable[(*VmPtr->Ip & 0x3F)].ExecuteFunction;
+    ExecFunc = (UINTN) mVmOpcodeTable[(*VmPtr->Ip & OPCODE_M_OPCODE)].ExecuteFunction;
     if (ExecFunc == (UINTN) NULL) {
       EbcDebugSignalException (EXCEPT_EBC_INVALID_OPCODE, EXCEPTION_FLAG_FATAL, VmPtr);
       return EFI_UNSUPPORTED;
     } else {
-      mVmOpcodeTable[(*VmPtr->Ip & 0x3F)].ExecuteFunction (VmPtr);
+      mVmOpcodeTable[(*VmPtr->Ip & OPCODE_M_OPCODE)].ExecuteFunction (VmPtr);
       *InstructionCount = *InstructionCount + 1;
     }
 
@@ -1482,14 +1483,6 @@ EbcExecute (
       }
     DEBUG_CODE_END ();
 
-    //
-    // Verify the opcode is in range. Otherwise generate an exception.
-    //
-    if ((*VmPtr->Ip & OPCODE_M_OPCODE) >= (sizeof (mVmOpcodeTable) / sizeof (mVmOpcodeTable[0]))) {
-      EbcDebugSignalException (EXCEPT_EBC_INVALID_OPCODE, EXCEPTION_FLAG_FATAL, VmPtr);
-      Status = EFI_UNSUPPORTED;
-      goto Done;
-    }
     //
     // Use the opcode bits to index into the opcode dispatch table. If the
     // function pointer is null then generate an exception.
@@ -4139,6 +4132,7 @@ ExecuteDataManip (
   UINT8   Size;
   UINT64  Op1;
   UINT64  Op2;
+  INTN    DataManipDispatchTableIndex;
 
   //
   // Get opcode and operands
@@ -4220,9 +4214,9 @@ ExecuteDataManip (
   //
   // Dispatch to the computation function
   //
-  if (((Opcode & OPCODE_M_OPCODE) - OPCODE_NOT) >=
-        (sizeof (mDataManipDispatchTable) / sizeof (mDataManipDispatchTable[0]))
-        ) {
+  DataManipDispatchTableIndex = (Opcode & OPCODE_M_OPCODE) - OPCODE_NOT;
+  if ((DataManipDispatchTableIndex < 0) ||
+      (DataManipDispatchTableIndex >= sizeof (mDataManipDispatchTable) / sizeof (mDataManipDispatchTable[0]))) {
     EbcDebugSignalException (
       EXCEPT_EBC_INVALID_OPCODE,
       EXCEPTION_FLAG_ERROR,
@@ -4234,7 +4228,7 @@ ExecuteDataManip (
     VmPtr->Ip += Size;
     return EFI_UNSUPPORTED;
   } else {
-    Op2 = mDataManipDispatchTable[(Opcode & OPCODE_M_OPCODE) - OPCODE_NOT](VmPtr, Op1, Op2);
+    Op2 = mDataManipDispatchTable[DataManipDispatchTableIndex](VmPtr, Op1, Op2);
   }
   //
   // Write back the result.
