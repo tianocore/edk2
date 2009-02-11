@@ -49,7 +49,9 @@ VariableIndexTableUpdate (
   IN      VARIABLE_HEADER        *Variable
   )
 {
-  IndexTable->Index[IndexTable->Length++] = (UINT16) (((UINT32)(UINTN) Variable) >> 2);
+  if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME) {
+    IndexTable->Index[IndexTable->Length++] = (UINT16) (((UINT32)(UINTN) Variable) >> 2);
+  }
 
   return;
 }

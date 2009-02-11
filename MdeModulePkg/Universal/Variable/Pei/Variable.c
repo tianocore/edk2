@@ -443,10 +443,8 @@ FindVariable (
       //
       // Record Variable in VariableIndex HOB
       //
-      if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME) {
-        VariableIndexTableUpdate (IndexTable, Variable);
-      }
-
+      VariableIndexTableUpdate (IndexTable, Variable);
+      
       if (CompareWithValidVariable (Variable, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
         return EFI_SUCCESS;
       }
