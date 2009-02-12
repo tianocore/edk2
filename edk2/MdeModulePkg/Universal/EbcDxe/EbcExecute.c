@@ -1825,6 +1825,7 @@ ExecuteBREAK (
   IN VM_CONTEXT *VmPtr
   )
 {
+  EFI_STATUS  Status;
   UINT8       Operands;
   VOID        *EbcEntryPoint;
   VOID        *Thunk;
@@ -1887,7 +1888,10 @@ ExecuteBREAK (
     //
     // Now create a new thunk
     //
-    EbcCreateThunks (VmPtr->ImageHandle, EbcEntryPoint, &Thunk, 0);
+    Status = EbcCreateThunks (VmPtr->ImageHandle, EbcEntryPoint, &Thunk, 0);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
     //
     // Finally replace the EBC entry point memory with the thunk address
