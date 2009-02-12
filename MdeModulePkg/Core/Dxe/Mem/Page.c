@@ -651,6 +651,8 @@ CoreConvertPages (
     // if that's all we've got
     //
     RangeEnd = End;
+
+    ASSERT (Entry != NULL);
     if (Entry->End < End) {
       RangeEnd = Entry->End;
     }
@@ -1099,6 +1101,7 @@ CoreFreePages (
 
   Alignment = EFI_DEFAULT_PAGE_ALLOCATION_ALIGNMENT;
 
+  ASSERT (Entry != NULL);
   if  (Entry->Type == EfiACPIReclaimMemory   ||
        Entry->Type == EfiACPIMemoryNVS       ||
        Entry->Type == EfiRuntimeServicesCode ||
