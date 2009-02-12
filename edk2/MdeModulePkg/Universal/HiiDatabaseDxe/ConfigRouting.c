@@ -1321,7 +1321,7 @@ HiiConfigToBlock (
     // Get Offset
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
-    if (Status == EFI_OUT_OF_RESOURCES) {
+    if (EFI_ERROR (Status)) {
       *Progress = ConfigResp;
       goto Exit;
     }
@@ -1369,7 +1369,7 @@ HiiConfigToBlock (
     // Get Value
     //
     Status = GetValueOfNumber (StringPtr, &Value, &Length);
-    if (Status == EFI_OUT_OF_RESOURCES) {
+    if (EFI_ERROR (Status)) {
       *Progress = ConfigResp;
       goto Exit;
     }
