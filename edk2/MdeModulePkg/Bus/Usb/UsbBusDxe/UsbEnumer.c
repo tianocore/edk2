@@ -340,6 +340,7 @@ UsbSelectSetting (
 
   IfDesc->ActiveIndex = Index;
 
+  ASSERT (Setting != NULL);
   DEBUG ((EFI_D_INFO, "UsbSelectSetting: setting %d selected for interface %d\n",
               Alternate, Setting->Desc.InterfaceNumber));
 
