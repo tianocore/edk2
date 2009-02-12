@@ -866,6 +866,7 @@ EfiKeyFiFoInsertOneKey (
   UINT8 Tail;
 
   Tail = TerminalDevice->EfiKeyFiFo->Tail;
+  ASSERT (Tail < FIFO_MAX_NUMBER + 1);
 
   if (IsEfiKeyFiFoFull (TerminalDevice)) {
     //
@@ -900,6 +901,7 @@ EfiKeyFiFoRemoveOneKey (
   UINT8 Head;
 
   Head = TerminalDevice->EfiKeyFiFo->Head;
+  ASSERT (Head < FIFO_MAX_NUMBER + 1);
 
   if (IsEfiKeyFiFoEmpty (TerminalDevice)) {
     //
@@ -986,6 +988,8 @@ UnicodeFiFoInsertOneKey (
   UINT8 Tail;
 
   Tail = TerminalDevice->UnicodeFiFo->Tail;
+  ASSERT (Tail < FIFO_MAX_NUMBER + 1);
+
 
   if (IsUnicodeFiFoFull (TerminalDevice)) {
     //
@@ -1020,6 +1024,7 @@ UnicodeFiFoRemoveOneKey (
   UINT8 Head;
 
   Head = TerminalDevice->UnicodeFiFo->Head;
+  ASSERT (Head < FIFO_MAX_NUMBER + 1);
 
   if (IsUnicodeFiFoEmpty (TerminalDevice)) {
     //

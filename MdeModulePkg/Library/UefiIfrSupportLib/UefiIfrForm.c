@@ -973,6 +973,11 @@ ConstructConfigHdr (
   CHAR16                    *StrPtr;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
+  //
+  // Make sure 
+  //
+  ASSERT (!(ConfigHdr == NULL && *StrBufferLen != 0));
+
   if (Name == NULL) {
     //
     // There will be no "NAME" in <ConfigHdr> for  Name/Value storage
