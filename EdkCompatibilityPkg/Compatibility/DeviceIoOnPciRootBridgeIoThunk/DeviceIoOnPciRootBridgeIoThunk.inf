@@ -2,7 +2,7 @@
 # Module Layer Device I/O on top of PCI Root Bridge I/O (Segment 0)
 #
 # Device I/O is on list of deprecated protocols for UEFI 2.0 and later.
-# This module module layers Device I/O on top of PCI Root Bridge I/O (Segment 0)
+# This module layers Device I/O on top of PCI Root Bridge I/O (Segment 0)
 # Use if:
 #   There are no R8.x modules present that produces Device I/O
 #   EFI drivers included that consume Device I/O
