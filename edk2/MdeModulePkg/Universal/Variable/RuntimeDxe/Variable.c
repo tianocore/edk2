@@ -3,7 +3,7 @@
   Implement all four UEFI Runtime Variable services for the nonvolatile
   and volatile storage space and install variable architecture protocol.
   
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -765,7 +765,9 @@ UpdateVariableCache (
   UINTN                     Index;
 
   if (EfiAtRuntime ()) {
+    //
     // Don't use the cache at runtime
+    // 
     return;
   }
 
@@ -774,7 +776,9 @@ UpdateVariableCache (
       if (StrCmp (VariableName, Entry->Name) == 0) { 
         Entry->Attributes = Attributes;
         if (DataSize == 0) {
+          //
           // Delete Case
+          //
           if (Entry->DataSize != 0) {
             FreePool (Entry->Data);
           }
@@ -783,6 +787,8 @@ UpdateVariableCache (
           CopyMem (Entry->Data, Data, DataSize);
         } else {
           Entry->Data = AllocatePool (DataSize);
+          ASSERT (Entry->Data != NULL);
+
           Entry->DataSize = DataSize;
           CopyMem (Entry->Data, Data, DataSize);
         }
