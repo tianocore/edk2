@@ -974,7 +974,7 @@ ConstructConfigHdr (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   //
-  // Make sure 
+  // Make sure when ConfigHdr is NULL, StrBufferlen must be 0
   //
   ASSERT (!(ConfigHdr == NULL && *StrBufferLen != 0));
 
