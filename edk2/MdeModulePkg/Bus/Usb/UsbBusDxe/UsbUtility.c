@@ -928,6 +928,7 @@ MatchUsbClass (
   }
 
   IfDesc       = UsbIf->IfDesc;
+  ASSERT (IfDesc->ActiveIndex < USB_MAX_INTERFACE_SETTING);
   ActIfDesc    = &(IfDesc->Settings[IfDesc->ActiveIndex]->Desc);
   DevDesc      = &(UsbIf->Device->DevDesc->Desc);
 
@@ -1008,6 +1009,7 @@ MatchUsbWwid (
   }
 
   IfDesc       = UsbIf->IfDesc;
+  ASSERT (IfDesc->ActiveIndex < USB_MAX_INTERFACE_SETTING);
   ActIfDesc    = &(IfDesc->Settings[IfDesc->ActiveIndex]->Desc);
   DevDesc      = &(UsbIf->Device->DevDesc->Desc);
   StrDesc      = UsbGetOneString (UsbIf->Device, DevDesc->StrSerialNumber, USB_US_LAND_ID);

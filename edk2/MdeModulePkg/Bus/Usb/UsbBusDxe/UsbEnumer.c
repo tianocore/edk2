@@ -109,6 +109,7 @@ UsbCreateInterface (
   UsbIf->Signature  = USB_INTERFACE_SIGNATURE;
   UsbIf->Device     = Device;
   UsbIf->IfDesc     = IfDesc;
+  ASSERT (IfDesc->ActiveIndex < USB_MAX_INTERFACE_SETTING);
   UsbIf->IfSetting  = IfDesc->Settings[IfDesc->ActiveIndex];
 
   CopyMem (
@@ -279,7 +280,7 @@ UsbConnectDriver (
     //
     if (UsbBusIsWantedUsbIO (UsbIf->Device->Bus, UsbIf)) {
       OldTpl            = UsbGetCurrentTpl ();
-      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", (UINT32)OldTpl));
+      DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d, %p\n", (UINT32)OldTpl, UsbIf->Handle));
 
       gBS->RestoreTPL (TPL_CALLBACK);
 
@@ -325,6 +326,7 @@ UsbSelectSetting (
   Setting = NULL;
 
   for (Index = 0; Index < IfDesc->NumOfSetting; Index++) {
+    ASSERT (Index < USB_MAX_INTERFACE_SETTING);
     Setting = IfDesc->Settings[Index];
 
     if (Setting->Desc.AlternateSetting == Alternate) {
@@ -420,6 +422,7 @@ UsbSelectConfig (
       return EFI_OUT_OF_RESOURCES;
     }
 
+    ASSERT (Index < USB_MAX_INTERFACE);
     Device->Interfaces[Index] = UsbIf;
 
     //
@@ -452,6 +455,7 @@ UsbDisconnectDriver (
   )
 {
   EFI_TPL                 OldTpl;
+  EFI_STATUS              Status;
 
   //
   // Release the hub if it's a hub controller, otherwise
@@ -469,14 +473,14 @@ UsbDisconnectDriver (
     // or disconnect at CALLBACK.
     //
     OldTpl           = UsbGetCurrentTpl ();
-    DEBUG ((EFI_D_INFO, "UsbDisconnectDriver: old TPL is %d\n", (UINT32)OldTpl));
+    DEBUG ((EFI_D_INFO, "UsbDisconnectDriver: old TPL is %d, %p\n", (UINT32)OldTpl, UsbIf->Handle));
 
     gBS->RestoreTPL (TPL_CALLBACK);
 
-    gBS->DisconnectController (UsbIf->Handle, NULL, NULL);
+    Status = gBS->DisconnectController (UsbIf->Handle, NULL, NULL);
     UsbIf->IsManaged = FALSE;
 
-    DEBUG (( EFI_D_INFO, "UsbDisconnectDriver: TPL after disconnect is %d\n", (UINT32)UsbGetCurrentTpl()));
+    DEBUG (( EFI_D_INFO, "UsbDisconnectDriver: TPL after disconnect is %d, %d\n", (UINT32)UsbGetCurrentTpl(), Status));
     ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
     gBS->RaiseTPL (OldTpl);
@@ -501,7 +505,8 @@ UsbRemoveConfig (
   //
   // Remove each interface of the device
   //
-  for (Index = 0; Index < Device->NumOfInterface; Index++) {
+  for (Index = 0; Index < Device->NumOfInterface; Index++) {    
+    ASSERT (Index < USB_MAX_INTERFACE);
     UsbIf = Device->Interfaces[Index];
 
     if (UsbIf == NULL) {
@@ -561,6 +566,7 @@ UsbRemoveDevice (
 
   DEBUG (( EFI_D_INFO, "UsbRemoveDevice: device %d removed\n", Device->Address));
 
+  ASSERT (Device->Address < USB_MAX_DEVICES);
   Bus->Devices[Device->Address] = NULL;
   UsbFreeDevice (Device);
 
@@ -900,7 +906,7 @@ UsbEnumeratePort (
   Child = UsbFindChild (HubIf, Port);
   
   if (Child != NULL) {
-    DEBUG (( EFI_D_INFO, "UsbEnumeratePort: device at port %d removed from system\n", Port));
+    DEBUG (( EFI_D_INFO, "UsbEnumeratePort: device at port %d removed from root hub %p\n", Port, HubIf));
     UsbRemoveDevice (Child);
   }
   

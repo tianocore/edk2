@@ -111,6 +111,7 @@ UsbIoControlTransfer (
     // Clear TT buffer when CTRL/BULK split transaction failes
     // Clear the TRANSLATOR TT buffer, not parent's buffer
     //
+    ASSERT (Dev->Translator.TranslatorHubAddress < USB_MAX_DEVICES);
     if (Dev->Translator.TranslatorHubAddress != 0) {
       UsbHubCtrlClearTTBuffer (
         Dev->Bus->Devices[Dev->Translator.TranslatorHubAddress],
@@ -195,6 +196,7 @@ UsbIoControlTransfer (
     Status = UsbSelectSetting (UsbIf->IfDesc, (UINT8) Request->Value);
 
     if (!EFI_ERROR (Status)) {
+      ASSERT (UsbIf->IfDesc->ActiveIndex < USB_MAX_INTERFACE_SETTING);
       UsbIf->IfSetting = UsbIf->IfDesc->Settings[UsbIf->IfDesc->ActiveIndex];
     }
   }
@@ -282,6 +284,7 @@ UsbIoBulkTransfer (
     // Clear TT buffer when CTRL/BULK split transaction failes.
     // Clear the TRANSLATOR TT buffer, not parent's buffer
     //
+    ASSERT (Dev->Translator.TranslatorHubAddress < USB_MAX_DEVICES);
     if (Dev->Translator.TranslatorHubAddress != 0) {
       UsbHubCtrlClearTTBuffer (
         Dev->Bus->Devices[Dev->Translator.TranslatorHubAddress],
@@ -751,6 +754,7 @@ UsbIoGetStringDescriptor (
   Status = EFI_NOT_FOUND;
 
   for (Index = 0; Index < Dev->TotalLangId; Index++) {
+    ASSERT (Index < USB_MAX_LANG_ID);
     if (Dev->LangId[Index] == LangID) {
       break;
     }
