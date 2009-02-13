@@ -954,18 +954,12 @@ LibPcdGetNextToken (
 /**
   Used to retrieve the list of available PCD token space GUIDs.
   
-  Retrieves the next PCD token space from a token space specified by Guid.
-  Guid of NULL is reserved to mark the default local token namespace on the current
-  platform. If Guid is NULL, then the GUID of the first non-local token space of the 
-  current platform is returned. If Guid is the last non-local token space, 
-  then NULL is returned. 
-
-  If Guid is not NULL and is not a valid token space in the current platform, then ASSERT().
-
-
+  Returns the PCD token space GUID that follows TokenSpaceGuid in the list of token spaces
+  in the platform.
+  If TokenSpaceGuid is NULL, then a pointer to the first PCD token spaces returned.
+  If TokenSpaceGuid is the last PCD token space GUID in the list, then NULL is returned.
   
-  @param[in]  Guid  Pointer to a 128-bit unique value that designates from which namespace 
-                    to start the search.
+  @param  TokenSpaceGuid  Pointer to the a PCD token space GUID
 
   @return The next valid token namespace.
 

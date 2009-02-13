@@ -251,12 +251,12 @@ IsDevicePathEndInstance (
 UINT16
 SetDevicePathNodeLength (
   IN OUT VOID  *Node,
-  IN UINTN     NodeLength
+  IN UINTN     Length
   )
 {
   ASSERT (Node != NULL);
-  ASSERT (NodeLength < 0x10000);
-  return WriteUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0], (UINT16)(NodeLength));
+  ASSERT (Length < 0x10000);
+  return WriteUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0], (UINT16)(Length));
 }
 
 /**
