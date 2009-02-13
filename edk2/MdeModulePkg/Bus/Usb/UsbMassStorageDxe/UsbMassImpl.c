@@ -14,14 +14,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UsbMassImpl.h"
 
+#define USB_MASS_TRANSPORT_COUNT    3
 //
 // Array of USB transport interfaces. 
 //
-USB_MASS_TRANSPORT *mUsbMassTransport[] = {
+USB_MASS_TRANSPORT *mUsbMassTransport[USB_MASS_TRANSPORT_COUNT] = {
   &mUsbCbi0Transport,
   &mUsbCbi1Transport,
   &mUsbBotTransport,
-  NULL
 };
 
 EFI_DRIVER_BINDING_PROTOCOL gUSBMassDriverBinding = {
@@ -424,7 +424,7 @@ UsbMassInitTransport (
   // If not found, return EFI_UNSUPPORTED.
   // If found, execute USB_MASS_TRANSPORT.Init() to initialize the transport context.
   //
-  for (Index = 0; mUsbMassTransport[Index] != NULL; Index++) {
+  for (Index = 0; Index < USB_MASS_TRANSPORT_COUNT; Index++) {
     *Transport = mUsbMassTransport[Index];
 
     if (Interface.InterfaceProtocol == (*Transport)->Protocol) {
@@ -780,7 +780,7 @@ USBMassDriverBindingSupported (
   // If not found, return EFI_UNSUPPORTED.
   // If found, execute USB_MASS_TRANSPORT.Init() to initialize the transport context.
   //
-  for (Index = 0; mUsbMassTransport[Index] != NULL; Index++) {
+  for (Index = 0; Index < USB_MASS_TRANSPORT_COUNT; Index++) {
     Transport = mUsbMassTransport[Index];
     if (Interface.InterfaceProtocol == Transport->Protocol) {
       Status = Transport->Init (UsbIo, NULL);

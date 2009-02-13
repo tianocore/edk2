@@ -82,7 +82,7 @@ LIST_ENTRY                   mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (m
 EFI_HANDLE                   *mDevicePathHandleBuffer;
 EFI_HANDLE                   *mDriverImageHandleBuffer;
 
-UINTN                        mSelectedCtrIndex;
+INTN                         mSelectedCtrIndex;
 EFI_STRING_ID                mControllerToken[MAX_CHOICE_NUM];
 UINTN                        mDriverImageHandleCount;
 EFI_STRING_ID                mDriverImageToken[MAX_CHOICE_NUM];
@@ -630,7 +630,8 @@ UpdateBindingDriverSelectPage (
   // Switch the item callback key value to its NO. in mDevicePathHandleBuffer
   //
   mSelectedCtrIndex = KeyValue - KEY_VALUE_DEVICE_OFFSET;
-  ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
+  ASSERT (mSelectedCtrIndex > 0 && mSelectedCtrIndex < MAX_CHOICE_NUM);
+
   mLastSavedDriverImageNum = 0;
   //
   // Clear all the content in dynamic page
@@ -927,6 +928,7 @@ UpdatePrioritySelectPage (
       // Check the driver DriverImage's order number in mapping database
       //
       DriverImageNO = 0;
+      ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
       CheckMapping (
               mControllerDevicePathProtocol[mSelectedCtrIndex],
               LoadedImageDevicePath,
@@ -1027,6 +1029,7 @@ CommintChanges (
   //  Following code will be run if user select 'commint changes' in third page
   //  user enter 'Commit Changes' to save the mapping database
   //
+  ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
   DeleteDriverImage (mControllerDevicePathProtocol[mSelectedCtrIndex], NULL, &mMappingDataBase);
   for (SelectedDriverImageNum = 0; SelectedDriverImageNum < mSelectedDriverImageNum; SelectedDriverImageNum++) {
     //

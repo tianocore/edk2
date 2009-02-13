@@ -188,8 +188,8 @@ DisplayPageFrame (
   CHAR16                 *StrFrontPageBanner;
   UINTN                  Row;
   EFI_SCREEN_DESCRIPTOR  LocalScreen;
-  UINTN                  RowIdx;
-  UINTN                  ColumnIdx;
+  UINT8                  RowIdx;
+  UINT8                  ColumnIdx;
 
   ZeroMem (&LocalScreen, sizeof (EFI_SCREEN_DESCRIPTOR));
   gST->ConOut->QueryMode (gST->ConOut, gST->ConOut->Mode->Mode, &LocalScreen.RightColumn, &LocalScreen.BottomRow);
