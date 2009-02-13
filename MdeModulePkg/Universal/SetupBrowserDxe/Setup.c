@@ -2166,7 +2166,8 @@ GetIfrBinaryData (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
+  ASSERT (HiiPackageList != NULL);
+  
   //
   // Get Form package from this HII package List
   //
