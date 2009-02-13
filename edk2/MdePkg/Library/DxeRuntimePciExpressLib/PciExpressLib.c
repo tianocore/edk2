@@ -183,7 +183,8 @@ DxeRuntimePciExpressLibDestructor (
   This internal functions retrieves PCI Express Base Address via a PCD entry
   PcdPciExpressBaseAddress.
   
-  @return The base address of PCI Express.
+  @param  Address  Address that encodes the PCI Bus, Device, Function and Register.
+  @return          The base address of PCI Express.
 
 **/
 UINTN
