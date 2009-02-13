@@ -123,8 +123,8 @@ GetWorker (
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
-      Guid = &(GuidTable[VariableHead->GuidTableIndex]);
-      Name = &(StringTable[VariableHead->StringIndex]);
+      Guid = GuidTable + VariableHead->GuidTableIndex;
+      Name = StringTable + VariableHead->StringIndex;
       VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
 
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
@@ -154,7 +154,7 @@ GetWorker (
 
     case PCD_TYPE_STRING:
       StringTableIdx = (UINT16) *((UINT8 *) PcdDb + Offset);
-      RetPtr = (VOID *) &StringTable[StringTableIdx];
+      RetPtr = (VOID *) (StringTable + StringTableIdx);
       break;
 
     case PCD_TYPE_DATA:
@@ -774,7 +774,7 @@ SetWorker (
     
     case PCD_TYPE_STRING:
       if (SetPtrTypeSize (TmpTokenNumber, Size)) {
-        CopyMem (&StringTable[*((UINT16 *)InternalData)], Data, *Size);
+        CopyMem (StringTable + *((UINT16 *)InternalData), Data, *Size);
         Status = EFI_SUCCESS;
       } else {
         Status = EFI_INVALID_PARAMETER;
@@ -794,8 +794,8 @@ SetWorker (
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
-      Guid = &(GuidTable[VariableHead->GuidTableIndex]);
-      Name = &(StringTable[VariableHead->StringIndex]);
+      Guid = GuidTable + VariableHead->GuidTableIndex;
+      Name = StringTable + VariableHead->StringIndex;
       VariableOffset = VariableHead->Offset;
 
       Status = SetHiiVariable (Guid, Name, Data, *Size, VariableOffset);
