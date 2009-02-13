@@ -70,29 +70,29 @@
   
 
 [Guids]
-  gPeiAprioriFileNameGuid
-  gEfiFirmwareFileSystem2Guid
+  gPeiAprioriFileNameGuid  ## SOMETIMES_CONSUMES ## GUID
+  gEfiFirmwareFileSystem2Guid ## SOMETIMES_CONSUME ## FV
 
 [Ppis]
-  gEfiPeiStatusCodePpiGuid                      # PPI SOMETIMES_CONSUMED
-  gEfiPeiResetPpiGuid                           # PPI SOMETIMES_CONSUMED
-  gEfiDxeIplPpiGuid                             # PPI ALWAYS_CONSUMED
-  gEfiPeiMemoryDiscoveredPpiGuid                # PPI ALWAYS_CONSUMED
-  gEfiPeiDecompressPpiGuid                      # PPI ALWAYS_CONSUMED
-  gEfiPeiFirmwareVolumeInfoPpiGuid              # PPI ALWAYS_CONSUMED
-  gEfiPeiLoadFilePpiGuid                        # PPI ALWAYS_CONSUMED
-  gEfiPeiSecurity2PpiGuid                       # PPI ALWAYS_CONSUMED
-  gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_CONSUMED
+  gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES
+  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES
+  gEfiDxeIplPpiGuid                             ## CONSUMES
+  gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
+  gEfiPeiDecompressPpiGuid                      ## CONSUMES
+  gEfiPeiFirmwareVolumeInfoPpiGuid              ## CONSUMES
+  gEfiPeiLoadFilePpiGuid                        ## CONSUMES
+  gEfiPeiSecurity2PpiGuid                       ## CONSUMES
+  gEfiTemporaryRamSupportPpiGuid                ## CONSUMES
 
 [FixedPcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported      ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch	## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize      ## CONSUMES
 
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkFvHobCompatibilitySupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkFvHobCompatibilitySupport	   ## CONSUMES
   

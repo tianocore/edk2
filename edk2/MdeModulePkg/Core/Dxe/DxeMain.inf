@@ -91,49 +91,48 @@
   TimerLib
 
 [Guids]
-  gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
-  gEfiEventMemoryMapChangeGuid                  # ALWAYS_CONSUMED
-  gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED
-  gEfiEventExitBootServicesGuid                 # ALWAYS_CONSUMED
-  gEfiHobMemoryAllocModuleGuid                  # ALWAYS_CONSUMED
-  gEfiFileInfoGuid                              # ALWAYS_CONSUMED
-  gEfiFirmwareFileSystem2Guid                   # ALWAYS_CONSUMED
-  gAprioriGuid                                  # ALWAYS_CONSUMED
-  gEfiDebugImageInfoTableGuid                   # ALWAYS_CONSUMED
-  gEfiHobListGuid                               # ALWAYS_CONSUMED
-  gEfiDxeServicesTableGuid                      # ALWAYS_CONSUMED
-  gEfiMemoryTypeInformationGuid                 # ALWAYS_CONSUMED
+  gEfiEventMemoryMapChangeGuid                  ## CONSUMES ## Event
+  gEfiEventVirtualAddressChangeGuid             ## SOMETIMES_CONSUMES ## Event
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+  gEfiHobMemoryAllocModuleGuid                  ## CONSUMES ## Hob
+  gEfiFileInfoGuid                              ## CONSUMES ## File
+  gEfiFirmwareFileSystem2Guid                   ## CONSUMES ## GUID
+  gAprioriGuid                                  ## CONSUMES ## GUID
+  gEfiDebugImageInfoTableGuid                   ## CONSUMES ## GUID
+  gEfiHobListGuid                               ## CONSUMES ## GUID
+  gEfiDxeServicesTableGuid                      ## CONSUMES ## GUID	
+  gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID
 
 [Protocols]
-  gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL SOMETIMES_CONSUMED
-  gEfiCapsuleArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiDecompressProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadPeImageProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
-  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-  gEfiResetArchProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiRealTimeClockArchProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiRuntimeArchProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
-  gEfiWatchdogTimerArchProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiSecurityArchProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiVariableArchProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiVariableWriteArchProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiMonotonicCounterArchProtocolGuid          # PROTOCOL ALWAYS_CONSUMED
-  gEfiMetronomeArchProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
-  gEfiTimerArchProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL ALWAYS_CONSUMED
-  gEfiPlatformDriverOverrideProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
-  gEfiDriverBindingProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
-  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
-  gEfiFirmwareVolumeDispatchProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
-  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
-  gEfiEbcProtocolGuid                           # PROTOCOL SOMETIMES_CONSUMED
-  gEfiTcgPlatformProtocolGuid
-  gEfiLoadedImageDevicePathProtocolGuid         # PROTOCOL ALWAYS_PRODUCED
+  gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiCapsuleArchProtocolGuid                   ## CONSUMES
+  gEfiDecompressProtocolGuid                    ## CONSUMES
+  gEfiLoadPeImageProtocolGuid                   ## PRODUCES
+  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+  gEfiLoadFileProtocolGuid                      ## CONSUMES
+  gEfiResetArchProtocolGuid                     ## CONSUMES
+  gEfiRealTimeClockArchProtocolGuid             ## CONSUMES
+  gEfiRuntimeArchProtocolGuid                   ## CONSUMES
+  gEfiWatchdogTimerArchProtocolGuid             ## CONSUMES
+  gEfiSecurityArchProtocolGuid                  ## CONSUMES
+  gEfiVariableArchProtocolGuid                  ## CONSUMES
+  gEfiBdsArchProtocolGuid                       ## CONSUMES
+  gEfiVariableWriteArchProtocolGuid             ## CONSUMES
+  gEfiMonotonicCounterArchProtocolGuid          ## CONSUMES
+  gEfiMetronomeArchProtocolGuid                 ## CONSUMES
+  gEfiTimerArchProtocolGuid                     ## CONSUMES
+  gEfiBusSpecificDriverOverrideProtocolGuid     ## CONSUMES
+  gEfiPlatformDriverOverrideProtocolGuid        ## CONSUMES
+  gEfiDriverBindingProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiFirmwareVolumeBlockProtocolGuid           ## PRODUCES
+  gEfiFirmwareVolumeDispatchProtocolGuid        ## PRODUCES
+  gEfiFirmwareVolume2ProtocolGuid               ## PRODUCES
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## PRODUCES
+  gEfiEbcProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiTcgPlatformProtocolGuid			        ## CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid         ## PRODUCES
 
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreEntry | 0x3041000          # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT
