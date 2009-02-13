@@ -231,8 +231,8 @@ DisplayPageFrame (
            Alignment < BANNER_COLUMNS + (UINT8) LocalScreen.LeftColumn;
            Alignment++
           ) {
-        RowIdx = Line - (UINT8) LocalScreen.TopRow;
-        ColumnIdx = Alignment - (UINT8) LocalScreen.LeftColumn;
+        RowIdx = (UINT8) (Line - (UINT8) LocalScreen.TopRow);
+        ColumnIdx = (UINT8) (Alignment - (UINT8) LocalScreen.LeftColumn);
 
         ASSERT (RowIdx < BANNER_HEIGHT);
         ASSERT (ColumnIdx < BANNER_COLUMNS);
