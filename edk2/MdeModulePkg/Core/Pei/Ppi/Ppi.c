@@ -167,6 +167,7 @@ PeiInstallPpi (
     }
 
     DEBUG((EFI_D_INFO, "Install PPI: %g\n", PpiList->Guid));
+    ASSERT (Index < FixedPcdGet32 (PcdPeiCoreMaxPpiSupported));
     PrivateData->PpiData.PpiListPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR*) PpiList;
     PrivateData->PpiData.PpiListEnd++;
 
