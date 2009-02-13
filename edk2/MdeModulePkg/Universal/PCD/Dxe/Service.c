@@ -762,7 +762,7 @@ SetWorker (
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
 
   StringTable = (UINT16 *) (IsPeiDb ? &mPcdDatabase->PeiDb.Init.StringTable[0] :
-                                        &mPcdDatabase->DxeDb.Init.StringTable[0]);
+                                      &mPcdDatabase->DxeDb.Init.StringTable[0]);
   
   InternalData = PcdDb + Offset;
 
@@ -789,8 +789,8 @@ SetWorker (
         }
       }
       
-      GuidTable   = IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
-                              mPcdDatabase->DxeDb.Init.GuidTable;
+      GuidTable   = (EFI_GUID *) (IsPeiDb ? &mPcdDatabase->PeiDb.Init.GuidTable[0] :
+                                            &mPcdDatabase->DxeDb.Init.GuidTable[0]);
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       

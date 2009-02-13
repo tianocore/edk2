@@ -1009,7 +1009,7 @@ ConstructConfigHdr (
   // | 5  |   32   |  6  |  NameStrLen*4 |  6  |    DevicePathStrLen    | 1 |
   //
   BufferSize = (5 + 32 + 6 + NameStrLen * 4 + 6 + DevicePathSize * 2 + 1) * sizeof (CHAR16);
-  if (*StrBufferLen < BufferSize) {
+  if ((*StrBufferLen == 0) || *StrBufferLen < BufferSize) {
     *StrBufferLen = BufferSize;
     return EFI_BUFFER_TOO_SMALL;
   }
