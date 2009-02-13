@@ -928,7 +928,6 @@ UpdatePrioritySelectPage (
       // Check the driver DriverImage's order number in mapping database
       //
       DriverImageNO = 0;
-      ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
       CheckMapping (
               mControllerDevicePathProtocol[mSelectedCtrIndex],
               LoadedImageDevicePath,
@@ -1029,7 +1028,6 @@ CommintChanges (
   //  Following code will be run if user select 'commint changes' in third page
   //  user enter 'Commit Changes' to save the mapping database
   //
-  ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
   DeleteDriverImage (mControllerDevicePathProtocol[mSelectedCtrIndex], NULL, &mMappingDataBase);
   for (SelectedDriverImageNum = 0; SelectedDriverImageNum < mSelectedDriverImageNum; SelectedDriverImageNum++) {
     //
