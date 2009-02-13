@@ -632,6 +632,7 @@ PeiDispatcher (
               // We call the entry point a 2nd time so the module knows it's shadowed.
               //
               //PERF_START (PeiServices, L"PEIM", PeimFileHandle, 0);
+              ASSERT (PeimEntryPoint != NULL);
               PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
               //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);
 
