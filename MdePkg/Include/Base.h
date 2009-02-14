@@ -521,7 +521,7 @@ typedef INTN RETURN_STATUS;
   @return The value specified by StatusCode with the highest bit set.
 
 **/
-#define ENCODE_ERROR(StatusCode)     (MAX_BIT | (StatusCode))
+#define ENCODE_ERROR(StatusCode)     ((RETURN_STATUS)(MAX_BIT | (StatusCode)))
 
 /**
   Produces a RETURN_STATUS code with the highest bit clear. 
@@ -532,7 +532,7 @@ typedef INTN RETURN_STATUS;
   @return The value specified by StatusCode with the highest bit clear.
 
 **/
-#define ENCODE_WARNING(StatusCode)   (StatusCode)
+#define ENCODE_WARNING(StatusCode)   ((RETURN_STATUS)(StatusCode))
 
 /**
   Returns TRUE if a specified RETURN_STATUS code is an error code. 
@@ -545,7 +545,7 @@ typedef INTN RETURN_STATUS;
   @retval FALSE         The high bit of StatusCode is clear.
 
 **/
-#define RETURN_ERROR(StatusCode)     ((INTN) (StatusCode) < 0)
+#define RETURN_ERROR(StatusCode)     (((RETURN_STATUS)(StatusCode)) < 0)
 
 ///
 /// The operation completed successfully.
