@@ -19,7 +19,7 @@
 ///
 /// SAL return status type 
 ///
-typedef UINTN EFI_SAL_STATUS;
+typedef INTN EFI_SAL_STATUS;
 
 ///
 /// Call completed without error. 
