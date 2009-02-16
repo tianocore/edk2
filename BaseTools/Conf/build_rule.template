@@ -80,7 +80,7 @@
 #   $(<FILE_TYPES_LIST>) Macro point to a file containing list of files of a file type
 #                       (
 #                        Note: The macro and file name are derived from file type name.
-#                        For example, C-Code-File will have C_CODE_FILES_LIST macro pointing 
+#                        For example, C-Code-File will have C_CODE_FILES_LIST macro pointing
 #                        to $(OUTPUT_DIR)/c_code_files.lst. The list file and macro name
 #                        will be generated only when this macro is used in command line.
 #                        This is intended to get over the long command line limitation.
@@ -202,10 +202,10 @@
         $(OUTPUT_DIR)(+)$(MODULE_NAME).lib
 
     <Command.MSFT, Command.INTEL>
-        "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} ${src}
+        "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} $(OBJECT_FILES)
 
     <Command.GCC>
-        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) ${src}
+        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) $(OBJECT_FILES)
 
 [Static-Library-File]
     <InputFile>
@@ -218,10 +218,26 @@
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
     <Command.MSFT, Command.INTEL>
-        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) ${src} 
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) $(STATIC_LIBRARY_FILES)
 
     <Command.GCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) ${src} -\) $(DLINK2_FLAGS)
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
+
+[Static-Library-File.USER_DEFINED]
+    <InputFile>
+        *.lib
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME)
+
+    <Command.MSFT, Command.INTEL>
+        "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(STATIC_LIBRARY_FILES)
+
+    <Command.GCC>
+        "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
 
 [Dynamic-Library-File]
     <InputFile>
@@ -326,7 +342,7 @@
         $(OUTPUT_DIR)(+)$(MODULE_NAME).bin
 
     <Command>
-        GenFw -o ${dst} -j ${src}
+        GenFw -o ${dst} -j $(MICROCODE_BINARY_FILES)
         -$(CP) ${dst} $(BIN_DIR)
 
 [EFI-Image-File]
