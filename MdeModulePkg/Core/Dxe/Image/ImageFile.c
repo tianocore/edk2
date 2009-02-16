@@ -290,6 +290,7 @@ CoreOpenImageFile (
           //
           // Allocate space for the file
           //
+          ASSERT (FileInfo != NULL);
           ImageFileHandle->Source = AllocatePool ((UINTN)FileInfo->FileSize);
           if (ImageFileHandle->Source != NULL) {
             //
