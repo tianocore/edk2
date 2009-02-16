@@ -580,8 +580,8 @@ CreateChildNode (
           // Decompress the stream
           //
           Status = CoreLocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
-
           ASSERT_EFI_ERROR (Status);
+          ASSERT (Decompress != NULL);
 
           Status = Decompress->GetInfo (
                                  Decompress,

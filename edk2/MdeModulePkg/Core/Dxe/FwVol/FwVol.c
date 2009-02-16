@@ -556,7 +556,7 @@ NotifyFwVolBlock (
     //
     Status = CoreHandleProtocol (Handle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **)&Fvb);
     ASSERT_EFI_ERROR (Status);
-
+    ASSERT (Fvb != NULL);
 
     //
     // Make sure the Fv Header is O.K.
