@@ -28,7 +28,7 @@ Abstract:
 //  if the /OPT:REF linker option is used. We defined a macro as this is a 
 //  a non standard extension
 //
-#if _MSC_EXTENSIONS
+#ifdef _MSC_EXTENSIONS
   #define GLOBAL_REMOVE_IF_UNREFERENCED __declspec(selectany)
 #else
   #define GLOBAL_REMOVE_IF_UNREFERENCED
