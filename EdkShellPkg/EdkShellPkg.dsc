@@ -39,7 +39,7 @@ DEFINE EDK_SHELL_DIR             = Shell
   EdkCompatibilityPkg/Foundation/Guid/EdkGuidLib.inf
   EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib.inf
   EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
-  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIA64Lib/CpuIA64Lib.inf
+  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
   EdkCompatibilityPkg/Foundation/Library/CustomizedDecompress/CustomizedDecompress.inf
   EdkCompatibilityPkg/Foundation/Library/Dxe/Hob/HobLib.inf
   #
