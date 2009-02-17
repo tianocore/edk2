@@ -106,8 +106,13 @@ GetWorker (
   }
 
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
-  StringTable = (UINT16 *) (IsPeiDb ? mPcdDatabase->PeiDb.Init.StringTable :
-                                      mPcdDatabase->DxeDb.Init.StringTable);
+                                    
+  if (IsPeiDb) {
+    StringTable = (UINT16 *) (&mPcdDatabase->PeiDb.Init.StringTable[0]);
+  } else {
+    StringTable = (UINT16 *) (&mPcdDatabase->DxeDb.Init.StringTable[0]);
+  }
+                                      
   
   Offset     = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
   
@@ -118,8 +123,11 @@ GetWorker (
       break;
       
     case PCD_TYPE_HII:
-      GuidTable   = (EFI_GUID *) (IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
-                                            mPcdDatabase->DxeDb.Init.GuidTable);
+      if (IsPeiDb) {
+        GuidTable = (EFI_GUID *) (&mPcdDatabase->PeiDb.Init.GuidTable[0]);
+      } else {
+        GuidTable = (EFI_GUID *) (&mPcdDatabase->DxeDb.Init.GuidTable[0]);
+      }
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
@@ -761,8 +769,12 @@ SetWorker (
 
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
 
-  StringTable = (UINT16*) (IsPeiDb ? mPcdDatabase->PeiDb.Init.StringTable :
-                                     mPcdDatabase->DxeDb.Init.StringTable);
+  if (IsPeiDb) {
+    StringTable = (UINT16 *) (&mPcdDatabase->PeiDb.Init.StringTable[0]);
+  } else {
+    StringTable = (UINT16 *) (&mPcdDatabase->DxeDb.Init.StringTable[0]);
+  }
+
   
   InternalData = PcdDb + Offset;
 
@@ -789,8 +801,11 @@ SetWorker (
         }
       }
       
-      GuidTable   = (EFI_GUID *)(IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
-                                           mPcdDatabase->DxeDb.Init.GuidTable);
+      if (IsPeiDb) {
+        GuidTable = (EFI_GUID *) (&mPcdDatabase->PeiDb.Init.GuidTable[0]);
+      } else {
+        GuidTable = (EFI_GUID *) (&mPcdDatabase->DxeDb.Init.GuidTable[0]);
+      }
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
