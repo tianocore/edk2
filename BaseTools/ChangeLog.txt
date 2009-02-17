@@ -42,26 +42,26 @@ EDK_0000: Compatible: owner
 ##########################################################################################
 ##########                 Revision number of tools source code                 ##########
     BaseTools/Bin/Win32/build.exe
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Autogen
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/build
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
 
     BaseTools/Bin/Win32/GenFds.exe
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
-        r1426 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/CommonDataClass
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/GenFds
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Workspace
 
     BaseTools/Bin/Win32/GenDepex.exe
         r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/AutoGen
         r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/Trim.exe
-        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
-        r1383 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Trim
+        r1483 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/Common
 
     BaseTools/Bin/Win32/MigrationMsa2Inf.exe
         r843 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/MigrationMsa2Inf
@@ -78,6 +78,32 @@ EDK_0000: Compatible: owner
         r767 https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python/fpd2dsc
 
 ==========================================================================================
+basetools_7529: Non-Compatible: jwang36
+
+      Class_BuildTool:
+        1) Use FAMILY defined in *_TAGNAME_*_*_FAMILY as the toolchain family
+        2) Force file name case check in Windows
+        3) Consolidate file/path operations
+        4) Support binary file type in build_rule.txt
+        5) Generate $(FILE_TYPES) macro only when it's used in build_rule.txt
+        6) Use build_rule.txt to solve customized build for USER_DEFINED module
+        7) Re-design TemplateString to make it faster
+        8) Improve performance of Trim tool
+        9) Fix undefined variables issue
+        10) Fix HSD202142 and HSD202144
+
+        Code Change :
+        1) /trunk/edk2/BaseTools/Bin/Win32/build.exe
+        2) /trunk/edk2/BaseTools/Bin/Win32/GenFds.exe
+        3) /trunk/edk2/BaseTools/Bin/Win32/Trim.exe
+        4) /trunk/edk2/BaseTools/Conf/build_rule.template
+
+        Possible Impacts:
+        1) To build Nt32Pkg.dsc correctly, the local version build_rule.txt must
+           updated with the change in new build_rule.template.
+        2) The case of file path must be the same as in file system, or the build
+           will break.
+
 basetools_7159: Non-Compatible: jwang36
 
       Class_BuildTool:
