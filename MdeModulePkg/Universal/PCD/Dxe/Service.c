@@ -106,8 +106,8 @@ GetWorker (
   }
 
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
-  StringTable = (UINT16 *) (IsPeiDb ? &mPcdDatabase->PeiDb.Init.StringTable[0] :
-                                      &mPcdDatabase->DxeDb.Init.StringTable[0]);
+  StringTable = (UINT16 *) (IsPeiDb ? mPcdDatabase->PeiDb.Init.StringTable :
+                                      mPcdDatabase->DxeDb.Init.StringTable);
   
   Offset     = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
   
@@ -118,8 +118,8 @@ GetWorker (
       break;
       
     case PCD_TYPE_HII:
-      GuidTable   = (EFI_GUID *) (IsPeiDb ? &mPcdDatabase->PeiDb.Init.GuidTable[0] :
-                                            &mPcdDatabase->DxeDb.Init.GuidTable[0]);
+      GuidTable   = (EFI_GUID *) (IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
+                                            mPcdDatabase->DxeDb.Init.GuidTable);
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
@@ -761,8 +761,8 @@ SetWorker (
 
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
 
-  StringTable = (UINT16 *) (IsPeiDb ? &mPcdDatabase->PeiDb.Init.StringTable[0] :
-                                      &mPcdDatabase->DxeDb.Init.StringTable[0]);
+  StringTable = IsPeiDb ? mPcdDatabase->PeiDb.Init.StringTable :
+                          mPcdDatabase->DxeDb.Init.StringTable;
   
   InternalData = PcdDb + Offset;
 
@@ -789,8 +789,8 @@ SetWorker (
         }
       }
       
-      GuidTable   = (EFI_GUID *) (IsPeiDb ? &mPcdDatabase->PeiDb.Init.GuidTable[0] :
-                                            &mPcdDatabase->DxeDb.Init.GuidTable[0]);
+      GuidTable   = IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
+                              mPcdDatabase->DxeDb.Init.GuidTable;
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
