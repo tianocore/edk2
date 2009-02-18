@@ -51,8 +51,8 @@
 
 
 [Protocols]
-  gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
-  gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
+  gEfiVariableArchProtocolGuid                  ## PRODUCES
+  gEfiVariableWriteArchProtocolGuid             ## PRODUCES
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid
