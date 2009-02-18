@@ -366,21 +366,7 @@ ReportDebugCodeEnabled (
   VOID
   );
 
-#ifndef NDEBUG
-#if 0
-//#if __INTEL_COMPILER  
-#define REPORT_STATUS_CODE(Type,Value) ReportStatusCode(Type,Value)
 
-#define REPORT_STATUS_CODE_WITH_DEVICE_PATH(Type,Value,DevicePathParameter)                     \
-  ReportStatusCodeWithDevicePath(Type,Value,DevicePathParameter)
-
-#define REPORT_STATUS_CODE_WITH_EXTENDED_DATA(Type,Value,ExtendedData,ExtendedDataSize)         \
-  ReportStatusCodeWithExtendedData(Type,Value,ExtendedData,ExtendedDataSize) 
-
-#define REPORT_STATUS_CODE_EX(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)  \
-  ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)
-
-#else
 /**
   Reports a status code with minimal parameters if the status code type is enabled.
 
@@ -505,13 +491,5 @@ ReportDebugCodeEnabled (
   (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)                   ?  \
   ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)        :  \
   EFI_UNSUPPORTED
-#endif
-
-#else
-#define REPORT_STATUS_CODE(Type,Value)                                                                   EFI_UNSUPPORTED
-#define REPORT_STATUS_CODE_WITH_DEVICE_PATH(Type,Value,DevicePathParameter)                              EFI_UNSUPPORTED
-#define REPORT_STATUS_CODE_WITH_EXTENDED_DATA(Type,Value,ExtendedData,ExtendedDataSize)                  EFI_UNSUPPORTED
-#define REPORT_STATUS_CODE_EX(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize) EFI_UNSUPPORTED
-#endif
 
 #endif
