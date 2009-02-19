@@ -50,6 +50,14 @@ typedef struct _EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL EFI_PCI_HOST_BR
 //
 #define EFI_PCI_HOST_BRIDGE_MEM64_DECODE   2
 
+typedef UINT64 EFI_RESOURCE_ALLOCATION_STATUS;
+
+/// The request of this resource type could be fulfilled.
+#define EFI_RESOURCE_SATISFIED      0x0000000000000000ULL
+
+/// The request of this resource type could not be fulfilled for its
+/// absence in the host bridge resource pool.
+#define EFI_RESOURCE_NOT_SATISFIED  0xFFFFFFFFFFFFFFFFULL
 
 //
 // EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE
