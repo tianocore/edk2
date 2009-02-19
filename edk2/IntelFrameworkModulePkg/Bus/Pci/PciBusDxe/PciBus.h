@@ -113,12 +113,6 @@ typedef struct {
 #define EFI_BRIDGE_MEM32_DECODE_SUPPORTED     0x0040
 
 #define PCI_MAX_HOST_BRIDGE_NUM               0x0010
-//
-// Define resource status constant
-//
-#define EFI_RESOURCE_NONEXISTENT  0xFFFFFFFFFFFFFFFFULL
-#define EFI_RESOURCE_LESS         0xFFFFFFFFFFFFFFFEULL
-#define EFI_RESOURCE_SATISFIED    0x0000000000000000ULL
 
 //
 // Define option for attribute

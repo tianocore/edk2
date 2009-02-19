@@ -926,7 +926,7 @@ PciHostBridgeAdjustAllocation (
       continue;
     }
 
-    if (ResStatus[ResType] == EFI_RESOURCE_NONEXISTENT) {
+    if (ResStatus[ResType] == EFI_RESOURCE_NOT_SATISFIED) {
       //
       // Hostbridge hasn't this resource type
       //
