@@ -85,143 +85,197 @@
 
 [Guids.common]
   ## MdeModule package token space guid
+  ## Include/Guid/MdeModulePkgTokenSpace.h
   gEfiMdeModulePkgTokenSpaceGuid       = { 0xA1AFF049, 0xFDEB, 0x442a, { 0xB3, 0x20, 0x13, 0xAB, 0x4C, 0xB7, 0x2B, 0xBC }}
 
   ## Hob guid for Pcd DataBase
+  ## Include/Guid/PcdDataBaseHobGuid.h
   gPcdDataBaseHobGuid            = { 0xEA296D92, 0x0B69, 0x423C, { 0x8C, 0x28, 0x33, 0xB4, 0xE0, 0xA9, 0x12, 0x68 }}
   
   ## Hob guid for Pcd Pei Callback Function Table
+  ## Include/Guid/PcdPeiCallbackFnTableHobGuid.h
   gPcdPeiCallbackFnTableHobGuid  = { 0xC625F4B2, 0xEA09, 0x4675, { 0x82, 0xD7, 0xBA, 0x36, 0x82, 0x15, 0x7A, 0x14 }}
   
   ## Guid to specify the System Non Volatile FV
+  ## Include/Guid/SystemNvDataGuid.h
   gEfiSystemNvDataFvGuid         = { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
   
   ## Hob guid for the System Non Volatile HOB entries in the HOB list
+  ## Include/Guid/SystemNvDataGuid.h
   gEfiSystemNvDataHobGuid        = { 0xD6E5092D, 0xC7B2, 0x4872, { 0xAF, 0x66, 0xFD, 0xC0, 0xE6, 0xF9, 0x5E, 0x78 }}
   
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Usb interface.
+  ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoUsbInterfaceGuid   = { 0xCB871572, 0xC11A, 0x47B5, { 0xB4, 0x92, 0x67, 0x5E, 0xAF, 0xA7, 0x77, 0x27 }}
   
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Scsi interface.
+  ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoScsiInterfaceGuid  = { 0x08F74BAA, 0xEA36, 0x41D9, { 0x95, 0x21, 0x21, 0xA7, 0x0F, 0x87, 0x80, 0xBC }}
   
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ide interface.
+  ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoIdeInterfaceGuid   = { 0x5E948FE3, 0x26D3, 0x42B5, { 0xAF, 0x17, 0x61, 0x02, 0x87, 0x18, 0x8D, 0xEC }}
   
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ahci interface.
+  ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoAhciInterfaceGuid  = { 0x9e498932, 0x4abc, 0x45af, { 0xa3, 0x4d, 0x02, 0x47, 0x78, 0x7b, 0xe7, 0xc6 }}
   
   ## Alternate Firmware Volume Block Guid specify that the additional 
   #  FVB protocol is installed into FVB handle
+  ## Include/Guid/AlternateFvBlock.h
   gEfiAlternateFvBlockGuid       = { 0xF496922D, 0x172F, 0x4BBC, { 0xA1, 0xEB, 0x0E, 0xEB, 0x94, 0x9C, 0x34, 0x86 }}
   
   ## Guid specify the device is the console out device.
+  ## Include/Guid/ConsoleOutDevice.h
   gEfiConsoleOutDeviceGuid       = { 0xD3B36F2C, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
 
   ## Guid specify the device is the console in device.
+  ## Include/Guid/ConsoleInDevice.h
   gEfiConsoleInDeviceGuid        = { 0xD3B36F2B, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   
   ## Guid specify the primary console out device.
+  ## Include/Guid/PrimaryConsoleOutDevice.h
   gEfiPrimaryConsoleOutDeviceGuid = { 0x62BDF38A, 0xE3D5, 0x492C, { 0x95, 0x0C, 0x23, 0xA7, 0xF6, 0x6E, 0x67, 0x2E }}
   
   ## Guid specify the primary console in device.
+  ## Include/Guid/PrimaryConsoleInDevice.h
   gEfiPrimaryConsoleInDeviceGuid = { 0xE451DCBE, 0x96A1, 0x4729, { 0xA5, 0xCF, 0x6B, 0x9C, 0x2C, 0xFF, 0x47, 0xFD }}
   
   ## Guid specify the primary StdErr device.
+  ## Include/Guid/PrimaryStandardErrorDevice.h
   gEfiPrimaryStandardErrorDeviceGuid = { 0x5A68191B, 0x9B97, 0x4752, { 0x99, 0x46, 0xE3, 0x6A, 0x5D, 0xA9, 0x42, 0xB1 }}
   
   ## Guid specify the default BMP logo file.
+  ## Include/Guid/Bmp.h
   gEfiDefaultBmpLogoGuid         = { 0x7BB28B99, 0x61BB, 0x11D5, { 0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   
   ## Variale guid specify boot state.
+  ## Include/Guid/BootState.h
   gEfiBootStateGuid              = { 0x60B5E939, 0x0FCF, 0x4227, { 0xBA, 0x83, 0x6B, 0xBE, 0xD4, 0x5B, 0xC0, 0xE3 }}
   
   ## Hob and Variable guid specify the platform memory type information.
+  ## Include/Guid/MemoryTypeInformation.h
   gEfiMemoryTypeInformationGuid  = { 0x4C19049F, 0x4137, 0x4DD3, { 0x9C, 0x10, 0x8B, 0x97, 0xA8, 0x3F, 0xFD, 0xFA }}
   
   ## Capsule update hob and variable guid
+  ## Include/Guid/CapsuleVendor.h
   gEfiCapsuleVendorGuid          = { 0x711C703F, 0xC285, 0x4B10, { 0xA3, 0xB0, 0x36, 0xEC, 0xBD, 0x3C, 0x8B, 0xE2 }}
   
   ## Performance guid for the performance entry in the HOB list
+  ## Include/Guid/PeiPerformanceHob.h
   gPeiPerformanceHobGuid         = { 0xEC4DF5AF, 0x4395, 0x4CC9, { 0x94, 0xDE, 0x77, 0x50, 0x6D, 0x12, 0xC7, 0xB8 }}
   
   ## The genenic platform guid for EFI variable.
+  ## Include/Guid/GenericPlatformVariable.h
   gEfiGenericPlatformVariableGuid = { 0x59d1c24f, 0x50f1, 0x401a, { 0xb1, 0x01, 0xf3, 0x3e, 0x0d, 0xae, 0xd4, 0x43 }}
   
   ## Guid specify the Shell application.
+  ## Include/Guid/ShellFile.h
   gEfiShellFileGuid              = { 0xC57AD6B7, 0x0515, 0x40A8, { 0x9D, 0x21, 0x55, 0x16, 0x52, 0x85, 0x4E, 0x37 }}
   
   ## Guid specifiy the device is the StdErr device.
+  ## Include/Guid/StandardErrorDevice.h
   gEfiStandardErrorDeviceGuid    = { 0xD3B36F2D, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   
   ## PeCoffLoader guid for PeCoffLoader entry in the HOB list.
+  ## Include/Guid/PeiPeCoffLoader.h
   gEfiPeiPeCoffLoaderGuid        = { 0xD8117CFF, 0x94A6, 0x11D4, { 0x9A, 0x3A, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   
   ## Guid specify the variable list entries put in the EFI system table.
+  ## Include/Guid/VariableInfo.h
   gEfiVariableInfoGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
   
   ## Platform Override Variable guid
+  ## Include/Guid/OverrideVariable.h
   gEfiOverrideVariableGuid       = { 0x8e3d4ad5, 0xf762, 0x438a, { 0xa1, 0xc1, 0x5b, 0x9f, 0xe6, 0x8c, 0x6b, 0x15 }}
 
 [Protocols.common]
   ## Capsule Arch protocol specify capsule runtime services are installed.  
+  ## Include/Protocol/Capsule.h
   gEfiCapsuleArchProtocolGuid    = { 0x5053697E, 0x2CBC, 0x4819, { 0x90, 0xD9, 0x05, 0x80, 0xDE, 0xEE, 0x57, 0x54 }}
   
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
+  ## Include/Protocol/LoadPe32Image.h
   gEfiLoadPeImageProtocolGuid    = { 0x5CB5C776, 0x60D5, 0x45EE, { 0x88, 0x3C, 0x45, 0x27, 0x08, 0xCD, 0x74, 0x3F }}
   
   ## Print protocol defines only one basic print function.
+  ## Include/Protocol/Print.h
   gEfiPrintProtocolGuid       = { 0xdf2d868e, 0x32fc, 0x4cf0, {0x8e, 0x6b, 0xff, 0xd9, 0x5d, 0x13, 0x43, 0xd0} }
 
   ## Print protocol defines six basic print functions to print the format unicode and ascii string.
+  ## Include/Protocol/Print2.h
   gEfiPrint2ProtocolGuid          = { 0x5bcc3dbc, 0x8c57, 0x450a, { 0xbb, 0x0c, 0xa1, 0xc0, 0xbd, 0xde, 0x48, 0x0c }}
 
   ## This protocol defines the generic memory test interfaces in Dxe phase.
+  ## Include/Protocol/GenericMemoryTest.h
   gEfiGenericMemTestProtocolGuid = { 0x309DE7F1, 0x7F5E, 0x4ACE, { 0xB4, 0x9C, 0x53, 0x1B, 0xE5, 0xAA, 0x95, 0xEF }}
   
   ## Disk Info protocol is used to export Inquiry Data for a drive.
+  ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
   
   ## This protocol provides an extended service to erase the specified range of a firmware volume block.
+  ## Include/Protocol/FvbExtension.h
   gEfiFvbExtensionProtocolGuid   = { 0x53A4C71B, 0xB581, 0x4170, { 0x91, 0xB3, 0x8D, 0xB8, 0x7A, 0x4B, 0x5C, 0x46 }}
   
   ## Fault tolerant write lite protocol defines only one interface to write 
   #  the buffer to the fault tolerant storage.
+  ## Include/Protocol/FaultTolerantWriteLite.h
   gEfiFaultTolerantWriteLiteProtocolGuid = { 0x3F557189, 0x8DAE, 0x45AE, { 0xA0, 0xB3, 0x2B, 0x99, 0xCA, 0x7A, 0xA7, 0xA0 }}
   
   ## This protocol provides the interfaces to Get/Set the current video mode for GOP/UGA screen
+  ## Include/Protocol/ConsoleControl.h
   gEfiConsoleControlProtocolGuid = { 0xF42F7782, 0x012E, 0x4C12, { 0x99, 0x56, 0x49, 0xF9, 0x43, 0x04, 0xF7, 0x21 }}
   
   ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
+  ## Include/Protocol/OEMBadging.h
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
   
   ## Performance protocol interfaces to support cross module performance logging.
+  ## Include/Protocol/Performance.h
   gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
   
   ## Protocol guid is defined for CRC32 encapsulation scheme.
+  ## Include/Protocol/Crc32GuidedSectionExtraction.h
   gEfiCrc32GuidedSectionExtractionProtocolGuid = { 0xFC1BCDB0, 0x7D31, 0x49aa, {0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83 } }
   
   ## Protocol guid tells the core dispatcher to dispatch this Firmware Volume.
+  ## Include/Protocol/FirmwareVolumeDispatch.h
   gEfiFirmwareVolumeDispatchProtocolGuid = { 0x7AA35A69, 0x506C, 0x444F, { 0xA7, 0xAF, 0x69, 0x4B, 0xF5, 0x6F, 0x71, 0xC8 }}
 
+  ## Include/Protocol/NicIp4Config.h
   gEfiNicIp4ConfigProtocolGuid   = {0xdca3d4d, 0x12da, 0x4728,  { 0xbf, 0x7e, 0x86, 0xce, 0xb9, 0x28, 0xd0, 0x67 }}
+  
+  ## Include/Protocol/NicIp4Config.h
   gEfiNicIp4ConfigVariableGuid   = {0xd8944553, 0xc4dd, 0x41f4, { 0x9b, 0x30, 0xe1, 0x39, 0x7c, 0xfb, 0x26, 0x7b }}
+  
+  ## Include/Protocol/Tcp.h
   gEfiTcpProtocolGuid            = {0x02b3d5f2, 0xac28, 0x11d3, { 0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d }}
+  
+  ## Include/Protocol/PxeDhcp4CallBack.h
   gEfiPxeDhcp4CallbackProtocolGuid = {0xc1544c01, 0x92a4, 0x4198, {0x8a, 0x84, 0x77, 0x85, 0x83, 0xc2, 0x36, 0x21 }}
+  
+  ## Include/Protocol/PxeDhcp4.h
   gEfiPxeDhcp4ProtocolGuid       = {0x03c4e624, 0xac28, 0x11d3, { 0x9a, 0x2d, 0x00, 0x90, 0x29, 0x3f, 0xc1, 0x4d }}
+  
+  ## Include/Protocol/Dpc.h
   gEfiDpcProtocolGuid            = {0x480f8ae9, 0xc46, 0x4aa9,  { 0xbc, 0x89, 0xdb, 0x9f, 0xba, 0x61, 0x98, 0x6 }}
   
   ## Tcg addtional services to measure PeImage and ActionString.
+  ## Include/Protocol/TcgPlatform.h
   gEfiTcgPlatformProtocolGuid    = { 0x8c4c9a41, 0xbf56, 0x4627, { 0x9e, 0xa, 0xc8, 0x38, 0x6d, 0x66, 0x11, 0x5c }}
   
   ## Protocol Guid specify the Simple TextIn Notify handle.
+  ## Include/Protocol/SimpleTextInExNotify.h
   gSimpleTextInExNotifyGuid      = { 0x856f2def, 0x4e93, 0x4d6b, { 0x94, 0xce, 0x1c, 0xfe, 0x47, 0x01, 0x3e, 0xa5 }}  
 
   ## Protocol Guid specify the device is the hot plug device.
+  ## Include/Protocol/HotPlugDevice.h
   gEfiHotPlugDeviceGuid          = { 0x220AC432, 0x1D43, 0x49E5, { 0xA7, 0x4F, 0x4C, 0x9D, 0xA6, 0x7A, 0xD2, 0x3B }}
 
 [Ppis.common]
   ## Pei memory test PPI used to Perform memory test in PEI phase.
+  ## Include/Ppi/BaseMemoryTest.h
   gPeiBaseMemoryTestPpiGuid      = { 0xB6EC423C, 0x21D2, 0x490D, { 0x85, 0xC6, 0xDD, 0x58, 0x64, 0xEA, 0xA6, 0x74 }}
 
 [PcdsFeatureFlag.common]
