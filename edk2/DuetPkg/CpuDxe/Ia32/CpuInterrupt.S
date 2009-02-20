@@ -209,7 +209,7 @@ INTUnknown:
 	.globl ASM_PFX(SystemTimerHandler)
 ASM_PFX(SystemTimerHandler):
     pushl    $0
-    pushl    $mTimerVector
+    pushl    $ASM_PFX(mTimerVector)
     JmpCommonIdtEntry
 
 commonIdtEntry:
@@ -333,10 +333,10 @@ commonIdtEntry:
   push    %eax
   cmpl    $32,%eax
   jb      CallException
-  call    TimerHandler
+  call    ASM_PFX(TimerHandler)
   jmp     ExceptionDone
 CallException:
-  call    ExceptionHandler
+  call    ASM_PFX(ExceptionHandler)
 ExceptionDone:
   addl    $8,%esp
 
@@ -428,51 +428,50 @@ gdtr:	.short GDT_END - GDT_BASE - 1   # GDT limit
 
         .align 4
 
-	.globl GDT_BASE
 GDT_BASE:
 # null descriptor
 NULL_SEL            = .-GDT_BASE
         .short 0            # limit 15:0
         .short 0            # base 15:0
-        .byte 0            # base 23:16
-        .byte 0            # type
-        .byte 0            # limit 19:16, flags
-        .byte 0            # base 31:24
+        .byte 0             # base 23:16
+        .byte 0             # type
+        .byte 0             # limit 19:16, flags
+        .byte 0             # base 31:24
 
 # linear data segment descriptor
 LINEAR_SEL      = .-GDT_BASE
         .short 0x0FFFF       # limit 0xFFFFF
-        .short 0            # base 0
+        .short 0             # base 0
         .byte 0
-        .byte 0x092         # present, ring 0, data, expand-up, writable
-        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0x092          # present, ring 0, data, expand-up, writable
+        .byte 0x0CF          # page-granular, 32-bit
         .byte 0
 
 # linear code segment descriptor
 LINEAR_CODE_SEL = .-GDT_BASE
         .short 0x0FFFF       # limit 0xFFFFF
-        .short 0            # base 0
+        .short 0             # base 0
         .byte 0
-        .byte 0x09A         # present, ring 0, data, expand-up, writable
-        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0x09A          # present, ring 0, data, expand-up, writable
+        .byte 0x0CF          # page-granular, 32-bit
         .byte 0
 
 # system data segment descriptor
 SYS_DATA_SEL    = .-GDT_BASE
         .short 0x0FFFF       # limit 0xFFFFF
-        .short 0            # base 0
+        .short 0             # base 0
         .byte 0
-        .byte 0x092         # present, ring 0, data, expand-up, writable
-        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0x092          # present, ring 0, data, expand-up, writable
+        .byte 0x0CF          # page-granular, 32-bit
         .byte 0
 
 # system code segment descriptor
 SYS_CODE_SEL    = .-GDT_BASE
         .short 0x0FFFF       # limit 0xFFFFF
-        .short 0            # base 0
+        .short 0             # base 0
         .byte 0
-        .byte 0x09A         # present, ring 0, data, expand-up, writable
-        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0x09A          # present, ring 0, data, expand-up, writable
+        .byte 0x0CF          # page-granular, 32-bit
         .byte 0
 
 # spare segment descriptor
@@ -480,8 +479,8 @@ SPARE3_SEL  = .-GDT_BASE
         .short 0            # limit 0xFFFFF
         .short 0            # base 0
         .byte 0
-        .byte 0            # present, ring 0, data, expand-up, writable
-        .byte 0            # page-granular, 32-bit
+        .byte 0             # present, ring 0, data, expand-up, writable
+        .byte 0             # page-granular, 32-bit
         .byte 0
 
 # spare segment descriptor
@@ -489,8 +488,8 @@ SPARE4_SEL  = .-GDT_BASE
         .short 0            # limit 0xFFFFF
         .short 0            # base 0
         .byte 0
-        .byte 0            # present, ring 0, data, expand-up, writable
-        .byte 0            # page-granular, 32-bit
+        .byte 0             # present, ring 0, data, expand-up, writable
+        .byte 0             # page-granular, 32-bit
         .byte 0
 
 # spare segment descriptor
@@ -498,8 +497,8 @@ SPARE5_SEL  = .-GDT_BASE
         .short 0            # limit 0xFFFFF
         .short 0            # base 0
         .byte 0
-        .byte 0            # present, ring 0, data, expand-up, writable
-        .byte 0            # page-granular, 32-bit
+        .byte 0             # present, ring 0, data, expand-up, writable
+        .byte 0             # page-granular, 32-bit
         .byte 0
 
 GDT_END:
@@ -509,7 +508,7 @@ GDT_END:
 
 
 idtr:	.short IDT_END - IDT_BASE - 1   # IDT limit
-        .long 0                        # (IDT base gets set above)
+        .long 0                         # (IDT base gets set above)
 #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #   interrupt descriptor table (IDT)
 #
@@ -522,13 +521,12 @@ idtr:	.short IDT_END - IDT_BASE - 1   # IDT limit
 #idt_tag .byte "IDT",0     
         .align 4
 
-.globl IDT_BASE
 IDT_BASE:
 # divide by zero (INT 0)
 DIV_ZERO_SEL        = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -536,7 +534,7 @@ DIV_ZERO_SEL        = .-IDT_BASE
 DEBUG_EXCEPT_SEL    = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -544,7 +542,7 @@ DEBUG_EXCEPT_SEL    = .-IDT_BASE
 NMI_SEL             = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -552,7 +550,7 @@ NMI_SEL             = .-IDT_BASE
 BREAKPOINT_SEL      = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -560,7 +558,7 @@ BREAKPOINT_SEL      = .-IDT_BASE
 OVERFLOW_SEL        = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -568,7 +566,7 @@ OVERFLOW_SEL        = .-IDT_BASE
 BOUNDS_CHECK_SEL    = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -576,7 +574,7 @@ BOUNDS_CHECK_SEL    = .-IDT_BASE
 INVALID_OPCODE_SEL  = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -584,7 +582,7 @@ INVALID_OPCODE_SEL  = .-IDT_BASE
 DEV_NOT_AVAIL_SEL   = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -592,7 +590,7 @@ DEV_NOT_AVAIL_SEL   = .-IDT_BASE
 DOUBLE_FAULT_SEL    = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -600,7 +598,7 @@ DOUBLE_FAULT_SEL    = .-IDT_BASE
 RSVD_INTR_SEL1      = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -608,7 +606,7 @@ RSVD_INTR_SEL1      = .-IDT_BASE
 INVALID_TSS_SEL     = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -616,7 +614,7 @@ INVALID_TSS_SEL     = .-IDT_BASE
 SEG_NOT_PRESENT_SEL = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -624,7 +622,7 @@ SEG_NOT_PRESENT_SEL = .-IDT_BASE
 STACK_FAULT_SEL     = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -632,7 +630,7 @@ STACK_FAULT_SEL     = .-IDT_BASE
 GP_FAULT_SEL        = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -640,7 +638,7 @@ GP_FAULT_SEL        = .-IDT_BASE
 PAGE_FAULT_SEL      = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -648,7 +646,7 @@ PAGE_FAULT_SEL      = .-IDT_BASE
 RSVD_INTR_SEL2      = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -656,7 +654,7 @@ RSVD_INTR_SEL2      = .-IDT_BASE
 FLT_POINT_ERR_SEL   = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -664,7 +662,7 @@ FLT_POINT_ERR_SEL   = .-IDT_BASE
 ALIGNMENT_CHECK_SEL = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -672,7 +670,7 @@ ALIGNMENT_CHECK_SEL = .-IDT_BASE
 MACHINE_CHECK_SEL   = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -680,14 +678,14 @@ MACHINE_CHECK_SEL   = .-IDT_BASE
 SIMD_EXCEPTION_SEL  = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
 	.rept  (32 - 20)
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 	.endr
@@ -701,7 +699,7 @@ SIMD_EXCEPTION_SEL  = .-IDT_BASE
 IRQ0_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -709,7 +707,7 @@ IRQ0_SEL            = .-IDT_BASE
 IRQ1_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -717,7 +715,7 @@ IRQ1_SEL            = .-IDT_BASE
 IRQ2_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -725,7 +723,7 @@ IRQ2_SEL            = .-IDT_BASE
 IRQ3_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -733,7 +731,7 @@ IRQ3_SEL            = .-IDT_BASE
 IRQ4_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -741,7 +739,7 @@ IRQ4_SEL            = .-IDT_BASE
 IRQ5_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -749,7 +747,7 @@ IRQ5_SEL            = .-IDT_BASE
 IRQ6_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -757,7 +755,7 @@ IRQ6_SEL            = .-IDT_BASE
 IRQ7_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -765,7 +763,7 @@ IRQ7_SEL            = .-IDT_BASE
 IRQ8_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -773,7 +771,7 @@ IRQ8_SEL            = .-IDT_BASE
 IRQ9_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -781,7 +779,7 @@ IRQ9_SEL            = .-IDT_BASE
 IRQ10_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -789,7 +787,7 @@ IRQ10_SEL            = .-IDT_BASE
 IRQ11_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -797,7 +795,7 @@ IRQ11_SEL            = .-IDT_BASE
 IRQ12_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -805,7 +803,7 @@ IRQ12_SEL            = .-IDT_BASE
 IRQ13_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -813,7 +811,7 @@ IRQ13_SEL            = .-IDT_BASE
 IRQ14_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
@@ -821,7 +819,7 @@ IRQ14_SEL            = .-IDT_BASE
 IRQ15_SEL            = .-IDT_BASE
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
-        .byte 0            # 0 for interrupt gate
+        .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
