@@ -35,7 +35,7 @@ Ia32Jump:
   jmp   BootSectorEntryPoint  # JMP inst                  - 3 bytes
   nop
 
-OemId:             .ascii  "INTEL   "    # OemId               - 8 bytes
+OemId:             .ascii  "INTEL   "   # OemId               - 8 bytes
 # BPB data below will be fixed by tool
 SectorSize:        .word  0             # Sector Size         - 16 bits
 SectorsPerCluster: .byte  0             # Sector Per Cluster  - 8 bits
