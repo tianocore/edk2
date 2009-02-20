@@ -332,7 +332,7 @@ start:
 MemMapLoop: 
         movl $0xe820, %eax
         movl $20, %ecx
-        movl 0x534d4150, %edx  # 0x534d4150  stands for 'SMAP'
+        movl $0x534d4150, %edx  # 0x534d4150  stands for 'SMAP'
         int $0x15
         jc  MemMapDone
         addl $20, %edi
