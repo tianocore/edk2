@@ -1,167 +1,216 @@
-/** @file
- *
- *   Copyright 2006, Intel Corporation                                                         
- *   All rights reserved. This program and the accompanying materials                          
- *   are licensed and made available under the terms and conditions of the BSD License         
- *   which accompanies this distribution.  The full text of the license may be found at        
- *   http://opensource.org/licenses/bsd-license.php                                            
- *                                                                                             
- *   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
- *   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
- *   
- *    CpuInterrupt.S
- *  
- *   Abstract:
- *
- **/
+#------------------------------------------------------------------------------
+#*
+#*   Copyright 2006, Intel Corporation                                                         
+#*   All rights reserved. This program and the accompanying materials                          
+#*   are licensed and made available under the terms and conditions of the BSD License         
+#*   which accompanies this distribution.  The full text of the license may be found at        
+#*   http://opensource.org/licenses/bsd-license.php                                            
+#*                                                                                             
+#*   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+#*   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#*   
+#*    CpuInterrupt.S
+#*  
+#*   Abstract:
+#*
+#------------------------------------------------------------------------------
 
-.globl ASM_PFX(SystemTimerHandler)
-.globl ASM_PFX(SystemExceptionHandler)
-.globl ASM_PFX(mExceptionCodeSize)
-.globl ASM_PFX(InitDescriptor)
-.globl ASM_PFX(InstallInterruptHandler)
+#PUBLIC SystemTimerHandler
+#PUBLIC SystemExceptionHandler
+#EXTERNDEF mExceptionCodeSize:DWORD
 
-ASM_PFX(mExceptionCodeSize):  .long  9
+#EXTERN TimerHandler: NEAR
+#EXTERN ExceptionHandler: NEAR
+#EXTERN mTimerVector: DWORD
 
-/**
- * VOID
- * InitDescriptor (
- * VOID
- * )
- **/
+	.data
+	.globl ASM_PFX(mExceptionCodeSize)
+ASM_PFX(mExceptionCodeSize): .long  9
+
+	.text
+	.globl ASM_PFX(InitDescriptor)
+
 ASM_PFX(InitDescriptor):
+        movl    $GDT_BASE,%eax              # EAX=PHYSICAL address of gdt
+        movl    %eax, gdtr + 2              # Put address of gdt into the gdtr
         lgdt    gdtr
+        movl    $IDT_BASE,%eax              # EAX=PHYSICAL address of idt
+        movl    %eax, idtr + 2              # Put address of idt into the idtr
         lidt    idtr
         ret
 
-/**
- * VOID
- * InstallInterruptHandler (
- *     UINTN Vector,
- *     VOID  (*Handler)(VOID)
- *     )
- **/
+# VOID
+# InstallInterruptHandler (
+#     UINTN Vector,
+#     VOID  (*Handler)(VOID)
+#     )
+	.globl ASM_PFX(InstallInterruptHandler)
 ASM_PFX(InstallInterruptHandler):
-        movl    %esp, %ebp
-        pushl   %edi
-        pushfl                              # save eflags
+#  Vector:DWORD @ 4(%esp)
+#  Handler:DWORD @ 8(%esp)
+
+        push    %edi
+        pushf                               # save eflags
         cli                                 # turn off interrupts
-        subl    $6, %esp                    # open some space on the stack
-        movl    %esp, %edi
-        sidt    %es:(%edi)                  # get fword address of IDT
-        movl    %es:2(%edi), %edi            # move offset of IDT into EDI
-        addl    $6, %esp                    # correct stack
-        mov     4(%ebp), %eax               # Get vector number
-        shll    $3, %eax                    # multiply by 8 to get offset
-        addl    %eax, %edi                  # add to IDT base to get entry
-        movl    8(%ebp), %eax               # load new address into IDT entry
-        movw    %ax, %es:(%edi)             # write bits 15..0 of offset
-        shrl    $16, %eax                   # use ax to copy 31..16 to descriptors
-        movw    %ax, %es:6(%edi)            # write bits 31..16 of offset
-        popfl                               # restore flags (possible enabling interrupts)
+        subl    $6,%esp                     # open some space on the stack
+        movl    %esp,%edi
+        sidt    (%edi)                      # get fword address of IDT
+        movl    2(%edi), %edi               # move offset of IDT into EDI
+        addl    $6,%esp                     # correct stack
+        movl    12(%esp),%eax               # Get vector number
+        shl     $3,%eax                     # multiply by 8 to get offset
+        addl    %eax,%edi                   # add to IDT base to get entry
+        movl    16(%esp),%eax               # load new address into IDT entry
+        movw    %ax,(%edi)                  # write bits 15..0 of offset
+        shrl    $16,%eax                    # use ax to copy 31..16 to descriptors
+        movw    %ax,6(%edi)                 # write bits 31..16 of offset
+        popf                                # restore flags (possible enabling interrupts)
         pop     %edi
         ret
 
-.macro JmpCommonIdtEntry  errno, vector
-    /* jmp     commonIdtEntry - this must be hand coded to keep the assembler from
-     *                          using a 8 bit reletive jump when the entries are
-     *                          within 255 bytes of the common entry.  This must
-     *                          be done to maintain the consistency of the size
-     *                          of entry points...
-     */
-    pushl \errno
-    pushl \vector
-    #.byte   0e9h                         # jmp 16 bit reletive 
-    #.long   commonIdtEntry - $ - $4      #  offset to jump to
-    jmpl *commonIdtEntry
-.endm
+	.macro JmpCommonIdtEntry
+    # jmp     commonIdtEntry - this must be hand coded to keep the assembler from
+    #                          using a 8 bit reletive jump when the entries are
+    #                          within 255 bytes of the common entry.  This must
+    #                          be done to maintain the consistency of the size
+    #                          of entry points...
+    .byte     0xe9                        # jmp 16 bit reletive 
+    .long     commonIdtEntry - . - 4      #  offset to jump to
+	.endm
 
-.align 0x02
+    .align 2
+	.globl ASM_PFX(SystemExceptionHandler)
 ASM_PFX(SystemExceptionHandler):
 INT0:
-    JmpCommonIdtEntry  errno=0,vector=0
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x0 
+    JmpCommonIdtEntry
+#    db      0e9h                        # jmp 16 bit reletive 
+#    dd      commonIdtEntry - $ - 4      #  offset to jump to
+    
 INT1:
-    JmpCommonIdtEntry  errno=0,vector=1
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x1 
+    JmpCommonIdtEntry
+    
 INT2:
-    JmpCommonIdtEntry  errno=0,vector=2
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x2 
+    JmpCommonIdtEntry
+    
 INT3:
-    JmpCommonIdtEntry  errno=0,vector=3
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x3 
+    JmpCommonIdtEntry
+    
 INT4:
-    JmpCommonIdtEntry  errno=0,vector=4
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x4 
+    JmpCommonIdtEntry
+    
 INT5:
-    JmpCommonIdtEntry  errno=0,vector=5
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x5 
+    JmpCommonIdtEntry
+    
 INT6:
-    JmpCommonIdtEntry  errno=0,vector=6
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x6 
+    JmpCommonIdtEntry
+    
 INT7:
-    JmpCommonIdtEntry  errno=0,vector=7
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x7 
+    JmpCommonIdtEntry
+    
 INT8:
-#   Double fault causes an error code to be pushed so no phony pushl necessary
+#   Double fault causes an error code to be pushed so no phony push necessary
     nop
     nop
-    pushl    $8
-    jmpl *commonIdtEntry
+    pushl    $0x8 
+    JmpCommonIdtEntry
+    
 INT9:
-    JmpCommonIdtEntry  errno=0,vector=9
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $0x9 
+    JmpCommonIdtEntry
+    
 INT10:
-#   Invalid TSS causes an error code to be pushed so no phony pushl necessary
+#   Invalid TSS causes an error code to be pushed so no phony push necessary
     nop
     nop
     pushl    $10
-    jmpl *commonIdtEntry
+    JmpCommonIdtEntry
+    
 INT11:
-#   Segment Not Present causes an error code to be pushed so no phony pushl necessary
+#   Segment Not Present causes an error code to be pushed so no phony push necessary
     nop
     nop
     pushl    $11
-    jmpl *commonIdtEntry    
+    JmpCommonIdtEntry
+    
 INT12:
-#   Stack fault causes an error code to be pushed so no phony pushl necessary
+#   Stack fault causes an error code to be pushed so no phony push necessary
     nop
     nop
     pushl    $12
-    jmpl *commonIdtEntry
+    JmpCommonIdtEntry
+    
 INT13:
-#   GP fault causes an error code to be pushed so no phony pushl necessary
+#   GP fault causes an error code to be pushed so no phony push necessary
     nop
     nop
     pushl    $13
-    jmpl *commonIdtEntry
+    JmpCommonIdtEntry
+    
 INT14:
-#   Page fault causes an error code to be pushed so no phony pushl necessary
+#   Page fault causes an error code to be pushed so no phony push necessary
     nop
     nop
     pushl    $14
-    jmpl *commonIdtEntry
+    JmpCommonIdtEntry
+    
 INT15:
-    JmpCommonIdtEntry  errno=0,vector=15
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $15
+    JmpCommonIdtEntry
+    
 INT16:
-    JmpCommonIdtEntry  errno=0,vector=16
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $16
+    JmpCommonIdtEntry
+    
 INT17:
-#   Alignment check causes an error code to be pushed so no phony pushl necessary
+#   Alignment check causes an error code to be pushed so no phony push necessary
     nop
     nop
     pushl    $17
-    jmpl *commonIdtEntry
+    JmpCommonIdtEntry
+    
 INT18:
-    JmpCommonIdtEntry  errno=0,vector=18
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $18
+    JmpCommonIdtEntry
+    
 INT19:
-    JmpCommonIdtEntry  errno=0,vector=19
-INTUnknown:
-    JmpCommonIdtEntry  errno=0,vector=20
-    JmpCommonIdtEntry  errno=0,vector=21
-    JmpCommonIdtEntry  errno=0,vector=22
-    JmpCommonIdtEntry  errno=0,vector=23
-    JmpCommonIdtEntry  errno=0,vector=24
-    JmpCommonIdtEntry  errno=0,vector=25
-    JmpCommonIdtEntry  errno=0,vector=26
-    JmpCommonIdtEntry  errno=0,vector=27
-    JmpCommonIdtEntry  errno=0,vector=28
-    JmpCommonIdtEntry  errno=0,vector=29
-    JmpCommonIdtEntry  errno=0,vector=30
-    JmpCommonIdtEntry  errno=0,vector=31
+    pushl    $0x0      # push error code place holder on the stack
+    pushl    $19
+    JmpCommonIdtEntry
 
+INTUnknown:
+	.rept (32 - 20)
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+	.endr
+
+	.globl ASM_PFX(SystemTimerHandler)
 ASM_PFX(SystemTimerHandler):
-    JmpCommonIdtEntry  errno=0,vector=ASM_PFX(mTimerVector)
+    pushl    $0
+    pushl    $mTimerVector
+    JmpCommonIdtEntry
 
 commonIdtEntry:
 # +---------------------+
@@ -179,539 +228,606 @@ commonIdtEntry:
 # +---------------------+ <-- EBP
 
   cli
-  pushl %ebp
-  movl  %esp, %ebp
+  push %ebp
+  movl %esp,%ebp
 
   #
   # Align stack to make sure that EFI_FX_SAVE_STATE_IA32 of EFI_SYSTEM_CONTEXT_IA32
   # is 16-byte aligned
   #
-  andl    $0xfffffff0, %esp
-  subl    $12, %esp
+  andl    $0xfffffff0,%esp
+  subl    $12,%esp
 
 ## UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax#
-  pushl    %eax
-  pushl    %ecx
-  pushl    %edx
-  pushl    %ebx
-  leal     24(%ebp), %ecx
-  pushl    %ecx                # ESP
-  pushl    (%ebp)              # EBP
-  pushl    %esi
-  pushl    %edi
+  push    %eax
+  push    %ecx
+  push    %edx
+  push    %ebx
+  leal    6*4(%ebp),%ecx
+  push    %ecx                          # ESP
+  push    (%ebp)                        # EBP
+  push    %esi
+  push    %edi
 
 ## UINT32  Gs, Fs, Es, Ds, Cs, Ss#
-  movl     %ss, %eax
-  pushl    %eax
-  movzwl   16(%ebp), %eax
-  pushl    %eax
-  movl     %ds, %eax
-  pushl    %eax
-  movl     %es, %eax
-  pushl    %eax
-  movl     %fs, %eax
-  pushl    %eax
-  movl     %gs, %eax
-  pushl    %eax
+  movw  %ss,%ax
+  push  %eax
+  movzx 4*4(%ebp),%eax
+  push %eax
+  movw  %ds,%ax
+  push %eax
+  movw  %es,%ax
+  push %eax
+  movw %fs,%ax
+  push %eax
+  movw %gs,%ax
+  push %eax
 
 ## UINT32  Eip#
-  pushl    12(%ebp)
+  pushl   3*4(%ebp)
 
 ## UINT32  Gdtr[2], Idtr[2]#
-  subl     $8, %esp
-  sidt     (%esp)
-  subl     $8, %esp
-  sgdt     (%esp)
+  subl  $8,%esp
+  sidt (%esp)
+  subl  $8,%esp
+  sgdt (%esp)
 
 ## UINT32  Ldtr, Tr#
-  xorl     %eax, %eax
-  strw     %ax
-  pushl    %eax
-  sldt     %ax
-  pushl    %eax
+  xorl  %eax, %eax
+  str  %ax
+  push %eax
+  sldt %eax
+  push %eax
 
 ## UINT32  EFlags#
-  pushl   5*4(%ebp)
+  pushl  5*4(%ebp)
 
 ## UINT32  Cr0, Cr1, Cr2, Cr3, Cr4#
-  movl %cr4, %eax
-  orl  $0x208, %eax
-  movl %eax, %cr4
-  pushl %eax
-  movl %cr3, %eax
-  pushl %eax
-  movl %cr2, %eax
-  pushl %eax
-  xorl %eax, %eax
-  pushl %eax
-  movl %cr0, %eax
-  pushl %eax
+  mov  %cr4,%eax
+  orl  $0x208,%eax
+  mov  %eax,%cr4
+  push %eax
+  mov  %cr3,%eax
+  push %eax
+  mov  %cr2,%eax
+  push %eax
+  xor  %eax, %eax
+  push %eax
+  mov  %cr0,%eax
+  push %eax
 
 ## UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7#
-  movl    %dr7, %eax
-  pushl   %eax
+  mov     %dr7,%eax
+  push    %eax
 ## clear Dr7 while executing debugger itself
-  xorl    %eax, %eax
-  movl    %eax, %dr7
+  xor     %eax, %eax
+  mov     %eax,%dr7
 
-  movl    %dr6, %eax
-  pushl   %eax
+  mov     %dr6,%eax
+  push    %eax
 ## insure all status bits in dr6 are clear...
-  xorl    %eax, %eax
-  movl    %eax, %dr6
+  xor     %eax, %eax
+  mov     %eax,%dr6
 
-  movl    %dr3, %eax
-  pushl   %eax
-  movl    %dr2, %eax
-  pushl   %eax
-  movl    %dr1, %eax
-  pushl   %eax
-  movl    %dr0, %eax
-  pushl   %eax
+  mov     %dr3,%eax
+  push    %eax
+  mov     %dr2,%eax
+  push    %eax
+  mov     %dr1,%eax
+  push    %eax
+  mov     %dr0,%eax
+  push    %eax
 
-## FX_SAVE_STATE_IA32 FxSaveState#
-  subl $512, %esp
-  movl %esp, %edi
-  #.byte 0f, 0ae, 00000111y #fxsave [edi]
+## FX_SAVE_STATE_IA32 FxSaveState;
+  sub     $512,%esp
+  mov     %esp,%edi
   fxsave (%edi)
-  
-## UINT32  ExceptionData#
+
+## UINT32  ExceptionData;
   pushl    2*4(%ebp)
 
 ## Prepare parameter and call
-  movl    %esp, %edx
-  pushl   %edx
-  movl    1*4(%ebp), %eax
-  pushl   %eax
-  cmpl    $32, %eax
+  mov     %esp,%edx
+  push    %edx
+  mov     1*4(%ebp),%eax
+  push    %eax
+  cmpl    $32,%eax
   jb      CallException
-  call    ASM_PFX(TimerHandler)
+  call    TimerHandler
   jmp     ExceptionDone
 CallException:
-  call    ASM_PFX(ExceptionHandler)
+  call    ExceptionHandler
 ExceptionDone:
-  addl    $8, %esp
+  addl    $8,%esp
 
   cli
-## UINT32  ExceptionData#
-  addl    $4, %esp
+## UINT32  ExceptionData;
+  addl     $4,%esp
 
-## FX_SAVE_STATE_IA32 FxSaveState#
-  movl %esp, %esi
-  #db 0fh, 0aeh, 00001110y # fxrstor [esi]
-  fxrstor (%esi)
-  addl $512, %esp
+## FX_SAVE_STATE_IA32 FxSaveState;
+  mov      %esp,%esi
+  fxrstor  (%esi)
+  addl     $512,%esp
 
-## UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7#
-  popl    %eax
-  movl    %eax, %dr0
-  popl    %eax
-  movl    %eax, %dr1
-  popl    %eax
-  movl    %eax, %dr2
-  popl    %eax
-  movl    %eax, %dr3
+#; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
+  pop     %eax
+  mov     %eax,%dr0
+  pop     %eax
+  mov     %eax,%dr1
+  pop     %eax
+  mov     %eax,%dr2
+  pop     %eax
+  mov     %eax,%dr3
 ## skip restore of dr6.  We cleared dr6 during the context save.
-  addl    $4, %esp
-  popl    %eax
-  movl    %eax, %dr7
+  addl    $4,%esp
+  pop     %eax
+  mov     %eax,%dr7
 
-## UINT32  Cr0, Cr1, Cr2, Cr3, Cr4#
-  popl    %eax
-  movl    %eax, %cr0
-  addl    $4, %esp  # not for Cr1
-  popl    %eax
-  movl    %eax, %cr2
-  popl    %eax
-  movl    %eax, %cr3
-  popl    %eax
-  movl    %eax, %cr4
+## UINT32  Cr0, Cr1, Cr2, Cr3, Cr4;
+  pop     %eax
+  mov     %eax,%cr0
+  addl    $4,%esp    # not for Cr1
+  pop     %eax
+  mov     %eax,%cr2
+  pop     %eax
+  mov     %eax,%cr3
+  pop     %eax
+  mov     %eax,%cr4
 
-## UINT32  EFlags#
-  popl    5*4(%ebp)
+## UINT32  EFlags;
+  popl     5*4(%ebp)
 
-## UINT32  Ldtr, Tr#
-## UINT32  Gdtr[2], Idtr[2]#
+## UINT32  Ldtr, Tr;
+## UINT32  Gdtr[2], Idtr[2];
 ## Best not let anyone mess with these particular registers...
-  addl    $24, %esp
+  addl     $24,%esp
 
-## UINT32  Eip#
-  popl    3*4(%ebp)
+## UINT32  Eip;
+  popl     3*4(%ebp)
 
-## UINT32  Gs, Fs, Es, Ds, Cs, Ss#
+## UINT32  Gs, Fs, Es, Ds, Cs, Ss;
 ## NOTE - modified segment registers could hang the debugger...  We
 ##        could attempt to insulate ourselves against this possibility,
 ##        but that poses risks as well.
 ##
-  popl    %gs
-  popl    %fs
-  popl    %es
-  popl    %ds
+  pop     %gs
+  pop     %fs
+  pop     %es
+  pop     %ds
   popl    4*4(%ebp)
-  popl    %ss
+  pop     %ss
 
-## UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax#
-  popl    %edi
-  popl    %esi
-  addl    $4, %esp # not for ebp
-  addl    $4, %esp # not for esp
-  popl    %ebx
-  popl    %edx
-  popl    %ecx
-  popl    %eax
+## UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax;
+  pop     %edi
+  pop     %esi
+  addl    $4,%esp   # not for ebp
+  addl    $4,%esp   # not for esp
+  pop     %ebx
+  pop     %edx
+  pop     %ecx
+  pop     %eax
 
-  movl    %ebp, %esp
-  popl    %ebp
-  addl    $8, %esp
-  iretl
+  mov     %ebp,%esp
+  pop     %ebp
+  addl    $8,%esp
+  iret
 
 
-##############################################################################
+#;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 # data
-##############################################################################
+#;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.align 2, 0x0
-gdtr:
-    .word 8*8 - 1
-    .long GDT_BASE
-    
-##############################################################################
+	.data
+        .align 4
+
+gdtr:	.short GDT_END - GDT_BASE - 1   # GDT limit
+        .long 0                         # (GDT base gets set above)
+#;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #   global descriptor table (GDT)
-##############################################################################
+#;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+        .align 4
 
-.align 2, 0x90
+	.globl GDT_BASE
 GDT_BASE:
-    .quad 0x0                   // null descriptor
-    .quad 0x00cf92000000ffff    // linear data segment descriptor
-    .quad 0x00cf9a000000ffff    // linear code segment descriptor
-    .quad 0x00cf92000000ffff    // system data segment descriptor
-    .quad 0x00cf9a000000ffff    // system code segment descriptor
-    .quad 0x0                   // spare segment descriptor
-    .quad 0x0
-    .quad 0x0
+# null descriptor
+NULL_SEL            = .-GDT_BASE
+        .short 0            # limit 15:0
+        .short 0            # base 15:0
+        .byte 0            # base 23:16
+        .byte 0            # type
+        .byte 0            # limit 19:16, flags
+        .byte 0            # base 31:24
 
-.align 0x02
+# linear data segment descriptor
+LINEAR_SEL      = .-GDT_BASE
+        .short 0x0FFFF       # limit 0xFFFFF
+        .short 0            # base 0
+        .byte 0
+        .byte 0x092         # present, ring 0, data, expand-up, writable
+        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0
 
-idtr:
-    .word IDT_END - IDT_BASE - 1   # IDT limit
-    .long IDT_BASE
-    
-##############################################################################
+# linear code segment descriptor
+LINEAR_CODE_SEL = .-GDT_BASE
+        .short 0x0FFFF       # limit 0xFFFFF
+        .short 0            # base 0
+        .byte 0
+        .byte 0x09A         # present, ring 0, data, expand-up, writable
+        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0
+
+# system data segment descriptor
+SYS_DATA_SEL    = .-GDT_BASE
+        .short 0x0FFFF       # limit 0xFFFFF
+        .short 0            # base 0
+        .byte 0
+        .byte 0x092         # present, ring 0, data, expand-up, writable
+        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0
+
+# system code segment descriptor
+SYS_CODE_SEL    = .-GDT_BASE
+        .short 0x0FFFF       # limit 0xFFFFF
+        .short 0            # base 0
+        .byte 0
+        .byte 0x09A         # present, ring 0, data, expand-up, writable
+        .byte 0x0CF                 # page-granular, 32-bit
+        .byte 0
+
+# spare segment descriptor
+SPARE3_SEL  = .-GDT_BASE
+        .short 0            # limit 0xFFFFF
+        .short 0            # base 0
+        .byte 0
+        .byte 0            # present, ring 0, data, expand-up, writable
+        .byte 0            # page-granular, 32-bit
+        .byte 0
+
+# spare segment descriptor
+SPARE4_SEL  = .-GDT_BASE
+        .short 0            # limit 0xFFFFF
+        .short 0            # base 0
+        .byte 0
+        .byte 0            # present, ring 0, data, expand-up, writable
+        .byte 0            # page-granular, 32-bit
+        .byte 0
+
+# spare segment descriptor
+SPARE5_SEL  = .-GDT_BASE
+        .short 0            # limit 0xFFFFF
+        .short 0            # base 0
+        .byte 0
+        .byte 0            # present, ring 0, data, expand-up, writable
+        .byte 0            # page-granular, 32-bit
+        .byte 0
+
+GDT_END:
+
+        .align 4
+
+
+
+idtr:	.short IDT_END - IDT_BASE - 1   # IDT limit
+        .long 0                        # (IDT base gets set above)
+#;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #   interrupt descriptor table (IDT)
 #
 #   Note: The hardware IRQ's specified in this table are the normal PC/AT IRQ
 #       mappings.  This implementation only uses the system timer and all other
 #       IRQs will remain masked.  The descriptors for vectors 33+ are provided
 #       for convenience.
-##############################################################################
+#;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.align 0x02
+#idt_tag .byte "IDT",0     
+        .align 4
 
+.globl IDT_BASE
 IDT_BASE:
-     .skip 256 * 16
-
-/**
 # divide by zero (INT 0)
-DIV_ZERO_SEL        equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+DIV_ZERO_SEL        = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # debug exception (INT 1)
-DEBUG_EXCEPT_SEL    equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+DEBUG_EXCEPT_SEL    = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # NMI (INT 2)
-NMI_SEL             equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+NMI_SEL             = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # soft breakpoint (INT 3)
-BREAKPOINT_SEL      equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+BREAKPOINT_SEL      = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # overflow (INT 4)
-OVERFLOW_SEL        equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+OVERFLOW_SEL        = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # bounds check (INT 5)
-BOUNDS_CHECK_SEL    equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+BOUNDS_CHECK_SEL    = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # invalid opcode (INT 6)
-INVALID_OPCODE_SEL  equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+INVALID_OPCODE_SEL  = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # device not available (INT 7)
-DEV_NOT_AVAIL_SEL   equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+DEV_NOT_AVAIL_SEL   = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # double fault (INT 8)
-DOUBLE_FAULT_SEL    equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+DOUBLE_FAULT_SEL    = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # Coprocessor segment overrun - reserved (INT 9)
-RSVD_INTR_SEL1      equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+RSVD_INTR_SEL1      = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # invalid TSS (INT 0ah)
-INVALID_TSS_SEL     equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+INVALID_TSS_SEL     = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # segment not present (INT 0bh)
-SEG_NOT_PRESENT_SEL equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+SEG_NOT_PRESENT_SEL = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # stack fault (INT 0ch)
-STACK_FAULT_SEL     equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+STACK_FAULT_SEL     = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # general protection (INT 0dh)
-GP_FAULT_SEL        equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+GP_FAULT_SEL        = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # page fault (INT 0eh)
-PAGE_FAULT_SEL      equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+PAGE_FAULT_SEL      = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # Intel reserved - do not use (INT 0fh)
-RSVD_INTR_SEL2      equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+RSVD_INTR_SEL2      = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# floating point error (INT 10h)
-FLT_POINT_ERR_SEL   equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# floating point error (INT 0x10)
+FLT_POINT_ERR_SEL   = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# alignment check (INT 11h)
-ALIGNMENT_CHECK_SEL equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# alignment check (INT 0x11)
+ALIGNMENT_CHECK_SEL = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# machine check (INT 12h)
-MACHINE_CHECK_SEL   equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# machine check (INT 0x12)
+MACHINE_CHECK_SEL   = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# SIMD floating-point exception (INT 13h)
-SIMD_EXCEPTION_SEL  equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# SIMD floating-point exception (INT 0x13)
+SIMD_EXCEPTION_SEL  = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-REPEAT  (32 - 20)
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
-ENDM
+	.rept  (32 - 20)
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+	.endr
 
 # 72 unspecified descriptors
-        db (72 * 8) dup(0)
+	.rept 72 * 8
+        .byte 0
+	.endr
         
-# IRQ 0 (System timer) - (INT 68h)
-IRQ0_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 0 (System timer) - (INT 0x68)
+IRQ0_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 1 (8042 Keyboard controller) - (INT 69h)
-IRQ1_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 1 (8042 Keyboard controller) - (INT 0x69)
+IRQ1_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # Reserved - IRQ 2 redirect (IRQ 2) - DO NOT USE!!! - (INT 6ah)
-IRQ2_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+IRQ2_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # IRQ 3 (COM 2) - (INT 6bh)
-IRQ3_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+IRQ3_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # IRQ 4 (COM 1) - (INT 6ch)
-IRQ4_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+IRQ4_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # IRQ 5 (LPT 2) - (INT 6dh)
-IRQ5_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+IRQ5_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # IRQ 6 (Floppy controller) - (INT 6eh)
-IRQ6_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+IRQ6_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
 # IRQ 7 (LPT 1) - (INT 6fh)
-IRQ7_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+IRQ7_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 8 (RTC Alarm) - (INT 70h)
-IRQ8_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 8 (RTC Alarm) - (INT 0x70)
+IRQ8_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 9 - (INT 71h)
-IRQ9_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 9 - (INT 0x71)
+IRQ9_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 10 - (INT 72h)
-IRQ10_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 10 - (INT 0x72)
+IRQ10_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 11 - (INT 73h)
-IRQ11_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 11 - (INT 0x73)
+IRQ11_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 12 (PS/2 mouse) - (INT 74h)
-IRQ12_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 12 (PS/2 mouse) - (INT 0x74)
+IRQ12_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 13 (Floating point error) - (INT 75h)
-IRQ13_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 13 (Floating point error) - (INT 0x75)
+IRQ13_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 14 (Secondary IDE) - (INT 76h)
-IRQ14_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 14 (Secondary IDE) - (INT 0x76)
+IRQ14_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-# IRQ 15 (Primary IDE) - (INT 77h)
-IRQ15_SEL            equ $-IDT_BASE
-        dw 0            # offset 15:0
-        dw SYS_CODE_SEL # selector 15:0
-        db 0            # 0 for interrupt gate
-        db 0eh OR 80h   # (10001110)type = 386 interrupt gate, present
-        dw 0            # offset 31:16
+# IRQ 15 (Primary IDE) - (INT 0x77)
+IRQ15_SEL            = .-IDT_BASE
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0            # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
 
-        db (1 * 8) dup(0)
+	.rept 1 * 8
+        .byte 0
+	.endr
 
-**/
 IDT_END:
+
