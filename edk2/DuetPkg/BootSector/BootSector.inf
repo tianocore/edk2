@@ -16,22 +16,37 @@
 [Sources]
   bootsect.asm | INTEL
   bootsect.asm | MSFT
-  bs16.asm | INTEL
-  bs16.asm | MSFT
-  bs32.asm | INTEL
-  bs32.asm | MSFT
-# bs32.S | GCC ## It can not be compiled. It is added just for version control.
-  Gpt.asm | INTEL
-  Gpt.asm | MSFT
-# Gpt.S | GCC ## It can not be compiled. It is added just for version control.
-  Mbr.asm | INTEL
-  Mbr.asm | MSFT
-  start.asm | INTEL
-  start.asm | MSFT
-  start16.asm | INTEL
-  start16.asm | MSFT
-  start32.asm | INTEL
-  start32.asm | MSFT
-  efi32.asm | INTEL
-  efi32.asm | MSFT
+# bootsect.S   | GCC 
+
+  bs16.asm     | INTEL
+  bs16.asm     | MSFT
+# bs16.S       | GCC 
+
+  bs32.asm     | INTEL
+  bs32.asm     | MSFT
+# bs32.S       | GCC
+ 
+  Gpt.asm      | INTEL
+  Gpt.asm      | MSFT
+# Gpt.S        | GCC
+
+  Mbr.asm      | INTEL
+  Mbr.asm      | MSFT
+# Mbr.S        | GCC
+
+  start.asm    | INTEL
+  start.asm    | MSFT
+# start.S      | GCC
+
+  start16.asm  | INTEL
+  start16.asm  | MSFT
+# start16.S    | GCC
+
+  start32.asm  | INTEL
+  start32.asm  | MSFT
+# start32.S    | GCC
+
+  efi32.asm    | INTEL
+  efi32.asm    | MSFT
+# efi32.S      | GCC
 
