@@ -20,8 +20,10 @@
   bs16.asm | MSFT
   bs32.asm | INTEL
   bs32.asm | MSFT
+# bs32.S | GCC ## It can not be compiled. It is added just for version control.
   Gpt.asm | INTEL
   Gpt.asm | MSFT
+# Gpt.S | GCC ## It can not be compiled. It is added just for version control.
   Mbr.asm | INTEL
   Mbr.asm | MSFT
   start.asm | INTEL
