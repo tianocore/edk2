@@ -3,7 +3,7 @@
   This print protocol defines six basic print functions to 
   print the format unicode and ascii string.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -61,11 +61,54 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
 **/
 typedef
 UINTN
-(EFIAPI *UNI_VSPRINT2)(
+(EFIAPI *UNICODE_VS_PRINT) (
   OUT CHAR16        *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
   IN  VA_LIST       Marker
+  );
+
+/**
+  Produces a Null-terminated Unicode string in an output buffer based on a Null-terminated 
+  Unicode format string and variable argument list.
+  
+  Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
+  and BufferSize.
+  The Unicode string is produced by parsing the format string specified by FormatString.
+  Arguments are pulled from the variable argument list based on the contents of the format string.
+  The number of Unicode characters in the produced output buffer is returned not including
+  the Null-terminator.
+  If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
+
+  If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
+  If BufferSize > 1 and FormatString is NULL, then ASSERT().
+  If BufferSize > 1 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than 
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
+  ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and produced Null-terminated Unicode string
+  contains more than PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
+
+  @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
+                          Unicode string.
+  @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
+  @param  FormatString    Null-terminated Unicode format string.
+  @param  ...             Variable argument list whose contents are accessed based on the 
+                          format string specified by FormatString.
+  
+  @return The number of Unicode characters in the produced output buffer not including the
+          Null-terminator.
+
+**/
+typedef
+UINTN
+(EFIAPI *UNICODE_S_PRINT) (
+  OUT CHAR16        *StartOfBuffer,
+  IN  UINTN         BufferSize,
+  IN  CONST CHAR16  *FormatString,
+  ...
   );
 
 /**
@@ -103,11 +146,54 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *UNI_VSPRINT_ASCII)(
+(EFIAPI *UNICODE_VS_PRINT_ASCII_FORMAT) (
   OUT CHAR16       *StartOfBuffer,
   IN  UINTN        BufferSize,
   IN  CONST CHAR8  *FormatString,
   IN  VA_LIST      Marker
+  );
+
+/**
+  Produces a Null-terminated Unicode string in an output buffer based on a Null-terminated 
+  ASCII format string and  variable argument list.
+  
+  Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
+  and BufferSize.
+  The Unicode string is produced by parsing the format string specified by FormatString.
+  Arguments are pulled from the variable argument list based on the contents of the 
+  format string.
+  The number of Unicode characters in the produced output buffer is returned not including
+  the Null-terminator.
+  If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
+
+  If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
+  If BufferSize > 1 and FormatString is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
+  ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and produced Null-terminated Unicode string
+  contains more than PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
+
+  @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
+                          Unicode string.
+  @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
+  @param  FormatString    Null-terminated ASCII format string.
+  @param  ...             Variable argument list whose contents are accessed based on the 
+                          format string specified by FormatString.
+  
+  @return The number of Unicode characters in the produced output buffer not including the
+          Null-terminator.
+
+**/
+typedef
+UINTN
+(EFIAPI *UNICODE_S_PRINT_ASCII_FORMAT) (
+  OUT CHAR16       *StartOfBuffer,
+  IN  UINTN        BufferSize,
+  IN  CONST CHAR8  *FormatString,
+  ...
   );
 
 /**
@@ -153,7 +239,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *VALUE_TO_UNISTRING)(
+(EFIAPI *UNICODE_VALUE_TO_STRING) (
   IN OUT CHAR16  *Buffer,
   IN UINTN       Flags,
   IN INT64       Value,
@@ -194,11 +280,53 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_VSPRINT)(
+(EFIAPI *ASCII_VS_PRINT) (
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR8   *FormatString,
   IN  VA_LIST       Marker
+  );
+
+/**
+  Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
+  ASCII format string and  variable argument list.
+  
+  Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
+  and BufferSize.
+  The ASCII string is produced by parsing the format string specified by FormatString.
+  Arguments are pulled from the variable argument list based on the contents of the 
+  format string.
+  The number of ASCII characters in the produced output buffer is returned not including
+  the Null-terminator.
+  If BufferSize is 0, then no output buffer is produced and 0 is returned.
+
+  If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 0 and FormatString is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
+  ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and produced Null-terminated ASCII string
+  contains more than PcdMaximumAsciiStringLength ASCII characters not including the
+  Null-terminator, then ASSERT().
+
+  @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
+                          ASCII string.
+  @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
+  @param  FormatString    Null-terminated ASCII format string.
+  @param  ...             Variable argument list whose contents are accessed based on the 
+                          format string specified by FormatString.
+   
+  @return The number of ASCII characters in the produced output buffer not including the
+          Null-terminator.
+
+**/
+typedef
+UINTN
+(EFIAPI *ASCII_S_PRINT) (
+  OUT CHAR8        *StartOfBuffer,
+  IN  UINTN        BufferSize,
+  IN  CONST CHAR8  *FormatString,
+  ...
   );
 
 /**
@@ -236,11 +364,54 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_VSPRINT_UNI)(
+(EFIAPI *ASCII_VS_PRINT_UNICODE_FORMAT) (
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
   IN  VA_LIST       Marker
+  );
+
+/**
+  Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
+  Unicode format string and  variable argument list.
+  
+  Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
+  and BufferSize.
+  The ASCII string is produced by parsing the format string specified by FormatString.
+  Arguments are pulled from the variable argument list based on the contents of the 
+  format string.
+  The number of ASCII characters in the produced output buffer is returned not including
+  the Null-terminator.
+  If BufferSize is 0, then no output buffer is produced and 0 is returned.
+
+  If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
+  If BufferSize > 0 and FormatString is NULL, then ASSERT().
+  If BufferSize > 0 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
+  ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and produced Null-terminated ASCII string
+  contains more than PcdMaximumAsciiStringLength ASCII characters not including the
+  Null-terminator, then ASSERT().
+
+  @param  StartOfBuffer   A pointer to the output buffer for the produced Null-terminated 
+                          ASCII string.
+  @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
+  @param  FormatString    Null-terminated Unicode format string.
+  @param  ...             Variable argument list whose contents are accessed based on the 
+                          format string specified by FormatString.
+  
+  @return The number of ASCII characters in the produced output buffer not including the
+          Null-terminator.
+
+**/
+typedef
+UINTN
+(EFIAPI *ASCII_S_PRINT_UNICODE_FORMAT) (
+  OUT CHAR8         *StartOfBuffer,
+  IN  UINTN         BufferSize,
+  IN  CONST CHAR16  *FormatString,
+  ...
   );
 
 /**
@@ -285,20 +456,24 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *VALUE_TO_ASCIISTRING)(
-  IN OUT CHAR8  *Buffer,
-  IN UINTN      Flags,
-  IN INT64      Value,
-  IN UINTN      Width
+(EFIAPI *ASCII_VALUE_TO_STRING) (
+  OUT CHAR8      *Buffer,
+  IN  UINTN      Flags,
+  IN  INT64      Value,
+  IN  UINTN      Width
   );
 
 struct _EFI_PRINT2_PROTOCOL {
-  UNI_VSPRINT2              VSPrint;
-  UNI_VSPRINT_ASCII         UniVSPrintAscii;
-  VALUE_TO_UNISTRING        UniValueToString;                         
-  ASCII_VSPRINT             AsciiVSPrint;          
-  ASCII_VSPRINT_UNI         AsciiVSPrintUni;
-  VALUE_TO_ASCIISTRING      AsciiValueToString;
+  UNICODE_VS_PRINT                 UnicodeVSPrint;
+  UNICODE_S_PRINT                  UnicodeSPrint;
+  UNICODE_VS_PRINT_ASCII_FORMAT    UnicodeVSPrintAsciiFormat;
+  UNICODE_S_PRINT_ASCII_FORMAT     UnicodeSPrintAsciiFormat;
+  UNICODE_VALUE_TO_STRING          UnicodeValueToString;
+  ASCII_VS_PRINT                   AsciiVSPrint;
+  ASCII_S_PRINT                    AsciiSPrint;
+  ASCII_VS_PRINT_UNICODE_FORMAT    AsciiVSPrintUnicodeFormat;
+  ASCII_S_PRINT_UNICODE_FORMAT     AsciiSPrintUnicodeFormat;
+  ASCII_VALUE_TO_STRING            AsciiValueToString;
 };
 
 extern EFI_GUID gEfiPrint2ProtocolGuid;
