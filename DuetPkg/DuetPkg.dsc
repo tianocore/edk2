@@ -130,6 +130,7 @@
   }
 
   MdeModulePkg/Core/Dxe/DxeMain.inf
+  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
@@ -140,7 +141,10 @@
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf 
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 
@@ -156,7 +160,10 @@
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   }
-  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
   DuetPkg/CpuIoDxe/CpuIo.inf
   DuetPkg/CpuDxe/Cpu.inf
   IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
