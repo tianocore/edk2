@@ -23,6 +23,44 @@ Abstract:
 #include "BdsPlatform.h"
 
 CHAR16  mFirmwareVendor[] = L"TianoCore.org";
+WIN_NT_SYSTEM_CONFIGURATION mSystemConfigData;
+
+VOID
+SetupVariableInit (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  UINTN                           Size;
+
+  Size = sizeof (mSystemConfigData);
+  Status = gRT->GetVariable (
+                  L"Setup",
+                  &gEfiWinNtSystemConfigGuid,
+                  NULL,
+                  &Size,
+                  (VOID *) &mSystemConfigData
+                  );
+
+  if (EFI_ERROR (Status)) {
+    //
+    // SetupVariable is corrupt
+    //
+    mSystemConfigData.ConOutRow = PcdGet32 (PcdConOutColumn);
+    mSystemConfigData.ConOutColumn = PcdGet32 (PcdConOutRow);
+
+    Status = gRT->SetVariable (
+                    L"Setup",
+                    &gEfiWinNtSystemConfigGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    sizeof (mSystemConfigData),
+                    (VOID *) &mSystemConfigData
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Failed to save Setup Variable to non-volatile storage, Status = %r\n", Status));
+    }
+  }
+}
 
 //
 // BDS Platform Functions
@@ -35,7 +73,7 @@ PlatformBdsInit (
 
 Routine Description:
 
-  Platform Bds init. Incude the platform firmware vendor, revision
+  Platform Bds init. Include the platform firmware vendor, revision
   and so crc check.
 
 Arguments:
@@ -64,6 +102,7 @@ Returns:
   //
   gBS->CalculateCrc32 ((VOID *) gST, sizeof (EFI_SYSTEM_TABLE), &gST->Hdr.CRC32);
 
+  SetupVariableInit ();
 }
 
 EFI_STATUS
