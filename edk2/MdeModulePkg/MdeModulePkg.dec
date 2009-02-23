@@ -329,7 +329,8 @@
   #  from HII database.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
-  ## If TRUE, Framework Hii is supported to provide backward compatibility
+  ## If TRUE, Setup Browser supports GUID opcodes generated from Framework HII VFR file by VFR compiler. 
+  #  This is used to provide backward compatibility support to Framework HII module built togehter EdkCompatbilityPkg.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport|TRUE|BOOLEAN|0x00012008
   
   ## If TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
