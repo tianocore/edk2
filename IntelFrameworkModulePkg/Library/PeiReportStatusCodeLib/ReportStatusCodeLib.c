@@ -67,22 +67,28 @@ InternalReportStatusCode (
   CONST EFI_PEI_SERVICES  **PeiServices;
   EFI_STATUS              Status;
 
-  PeiServices = GetPeiServicesTablePointer ();
-  Status =  (*PeiServices)->ReportStatusCode (
-                             PeiServices,
-                             Type,
-                             Value,
-                             Instance,
-                             (EFI_GUID *)CallerId,
-                             Data
-                             );
-  if (Status == EFI_NOT_AVAILABLE_YET) {
-    Status = OemHookStatusCodeInitialize ();
-    if (!EFI_ERROR (Status)) {
-      return OemHookStatusCodeReport (Type, Value, Instance, (EFI_GUID *) CallerId, Data);
+  if ((ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ||
+    (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) ||
+    (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)) {
+    PeiServices = GetPeiServicesTablePointer ();
+    Status =  (*PeiServices)->ReportStatusCode (
+                               PeiServices,
+                               Type,
+                               Value,
+                               Instance,
+                               (EFI_GUID *)CallerId,
+                               Data
+                               );
+    if (Status == EFI_NOT_AVAILABLE_YET) {
+      Status = OemHookStatusCodeInitialize ();
+      if (!EFI_ERROR (Status)) {
+        return OemHookStatusCodeReport (Type, Value, Instance, (EFI_GUID *) CallerId, Data);
+      }
     }
+    return Status;
   }
-  return Status;
+
+  return EFI_UNSUPPORTED;
 }
 
 
