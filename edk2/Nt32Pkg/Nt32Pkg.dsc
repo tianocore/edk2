@@ -243,7 +243,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
@@ -491,6 +491,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
+  MdeModulePkg\Universal\Variable\Application\VariableInfo.inf
   
 [BuildOptions]
   DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /ALIGN:4096 /SUBSYSTEM:CONSOLE
@@ -550,5 +551,4 @@
   #
   #  EdkCompatibilityPkg/Foundation/Library/Dxe/PrintLite/PrintLib.inf
   #  EdkCompatibilityPkg/Foundation/Library/Dxe/GraphicsLite/Graphics.inf
-
 
