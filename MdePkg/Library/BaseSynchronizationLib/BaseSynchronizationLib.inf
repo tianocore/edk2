@@ -24,6 +24,8 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
+[Sources.Common]
+  BaseSynchronizationLibInternals.h
 
 [Sources.Ia32]
   Ia32/InterlockedCompareExchange64.c | MSFT 
@@ -45,9 +47,12 @@
   SynchronizationGcc.c  | GCC
 
 [Sources.X64]
-  X64/InterlockedCompareExchange64.asm 
-  X64/InterlockedCompareExchange32.asm 
-
+  X64/InterlockedCompareExchange64.c | MSFT
+  X64/InterlockedCompareExchange32.c | MSFT
+  
+  X64/InterlockedCompareExchange64.asm | INTEL
+  X64/InterlockedCompareExchange32.asm | INTEL
+  
   X64/InterlockedDecrement.c | MSFT 
   X64/InterlockedIncrement.c | MSFT 
   SynchronizationMsc.c | MSFT 
