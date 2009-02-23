@@ -38,7 +38,7 @@ Abstract:
 #include <Protocol/UnixThunk.h>
 #include <Protocol/UnixIo.h>
 #include <Guid/Bmp.h>
-#include <Guid/WinNtSystemConfig.h>
+#include <Guid/UnixSystemConfig.h>
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
