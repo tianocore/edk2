@@ -326,7 +326,9 @@
   #  FALSE is for size reduction.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportFullConfigRoutingProtocol|TRUE|BOOLEAN|0x00010101
   
-  ## If TRUE, Default Keyboard Layout is disabled in Usb KeyBoard device.
+  ## If TRUE, USB KeyBoard Driver disables the default keyboard layout.
+  #  The default keyboard layout serves as the backup when no keyboard layout can be retrieved
+  #  from HII database.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
   ## If TRUE, Framework Hii is supported to provide backward compatibility
