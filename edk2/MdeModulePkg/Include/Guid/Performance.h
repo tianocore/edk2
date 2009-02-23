@@ -1,7 +1,8 @@
 /** @file
-  Performance protocol interfaces to support cross module performance logging. 
+  This file defines performance related definitions: the format of performance
+  GUID HOB, performance protocol interfaces and performance variable format.  
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,26 +13,63 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef __PERFORMANCE_H__
-#define __PERFORMANCE_H__
+#ifndef __PERFORMANCE_DATA_H__
+#define __PERFORMANCE_DATA_H__
+
+//
+// PEI_PERFORMANCE_STRING_SIZE must be a multiple of 8.
+//
+#define PEI_PERFORMANCE_STRING_SIZE     8
+#define PEI_PERFORMANCE_STRING_LENGTH   (PEI_PERFORMANCE_STRING_SIZE - 1)
+
+typedef struct {
+  EFI_PHYSICAL_ADDRESS  Handle;
+  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   ///> Measured token string name 
+  CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];  ///> Module string name
+  UINT64                StartTimeStamp;                       ///> Start time point
+  UINT64                EndTimeStamp;                         ///> End time point
+} PEI_PERFORMANCE_LOG_ENTRY;
+
+//
+// The header must be aligned at 8 bytes.
+// 
+typedef struct {
+  UINT32                NumberOfEntries;  ///> The number of all performance log entries
+  UINT32                Reserved;
+} PEI_PERFORMANCE_LOG_HEADER;
+
+
+//
+// The data structure for performance data in ACPI memory.
+//
+#define PERFORMANCE_SIGNATURE   SIGNATURE_32 ('P', 'e', 'r', 'f')
+#define PERF_TOKEN_SIZE         28
+#define PERF_TOKEN_LENGTH       (PERF_TOKEN_SIZE - 1)
+#define PERF_PEI_ENTRY_MAX_NUM  50
+
+typedef struct {
+  CHAR8   Token[PERF_TOKEN_SIZE];
+  UINT32  Duration;
+} PERF_DATA;
+
+typedef struct {
+  UINT64        BootToOs;
+  UINT64        S3Resume;
+  UINT32        S3EntryNum;
+  PERF_DATA     S3Entry[PERF_PEI_ENTRY_MAX_NUM];
+  UINT64        CpuFreq;
+  UINT64        BDSRaw;
+  UINT32        Count;
+  UINT32        Signiture;
+} PERF_HEADER;
 
 #define PERFORMANCE_PROTOCOL_GUID \
   { 0x76b6bdfa, 0x2acd, 0x4462, {0x9E, 0x3F, 0xcb, 0x58, 0xC9, 0x69, 0xd9, 0x37 } }
 
 //
-// Forward reference for pure ANSI compatability
+// Forward reference for pure ANSI compatibility
 //
 typedef struct _PERFORMANCE_PROTOCOL PERFORMANCE_PROTOCOL;
-
-#define SEC_TOK                         "SEC"
-#define DXE_TOK                         "DXE"
-#define SHELL_TOK                       "SHELL"
-#define PEI_TOK                         "PEI"
-#define BDS_TOK                         "BDS"
-#define DRIVERBINDING_START_TOK         "DB:Start:"
-#define DRIVERBINDING_SUPPORT_TOK       "DB:Support:"
-#define START_IMAGE_TOK                 "StartImage:"
-#define LOAD_IMAGE_TOK                  "LoadImage:"
 
 //
 // DXE_PERFORMANCE_STRING_SIZE must be a multiple of 8.
