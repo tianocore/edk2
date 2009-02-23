@@ -199,7 +199,7 @@ typedef struct {
   UINT8 Peripheral_Type : 5;
   UINT8 Peripheral_Qualifier : 3;
   UINT8 DeviceType_Modifier : 7;
-  UINT8 RMB : 1;
+  UINT8 Rmb : 1;
   UINT8 Version;
   UINT8 Response_Data_Format;
   UINT8 Addnl_Length;
@@ -215,7 +215,7 @@ typedef struct {
   UINT8 Segment_Number;
   UINT8 Sense_Key : 4;
   UINT8 Reserved_21 : 1;
-  UINT8 ILI : 1;
+  UINT8 Ili : 1;
   UINT8 Reserved_22 : 2;
   UINT8 Information_3_6[4];
   UINT8 Addnl_Sense_Length;           ///< Additional sense length (n-7)
