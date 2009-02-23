@@ -52,10 +52,6 @@
   BaseLib
   PcdLib
 
-[Guids]
-  gEfiGenericPlatformVariableGuid               ## PRODUCES ##Variable:L"TimerVar"
-  gEfiGenericPlatformVariableGuid               ## CONSUMES ##Variable:L"TimerVar"
-
 [Protocols]
   gEfiRealTimeClockArchProtocolGuid             ## PRODUCES
 
