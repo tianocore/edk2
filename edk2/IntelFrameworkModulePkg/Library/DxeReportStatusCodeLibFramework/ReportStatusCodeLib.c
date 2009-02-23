@@ -48,22 +48,28 @@ InternalReportStatusCode (
   IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL
   )
 {
-  //
-  // If gStatusCode is NULL, then see if a Status Code Protocol instance is present
-  // in the handle database.
-  //
-  if (mReportStatusCode == NULL) {
-    mReportStatusCode = InternalGetReportStatusCode ();
+  if ((ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ||
+    (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) ||
+    (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)) {
+    //
+    // If gStatusCode is NULL, then see if a Status Code Protocol instance is present
+    // in the handle database.
+    //
     if (mReportStatusCode == NULL) {
-      return EFI_UNSUPPORTED;
+      mReportStatusCode = InternalGetReportStatusCode ();
+      if (mReportStatusCode == NULL) {
+        return EFI_UNSUPPORTED;
+      }
     }
+  
+    //
+    // A Status Code Protocol is present in the handle database, so pass in all the
+    // parameters to the ReportStatusCode() service of the Status Code Protocol
+    //
+    return (*mReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
   }
-
-  //
-  // A Status Code Protocol is present in the handle database, so pass in all the
-  // parameters to the ReportStatusCode() service of the Status Code Protocol
-  //
-  return (*mReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
+  
+  return EFI_UNSUPPORTED;
 }
 
 
