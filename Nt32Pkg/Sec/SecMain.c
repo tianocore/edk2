@@ -1058,37 +1058,7 @@ SecNt32PeCoffGetImageInfo (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  EFI_STATUS  Status;
-
-  Status = PeCoffLoaderGetImageInfo (ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  switch (ImageContext->ImageType) {
-
-  case EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION:
-    ImageContext->ImageCodeMemoryType = EfiLoaderCode;
-    ImageContext->ImageDataMemoryType = EfiLoaderData;
-    break;
-
-  case EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER:
-    ImageContext->ImageCodeMemoryType = EfiBootServicesCode;
-    ImageContext->ImageDataMemoryType = EfiBootServicesData;
-    break;
-
-  case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
-  case EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER:
-    ImageContext->ImageCodeMemoryType = EfiRuntimeServicesCode;
-    ImageContext->ImageDataMemoryType = EfiRuntimeServicesData;
-    break;
-
-  default:
-    ImageContext->ImageError = IMAGE_ERROR_INVALID_SUBSYSTEM;
-    return RETURN_UNSUPPORTED;
-  }
-
-  return Status;
+  return PeCoffLoaderGetImageInfo (ImageContext);
 }
 
 EFI_STATUS
@@ -1098,10 +1068,7 @@ SecNt32PeCoffLoadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  EFI_STATUS  Status;
-
-  Status = PeCoffLoaderLoadImage (ImageContext);
-  return Status;
+  return PeCoffLoaderLoadImage (ImageContext);
 }
 
 EFI_STATUS
