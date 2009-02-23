@@ -1,23 +1,22 @@
 #/**@file
-#   This library instance produce SerialIo library class for DUET platform.
+#   Library instance for SerialIo library class
 #
-# Copyright (c) 2006 - 2007, Intel Corporation                                                  
-# All rights reserved. This program and the accompanying materials                          
-# are licensed and made available under the terms and conditions of the BSD License         
-# which accompanies this distribution.  The full text of the license may be found at        
-# http://opensource.org/licenses/bsd-license.php                                            
-#                                                                                           
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-# 
+#  Copyright (c) 2006 - 2009, Intel Corporation
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #**/
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DuetSerialPortLib
+  BASE_NAME                      = PcAtSerialPortLib
   FILE_GUID                      = 1B25AF84-1EA8-4b52-894E-BFA6880B97FF
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib
   EDK_RELEASE_VERSION            = 0x00020000
@@ -27,10 +26,9 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  SerialPortLib
+  BaseLib
   IoLib
 
 [Sources.common]
   SerialPortLib.c
-
 
