@@ -258,8 +258,8 @@ DxeMain (
   // Call constructor for all libraries
   //
   ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
-  PERF_END   (0,PEI_TOK, NULL, 0) ;
-  PERF_START (0,DXE_TOK, NULL, 0) ;
+  PERF_END   (0,"PEI", NULL, 0) ;
+  PERF_START (0,"DXE", NULL, 0) ;
 
   //
   // Initialize the Global Coherency Domain Services

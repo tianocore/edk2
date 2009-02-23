@@ -541,13 +541,13 @@ CoreConnectSingleController (
     for (Index = 0; (Index < NumberOfSortedDriverBindingProtocols) && !DriverFound; Index++) {
       if (SortedDriverBindingProtocols[Index] != NULL) {
         DriverBinding = SortedDriverBindingProtocols[Index];
-        PERF_START (DriverBinding->DriverBindingHandle, DRIVERBINDING_SUPPORT_TOK, NULL, 0);
+        PERF_START (DriverBinding->DriverBindingHandle, "DB:Support:", NULL, 0);
         Status = DriverBinding->Supported(
                                   DriverBinding,
                                   ControllerHandle,
                                   RemainingDevicePath
                                   );
-        PERF_END (DriverBinding->DriverBindingHandle, DRIVERBINDING_SUPPORT_TOK, NULL, 0);
+        PERF_END (DriverBinding->DriverBindingHandle, "DB:Support:", NULL, 0);
         if (!EFI_ERROR (Status)) {
           SortedDriverBindingProtocols[Index] = NULL;
           DriverFound = TRUE;
@@ -556,13 +556,13 @@ CoreConnectSingleController (
           // A driver was found that supports ControllerHandle, so attempt to start the driver
           // on ControllerHandle.
           //
-          PERF_START (DriverBinding->DriverBindingHandle, DRIVERBINDING_START_TOK, NULL, 0);
+          PERF_START (DriverBinding->DriverBindingHandle, "DB:Start:", NULL, 0);
           Status = DriverBinding->Start (
                                     DriverBinding,
                                     ControllerHandle,
                                     RemainingDevicePath
                                     );
-          PERF_END (DriverBinding->DriverBindingHandle, DRIVERBINDING_START_TOK, NULL, 0);
+          PERF_END (DriverBinding->DriverBindingHandle, "DB:Start:", NULL, 0);
 
           if (!EFI_ERROR (Status)) {
             //
