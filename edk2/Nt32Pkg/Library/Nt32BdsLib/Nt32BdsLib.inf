@@ -46,6 +46,7 @@
   BaseLib
   MemoryAllocationLib
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   BaseMemoryLib
   DebugLib
   PcdLib
@@ -53,3 +54,11 @@
 
 [Guids]
   gEfiDefaultBmpLogoGuid
+  gEfiWinNtSystemConfigGuid
+
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

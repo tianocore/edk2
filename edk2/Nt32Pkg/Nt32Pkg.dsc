@@ -225,7 +225,7 @@
   WinNtLib|Nt32Pkg/Library/DxeWinNtLib/DxeWinNtLib.inf
   OemHookStatusCodeLib|Nt32Pkg/Library/DxeNt32OemHookStatusCodeLib/DxeNt32OemHookStatusCodeLib.inf
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  PrintLib|MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
+  PrintLib|MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
 
 
 ################################################################################
@@ -367,6 +367,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|10
 
+[PcdsDynamicHii.common.DEFAULT]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x0|80 # Variable: L"Setup"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x4|25 # Variable: L"Setup"
 
 ###################################################################################################
 #
@@ -441,7 +444,10 @@
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
-  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
@@ -480,6 +486,7 @@
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
   MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -505,42 +512,43 @@
   #
   # Libraries common to PEI and DXE
   #
-  #  EdkCompatibilityPkg\Foundation\Efi\Guid\EfiGuidLib.inf
-  #  EdkCompatibilityPkg\Foundation\Framework\Guid\EdkFrameworkGuidLib.inf
-  #  EdkCompatibilityPkg\Foundation\Guid\EdkGuidLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\EfiCommonLib\EfiCommonLib.inf
-  #  EdkCompatibilityPkg\Foundation\Cpu\Pentium\CpuIA32Lib\CpuIA32Lib.inf
-  #  EdkCompatibilityPkg\Foundation\Cpu\Itanium\CpuIA64Lib\CpuIA64Lib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\CustomizedDecompress\CustomizedDecompress.inf
-  #  EdkCompatibilityPkg\Foundation\Library\CompilerStub\CompilerStubLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Hob\HobLib.inf
+  #  EdkCompatibilityPkg/Foundation/Efi/Guid/EfiGuidLib.inf
+  #  EdkCompatibilityPkg/Foundation/Framework/Guid/EdkFrameworkGuidLib.inf
+  #  EdkCompatibilityPkg/Foundation/Guid/EdkGuidLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib.inf
+  #  EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
+  #  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/CustomizedDecompress/CustomizedDecompress.inf
+  #  EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/Hob/HobLib.inf
 
   #
   # PEI libraries
   #
-  #  EdkCompatibilityPkg\Foundation\Framework\Ppi\EdkFrameworkPpiLib.inf
-  #  EdkCompatibilityPkg\Foundation\Ppi\EdkPpiLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Pei\PeiLib\PeiLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Pei\Hob\PeiHobLib.inf
+  #  EdkCompatibilityPkg/Foundation/Framework/Ppi/EdkFrameworkPpiLib.inf
+  #  EdkCompatibilityPkg/Foundation/Ppi/EdkPpiLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Pei/Hob/PeiHobLib.inf
 
   #
   # DXE libraries
   #
-  #  EdkCompatibilityPkg\Foundation\Core\Dxe\ArchProtocol\ArchProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Efi\Protocol\EfiProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Framework\Protocol\EdkFrameworkProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Protocol\EdkProtocolLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiDriverLib\EfiDriverLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\RuntimeDxe\EfiRuntimeLib\EfiRuntimeLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Graphics\Graphics.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiIfrSupportLib\EfiIfrSupportLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\Print\PrintLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiScriptLib\EfiScriptLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\EfiUiLib\EfiUiLib.inf
+  #  EdkCompatibilityPkg/Foundation/Core/Dxe/ArchProtocol/ArchProtocolLib.inf
+  #  EdkCompatibilityPkg/Foundation/Efi/Protocol/EfiProtocolLib.inf
+  #  EdkCompatibilityPkg/Foundation/Framework/Protocol/EdkFrameworkProtocolLib.inf
+  #  EdkCompatibilityPkg/Foundation/Protocol/EdkProtocolLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiDriverLib/EfiDriverLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/RuntimeDxe/EfiRuntimeLib/EfiRuntimeLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/Graphics/Graphics.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiIfrSupportLib/EfiIfrSupportLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/Print/PrintLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiScriptLib/EfiScriptLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/EfiUiLib/EfiUiLib.inf
 
   #
   # Print/Graphics Library consume SetupBrowser Print Protocol
   #
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\PrintLite\PrintLib.inf
-  #  EdkCompatibilityPkg\Foundation\Library\Dxe\GraphicsLite\Graphics.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/PrintLite/PrintLib.inf
+  #  EdkCompatibilityPkg/Foundation/Library/Dxe/GraphicsLite/Graphics.inf
+
 
