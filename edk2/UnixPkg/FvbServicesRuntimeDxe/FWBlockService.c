@@ -19,7 +19,7 @@ Revision History
 
 --*/
 
-#include "PiDxe.h"
+#include <PiDxe.h>
 #include <Guid/EventGroup.h>
 #include <Protocol/FvbExtension.h>
 #include <Protocol/FirmwareVolumeBlock.h>
@@ -846,7 +846,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolGetPhysicalAddress (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
   OUT EFI_PHYSICAL_ADDRESS                        *Address
   )
 /*++
@@ -877,8 +877,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolGetBlockSize (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  IN  EFI_LBA                                     Lba,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_LBA                                     Lba,
   OUT UINTN                                       *BlockSize,
   OUT UINTN                                       *NumOfBlocks
   )
@@ -921,7 +921,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolGetAttributes (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
   OUT EFI_FVB_ATTRIBUTES_2                          *Attributes
   )
 /*++
@@ -948,7 +948,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolSetAttributes (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
   IN OUT EFI_FVB_ATTRIBUTES_2                       *Attributes
   )
 /*++
@@ -975,7 +975,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolEraseBlocks (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   ...  
   )
 /*++
@@ -1073,7 +1073,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolWrite (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
@@ -1115,15 +1115,15 @@ Returns:
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  return FvbWriteBlock (FvbDevice->Instance, Lba, Offset, NumBytes, Buffer, mFvbModuleGlobal, EfiGoneVirtual ());
+  return FvbWriteBlock (FvbDevice->Instance, (EFI_LBA)Lba, (UINTN)Offset, NumBytes, (UINT8 *)Buffer, mFvbModuleGlobal, EfiGoneVirtual ());
 }
 
 EFI_STATUS
 EFIAPI
 FvbProtocolRead (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  IN EFI_LBA                                      Lba,
-  IN UINTN                                        Offset,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_LBA                                      Lba,
+  IN CONST UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
   IN UINT8                                        *Buffer
   )
@@ -1256,7 +1256,7 @@ Returns:
   Ptr           = (UINT16 *) FwVolHeader;
   Checksum      = 0;
   while (HeaderLength > 0) {
-    Checksum = Checksum + (*Ptr);
+    Checksum = (UINT16)(Checksum + (*Ptr));
     HeaderLength--;
     Ptr++;
   }
@@ -1312,12 +1312,8 @@ Returns:
   // Allocate runtime services data for global variable, which contains
   // the private data of all firmware volume block instances
   //
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  sizeof (ESAL_FWB_GLOBAL),
-                  (VOID**) &mFvbModuleGlobal
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mFvbModuleGlobal = AllocateRuntimePool (sizeof (ESAL_FWB_GLOBAL));
+  ASSERT (mFvbModuleGlobal != NULL);
 
   //
   // Calculate the total size for all firmware volume block instances
@@ -1366,12 +1362,8 @@ Returns:
   // the private data of each FV instance. But in virtual mode or in physical
   // mode, the address of the the physical memory may be different.
   //
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  BufferSize,
-                  (VOID**) &mFvbModuleGlobal->FvInstance[FVB_PHYSICAL]
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] = AllocateRuntimePool (BufferSize);
+  ASSERT (mFvbModuleGlobal->FvInstance[FVB_PHYSICAL] != NULL);
 
   //
   // Make a virtual copy of the FvInstance pointer.
@@ -1452,12 +1444,8 @@ Returns:
     //
     // Add a FVB Protocol Instance
     //
-    Status = gBS->AllocatePool (
-                    EfiRuntimeServicesData,
-                    sizeof (EFI_FW_VOL_BLOCK_DEVICE),
-                    (VOID**) &FvbDevice
-                    );
-    ASSERT_EFI_ERROR (Status);
+    FvbDevice = AllocateRuntimePool (sizeof (EFI_FW_VOL_BLOCK_DEVICE));
+    ASSERT (FvbDevice != NULL);
 
     CopyMem (FvbDevice, &mFvbDeviceTemplate, sizeof (EFI_FW_VOL_BLOCK_DEVICE));
 
@@ -1541,12 +1529,8 @@ Returns:
   //
   // Allocate for scratch space, an intermediate buffer for FVB extention
   //
-  Status = gBS->AllocatePool (
-                  EfiRuntimeServicesData,
-                  MaxLbaSize,
-                  (VOID**)&mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL]
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL] = AllocateRuntimePool (MaxLbaSize);
+  ASSERT (mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL] != NULL);
 
   mFvbModuleGlobal->FvbScratchSpace[FVB_VIRTUAL] = mFvbModuleGlobal->FvbScratchSpace[FVB_PHYSICAL];
 

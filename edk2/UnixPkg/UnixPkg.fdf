@@ -211,7 +211,8 @@ INF  UnixPkg/UnixSerialIoDxe/UnixSerialIo.inf
 INF  UnixPkg/UnixUgaDxe/UnixUga.inf
 #INF  UnixPkg/UnixConsoleDxe/UnixConsole.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf  
+INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf 
 INF  UnixPkg/UnixSimpleFileSystemDxe/UnixSimpleFileSystem.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
