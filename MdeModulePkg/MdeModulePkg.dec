@@ -286,7 +286,7 @@
   #  It can be disabled to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE|BOOLEAN|0x00010038
     
-  ## If this PCD is set as TRUE, the code specific to NT emulator will be endabled.
+  ## If this PCD is set as TRUE, the code specific to NT emulator will be enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE|BOOLEAN|0x0001003e
   
   ## If TRUE, track statistical information about variable usage stored in the EFI system table.
@@ -298,10 +298,12 @@
   ## If TRUE, Unicode Collation 2 Protocol will be installed.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE|BOOLEAN|0x00010041
   
-  ## If TRUE, GOP device is supported in graphics mode.
+  ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
+  #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE|BOOLEAN|0x00010042
   
-  ## If TRUE, UGA device is supported in graphics mode.
+  ## If TRUE, UGA Draw Protocol will be installed on virtual handle created by ConsplitterDxe.
+  #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE|BOOLEAN|0x00010043
   
   ## If TRUE, TE image will first be searched in PeiCore dispatcher. 
