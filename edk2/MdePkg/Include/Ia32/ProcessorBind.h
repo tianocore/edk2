@@ -23,11 +23,11 @@
 //
 // Make sure we are using the correct packing rules per EFI specification
 //
-#ifndef __GNUC__
+#if !defined(__GNUC__)
 #pragma pack()
 #endif
 
-#if __INTEL_COMPILER
+#if defined(__INTEL_COMPILER)
 //
 // Disable ICC's remark #869: "Parameter" was never referenced warning.
 // This is legal ANSI C code so we disable the remark that is turned on with -Wall
@@ -49,7 +49,7 @@
 #endif
 
 
-#if _MSC_EXTENSIONS
+#if defined(_MSC_EXTENSIONS)
 
 //
 // Disable warning that make it impossible to compile at /W4
@@ -95,7 +95,7 @@
   // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
   //
  
-  #if _MSC_EXTENSIONS 
+  #if defined(_MSC_EXTENSIONS)
 
     //
     // use Microsoft C complier dependent integer width types 
@@ -295,13 +295,13 @@ typedef INT32   INTN;
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify their member functions with EFIAPI.
 //
-#if _MSC_EXTENSIONS
+#if defined(_MSC_EXTENSIONS)
   ///
   /// Microsoft* compiler specific method for EFIAPI calling convension
   /// 
   #define EFIAPI __cdecl  
 #else
-  #if __GNUC__
+  #if defined(__GNUC__)
     ///
     /// GCC specific method for EFIAPI calling convension
     /// 
@@ -314,7 +314,7 @@ typedef INT32   INTN;
 //  if the /OPT:REF linker option is used. We defined a macro as this is a 
 //  a non standard extension
 //
-#if _MSC_EXTENSIONS
+#if defined(_MSC_EXTENSIONS)
   ///
   /// Remove global variable from the linked image if there are no references to 
   /// it after all compiler and linker optimizations have been performed.
@@ -331,7 +331,7 @@ typedef INT32   INTN;
 //
 // For symbol name in GNU assembly code, an extra "_" is necessary
 //
-#if __GNUC__
+#if defined(__GNUC__)
   #if defined(linux)
     #define ASM_PFX(name) name
   #else
