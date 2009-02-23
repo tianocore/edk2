@@ -50,7 +50,7 @@ CreateBannerOpCode (
   Banner.Header.OpCode  = EFI_IFR_GUID_OP;
   Banner.Header.Length  = sizeof (EFI_IFR_GUID_BANNER);
   Banner.Header.Scope   = 0;
-  CopyMem (&Banner.Guid, &mIfrVendorGuid, sizeof (EFI_IFR_GUID));
+  CopyMem (&Banner.Guid, &gEfiIfrTianoGuid, sizeof (EFI_IFR_GUID));
   Banner.ExtendOpCode   = EFI_IFR_EXTEND_OP_BANNER;
   Banner.Title          = Title;
   Banner.LineNumber     = LineNumber;

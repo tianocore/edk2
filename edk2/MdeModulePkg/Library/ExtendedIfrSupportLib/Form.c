@@ -180,7 +180,7 @@ UpdateFormPackageData (
       ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
       LabelNumber = ReadUnaligned16 ((UINT16 *)(VOID *)&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Number);
       if ((ExtendOpCode != EFI_IFR_EXTEND_OP_LABEL) || (LabelNumber != Label) 
-          || !CompareGuid ((EFI_GUID *)(UINTN)(&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid), &mIfrVendorGuid)) {
+          || !CompareGuid ((EFI_GUID *)(UINTN)(&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid), &gEfiIfrTianoGuid)) {
         //
         // Go to the next Op-Code
         //
@@ -219,7 +219,7 @@ UpdateFormPackageData (
           IfrOpHdr = (EFI_IFR_OP_HEADER *) ((CHAR8 *) (IfrOpHdr) + IfrOpHdr->Length);
           if (IfrOpHdr->OpCode == EFI_IFR_GUID_OP) {
             ExtendOpCode = ((EFI_IFR_GUID_LABEL *) IfrOpHdr)->ExtendOpCode;
-            if ((ExtendOpCode == EFI_IFR_EXTEND_OP_LABEL) && CompareGuid ((EFI_GUID *)(UINTN)(&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid), &mIfrVendorGuid)) {
+            if ((ExtendOpCode == EFI_IFR_EXTEND_OP_LABEL) && CompareGuid ((EFI_GUID *)(UINTN)(&((EFI_IFR_GUID_LABEL *)IfrOpHdr)->Guid), &gEfiIfrTianoGuid)) {
               break;
             }
           }

@@ -24,10 +24,6 @@ BOOLEAN          mInScopeGrayOut;
 FORM_EXPRESSION  *mSuppressExpression;
 FORM_EXPRESSION  *mGrayOutExpression;
 
-EFI_GUID  gTianoHiiIfrGuid = EFI_IFR_TIANO_GUID;
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID  mFrameworkHiiCompatibilityGuid = EFI_IFR_FRAMEWORK_GUID;
-
-
 /**
   Initialize Statement header members.
 
@@ -148,7 +144,7 @@ IsNextOpCodeGuidedVarEqName (
   //
   OpCodeData += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
   if (*OpCodeData == EFI_IFR_GUID_OP) {
-    if (CompareGuid (&mFrameworkHiiCompatibilityGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
+    if (CompareGuid (&gEfiIfrFrameworkGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
       //
       // Specific GUIDed opcodes to support IFR generated from Framework HII VFR 
       //
@@ -1623,7 +1619,7 @@ ParseOpCodes (
     // Vendor specific
     //
     case EFI_IFR_GUID_OP:
-      if (CompareGuid (&gTianoHiiIfrGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
+      if (CompareGuid (&gEfiIfrTianoGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
         //
         // Tiano specific GUIDed opcodes
         //

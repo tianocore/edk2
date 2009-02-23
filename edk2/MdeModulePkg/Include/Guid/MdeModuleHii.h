@@ -233,5 +233,8 @@ typedef struct _EFI_IFR_GUID_VAREQNAME {
 
 #pragma pack()
 
+extern EFI_GUID gEfiIfrTianoGuid;
+extern EFI_GUID gEfiIfrFrameworkGuid;
+
 #endif
 

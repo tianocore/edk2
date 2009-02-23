@@ -1215,7 +1215,7 @@ InsertDriverImage (
 
   if (!Found) {
     //
-    // if not find the wantted order location, add it as last item of the controller mapping item
+    // if not find the wanted order location, add it as last item of the controller mapping item
     //
     InsertTailList (&OverrideItem->DriverInfoList, &DriverImageInfo->Link);
     OverrideItem->DriverInfoNum ++;

@@ -32,7 +32,7 @@ Revision History
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
 
-#include <MdeModuleHii.h>
+#include <Guid/MdeModuleHii.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>

@@ -57,14 +57,14 @@
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseSetEnabled
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseGetSizeEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseExEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseCallbackOnSetEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseGetSizeEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled
 
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry || PcdPeiPcdDatabaseCallbackOnSetEnabled
 
 [Depex]
   TRUE

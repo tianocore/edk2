@@ -63,6 +63,10 @@
   HiiLib
   ExtendedHiiLib
 
+[Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES  ## GUID
+  gEfiIfrFrameworkGuid                          ## CONSUMES  ## GUID
+
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
   gEfiHiiStringProtocolGuid                     ## CONSUMES

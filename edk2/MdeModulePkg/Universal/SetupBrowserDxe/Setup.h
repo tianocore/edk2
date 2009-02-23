@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiString.h>
 #include <Protocol/ConsoleControl.h>
 
-#include <MdeModuleHii.h>
+#include <Guid/MdeModuleHii.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
