@@ -288,8 +288,8 @@ BdsEntry (
   //
   // Insert the performance probe
   //
-  PERF_END (0, DXE_TOK, NULL, 0);
-  PERF_START (0, BDS_TOK, NULL, 0);
+  PERF_END (0, "DXE", NULL, 0);
+  PERF_START (0, "BDS", NULL, 0);
 
   //
   // Initialize the global system boot option and driver option

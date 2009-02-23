@@ -26,7 +26,7 @@
 #define LABEL_END                          0xffff
 
 #define DEVICE_MANAGER_CLASS               0x0000
-#define FRONT_PAGE_SUBCLASS		           0x0003
+#define FRONT_PAGE_SUBCLASS                0x0003
 
 #define DEVICE_MANAGER_FORM_ID             0x1000
 
