@@ -1,26 +1,16 @@
-/*++
+/** @file
+  EFI PCAT ISA ACPI Driver for a Generic PC Platform
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006, 2009, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-    PcatIsaAcpi.c
-    
-Abstract:
-
-    EFI PCAT ISA ACPI Driver for a Generic PC Platform
-
-Revision History
-
---*/
+**/
 
 #include "PcatIsaAcpi.h"
 
@@ -107,7 +97,7 @@ Returns:
                     0,
                     sizeof(Pci) / sizeof(UINT32), 
                     &Pci);
-  
+
   if (!EFI_ERROR (Status)) {
     Status = EFI_UNSUPPORTED;
     if ((Pci.Hdr.Command & 0x03) == 0x03) {
@@ -124,7 +114,7 @@ Returns:
         //
         if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE &&
             Pci.Hdr.VendorId == 0x8086 && 
-            Pci.Hdr.DeviceId == 0x7110) {
+            (Pci.Hdr.DeviceId & 0xF000) == 0x7000) {
           Status = EFI_SUCCESS;
         }
       } 
