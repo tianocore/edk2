@@ -51,10 +51,9 @@
 
 [Ppis]
   gEfiPeiMemoryDiscoveredPpiGuid                # PPI ALWAYS_PRODUCED
-  gPeiBaseMemoryTestPpiGuid                     # PPI ALWAYS_CONSUMED
   gPeiUnixAutoScanPpiGuid                       # PPI ALWAYS_CONSUMED
 
 
 [Depex]
-  gPeiUnixAutoScanPpiGuid AND gEfiPeiMasterBootModePpiGuid AND gPeiBaseMemoryTestPpiGuid
+  gPeiUnixAutoScanPpiGuid AND gEfiPeiMasterBootModePpiGuid
 

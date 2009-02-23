@@ -47,8 +47,7 @@
   PeiServicesLib
 
 [Ppis]
-  gPeiBaseMemoryTestPpiGuid                     # PPI ALWAYS_CONSUMED
   gPeiNtAutoScanPpiGuid                         # PPI ALWAYS_CONSUMED
 
 [depex]
-  gPeiNtAutoScanPpiGuid AND gEfiPeiMasterBootModePpiGuid AND gPeiBaseMemoryTestPpiGuid
+  gPeiNtAutoScanPpiGuid AND gEfiPeiMasterBootModePpiGuid

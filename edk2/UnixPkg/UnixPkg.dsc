@@ -424,7 +424,6 @@
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   UnixPkg/BootModePei/BootModePei.inf
   UnixPkg/UnixFlashMapPei/FlashMap.inf
-  MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   UnixPkg/UnixAutoScanPei/UnixAutoScan.inf
   UnixPkg/UnixFirmwareVolumePei/UnixFwh.inf

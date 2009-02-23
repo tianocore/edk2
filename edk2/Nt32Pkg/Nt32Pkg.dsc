@@ -404,7 +404,6 @@
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
   Nt32Pkg/BootModePei/BootModePei.inf
   Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
-  MdeModulePkg/Universal/MemoryTest/BaseMemoryTestPei/BaseMemoryTestPei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
   Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
