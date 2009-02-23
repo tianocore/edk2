@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
-#include <Protocol/HotPlugDevice.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/ConsoleInDevice.h>
