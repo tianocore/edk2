@@ -293,9 +293,8 @@ USBKeyboardDriverBindingStart (
   // Install Simple Text Input Protocol and Simple Text Input Ex Protocol
   // for the USB keyboard device.
   // USB keyboard is a hot plug device, and expected to work immediately
-  // when plugging into system, so a HotPlugDeviceGuid is installed onto
-  // the usb keyboard device handle, to distinguish it from other conventional
-  // console devices.
+  // when plugging into system, other conventional console devices could
+  // distinguish it by its device path.
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Controller,
@@ -303,8 +302,6 @@ USBKeyboardDriverBindingStart (
                   &UsbKeyboardDevice->SimpleInput,
                   &gEfiSimpleTextInputExProtocolGuid,
                   &UsbKeyboardDevice->SimpleInputEx,
-                  &gEfiHotPlugDeviceGuid,
-                  NULL,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
@@ -325,8 +322,6 @@ USBKeyboardDriverBindingStart (
            &UsbKeyboardDevice->SimpleInput,
            &gEfiSimpleTextInputExProtocolGuid,
            &UsbKeyboardDevice->SimpleInputEx,
-           &gEfiHotPlugDeviceGuid,
-           NULL,
            NULL
            );
     goto ErrorExit;
@@ -356,8 +351,6 @@ USBKeyboardDriverBindingStart (
            &UsbKeyboardDevice->SimpleInput,
            &gEfiSimpleTextInputExProtocolGuid,
            &UsbKeyboardDevice->SimpleInputEx,
-           &gEfiHotPlugDeviceGuid,
-           NULL,
            NULL
            );
     goto ErrorExit;
@@ -495,8 +488,6 @@ USBKeyboardDriverBindingStop (
                   &UsbKeyboardDevice->SimpleInput,
                   &gEfiSimpleTextInputExProtocolGuid,
                   &UsbKeyboardDevice->SimpleInputEx,
-                  &gEfiHotPlugDeviceGuid,
-                  NULL,
                   NULL
                   );
   //

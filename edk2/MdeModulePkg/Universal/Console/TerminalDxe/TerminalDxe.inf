@@ -73,7 +73,6 @@
   gEfiSimpleTextInputExProtocolGuid             ## BY_START
   gEfiSimpleTextOutProtocolGuid                 ## BY_START
   gSimpleTextInExNotifyGuid                     ## SOMETIMES_CONSUMES
-  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError

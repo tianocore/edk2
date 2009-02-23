@@ -256,7 +256,7 @@ ConPlatformTextInDriverBindingStart (
     return Status;
   }
   //
-  // Check the device handle, if it is a hot plug device,
+  // Check the device path, if it is a hot plug device,
   // do not put the device path into ConInDev, and install
   // gEfiConsoleInDeviceGuid to the device handle directly.
   // The policy is, make hot plug device plug in and play immediately.
@@ -373,7 +373,7 @@ ConPlatformTextOutDriverBindingStart (
     return Status;
   }
   //
-  // Check the device handle, if it is a hot plug device,
+  // Check the device path, if it is a hot plug device,
   // do not put the device path into ConOutDev and ErrOutDev,
   // and install gEfiConsoleOutDeviceGuid to the device handle directly.
   // The policy is, make hot plug device plug in and play immediately.
@@ -953,24 +953,31 @@ IsHotPlugDevice (
   IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
   )
 {
-  //
-  // Check device whether is hot plug device or not throught Device Path
-  // 
-  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
-      (DevicePathSubType (DevicePath) == MSG_USB_DP ||
-       DevicePathSubType (DevicePath) == MSG_USB_CLASS_DP ||
-       DevicePathSubType (DevicePath) == MSG_USB_WWID_DP)) {
+  EFI_DEVICE_PATH_PROTOCOL     *CheckDevicePath;
+
+  CheckDevicePath = DevicePath;
+  while (!IsDevicePathEnd (CheckDevicePath)) {
     //
-    // If Device is USB device
-    //
-    return TRUE;
-  }
-  if ((DevicePathType (DevicePath) == HARDWARE_DEVICE_PATH) &&
-      (DevicePathSubType (DevicePath) == HW_PCCARD_DP)) {
-    //
-    // If Device is PCCard
-    //
-    return TRUE;
+    // Check device whether is hot plug device or not throught Device Path
+    // 
+    if ((DevicePathType (CheckDevicePath) == MESSAGING_DEVICE_PATH) &&
+        (DevicePathSubType (CheckDevicePath) == MSG_USB_DP ||
+         DevicePathSubType (CheckDevicePath) == MSG_USB_CLASS_DP ||
+         DevicePathSubType (CheckDevicePath) == MSG_USB_WWID_DP)) {
+      //
+      // If Device is USB device
+      //
+      return TRUE;
+    }
+    if ((DevicePathType (CheckDevicePath) == HARDWARE_DEVICE_PATH) &&
+        (DevicePathSubType (CheckDevicePath) == HW_PCCARD_DP)) {
+      //
+      // If Device is PCCard
+      //
+      return TRUE;
+    }
+  
+    CheckDevicePath = NextDevicePathNode (CheckDevicePath);
   }
 
   return FALSE;

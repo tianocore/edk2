@@ -79,7 +79,6 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSimpleTextInProtocolGuid                  ## BY_START
   gEfiSimpleTextInputExProtocolGuid             ## BY_START
-  gEfiHotPlugDeviceGuid                         ## BY_START
   ##
   # If HII Database Protocol exists, then keyboard layout from HII database is used.
   # Otherwise, USB keyboard module tries to use its carried default layout.

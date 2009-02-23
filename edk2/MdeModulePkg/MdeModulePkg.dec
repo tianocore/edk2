@@ -269,10 +269,6 @@
   ## Include/Protocol/SimpleTextInExNotify.h
   gSimpleTextInExNotifyGuid      = { 0x856f2def, 0x4e93, 0x4d6b, { 0x94, 0xce, 0x1c, 0xfe, 0x47, 0x01, 0x3e, 0xa5 }}  
 
-  ## Protocol Guid specify the device is the hot plug device.
-  ## Include/Protocol/HotPlugDevice.h
-  gEfiHotPlugDeviceGuid          = { 0x220AC432, 0x1D43, 0x49E5, { 0xA7, 0x4F, 0x4C, 0x9D, 0xA6, 0x7A, 0xD2, 0x3B }}
-
 [PcdsFeatureFlag.common]
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
