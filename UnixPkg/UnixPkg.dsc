@@ -219,7 +219,7 @@
   UnixLib|UnixPkg/Library/DxeUnixLib/DxeUnixLib.inf
   OemHookStatusCodeLib|UnixPkg/Library/DxeUnixOemHookStatusCodeLib/DxeUnixOemHookStatusCodeLib.inf
   DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  PrintLib|MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
+  PrintLib|MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
 
 ################################################################################
 #
@@ -389,6 +389,10 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize|L"64!64"|VOID*|10
   gEfiUnixPkgTokenSpaceGuid.PcdUnixSerialPort|L"/dev/ttyS0!/dev/ttyS1"|VOID*|20
 
+[PcdsDynamicHii.common.DEFAULT]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x0|80 # Variable: L"Setup"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x4|25 # Variable: L"Setup"
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation
@@ -500,6 +504,7 @@
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
   MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf

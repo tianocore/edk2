@@ -24,7 +24,6 @@
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
 
-  ENTRY_POINT                    = BdsInitialize
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -34,9 +33,8 @@
 
 [Sources.common]
   BdsPlatform.c
-  BdsPlatform.h
   PlatformData.c
-
+  BdsPlatform.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -69,6 +67,7 @@
   BaseLib
   MemoryAllocationLib
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   BaseMemoryLib
   DebugLib
   PcdLib
@@ -78,3 +77,11 @@
 
 [Guids]
   gEfiDefaultBmpLogoGuid                        # ALWAYS_CONSUMED
+  gEfiUnixSystemConfigGuid
+
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
