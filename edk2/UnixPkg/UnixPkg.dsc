@@ -390,8 +390,8 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixSerialPort|L"/dev/ttyS0!/dev/ttyS1"|VOID*|20
 
 [PcdsDynamicHii.common.DEFAULT]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x0|80 # Variable: L"Setup"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x4|25 # Variable: L"Setup"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiUnixSystemConfigGuid|0x0|80 # Variable: L"Setup"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiUnixSystemConfigGuid|0x4|25 # Variable: L"Setup"
 
 ###################################################################################################
 #
