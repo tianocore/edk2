@@ -1114,18 +1114,6 @@ BdsLibEnumerateAllBootOption (
         &FvHandleBuffer
         );
   for (Index = 0; Index < FvHandleCount; Index++) {
-    //
-    // Only care the dispatched FV. If no dispatch protocol on the FV, it is not dispatched, then skip it.
-    //
-    Status = gBS->HandleProtocol (
-                    FvHandleBuffer[Index],
-                    &gEfiFirmwareVolumeDispatchProtocolGuid,
-                    (VOID **) &Fv
-                    );
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-    
     gBS->HandleProtocol (
           FvHandleBuffer[Index],
           &gEfiFirmwareVolume2ProtocolGuid,

@@ -125,7 +125,6 @@
   gEfiPlatformDriverOverrideProtocolGuid        ## CONSUMES
   gEfiDriverBindingProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiFirmwareVolumeBlockProtocolGuid           ## PRODUCES
-  gEfiFirmwareVolumeDispatchProtocolGuid        ## PRODUCES
   gEfiFirmwareVolume2ProtocolGuid               ## PRODUCES
   gEfiCpuArchProtocolGuid                       ## CONSUMES
   gEfiDevicePathProtocolGuid                    ## CONSUMES

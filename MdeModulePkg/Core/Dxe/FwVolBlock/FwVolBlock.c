@@ -495,7 +495,6 @@ ProduceFVBProtocolOnBuffer (
              &FvbDev->Handle,
              &gEfiFirmwareVolumeBlockProtocolGuid,     &FvbDev->FwVolBlockInstance,
              &gEfiDevicePathProtocolGuid,              &FvbDev->DevicePath,
-             &gEfiFirmwareVolumeDispatchProtocolGuid,  NULL,
              NULL
              );
 
