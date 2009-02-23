@@ -77,7 +77,6 @@
   gEfiPrimaryConsoleOutDeviceGuid               ## PRODUCES
   gEfiPrimaryConsoleInDeviceGuid                ## PRODUCES
   gEfiPrimaryStandardErrorDeviceGuid            ## PRODUCES
-  gEfiGenericPlatformVariableGuid               ## SOMETIMES_CONSUMES ## Variable:L"ConOutMode"
 
 [Protocols]
   gEfiConsoleControlProtocolGuid                ## PRODUCES
@@ -95,6 +94,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
 
 # [Event]
 #   ##
