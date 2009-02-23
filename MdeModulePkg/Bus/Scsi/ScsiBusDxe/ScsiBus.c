@@ -1134,7 +1134,7 @@ DiscoverScsiDevice (
   // valid device type and peripheral qualifier combination.
   //
   ScsiIoDevice->ScsiDeviceType  = InquiryData.Peripheral_Type;
-  ScsiIoDevice->RemovableDevice = InquiryData.RMB;
+  ScsiIoDevice->RemovableDevice = InquiryData.Rmb;
   if (InquiryData.Version == 0) {
     ScsiIoDevice->ScsiVersion = 0;
   } else {

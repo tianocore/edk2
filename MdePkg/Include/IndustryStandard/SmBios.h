@@ -287,7 +287,7 @@ typedef struct {
   SMBIOS_STRUCTURE      Hdr;
   UINT8                 InstallableLanguages;
   UINT8                 Flags;
-  UINT8                 reserved[15];
+  UINT8                 Reserved[15];
   SMBIOS_TABLE_STRING   CurrentLanguages;
 } SMBIOS_TABLE_TYPE13;
 
