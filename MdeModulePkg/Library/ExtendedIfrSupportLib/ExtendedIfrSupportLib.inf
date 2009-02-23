@@ -54,6 +54,9 @@
   DebugLib
   PcdLib
 
+[Guids]
+  gEfiIfrTianoGuid                   ## CONSUMES  ## GUID
+
 [Protocols]
   gEfiHiiDatabaseProtocolGuid        ## CONSUMES
   gEfiHiiStringProtocolGuid          ## CONSUMES

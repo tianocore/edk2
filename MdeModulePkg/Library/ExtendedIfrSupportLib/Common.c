@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_HII_DATABASE_PROTOCOL *gIfrLibHiiDatabase;
 EFI_HII_STRING_PROTOCOL   *gIfrLibHiiString;
-GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_GUID mIfrVendorGuid = EFI_IFR_TIANO_GUID;
 
 /**
   ExtendedIfrSupportLib's constructor. It locates the required protocol:
@@ -145,7 +144,7 @@ IfrLibExtractClassFromHiiHandle (
         }
 
         if ((((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_GUID_OP) &&
-             CompareGuid (&mIfrVendorGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER))) &&
+             CompareGuid (&gEfiIfrTianoGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER))) &&
             (((EFI_IFR_GUID_CLASS *) OpCodeData)->ExtendOpCode == EFI_IFR_EXTEND_OP_CLASS)
            ) {
           //

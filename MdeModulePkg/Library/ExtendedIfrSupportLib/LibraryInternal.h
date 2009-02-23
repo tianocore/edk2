@@ -32,7 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/IfrSupportLib.h>
 #include <Library/PcdLib.h>
 
-#include <MdeModuleHii.h>
+#include <Guid/MdeModuleHii.h>
 
 extern CONST EFI_GUID mIfrVendorGuid;
 

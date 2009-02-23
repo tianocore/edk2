@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
 
-#include <MdeModuleHii.h>
+#include <Guid/MdeModuleHii.h>
 
 #include <Protocol/HiiFont.h>
 #include <Protocol/HiiDatabase.h>

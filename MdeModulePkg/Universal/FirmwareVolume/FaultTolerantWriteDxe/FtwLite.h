@@ -32,8 +32,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 
-#include <WorkingBlockHeader.h>
-
 //
 // Flash erase polarity is 1
 //

@@ -95,6 +95,12 @@
   ## Hob guid for Pcd Pei Callback Function Table
   ## Include/Guid/PcdPeiCallbackFnTableHobGuid.h
   gPcdPeiCallbackFnTableHobGuid  = { 0xC625F4B2, 0xEA09, 0x4675, { 0x82, 0xD7, 0xBA, 0x36, 0x82, 0x15, 0x7A, 0x14 }}
+
+  ## Guid for EDKII implementation GUIDed opcodes
+  gEfiIfrTianoGuid      = { 0xf0b1735, 0x87a0, 0x4193, {0xb2, 0x66, 0x53, 0x8c, 0x38, 0xaf, 0x48, 0xce }}
+  
+  ## Guid for Framework vfr GUIDed opcodes.
+  gEfiIfrFrameworkGuid  = { 0x31ca5d1a, 0xd511, 0x4931, { 0xb7, 0x82, 0xae, 0x6b, 0x2b, 0x17, 0x8c, 0xd7 }}
   
   ## Guid to specify the System Non Volatile FV
   ## Include/Guid/SystemNvDataGuid.h
@@ -185,11 +191,7 @@
   ## Include/Guid/Performance.h
   gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
 
-[Protocols.common]
-  ## Capsule Arch protocol specify capsule runtime services are installed.  
-  ## Include/Protocol/Capsule.h
-  gEfiCapsuleArchProtocolGuid    = { 0x5053697E, 0x2CBC, 0x4819, { 0x90, 0xD9, 0x05, 0x80, 0xDE, 0xEE, 0x57, 0x54 }}
-  
+[Protocols.common] 
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   ## Include/Protocol/LoadPe32Image.h
   gEfiLoadPeImageProtocolGuid    = { 0x5CB5C776, 0x60D5, 0x45EE, { 0x88, 0x3C, 0x45, 0x27, 0x08, 0xCD, 0x74, 0x3F }}
@@ -353,10 +355,13 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
   
-  ## Indicate the max size the platform can support in case of populated capsules.
+  ## Indicate the max size of the populated image that the platform can support.
+  #  To support the multi populated images, the defautl supported size will 
+  #  be enlarged to 100MB that is 10 times of the single non-populated image.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x6400000|UINT32|0x0001001e
   
-  ## Indicate the max size the platform can support in case of non-populated capsules.
+  ## Indicate the max size of the non-populated image that the platform can support.
+  #  The default size is 10MB for the casule image without populated flag setting.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
   
   ## Maximun number of performance log entries during PEI phase.

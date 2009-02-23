@@ -235,15 +235,23 @@ QueryCapsuleCapabilities (
     if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
       return EFI_UNSUPPORTED;
     }
-    *ResetType = EfiResetWarm;
-    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);
+    *ResetType = EfiResetWarm;   
   } else {
     //
     // For non-reset capsule image.
     //
     *ResetType = EfiResetCold;
+  }
+  
+  //
+  // The support max capsule image size
+  //
+  if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0) {
+    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);
+  } else {
     *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizeNonPopulateCapsule);
   }
+
   return EFI_SUCCESS;
 }
 
