@@ -27,7 +27,7 @@ typedef struct {
   //
   UINT32        ConOutColumn;
   UINT32        ConOutRow;
-} WIN_NT_SYSTEM_CONFIGURATION;
+} UNIX_SYSTEM_CONFIGURATION;
 #pragma pack()
 
 
