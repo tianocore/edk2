@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/UgaDraw.h>
 #include <Protocol/BlockIo.h>
 #include <Guid/GlobalVariable.h>
-#include <Guid/GenericPlatformVariable.h>
 #include <Guid/CapsuleVendor.h>
 #include <Protocol/ConsoleControl.h>
 #include <Protocol/GenericMemoryTest.h>
@@ -44,7 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SerialIo.h>
 #include <Protocol/LegacyBios.h>
 #include <Protocol/SimpleTextInEx.h>
-#include <Protocol/Performance.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/PrintLib.h>

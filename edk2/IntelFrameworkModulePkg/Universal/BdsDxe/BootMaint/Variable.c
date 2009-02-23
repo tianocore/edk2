@@ -1399,18 +1399,10 @@ Var_UpdateConMode (
   Mode = CallbackData->BmmFakeNvData.ConsoleOutMode;
 
   Status = gST->ConOut->QueryMode (gST->ConOut, Mode, &(ModeInfo.Column), &(ModeInfo.Row));
-  if (EFI_ERROR(Status)) {
-    ModeInfo.Column = 80;
-    ModeInfo.Row = 25;
+  if (!EFI_ERROR(Status)) {
+    PcdSet32 (PcdConOutColumn, (UINT32) ModeInfo.Column);
+    PcdSet32 (PcdConOutRow, (UINT32) ModeInfo.Row);
   }
 
-  Status = gRT->SetVariable (
-                  VAR_CON_OUT_MODE,
-                  &gEfiGenericPlatformVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                  sizeof (CONSOLE_OUT_MODE),
-                  &ModeInfo
-                  );
-
-  return Status;
+  return EFI_SUCCESS;
 }

@@ -131,8 +131,6 @@
   gEfiBootStateGuid                             ## SOMETIMES_PRODUCES (Produce when status has not been set yet) ## Variable:L"BootState" (Indicate the state of last boot)
   gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
   gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
-  gEfiGenericPlatformVariableGuid               ## PRODUCES ## Variable:L"ConOutMode" (The mode of console out device)
-                                                ## PRODUCES ## Variable:L"VBIOS" (The option of video BIOS)
   gEfiMiscSubClassGuid                          ## CONSUMES ## GUID (Indicate the datahub for holding misc sub class record)
   gEfiMemorySubClassGuid                        ## CONSUMES ## GUID (Indicate the datahub for holding memory record)
   gEfiProcessorSubClassGuid                     ## CONSUMES ## GUID (Indicate the datahub for holding processor record)
@@ -169,6 +167,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid

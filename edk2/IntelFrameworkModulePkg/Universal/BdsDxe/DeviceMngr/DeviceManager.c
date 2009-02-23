@@ -67,44 +67,18 @@ DeviceManagerCallback (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  DEVICE_MANAGER_CALLBACK_DATA *PrivateData;
-
   if ((Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  PrivateData = DEVICE_MANAGER_CALLBACK_DATA_FROM_THIS (This);
 
-  switch (QuestionId) {
-  case DEVICE_MANAGER_KEY_VBIOS:
-    PrivateData->VideoBios = Value->u8;
-    gRT->SetVariable (
-           L"VBIOS",
-           &gEfiGenericPlatformVariableGuid,
-           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-           sizeof (UINT8),
-           &PrivateData->VideoBios
-           );
+  gCallbackKey = QuestionId;
 
-    //
-    // Tell browser not to ask for confirmation of changes,
-    // since we have already applied.
-    //
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    break;
+  //
+  // Request to exit SendForm(), so as to switch to selected form
+  //
+  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
 
-  default:
-    //
-    // The key corresponds the Handle Index which was requested to be displayed
-    //
-    gCallbackKey = QuestionId;
-
-    //
-    // Request to exit SendForm(), so as to switch to selected form
-    //
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    break;
-  }
 
   return EFI_SUCCESS;
 }
@@ -186,9 +160,6 @@ CallDeviceManager (
   EFI_HII_UPDATE_DATA         UpdateData[MENU_ITEM_NUM];
   EFI_STRING_ID               Token;
   EFI_STRING_ID               TokenHelp;
-  IFR_OPTION                  *IfrOptionList;
-  UINT8                       *VideoOption;
-  UINTN                       VideoOptionSize;
   EFI_HII_HANDLE              *HiiHandles;
   UINTN                       HandleBufferLength;
   UINTN                       NumberOfHiiHandles;
@@ -199,8 +170,6 @@ CallDeviceManager (
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
 
-  IfrOptionList       = NULL;
-  VideoOption         = NULL;
   HiiHandles          = NULL;
   HandleBufferLength  = 0;
 
@@ -295,47 +264,6 @@ CallDeviceManager (
       &UpdateData[Index]
       );
   }
-
-  //
-  // Add oneof for video BIOS selection
-  //
-  VideoOption = BdsLibGetVariableAndSize (
-                  L"VBIOS",
-                  &gEfiGenericPlatformVariableGuid,
-                  &VideoOptionSize
-                  );
-  if (VideoOption == NULL) {
-    gDeviceManagerPrivate.VideoBios = 0;
-  } else {
-    gDeviceManagerPrivate.VideoBios = VideoOption[0];
-    FreePool (VideoOption);
-  }
-
-  ASSERT (gDeviceManagerPrivate.VideoBios <= 1);
-
-  IfrOptionList = AllocatePool (2 * sizeof (IFR_OPTION));
-  ASSERT (IfrOptionList != NULL);
-  IfrOptionList[0].Flags        = 0;
-  IfrOptionList[0].StringToken  = STRING_TOKEN (STR_ONE_OF_PCI);
-  IfrOptionList[0].Value.u8     = 0;
-  IfrOptionList[1].Flags        = 0;
-  IfrOptionList[1].StringToken  = STRING_TOKEN (STR_ONE_OF_AGP);
-  IfrOptionList[1].Value.u8     = 1;
-  IfrOptionList[gDeviceManagerPrivate.VideoBios].Flags |= EFI_IFR_OPTION_DEFAULT;
-
-  UpdateData[0].Offset = 0;
-  CreateOneOfOpCode (
-    DEVICE_MANAGER_KEY_VBIOS,
-    0,
-    0,
-    STRING_TOKEN (STR_ONE_OF_VBIOS),
-    STRING_TOKEN (STR_ONE_OF_VBIOS_HELP),
-    EFI_IFR_FLAG_CALLBACK,
-    EFI_IFR_NUMERIC_SIZE_1,
-    IfrOptionList,
-    2,
-    &UpdateData[0]
-    );
 
   IfrLibUpdateForm (
     HiiHandle,

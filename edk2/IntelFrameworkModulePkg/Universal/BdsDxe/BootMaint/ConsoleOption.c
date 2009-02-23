@@ -918,25 +918,20 @@ GetConsoleOutMode (
   UINTN                         Mode;
   UINTN                         MaxMode;
   EFI_STATUS                    Status;
-  CONSOLE_OUT_MODE              *ModeInfo;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *ConOut;
 
   ConOut   = gST->ConOut;
   MaxMode  = (UINTN) (ConOut->Mode->MaxMode);
-  ModeInfo = EfiLibGetVariable (VAR_CON_OUT_MODE, &gEfiGenericPlatformVariableGuid);
 
-  if (ModeInfo != NULL) {
-    CurrentCol = ModeInfo->Column;
-    CurrentRow = ModeInfo->Row;
-    for (Mode = 0; Mode < MaxMode; Mode++) {
-      Status = ConOut->QueryMode (ConOut, Mode, &Col, &Row);
-      if (!EFI_ERROR(Status)) {
-        if (CurrentCol == Col && CurrentRow == Row) {
-          CallbackData->BmmFakeNvData.ConsoleOutMode = (UINT16) Mode;
-          break;
-        }
+  CurrentCol = PcdGet32 (PcdConOutColumn);
+  CurrentRow = PcdGet32 (PcdConOutRow);
+  for (Mode = 0; Mode < MaxMode; Mode++) {
+    Status = ConOut->QueryMode (ConOut, Mode, &Col, &Row);
+    if (!EFI_ERROR(Status)) {
+      if (CurrentCol == Col && CurrentRow == Row) {
+        CallbackData->BmmFakeNvData.ConsoleOutMode = (UINT16) Mode;
+        break;
       }
     }
-    FreePool (ModeInfo);
   }
 }
