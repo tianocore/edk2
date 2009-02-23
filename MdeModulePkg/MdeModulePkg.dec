@@ -161,14 +161,6 @@
   ## Include/Guid/CapsuleVendor.h
   gEfiCapsuleVendorGuid          = { 0x711C703F, 0xC285, 0x4B10, { 0xA3, 0xB0, 0x36, 0xEC, 0xBD, 0x3C, 0x8B, 0xE2 }}
   
-  ## Performance guid for the performance entry in the HOB list
-  ## Include/Guid/PeiPerformanceHob.h
-  gPeiPerformanceHobGuid         = { 0xEC4DF5AF, 0x4395, 0x4CC9, { 0x94, 0xDE, 0x77, 0x50, 0x6D, 0x12, 0xC7, 0xB8 }}
-  
-  ## The genenic platform guid for EFI variable.
-  ## Include/Guid/GenericPlatformVariable.h
-  gEfiGenericPlatformVariableGuid = { 0x59d1c24f, 0x50f1, 0x401a, { 0xb1, 0x01, 0xf3, 0x3e, 0x0d, 0xae, 0xd4, 0x43 }}
-  
   ## Guid specify the Shell application.
   ## Include/Guid/ShellFile.h
   gEfiShellFileGuid              = { 0xC57AD6B7, 0x0515, 0x40A8, { 0x9D, 0x21, 0x55, 0x16, 0x52, 0x85, 0x4E, 0x37 }}
@@ -188,6 +180,10 @@
   ## Platform Override Variable guid
   ## Include/Guid/OverrideVariable.h
   gEfiOverrideVariableGuid       = { 0x8e3d4ad5, 0xf762, 0x438a, { 0xa1, 0xc1, 0x5b, 0x9f, 0xe6, 0x8c, 0x6b, 0x15 }}
+  
+  ## Performance protocol guid that also acts as the performance HOB guid and performance variable GUID
+  ## Include/Guid/Performance.h
+  gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
 
 [Protocols.common]
   ## Capsule Arch protocol specify capsule runtime services are installed.  
@@ -198,10 +194,6 @@
   ## Include/Protocol/LoadPe32Image.h
   gEfiLoadPeImageProtocolGuid    = { 0x5CB5C776, 0x60D5, 0x45EE, { 0x88, 0x3C, 0x45, 0x27, 0x08, 0xCD, 0x74, 0x3F }}
   
-  ## Print protocol defines only one basic print function.
-  ## Include/Protocol/Print.h
-  gEfiPrintProtocolGuid       = { 0xdf2d868e, 0x32fc, 0x4cf0, {0x8e, 0x6b, 0xff, 0xd9, 0x5d, 0x13, 0x43, 0xd0} }
-
   ## Print protocol defines six basic print functions to print the format unicode and ascii string.
   ## Include/Protocol/Print2.h
   gEfiPrint2ProtocolGuid          = { 0x5bcc3dbc, 0x8c57, 0x450a, { 0xbb, 0x0c, 0xa1, 0xc0, 0xbd, 0xde, 0x48, 0x0c }}
@@ -230,10 +222,6 @@
   ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
   ## Include/Protocol/OEMBadging.h
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
-  
-  ## Performance protocol interfaces to support cross module performance logging.
-  ## Include/Protocol/Performance.h
-  gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
   
   ## Protocol guid is defined for CRC32 encapsulation scheme.
   ## Include/Protocol/Crc32GuidedSectionExtraction.h
@@ -491,6 +479,16 @@
   #  This PCD is a sample to explain Dynamic UINT32 PCD usage.
   ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
+
+  ##
+  #  This PCD defines the Console output column and the default value is 25 according to UEFI spec
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|25|UINT32|0x40000006
+  
+  ##
+  #  This PCD defines the Console output row and the default value is 80 according to UEFI spec
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
 
 [PcdsPatchableInModule.common]
   ## Maximun number of performance log entries during PEI phase.
