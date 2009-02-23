@@ -64,8 +64,6 @@
   ExtendedHiiLib
 
 [Protocols]
-  gEfiPrintProtocolGuid                         ## PRODUCES
-  gEfiPrint2ProtocolGuid                        ## PRODUCES
   gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
   gEfiHiiStringProtocolGuid                     ## CONSUMES
   gEfiFormBrowser2ProtocolGuid                  ## PRODUCES
