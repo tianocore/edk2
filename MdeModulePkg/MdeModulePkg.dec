@@ -273,11 +273,6 @@
   ## Include/Protocol/HotPlugDevice.h
   gEfiHotPlugDeviceGuid          = { 0x220AC432, 0x1D43, 0x49E5, { 0xA7, 0x4F, 0x4C, 0x9D, 0xA6, 0x7A, 0xD2, 0x3B }}
 
-[Ppis.common]
-  ## Pei memory test PPI used to Perform memory test in PEI phase.
-  ## Include/Ppi/BaseMemoryTest.h
-  gPeiBaseMemoryTestPpiGuid      = { 0xB6EC423C, 0x21D2, 0x490D, { 0x85, 0xC6, 0xDD, 0x58, 0x64, 0xEA, 0xA6, 0x74 }}
-
 [PcdsFeatureFlag.common]
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d

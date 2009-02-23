@@ -27,7 +27,6 @@ Revision History
 //
 // The protocols, PPI and GUID defintions for this module
 //
-#include <Ppi/BaseMemoryTest.h>
 #include <Ppi/NtAutoscan.h>
 //
 // The Library classes this module consumes
@@ -62,8 +61,6 @@ Returns:
   PEI_NT_AUTOSCAN_PPI         *PeiNtService;
   UINT64                      MemorySize;
   EFI_PHYSICAL_ADDRESS        MemoryBase;
-  PEI_BASE_MEMORY_TEST_PPI    *MemoryTestPpi;
-  EFI_PHYSICAL_ADDRESS        ErrorAddress;
   UINTN                       Index;
   EFI_RESOURCE_ATTRIBUTE_TYPE Attributes;
 
@@ -79,17 +76,6 @@ Returns:
              &PpiDescriptor,         // EFI_PEI_PPI_DESCRIPTOR
              (VOID**)&PeiNtService           // PPI
              );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get the Memory Test PPI
-  //
-  Status = PeiServicesLocatePpi (
-             &gPeiBaseMemoryTestPpiGuid,
-             0,
-             NULL,
-            (VOID**)&MemoryTestPpi
-            );
   ASSERT_EFI_ERROR (Status);
 
   Index = 0;
@@ -108,20 +94,7 @@ Returns:
 
       if (Index == 0) {
         //
-        // For the first area register it as PEI tested memory
-        //
-        Status = MemoryTestPpi->BaseMemoryTest (
-                                  (EFI_PEI_SERVICES **) PeiServices,
-                                  MemoryTestPpi,
-                                  MemoryBase,
-                                  MemorySize,
-                                  Quick,
-                                  &ErrorAddress
-                                  );
-        ASSERT_EFI_ERROR (Status);
-
-        //
-        // Register the "tested" memory with the PEI Core
+        // Register the memory with the PEI Core
         //
         Status = PeiServicesInstallPeiMemory (MemoryBase, MemorySize);
         ASSERT_EFI_ERROR (Status);
