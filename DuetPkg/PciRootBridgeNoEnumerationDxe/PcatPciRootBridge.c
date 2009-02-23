@@ -183,7 +183,7 @@ Returns:
                                        &PrivateData->Io, 
                                        EfiPciWidthUint16, 
                                        Address, 
-                                       sizeof (VendorId), 
+                                       sizeof (VendorId) / sizeof (UINT16), 
                                        &VendorId
                                        );
         if ((EFI_ERROR (Status)) || ((VendorId == 0xffff) && (Function == 0))) {
@@ -205,9 +205,9 @@ Returns:
         //
         Status = PrivateData->Io.Pci.Read (
                                        &PrivateData->Io, 
-                                       EfiPciWidthUint32, 
+                                       EfiPciWidthUint16, 
                                        Address, 
-                                       sizeof (PciConfigurationHeader) / sizeof (UINT32), 
+                                       sizeof (PciConfigurationHeader) / sizeof (UINT16), 
                                        &PciConfigurationHeader
                                        );
         if (EFI_ERROR (Status)) {
