@@ -735,15 +735,6 @@ InternalX86DisablePaging64 (
 // IPF specific functions
 //
 
-//
-// Structure definition for look up table.
-//
-typedef struct {
-  UINT64 Index;
-  UINT64 (*Function) (VOID);
-} REGISTER_ENTRY;
-
-
 /**
   Reads control register DCR.
 
