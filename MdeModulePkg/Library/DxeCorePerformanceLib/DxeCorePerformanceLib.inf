@@ -57,11 +57,8 @@
 
 
 [Guids]
-  gPeiPerformanceHobGuid                        ## CONSUMES ## HOB
-
-
-[Protocols]
-  gPerformanceProtocolGuid                      # PRODUCES
+  gPerformanceProtocolGuid                        ## CONSUMES ## HOB
+  gPerformanceProtocolGuid                        ## PRODUCES ## PROTOCOL
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries

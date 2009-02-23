@@ -50,7 +50,7 @@
 
 
 [Guids]
-  gPeiPerformanceHobGuid ## HOB
+  gPerformanceProtocolGuid ## HOB
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries

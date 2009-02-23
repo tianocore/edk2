@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 
-#include <Protocol/Performance.h>
+#include <Guid/Performance.h>
 
 #include <Library/PerformanceLib.h>
 #include <Library/DebugLib.h>

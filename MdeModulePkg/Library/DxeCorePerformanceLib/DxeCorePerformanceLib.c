@@ -306,7 +306,7 @@ InternalGetPeiPerformance (
   //
   // Dump PEI Log Entries to DXE Guage Data structure.
   //
-  GuidHob = GetFirstGuidHob (&gPeiPerformanceHobGuid);
+  GuidHob = GetFirstGuidHob (&gPerformanceProtocolGuid);
   if (GuidHob != NULL) {
     LogHob          = GET_GUID_HOB_DATA (GuidHob);
     LogEntryArray   = (PEI_PERFORMANCE_LOG_ENTRY *) (LogHob + 1);
