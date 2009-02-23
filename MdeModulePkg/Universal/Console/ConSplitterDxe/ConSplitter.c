@@ -2918,7 +2918,6 @@ ConsplitterSetConsoleOutMode (
   UINTN                            MaxMode;
   EFI_STATUS                       Status;
   CONSOLE_OUT_MODE                 ModeInfo;
-  UINTN                            ModeInfoSize;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
 
   PreferMode   = 0xFF;
@@ -2926,31 +2925,8 @@ ConsplitterSetConsoleOutMode (
   TextOut      = &Private->TextOut;
   MaxMode      = (UINTN) (TextOut->Mode->MaxMode);
 
-  ModeInfoSize = sizeof (CONSOLE_OUT_MODE);
-  Status = gRT->GetVariable (
-                   VARCONOUTMODE,
-                   &gEfiGenericPlatformVariableGuid,
-                   NULL,
-                   &ModeInfoSize,
-                   &ModeInfo
-                   );
-
-  if (EFI_ERROR(Status)) {
-    //
-    // If fail to get variable, set variable to the default mode 80 x 25
-    // required by UEFI spec;
-    //
-    ModeInfo.Column = 80;
-    ModeInfo.Row    = 25;
-
-    gRT->SetVariable (
-           VARCONOUTMODE,
-           &gEfiGenericPlatformVariableGuid,
-           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-           sizeof (CONSOLE_OUT_MODE),
-           &ModeInfo
-           );
-  }
+  ModeInfo.Column = PcdGet32 (PcdConOutColumn);
+  ModeInfo.Row    = PcdGet32 (PcdConOutRow);
 
   //
   // To find the prefer mode and basic mode from Text Out mode list
@@ -2968,7 +2944,7 @@ ConsplitterSetConsoleOutMode (
   }
 
   //
-  // Set perfer mode to Text Out devices.
+  // Set prefer mode to Text Out devices.
   //
   Status = TextOut->SetMode (TextOut, PreferMode);
   if (EFI_ERROR(Status)) {
@@ -2977,20 +2953,9 @@ ConsplitterSetConsoleOutMode (
     //
     Status = TextOut->SetMode (TextOut, BaseMode);
     ASSERT(!EFI_ERROR(Status));
-
-    ModeInfo.Column = 80;
-    ModeInfo.Row    = 25;
-
-    //
-    // Update ConOutMode variable
-    //
-    gRT->SetVariable (
-           VARCONOUTMODE,
-           &gEfiGenericPlatformVariableGuid,
-           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-           sizeof (CONSOLE_OUT_MODE),
-           &ModeInfo
-           );
+    
+    PcdSet32 (PcdConOutColumn, 80);
+    PcdSet32 (PcdConOutRow, 25);
   }
 
   return ;

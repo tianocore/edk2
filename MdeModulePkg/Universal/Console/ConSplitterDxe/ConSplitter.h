@@ -33,7 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/PrimaryStandardErrorDevice.h>
 #include <Guid/PrimaryConsoleOutDevice.h>
 #include <Guid/PrimaryConsoleInDevice.h>
-#include <Guid/GenericPlatformVariable.h>
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/StandardErrorDevice.h>
 #include <Guid/ConsoleOutDevice.h>
@@ -84,7 +83,6 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
 #define CONSOLE_SPLITTER_MODES_ALLOC_UNIT     32
 #define MAX_STD_IN_PASSWORD                   80
 
-#define VARCONOUTMODE L"ConOutMode"
 
 typedef struct {
   UINTN   Column;
