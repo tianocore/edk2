@@ -22,14 +22,6 @@ SETUP_DRIVER_PRIVATE_DATA  mPrivateData = {
   {
     SendForm,
     BrowserCallback
-  },
-  {
-    UnicodeVSPrint,
-    UnicodeVSPrintAsciiFormat,
-    UnicodeValueToString,                         
-    AsciiVSPrint,          
-    AsciiVSPrintUnicodeFormat,
-    AsciiValueToString
   }
 };
 
@@ -603,29 +595,6 @@ InitializeSetup (
                   &mPrivateData.FormBrowser2
                   );
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Install Print protocol
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &mPrivateData.Handle,
-                  &gEfiPrint2ProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mPrivateData.Print
-                  );
-
-  //
-  // Install Ecp Print protocol, which is defined in
-  // Edk\Foundation\Protocol\Print\Print.h with protocol
-  // GUID of { 0xdf2d868e, 0x32fc, 0x4cf0, {0x8e, 0x6b, 0xff, 0xd9, 0x5d, 0x13, 0x43, 0xd0 }}
-  // This is support previous module that written to consume this protocol.
-  // 
-  Status = gBS->InstallProtocolInterface (
-                  &mPrivateData.Handle,
-                  &gEfiPrintProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mPrivateData.Print
-                  );
 
   return Status;
 }
