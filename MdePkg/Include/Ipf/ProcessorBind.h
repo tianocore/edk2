@@ -28,7 +28,7 @@
 #pragma pack()
 
 
-#if __INTEL_COMPILER
+#if defined(__INTEL_COMPILER)
 //
 // Disable ICC's remark #869: "Parameter" was never referenced warning.
 // This is legal ANSI C code so we disable the remark that is turned on with -Wall
@@ -50,7 +50,7 @@
 #endif
 
 
-#if _MSC_EXTENSIONS
+#if defined(_MSC_EXTENSIONS)
 //
 // Disable warning that make it impossible to compile at /W4
 // This only works for Microsoft* tools
@@ -101,12 +101,12 @@
 #endif
 
 
-#if (__STDC_VERSION__ < 199901L)
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ < 199901L)
   //
   // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
   //
 
-  #if _MSC_EXTENSIONS
+  #if defined(_MSC_EXTENSIONS)
     //
     // use Microsoft C complier dependent integer width types
     //
@@ -158,7 +158,7 @@
     ///
     typedef char                INT8;
   #else
-    #ifdef _EFI_P64
+    #if defined(_EFI_P64)
       //
       // P64 - pointers being 64-bit and longs and ints are 32-bits.
       //
@@ -358,7 +358,7 @@ typedef INT64   INTN;
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify their member functions with EFIAPI.
 //
-#if _MSC_EXTENSIONS
+#if defined(_MSC_EXTENSIONS)
   ///
   /// Microsoft* compiler specific method for EFIAPI calling convension
   /// 
@@ -372,7 +372,7 @@ typedef INT64   INTN;
 //  if the /OPT:REF linker option is used. We defined a macro as this is a
 //  a non standard extension
 //
-#if _MSC_EXTENSIONS
+#if defined(_MSC_EXTENSIONS)
   ///
   /// Remove global variable from the linked image if there are no references to 
   /// it after all compiler and linker optimizations have been performed.
