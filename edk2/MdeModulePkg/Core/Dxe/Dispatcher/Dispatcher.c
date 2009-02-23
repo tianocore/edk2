@@ -962,15 +962,6 @@ CoreFwVolEventProtocolNotify (
       continue;
     }
 
-    Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolumeDispatchProtocolGuid, (VOID **)&Fv);
-    if (EFI_ERROR (Status)) {
-      //
-      // If no dispatch protocol then skip, but do not marked as being processed as it
-      // may show up later.
-      //
-      continue;
-    }
-
     //
     // Since we are about to process this Fv mark it as processed.
     //

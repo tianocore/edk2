@@ -87,7 +87,7 @@
   gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
   gEfiUartDevicePathGuid                        ## CONSUMES ## GUID (Identify the device path for UARD device)
   gEfiSasDevicePathGuid                         ## CONSUMES ## GUID (Identify the device path for SAS device)
-  
+
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL CONSUMES
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL CONSUMES
@@ -102,7 +102,6 @@
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMES
   gEfiCpuArchProtocolGuid                       # PROTOCOL CONSUMES
   gEfiDevicePathProtocolGuid                    # PROTOCOL CONSUMES
-  gEfiFirmwareVolumeDispatchProtocolGuid        # PROTOCOL CONSUMES
   gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL CONSUMES
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES ## not gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
   gEfiUgaDrawProtocolGuid                       # PROTOCOL SOMETIMES_CONSUMES ## gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
