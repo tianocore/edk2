@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiPei.h>
 
-#include <Guid/PeiPerformanceHob.h>
+#include <Guid/Performance.h>
 
 #include <Library/PerformanceLib.h>
 #include <Library/DebugLib.h>
@@ -57,7 +57,7 @@ InternalGetPerformanceHobLog (
   PEI_PERFORMANCE_LOG_HEADER  *PeiPerformanceLog;
   UINTN                       PeiPerformanceLogSize;
 
-  GuidHob = GetFirstGuidHob (&gPeiPerformanceHobGuid);
+  GuidHob = GetFirstGuidHob (&gPerformanceProtocolGuid);
 
   if (GuidHob != NULL) {
     //
@@ -70,7 +70,7 @@ InternalGetPerformanceHobLog (
     //
     PeiPerformanceLogSize = sizeof (PEI_PERFORMANCE_LOG_HEADER) +
                             sizeof (PEI_PERFORMANCE_LOG_ENTRY) * PcdGet8 (PcdMaxPeiPerformanceLogEntries);
-    PeiPerformanceLog     = BuildGuidHob (&gPeiPerformanceHobGuid, PeiPerformanceLogSize);
+    PeiPerformanceLog     = BuildGuidHob (&gPerformanceProtocolGuid, PeiPerformanceLogSize);
     PeiPerformanceLog     = ZeroMem (PeiPerformanceLog, PeiPerformanceLogSize);
   }
 

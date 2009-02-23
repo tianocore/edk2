@@ -46,8 +46,8 @@
   DebugLib
 
 
-[Protocols]
-  gPerformanceProtocolGuid  ## CONSUMES
+[Guids]
+  gPerformanceProtocolGuid  ## CONSUMES ## PROTOCOL
 
 
 [Pcd.common]
