@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 
 #include <Protocol/RealTimeClock.h>
-#include <Guid/GenericPlatformVariable.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

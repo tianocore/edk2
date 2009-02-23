@@ -199,8 +199,8 @@ PcRtcInit (
   //
   DataSize = sizeof (UINT32);
   Status = EfiGetVariable (
-             L"TimerVar",
-             &gEfiGenericPlatformVariableGuid,
+             L"RTC",
+             &gEfiCallerIdGuid,
              NULL,
              &DataSize,
              (VOID *) &TimerVar
@@ -429,8 +429,8 @@ PcRtcSetTime (
   TimerVar = Time->Daylight;
   TimerVar = (UINT32) ((TimerVar << 16) | Time->TimeZone);
   Status =  EfiSetVariable (
-              L"TimerVar",
-              &gEfiGenericPlatformVariableGuid,
+              L"RTC",
+              &gEfiCallerIdGuid,
               EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
               sizeof (TimerVar),
               &TimerVar
