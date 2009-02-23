@@ -33,7 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/AcpiS3Save.h>
-#include <Protocol/Performance.h>
 #include <Protocol/FirmwareVolumeDispatch.h>
 #include <Protocol/OEMBadging.h>
 #include <Protocol/ConsoleControl.h>
@@ -42,14 +41,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiFont.h>
 #include <Protocol/HiiImage.h>
 
-
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/PcAnsi.h>
 #include <Guid/ShellFile.h>
-#include <Guid/GenericPlatformVariable.h>
 #include <Guid/Bmp.h>
+#include <Guid/Performance.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
@@ -71,26 +69,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/DxeServicesLib.h>
 
-#define PERFORMANCE_SIGNATURE   SIGNATURE_32 ('P', 'e', 'r', 'f')
-#define PERF_TOKEN_SIZE         28
-#define PERF_TOKEN_LENGTH       (PERF_TOKEN_SIZE - 1)
-#define PERF_PEI_ENTRY_MAX_NUM  50
-
-typedef struct {
-  CHAR8   Token[PERF_TOKEN_SIZE];
-  UINT32  Duration;
-} PERF_DATA;
-
-typedef struct {
-  UINT64        BootToOs;
-  UINT64        S3Resume;
-  UINT32        S3EntryNum;
-  PERF_DATA     S3Entry[PERF_PEI_ENTRY_MAX_NUM];
-  UINT64        CpuFreq;
-  UINT64        BDSRaw;
-  UINT32        Count;
-  UINT32        Signiture;
-} PERF_HEADER;
 
 /**
 

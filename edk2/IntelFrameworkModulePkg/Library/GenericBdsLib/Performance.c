@@ -166,7 +166,7 @@ WriteBootToOsPerformanceData (
   BOOLEAN                   CountUp;
 
   //
-  // Retrive time stamp count as early as possilbe
+  // Retrieve time stamp count as early as possible
   //
   Ticker  = GetPerformanceCounter ();
 
@@ -306,7 +306,7 @@ Done:
 
   gRT->SetVariable (
         L"PerfDataMemAddr",
-        &gEfiGenericPlatformVariableGuid,
+        &gPerformanceProtocolGuid,
         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
         sizeof (EFI_PHYSICAL_ADDRESS),
         &AcpiLowMemoryBase

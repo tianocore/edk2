@@ -150,7 +150,7 @@ BdsLibBootViaBootOption (
   //
   // Record the performance data for End of BDS
   //
-  PERF_END (0, BDS_TOK, NULL, 0);
+  PERF_END (0, "BDS", NULL, 0);
 
   *ExitDataSize = 0;
   *ExitData     = NULL;
