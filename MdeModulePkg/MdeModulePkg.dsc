@@ -291,7 +291,7 @@
   MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
   MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-  MdeModulePkg/Library/EdkDxePrintLib/EdkDxePrintLib.inf
+  MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
   MdeModulePkg/Library/ExtendedHiiLib/ExtendedHiiLib.inf
   MdeModulePkg/Library/ExtendedIfrSupportLib/ExtendedIfrSupportLib.inf
   MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
@@ -309,6 +309,7 @@
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/DebugPortDxe/DebugPortDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
