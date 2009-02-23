@@ -31,7 +31,6 @@
   ENTRY_POINT                    = CpuIoInitialize
 
 [Packages]
-  DuetPkg/DuetPkg.dec
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
