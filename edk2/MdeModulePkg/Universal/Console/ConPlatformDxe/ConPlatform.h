@@ -293,10 +293,12 @@ ConPlatformUpdateDeviceVariable (
   );
 
 /**
-  Check if the device supports hot-plug.
+  Check if the device supports hot-plug through its device path.
 
-  @param  DriverBindingHandle   Protocol instance pointer.
-  @param  ControllerHandle      Handle of device to check.
+  This function could be updated to check more types of Hot Plug devices.
+  Currently, it checks USB and PCCard device.
+
+  @param  DevicePath            Pointer to device's device path.
 
   @retval TRUE                  The devcie is a hot-plug device
   @retval FALSE                 The devcie is not a hot-plug device.
@@ -304,8 +306,7 @@ ConPlatformUpdateDeviceVariable (
 **/
 BOOLEAN
 IsHotPlugDevice (
-  EFI_HANDLE    DriverBindingHandle,
-  EFI_HANDLE    ControllerHandle
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
   );
 
 //
