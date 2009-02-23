@@ -1,12 +1,12 @@
 /** @file
-  Instance of Print Library based on EFI_PRINT2_PROTOCOL.
+  Instance of Print Library based on gEfiPrint2ProtocolGuid.
 
   Implement the print library instance by wrap the interface 
-  provided in the Print protocol. This protocol is defined as the internal
+  provided in the Print2 protocol. This protocol is defined as the internal
   protocol related to this implementation, not in the public spec. So, this 
   library instance is only for this code base.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,43 +18,44 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include <Uefi.h>
-
 #include <Protocol/Print2.h>
-
-#include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DebugLib.h>
 
-EFI_PRINT2_PROTOCOL  *gPrintProtocol = NULL;
+EFI_PRINT2_PROTOCOL  *mPrint2Protocol = NULL;
 
 /**
-  Internal function to locate the EFI_PRINT2_PROTOCOL.
+  The constructor function caches the pointer to Print2 protocol.
+  
+  The constructor function locates Print2 protocol from protocol database.
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
 
-  @retval  EFI_SUCCESS   EFI_PRINT2_PROTOCOL is successfuly located.
-  @retval  EFI_NOT_FOUND EFI_PRINT2_PROTOCOL cannot be found.
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS
 EFIAPI
-InternalLocatePrintProtocol (
-  VOID
+PrintLibConstructor (
+  IN EFI_HANDLE                ImageHandle,
+  IN EFI_SYSTEM_TABLE          *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                   Status;
 
-  if (gPrintProtocol == NULL) {
-    Status = gBS->LocateProtocol (
-                    &gEfiPrint2ProtocolGuid,
-                    NULL,
-                    (VOID **)&gPrintProtocol
-                    );
-    if (EFI_ERROR (Status)) {
-      gPrintProtocol = NULL;
-      return Status;
-    }
-  }
-  
-  return EFI_SUCCESS;
+  Status = gBS->LocateProtocol (
+                  &gEfiPrint2ProtocolGuid,
+                  NULL,
+                  (VOID**) &mPrint2Protocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (mPrint2Protocol != NULL);
+
+  return Status;
 }
+
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on 
@@ -99,11 +100,7 @@ UnicodeVSPrint (
   IN  VA_LIST       Marker
   )
 {
-  if (InternalLocatePrintProtocol() != EFI_SUCCESS) {
-    return 0;
-  }
-
-  return gPrintProtocol->VSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2Protocol->UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -197,11 +194,7 @@ UnicodeVSPrintAsciiFormat (
   IN  VA_LIST      Marker
   )
 {
-  if (InternalLocatePrintProtocol() != EFI_SUCCESS) {
-    return 0;
-  }
-
-  return gPrintProtocol->UniVSPrintAscii (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2Protocol->UnicodeSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -303,11 +296,7 @@ UnicodeValueToString (
   IN UINTN       Width
   )
 {
-  if (InternalLocatePrintProtocol() != EFI_SUCCESS) {
-    return 0;
-  }
-
-  return gPrintProtocol->UniValueToString (Buffer, Flags, Value, Width);
+  return mPrint2Protocol->UnicodeValueToString (Buffer, Flags, Value, Width);
 }
 
 /**
@@ -351,11 +340,7 @@ AsciiVSPrint (
   IN  VA_LIST       Marker
   )
 {
-  if (InternalLocatePrintProtocol() != EFI_SUCCESS) {
-    return 0;
-  }
-
-  return gPrintProtocol->AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2Protocol->AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -448,11 +433,7 @@ AsciiVSPrintUnicodeFormat (
   IN  VA_LIST       Marker
   )
 {
-  if (InternalLocatePrintProtocol() != EFI_SUCCESS) {
-    return 0;
-  }
-
-  return gPrintProtocol->AsciiVSPrintUni (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2Protocol->AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -554,9 +535,5 @@ AsciiValueToString (
   IN  UINTN      Width
   )
 {
-  if (InternalLocatePrintProtocol() != EFI_SUCCESS) {
-    return 0;
-  }
-
-  return gPrintProtocol->AsciiValueToString (Buffer, Flags, Value, Width);
+  return mPrint2Protocol->AsciiValueToString (Buffer, Flags, Value, Width);
 }
