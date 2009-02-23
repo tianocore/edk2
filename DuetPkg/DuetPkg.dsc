@@ -164,7 +164,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
-  DuetPkg/CpuIoDxe/CpuIo.inf
+  UefiCpuPkg/CpuIoDxe/CpuIo.inf
   DuetPkg/CpuDxe/Cpu.inf
   IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
   DuetPkg/KbcResetDxe/Reset.inf
