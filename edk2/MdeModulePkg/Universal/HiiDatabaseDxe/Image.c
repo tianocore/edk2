@@ -1233,7 +1233,6 @@ HiiDrawImage (
   UINTN                               OffsetY2;
   EFI_FONT_DISPLAY_INFO               *FontInfo;
   UINTN                               Index;
-  EFI_CONSOLE_CONTROL_PROTOCOL        *Console;
 
   if (This == NULL || Image == NULL || Blt == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1323,17 +1322,10 @@ HiiDrawImage (
     // Draw the image to existing bitmap or screen depending on flag.
     //
     if ((Flags & EFI_HII_DIRECT_TO_SCREEN) == EFI_HII_DIRECT_TO_SCREEN) {
-      Status = gBS->LocateProtocol (
-                      &gEfiConsoleControlProtocolGuid,
-                      NULL,
-                      (VOID **) &Console
-                      );
+      //
+      // Caller should make sure the current UGA console is grarphic mode.
+      //
 
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      Console->SetMode (Console, EfiConsoleControlScreenGraphics);
       //
       // Write the image directly to the output device specified by Screen.
       //

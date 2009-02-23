@@ -59,7 +59,6 @@
   UefiRuntimeServicesTableLib
 
 [Protocols]
-  gEfiConsoleControlProtocolGuid                                        ## CONSUMES
   gEfiDevicePathProtocolGuid                                            ## SOMETIMES_CONSUMES
   gEfiHiiStringProtocolGuid                                             ## PRODUCES
   gEfiHiiImageProtocolGuid |PcdSupportHiiImageProtocol                  ## PRODUCES
