@@ -51,7 +51,6 @@
 
 
 [Guids]
-  gEfiSystemNvDataHobGuid                       # ALWAYS_CONSUMED
   gEfiFirmwareFileSystemGuid                    # ALWAYS_CONSUMED
 
 [Protocols]
