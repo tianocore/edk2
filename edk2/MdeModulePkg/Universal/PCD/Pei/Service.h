@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/Pcd.h>
 #include <Guid/PcdDataBaseHobGuid.h>
-#include <Guid/PcdPeiCallbackFnTableHobGuid.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>

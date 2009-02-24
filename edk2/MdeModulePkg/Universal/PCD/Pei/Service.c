@@ -80,7 +80,7 @@ PeiRegisterCallBackWorker (
   ASSERT ((LocalTokenNumber & PCD_TYPE_HII) == 0);
   ASSERT ((LocalTokenNumber & PCD_TYPE_VPD) == 0);
 
-  GuidHob = GetFirstGuidHob (&gPcdPeiCallbackFnTableHobGuid);
+  GuidHob = GetFirstGuidHob (&gEfiCallerIdGuid);
   ASSERT (GuidHob != NULL);
   
   CallbackTable = GET_GUID_HOB_DATA (GuidHob);
@@ -125,7 +125,7 @@ BuildPcdDatabase (
 
   SizeOfCallbackFnTable = PEI_LOCAL_TOKEN_NUMBER * sizeof (PCD_PPI_CALLBACK) * FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry);
 
-  CallbackFnTable = BuildGuidHob (&gPcdPeiCallbackFnTableHobGuid, SizeOfCallbackFnTable);
+  CallbackFnTable = BuildGuidHob (&gEfiCallerIdGuid, SizeOfCallbackFnTable);
   
   ZeroMem (CallbackFnTable, SizeOfCallbackFnTable);
 }
@@ -292,7 +292,7 @@ InvokeCallbackOnSet (
     ASSERT (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
   }
 
-  GuidHob = GetFirstGuidHob (&gPcdPeiCallbackFnTableHobGuid);
+  GuidHob = GetFirstGuidHob (&gEfiCallerIdGuid);
   ASSERT (GuidHob != NULL);
   
   CallbackTable = GET_GUID_HOB_DATA (GuidHob);
