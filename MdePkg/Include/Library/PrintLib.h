@@ -170,12 +170,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 ///
 /// Define the maximum number of characters that are required to
-/// encode a decimal, hexidecimal, GUID, or TIME value with a NULL 
+/// encode a decimal, hexadecimal, GUID, or TIME value with a NULL 
 /// terminator.
 ///  
 ///  Maximum Length Decimal String     = 28
 ///    "-9,223,372,036,854,775,808"
-///  Maximum Length Hexidecimal String = 17
+///  Maximum Length Hexadecimal String = 17
 ///    "FFFFFFFFFFFFFFFF"
 ///  Maximum Length GUID               = 37
 ///    "00000000-0000-0000-0000-000000000000"

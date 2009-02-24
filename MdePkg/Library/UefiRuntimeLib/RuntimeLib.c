@@ -22,7 +22,7 @@ EFI_EVENT              mEfiVirtualNotifyEvent;
 EFI_EVENT              mEfiExitBootServicesEvent;
 BOOLEAN                mEfiGoneVirtual         = FALSE;
 BOOLEAN                mEfiAtRuntime           = FALSE;
-EFI_RUNTIME_SERVICES          *mRT;
+EFI_RUNTIME_SERVICES   *mRT;
 
 /**
   Set AtRuntime flag as TRUE after ExitBootServices.
@@ -69,7 +69,7 @@ RuntimeLibVirtualNotifyEvent (
 }
 
 /**
-  Intialize runtime Driver Lib if it has not yet been initialized.
+  Initialize runtime Driver Lib if it has not yet been initialized.
   It will ASSERT() if gRT is NULL or gBS is NULL.
   It will ASSERT() if that operation fails.
 
