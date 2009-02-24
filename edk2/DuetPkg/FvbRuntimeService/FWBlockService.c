@@ -61,9 +61,6 @@ EFI_FW_VOL_BLOCK_DEVICE mFvbDeviceTemplate = {
     FvbProtocolWrite,
     FvbProtocolEraseBlocks,
     NULL
-  },
-  {
-    FvbExtendProtocolEraseCustomBlockRange
   }
 };
 
@@ -701,99 +698,6 @@ Returns:
 }
 
 EFI_STATUS
-FvbEraseCustomBlockRange (
-  IN UINTN                                Instance,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
-  )
-/*++
-
-Routine Description:
-  Erases and initializes a specified range of a firmware volume
-
-Arguments:
-  Instance              - The FV instance to be erased
-  StartLba              - The starting logical block index to be erased
-  OffsetStartLba        - Offset into the starting block at which to 
-                          begin erasing
-  LastLba               - The last logical block index to be erased
-  OffsetStartLba        - Offset into the last block at which to end erasing
-  Global                - Pointer to ESAL_FWB_GLOBAL that contains all
-                          instance data
-  Virtual               - Whether CPU is in virtual or physical mode
-
-Returns: 
-  EFI_SUCCESS           - The firmware volume was erased successfully
-  EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
-                          could not be written. Firmware device may have been
-                          partially erased
-  EFI_INVALID_PARAMETER - Instance not found
-
---*/
-{
-  EFI_LBA Index;
-  UINTN   LbaSize;
-  UINTN   ScratchLbaSizeData;
-
-  //
-  // First LBA.
-  //
-  FvbGetLbaAddress (Instance, StartLba, NULL, &LbaSize, NULL, Global, Virtual);
-
-  //
-  // Use the scratch space as the intermediate buffer to transfer data
-  // Back up the first LBA in scratch space.
-  //
-  FvbReadBlock (Instance, StartLba, 0, &LbaSize, Global->FvbScratchSpace[Virtual], Global, Virtual);
-
-  //
-  // erase now
-  //
-  FvbEraseBlock (Instance, StartLba, Global, Virtual);
-  ScratchLbaSizeData = OffsetStartLba;
-
-  //
-  // write the data back to the first block
-  //
-  if (ScratchLbaSizeData > 0) {
-    FvbWriteBlock (Instance, StartLba, 0, &ScratchLbaSizeData, Global->FvbScratchSpace[Virtual], Global, Virtual);
-  }
-  //
-  // Middle LBAs
-  //
-  if (LastLba > (StartLba + 1)) {
-    for (Index = (StartLba + 1); Index <= (LastLba - 1); Index++) {
-      FvbEraseBlock (Instance, Index, Global, Virtual);
-    }
-  }
-  //
-  // Last LBAs, the same as first LBAs
-  //
-  if (LastLba > StartLba) {
-    FvbGetLbaAddress (Instance, LastLba, NULL, &LbaSize, NULL, Global, Virtual);
-    FvbReadBlock (Instance, LastLba, 0, &LbaSize, Global->FvbScratchSpace[Virtual], Global, Virtual);
-    FvbEraseBlock (Instance, LastLba, Global, Virtual);
-  }
-
-  ScratchLbaSizeData = LbaSize - (OffsetStartLba + 1);
-
-  return FvbWriteBlock (
-          Instance,
-          LastLba,
-          (OffsetLastLba + 1),
-          &ScratchLbaSizeData,
-          Global->FvbScratchSpace[Virtual],
-          Global,
-          Virtual
-          );
-}
-
-EFI_STATUS
 FvbSetVolumeAttributes (
   IN UINTN                                Instance,
   IN OUT EFI_FVB_ATTRIBUTES_2             *Attributes,
@@ -1222,54 +1126,6 @@ Returns:
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
   return FvbReadBlock (FvbDevice->Instance, Lba, Offset, NumBytes, Buffer, mFvbModuleGlobal, EfiGoneVirtual ());
-}
-//
-// FVB Extension Protocols
-//
-EFI_STATUS
-EFIAPI
-FvbExtendProtocolEraseCustomBlockRange (
-  IN EFI_FVB_EXTENSION_PROTOCOL           *This,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba
-  )
-/*++
-
-Routine Description:
-  Erases and initializes a specified range of a firmware volume
-
-Arguments:
-  This                  - Calling context
-  StartLba              - The starting logical block index to be erased
-  OffsetStartLba        - Offset into the starting block at which to 
-                          begin erasing
-  LastLba               - The last logical block index to be erased
-  OffsetStartLba        - Offset into the last block at which to end erasing
-
-Returns: 
-  EFI_SUCCESS           - The firmware volume was erased successfully
-  EFI_ACCESS_DENIED     - The firmware volume is in the WriteDisabled state
-  EFI_DEVICE_ERROR      - The block device is not functioning correctly and 
-                          could not be written. Firmware device may have been
-                          partially erased
-
---*/
-{
-  EFI_FW_VOL_BLOCK_DEVICE *FvbDevice;
-
-  FvbDevice = FVB_EXTEND_DEVICE_FROM_THIS (This);
-
-  return FvbEraseCustomBlockRange (
-          FvbDevice->Instance,
-          StartLba,
-          OffsetStartLba,
-          LastLba,
-          OffsetLastLba,
-          mFvbModuleGlobal,
-          EfiGoneVirtual ()
-          );
 }
 
 EFI_STATUS
@@ -1781,8 +1637,6 @@ Returns:
     //
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &FwbHandle,
-                    &gEfiFvbExtensionProtocolGuid,
-                    &FvbDevice->FvbExtension,
                     &gEfiAlternateFvBlockGuid,
                     NULL,
                     NULL
