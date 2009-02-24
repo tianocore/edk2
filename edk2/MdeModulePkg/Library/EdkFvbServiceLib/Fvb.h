@@ -22,7 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 
 #include <Protocol/FirmwareVolumeBlock.h>
-#include <Protocol/FvbExtension.h>
 
 #include <Library/FvbServiceLib.h>
 #include <Library/UefiLib.h>
@@ -40,7 +39,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct {
   EFI_HANDLE                          Handle;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
-  EFI_FVB_EXTENSION_PROTOCOL          *FvbExtension;
   BOOLEAN                             IsRuntimeAccess;
 } FVB_ENTRY;
 

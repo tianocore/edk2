@@ -44,7 +44,9 @@
   DebugLib
   BaseMemoryLib
 
+[Guids]
+  gEfiCrc32GuidedSectionExtractionGuid             ## CONSUMES ## GUID
+
 [Protocols]
-  gEfiCrc32GuidedSectionExtractionProtocolGuid     ## PRODUCED
   gEfiSecurityPolicyProtocolGuid                   ## SOMETIMES_CONSUMED (Set platform override AUTH status if exist)
   

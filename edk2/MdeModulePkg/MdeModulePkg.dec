@@ -106,26 +106,6 @@
   ## Include/Guid/SystemNvDataGuid.h
   gEfiSystemNvDataFvGuid         = { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
   
-  ## Hob guid for the System Non Volatile HOB entries in the HOB list
-  ## Include/Guid/SystemNvDataGuid.h
-  gEfiSystemNvDataHobGuid        = { 0xD6E5092D, 0xC7B2, 0x4872, { 0xAF, 0x66, 0xFD, 0xC0, 0xE6, 0xF9, 0x5E, 0x78 }}
-  
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Usb interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoUsbInterfaceGuid   = { 0xCB871572, 0xC11A, 0x47B5, { 0xB4, 0x92, 0x67, 0x5E, 0xAF, 0xA7, 0x77, 0x27 }}
-  
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Scsi interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoScsiInterfaceGuid  = { 0x08F74BAA, 0xEA36, 0x41D9, { 0x95, 0x21, 0x21, 0xA7, 0x0F, 0x87, 0x80, 0xBC }}
-  
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ide interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoIdeInterfaceGuid   = { 0x5E948FE3, 0x26D3, 0x42B5, { 0xAF, 0x17, 0x61, 0x02, 0x87, 0x18, 0x8D, 0xEC }}
-  
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ahci interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoAhciInterfaceGuid  = { 0x9e498932, 0x4abc, 0x45af, { 0xa3, 0x4d, 0x02, 0x47, 0x78, 0x7b, 0xe7, 0xc6 }}
-  
   ## Alternate Firmware Volume Block Guid specify that the additional 
   #  FVB protocol is installed into FVB handle
   ## Include/Guid/AlternateFvBlock.h
@@ -191,6 +171,10 @@
   ## Include/Guid/Performance.h
   gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
 
+  ## Guid is defined for CRC32 encapsulation scheme.
+  ## Include/Guid/Crc32GuidedSectionExtraction.h
+  gEfiCrc32GuidedSectionExtractionGuid = { 0xFC1BCDB0, 0x7D31, 0x49aa, {0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83 } }
+
 [Protocols.common] 
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   ## Include/Protocol/LoadPe32Image.h
@@ -203,15 +187,7 @@
   ## This protocol defines the generic memory test interfaces in Dxe phase.
   ## Include/Protocol/GenericMemoryTest.h
   gEfiGenericMemTestProtocolGuid = { 0x309DE7F1, 0x7F5E, 0x4ACE, { 0xB4, 0x9C, 0x53, 0x1B, 0xE5, 0xAA, 0x95, 0xEF }}
-  
-  ## Disk Info protocol is used to export Inquiry Data for a drive.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
-  
-  ## This protocol provides an extended service to erase the specified range of a firmware volume block.
-  ## Include/Protocol/FvbExtension.h
-  gEfiFvbExtensionProtocolGuid   = { 0x53A4C71B, 0xB581, 0x4170, { 0x91, 0xB3, 0x8D, 0xB8, 0x7A, 0x4B, 0x5C, 0x46 }}
-  
+
   ## Fault tolerant write lite protocol defines only one interface to write 
   #  the buffer to the fault tolerant storage.
   ## Include/Protocol/FaultTolerantWriteLite.h
@@ -224,11 +200,7 @@
   ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
   ## Include/Protocol/OEMBadging.h
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
-  
-  ## Protocol guid is defined for CRC32 encapsulation scheme.
-  ## Include/Protocol/Crc32GuidedSectionExtraction.h
-  gEfiCrc32GuidedSectionExtractionProtocolGuid = { 0xFC1BCDB0, 0x7D31, 0x49aa, {0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83 } }
-  
+    
   ## Include/Protocol/NicIp4Config.h
   gEfiNicIp4ConfigProtocolGuid   = {0xdca3d4d, 0x12da, 0x4728,  { 0xbf, 0x7e, 0x86, 0xce, 0xb9, 0x28, 0xd0, 0x67 }}
   
