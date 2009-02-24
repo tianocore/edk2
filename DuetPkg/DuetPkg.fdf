@@ -101,10 +101,10 @@ INF  IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 #IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   
   # Usb Support
-#INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-#INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-#INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-#INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   
   # ISA Support
 INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
