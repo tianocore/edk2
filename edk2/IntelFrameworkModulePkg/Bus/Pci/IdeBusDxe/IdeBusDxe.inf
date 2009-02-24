@@ -1,5 +1,5 @@
 #/** @file
-# Component description file for PS2 keyboard module.
+# Component description file for IdeBus module.
 #
 # IDE bus driver. This driver will enumerate IDE device and export the blockIo
 #  protocol for every device.
@@ -55,7 +55,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec  
 
 
 [LibraryClasses]
