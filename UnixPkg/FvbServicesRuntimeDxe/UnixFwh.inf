@@ -63,7 +63,6 @@
 
 
 [Protocols]
-  gEfiFvbExtensionProtocolGuid                  # PROTOCOL ALWAYS_PRODUCED
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
 
