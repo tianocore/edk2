@@ -84,14 +84,14 @@ INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 INF  DuetPkg/DataHubGenDxe/DataHubGen.inf
 #INF  DuetPkg/FvbRuntimeService/DUETFwh.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-INF  DuetPkg/CpuIoDxe/CpuIo.inf
+INF  UefiCpuPkg/CpuIoDxe/CpuIo.inf
 INF  DuetPkg/CpuDxe/Cpu.inf
   
 INF  IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
-INF  DuetPkg/KbcResetDxe/Reset.inf
+INF  PcAtChipsetPkg/KbcResetDxe/Reset.inf
 INF  DuetPkg/LegacyMetronome/Metronome.inf
-INF  DuetPkg/8254TimerDxe/8254Timer.inf
-INF  DuetPkg/PcRtc/RealTimeClock.inf
+INF  PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
+INF  PcAtChipsetPkg/PcRtc/RealTimeClock.inf
 INF  DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
 INF  DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
 INF  IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
@@ -107,7 +107,7 @@ INF  IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 #INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   
   # ISA Support
-INF  DuetPkg/IsaAcpiDxe/IsaAcpi.inf
+INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
