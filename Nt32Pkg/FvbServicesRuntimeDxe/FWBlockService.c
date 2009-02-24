@@ -1274,9 +1274,7 @@ Returns:
 
     for (PtrBlockMapEntry = FwVolHeader->BlockMap; PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
       //
-      // Get the maximum size of a block. The size will be used to allocate
-      // buffer for Scratch space, the intermediate buffer for FVB extension
-      // protocol
+      // Get the maximum size of a block.
       //
       if (MaxLbaSize < PtrBlockMapEntry->Length) {
         MaxLbaSize = PtrBlockMapEntry->Length;
