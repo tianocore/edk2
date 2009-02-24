@@ -197,15 +197,6 @@ FvbNotificationEvent (
                     );
     ASSERT_EFI_ERROR (Status);
 
-    Status = gBS->HandleProtocol (
-                    Handle,
-                    &gEfiFvbExtensionProtocolGuid,
-                    (VOID **) &mFvbEntry[UpdateIndex].FvbExtension
-                    );
-    if (Status != EFI_SUCCESS) {
-      mFvbEntry[UpdateIndex].FvbExtension = NULL;
-    }
-
     //
     // Check the FVB can be accessed in RUNTIME, The FVBs in FVB handle list come from two ways:
     // 1) Dxe Core. (FVB information is transferred from FV HOB). 2) FVB driver. The FVB produced
@@ -250,11 +241,6 @@ FvbVirtualAddressChangeNotifyEvent (
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->Write);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb->EraseBlocks);
         EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].Fvb);
-      }
-
-      if (mFvbEntry[Index].FvbExtension != NULL) {
-        EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].FvbExtension->EraseFvbCustomBlock);
-        EfiConvertPointer (0x0, (VOID **) &mFvbEntry[Index].FvbExtension);
       }
     }
 
@@ -667,61 +653,4 @@ EfiFvbGetBlockSize (
   }
 
   return mFvbEntry[Instance].Fvb->GetBlockSize (mFvbEntry[Instance].Fvb, Lba, BlockSize, NumOfBlocks);
-}
-
-
-/**
-  Erases and initializes a specified range of a firmware volume.
-
-  The EfiFvbEraseCustomBlockRange() function erases the specified range in the firmware
-  volume index by Instance. If Instance is larger than the max FVB number, StartLba or 
-  LastLba  index is larger than the last block of the firmware volume, StartLba > LastLba
-  or StartLba equal to LastLba but OffsetStartLba > OffsetLastLba, this function return 
-  the status code EFI_INVALID_PARAMETER.
-
-  @param[in]     Instance          The FV instance to be operated.
-  @param[in]     StartLba          The starting logical block index to be erased.
-  @param[in]     OffsetStartLba    Offset into the starting block at which to 
-                                   begin erasing.    
-  @param[in]     LastLba           The last logical block index to be erased.
-  @param[in]     OffsetLastLba     Offset into the last block at which to end erasing.   
-
-  @retval   EFI_EFI_SUCCESS        Successfully erase custom block range
-  @retval   EFI_INVALID_PARAMETER  Invalid parameter. Instance is larger than the max FVB number. 
-  @retval   EFI_UNSUPPORTED        Firmware volume block device has no this capability.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiFvbEraseCustomBlockRange (
-  IN UINTN                                Instance,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba
-  )
-{
-  if (Instance >= mFvbCount) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (EfiAtRuntime() && !mFvbEntry[Instance].IsRuntimeAccess) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (mFvbEntry[Instance].FvbExtension == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if (mFvbEntry[Instance].FvbExtension->EraseFvbCustomBlock == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
-  return mFvbEntry[Instance].FvbExtension->EraseFvbCustomBlock (
-                                            mFvbEntry[Instance].FvbExtension,
-                                            StartLba,
-                                            OffsetStartLba,
-                                            LastLba,
-                                            OffsetLastLba
-                                            );
 }

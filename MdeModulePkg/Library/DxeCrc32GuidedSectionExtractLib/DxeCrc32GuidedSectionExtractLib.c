@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include <PiDxe.h>
-#include <Protocol/Crc32GuidedSectionExtraction.h>
+#include <Guid/Crc32GuidedSectionExtraction.h>
 #include <Protocol/SecurityPolicy.h>
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/DebugLib.h>
@@ -62,7 +62,7 @@ Crc32GuidedSectionGetInfo (
   // Check whether the input guid section is recognized.
   //
   if (!CompareGuid (
-        &gEfiCrc32GuidedSectionExtractionProtocolGuid, 
+        &gEfiCrc32GuidedSectionExtractionGuid, 
         &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
     return EFI_INVALID_PARAMETER;
   }
@@ -113,7 +113,7 @@ Crc32GuidedSectionHandler (
   // Check whether the input guid section is recognized.
   //
   if (!CompareGuid (
-        &gEfiCrc32GuidedSectionExtractionProtocolGuid, 
+        &gEfiCrc32GuidedSectionExtractionGuid, 
         &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
     return EFI_INVALID_PARAMETER;
   }
@@ -185,7 +185,7 @@ DxeCrc32GuidedSectionExtractLibConstructor (
   )
 {
   return ExtractGuidedSectionRegisterHandlers (
-          &gEfiCrc32GuidedSectionExtractionProtocolGuid,
+          &gEfiCrc32GuidedSectionExtractionGuid,
           Crc32GuidedSectionGetInfo,
           Crc32GuidedSectionHandler
           );

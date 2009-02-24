@@ -276,36 +276,4 @@ EfiFvbGetBlockSize (
   OUT UINTN                                       *NumOfBlocks
   );
 
-
-/**
-  Erases and initializes a specified range of a firmware volume.
-
-  The EfiFvbEraseCustomBlockRange() function erases the specified range in the firmware
-  volume index by Instance. If Instance is larger than the max FVB number, StartLba or 
-  LastLba  index is larger than the last block of the firmware volume, StartLba > LastLba
-  or StartLba equal to LastLba but OffsetStartLba > OffsetLastLba, this function return 
-  the status code EFI_INVALID_PARAMETER.
-
-  @param[in]     Instance          The FV instance to be operated.
-  @param[in]     StartLba          The starting logical block index to be erased.
-  @param[in]     OffsetStartLba    Offset into the starting block at which to 
-                                   begin erasing.    
-  @param[in]     LastLba           The last logical block index to be erased.
-  @param[in]     OffsetLastLba     Offset into the last block at which to end erasing.   
-
-  @retval   EFI_EFI_SUCCESS        Successfully erase custom block range
-  @retval   EFI_INVALID_PARAMETER  Invalid parameter. Instance is larger than the max FVB number. 
-  @retval   EFI_UNSUPPORTED        Firmware volume block device has no this capability.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiFvbEraseCustomBlockRange (
-  IN UINTN                                Instance,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba
-  );
-
 #endif

@@ -51,7 +51,6 @@
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           ## NOTIFY
-  gEfiFvbExtensionProtocolGuid                  ## CONSUMES
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES
