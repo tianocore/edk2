@@ -131,7 +131,6 @@ Returns:
     Index++;
   }
 
-  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal->FvbScratchSpace[FVB_VIRTUAL]);
   EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal);
 }
 
