@@ -106,7 +106,7 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       {
         0,
       },  // ZeroVector[16]
-      EFI_SYSTEM_NV_DATA_HOB_GUID,
+      EFI_SYSTEM_NV_DATA_FV_GUID,
       FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
       FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
       FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
