@@ -47,7 +47,6 @@
   DebugLib
 
 [Guids]
-  gPcdPeiCallbackFnTableHobGuid                 ## RPIVATE   ## Hob
   gPcdDataBaseHobGuid                           ## PRODUCES  ## Hob
   gPcdDataBaseHobGuid                           ## CONSUMES  ## Hob
 
