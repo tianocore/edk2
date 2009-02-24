@@ -256,12 +256,12 @@ ConPlatformTextInDriverBindingStart (
     return Status;
   }
   //
-  // Check the device path, if it is a hot plug device,
+  // Check the device handle, if it is a hot plug device,
   // do not put the device path into ConInDev, and install
   // gEfiConsoleInDeviceGuid to the device handle directly.
   // The policy is, make hot plug device plug in and play immediately.
   //
-  if (IsHotPlugDevice (DevicePath)) {
+  if (IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     gBS->InstallMultipleProtocolInterfaces (
            &ControllerHandle,
            &gEfiConsoleInDeviceGuid,
@@ -373,12 +373,12 @@ ConPlatformTextOutDriverBindingStart (
     return Status;
   }
   //
-  // Check the device path, if it is a hot plug device,
+  // Check the device handle, if it is a hot plug device,
   // do not put the device path into ConOutDev and ErrOutDev,
   // and install gEfiConsoleOutDeviceGuid to the device handle directly.
   // The policy is, make hot plug device plug in and play immediately.
   //
-  if (IsHotPlugDevice (DevicePath)) {
+  if (IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     gBS->InstallMultipleProtocolInterfaces (
            &ControllerHandle,
            &gEfiConsoleOutDeviceGuid,
@@ -482,35 +482,31 @@ ConPlatformTextInDriverBindingStop (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   //
-  // Get the Device Path Protocol firstly
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &DevicePath,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
   // If it is not a hot-plug device, first delete it from the ConInDev variable.
   //
-  if (!IsHotPlugDevice (DevicePath)) {
-   //
-    // Remove DevicePath from ConInDev
+  if (!IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     //
-    ConPlatformUpdateDeviceVariable (
-      L"ConInDev",
-      DevicePath,
-      DELETE
-      );
+    // Get the Device Path Protocol so the environment variables can be updated
+    //
+    Status = gBS->OpenProtocol (
+                    ControllerHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID **) &DevicePath,
+                    This->DriverBindingHandle,
+                    ControllerHandle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Remove DevicePath from ConInDev
+      //
+      ConPlatformUpdateDeviceVariable (
+        L"ConInDev",
+        DevicePath,
+        DELETE
+        );
+    }
   }
-
   //
   // Uninstall the Console Device GUIDs from Controller Handle
   //
@@ -561,40 +557,36 @@ ConPlatformTextOutDriverBindingStop (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   //
-  // Get the Device Path Protocol firstly
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &DevicePath,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
   // If it is not a hot-plug device, first delete it from the ConOutDev and ErrOutDev variable.
   //
-  if (!IsHotPlugDevice (DevicePath)) {
+  if (!IsHotPlugDevice (This->DriverBindingHandle, ControllerHandle)) {
     //
-    // Remove DevicePath from ConOutDev, and ErrOutDev
+    // Get the Device Path Protocol so the environment variables can be updated
     //
-    ConPlatformUpdateDeviceVariable (
-      L"ConOutDev",
-      DevicePath,
-      DELETE
-      );
-    ConPlatformUpdateDeviceVariable (
-      L"ErrOutDev",
-      DevicePath,
-      DELETE
-      );
+    Status = gBS->OpenProtocol (
+                    ControllerHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID **) &DevicePath,
+                    This->DriverBindingHandle,
+                    ControllerHandle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Remove DevicePath from ConOutDev, and ErrOutDev
+      //
+      ConPlatformUpdateDeviceVariable (
+        L"ConOutDev",
+        DevicePath,
+        DELETE
+        );
+      ConPlatformUpdateDeviceVariable (
+        L"ErrOutDev",
+        DevicePath,
+        DELETE
+        );
+    }
   }
- 
   //
   // Uninstall the Console Device GUIDs from Controller Handle
   //
@@ -937,12 +929,10 @@ ConPlatformUpdateDeviceVariable (
 }
 
 /**
-  Check if the device supports hot-plug through its device path.
+  Check if the device supports hot-plug.
 
-  This function could be updated to check more types of Hot Plug devices.
-  Currently, it checks USB and PCCard device.
-
-  @param  DevicePath            Pointer to device's device path.
+  @param  DriverBindingHandle   Protocol instance pointer.
+  @param  ControllerHandle      Handle of device to check.
 
   @retval TRUE                  The devcie is a hot-plug device
   @retval FALSE                 The devcie is not a hot-plug device.
@@ -950,35 +940,26 @@ ConPlatformUpdateDeviceVariable (
 **/
 BOOLEAN
 IsHotPlugDevice (
-  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  EFI_HANDLE    DriverBindingHandle,
+  EFI_HANDLE    ControllerHandle
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL     *CheckDevicePath;
+  EFI_STATUS  Status;
 
-  CheckDevicePath = DevicePath;
-  while (!IsDevicePathEnd (CheckDevicePath)) {
-    //
-    // Check device whether is hot plug device or not throught Device Path
-    // 
-    if ((DevicePathType (CheckDevicePath) == MESSAGING_DEVICE_PATH) &&
-        (DevicePathSubType (CheckDevicePath) == MSG_USB_DP ||
-         DevicePathSubType (CheckDevicePath) == MSG_USB_CLASS_DP ||
-         DevicePathSubType (CheckDevicePath) == MSG_USB_WWID_DP)) {
-      //
-      // If Device is USB device
-      //
-      return TRUE;
-    }
-    if ((DevicePathType (CheckDevicePath) == HARDWARE_DEVICE_PATH) &&
-        (DevicePathSubType (CheckDevicePath) == HW_PCCARD_DP)) {
-      //
-      // If Device is PCCard
-      //
-      return TRUE;
-    }
-  
-    CheckDevicePath = NextDevicePathNode (CheckDevicePath);
+  //
+  // HotPlugDeviceGuid indicates ControllerHandle stands for a hot plug device.
+  //
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiHotPlugDeviceGuid,
+                  NULL,
+                  DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
   }
 
-  return FALSE;
+  return TRUE;
 }

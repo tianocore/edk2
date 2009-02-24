@@ -87,4 +87,5 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSimpleTextInProtocolGuid                  ## TO_START
   gEfiSimpleTextOutProtocolGuid                 ## TO_START
+  gEfiHotPlugDeviceGuid                         ## SOMETIMES_CONSUMES (Used to check if it's a hot-plug device)
   

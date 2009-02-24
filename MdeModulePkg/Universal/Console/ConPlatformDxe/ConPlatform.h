@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/HotPlugDevice.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/ConsoleInDevice.h>
@@ -292,12 +293,10 @@ ConPlatformUpdateDeviceVariable (
   );
 
 /**
-  Check if the device supports hot-plug through its device path.
+  Check if the device supports hot-plug.
 
-  This function could be updated to check more types of Hot Plug devices.
-  Currently, it checks USB and PCCard device.
-
-  @param  DevicePath            Pointer to device's device path.
+  @param  DriverBindingHandle   Protocol instance pointer.
+  @param  ControllerHandle      Handle of device to check.
 
   @retval TRUE                  The devcie is a hot-plug device
   @retval FALSE                 The devcie is not a hot-plug device.
@@ -305,7 +304,8 @@ ConPlatformUpdateDeviceVariable (
 **/
 BOOLEAN
 IsHotPlugDevice (
-  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  EFI_HANDLE    DriverBindingHandle,
+  EFI_HANDLE    ControllerHandle
   );
 
 //
