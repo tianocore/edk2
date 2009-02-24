@@ -30,7 +30,6 @@ Abstract:
 //
 #include <Guid/EventGroup.h>
 #include <Guid/FirmwareFileSystem2.h>
-#include <Protocol/FvbExtension.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Guid/AlternateFvBlock.h>
 #include <Protocol/DevicePath.h>
@@ -41,7 +40,6 @@ Abstract:
 #include <Guid/FlashMapHob.h>
 #include <Guid/HobList.h>
 #include <Guid/AlternateFvBlock.h>
-#include <Protocol/FvbExtension.h>
 
 //
 // The Library classes this module consumes
@@ -125,7 +123,6 @@ typedef struct {
   FV_DEVICE_PATH                      DevicePath;
   UINTN                               Instance;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  FwVolBlockInstance;
-  EFI_FVB_EXTENSION_PROTOCOL          FvbExtension;
 } EFI_FW_VOL_BLOCK_DEVICE;
 
 EFI_STATUS
@@ -240,17 +237,6 @@ FvbGetLbaAddress (
   IN  BOOLEAN                             Virtual
   );
 
-EFI_STATUS
-FvbEraseCustomBlockRange (
-  IN UINTN                                Instance,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba,
-  IN ESAL_FWB_GLOBAL                      *Global,
-  IN BOOLEAN                              Virtual
-  );
-
 //
 // Protocol APIs
 //
@@ -309,16 +295,6 @@ EFIAPI
 FvbProtocolEraseBlocks (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   ...  
-  );
-
-EFI_STATUS
-EFIAPI
-FvbExtendProtocolEraseCustomBlockRange (
-  IN EFI_FVB_EXTENSION_PROTOCOL           *This,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba
   );
 
 #endif
