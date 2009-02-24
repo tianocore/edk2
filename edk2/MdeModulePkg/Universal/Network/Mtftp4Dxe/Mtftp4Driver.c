@@ -66,7 +66,16 @@ Mtftp4DriverEntryPoint (
 
   @retval EFI_SUCCESS            The controller has UDP service binding protocol
                                  installed, MTFTP can support it.
-  @retval Others                 MTFTP can't support the controller.
+  @retval EFI_ALREADY_STARTED    The device specified by ControllerHandle and
+                                 RemainingDevicePath is already being managed by 
+                                 the driver specified by This.
+  @retval EFI_ACCESS_DENIED      The device specified by ControllerHandle and
+                                 RemainingDevicePath is already being managed by a 
+                                 different driver or an application that requires 
+                                 exclusive access.
+  @retval EFI_UNSUPPORTED        The device specified by ControllerHandle and
+                                 RemainingDevicePath is not supported by the driver 
+                                 specified by This.
 
 **/
 EFI_STATUS

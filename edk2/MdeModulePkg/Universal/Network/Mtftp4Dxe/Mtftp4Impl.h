@@ -73,7 +73,7 @@ struct _MTFTP4_SERVICE {
   UINT16                        ChildrenNum;
   LIST_ENTRY                    Children;
 
-  EFI_EVENT                     Timer;  // Ticking timer for all the MTFTP clients
+  EFI_EVENT                     Timer;  ///< Ticking timer for all the MTFTP clients
   EFI_EVENT                     TimerToGetMap;
 
   EFI_HANDLE                    Controller;
