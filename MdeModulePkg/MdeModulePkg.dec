@@ -69,12 +69,6 @@
   ##  @libraryclass  Defines a set of interfaces on how to process capusle image update.
   CapsuleLib|Include/Library/CapsuleLib.h
   
-  ##  @libraryclass  Platform BDS library definition about platform specific behavior.
-  PlatformBdsLib|Include/Library/PlatformBdsLib.h
-  
-  ##  @libraryclass  Generic BDS library definition, include the data structure and function.
-  GenericBdsLib|Include/Library/GenericBdsLib.h
-  
   ##  @libraryclass  Library for Deferred Procedure Calls.
   DpcLib|Include/Library/DpcLib.h
 

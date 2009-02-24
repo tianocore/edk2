@@ -36,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ComponentName2.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
+#include <Protocol/DevicePathToText.h>
 #include <Guid/GlobalVariable.h>
 
 #include <Library/BaseLib.h>
@@ -52,7 +53,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/GenericBdsLib.h>
 #include "PlatOverMngr.h"
 
 #define EFI_CALLBACK_INFO_SIGNATURE SIGNATURE_32 ('C', 'l', 'b', 'k')
@@ -93,6 +93,22 @@ UINTN                        mSelectedDriverImageNum;
 UINTN                        mLastSavedDriverImageNum;
 CHAR8                        mLanguage[RFC_3066_ENTRY_SIZE];
 UINT16                       mCurrentPage;
+
+/**
+  Converting a given device to an unicode string. 
+  
+  This function will dependent on gEfiDevicePathToTextProtocolGuid, if protocol
+  does not installed, then return unknown device path L"?" directly.
+  
+  @param    DevPath     Given device path instance
+  
+  @return   Converted string from given device path.
+  @retval   L"?"  Can not locate gEfiDevicePathToTextProtocolGuid protocol for converting.
+**/
+CHAR16 *
+DevicePathToStr (
+  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
+  );
 
 /**
   Do string convertion for the ComponentName supported language. It do
@@ -1439,3 +1455,46 @@ Finish:
 
   return Status;
 }
+
+/**
+  Converting a given device to an unicode string. 
+  
+  This function will dependent on gEfiDevicePathToTextProtocolGuid, if protocol
+  does not installed, then return unknown device path L"?" directly.
+  
+  @param    DevPath     Given device path instance
+  
+  @return   Converted string from given device path.
+  @retval   L"?"  Can not locate gEfiDevicePathToTextProtocolGuid protocol for converting.
+**/
+CHAR16 *
+DevicePathToStr (
+  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
+  CHAR16                           *ToText;
+  
+  if (DevPath == NULL) {
+    return L"";
+  }
+    
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathToTextProtocolGuid,
+                  NULL,
+                  (VOID **) &DevPathToText
+                  );
+  if (!EFI_ERROR (Status)) {
+    ToText = DevPathToText->ConvertDevicePathToText (
+                              DevPath,
+                              FALSE,
+                              TRUE
+                              );
+    ASSERT (ToText != NULL);
+    return ToText;
+  }
+
+  return L"?";
+}
+  

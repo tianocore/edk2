@@ -64,7 +64,6 @@
   MemoryAllocationLib
   UefiRuntimeServicesTableLib
   DevicePathLib
-  GenericBdsLib
   
 [Guids]
   gEfiGlobalVariableGuid                        ## CONSUMED ## Variable:L"PlatformLang" this variable specifies the platform supported language string (RFC 3066 format)
@@ -85,4 +84,4 @@
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMED
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMED
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCED
-  
+  gEfiDevicePathToTextProtocolGuid              ## CONSUMED
