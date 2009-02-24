@@ -43,7 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/PlatDriOverLib.h>
+#include <Library/PlatformDriverOverrideLib.h>
 #include <Library/HiiLib.h>
 #include <Library/IfrSupportLib.h>
 #include <Library/ExtendedHiiLib.h>

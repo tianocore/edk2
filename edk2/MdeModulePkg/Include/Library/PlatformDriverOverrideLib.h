@@ -1,8 +1,8 @@
 /** @file
+  Ihis library is only intended to be used by Platform Driver Override Dxe Driver and Application.
+  It provides basic platform driver override functions.
 
-  This library provides basic platform driver override functions.
-
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PLAT_DRI_OVER_LIB_H_
-#define _PLAT_DRI_OVER_LIB_H_
+#ifndef _PLATFORM_DRIVER_OVERRIDE_LIB_H_
+#define _PLATFORM_DRIVER_OVERRIDE_LIB_H_
 
 #include <Protocol/DevicePath.h>
 

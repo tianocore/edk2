@@ -48,7 +48,7 @@
   RecoveryLib|Include/Library/RecoveryLib.h
   
   ##  @libraryclass  Basic platform driver override functions.
-  PlatDriOverLib|Include/Library/PlatDriOverLib.h
+  PlatformDriverOverrideLib|Include/Library/PlatformDriverOverrideLib.h
 
   ##  @libraryclass  Provides HII related functions.
   HiiLib|Include/Library/HiiLib.h

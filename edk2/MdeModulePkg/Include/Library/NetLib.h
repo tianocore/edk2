@@ -1,5 +1,6 @@
 /** @file
-  This library provides basic function for UEFI network stack.
+  Ihis library is only intended to be used by UEFI network stack modules.
+  It provides basic function for UEFI network stack.
 
 Copyright (c) 2005 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

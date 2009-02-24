@@ -482,6 +482,7 @@ FREE_MEM:
 
 **/
 VOID
+EFIAPI
 UdpIoCancelDgrams (
   IN UDP_IO_PORT            *UdpIo,
   IN EFI_STATUS             IoStatus,

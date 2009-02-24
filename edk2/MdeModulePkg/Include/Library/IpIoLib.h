@@ -1,5 +1,6 @@
 /** @file
-  This library provides IpIo layer upon EFI IP4 Protocol.
+  Ihis library is only intended to be used by UEFI network stack modules.
+  It provides IpIo layer upon EFI IP4 Protocol.
 
 Copyright (c) 2005 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials

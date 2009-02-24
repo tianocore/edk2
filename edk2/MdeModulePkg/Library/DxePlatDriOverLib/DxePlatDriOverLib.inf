@@ -24,7 +24,7 @@
   FILE_GUID                      = 8bd8d711-2736-46d7-8c81-5de68e0a9e88
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatDriOverLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = PlatformDriverOverrideLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
 
 #
 # The following information is for reference only and not required by the build tools.
