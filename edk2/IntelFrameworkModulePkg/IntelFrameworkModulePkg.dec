@@ -27,6 +27,12 @@
   PciIncompatibleDeviceSupportLib|Include/Library/PciIncompatibleDeviceSupportLib.h
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
 
+  ##  @libraryclass  Platform BDS library definition about platform specific behavior.
+  PlatformBdsLib|Include/Library/PlatformBdsLib.h
+  
+  ##  @libraryclass  Generic BDS library definition, include the data structure and function.
+  GenericBdsLib|Include/Library/GenericBdsLib.h
+
 [Guids.common]
   gMemoryStatusCodeRecordGuid     = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
   gEfiDataHubStatusCodeRecordGuid = { 0xD083E94C, 0x6560, 0x42E4, { 0xB6, 0xD4, 0x2D, 0xF7, 0x5A, 0xDF, 0x6A, 0x2A }}
