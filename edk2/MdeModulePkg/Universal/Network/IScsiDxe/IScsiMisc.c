@@ -94,7 +94,7 @@ IScsiGetSubnetMaskPrefixLength (
   //
   ReverseMask = ~ReverseMask;
 
-  if ((ReverseMask != 0) & ((ReverseMask + 1) != 0)) {
+  if ((ReverseMask & (ReverseMask + 1)) != 0) {
     return 0;
   }
 
