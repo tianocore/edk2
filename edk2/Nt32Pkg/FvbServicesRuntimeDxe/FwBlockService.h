@@ -58,7 +58,6 @@ typedef struct {
   FV_DEVICE_PATH                      DevicePath;
   UINTN                               Instance;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  FwVolBlockInstance;
-  EFI_FVB_EXTENSION_PROTOCOL          FvbExtension;
 } EFI_FW_VOL_BLOCK_DEVICE;
 
 EFI_STATUS
@@ -205,16 +204,6 @@ EFIAPI
 FvbProtocolEraseBlocks (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   ...
-  );
-
-EFI_STATUS
-EFIAPI
-FvbExtendProtocolEraseCustomBlockRange (
-  IN EFI_FVB_EXTENSION_PROTOCOL           *This,
-  IN EFI_LBA                              StartLba,
-  IN UINTN                                OffsetStartLba,
-  IN EFI_LBA                              LastLba,
-  IN UINTN                                OffsetLastLba
   );
 
 #endif
