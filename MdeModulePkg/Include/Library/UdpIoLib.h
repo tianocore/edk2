@@ -1,6 +1,6 @@
 /** @file
-  The helper routines to access UDP service. It is used by both
-  DHCP and MTFTP.
+  Ihis library is only intended to be used by UEFI network stack modules.
+  It provides the helper routines to access UDP service. It is used by both DHCP and MTFTP.
 
 Copyright (c) 2006 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -166,6 +166,26 @@ typedef
 BOOLEAN
 (*UDP_IO_TO_CANCEL) (
   IN UDP_TX_TOKEN           *Token,
+  IN VOID                   *Context
+  );
+
+/**
+  Cancel all the sent datagram that pass the selection criteria of ToCancel.
+  If ToCancel is NULL, all the datagrams are cancelled.
+
+  @param[in]  UdpIo                 The UDP_IO_PORT to cancel packet.
+  @param[in]  IoStatus              The IoStatus to return to the packet owners.
+  @param[in]  ToCancel              The select funtion to test whether to cancel this
+                                    packet or not.
+  @param[in]  Context               The opaque parameter to the ToCancel.
+
+**/
+VOID
+EFIAPI
+UdpIoCancelDgrams (
+  IN UDP_IO_PORT            *UdpIo,
+  IN EFI_STATUS             IoStatus,
+  IN UDP_IO_TO_CANCEL       ToCancel,        OPTIONAL
   IN VOID                   *Context
   );
 

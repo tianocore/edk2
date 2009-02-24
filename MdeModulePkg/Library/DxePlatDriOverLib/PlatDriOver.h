@@ -32,7 +32,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DxeServicesTableLib.h>
-#include <Library/PlatDriOverLib.h>
+#include <Library/PlatformDriverOverrideLib.h>
 
 #include <Guid/OverrideVariable.h>
 #include <VariableFormat.h>
