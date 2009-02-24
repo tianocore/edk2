@@ -40,8 +40,8 @@
   Ia32/VirtualMemory.c ||||PcdDxeIplSwitchToLongMode
   Ia32/DxeLoadFunc.c
   Ia32/ImageRead.c
-  Ia32/IdtVectorAsm.asm||||PcdDxeIplSwitchToLongMode AND PcdDxeIplEnableIdt
-  Ia32/IdtVectorAsm.S  ||||PcdDxeIplSwitchToLongMode AND PcdDxeIplEnableIdt
+  Ia32/IdtVectorAsm.asm||||PcdDxeIplSwitchToLongMode
+  Ia32/IdtVectorAsm.S  ||||PcdDxeIplSwitchToLongMode
 
 [Sources.X64]
   X64/VirtualMemory.h
@@ -89,7 +89,6 @@
   gEfiMemoryTypeInformationGuid     ## SOMETIMES_PRODUCES ## HOB
 
 [FeaturePcd.IA32]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt||PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
 [FixedPcd.common]

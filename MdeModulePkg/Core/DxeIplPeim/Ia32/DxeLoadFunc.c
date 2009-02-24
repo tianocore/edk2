@@ -114,36 +114,36 @@ HandOffToDxeCore (
     //    
     UpdateStackHob (BaseOfStack, STACK_SIZE);
 
-    if (FeaturePcdGet (PcdDxeIplEnableIdt)) {
-      SizeOfTemplate = AsmGetVectorTemplatInfo (&TemplateBase);
-  
-      Status = PeiServicesAllocatePages (
-                 EfiBootServicesData, 
-                 EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * 32), 
-                 &VectorAddress
-                 );
-      ASSERT_EFI_ERROR (Status);
-  
-      IdtTable      = (X64_IDT_GATE_DESCRIPTOR *) (UINTN) (VectorAddress + SizeOfTemplate * 32);
-      for (Index = 0; Index < 32; Index++) {
-        IdtTable[Index].Ia32IdtEntry.Bits.GateType    =  0x8e;
-        IdtTable[Index].Ia32IdtEntry.Bits.Reserved_0  =  0;
-        IdtTable[Index].Ia32IdtEntry.Bits.Selector    =  SYS_CODE64_SEL;
-  
-        IdtTable[Index].Ia32IdtEntry.Bits.OffsetLow   = (UINT16) VectorAddress;
-        IdtTable[Index].Ia32IdtEntry.Bits.OffsetHigh  = (UINT16) (RShiftU64 (VectorAddress, 16));
-        IdtTable[Index].Offset32To63                  = (UINT32) (RShiftU64 (VectorAddress, 32));
-        IdtTable[Index].Reserved                      = 0;
-  
-        CopyMem ((VOID *) (UINTN) VectorAddress, TemplateBase, SizeOfTemplate);
-        AsmVectorFixup ((VOID *) (UINTN) VectorAddress, (UINT8) Index);
-  
-        VectorAddress += SizeOfTemplate;
-      }
-  
-      gLidtDescriptor.Base = (UINTN) IdtTable;
-      AsmWriteIdtr (&gLidtDescriptor);
+    SizeOfTemplate = AsmGetVectorTemplatInfo (&TemplateBase);
+
+    Status = PeiServicesAllocatePages (
+               EfiBootServicesData, 
+               EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * 32), 
+               &VectorAddress
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    IdtTable      = (X64_IDT_GATE_DESCRIPTOR *) (UINTN) (VectorAddress + SizeOfTemplate * 32);
+    for (Index = 0; Index < 32; Index++) {
+      IdtTable[Index].Ia32IdtEntry.Bits.GateType    =  0x8e;
+      IdtTable[Index].Ia32IdtEntry.Bits.Reserved_0  =  0;
+      IdtTable[Index].Ia32IdtEntry.Bits.Selector    =  SYS_CODE64_SEL;
+
+      IdtTable[Index].Ia32IdtEntry.Bits.OffsetLow   = (UINT16) VectorAddress;
+      IdtTable[Index].Ia32IdtEntry.Bits.OffsetHigh  = (UINT16) (RShiftU64 (VectorAddress, 16));
+      IdtTable[Index].Offset32To63                  = (UINT32) (RShiftU64 (VectorAddress, 32));
+      IdtTable[Index].Reserved                      = 0;
+
+      CopyMem ((VOID *) (UINTN) VectorAddress, TemplateBase, SizeOfTemplate);
+      AsmVectorFixup ((VOID *) (UINTN) VectorAddress, (UINT8) Index);
+
+      VectorAddress += SizeOfTemplate;
     }
+
+    gLidtDescriptor.Base = (UINTN) IdtTable;
+    AsmWriteIdtr (&gLidtDescriptor);
+
+      
     //
     // Go to Long Mode and transfer control to DxeCore.
     // Interrupts will not get turned on until the CPU AP is loaded.

@@ -500,6 +500,15 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
   ##
+  #  This PCD defines the Console output column and the default value is 25 according to UEFI spec
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|25|UINT32|0x40000006
+  
+  ##
+  #  This PCD defines the Console output row and the default value is 80 according to UEFI spec
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
+  ##
   #  This PCD defines the times to print hello world string.
   #  This PCD is a sample to explain Patchable UINT32 PCD usage.
   ##
@@ -508,8 +517,4 @@
 [PcdsFeatureFlag.IA32]
   ## If TRUE, the DXE IPL will load a 64-bit DxeCore.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE|BOOLEAN|0x0001003b
-  
-  ## If TRUE, the DXE IPL will create the default IDT table.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplEnableIdt|TRUE|BOOLEAN|0x0001003d
-
 
