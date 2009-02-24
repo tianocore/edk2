@@ -214,7 +214,7 @@ INF  Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
 INF  Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
 INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
-INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+INF  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 
 ################################################################################
 #

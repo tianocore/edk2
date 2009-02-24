@@ -9,7 +9,7 @@
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
 #    which accompanies this distribution. The full text of the license may be found at
-#    http://opensource.org/licenses/bsd-license.php
+#    http:\\opensource.org/licenses/bsd-license.php
 #
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -77,6 +77,7 @@
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  PlatformDriverOverrideLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
   
 [LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -465,7 +466,7 @@
   Nt32Pkg/WinNtSerialIoDxe/WinNtSerialIoDxe.inf
   Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
   Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
-  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  #MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   #
   # Network stack drivers
@@ -490,8 +491,11 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  MdeModulePkg\Universal\Variable\Application\VariableInfo.inf
+  MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
   
+  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+  MdeModulePkg/Application/PlatOverMngr/PlatOverMngr.inf
+
 [BuildOptions]
   DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /ALIGN:4096 /SUBSYSTEM:CONSOLE
   RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
