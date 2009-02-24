@@ -39,7 +39,8 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   DuetPkg/DuetPkg.dec
-
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  
 [LibraryClasses]
   BaseLib
   MemoryAllocationLib
