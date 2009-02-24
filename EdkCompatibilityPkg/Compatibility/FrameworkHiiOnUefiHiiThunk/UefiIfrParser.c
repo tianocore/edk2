@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include <MdeModuleHii.h>
+#include <Guid/MdeModuleHii.h>
 
 #include "UefiIfrParser.h"
 
