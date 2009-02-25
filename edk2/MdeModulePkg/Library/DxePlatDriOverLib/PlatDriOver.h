@@ -21,6 +21,7 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/BusSpecificDriverOverride.h>
+#include <Protocol/DriverBinding.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
