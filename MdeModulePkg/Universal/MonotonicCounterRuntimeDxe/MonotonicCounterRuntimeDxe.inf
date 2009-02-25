@@ -51,12 +51,3 @@
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
-
-
-# [Event]
-#   ##
-#   # This is a private event to update the Monotonic Counter's high part when low part overflows.
-#   #
-#   EVT_NOTIFY_SIGNAL                   ## PRODUCES
-#
-#
