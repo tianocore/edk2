@@ -1409,7 +1409,7 @@ SnpNt32Unload (
 
 **/
 EFI_STATUS
-InitializeSnpNt32river (
+InitializeSnpNt32Driver (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
