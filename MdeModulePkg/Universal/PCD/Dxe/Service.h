@@ -1106,10 +1106,10 @@ extern EFI_LOCK mPcdDatabaseLock;
 // #define PCD_DATUM_TYPE_UINT32   (0x4 << PCD_DATUM_TYPE_SHIFT)
 // #define PCD_DATUM_TYPE_UINT64   (0x8 << PCD_DATUM_TYPE_SHIFT)
 // 
-// #define PCD_DATUM_TYPE_ALL_SET  (PCD_DATUM_TYPE_POINTER | \
-//                                  PCD_DATUM_TYPE_UINT8   | \
-//                                  PCD_DATUM_TYPE_UINT16  | \
-//                                  PCD_DATUM_TYPE_UINT32  | \
+// #define PCD_DATUM_TYPE_ALL_SET  (PCD_DATUM_TYPE_POINTER |
+//                                  PCD_DATUM_TYPE_UINT8   |
+//                                  PCD_DATUM_TYPE_UINT16  |
+//                                  PCD_DATUM_TYPE_UINT32  |
 //                                  PCD_DATUM_TYPE_UINT64)
 // 
 // #define PCD_DATABASE_OFFSET_MASK (~(PCD_TYPE_ALL_SET | PCD_DATUM_TYPE_ALL_SET))
