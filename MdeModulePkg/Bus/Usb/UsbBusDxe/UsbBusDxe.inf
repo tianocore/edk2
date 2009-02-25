@@ -64,10 +64,10 @@
 
 
 [Protocols]
-  gEfiUsbIoProtocolGuid                         ## ALWAYS_PRODUCED
-  gEfiDevicePathProtocolGuid                    ## ALWAYS_CONSUMED
-  gEfiUsb2HcProtocolGuid                        ## SOMETIMES_CONSUMED
-  gEfiUsbHcProtocolGuid                         ## SOMETIMES_CONSUMED
+  gEfiUsbIoProtocolGuid                         ## BY_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+  gEfiUsb2HcProtocolGuid                        ## TO_START
+  gEfiUsbHcProtocolGuid                         ## TO_START
 
 # [Event]
 #   ##

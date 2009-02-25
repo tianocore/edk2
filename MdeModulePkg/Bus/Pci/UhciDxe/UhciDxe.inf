@@ -60,7 +60,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport  ## SOMETIME_CONSUMES (enable/disable usb legacy support.)
 
 [LibraryClasses]
   MemoryAllocationLib
