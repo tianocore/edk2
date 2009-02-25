@@ -1,7 +1,7 @@
 /** @file
   Capsule Runtime Driver produces two UEFI capsule runtime services.
   (UpdateCapsule, QueryCapsuleCapabilities)
-  It installs the Capsule Architectural Protocol (EDKII definition) to signify 
+  It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
   the capsule runtime services are ready.
 
 Copyright (c) 2006 - 2008, Intel Corporation. <BR>
