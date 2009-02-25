@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiDriverEntryPoint.h>
 
 /**
   Waits for the specified number of ticks.
