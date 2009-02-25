@@ -1,7 +1,8 @@
 #/** @file
-#  This library doesn't produce any library class. In its constructor function,
-#  it uses ExtractGuidedSectionLib service to registers CRC32 guided section handler
+#  This library doesn't produce any library class. The constructor function uses 
+#  ExtractGuidedSectionLib service to register CRC32 guided section handler
 #  that parses CRC32 encapsulation section and extracts raw data.
+#
 #  It uses UEFI boot service CalculateCrc32 to authenticate 32 bit CRC value.
 #
 # Copyright (c) 2006 - 2008, Intel Corporation
