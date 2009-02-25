@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/GlobalVariable.h>
 #include <Guid/PcAnsi.h>
 
-#include <Protocol/HotPlugDevice.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/DevicePath.h>
@@ -1344,6 +1343,23 @@ TerminalIsValidAscii (
 BOOLEAN
 TerminalIsValidEfiCntlChar (
   IN  CHAR16  CharC
+  );
+
+/**
+  Check if the device supports hot-plug through its device path.
+
+  This function could be updated to check more types of Hot Plug devices.
+  Currently, it checks USB and PCCard device.
+
+  @param  DevicePath            Pointer to device's device path.
+
+  @retval TRUE                  The devcie is a hot-plug device
+  @retval FALSE                 The devcie is not a hot-plug device.
+
+**/
+BOOLEAN
+IsHotPlugDevice (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
   );
 
 #endif

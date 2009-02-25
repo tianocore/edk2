@@ -300,19 +300,12 @@ TerminalDriverBindingStart (
       if (EFI_ERROR (Status)) {
         goto Error;
       }
-      //
-      // if the serial device is a hot plug device, do not update the
-      // ConInDev, ConOutDev, and StdErrDev variables.
-      //
-      Status = gBS->OpenProtocol (
-                      Controller,
-                      &gEfiHotPlugDeviceGuid,
-                      NULL,
-                      This->DriverBindingHandle,
-                      Controller,
-                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                      );
-      if (EFI_ERROR (Status)) {
+
+      if (IsHotPlugDevice (ParentDevicePath)) {
+        //
+        // if the serial device is a hot plug device, do not update the
+        // ConInDev, ConOutDev, and StdErrDev variables.
+        //
         TerminalUpdateConsoleDevVariable (L"ConInDev", ParentDevicePath);
         TerminalUpdateConsoleDevVariable (L"ConOutDev", ParentDevicePath);
         TerminalUpdateConsoleDevVariable (L"ErrOutDev", ParentDevicePath);
@@ -627,26 +620,7 @@ TerminalDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto Error;
   }
-  //
-  // if the serial device is a hot plug device, attaches the HotPlugGuid
-  // onto the terminal device handle.
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiHotPlugDeviceGuid,
-                  NULL,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
-  if (!EFI_ERROR (Status)) {
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &TerminalDevice->Handle,
-                    &gEfiHotPlugDeviceGuid,
-                    NULL,
-                    NULL
-                    );
-  }
+
   //
   // Register the Parent-Child relationship via
   // EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
@@ -884,25 +858,6 @@ TerminalDriverBindingStop (
 
         if (TerminalDevice->ControllerNameTable != NULL) {
           FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
-        }
-
-        Status = gBS->OpenProtocol (
-                        ChildHandleBuffer[Index],
-                        &gEfiHotPlugDeviceGuid,
-                        NULL,
-                        This->DriverBindingHandle,
-                        Controller,
-                        EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                        );
-        if (!EFI_ERROR (Status)) {
-          Status = gBS->UninstallMultipleProtocolInterfaces (
-                          ChildHandleBuffer[Index],
-                          &gEfiHotPlugDeviceGuid,
-                          NULL,
-                          NULL
-                          );
-        } else {
-          Status = EFI_SUCCESS;
         }
 
         gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
@@ -1322,3 +1277,51 @@ InitializeTerminal(
 
   return Status;
 }
+
+/**
+  Check if the device supports hot-plug through its device path.
+
+  This function could be updated to check more types of Hot Plug devices.
+  Currently, it checks USB and PCCard device.
+
+  @param  DevicePath            Pointer to device's device path.
+
+  @retval TRUE                  The devcie is a hot-plug device
+  @retval FALSE                 The devcie is not a hot-plug device.
+
+**/
+BOOLEAN
+IsHotPlugDevice (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL     *CheckDevicePath;
+
+  CheckDevicePath = DevicePath;
+  while (!IsDevicePathEnd (CheckDevicePath)) {
+    //
+    // Check device whether is hot plug device or not throught Device Path
+    // 
+    if ((DevicePathType (CheckDevicePath) == MESSAGING_DEVICE_PATH) &&
+        (DevicePathSubType (CheckDevicePath) == MSG_USB_DP ||
+         DevicePathSubType (CheckDevicePath) == MSG_USB_CLASS_DP ||
+         DevicePathSubType (CheckDevicePath) == MSG_USB_WWID_DP)) {
+      //
+      // If Device is USB device
+      //
+      return TRUE;
+    }
+    if ((DevicePathType (CheckDevicePath) == HARDWARE_DEVICE_PATH) &&
+        (DevicePathSubType (CheckDevicePath) == HW_PCCARD_DP)) {
+      //
+      // If Device is PCCard
+      //
+      return TRUE;
+    }
+  
+    CheckDevicePath = NextDevicePathNode (CheckDevicePath);
+  }
+
+  return FALSE;
+}
+
