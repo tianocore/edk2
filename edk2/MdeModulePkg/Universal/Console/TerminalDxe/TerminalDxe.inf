@@ -44,7 +44,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   DevicePathLib
