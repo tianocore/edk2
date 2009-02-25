@@ -37,6 +37,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/DevicePathToText.h>
+#include <Protocol/DevicePath.h>
+
 #include <Guid/GlobalVariable.h>
 
 #include <Library/BaseLib.h>
