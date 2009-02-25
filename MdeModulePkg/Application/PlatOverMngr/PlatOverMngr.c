@@ -1497,4 +1497,3 @@ DevicePathToStr (
 
   return L"?";
 }
-  
