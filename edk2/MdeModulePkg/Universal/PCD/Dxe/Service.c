@@ -1128,33 +1128,36 @@ GetSkuIdArray (
   
 }
 
-
 /**
-  Get index of PCD entry in size table.
-
+  Wrapper function of getting index of PCD entry in size table.
+  
   @param LocalTokenNumberTableIdx Index of this PCD in local token number table.
-  @param LocalTokenNumberTable    Pointer to local token number table in PCD database.
   @param IsPeiDb                  If TRUE, the pcd entry is initialized in PEI phase,
                                   If FALSE, the pcd entry is initialized in DXE phase.
 
   @return index of PCD entry in size table.
-
 **/
 UINTN
-GetSizeTableIndexA (
-  IN UINTN        LocalTokenNumberTableIdx,
-  IN UINT32       *LocalTokenNumberTable,
-  IN BOOLEAN      IsPeiDb
+GetSizeTableIndex (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  IN    BOOLEAN           IsPeiDb
   )
 {
-  UINTN       Index;
-  UINTN       SizeTableIdx;
-  UINTN       LocalTokenNumber;
-  SKU_ID      *SkuIdTable;
+  UINT32 *LocalTokenNumberTable;
+  UINTN  LocalTokenNumber;
+  UINTN  Index;
+  UINTN  SizeTableIdx;
+  SKU_ID *SkuIdTable;
   
+  if (IsPeiDb) {
+    LocalTokenNumberTable = mPcdDatabase->PeiDb.Init.LocalTokenNumberTable;
+  } else {
+    LocalTokenNumberTable = mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
+  }
+
   SizeTableIdx = 0;
 
-  for (Index=0; Index<LocalTokenNumberTableIdx; Index++) {
+  for (Index = 0; Index < LocalTokenNumberTableIdx; Index ++) {
     LocalTokenNumber = LocalTokenNumberTable[Index];
 
     if ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER) {
@@ -1191,36 +1194,7 @@ GetSizeTableIndexA (
 
   }
 
-  return SizeTableIdx;
-}
-
-
-
-/**
-  Wrapper function of getting index of PCD entry in size table.
-  
-  @param LocalTokenNumberTableIdx Index of this PCD in local token number table.
-  @param IsPeiDb                  If TRUE, the pcd entry is initialized in PEI phase,
-                                  If FALSE, the pcd entry is initialized in DXE phase.
-
-  @return index of PCD entry in size table.
-**/
-UINTN
-GetSizeTableIndex (
-  IN    UINTN             LocalTokenNumberTableIdx,
-  IN    BOOLEAN           IsPeiDb
-  )
-{
-  UINT32 *LocalTokenNumberTable;
-  
-  if (IsPeiDb) {
-    LocalTokenNumberTable = mPcdDatabase->PeiDb.Init.LocalTokenNumberTable;
-  } else {
-    LocalTokenNumberTable = mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
-  }
-  return GetSizeTableIndexA (LocalTokenNumberTableIdx, 
-                             LocalTokenNumberTable,
-                             IsPeiDb);
+  return SizeTableIdx;  
 }
 
 /**
