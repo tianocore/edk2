@@ -1065,3 +1065,300 @@ extern DXE_PCD_DATABASE_INIT gDXEPcdDbInit;
 extern EFI_LOCK mPcdDatabaseLock;
 
 #endif
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+///                                                                                              ///
+///  Following code is an example for auto-generated PCD database to hold all dynamic/dynamicex  ///
+///  PCD's value for one given platform. And following sample comes from autogen.h/autogen.c of  ///
+///  PCD Dxe driver for NT32 platform.                                                           ///
+///                                                                                              ///
+///  The PCD database is stored into a big structure - PCD_DATABASE which is consisted of        ///
+///  PEI PCD database structure and DXE PCD database structure.                                  ///
+///                                                                                              ///
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// //
+// // Common definitions
+// //
+// typedef UINT8 SKU_ID;
+// 
+// //
+// // A PCD offset value is consisted as follows:
+// // 32 ------------- 28 ---------- 24 -------- 0
+// //  | PCD type mask  | Datum Type  |  Offset  |
+// //  -------------------------------------------
+// 
+// #define PCD_TYPE_SHIFT        28             // 28 ~ 32 bit hold PCD type information
+// 
+// #define PCD_TYPE_DATA         (0x0 << PCD_TYPE_SHIFT)
+// #define PCD_TYPE_HII          (0x8 << PCD_TYPE_SHIFT)
+// #define PCD_TYPE_VPD          (0x4 << PCD_TYPE_SHIFT)
+// #define PCD_TYPE_SKU_ENABLED  (0x2 << PCD_TYPE_SHIFT)
+// #define PCD_TYPE_STRING       (0x1 << PCD_TYPE_SHIFT)
+// 
+// #define PCD_TYPE_ALL_SET      (PCD_TYPE_DATA | PCD_TYPE_HII | PCD_TYPE_VPD | PCD_TYPE_SKU_ENABLED | PCD_TYPE_STRING)
+// 
+// #define PCD_DATUM_TYPE_SHIFT  24             // 24 ~ 28 bit hold datum type information
+// 
+// #define PCD_DATUM_TYPE_POINTER  (0x0 << PCD_DATUM_TYPE_SHIFT)
+// #define PCD_DATUM_TYPE_UINT8    (0x1 << PCD_DATUM_TYPE_SHIFT)
+// #define PCD_DATUM_TYPE_UINT16   (0x2 << PCD_DATUM_TYPE_SHIFT)
+// #define PCD_DATUM_TYPE_UINT32   (0x4 << PCD_DATUM_TYPE_SHIFT)
+// #define PCD_DATUM_TYPE_UINT64   (0x8 << PCD_DATUM_TYPE_SHIFT)
+// 
+// #define PCD_DATUM_TYPE_ALL_SET  (PCD_DATUM_TYPE_POINTER | \
+//                                  PCD_DATUM_TYPE_UINT8   | \
+//                                  PCD_DATUM_TYPE_UINT16  | \
+//                                  PCD_DATUM_TYPE_UINT32  | \
+//                                  PCD_DATUM_TYPE_UINT64)
+// 
+// #define PCD_DATABASE_OFFSET_MASK (~(PCD_TYPE_ALL_SET | PCD_DATUM_TYPE_ALL_SET))
+// 
+// typedef struct  {
+//   UINT32  ExTokenNumber;
+//   UINT16  LocalTokenNumber;   // PCD Number of this particular platform build
+//   UINT16  ExGuidIndex;        // Index of GuidTable
+// } DYNAMICEX_MAPPING;
+// 
+// typedef struct {
+//   UINT32  SkuDataStartOffset; //We have to use offsetof MACRO as we don't know padding done by compiler
+//   UINT32  SkuIdTableOffset;   //Offset from the PCD_DB
+// } SKU_HEAD;
+// 
+// typedef struct {
+//   UINT16  GuidTableIndex;     // Offset in Guid Table in units of GUID.
+//   UINT16  StringIndex;        // Offset in String Table in units of UINT16.
+//   UINT16  Offset;             // Offset in Variable
+//   UINT16  DefaultValueOffset; // Offset of the Default Value
+// } VARIABLE_HEAD;
+// 
+// typedef  struct {
+//   UINT32  Offset;
+// } VPD_HEAD;
+// 
+// typedef UINT16 STRING_HEAD;
+// 
+// typedef UINT16 SIZE_INFO;
+// 
+// #define offsetof(s,m)  (UINT32) (UINTN) &(((s *)0)->m)
+// 
+// 
+// #define PEI_GUID_TABLE_SIZE                1
+// #define PEI_STRING_TABLE_SIZE              1
+// #define PEI_SKUID_TABLE_SIZE               1
+// #define PEI_LOCAL_TOKEN_NUMBER_TABLE_SIZE  3
+// #define PEI_LOCAL_TOKEN_NUMBER             3
+// #define PEI_EXMAPPING_TABLE_SIZE           1
+// #define PEI_EX_TOKEN_NUMBER                0
+// #define PEI_SIZE_TABLE_SIZE                2
+// #define PEI_GUID_TABLE_EMPTY               TRUE
+// #define PEI_STRING_TABLE_EMPTY             TRUE
+// #define PEI_SKUID_TABLE_EMPTY              TRUE
+// #define PEI_DATABASE_EMPTY                 FALSE
+// #define PEI_EXMAP_TABLE_EMPTY              TRUE
+// 
+// //
+// // PEI database structure for dynamic/dynamicex PCD which has default value.
+// //
+// typedef struct {
+// 
+// 
+// 
+// 
+// 
+//   DYNAMICEX_MAPPING  ExMapTable[PEI_EXMAPPING_TABLE_SIZE];                       // table for mapping dynamicex token number to local token number
+//   UINT32             LocalTokenNumberTable[PEI_LOCAL_TOKEN_NUMBER_TABLE_SIZE];   // table for local token number
+//   GUID               GuidTable[PEI_GUID_TABLE_SIZE];                             // table for token guid
+// 
+// 
+//   UINT16             StringTable[1]; /* _ */                                     // table for unicode string type PCD's value
+// 
+//   SIZE_INFO          SizeTable[PEI_SIZE_TABLE_SIZE];                             // table for PCD size information
+// 
+// 
+// 
+// 
+// 
+// 
+//   UINT8              SkuIdTable[PEI_SKUID_TABLE_SIZE];                           // table for SKU IDs 
+//   SKU_ID             SystemSkuId;                                                // system SKU ID
+// } PEI_PCD_DATABASE_INIT;
+// 
+// //
+// // PEI database structure for dynamic/dynamicex PCD which has no default value.
+// //
+// typedef struct {
+// 
+// 
+//   UINT32   PcdFlashNvStorageVariableBase_a1aff049_fdeb_442a_b320_13ab4cb72bbc[1];        // PCD entry for PcdFlashNvStorageVariableBase
+//   UINT32   PcdFlashNvStorageFtwSpareBase_a1aff049_fdeb_442a_b320_13ab4cb72bbc[1];        // PCD entry for PcdFlashNvStorageFtwSpareBase
+//   UINT32   PcdFlashNvStorageFtwWorkingBase_a1aff049_fdeb_442a_b320_13ab4cb72bbc[1];      // PCD entry for PcdFlashNvStorageFtwWorkingBase
+// 
+// 
+// 
+// 
+// } PEI_PCD_DATABASE_UNINIT;
+// 
+// #define PCD_PEI_SERVICE_DRIVER_VERSION         2
+// 
+// typedef struct {
+//   PEI_PCD_DATABASE_INIT    Init;
+//   PEI_PCD_DATABASE_UNINIT  Uninit;
+// } PEI_PCD_DATABASE;
+// 
+// #define PEI_NEX_TOKEN_NUMBER (PEI_LOCAL_TOKEN_NUMBER - PEI_EX_TOKEN_NUMBER)
+// 
+// #define DXE_GUID_TABLE_SIZE                1
+// #define DXE_STRING_TABLE_SIZE              212
+// #define DXE_SKUID_TABLE_SIZE               1
+// #define DXE_LOCAL_TOKEN_NUMBER_TABLE_SIZE  9
+// #define DXE_LOCAL_TOKEN_NUMBER             9
+// #define DXE_EXMAPPING_TABLE_SIZE           1
+// #define DXE_EX_TOKEN_NUMBER                0
+// #define DXE_SIZE_TABLE_SIZE                16
+// #define DXE_GUID_TABLE_EMPTY               TRUE
+// #define DXE_STRING_TABLE_EMPTY             FALSE
+// #define DXE_SKUID_TABLE_EMPTY              TRUE
+// #define DXE_DATABASE_EMPTY                 FALSE
+// #define DXE_EXMAP_TABLE_EMPTY              TRUE
+// 
+// typedef struct {
+// 
+// 
+// 
+// 
+// 
+//   DYNAMICEX_MAPPING  ExMapTable[DXE_EXMAPPING_TABLE_SIZE];
+//   UINT32             LocalTokenNumberTable[DXE_LOCAL_TOKEN_NUMBER_TABLE_SIZE];
+//   GUID               GuidTable[DXE_GUID_TABLE_SIZE];
+//   STRING_HEAD        PcdWinNtMemorySize_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+//   STRING_HEAD        PcdWinNtGop_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+//   STRING_HEAD        PcdWinNtSerialPort_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+//   STRING_HEAD        PcdWinNtVirtualDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+//   STRING_HEAD        PcdWinNtUga_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+//   STRING_HEAD        PcdWinNtPhysicalDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+//   STRING_HEAD        PcdWinNtFileSystem_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+//   STRING_HEAD        PcdWinNtConsole_0d79a645_1d91_40a6_a81f_61e6982b32b4[1];
+// 
+// 
+//   UINT16             StringTable[6]; /* PcdWinNtMemorySize_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//   UINT16             StringTable_1[26]; /* PcdWinNtGop_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//   UINT16             StringTable_2[10]; /* PcdWinNtSerialPort_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//   UINT16             StringTable_3[13]; /* PcdWinNtVirtualDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//   UINT16             StringTable_4[26]; /* PcdWinNtUga_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//   UINT16             StringTable_5[51]; /* PcdWinNtPhysicalDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//   UINT16             StringTable_6[54]; /* PcdWinNtFileSystem_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//   UINT16             StringTable_7[26]; /* PcdWinNtConsole_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+// 
+//   SIZE_INFO          SizeTable[DXE_SIZE_TABLE_SIZE];
+//   UINT16             PcdPlatformBootTimeOutDefault_a1aff049_fdeb_442a_b320_13ab4cb72bbc[1];
+// 
+// 
+// 
+// 
+// 
+// 
+//   UINT8              SkuIdTable[DXE_SKUID_TABLE_SIZE];
+// 
+// } DXE_PCD_DATABASE_INIT;
+// 
+// typedef struct {
+//   UINT8  dummy; /* PCD_DATABASE_UNINIT is emptry */
+// 
+// 
+// 
+// 
+// 
+// } DXE_PCD_DATABASE_UNINIT;
+// 
+// #define PCD_DXE_SERVICE_DRIVER_VERSION         2
+// 
+// typedef struct {
+//   DXE_PCD_DATABASE_INIT    Init;
+//   DXE_PCD_DATABASE_UNINIT  Uninit;
+// } DXE_PCD_DATABASE;
+// 
+// #define DXE_NEX_TOKEN_NUMBER (DXE_LOCAL_TOKEN_NUMBER - DXE_EX_TOKEN_NUMBER)
+// 
+// typedef struct {
+//   PEI_PCD_DATABASE PeiDb;
+//   DXE_PCD_DATABASE DxeDb;
+// } PCD_DATABASE;
+// 
+// #define PCD_TOTAL_TOKEN_NUMBER (PEI_LOCAL_TOKEN_NUMBER + DXE_LOCAL_TOKEN_NUMBER)
+// 
+// 
+// DXE_PCD_DATABASE_INIT gDXEPcdDbInit = {
+// 
+// 
+// 
+// 
+//   /* VPD */
+// 
+//   /* ExMapTable */
+//   {
+//     { 0, 0, 0 },
+// 
+//   },
+//   /* LocalTokenNumberTable */
+//   {
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtMemorySize_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtGop_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtSerialPort_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtVirtualDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtUga_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtPhysicalDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtFileSystem_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdWinNtConsole_0d79a645_1d91_40a6_a81f_61e6982b32b4) | PCD_DATUM_TYPE_POINTER | PCD_TYPE_STRING,
+//     offsetof(DXE_PCD_DATABASE, Init.PcdPlatformBootTimeOutDefault_a1aff049_fdeb_442a_b320_13ab4cb72bbc) | PCD_TYPE_DATA | PCD_DATUM_TYPE_UINT16,
+//
+//   },
+//   /* GuidTable */
+//   {
+//     {0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}},
+// 
+//   },
+//  { 0 }, /* PcdWinNtMemorySize_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//  { 6 }, /* PcdWinNtGop_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//  { 32 }, /* PcdWinNtSerialPort_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//  { 42 }, /* PcdWinNtVirtualDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//  { 55 }, /* PcdWinNtUga_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//  { 81 }, /* PcdWinNtPhysicalDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//  { 132 }, /* PcdWinNtFileSystem_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//  { 186 }, /* PcdWinNtConsole_0d79a645_1d91_40a6_a81f_61e6982b32b4[1] */
+//
+//
+// /* StringTable */
+//  L"64!64", /* PcdWinNtMemorySize_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//  L"UGA Window 1!UGA Window 2", /* PcdWinNtGop_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//  L"COM1!COM2", /* PcdWinNtSerialPort_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//  L"FW;40960;512", /* PcdWinNtVirtualDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//  L"UGA Window 1!UGA Window 2", /* PcdWinNtUga_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//  L"a:RW;2880;512!d:RO;307200;2048!j:RW;262144;512", /* PcdWinNtPhysicalDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//  L".!..\\..\\..\\..\\EdkShellBinPkg\\Bin\\Ia32\\Apps", /* PcdWinNtFileSystem_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//  L"Bus Driver Console Window", /* PcdWinNtConsole_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+
+//  /* SizeTable */
+//  {
+//    10, 10, /* PcdWinNtMemorySize_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//    50, 50, /* PcdWinNtGop_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//    18, 18, /* PcdWinNtSerialPort_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//    24, 24, /* PcdWinNtVirtualDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//    50, 50, /* PcdWinNtUga_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//    100, 92, /* PcdWinNtPhysicalDisk_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//    106, 98, /* PcdWinNtFileSystem_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//    50, 50, /* PcdWinNtConsole_0d79a645_1d91_40a6_a81f_61e6982b32b4 */
+//
+//  },
+//  { 10 }, /*  PcdPlatformBootTimeOutDefault_a1aff049_fdeb_442a_b320_13ab4cb72bbc[1] */
+//
+//
+//
+//
+//
+//
+//  /* SkuIdTable */
+//  { 0,  },
+//  
+//};
+
