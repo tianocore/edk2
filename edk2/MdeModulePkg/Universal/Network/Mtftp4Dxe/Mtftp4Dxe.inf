@@ -52,7 +52,6 @@
 
 
 [LibraryClasses]
-  BaseLib
   UefiLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
