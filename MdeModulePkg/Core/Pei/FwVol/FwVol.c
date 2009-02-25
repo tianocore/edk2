@@ -638,7 +638,7 @@ PeiFvFindNextVolume (
   //
   // Handle Framework FvHob and Install FvInfo Ppi for it.
   //
-  if (FeaturePcdGet (PcdFrameworkFvHobCompatibilitySupport)) {
+  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
     //
     // Loop to search the wanted FirmwareVolume which supports FFS
     //

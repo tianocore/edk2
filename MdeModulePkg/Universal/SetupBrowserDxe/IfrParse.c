@@ -204,7 +204,7 @@ CreateQuestion (
   // Take a look at next OpCode to see whether it is a GUIDed opcode to support
   // Framework Compatibility
   //
-  if (FeaturePcdGet (PcdFrameworkHiiCompatibilitySupport)) {
+  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
     if ((*OpCodeData == EFI_IFR_NUMERIC_OP) && IsNextOpCodeGuidedVarEqName (OpCodeData)) {
       Status = UpdateCheckBoxStringToken (FormSet, Statement);
       if (EFI_ERROR (Status)) {

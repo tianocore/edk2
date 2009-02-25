@@ -360,7 +360,7 @@ SetWorker (
   VOID                *InternalData;
   UINTN               MaxSize;
 
-  if (!FeaturePcdGet(PcdPeiPcdDatabaseSetEnabled)) {
+  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
   
@@ -514,7 +514,7 @@ ExSetWorker (
 {
   UINTN                     TokenNumber;
 
-  if (!FeaturePcdGet(PcdPeiPcdDatabaseSetEnabled)) {
+  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -542,12 +542,7 @@ ExGetWorker (
   IN UINTN            ExTokenNumber,
   IN UINTN            GetSize
   )
-{
-  if (!FeaturePcdGet (PcdPeiPcdDatabaseExEnabled)) {
-    ASSERT (FALSE);
-    return 0;
-  }
-  
+{ 
   return GetWorker (GetExPcdTokenNumber (Guid, ExTokenNumber), GetSize);
 }
 

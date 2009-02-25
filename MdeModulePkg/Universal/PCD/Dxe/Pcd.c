@@ -948,10 +948,6 @@ DxePcdGetNextToken (
   BOOLEAN             PeiExMapTableEmpty;
   BOOLEAN             DxeExMapTableEmpty;
 
-  if (!FeaturePcdGet (PcdDxePcdDatabaseTraverseEnabled)) {
-    return EFI_UNSUPPORTED;
-  }
-
   Status = EFI_NOT_FOUND;
   PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
   DxeExMapTableEmpty = DXE_EXMAP_TABLE_EMPTY;
@@ -1065,14 +1061,11 @@ GetDistinctTokenSpace (
 /**
   Get next token space in PCD database according to given token space guid.
   
-  This routine is enable only when feature flag PCD PcdDxePcdDatabaseTraverseEnabled 
-  is TRUE.
-  
   @param Guid            Given token space guid. If NULL, then Guid will be set to 
                          the first PCD token space in PCD database, If not NULL, then
                          Guid will be set to next PCD token space.
 
-  @retval EFI_UNSUPPORTED If feature flag PCD PcdDxePcdDatabaseTraverseEnabled is FALSE.
+  @retval EFI_UNSUPPORTED 
   @retval EFI_NOT_FOUND   If PCD database has no token space table or can not find given
                           token space in PCD database.
   @retval EFI_SUCCESS     Success to get next token space guid.
@@ -1093,10 +1086,6 @@ DxePcdGetNextTokenSpace (
   BOOLEAN             Match;
   BOOLEAN             PeiExMapTableEmpty;
   BOOLEAN             DxeExMapTableEmpty;
-
-  if (!FeaturePcdGet (PcdDxePcdDatabaseTraverseEnabled)) {
-    return EFI_UNSUPPORTED;
-  }
 
   ASSERT (Guid != NULL);
   

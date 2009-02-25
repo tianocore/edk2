@@ -55,15 +55,11 @@
   gPcdPpiGuid                                   ## PRODUCES
 
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseSetEnabled
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseExEnabled
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseCallbackOnSetEnabled
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseGetSizeEnabled
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable
 
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry || PcdPeiPcdDatabaseCallbackOnSetEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry || PcdPeiFullPcdDatabaseEnable
 
 [Depex]
   TRUE
