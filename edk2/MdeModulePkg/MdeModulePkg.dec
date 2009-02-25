@@ -220,28 +220,12 @@
 [PcdsFeatureFlag.common]
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
-  
-  ## This feature flag can be used to enable or disable the Pcd PEIM database 
-  #  traverse capability. Disable it can reduce the size of final image generated.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseTraverseEnabled|TRUE|BOOLEAN|0x00010020
-  
-  ## This feature flag can be used to enable or disable the Pcd DXE database 
-  #  traverse capability. Disable it can reduce the size of final image generated.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled|TRUE|BOOLEAN|0x00010021
-  
-  ## This feature flag can be used to enable or disable the SET capability of PCD service PEIM.
-  #  If a platform does not do PCD SET operation in PEI phase. This flag can be set to DISABLE to save size.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseSetEnabled|TRUE|BOOLEAN|0x00010030
-  
-  ## This feature flag can be used to enable or disable the GET size capability of PCD service PEIM.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseGetSizeEnabled|TRUE|BOOLEAN|0x00010031
-  
-  ## This feature flag can be used to enable or disable the Callback On SET capability of PCD service PEIM. 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseCallbackOnSetEnabled|TRUE|BOOLEAN|0x00010032
-  
-  ## This feature flag can be used to enable or disable the PCD service PEIM to handle DynamicEX PCD. 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiPcdDatabaseExEnabled|TRUE|BOOLEAN|0x00010033
  
+  ## This feature flag can be used to enable or disable all PCD PEIM services.
+  #  If TRUE, all PCD PEIM services will be provided.
+  ## If FALSE, the minimal PCD PEIM services (only GetService) will be provided.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable|TRUE|BOOLEAN|0x00010020
+
   ## If TRUE, then the Device Path To Text Protocol should be produced by the platform.
   #  It can be disabled to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|TRUE|BOOLEAN|0x00010037
@@ -294,11 +278,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
   ## If TRUE, Setup Browser supports GUID opcodes generated from Framework HII VFR file by VFR compiler. 
-  #  This is used to provide backward compatibility support to Framework HII module built togehter EdkCompatbilityPkg.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport|TRUE|BOOLEAN|0x00012008
-  
-  ## If TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkFvHobCompatibilitySupport|FALSE|BOOLEAN|0x00012009
+  #  If TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
+  ## This is used to provide backward compatibility support to Framework HII and Framework FvHob.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport|FALSE|BOOLEAN|0x00012009
   
   ##
   #  If TRUE, HelloWorld Application will print the verbose information.
@@ -413,21 +395,12 @@
 [PcdsDynamic.common]
   ## Base address of the NV variable range in flash device 
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
-  
-  ## Size of the NV variable range.  
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
 
   ## Base address of the FTW spare block range in flash device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013
 
-  ## Size of the FTW spare block range.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x0|UINT32|0x30000014
-
   ## Base address of the FTW working block range in flash device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
-
-  ## Size of the FTW working block range.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
 
   ## Default timeout value for displaying progressing bar in before boot OS.
   #  This value can be changed in BDS.
@@ -461,24 +434,6 @@
 [PcdsPatchableInModule.common]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
-
-  ## Base address of the NV variable range in flash device 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
-  
-  ## Size of the NV variable range.  
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
-
-  ## Base address of the FTW spare block range in flash device.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013
-
-  ## Size of the FTW spare block range.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x0|UINT32|0x30000014
-
-  ## Base address of the FTW working block range in flash device.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
-
-  ## Size of the FTW working block range.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
 
   ## Default timeout value for displaying progressing bar in before boot OS.
   #  This value can be changed in BDS.

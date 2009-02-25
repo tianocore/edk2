@@ -260,15 +260,6 @@ PeiPcdGetSize (
   UINTN               Size;
   UINTN               MaxSize;
 
-  //
-  // If DebugAssertEnabled is TRUE, we still need to provide the GET size
-  // function as GetWorker and SetWoker need this function to do ASSERT.
-  //
-  if ((!FeaturePcdGet(PcdPeiPcdDatabaseGetSizeEnabled)) &&
-      (!DebugAssertEnabled ())) {
-    return 0;
-  }
-
   PeiPcdDb = GetPcdDatabase ();
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -458,10 +449,6 @@ PeiPcdGetSizeEx (
   IN UINTN                        ExTokenNumber
   )
 {
-  if ((!FeaturePcdGet (PcdPeiPcdDatabaseGetSizeEnabled)) ||  !FeaturePcdGet (PcdPeiPcdDatabaseExEnabled)) {
-    return 0;
-  }
-
   return PeiPcdGetSize (GetExPcdTokenNumber (Guid, ExTokenNumber));
 }
 
@@ -831,7 +818,7 @@ PeiRegisterCallBackOnSet (
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
-  if (!FeaturePcdGet(PcdPeiPcdDatabaseCallbackOnSetEnabled)) {
+  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -862,7 +849,7 @@ PcdUnRegisterCallBackOnSet (
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
-  if (!FeaturePcdGet(PcdPeiPcdDatabaseCallbackOnSetEnabled)) {
+  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -906,7 +893,7 @@ PeiPcdGetNextToken (
   BOOLEAN             Found;
   BOOLEAN             PeiExMapTableEmpty;
 
-  if (!FeaturePcdGet (PcdPeiPcdDatabaseTraverseEnabled)) {
+  if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1023,7 +1010,7 @@ PeiPcdGetNextTokenSpace (
   BOOLEAN             Found;
   BOOLEAN             PeiExMapTableEmpty;
 
-  if (!FeaturePcdGet (PcdPeiPcdDatabaseTraverseEnabled)) {
+  if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 

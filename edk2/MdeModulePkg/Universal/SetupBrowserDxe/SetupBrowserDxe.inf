@@ -77,7 +77,7 @@
   gEfiConsoleControlProtocolGuid                ## CONSUMES
 
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkHiiCompatibilitySupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid

@@ -57,9 +57,6 @@
 [Protocols]
   gPcdProtocolGuid                              ## PRODUCES
 
-[FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled
-
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress
 
