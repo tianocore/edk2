@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/Bds.h>
 #include <Protocol/GenericMemoryTest.h>
+#include <Library/GenericBdsLib.h>
 
 //
 // Bds AP Context data
