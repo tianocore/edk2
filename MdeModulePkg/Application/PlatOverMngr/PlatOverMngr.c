@@ -1,6 +1,6 @@
 /** @file
 
-  A UI application to offer a UI interface in device manager to let user configue
+  A UI application to offer a UI interface in device manager to let user configure
   platform override protocol to override the default algorithm for matching
   drivers to controllers.
 
