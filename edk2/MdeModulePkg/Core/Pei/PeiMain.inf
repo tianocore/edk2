@@ -49,8 +49,8 @@
   PeiMain.h
 
 [Packages]
-  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   TimerLib
@@ -70,29 +70,29 @@
   
 
 [Guids]
-  gPeiAprioriFileNameGuid  ## SOMETIMES_CONSUMES ## GUID
-  gEfiFirmwareFileSystem2Guid ## SOMETIMES_CONSUME ## FV
+  gPeiAprioriFileNameGuid     ## CONSUMES ## GUID
+  gEfiFirmwareFileSystem2Guid ## CONSUMES ## FV
 
 [Ppis]
-  gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES
-  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES
+  gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES (PeiReportStatusService is not ready if this PPI doesn't exist)
+  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES (PeiResetService is not ready if this PPI doesn't exist) 
   gEfiDxeIplPpiGuid                             ## CONSUMES
-  gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
+  gEfiPeiMemoryDiscoveredPpiGuid                ## PRODUCES
   gEfiPeiDecompressPpiGuid                      ## CONSUMES
-  gEfiPeiFirmwareVolumeInfoPpiGuid              ## CONSUMES
-  gEfiPeiLoadFilePpiGuid                        ## CONSUMES
-  gEfiPeiSecurity2PpiGuid                       ## CONSUMES
+  gEfiPeiFirmwareVolumeInfoPpiGuid              ## NOTIFY   ## SOMETIMES_PRODUCES (Produce FvInfoPpi if the encapsulated FvImage is found) 
+  gEfiPeiLoadFilePpiGuid                        ## PRODUCES ## SOMETIMES_CONSUMES (The default load PeImage logic will be used when this PPI doesn't exist)
+  gEfiPeiSecurity2PpiGuid                       ## NOTIFY
   gEfiTemporaryRamSupportPpiGuid                ## CONSUMES
 
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported      ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch	## SOMETIMES_CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry       ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch	    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize      ## CONSUMES
 
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	         ## CONSUMES
   
