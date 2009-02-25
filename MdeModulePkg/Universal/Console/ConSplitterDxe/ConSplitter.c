@@ -3861,6 +3861,7 @@ ConSplitterTextInRegisterKeyNotify (
   }
   NewNotify->Signature         = TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
+  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
 
   //
@@ -3880,17 +3881,6 @@ ConSplitterTextInRegisterKeyNotify (
       return Status;
     }
   }
-
-  //
-  // Use gSimpleTextInExNotifyGuid to get a valid EFI_HANDLE
-  //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &NewNotify->NotifyHandle,
-                  &gSimpleTextInExNotifyGuid,
-                  NULL,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
 
   InsertTailList (&mConIn.NotifyList, &NewNotify->NotifyEntry);
 
@@ -3931,18 +3921,6 @@ ConSplitterTextInUnregisterKeyNotify (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = gBS->OpenProtocol (
-                  NotificationHandle,
-                  &gSimpleTextInExNotifyGuid,
-                  NULL,
-                  NULL,
-                  NULL,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   //
@@ -3966,13 +3944,7 @@ ConSplitterTextInUnregisterKeyNotify (
         }
       }
       RemoveEntryList (&CurrentNotify->NotifyEntry);
-      Status = gBS->UninstallMultipleProtocolInterfaces (
-                      CurrentNotify->NotifyHandle,
-                      &gSimpleTextInExNotifyGuid,
-                      NULL,
-                      NULL
-                      );
-      ASSERT_EFI_ERROR (Status);
+
       gBS->FreePool (CurrentNotify->NotifyHandleList);
       gBS->FreePool (CurrentNotify);
       return EFI_SUCCESS;
