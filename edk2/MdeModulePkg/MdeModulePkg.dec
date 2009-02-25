@@ -77,6 +77,10 @@
   ##
   FvbServiceLib|Include/Library/FvbServiceLib.h
 
+  ##  @libraryclass  Provides APIs for system memory test.
+  ##
+  MemoryTestLib|Include/Library/BaseMemoryTestLib.h
+
 [Guids.common]
   ## MdeModule package token space guid
   ## Include/Guid/MdeModulePkgTokenSpace.h
