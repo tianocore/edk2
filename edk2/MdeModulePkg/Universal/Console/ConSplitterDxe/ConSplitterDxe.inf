@@ -87,7 +87,6 @@
   gEfiSimpleTextOutProtocolGuid                 ## BY_START
   gEfiGraphicsOutputProtocolGuid                ## BY_START
   gEfiUgaDrawProtocolGuid                       ## BY_START
-  gSimpleTextInExNotifyGuid                     ## PRODUCES
 
 
 [FeaturePcd.common]

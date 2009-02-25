@@ -84,10 +84,6 @@
   # Otherwise, USB keyboard module tries to use its carried default layout.
   #
   gEfiHiiDatabaseProtocolGuid                   ## SOMETIMES_CONSUMES (Default value is used if it's absent.)
-  ##
-  # SimpleTextInExNotify is installed on the handle created by EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.RegisterKeyNotify().
-  #
-  gSimpleTextInExNotifyGuid                     ## PRODUCES
   
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver ## SOMETIME_CONSUMES (Checked when no layout is provided by HII.)

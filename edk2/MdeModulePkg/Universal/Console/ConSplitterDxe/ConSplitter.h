@@ -28,7 +28,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
-#include <Protocol/SimpleTextInExNotify.h>
 
 #include <Guid/PrimaryStandardErrorDevice.h>
 #include <Guid/PrimaryConsoleOutDevice.h>

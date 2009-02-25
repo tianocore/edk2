@@ -69,4 +69,3 @@
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL BY_START
   gEfiSimpleTextInputExProtocolGuid             # PROTOCOL BY_START
   gEfiWinNtIoProtocolGuid                       # PROTOCOL TO_START
-  gSimpleTextInExNotifyGuid                     # PROTOCOL ALWAYS_CONSUMED

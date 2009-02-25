@@ -365,7 +365,6 @@ TerminalConInRegisterKeyNotify (
   OUT EFI_HANDLE                        *NotifyHandle
   )
 {
-  EFI_STATUS                      Status;
   TERMINAL_DEV                    *TerminalDevice;
   TERMINAL_CONSOLE_IN_EX_NOTIFY   *NewNotify;
   LIST_ENTRY                      *Link;
@@ -407,18 +406,10 @@ TerminalConInRegisterKeyNotify (
 
   NewNotify->Signature         = TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
+  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
   InsertTailList (&TerminalDevice->NotifyList, &NewNotify->NotifyEntry);
-  //
-  // Use gSimpleTextInExNotifyGuid to get a valid EFI_HANDLE
-  //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &NewNotify->NotifyHandle,
-                  &gSimpleTextInExNotifyGuid,
-                  NULL,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
+
   *NotifyHandle                = NewNotify->NotifyHandle;
 
   return EFI_SUCCESS;
@@ -445,25 +436,12 @@ TerminalConInUnregisterKeyNotify (
   IN EFI_HANDLE                         NotificationHandle
   )
 {
-  EFI_STATUS                      Status;
   TERMINAL_DEV                    *TerminalDevice;
   LIST_ENTRY                      *Link;
   TERMINAL_CONSOLE_IN_EX_NOTIFY   *CurrentNotify;
   LIST_ENTRY                      *NotifyList;
 
   if (NotificationHandle == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status = gBS->OpenProtocol (
-                  NotificationHandle,
-                  &gSimpleTextInExNotifyGuid,
-                  NULL,
-                  NULL,
-                  NULL,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -482,13 +460,7 @@ TerminalConInUnregisterKeyNotify (
       // Remove the notification function from NotifyList and free resources
       //
       RemoveEntryList (&CurrentNotify->NotifyEntry);
-      Status = gBS->UninstallMultipleProtocolInterfaces (
-                      CurrentNotify->NotifyHandle,
-                      &gSimpleTextInExNotifyGuid,
-                      NULL,
-                      NULL
-                      );
-      ASSERT_EFI_ERROR (Status);
+
       gBS->FreePool (CurrentNotify);
       return EFI_SUCCESS;
     }

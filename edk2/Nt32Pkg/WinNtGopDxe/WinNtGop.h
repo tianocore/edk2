@@ -34,7 +34,6 @@ Abstract:
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Protocol/SimpleTextInExNotify.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>

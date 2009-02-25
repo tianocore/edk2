@@ -640,19 +640,10 @@ KeyboardRegisterKeyNotify (
 
   NewNotify->Signature         = KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE;     
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
+  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&ConsoleInDev->NotifyList, &NewNotify->NotifyEntry);
 
-  //
-  // Use gSimpleTextInExNotifyGuid to get a valid EFI_HANDLE
-  //  
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &NewNotify->NotifyHandle,
-                  &gSimpleTextInExNotifyGuid,
-                  NULL,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
   *NotifyHandle                = NewNotify->NotifyHandle;  
   Status                       = EFI_SUCCESS;
 
@@ -694,18 +685,6 @@ KeyboardUnregisterKeyNotify (
     return EFI_INVALID_PARAMETER;
   } 
   
-  Status = gBS->OpenProtocol (
-                  NotificationHandle,
-                  &gSimpleTextInExNotifyGuid,
-                  NULL,
-                  NULL,
-                  NULL,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   ConsoleInDev = TEXT_INPUT_EX_KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (This);
   
   //
@@ -725,13 +704,7 @@ KeyboardUnregisterKeyNotify (
       // Remove the notification function from NotifyList and free resources
       //
       RemoveEntryList (&CurrentNotify->NotifyEntry);      
-      Status = gBS->UninstallMultipleProtocolInterfaces (
-                      CurrentNotify->NotifyHandle,
-                      &gSimpleTextInExNotifyGuid,
-                      NULL,
-                      NULL
-                      );
-      ASSERT_EFI_ERROR (Status);
+ 
       gBS->FreePool (CurrentNotify);            
       Status = EFI_SUCCESS;
       goto Exit;
