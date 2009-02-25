@@ -1,8 +1,10 @@
 #/** @file
 #  Sample UEFI Application Reference EDKII Module
 #
-#  This is a shell application that will display Hello World.
-#  It uses EDKII PCD feature to show PCD usage and configuration.
+#  This is a sample shell application that will print "UEFI Hello World!" to the 
+#  UEFI Console based on PCD setting.
+#
+#  It demo how to use EDKII PCD mechnism to make code more flexible.
 #
 #  Copyright (c) 2008, Intel Corporation.
 #
