@@ -217,9 +217,6 @@
   ## Include/Protocol/TcgPlatform.h
   gEfiTcgPlatformProtocolGuid    = { 0x8c4c9a41, 0xbf56, 0x4627, { 0x9e, 0xa, 0xc8, 0x38, 0x6d, 0x66, 0x11, 0x5c }}
   
-  ## Protocol Guid specify the device is the hot plug device.
-  gEfiHotPlugDeviceGuid          = { 0x220AC432, 0x1D43, 0x49E5, { 0xA7, 0x4F, 0x4C, 0x9D, 0xA6, 0x7A, 0xD2, 0x3B }}
-
 [PcdsFeatureFlag.common]
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
