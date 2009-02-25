@@ -280,7 +280,7 @@ ConPlatformTextInDriverBindingStart (
       );
 
     //
-    // If the device path is successfully added to the ConIn environment variable,
+    // If the device path is an instance in the ConIn environment variable,
     // then install EfiConsoleInDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
@@ -405,7 +405,7 @@ ConPlatformTextOutDriverBindingStart (
       );
 
     //
-    // If the device path is successfully added to the ConOut environment variable,
+    // If the device path is an instance in the ConOut environment variable,
     // then install EfiConsoleOutDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
@@ -424,7 +424,7 @@ ConPlatformTextOutDriverBindingStart (
                       );
     }
     //
-    // If the device path is successfully added to the ErrOut environment variable,
+    // If the device path is an instance in the ErrOut environment variable,
     // then install EfiStandardErrorDeviceGuid onto ControllerHandle
     //
     Status = ConPlatformUpdateDeviceVariable (
