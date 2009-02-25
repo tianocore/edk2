@@ -1,5 +1,5 @@
 /** @file
-  Capsule Runtime Drivers produces two UEFI capsule runtime services.
+  Capsule Runtime Driver produces two UEFI capsule runtime services.
   (UpdateCapsule, QueryCapsuleCapabilities)
   It installs the Capsule Architectural Protocol (EDKII definition) to signify 
   the capsule runtime services are ready.
