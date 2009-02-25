@@ -61,7 +61,6 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
-  UefiRuntimeServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
   BaseLib
