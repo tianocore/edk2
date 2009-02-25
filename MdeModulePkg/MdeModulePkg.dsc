@@ -77,7 +77,8 @@
   PlatformDriverOverrideLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
   OemHookStatusCodeLib|IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-  
+  MemoryTestLib|MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
+
 [LibraryClasses.IA32]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
@@ -296,6 +297,7 @@
   MdeModulePkg/Library/EdkFvbServiceLib/EdkFvbServiceLib.inf
   MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   MdeModulePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
+  MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
 
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
