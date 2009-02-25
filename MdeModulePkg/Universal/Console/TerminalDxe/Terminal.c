@@ -301,7 +301,7 @@ TerminalDriverBindingStart (
         goto Error;
       }
 
-      if (IsHotPlugDevice (ParentDevicePath)) {
+      if (!IsHotPlugDevice (ParentDevicePath)) {
         //
         // if the serial device is a hot plug device, do not update the
         // ConInDev, ConOutDev, and StdErrDev variables.
