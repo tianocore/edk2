@@ -1,5 +1,5 @@
 #/** @file
-# This driver provides lite fault tolerant capability for write operation on flash devices.
+# This driver provides lite version of fault tolerant capability for writing operation on flash devices.
 # Its implementation depends on the full functionality FVB protocol that support read, write/erase flash access.
 #
 # Copyright (c) 2006 - 2009, Intel Corporation
