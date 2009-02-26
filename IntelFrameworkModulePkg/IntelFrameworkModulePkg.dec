@@ -69,6 +69,10 @@
   ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
 
+  ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
+  ## Include/Protocol/OEMBadging.h
+  gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
+
 [PcdsDynamic.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
