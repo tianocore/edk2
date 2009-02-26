@@ -978,6 +978,9 @@ SetHiiVariable (
 
   Size = 0;
 
+  //
+  // Try to get original variable size information.
+  //
   Status = gRT->GetVariable (
     (UINT16 *)VariableName,
     VariableGuid,
@@ -987,7 +990,10 @@ SetHiiVariable (
     );
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
-
+    //
+    // Patch new PCD's value to offset in given HII variable.
+    //
+    
     Buffer = AllocatePool (Size);
 
     ASSERT (Buffer != NULL);
@@ -1015,12 +1021,33 @@ SetHiiVariable (
     FreePool (Buffer);
     return Status;
 
-  } 
+  } else if (Status == EFI_NOT_FOUND) {
+    //
+    // If variable does not exist, a new variable need to be created.
+    //
+    
+    Size = Offset + DataSize;
+    
+    Buffer = AllocateZeroPool (Size);
+    ASSERT (Buffer != NULL);
+    
+    CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
+    
+    Status = gRT->SetVariable (
+              VariableName,
+              VariableGuid,
+              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+              Size,
+              Buffer
+              );
+
+    FreePool (Buffer);
+    return Status;    
+  }
   
   //
-  // If we drop to here, we don't have a Variable entry in
-  // the variable service yet. So, we will save the data
-  // in the PCD Database's volatile area.
+  // If we drop to here, the value is failed to be written in to variable area
+  // So, we will save the data in the PCD Database's volatile area.
   //
   return Status;
 }
