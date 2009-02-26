@@ -473,6 +473,8 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   Nt32Pkg/SnpNt32Dxe/SnpNt32Dxe.inf
 
+  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
@@ -481,7 +483,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
+  MdeModulePkg/Application/VariableInfo/VariableInfo.inf
   
   MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
   MdeModulePkg/Application/PlatOverMngr/PlatOverMngr.inf

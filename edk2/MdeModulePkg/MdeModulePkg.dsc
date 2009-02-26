@@ -333,7 +333,7 @@
   MdeModulePkg/Application/PlatOverMngr/PlatOverMngr.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
-  MdeModulePkg/Universal/Variable/Application/VariableInfo.inf
+  MdeModulePkg/Application/VariableInfo/VariableInfo.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
