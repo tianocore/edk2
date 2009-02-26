@@ -18,7 +18,7 @@
         #.MODEL small
         #.stack: 
         #.486p: 
-        #.code: 
+        .code16: 
 .section .text
 
 .equ                      FAT_DIRECTORY_ENTRY_SIZE, 0x0020
