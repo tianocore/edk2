@@ -43,27 +43,6 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
-#  EdkGenericPlatformBdsLib
-#  HiiLib
-#  DevicePathLib
-#  UefiRuntimeServicesTableLib
-#  UefiBootServicesTableLib
-#  BaseMemoryLib
-#  MemoryAllocationLib
-#  EdkGenericBdsLib
-#  HobLib
-#  ReportStatusCodeLib
-#  EdkIfrSupportLib
-#  PrintLib
-#  PerformanceLib
-#  DxeServicesTableLib
-#  EdkGraphicsLib
-#  BaseLib
-#  UefiDriverEntryPoint
-#  UefiLib
-#  DebugLib
-
-
   BaseLib
   MemoryAllocationLib
   UefiBootServicesTableLib
@@ -82,6 +61,7 @@
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
