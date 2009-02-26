@@ -269,7 +269,7 @@ BdsLibBootViaBootOption (
     // Load the default boot file \EFI\BOOT\boot{machinename}.EFI from removable Media
     //  machinename is ia32, ia64, x64, ...
     //
-    FilePath = FileDevicePath (Handle, (CONST CHAR16*)PcdGetPtr(PcdDefaultBootFileName));
+    FilePath = FileDevicePath (Handle, EFI_REMOVABLE_MEDIA_FILE_NAME);
     if (FilePath != NULL) {
       Status = gBS->LoadImage (
                       TRUE,
@@ -1050,7 +1050,7 @@ BdsLibEnumerateAllBootOption (
     NeedDelete = TRUE;
     Status     = BdsLibGetImageHeader (
                    FileSystemHandles[Index],
-                   (CHAR16*)PcdGetPtr (PcdDefaultBootFileName),
+                   EFI_REMOVABLE_MEDIA_FILE_NAME,
                    &DosHeader,
                    Hdr
                    );
@@ -1408,7 +1408,7 @@ BdsLibGetBootableHandle (
       Hdr.Union = &HdrData;
       Status = BdsLibGetImageHeader (
                  SimpleFileSystemHandles[Index],
-                 (CHAR16*)PcdGetPtr(PcdDefaultBootFileName),
+                 EFI_REMOVABLE_MEDIA_FILE_NAME,
                  &DosHeader,
                  Hdr
                  );

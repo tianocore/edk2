@@ -112,5 +112,3 @@
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName
