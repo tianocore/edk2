@@ -254,9 +254,6 @@
   #  If FALSE, PE image will first be searched.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|TRUE|BOOLEAN|0x00010044
   
-  ## If PcdSupportHardwareErrorRecord is TRUE, support hardware error record via variable in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHardwareErrorRecord|FALSE|BOOLEAN|0x00010045
-  
   ## If TRUE, Robustnesss improvement such as for DUET. Default is not required.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
 
@@ -349,9 +346,6 @@
   ## Size of the FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
 
-  ## Error level for hardware recorder.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
-  
   ##
   #  This PCD defines the print string.
   #  This PCD is a sample to explain FixedAtBuild String PCD usage.
@@ -394,9 +388,6 @@
   ## Base address of the FTW working block range in flash device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
 
-  ## Error level for hardware recorder.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
-
   ##
   #  This PCD defines the print string.
   #  This PCD is a sample to explain Dynamic PCD usage.
@@ -422,9 +413,6 @@
 [PcdsPatchableInModule.common]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
-
-  ## Error level for hardware recorder.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
   ##
   #  This PCD defines the Console output column and the default value is 25 according to UEFI spec
