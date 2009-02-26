@@ -111,7 +111,8 @@
   UefiDriverEntryPoint
   PlatformBdsLib
   CapsuleLib
-
+  PcdLib
+  
 [Guids]
   gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
                                                 ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
@@ -170,7 +171,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  
 [Depex]
   TRUE
 

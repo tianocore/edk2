@@ -22,42 +22,6 @@ BOOLEAN   mResetRequired  = FALSE;
 
 extern UINT16 gPlatformBootTimeOutDefault;
 
-
-/**
-  Return the default value for system Timeout variable.
-
-  @return Timeout value.
-
-**/
-UINT16
-EFIAPI
-BdsLibGetTimeout (
-  VOID
-  )
-{
-  UINT16      Timeout;
-  UINTN       Size;
-  EFI_STATUS  Status;
-
-  //
-  // Return Timeout variable or 0xffff if no valid
-  // Timeout variable exists.
-  //
-  Size    = sizeof (UINT16);
-  Status  = gRT->GetVariable (L"Timeout", &gEfiGlobalVariableGuid, NULL, &Size, &Timeout);
-  if (EFI_ERROR (Status)) {
-    //
-    // According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff
-    // (default value PcdPlatformBootTimeOutDefault) when L"Timeout" variable is not present.
-    // To make the current EFI Automatic-Test activity possible, platform can choose other value
-    // for automatic boot when the variable is not present.
-    //
-    Timeout = PcdGet16 (PcdPlatformBootTimeOutDefault);
-  }
-
-  return Timeout;
-}
-
 /**
   The function will go through the driver option link list, load and start
   every driver the driver option device path point to.

@@ -63,7 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/CapsuleLib.h>
 #include <Library/HiiLib.h>
 #include <Library/ExtendedHiiLib.h>
-
+#include <Library/PcdLib.h>
 
 #include <Library/GenericBdsLib.h>
 #include <Library/PlatformBdsLib.h>

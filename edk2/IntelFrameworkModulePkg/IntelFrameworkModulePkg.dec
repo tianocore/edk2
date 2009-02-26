@@ -106,5 +106,8 @@
 [PcdsPatchableInModule.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
-
-
+  
+[PcdsDynamic.common]
+  ## Timeout value for displaying progressing bar in before boot OS.
+  #  According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
