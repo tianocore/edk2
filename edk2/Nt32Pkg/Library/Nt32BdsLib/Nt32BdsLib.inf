@@ -60,6 +60,7 @@
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
