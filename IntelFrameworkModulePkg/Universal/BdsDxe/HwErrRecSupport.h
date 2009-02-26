@@ -23,17 +23,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   level of support for Hardware Error Record Persistence that is implemented
   by the platform.
 
-
-  @param HwErrRecSupportLevel
-                         zero value      - Indicates that the platform implements no support for
-                         Hardware Error Record Persistence.
-                         non-zero value  - Indicates that the platform implements Hardware Error
-                         Record Persistence.
-
 **/
 VOID
 InitializeHwErrRecSupport (
-  IN UINT16       HwErrRecSupportLevel
+  VOID
   );
 
 #endif

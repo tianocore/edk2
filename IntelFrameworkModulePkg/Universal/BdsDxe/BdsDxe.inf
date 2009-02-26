@@ -160,7 +160,6 @@
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHardwareErrorRecord
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [Pcd.common]
@@ -168,7 +167,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut

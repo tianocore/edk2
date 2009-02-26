@@ -111,3 +111,7 @@
   ## Timeout value for displaying progressing bar in before boot OS.
   #  According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
+
+  ## Error level for hardware recorder. If value 0, platform does not support feature of hardware error record.
+  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
