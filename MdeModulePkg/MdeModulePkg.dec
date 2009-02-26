@@ -349,10 +349,6 @@
   ## Size of the FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
 
-  ## Default timeout value for displaying progressing bar in before boot OS.
-  #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
-
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
   
@@ -398,10 +394,6 @@
   ## Base address of the FTW working block range in flash device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
 
-  ## Default timeout value for displaying progressing bar in before boot OS.
-  #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
-
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
@@ -430,10 +422,6 @@
 [PcdsPatchableInModule.common]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
-
-  ## Default timeout value for displaying progressing bar in before boot OS.
-  #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
 
   ## Error level for hardware recorder.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
