@@ -7,7 +7,7 @@
   EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
   CUSTOM_MAKEFILE                = MSFT|Makefile
-  CUSTOM_MAKEFILE                = GCC|GnuMakefile
+  CUSTOM_MAKEFILE                = GCC|GNUmakefile
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -16,37 +16,37 @@
 [Sources]
   bootsect.asm | INTEL
   bootsect.asm | MSFT
-# bootsect.S   | GCC 
+  bootsect.S   | GCC 
 
   bs16.asm     | INTEL
   bs16.asm     | MSFT
-# bs16.S       | GCC 
+  bs16.S       | GCC 
 
   bs32.asm     | INTEL
   bs32.asm     | MSFT
-# bs32.S       | GCC
+  bs32.S       | GCC
  
   Gpt.asm      | INTEL
   Gpt.asm      | MSFT
-# Gpt.S        | GCC
+  Gpt.S        | GCC
 
   Mbr.asm      | INTEL
   Mbr.asm      | MSFT
-# Mbr.S        | GCC
+  Mbr.S        | GCC
 
   start.asm    | INTEL
   start.asm    | MSFT
-# start.S      | GCC
+  start.S      | GCC
 
   start16.asm  | INTEL
   start16.asm  | MSFT
-# start16.S    | GCC
+  start16.S    | GCC
 
   start32.asm  | INTEL
   start32.asm  | MSFT
-# start32.S    | GCC
+  start32.S    | GCC
 
   efi32.asm    | INTEL
   efi32.asm    | MSFT
-# efi32.S      | GCC
+  efi32.S      | GCC
 

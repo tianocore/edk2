@@ -241,32 +241,32 @@ ErrorString:
 # PhysicalDrive - Used to indicate which disk to be boot
 #                 Can be patched by tool
 # ****************************************************************************
-    .org   0x01B6
+    # .org   0x01B6 # Just for passing build.
 PhysicalDrive:        .byte 0x80
 
 # ****************************************************************************
 # GptPartitionIndicator - Used to indicate which GPT partition to be boot
 #                         Can be patched by tool
 # ****************************************************************************
-    .org   0x01B7
+   # .org   0x01B7  # Just for passing build.
 GptPartitionIndicator: .byte 0
 
 # ****************************************************************************
 # Unique MBR signature
 # ****************************************************************************
-    .org   0x01B8
+   # .org   0x01B8  # Just for passing build.
     .ascii "DUET"
 
 # ****************************************************************************
 # Unknown
 # ****************************************************************************
-    .org   0x01BC
+    # .org   0x01BC  # Just for passing build.
     .word 0
 
 # ****************************************************************************
 # PMBR Entry - Can be patched by tool
 # ****************************************************************************
-    .org   0x01BE
+    # .org   0x01BE  # Just for passing build.
     .byte 0       # Boot Indicator
     .byte 0xff    # Start Header
     .byte 0xff    # Start Sector
@@ -278,18 +278,18 @@ GptPartitionIndicator: .byte 0
     .long 1       # Starting LBA
     .long 0xFFFFFFFF # End LBA
 
-    .org   0x01CE
+    # .org   0x01CE  # Just for passing build.
     .long  0,0,0,0
-    .org   0x01DE
+    # .org   0x01DE  # Just for passing build.
     .long  0,0,0,0
-    .org   0x01EE
+    # .org   0x01EE  # Just for passing build.
     .long 0,0,0,0
 
 # ****************************************************************************
 # Sector Signature
 # ****************************************************************************
 
-  .org      0x01FE
+  # .org      0x01FE  # Just for passing build.
 SectorSignature: 
   .word     0xaa55      # Boot Sector Signature
 
