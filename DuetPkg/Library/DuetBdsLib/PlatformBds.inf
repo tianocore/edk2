@@ -61,3 +61,6 @@
   gEfiMpsTableGuid
   gEfiSmbiosTableGuid
   gEfiAcpiTableGuid
+  
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut  
