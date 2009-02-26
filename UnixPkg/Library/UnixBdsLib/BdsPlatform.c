@@ -332,7 +332,7 @@ Returns:
   //
   // Init the time out value
   //
-  Timeout = BdsLibGetTimeout ();
+  Timeout = PcdGet16 (PcdPlatformBootTimeOut);
 
   //
   // Load the driver option as the driver option list
