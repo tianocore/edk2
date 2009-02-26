@@ -197,18 +197,6 @@ BdsLibBuildOptionFromShell (
 // Bds misc lib functions
 //
 /**
-  Return the default value for system Timeout variable.
-
-  @return Timeout value.
-
-**/
-UINT16
-EFIAPI
-BdsLibGetTimeout (
-  VOID
-  );
-
-/**
   Get boot mode by looking up configuration table and parsing HOB list
 
   @param  BootMode              Boot mode from PEI handoff HOB.

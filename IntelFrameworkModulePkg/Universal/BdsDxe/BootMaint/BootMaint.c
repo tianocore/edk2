@@ -610,16 +610,7 @@ ApplyChangeHandler (
     break;
 
   case FORM_TIME_OUT_ID:
-    Status = gRT->SetVariable (
-                    L"Timeout",
-                    &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
-                    sizeof (UINT16),
-                    &(CurrentFakeNVMap->BootTimeOut)
-                    );
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
+    PcdSet16 (PcdPlatformBootTimeOut, CurrentFakeNVMap->BootTimeOut);
 
     Private->BmmOldFakeNVData.BootTimeOut = CurrentFakeNVMap->BootTimeOut;
     break;

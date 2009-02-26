@@ -651,7 +651,7 @@ UpdateTimeOutPage (
 
   UpdatePageStart (CallbackData);
 
-  BootTimeOut = BdsLibGetTimeout ();
+  BootTimeOut = PcdGet16 (PcdPlatformBootTimeOut);
 
   CreateNumericOpCode (
     (EFI_QUESTION_ID) BOOT_TIME_OUT_QUESTION_ID,
