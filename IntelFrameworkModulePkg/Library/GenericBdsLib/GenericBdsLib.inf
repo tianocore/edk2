@@ -93,7 +93,7 @@
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL CONSUMES
   gEfiPciIoProtocolGuid                         # PROTOCOL CONSUMES
   gEfiLoadedImageProtocolGuid                   # PROTOCOL CONSUMES
-  gEfiDevicePathToTextProtocolGuid              # PROTOCOL CONSUMES
+  gEfiDevicePathToTextProtocolGuid              # PROTOCOL SOMETIMES_CONSUMES
   gEfiSimpleNetworkProtocolGuid                 # PROTOCOL CONSUMES
   gEfiDebugPortProtocolGuid                     # PROTOCOL CONSUMES
   gEfiSimpleTextInProtocolGuid                  # PROTOCOL CONSUMES
@@ -103,8 +103,8 @@
   gEfiCpuArchProtocolGuid                       # PROTOCOL CONSUMES
   gEfiDevicePathProtocolGuid                    # PROTOCOL CONSUMES
   gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL CONSUMES
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES ## not gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
-  gEfiUgaDrawProtocolGuid                       # PROTOCOL SOMETIMES_CONSUMES ## gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
   gEfiConsoleControlProtocolGuid                # PROTOCOL CONSUMES
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL CONSUMES
   gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
