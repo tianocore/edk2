@@ -262,7 +262,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol|TRUE|BOOLEAN|0x00010100
   
   ## If TRUE, these interface in EFI_HII_CONFIG_ROUTING_PROTOCOL will be supported: ExtractConfig, ExportConfig, RouteConfig 
-  # and GetAltCfg will be supported. Otherwise, these interface will return EFI_UNSUPPORTED.
+  # and GetAltCfg will be supported. Otherwise, these interfaces will return EFI_UNSUPPORTED.
   # FALSE is for size reduction.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportFullConfigRoutingProtocol|TRUE|BOOLEAN|0x00010101
   
