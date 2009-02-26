@@ -54,7 +54,6 @@
   ReportStatusCodeLib
   PrintLib
   DebugLib
-  BaseMemoryLib
   BaseLib
 
 
