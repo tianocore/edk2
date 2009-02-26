@@ -74,7 +74,7 @@ BootSectorEntryPoint:
 NoVarStore: 
         pushw   %es
 # Set the 5th byte start @ 0:19000 to non-zero indicating we should init var store header in DxeIpl
-        movb    %al, %es:($4)
+        movb    %al, %es:4
         jmp     SaveVolumeId
 
 CheckVarStoreSize: 
@@ -85,7 +85,7 @@ CheckVarStoreSize:
 
 LoadVarStore: 
         movb    $0, %al
-        movb    %al, %es:($4)
+        movb    %al, %es:4
         movw    (%di), %cx
 #       ES:DI = 1500:0
         xorw    %di, %di
@@ -96,9 +96,9 @@ LoadVarStore:
 SaveVolumeId: 
         popw    %es
         movw    VolId(%bp), %ax
-        movw    %ax, %es:($0)                       # Save Volume Id to 0:19000. we will find the correct volume according to this VolumeId
+        movw    %ax, %es:0                     # Save Volume Id to 0:19000. we will find the correct volume according to this VolumeId
         movw    VolId+2(%bp), %ax
-        movw    %ax, %es:($2)
+        movw    %ax, %es:2
 
 # Read Efildr
         popw    %cx

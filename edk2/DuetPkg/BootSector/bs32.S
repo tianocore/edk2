@@ -16,9 +16,10 @@
 #------------------------------------------------------------------------------
 
         #.MODEL small
-        .stack: 
-        .486p: 
-        .code: 
+        #.stack: 
+        #.486p: 
+        #.code: 
+.section .text
 
 .equ                      FAT_DIRECTORY_ENTRY_SIZE, 0x0020
 .equ                      FAT_DIRECTORY_ENTRY_SHIFT, 5
@@ -31,6 +32,8 @@
 .equ                      LOADER_FILENAME_PART3, 0x20202030    # "0___"
 
         .org 0x00
+.global _start
+_start:
 Ia32Jump: 
   jmp   BootSectorEntryPoint  # JMP inst                  - 3 bytes
   nop
@@ -148,7 +151,7 @@ FindEFILDR:
   jmp   FoundAll
 
 FindVARSTORE: 
-  # if the file is not loader file, see if it's "EFIVAR  BIN"
+  ## if the file is not loader file, see if it's "EFIVAR  BIN"
   cmpl  $0x56494645, (%di)                # Compare to "EFIV"
   jne   FindNext
   cmpl  $0x20205241, 4(%di)               # Compare to "AR  "
@@ -275,7 +278,7 @@ LimitTransfer:
 # ERROR Condition:
 # ****************************************************************************
 NotFoundAll: 
-  # if we found EFILDR, continue
+  ## if we found EFILDR, continue
   testw %bx, %bx
   jne  FoundEFILDR
 BadBootSector: 
@@ -294,7 +297,7 @@ ErrorString:
 # LBA Offset for BootSector, need patched by tool for HD boot.
 # ****************************************************************************
 
-  .org 0x01fa
+  # .org 0x01fa  # BUG_BUG
 LBAOffsetForBootSector: 
   .long     0x0
 
@@ -302,7 +305,7 @@ LBAOffsetForBootSector:
 # Sector Signature
 # ****************************************************************************
 
-  .org 0x01fe
+  # .org 0x01fe  # BUG_BUG
 SectorSignature: 
   .word     0xaa55      # Boot Sector Signature
 
