@@ -18,7 +18,7 @@
         #.MODEL small
         .stack: 
         .486p: 
-        .code16:  
+        .code16
 
 .equ                      FAT_DIRECTORY_ENTRY_SIZE, 0x020
 .equ                      FAT_DIRECTORY_ENTRY_SHIFT, 5
@@ -275,7 +275,7 @@ ErrorString:
 # LBA Offset for BootSector, need patched by tool for HD boot.
 # ****************************************************************************
 
-  # .org 0x01fa # Comment it for pass build. Should optimise code size. 
+  .org 0x01fa
 LBAOffsetForBootSector: 
   .long     0x0
 
@@ -283,7 +283,7 @@ LBAOffsetForBootSector:
 # Sector Signature
 # ****************************************************************************
 
-  # .org 0x01fe # Comment it for pass build. Should optimise code size. 
+  .org 0x01fe
 SectorSignature: 
   .word     0xaa55      # Boot Sector Signature
 

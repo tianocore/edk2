@@ -22,7 +22,7 @@
         .486: 
         #.MODEL flat
         .stack: 
-        .code16:  
+        .code:
         .org 0x21000
 
 .equ                 DEFAULT_HANDLER_SIZE, INT1 - INT0
