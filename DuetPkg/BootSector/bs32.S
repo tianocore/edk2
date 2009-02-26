@@ -16,10 +16,9 @@
 #------------------------------------------------------------------------------
 
         #.MODEL small
-        #.stack: 
-        #.486p: 
-        .code16: 
-.section .text
+        .stack: 
+        .486p: 
+        .code16
 
 .equ                      FAT_DIRECTORY_ENTRY_SIZE, 0x0020
 .equ                      FAT_DIRECTORY_ENTRY_SHIFT, 5
@@ -31,7 +30,7 @@
 .equ                      LOADER_FILENAME_PART2, 0x30325244    # "DR20"
 .equ                      LOADER_FILENAME_PART3, 0x20202030    # "0___"
 
-        .org 0x00
+        .org 0x0
 .global _start
 _start:
 Ia32Jump: 
@@ -80,7 +79,7 @@ BootSectorEntryPoint:
 # ****************************************************************************
 # Start Print
 # ****************************************************************************
-  leaw %cs:StartString, %si
+  movw $StartString, %si
   call PrintString
 
 # ****************************************************************************
@@ -283,7 +282,7 @@ NotFoundAll:
   jne  FoundEFILDR
 BadBootSector: 
 DiskError: 
-  leaw %cs:ErrorString, %si
+  movw $ErrorString, %si
   call PrintString
 Halt: 
   jmp   Halt
@@ -297,7 +296,7 @@ ErrorString:
 # LBA Offset for BootSector, need patched by tool for HD boot.
 # ****************************************************************************
 
-  # .org 0x01fa  # BUG_BUG
+  #.org 0x01fa
 LBAOffsetForBootSector: 
   .long     0x0
 
@@ -305,7 +304,7 @@ LBAOffsetForBootSector:
 # Sector Signature
 # ****************************************************************************
 
-  # .org 0x01fe  # BUG_BUG
+  #.org 0x01fe
 SectorSignature: 
   .word     0xaa55      # Boot Sector Signature
 
