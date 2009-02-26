@@ -20,30 +20,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   level of support for Hardware Error Record Persistence that is implemented
   by the platform.
 
-
-  @param HwErrRecSupportLevel
-                         zero value:      Indicates that the platform implements no support for
-                                          Hardware Error Record Persistence.
-                         non-zero value:  Indicates that the platform implements Hardware Error
-                                          Record Persistence.
-
 **/
 VOID
 InitializeHwErrRecSupport (
-  IN UINT16       HwErrRecSupportLevel
+  VOID
   )
 {
-  EFI_STATUS  Status;
-
-  Status = gRT->SetVariable (
-                  L"HwErrRecSupport",
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  sizeof (UINT16),
-                  &HwErrRecSupportLevel
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "HwErrRecSupport: Can not set the variable\n"));
+  UINT16 HardwareErrorRecordLevel;
+  
+  HardwareErrorRecordLevel = PcdGet16 (PcdHardwareErrorRecordLevel);
+  
+  if (HardwareErrorRecordLevel != 0) {
+    //
+    // Set original value again to make sure this value is stored into variable
+    // area but not PCD database.
+    // if level value equal 0, no need set to 0 to variable area because UEFI specification
+    // define same behavior between no value or 0 value for L"HwErrRecSupport"
+    //
+    PcdSet16 (PcdHardwareErrorRecordLevel, HardwareErrorRecordLevel);
   }
-
 }

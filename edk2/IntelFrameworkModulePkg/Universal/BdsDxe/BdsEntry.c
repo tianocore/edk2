@@ -313,9 +313,8 @@ BdsEntry (
   PERF_START (0, "PlatformBds", "BDS", 0);
   PlatformBdsInit (PrivateData);
 
-  if (FeaturePcdGet (PcdSupportHardwareErrorRecord)) {
-    InitializeHwErrRecSupport (PcdGet16 (PcdHardwareErrorRecordLevel));
-  }
+  InitializeHwErrRecSupport();
+  
   //
   // bugbug: platform specific code
   // Initialize the platform specific string and language
