@@ -18,7 +18,7 @@
         #.MODEL small
         .stack: 
         .486p: 
-        .code: 
+        .code16: 
 
 .equ                      FAT_DIRECTORY_ENTRY_SIZE, 0x020
 .equ                      FAT_DIRECTORY_ENTRY_SHIFT, 5
@@ -65,7 +65,7 @@ BootSectorEntryPoint:
 # ****************************************************************************
 # Start Print
 # ****************************************************************************
-  leaw %cs:StartString, %si
+  movw $StartString, %si
   call PrintString
 
 # ****************************************************************************
@@ -261,7 +261,7 @@ NotFoundAll:
   jne  FoundEFILDR
 BadBootSector: 
 DiskError: 
-  leaw %cs:ErrorString, %si
+  movw $ErrorString, %si
   call PrintString
 Halt: 
   jmp   Halt
