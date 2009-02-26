@@ -65,7 +65,7 @@ BootSectorEntryPoint:
 # ****************************************************************************
 # Start Print
 # ****************************************************************************
-  leaw %cs:StartString, %si
+  movw $StartString, %si
   call PrintString
 
 # ****************************************************************************
@@ -261,7 +261,7 @@ NotFoundAll:
   jne  FoundEFILDR
 BadBootSector: 
 DiskError: 
-  leaw %cs:ErrorString, %si
+  movw $ErrorString, %si
   call PrintString
 Halt: 
   jmp   Halt
