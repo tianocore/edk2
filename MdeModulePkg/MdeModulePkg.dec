@@ -191,6 +191,10 @@
   ## Include/Protocol/ConsoleControl.h
   gEfiConsoleControlProtocolGuid = { 0xF42F7782, 0x012E, 0x4C12, { 0x99, 0x56, 0x49, 0xF9, 0x43, 0x04, 0xF7, 0x21 }}
   
+  ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
+  ## Include/Protocol/OEMBadging.h
+  gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
+    
   ## Include/Protocol/NicIp4Config.h
   gEfiNicIp4ConfigProtocolGuid   = {0xdca3d4d, 0x12da, 0x4728,  { 0xbf, 0x7e, 0x86, 0xce, 0xb9, 0x28, 0xd0, 0x67 }}
   
@@ -218,8 +222,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
  
   ## This feature flag can be used to enable or disable all PCD PEIM services.
-  #  If TRUE, all PCD PEIM services will be provided.
-  ## If FALSE, the minimal PCD PEIM services (only GetService) will be provided.
+  #  If TRUE, all PCD PPI services will be produced.
+  ## If FALSE, the minimal PCD PEIM services (only GetService) will be produced.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable|TRUE|BOOLEAN|0x00010020
 
   ## If TRUE, then the Device Path To Text Protocol should be produced by the platform.
@@ -250,9 +254,15 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE|BOOLEAN|0x00010043
   
-  ## If TRUE, TE image will first be searched in PeiCore dispatcher. 
-  #  If FALSE, PE image will first be searched.
+  ## If TRUE, when PeiCore dispatches a PEI module, PeiCore will first search TE section from this PEIM to load the image.
+  #  If TE section is not found, then PeiCore will search PE section.
+  #  If FALSE, PeiCore will first search PE section from PEIM to load the image.
+  #  This PCD is used to tune Pei phase performance to reduce the search image time.
+  #  It can be set according to the generated image section type.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|TRUE|BOOLEAN|0x00010044
+  
+  ## If PcdSupportHardwareErrorRecord is TRUE, support hardware error record via variable in BDS.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHardwareErrorRecord|FALSE|BOOLEAN|0x00010045
   
   ## If TRUE, Robustnesss improvement such as for DUET. Default is not required.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
@@ -261,9 +271,8 @@
   #  FALSE is for size reduction.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol|TRUE|BOOLEAN|0x00010100
   
-  ## If TRUE, these interface in EFI_HII_CONFIG_ROUTING_PROTOCOL will be supported: ExtractConfig, ExportConfig, RouteConfig 
-  # and GetAltCfg will be supported. Otherwise, these interfaces will return EFI_UNSUPPORTED.
-  # FALSE is for size reduction.
+  ## If TRUE, Full UEFI Config Routing Protocol will be installed.
+  #  FALSE is for size reduction.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportFullConfigRoutingProtocol|TRUE|BOOLEAN|0x00010101
   
   ## If TRUE, USB KeyBoard Driver disables the default keyboard layout.
@@ -293,13 +302,12 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
   
-  ## Indicate the max size of the populated image that the platform can support.
-  #  To support the multi populated images, the defautl supported size will 
-  #  be enlarged to 100MB that is 10 times of the single non-populated image.
+  ## Indicate the max size of the populated capsule image that the platform can support.
+  #  The default max size is 100MB (0x6400000) for more than one large capsule images. 
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x6400000|UINT32|0x0001001e
   
-  ## Indicate the max size of the non-populated image that the platform can support.
-  #  The default size is 10MB for the casule image without populated flag setting.
+  ## Indicate the max size of the non-populated capsule image that the platform can support.
+  #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
   
   ## Maximun number of performance log entries during PEI phase.
@@ -347,6 +355,13 @@
   ## Size of the FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
 
+  ## Default timeout value for displaying progressing bar in before boot OS.
+  #  This value can be changed in BDS.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
+
+  ## Error level for hardware recorder.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
+  
   ##
   #  This PCD defines the print string.
   #  This PCD is a sample to explain FixedAtBuild String PCD usage.
@@ -358,6 +373,26 @@
   #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
   ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
+
+[PcdsFixedAtBuild.IA32]
+  ## Default EFI boot path name for IA32 architecture, this path is relative to 
+  #  EFI boot disk.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\EFI\BOOT\BOOTIA32.EFI"|VOID*|0x40000003
+
+[PcdsFixedAtBuild.X64]
+  ## Default EFI boot path name for X64 architecture, this path is relative to 
+  #  EFI boot disk.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\EFI\BOOT\BOOTX64.EFI"|VOID*|0x40000003
+
+[PcdsFixedAtBuild.IPF]
+  ## Default EFI boot path name for IPF architecture, this path is relative to 
+  #  EFI boot disk.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\EFI\BOOT\BOOTIA64.EFI"|VOID*|0x40000003
+
+[PcdsFixedAtBuild.EBC]
+  ## Default EFI boot path name for EBC architecture, this path is relative to 
+  #  EFI boot disk.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\EFI\BOOT\BOOTEBC.EFI"|VOID*|0x40000003
   
 [PcdsDynamic.common]
   ## Base address of the NV variable range in flash device 
@@ -368,6 +403,13 @@
 
   ## Base address of the FTW working block range in flash device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
+
+  ## Default timeout value for displaying progressing bar in before boot OS.
+  #  This value can be changed in BDS.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
+
+  ## Error level for hardware recorder.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
   ##
   #  This PCD defines the print string.
@@ -394,6 +436,13 @@
 [PcdsPatchableInModule.common]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
+
+  ## Default timeout value for displaying progressing bar in before boot OS.
+  #  This value can be changed in BDS.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
+
+  ## Error level for hardware recorder.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
 
   ##
   #  This PCD defines the Console output column and the default value is 25 according to UEFI spec
