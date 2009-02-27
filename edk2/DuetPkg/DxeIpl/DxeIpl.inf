@@ -39,6 +39,9 @@
   ReportStatusCodeLib
   IoLib
 
+[Guids]
+  gEfiVariableGuid
+
 [Sources.common]
   DxeIpl.h
   DxeInit.c

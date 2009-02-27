@@ -60,7 +60,7 @@
   gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
 
 [Guids]
-  gEfiVariableInfoGuid                          ## PRODUCES ## Configuration Table Guid 
+  gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
 

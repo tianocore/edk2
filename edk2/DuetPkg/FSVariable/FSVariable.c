@@ -22,7 +22,7 @@ Abstract:
 #include "FSVariable.h"
 
 VARIABLE_STORE_HEADER mStoreHeaderTemplate = {
-  VARIABLE_STORE_SIGNATURE,
+  gEfiVariableGuid,
   VOLATILE_VARIABLE_STORE_SIZE,
   VARIABLE_STORE_FORMATTED,
   VARIABLE_STORE_HEALTHY,
@@ -100,15 +100,18 @@ Returns:
 
 --*/
 {
-  if ((VarStoreHeader->Signature == mStoreHeaderTemplate.Signature) &&
+  if (CompareGuid (&VarStoreHeader->Signature, &mStoreHeaderTemplate.Signature) &&
       (VarStoreHeader->Format == mStoreHeaderTemplate.Format) &&
       (VarStoreHeader->State == mStoreHeaderTemplate.State)
      ) {
     return EfiValid;
-  } else if (VarStoreHeader->Signature == VAR_DEFAULT_VALUE_32 &&
-           VarStoreHeader->Size == VAR_DEFAULT_VALUE_32 &&
-           VarStoreHeader->Format == VAR_DEFAULT_VALUE &&
-           VarStoreHeader->State == VAR_DEFAULT_VALUE
+  } else if (((UINT32 *)(&VarStoreHeader->Signature))[0] == VAR_DEFAULT_VALUE_32 &&
+             ((UINT32 *)(&VarStoreHeader->Signature))[1] == VAR_DEFAULT_VALUE_32 &&
+             ((UINT32 *)(&VarStoreHeader->Signature))[2] == VAR_DEFAULT_VALUE_32 &&
+             ((UINT32 *)(&VarStoreHeader->Signature))[3] == VAR_DEFAULT_VALUE_32 &&
+             VarStoreHeader->Size == VAR_DEFAULT_VALUE_32 &&
+             VarStoreHeader->Format == VAR_DEFAULT_VALUE &&
+             VarStoreHeader->State == VAR_DEFAULT_VALUE
           ) {
 
     return EfiRaw;

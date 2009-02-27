@@ -18,7 +18,7 @@
 #include <Uefi.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
-#include <Guid/VariableInfo.h>
+#include <Guid/VariableFormat.h>
 
 
 /**
@@ -45,7 +45,7 @@ UefiMain (
   VARIABLE_INFO_ENTRY   *VariableInfo;
   VARIABLE_INFO_ENTRY   *Entry;
 
-  Status = EfiGetSystemConfigurationTable (&gEfiVariableInfoGuid, (VOID **)&Entry);
+  Status = EfiGetSystemConfigurationTable (&gEfiVariableGuid, (VOID **)&Entry);
   if (!EFI_ERROR (Status) && (Entry != NULL)) {
     Print (L"Non-Volatile EFI Variables:\n");
     VariableInfo = Entry;

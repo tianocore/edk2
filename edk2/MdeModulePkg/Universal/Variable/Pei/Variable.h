@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
 
-#include <VariableFormat.h>
+#include <Guid/VariableFormat.h>
 
 typedef struct {
   VARIABLE_HEADER *CurrPtr;

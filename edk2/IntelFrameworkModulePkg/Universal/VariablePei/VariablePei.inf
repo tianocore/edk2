@@ -99,6 +99,9 @@
   gEfiPeiReadOnlyVariablePpiGuid                # PPI ALWAYS_PRODUCED
   gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_PRODUCED
 
+[Guids]
+  gEfiVariableGuid
+
 ################################################################################
 #
 # Pcd DYNAMIC - list of PCDs that this module is coded for.

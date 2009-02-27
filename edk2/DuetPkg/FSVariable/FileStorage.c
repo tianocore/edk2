@@ -247,7 +247,7 @@ FileStorageConstructor (
   ASSERT_EFI_ERROR (Status);
   ZeroMem (Dev, sizeof(VS_DEV));
 
-  Dev->Signature          = VARIABLE_STORE_SIGNATURE;
+  CopyGuid (&Dev->Signature, &gEfiVariableGuid);
   Dev->Size               = Size;
   VAR_DATA_PTR (Dev)      = (UINT8 *) (UINTN) NvStorageBase;
   VAR_FILE_VOLUMEID (Dev) = VolumeId;

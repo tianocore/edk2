@@ -100,7 +100,8 @@ typedef struct _VS_DEV {
 
 } VS_DEV;
 
-#define DEV_FROM_THIS(a)        CR (a, VS_DEV, VarStore, VARIABLE_STORE_SIGNATURE)
+#define VS_DEV_SIGNATURE        SIGNATURE_32 ('$', 'V', 'S', 'D')
+#define DEV_FROM_THIS(a)        CR (a, VS_DEV, VarStore, VS_DEV_SIGNATURE)
 
 #define VAR_DATA_PTR(a)         ((a)->Info.Data)
 #define VAR_FILE_DEVICEPATH(a)  ((a)->Info.FileInfo.DevicePath)

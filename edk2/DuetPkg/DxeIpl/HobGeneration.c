@@ -738,7 +738,7 @@ PrepareHobNvStorage (
 */
 {
   STATIC VARIABLE_STORE_HEADER VarStoreHeader = {
-    VARIABLE_STORE_SIGNATURE,
+    gEfiVariableGuid,
     0xffffffff,                 // will be fixed in Variable driver
     VARIABLE_STORE_FORMATTED,
     VARIABLE_STORE_HEALTHY,

@@ -57,6 +57,9 @@
   PeiServicesTablePointerLib
   PeiServicesLib
 
+[Guids]
+  gEfiVariableGuid
+
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid                ## SOMETIMES_PRODUCES (Not for boot mode RECOVERY)
 
