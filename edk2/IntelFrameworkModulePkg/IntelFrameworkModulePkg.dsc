@@ -214,7 +214,6 @@
   IntelFrameworkModulePkg/Library/SmmRuntimeDxeReportStatusCodeLibFramework/SmmRuntimeDxeReportStatusCodeLibFramework.inf
   IntelFrameworkModulePkg/Library/BaseReportStatusCodeLib/BaseReportStatusCodeLib.inf
   IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   IntelFrameworkModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   
   IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
@@ -235,10 +234,17 @@
   IntelFrameworkModulePkg/Universal/PcatSingleSegmentPciCfgPei/PcatSingleSegmentPciCfgPei.inf
   IntelFrameworkModulePkg/Universal/VariablePei/VariablePei.inf
   IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
-  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   
 [Components.IA32]
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+  IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  
 [Components.X64]
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+  IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  
+[Components.IPF]  
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+  IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
