@@ -34,7 +34,7 @@ extern EFI_GUID gEfiVariableGuid;
 //
 // GET_PAD_SIZE to calculate miminal pad bytes to make current size satisfy the alignment requirement
 //
-#if ((ALIGNMENT == 0) || (ALIGNMENT == 1))
+#if (ALIGNMENT == 1)
 #define GET_PAD_SIZE(a) (0)
 #else
 #define GET_PAD_SIZE(a) (((~a) + 1) & (ALIGNMENT - 1))
