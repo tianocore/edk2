@@ -68,6 +68,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/DxeServicesLib.h>
 
+#if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
+    #if defined (MDE_CPU_EBC)
+        //
+        // Uefi specification only defines the default boot file name for IA32, X64
+        // and IPF processor, so need define boot file name for EBC architecture here.
+        //
+        #define EFI_REMOVABLE_MEDIA_FILE_NAME L"\\EFI\\BOOT\\BOOTEBC.EFI"
+    #else
+        #error "Can not determine the default boot file name for unknown processor type!"
+    #endif
+#endif
 
 /**
 
