@@ -137,7 +137,7 @@ UpdateVariableInfo (
       StrCpy (gVariableInfo->Name, VariableName);
       gVariableInfo->Volatile = Volatile;
 
-      gBS->InstallConfigurationTable (&gEfiVariableInfoGuid, gVariableInfo);
+      gBS->InstallConfigurationTable (&gEfiVariableGuid, gVariableInfo);
     }
 
     
@@ -362,16 +362,19 @@ GetVariableStoreStatus (
   IN VARIABLE_STORE_HEADER *VarStoreHeader
   )
 {
-  if (VarStoreHeader->Signature == VARIABLE_STORE_SIGNATURE &&
+  if (CompareGuid (&VarStoreHeader->Signature, &gEfiVariableGuid) &&
       VarStoreHeader->Format == VARIABLE_STORE_FORMATTED &&
       VarStoreHeader->State == VARIABLE_STORE_HEALTHY
       ) {
 
     return EfiValid;
-  } else if (VarStoreHeader->Signature == 0xffffffff &&
-           VarStoreHeader->Size == 0xffffffff &&
-           VarStoreHeader->Format == 0xff &&
-           VarStoreHeader->State == 0xff
+  } else if (((UINT32 *)(&VarStoreHeader->Signature))[0] == 0xffffffff &&
+             ((UINT32 *)(&VarStoreHeader->Signature))[1] == 0xffffffff &&
+             ((UINT32 *)(&VarStoreHeader->Signature))[2] == 0xffffffff &&
+             ((UINT32 *)(&VarStoreHeader->Signature))[3] == 0xffffffff &&
+             VarStoreHeader->Size == 0xffffffff &&
+             VarStoreHeader->Format == 0xff &&
+             VarStoreHeader->State == 0xff
           ) {
 
     return EfiRaw;
@@ -1849,7 +1852,7 @@ VariableCommonInitialize (
   mVariableModuleGlobal->VariableGlobal.VolatileVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VolatileVariableStore;
   mVariableModuleGlobal->VolatileLastVariableOffset = (UINTN) GetStartPointer (VolatileVariableStore) - (UINTN) VolatileVariableStore;
 
-  VolatileVariableStore->Signature                  = VARIABLE_STORE_SIGNATURE;
+  CopyGuid (&VolatileVariableStore->Signature, &gEfiVariableGuid);
   VolatileVariableStore->Size                       = FixedPcdGet32(PcdVariableStoreSize);
   VolatileVariableStore->Format                     = VARIABLE_STORE_FORMATTED;
   VolatileVariableStore->State                      = VARIABLE_STORE_HEALTHY;

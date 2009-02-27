@@ -16,6 +16,11 @@
 #ifndef __VARIABLE_FORMAT_H__
 #define __VARIABLE_FORMAT_H__
 
+#define EFI_VARIABLE_GUID \
+  { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d } }
+
+extern EFI_GUID gEfiVariableGuid;
+
 ///
 /// Alignment of variable name and data.
 /// For IA32/X64 architecture, the alignment is set to 1, and 8 is for IPF archtecture.
@@ -53,7 +58,7 @@ typedef enum {
 
 #pragma pack(1)
 
-#define VARIABLE_STORE_SIGNATURE  SIGNATURE_32 ('$', 'V', 'S', 'S')
+#define VARIABLE_STORE_SIGNATURE  EFI_VARIABLE_GUID
 
 ///
 /// Variable Store Header Format and State
@@ -68,9 +73,10 @@ typedef struct {
   ///
   /// Variable store region signature.
   ///
-  UINT32  Signature;
+  EFI_GUID  Signature;
   ///
-  /// Size of variable store region including this header
+  /// Size of entire variable store, 
+  /// including size of variable store header but not including the size of FvHeader.
   ///
   UINT32  Size;
   ///
@@ -130,5 +136,24 @@ typedef struct {
 } VARIABLE_HEADER;
 
 #pragma pack()
+
+typedef struct _VARIABLE_INFO_ENTRY  VARIABLE_INFO_ENTRY;
+
+///
+/// This structure contains the variable list that is put in EFI system table.
+/// The variable driver collects all used variables at boot service time and produce this list.
+/// This is an optional feature to dump all used variables in shell environment. 
+///
+struct _VARIABLE_INFO_ENTRY {
+  VARIABLE_INFO_ENTRY *Next;       ///> Pointer to next entry
+  EFI_GUID            VendorGuid;  ///> Guid of Variable 
+  CHAR16              *Name;       ///> Name of Variable 
+  UINT32              Attributes;  ///> Attributes of variable defined in UEFI spec
+  UINT32              ReadCount;   ///> Times to read this variable
+  UINT32              WriteCount;  ///> Times to write this variable
+  UINT32              DeleteCount; ///> Times to delete this variable
+  UINT32              CacheCount;  ///> Times that cache hits this variable
+  BOOLEAN             Volatile;    ///> TRUE if volatile FALSE if non-volatile
+};
 
 #endif // _EFI_VARIABLE_H_

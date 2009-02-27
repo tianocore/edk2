@@ -153,9 +153,9 @@
   ## Include/Guid/PeiPeCoffLoader.h
   gEfiPeiPeCoffLoaderGuid        = { 0xD8117CFF, 0x94A6, 0x11D4, { 0x9A, 0x3A, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   
-  ## Guid specify the variable list entries put in the EFI system table.
-  ## Include/Guid/VariableInfo.h
-  gEfiVariableInfoGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
+  ## Guid acted as variable store header's signature and to specify the variable list entries put in the EFI system table.
+  ## Include/Guid/VariableFormat.h
+  gEfiVariableGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
   
   ## Platform Override Variable guid
   ## Include/Guid/OverrideVariable.h

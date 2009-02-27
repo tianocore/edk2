@@ -36,7 +36,7 @@
 #include <Library/PlatformDriverOverrideLib.h>
 
 #include <Guid/OverrideVariable.h>
-#include <VariableFormat.h>
+#include <Guid/VariableFormat.h>
 
 
 #define PLATFORM_OVERRIDE_ITEM_SIGNATURE      SIGNATURE_32('p','d','o','i')

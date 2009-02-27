@@ -56,6 +56,7 @@
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
+  gEfiVariableGuid
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize

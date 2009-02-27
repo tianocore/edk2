@@ -38,6 +38,7 @@ Abstract:
 
 #include <Guid/HobList.h>
 #include <Guid/FlashMapHob.h>
+#include <Guid/VariableFormat.h>
 
 #include <Protocol/Variable.h>
 #include <Protocol/VariableWrite.h>
@@ -46,7 +47,6 @@ Abstract:
 
 
 #include "EfiFlashMap.h"
-#include "VariableFormat.h"
 #include "VariableStorage.h"
 
 #define VOLATILE_VARIABLE_STORE_SIZE  (64 * 1024)

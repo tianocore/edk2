@@ -57,6 +57,7 @@
 [Guids]
   gEfiHobListGuid
   gEfiFlashMapHobGuid
+  gEfiVariableGuid
 
 [Protocols]
   gEfiVariableArchProtocolGuid

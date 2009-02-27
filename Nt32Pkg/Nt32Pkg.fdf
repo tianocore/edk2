@@ -73,9 +73,13 @@ DATA = {
   #Blockmap[1]: End
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   ## This is the VARIABLE_STORE_HEADER
-  #Signature: "$VSS"      #Size: 0xc000 (gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize) - 0x48 (HeaderLength) = 0xBFB8
-                                # This can speed up the Variable Dispatch a bit.
-  0x24, 0x56, 0x53, 0x53, 0xB8, 0xBF, 0x00, 0x00,
+  #Signature: gEfiVariableGuid =
+  #  { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
+  0x16, 0x36, 0xcf, 0xdd, 0x75, 0x32, 0x64, 0x41,
+  0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d,
+  #Size: 0xc000 (gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize) - 0x48 (size of EFI_FIRMWARE_VOLUME_HEADER) = 0xBFB8
+  # This can speed up the Variable Dispatch a bit.
+  0xB8, 0xBF, 0x00, 0x00,
   #FORMATTED: 0x5A #HEALTHY: 0xFE #Reserved: UINT16 #Reserved1: UINT32
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
@@ -216,6 +220,17 @@ INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
 INF  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 
+INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+INF  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
+INF  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
+INF  MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
+INF  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
+INF  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
+INF  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
+INF  MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
+INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+INF  Nt32Pkg/SnpNt32Dxe/SnpNt32Dxe.inf
+INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
 ################################################################################
 #
 # FILE statements are provided so that a platform integrator can include

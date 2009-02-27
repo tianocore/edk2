@@ -18,6 +18,7 @@
 #include <Guid/Mps.h>
 #include <Guid/FlashMapHob.h>
 #include <Guid/SystemNvDataGuid.h>
+#include <Guid/VariableFormat.h>
 
 #include <Protocol/Decompress.h>
 #include <Protocol/StatusCode.h>
@@ -29,7 +30,6 @@
 #include <Library/PrintLib.h>
 #include <Library/IoLib.h>
 
-#include <VariableFormat.h>
 #include <CpuIA32.h>
 
 #endif // _DUET_DXEIPL_H_

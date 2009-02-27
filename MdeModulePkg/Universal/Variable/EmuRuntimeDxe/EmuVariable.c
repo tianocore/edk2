@@ -822,7 +822,7 @@ InitializeVariableStore (
   *VariableBase             = (EFI_PHYSICAL_ADDRESS) (UINTN) VariableStore;
   *LastVariableOffset       = sizeof (VARIABLE_STORE_HEADER);
 
-  VariableStore->Signature  = VARIABLE_STORE_SIGNATURE;
+  CopyGuid (&VariableStore->Signature, &gEfiVariableGuid);
   VariableStore->Size       = FixedPcdGet32(PcdVariableStoreSize);
   VariableStore->Format     = VARIABLE_STORE_FORMATTED;
   VariableStore->State      = VARIABLE_STORE_HEALTHY;

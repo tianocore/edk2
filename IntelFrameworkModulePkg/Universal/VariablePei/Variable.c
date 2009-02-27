@@ -277,7 +277,8 @@ GetVariableStoreStatus (
   )
 
 {
-  if (VarStoreHeader->Signature == VARIABLE_STORE_SIGNATURE &&
+	
+  if (CompareGuid (&VarStoreHeader->Signature, &gEfiVariableGuid) &&
       VarStoreHeader->Format == VARIABLE_STORE_FORMATTED &&
       VarStoreHeader->State == VARIABLE_STORE_HEALTHY
       ) {
@@ -285,7 +286,10 @@ GetVariableStoreStatus (
     return EfiValid;
   }
 
-  if (VarStoreHeader->Signature == 0xffffffff &&
+  if (((UINT32 *)(&VarStoreHeader->Signature))[0] == 0xffffffff &&
+      ((UINT32 *)(&VarStoreHeader->Signature))[1] == 0xffffffff &&
+      ((UINT32 *)(&VarStoreHeader->Signature))[2] == 0xffffffff &&
+      ((UINT32 *)(&VarStoreHeader->Signature))[3] == 0xffffffff &&
       VarStoreHeader->Size == 0xffffffff &&
       VarStoreHeader->Format == 0xff &&
       VarStoreHeader->State == 0xff
