@@ -59,7 +59,7 @@ MemStorageConstructor (
 
   ZeroMem (Dev, sizeof(VS_DEV));
 
-  CopyGuid (&Dev->Signature, &gEfiVariableGuid);
+  Dev->Signature   = VS_DEV_SIGNATURE;
   Dev->Size        = Size;
 
   Dev->VarStore.Erase    = MemEraseStore;
