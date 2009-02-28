@@ -2560,7 +2560,7 @@ LegacyBiosInt86 (
 --*/
 {
   UINTN                 Status;
-  UINT32                Eflags;
+  UINTN                 Eflags;
   IA32_REGISTER_SET     ThunkRegSet;
   BOOLEAN               Ret;
   UINT16                *Stack16;
