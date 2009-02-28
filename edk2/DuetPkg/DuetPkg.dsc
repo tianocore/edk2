@@ -197,6 +197,9 @@
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   
+  # Bios Thunk
+  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
+  
 [Components.IA32]  
   DuetPkg/BootSector/BootSector.inf
   
