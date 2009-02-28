@@ -116,6 +116,7 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
 FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
   SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
