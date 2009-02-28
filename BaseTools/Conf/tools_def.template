@@ -462,7 +462,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 #   CYGWINGCC        - CygWin GCC
 *_CYGWINGCC_*_*_FAMILY              = GCC
 
-*_CYGWINGCC_*_*_DPATH               = DEF(CYGWIN_BIN)
+*_CYGWINGCC_*_*_DLL                 = DEF(CYGWIN_BIN)
 *_CYGWINGCC_*_ASL_PATH              = DEF(ASL_BIN)/iasl.exe
 *_CYGWINGCC_*_MAKE_PATH             = DEF(VSNET2003_BIN)\nmake.exe
 
