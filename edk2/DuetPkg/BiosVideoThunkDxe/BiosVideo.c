@@ -361,7 +361,7 @@ BiosVideoDriverBindingStart (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   sizeof (BIOS_VIDEO_DEV),
-                  &BiosVideoPrivate
+                  (VOID**)&BiosVideoPrivate
                   );
   if (EFI_ERROR (Status)) {
     goto Done;
@@ -383,7 +383,7 @@ BiosVideoDriverBindingStart (
   Status = gBS->HandleProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
-                  &BiosVideoPrivate->DevicePath
+                  (VOID**)&BiosVideoPrivate->DevicePath
                   );
   if (EFI_ERROR (Status)) {
     goto Done;
@@ -1274,7 +1274,7 @@ Returns:
     Status = gBS->AllocatePool (
                     EfiBootServicesData,
                     BiosVideoPrivate->ModeData[Index].BytesPerScanLine,
-                    &BiosVideoPrivate->LineBuffer
+                    (VOID**)&BiosVideoPrivate->LineBuffer
                     );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1292,7 +1292,7 @@ Returns:
       Status = gBS->AllocatePool (
                       EfiBootServicesData,
                       4 * 480 * 80,
-                      &BiosVideoPrivate->VgaFrameBuffer
+                      (VOID**)&BiosVideoPrivate->VgaFrameBuffer
                       );
       if (EFI_ERROR (Status)) {
         return Status;
@@ -1311,7 +1311,7 @@ Returns:
       Status = gBS->AllocatePool (
                       EfiBootServicesData,
                       BiosVideoPrivate->ModeData[Index].BytesPerScanLine * BiosVideoPrivate->ModeData[Index].VerticalResolution,
-                      &BiosVideoPrivate->VbeFrameBuffer
+                      (VOID**)&BiosVideoPrivate->VbeFrameBuffer
                       );
       if (EFI_ERROR (Status)) {
         return Status;
@@ -1738,6 +1738,8 @@ Returns:
         );
     }
     break;
+  default:
+    break;
   }
 
   gBS->RestoreTPL (OriginalTPL);
@@ -1845,7 +1847,7 @@ Returns:
                   PciIo,
                   EfiPciIoWidthUint8,
                   EFI_PCI_IO_PASS_THROUGH_BAR,
-                  (UINT64) Source,
+                  (UINT64) (UINTN)Source,
                   WidthInBytes,
                   (VOID *) Destination
                   );
@@ -2110,9 +2112,9 @@ Returns:
                 PciIo,
                 EfiPciIoWidthUint8,
                 EFI_PCI_IO_PASS_THROUGH_BAR,
-                (UINT64) (DestinationAddress + Offset),
+                (UINT64) ((UINTN)DestinationAddress + Offset),
                 EFI_PCI_IO_PASS_THROUGH_BAR,
-                (UINT64) (SourceAddress + Offset),
+                (UINT64) ((UINTN)SourceAddress + Offset),
                 Bytes
                 );
       }
@@ -2316,7 +2318,7 @@ Returns:
                       PciIo,
                       EfiPciIoWidthUint8,
                       EFI_PCI_IO_PASS_THROUGH_BAR,
-                      (UINT64) Address1,
+                      (UINT64) (UINTN) Address1,
                       1,
                       &Data
                       );
@@ -2325,7 +2327,7 @@ Returns:
                       PciIo,
                       EfiPciIoWidthUint8,
                       EFI_PCI_IO_PASS_THROUGH_BAR,
-                      (UINT64) Address1,
+                      (UINT64) (UINTN) Address1,
                       1,
                       &BiosVideoPrivate->LineBuffer[Index1]
                       );
@@ -2339,6 +2341,8 @@ Returns:
       }
     }
 
+    break;
+  default:
     break;
   }
 
