@@ -7,7 +7,7 @@
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -50,7 +50,9 @@
 
 [Components.common]
   PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
+  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
   PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
   PcAtChipsetPkg/KbcResetDxe/Reset.inf
   PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
   PcAtChipsetPkg/PcRtc/RealTimeClock.inf
+

@@ -66,7 +66,7 @@ INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-  
+
 INF  DuetPkg/FSVariable/FSVariable.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
@@ -86,8 +86,8 @@ INF  DuetPkg/DataHubGenDxe/DataHubGen.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  UefiCpuPkg/CpuIoDxe/CpuIo.inf
 INF  DuetPkg/CpuDxe/Cpu.inf
-  
-INF  IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
+
+INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 INF  PcAtChipsetPkg/KbcResetDxe/Reset.inf
 INF  DuetPkg/LegacyMetronome/Metronome.inf
 INF  PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
@@ -99,13 +99,13 @@ INF  IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 
   # IDE Support
 #IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
-  
+
   # Usb Support
 INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-  
+
   # ISA Support
 INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
@@ -126,20 +126,20 @@ FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
 FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
-      
+
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
     PE32     PE32           |.efi
-    UI       STRING ="$(MODULE_NAME)" Optional         
-    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)    
+    UI       STRING ="$(MODULE_NAME)" Optional
+    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional        |.depex
      PE32      PE32                      |.efi
-     UI       STRING="$(MODULE_NAME)" Optional         
-     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)   
+     UI       STRING="$(MODULE_NAME)" Optional
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.PEIM.TIANOCOMPRESSED]
@@ -207,3 +207,4 @@ FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
       }
     }
   }
+
