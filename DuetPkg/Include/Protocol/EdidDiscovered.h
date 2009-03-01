@@ -11,20 +11,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  LegacyBiosThunk.c
-    
+  EdidDiscovered.h
+
 Abstract:
 
-  Legacy BIOS Thunk Protocol
+  EDID Discovered Protocol from the UEFI 2.0 specification.
 
-Revision History
+  This protocol is placed on the video output device child handle and it represents
+  the EDID information being used for output device represented by the child handle.
 
 --*/
 
-#include "Tiano.h"
+#ifndef __EDID_DISCOVERED_H__
+#define __EDID_DISCOVERED_H__
 
-#include EFI_PROTOCOL_DEFINITION (LegacyBiosThunk)
+#define EFI_EDID_DISCOVERED_PROTOCOL_GUID \
+  { \
+    0x1c0c34f6, 0xd380, 0x41fa, 0xa0, 0x49, 0x8a, 0xd0, 0x6c,0x1a, 0x66, 0xaa \
+  }
 
-EFI_GUID  gEfiLegacyBiosThunkProtocolGuid = EFI_LEGACY_BIOS_THUNK_PROTOCOL_GUID;
+typedef struct {
+  UINT32   SizeOfEdid;
+  UINT8    *Edid;
+} EFI_EDID_DISCOVERED_PROTOCOL;
 
-EFI_GUID_STRING(&gEfiLegacyBiosThunkProtocolGuid, "Legacy BIOS Thunk Protocol", "Legacy BIOS Thunk Protocol");
+extern EFI_GUID gEfiEdidDiscoveredProtocolGuid;
+
+#endif
