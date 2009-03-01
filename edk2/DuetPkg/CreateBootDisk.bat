@@ -76,6 +76,7 @@ copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\boot
 @goto end
 
 :CreateUsb_FAT32
+@if "%4"=="step2" goto CreateUsb_FAT32_step2
 @echo Format %EFI_BOOT_DISK% ...
 @echo.> FormatCommandInput.txt
 @format /FS:FAT32 /v:%DISK_LABEL% /q %EFI_BOOT_DISK% < FormatCommandInput.txt > NUL
@@ -86,12 +87,15 @@ copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\boot
 @del UsbBs32.com
 @%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bs32.com
 @%BASETOOLS_DIR%\Genbootsector.exe -m -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Mbr.com
-@copy %BUILD_DIR%\FV\EfiLdr20 %EFI_BOOT_DISK%
-@mkdir %EFI_BOOT_DISK%\efi\boot
-@copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
 @echo Done.
 @echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN!
 @goto end  
+
+:CreateUsb_FAT32_step2
+@copy %BUILD_DIR%\FV\EfiLdr20 %EFI_BOOT_DISK%
+@mkdir %EFI_BOOT_DISK%\efi\boot
+@copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+@goto end
 
 :CreateIde
 @goto end
