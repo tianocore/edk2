@@ -426,7 +426,7 @@ BiosVideoChildHandleInstall (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   sizeof (BIOS_VIDEO_DEV),
-                  &BiosVideoPrivate
+                  (VOID**) &BiosVideoPrivate
                   );
   if (EFI_ERROR (Status)) {
     goto Done;
@@ -1146,7 +1146,7 @@ BiosVideoCheckForVbe (
       Status = gBS->AllocatePool (
                       EfiBootServicesData,
                       VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE,
-                      &BiosVideoPrivate->EdidDiscovered.Edid
+                      (VOID**) &BiosVideoPrivate->EdidDiscovered.Edid
                       );
       if (EFI_ERROR (Status)) {
         goto Done;
@@ -1161,7 +1161,7 @@ BiosVideoCheckForVbe (
       Status = gBS->AllocatePool (
                       EfiBootServicesData,
                       VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE,
-                      &BiosVideoPrivate->EdidActive.Edid
+                      (VOID**)&BiosVideoPrivate->EdidActive.Edid
                       );
       if (EFI_ERROR (Status)) {
         goto Done;
@@ -1580,7 +1580,7 @@ BiosVideoGraphicsOutputQueryMode (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION),
-                  Info
+                  (VOID**) Info
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1657,7 +1657,7 @@ BiosVideoGraphicsOutputSetMode (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   ModeData->BytesPerScanLine,
-                  &BiosVideoPrivate->LineBuffer
+                  (VOID**) &BiosVideoPrivate->LineBuffer
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1675,7 +1675,7 @@ BiosVideoGraphicsOutputSetMode (
     Status = gBS->AllocatePool (
                     EfiBootServicesData,
                     4 * 480 * 80,
-                    &BiosVideoPrivate->VgaFrameBuffer
+                    (VOID**) &BiosVideoPrivate->VgaFrameBuffer
                     );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1694,7 +1694,7 @@ BiosVideoGraphicsOutputSetMode (
     Status = gBS->AllocatePool (
                     EfiBootServicesData,
                     ModeData->BytesPerScanLine * ModeData->VerticalResolution,
-                    &BiosVideoPrivate->VbeFrameBuffer
+                    (VOID**) &BiosVideoPrivate->VbeFrameBuffer
                     );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1743,7 +1743,7 @@ BiosVideoGraphicsOutputSetMode (
   //
   // Frame BufferSize remain unchanged
   //
-  This->Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) ModeData->LinearFrameBuffer;
+  This->Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS)(UINTN)ModeData->LinearFrameBuffer;
   This->Mode->FrameBufferSize = ModeData->FrameBufferSize;
 
   BiosVideoPrivate->HardwareNeedsStarting = FALSE;
@@ -2120,6 +2120,8 @@ BiosVideoGraphicsOutputVbeBlt (
         );
     }
     break;
+  default:
+    break;
   }
 
   gBS->RestoreTPL (OriginalTPL);
@@ -2216,8 +2218,8 @@ VgaReadBitPlanes (
       PciIo->Mem.Read (
                   PciIo,
                   EfiPciIoWidthUint8,
-                  EFI_PCI_IO_PASS_THROUGH_BAR,
-                  (UINT64) Source,
+                  (UINT8) EFI_PCI_IO_PASS_THROUGH_BAR,
+                  (UINT64)(UINTN) Source,
                   WidthInBytes,
                   (VOID *) Destination
                   );
@@ -2467,9 +2469,9 @@ BiosVideoGraphicsOutputVgaBlt (
                 PciIo,
                 EfiPciIoWidthUint8,
                 EFI_PCI_IO_PASS_THROUGH_BAR,
-                (UINT64) (DestinationAddress + Offset),
+                (UINT64) ((UINTN)DestinationAddress + Offset),
                 EFI_PCI_IO_PASS_THROUGH_BAR,
-                (UINT64) (SourceAddress + Offset),
+                (UINT64) ((UINTN)SourceAddress + Offset),
                 Bytes
                 );
       }
@@ -2673,7 +2675,7 @@ BiosVideoGraphicsOutputVgaBlt (
                       PciIo,
                       EfiPciIoWidthUint8,
                       EFI_PCI_IO_PASS_THROUGH_BAR,
-                      (UINT64) Address1,
+                      (UINT64)(UINTN) Address1,
                       1,
                       &Data
                       );
@@ -2682,7 +2684,7 @@ BiosVideoGraphicsOutputVgaBlt (
                       PciIo,
                       EfiPciIoWidthUint8,
                       EFI_PCI_IO_PASS_THROUGH_BAR,
-                      (UINT64) Address1,
+                      (UINT64)(UINTN) Address1,
                       1,
                       &BiosVideoPrivate->LineBuffer[Index1]
                       );
@@ -2696,6 +2698,8 @@ BiosVideoGraphicsOutputVgaBlt (
       }
     }
 
+    break;
+  default:
     break;
   }
 
