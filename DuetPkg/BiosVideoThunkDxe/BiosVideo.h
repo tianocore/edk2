@@ -1,4 +1,4 @@
-/*++
+/** @file
 
 Copyright (c) 2006 - 2007, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -9,14 +9,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  UefiBiosVideo.h
-    
-Abstract: 
-
-Revision History
---*/
+**/
 
 #ifndef _BIOS_GRAPHICS_OUTPUT_H
 #define _BIOS_GRAPHICS_OUTPUT_H
@@ -88,11 +81,12 @@ typedef struct {
   EFI_HANDLE                                  Handle;
 
   //
-  // Consumed Protocols
+  // Consumed Protocols inherited from parent controller.
   //
   EFI_PCI_IO_PROTOCOL                         *PciIo;
   EFI_LEGACY_8259_PROTOCOL                    *Legacy8259;
-
+  THUNK_CONTEXT                               *ThunkContext;
+  
   //
   // Produced Protocols
   //
@@ -106,7 +100,6 @@ typedef struct {
   //
   BOOLEAN                                     VgaCompatible;
   BOOLEAN                                     ProduceGraphicsOutput;
-  EFI_EVENT                                   ExitBootServicesEvent;
 
   //
   // Graphics Output Protocol related fields
@@ -150,6 +143,17 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gBiosVideoComponentName2;
 //
 // Driver Binding Protocol functions
 //
+/**
+  Test to see if Bios Video could be supported on the Controller.
+
+  @param This                  Pointer to driver binding protocol
+  @param Controller            Controller handle to connect
+  @param RemainingDevicePath   A pointer to the remaining portion of a device path
+
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoDriverBindingSupported (
@@ -157,25 +161,18 @@ BiosVideoDriverBindingSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This                - GC_TODO: add argument description
-  Controller          - GC_TODO: add argument description
-  RemainingDevicePath - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Install Graphics Output Protocol onto VGA device handles
+
+  @param This                   Pointer to driver binding protocol
+  @param Controller             Controller handle to connect
+  @param RemainingDevicePath    A pointer to the remaining portion of a device path
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoDriverBindingStart (
@@ -183,25 +180,21 @@ BiosVideoDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This                - GC_TODO: add argument description
-  Controller          - GC_TODO: add argument description
-  RemainingDevicePath - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
+/**
+  Stop this driver on Controller 
+
+  @param  This              Protocol instance pointer.
+  @param  Controller        Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed Controller.
+  @retval other             This driver was not removed from this device.
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoDriverBindingStop (
@@ -210,120 +203,70 @@ BiosVideoDriverBindingStop (
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  This              - GC_TODO: add argument description
-  Controller        - GC_TODO: add argument description
-  NumberOfChildren  - GC_TODO: add argument description
-  ChildHandleBuffer - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
 //
 // Private worker functions
 //
+/**
+  Check for VBE device
+
+  @param BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
+
+  @retval EFI_SUCCESS VBE device found
+
+**/
 EFI_STATUS
 BiosVideoCheckForVbe (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  BiosVideoPrivate  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
+
+/**
+  Check for VGA device
+
+  @param BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
+
+  @retval EFI_SUCCESS  Standard VGA device found
+**/
 
 EFI_STATUS
 BiosVideoCheckForVga (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
-/*++
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  BiosVideoPrivate  - GC_TODO: add argument description
-
-Returns:
-
-  GC_TODO: add return values
-
---*/
 ;
 
-STATIC
-EFI_STATUS
-DeRegisterVideoChildHandle (
-  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  EFI_HANDLE                     Controller,
-  EFI_HANDLE                     Handle
-  )
-/*++
+/**
+  Collect the resource from destroyed bios video device.
 
-Routine Description:
+  @param BiosVideoPrivate   Video child device private data structure
 
-  Deregister an video child handle and free resources
-
-Arguments:
-
-  This            - Protocol instance pointer.
-  Controller      - Video controller handle
-  Handle          - Video child handle
-
-Returns:
-
-  EFI_STATUS
-
---*/
-;
-
+**/
 VOID
 BiosVideoDeviceReleaseResource (
   BIOS_VIDEO_DEV  *BiosVideoChildPrivate
   )
-/*++
-Routing Description:
-
-  Release resources of a video child device before stopping it.
-
-Arguments:
-
-  BiosVideoChildPrivate  -  Video child device private data structure
-
-Returns:
-
-    NONE
-    
----*/
 ;
 
 //
 // BIOS Graphics Output Protocol functions
 //
+/**
+
+  Graphics Output protocol interface to get video mode
+
+
+  @param This            - Protocol instance pointer.
+  @param ModeNumber      - The mode number to return information on.
+  @param SizeOfInfo      - A pointer to the size, in bytes, of the Info buffer.
+  @param Info            - Caller allocated buffer that returns information about ModeNumber.
+
+  @return EFI_SUCCESS           - Mode information returned.
+          EFI_DEVICE_ERROR      - A hardware error occurred trying to retrieve the video mode.
+          EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
+          EFI_INVALID_PARAMETER - One of the input args was NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputQueryMode (
@@ -332,52 +275,52 @@ BiosVideoGraphicsOutputQueryMode (
   OUT UINTN                                 *SizeOfInfo,
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
   )
-/*++
-
-Routine Description:
-
-  Graphics Output protocol interface to get video mode
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    ModeNumber            - The mode number to return information on.
-    Info                  - Caller allocated buffer that returns information about ModeNumber.
-    SizeOfInfo            - A pointer to the size, in bytes, of the Info buffer.
-
-  Returns:
-    EFI_SUCCESS           - Mode information returned.
-    EFI_BUFFER_TOO_SMALL  - The Info buffer was too small.
-    EFI_DEVICE_ERROR      - A hardware error occurred trying to retrieve the video mode.
-    EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
-    EFI_INVALID_PARAMETER - One of the input args was NULL.
-
---*/
 ;
 
+/**
+
+  Graphics Output protocol interface to set video mode
+
+
+  @param This            - Protocol instance pointer.
+  @param ModeNumber      - The mode number to be set.
+
+  @return EFI_SUCCESS      - Graphics mode was changed.
+          EFI_DEVICE_ERROR - The device had an error and could not complete the request.
+          EFI_UNSUPPORTED  - ModeNumber is not supported by this device.
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputSetMode (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
   IN  UINT32                       ModeNumber
   )
-/*++
-
-Routine Description:
-
-  Graphics Output protocol interface to set video mode
-
-  Arguments:
-    This             - Protocol instance pointer.
-    ModeNumber       - The mode number to be set.
-
-  Returns:
-    EFI_SUCCESS      - Graphics mode was changed.
-    EFI_DEVICE_ERROR - The device had an error and could not complete the request.
-    EFI_UNSUPPORTED  - ModeNumber is not supported by this device.
-
---*/
 ;
 
+/**
+
+  Graphics Output protocol instance to block transfer for VBE device
+
+
+  @param This            - Pointer to Graphics Output protocol instance
+  @param BltBuffer       - The data to transfer to screen
+  @param BltOperation    - The operation to perform
+  @param SourceX         - The X coordinate of the source for BltOperation
+  @param SourceY         - The Y coordinate of the source for BltOperation
+  @param DestinationX    - The X coordinate of the destination for BltOperation
+  @param DestinationY    - The Y coordinate of the destination for BltOperation
+  @param Width           - The width of a rectangle in the blt rectangle in pixels
+  @param Height          - The height of a rectangle in the blt rectangle in pixels
+  @param Delta           - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
+                         If a Delta of 0 is used, the entire BltBuffer will be operated on.
+                         If a subrectangle of the BltBuffer is used, then Delta represents
+                         the number of bytes in a row of the BltBuffer.
+
+  @return EFI_INVALID_PARAMETER - Invalid parameter passed in
+          EFI_SUCCESS - Blt operation success
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVbeBlt (
@@ -392,36 +335,29 @@ BiosVideoGraphicsOutputVbeBlt (
   IN  UINTN                              Height,
   IN  UINTN                              Delta
   )
-/*++
-
-Routine Description:
-
-  Graphics Output protocol instance to block transfer for VBE device
-
-Arguments:
-
-  This          - Pointer to Graphics Output protocol instance
-  BltBuffer     - The data to transfer to screen
-  BltOperation  - The operation to perform
-  SourceX       - The X coordinate of the source for BltOperation
-  SourceY       - The Y coordinate of the source for BltOperation
-  DestinationX  - The X coordinate of the destination for BltOperation
-  DestinationY  - The Y coordinate of the destination for BltOperation
-  Width         - The width of a rectangle in the blt rectangle in pixels
-  Height        - The height of a rectangle in the blt rectangle in pixels
-  Delta         - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
-                  If a Delta of 0 is used, the entire BltBuffer will be operated on.
-                  If a subrectangle of the BltBuffer is used, then Delta represents
-                  the number of bytes in a row of the BltBuffer.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Invalid parameter passed in
-  EFI_SUCCESS - Blt operation success
-
---*/
 ;
 
+/**
+  Grahpics Output protocol instance to block transfer for VGA device
+
+  @param This            Pointer to Grahpics Output protocol instance
+  @param BltBuffer       The data to transfer to screen
+  @param BltOperation    The operation to perform
+  @param SourceX         The X coordinate of the source for BltOperation
+  @param SourceY         The Y coordinate of the source for BltOperation
+  @param DestinationX    The X coordinate of the destination for BltOperation
+  @param DestinationY    The Y coordinate of the destination for BltOperation
+  @param Width           The width of a rectangle in the blt rectangle in pixels
+  @param Height          The height of a rectangle in the blt rectangle in pixels
+  @param Delta           Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
+                         If a Delta of 0 is used, the entire BltBuffer will be operated on.
+                         If a subrectangle of the BltBuffer is used, then Delta represents
+                         the number of bytes in a row of the BltBuffer.
+
+  @retval EFI_INVALID_PARAMETER Invalid parameter passed in
+  @retval EFI_SUCCESS           Blt operation success
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVgaBlt (
@@ -436,65 +372,37 @@ BiosVideoGraphicsOutputVgaBlt (
   IN  UINTN                              Height,
   IN  UINTN                              Delta
   )
-/*++
-
-Routine Description:
-
-  Grahpics Output protocol instance to block transfer for VGA device
-
-Arguments:
-
-  This          - Pointer to Grahpics Output protocol instance
-  BltBuffer     - The data to transfer to screen
-  BltOperation  - The operation to perform
-  SourceX       - The X coordinate of the source for BltOperation
-  SourceY       - The Y coordinate of the source for BltOperation
-  DestinationX  - The X coordinate of the destination for BltOperation
-  DestinationY  - The Y coordinate of the destination for BltOperation
-  Width         - The width of a rectangle in the blt rectangle in pixels
-  Height        - The height of a rectangle in the blt rectangle in pixels
-  Delta         - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
-                  If a Delta of 0 is used, the entire BltBuffer will be operated on.
-                  If a subrectangle of the BltBuffer is used, then Delta represents
-                  the number of bytes in a row of the BltBuffer.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Invalid parameter passed in
-  EFI_SUCCESS - Blt operation success
-
---*/
 ;
 
 //
 // BIOS VGA Mini Port Protocol functions
 //
+/**
+  VgaMiniPort protocol interface to set mode
+
+  @param This             Pointer to VgaMiniPort protocol instance
+  @param ModeNumber       The index of the mode
+
+  @retval EFI_UNSUPPORTED The requested mode is not supported
+  @retval EFI_SUCCESS     The requested mode is set successfully
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoVgaMiniPortSetMode (
   IN  EFI_VGA_MINI_PORT_PROTOCOL  *This,
   IN  UINTN                       ModeNumber
   )
-/*++
-
-Routine Description:
-
-  VgaMiniPort protocol interface to set mode
-
-Arguments:
-
-  This        - Pointer to VgaMiniPort protocol instance
-  ModeNumber  - The index of the mode
-
-Returns:
-
-  EFI_UNSUPPORTED - The requested mode is not supported
-  EFI_SUCCESS - The requested mode is set successfully
-
---*/
 ;
 
+/**
+  Judge whether this device is VGA device.
 
+  @param PciIo      Parent PciIo protocol instance pointer
+
+  @retval TRUE  Is vga device
+  @retval FALSE Is no vga device
+**/
 BOOLEAN
 BiosVideoIsVga (
   IN  EFI_PCI_IO_PROTOCOL       *PciIo
@@ -543,16 +451,44 @@ BiosVideoIsVga (
 
 #define VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER         0x08
 
+/**
+  Initialize legacy environment for BIOS INI caller.
+  
+  @param ThunkContext   the instance pointer of THUNK_CONTEXT
+**/
 VOID
 InitializeBiosIntCaller (
-  IN  BIOS_VIDEO_DEV                 *BiosDev
+  THUNK_CONTEXT     *ThunkContext
   );
   
+/**
+   Initialize interrupt redirection code and entries, because
+   IDT Vectors 0x68-0x6f must be redirected to IDT Vectors 0x08-0x0f.
+   Or the interrupt will lost when we do thunk.
+   NOTE: We do not reset 8259 vector base, because it will cause pending
+   interrupt lost.
+   
+   @param Legacy8259  Instance pointer for EFI_LEGACY_8259_PROTOCOL.
+   
+**/  
 VOID
 InitializeInterruptRedirection (
-  IN  BIOS_VIDEO_DEV                 *BiosDev
+  IN  EFI_LEGACY_8259_PROTOCOL  *Legacy8259
   );
   
+/**
+  Thunk to 16-bit real mode and execute a software interrupt with a vector 
+  of BiosInt. Regs will contain the 16-bit register context on entry and 
+  exit.
+  
+  @param  This    Protocol instance pointer.
+  @param  BiosInt Processor interrupt vector to invoke
+  @param  Reg     Register contexted passed into (and returned) from thunk to 16-bit mode
+  
+  @retval TRUE   Thunk completed, and there were no BIOS errors in the target code.
+                 See Regs for status.
+  @retval FALSE  There was a BIOS erro in the target code.  
+**/  
 BOOLEAN
 EFIAPI
 LegacyBiosInt86 (

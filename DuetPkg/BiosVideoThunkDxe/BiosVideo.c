@@ -1,4 +1,6 @@
-/*++
+/** @file
+
+  BiosVideo driver produce EFI_GRAPHIC_OUTPUT_PROTOCOL via LegacyBios Video rom.
 
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -9,17 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  BiosVideo.c
-
-Abstract:
-
-  ConsoleOut Routines that speak VGA.
-
-Revision History
-
---*/
+**/
 
 #include "BiosVideo.h"
 
@@ -38,109 +30,35 @@ EFI_DRIVER_BINDING_PROTOCOL gBiosVideoDriverBinding = {
 //
 // Global lookup tables for VGA graphics modes
 //
-UINT8                       mVgaLeftMaskTable[]   = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01 };
+UINT8 mVgaLeftMaskTable[]   = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01 };
 
-UINT8                       mVgaRightMaskTable[]  = { 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff };
+UINT8 mVgaRightMaskTable[]  = { 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff };
 
-UINT8                       mVgaBitMaskTable[]    = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+UINT8 mVgaBitMaskTable[]    = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+
+EFI_LEGACY_8259_PROTOCOL   *mLegacy8259 = NULL;
+THUNK_CONTEXT              mThunkContext;
 
 EFI_GRAPHICS_OUTPUT_BLT_PIXEL  mVgaColorToGraphicsOutputColor[] = {
-  {
-    0x00,
-    0x00,
-    0x00,
-    0x00
-  },
-  {
-    0x98,
-    0x00,
-    0x00,
-    0x00
-  },
-  {
-    0x00,
-    0x98,
-    0x00,
-    0x00
-  },
-  {
-    0x98,
-    0x98,
-    0x00,
-    0x00
-  },
-  {
-    0x00,
-    0x00,
-    0x98,
-    0x00
-  },
-  {
-    0x98,
-    0x00,
-    0x98,
-    0x00
-  },
-  {
-    0x00,
-    0x98,
-    0x98,
-    0x00
-  },
-  {
-    0x98,
-    0x98,
-    0x98,
-    0x00
-  },
-  {
-    0x10,
-    0x10,
-    0x10,
-    0x00
-  },
-  {
-    0xff,
-    0x10,
-    0x10,
-    0x00
-  },
-  {
-    0x10,
-    0xff,
-    0x10,
-    0x00
-  },
-  {
-    0xff,
-    0xff,
-    0x10,
-    0x00
-  },
-  {
-    0x10,
-    0x10,
-    0xff,
-    0x00
-  },
-  {
-    0xf0,
-    0x10,
-    0xff,
-    0x00
-  },
-  {
-    0x10,
-    0xff,
-    0xff,
-    0x00
-  },
-  {
-    0xff,
-    0xff,
-    0xff,
-    0x00
-  }
+  //
+  // {B, G, R, reserved}
+  //  
+  {0x00, 0x00, 0x00, 0x00}, // BLACK
+  {0x98, 0x00, 0x00, 0x00}, // LIGHTBLUE
+  {0x00, 0x98, 0x00, 0x00}, // LIGHGREEN
+  {0x98, 0x98, 0x00, 0x00}, // LIGHCYAN
+  {0x00, 0x00, 0x98, 0x00}, // LIGHRED
+  {0x98, 0x00, 0x98, 0x00}, // MAGENTA
+  {0x00, 0x98, 0x98, 0x00}, // BROWN
+  {0x98, 0x98, 0x98, 0x00}, // LIGHTGRAY
+  {0x10, 0x10, 0x10, 0x00},
+  {0xff, 0x10, 0x10, 0x00}, // BLUE
+  {0x10, 0xff, 0x10, 0x00}, // LIME
+  {0xff, 0xff, 0x10, 0x00}, // CYAN
+  {0x10, 0x10, 0xff, 0x00}, // RED
+  {0xf0, 0x10, 0xff, 0x00}, // FUCHSIA
+  {0x10, 0xff, 0xff, 0x00}, // YELLOW
+  {0xff, 0xff, 0xff, 0x00}  // WHITE  
 };
 
 //
@@ -175,16 +93,43 @@ VESA_BIOS_EXTENSIONS_EDID_TIMING mEstablishedEdidTiming[] = {
   {1152, 870, 75}
 };
 
+/**
+  Install child hanlde for a detect BiosVideo device and install related protocol
+  into this handle, such as EFI_GRAPHIC_OUTPUT_PROTOCOL.
+
+  @param This                Instance pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param ParentHandle        Parent's controller handle
+  @param ParentPciIo         Parent's EFI_PCI_IO_PROTOCOL instance pointer
+  @param ParentLegacy8259    Parent's EFI_LEGACY_8259_PROTOCOL instance pointer 
+  @param ParentDevicePath    Parent's BIOS Video controller device path
+  @param RemainingDevicePath Remaining device path node instance for children.
+
+  @return whether success to create children handle for a VGA device and install 
+          related protocol into new children handle.
+
+**/
 EFI_STATUS
 BiosVideoChildHandleInstall (
   IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN  EFI_HANDLE                     ParentHandle,
   IN  EFI_PCI_IO_PROTOCOL            *ParentPciIo,
   IN  EFI_LEGACY_8259_PROTOCOL       *ParentLegacy8259,
+  IN  THUNK_CONTEXT                  *ThunkContext,
   IN  EFI_DEVICE_PATH_PROTOCOL       *ParentDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 ;
+
+/**
+  Deregister an video child handle and free resources
+
+  @param This            Protocol instance pointer.
+  @param Controller      Video controller handle
+  @param Handle          Video child handle
+
+  @return EFI_STATUS
+
+**/
 
 EFI_STATUS
 BiosVideoChildHandleUninstall (
@@ -194,34 +139,32 @@ BiosVideoChildHandleUninstall (
   )
 ;
 
+/**
+  Collect the resource from destroyed bios video device.
+
+  @param BiosVideoPrivate   Video child device private data structure
+**/
+
 VOID
 BiosVideoDeviceReleaseResource (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
 ;
 
+/**
+  Driver Entry Point.
+
+  @param ImageHandle      Handle of driver image.
+  @param SystemTable      Pointer to system table.
+
+  @return EFI_STATUS
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoDriverEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-
-  Routine Description:
-
-    Driver Entry Point.
-
-  Arguments:
-
-  ImageHandle - Handle of driver image.
-  SystemTable - Pointer to system table.
-
-  Returns:
-
-    EFI_STATUS
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -237,52 +180,17 @@ BiosVideoDriverEntryPoint (
   return Status;
 }
 
-VOID
-EFIAPI
-BiosVideoExitBootServices (
-  EFI_EVENT  Event,
-  VOID       *Context
-  )
-/*++
+/**
+  Test to see if Bios Video could be supported on the Controller.
 
-Routine Description:
+  @param This                  Pointer to driver binding protocol
+  @param Controller            Controller handle to connect
+  @param RemainingDevicePath   A pointer to the remaining portion of a device path
 
-  Callback function for exit boot service event
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
 
-Arguments:
-
-  Event   - EFI_EVENT structure
-  Context - Event context
-
-Returns:
-
-  None
-
---*/
-{
-/*
-  BIOS_VIDEO_DEV        *BiosVideoPrivate;
-  EFI_IA32_REGISTER_SET Regs;
-
-  //
-  // Get our context
-  //
-  BiosVideoPrivate = (BIOS_VIDEO_DEV *) Context;
-
-  //
-  // Set the 80x25 Text VGA Mode
-  //
-  Regs.H.AH = 0x00;
-  Regs.H.AL = 0x83;
-  BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
-
-  Regs.H.AH = 0x11;
-  Regs.H.AL = 0x14;
-  Regs.H.BL = 0;
-  BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
-*/
-}
-
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoDriverBindingSupported (
@@ -290,25 +198,6 @@ BiosVideoDriverBindingSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-
-    Supported.
-
-  Arguments:
-
-  This - Pointer to driver binding protocol
-  Controller - Controller handle to connect
-  RemainingDevicePath - A pointer to the remaining portion of a device path
-
-
-  Returns:
-
-  EFI_STATUS - EFI_SUCCESS:This controller can be managed by this driver,
-               Otherwise, this controller cannot be managed by this driver
-
---*/
 {
   EFI_STATUS                Status;
   EFI_LEGACY_8259_PROTOCOL  *LegacyBios;
@@ -351,6 +240,16 @@ BiosVideoDriverBindingSupported (
   return Status;
 }
 
+/**
+  Install Graphics Output Protocol onto VGA device handles
+
+  @param This                   Pointer to driver binding protocol
+  @param Controller             Controller handle to connect
+  @param RemainingDevicePath    A pointer to the remaining portion of a device path
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoDriverBindingStart (
@@ -358,28 +257,10 @@ BiosVideoDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-
-    Install Graphics Output Protocol onto VGA device handles
-
-  Arguments:
-
-  This - Pointer to driver binding protocol
-  Controller - Controller handle to connect
-  RemainingDevicePath - A pointer to the remaining portion of a device path
-
-  Returns:
-
-    EFI_STATUS
-
---*/
 {
   EFI_STATUS                      Status;
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
   EFI_PCI_IO_PROTOCOL             *PciIo;
-  EFI_LEGACY_8259_PROTOCOL        *Legacy8259;
 
   PciIo = NULL;
   //
@@ -410,13 +291,17 @@ BiosVideoDriverBindingStart (
   }
 
   //
-  // See if the Legacy BIOS Protocol is available
+  // Establish legacy environment for thunk call for all children handle.
   //
-  Status = gBS->LocateProtocol (&gEfiLegacy8259ProtocolGuid, NULL, (VOID **) &Legacy8259);
-  if (EFI_ERROR (Status)) {
-    goto Done;
+  if (mLegacy8259 == NULL) {
+    Status = gBS->LocateProtocol (&gEfiLegacy8259ProtocolGuid, NULL, (VOID **) &mLegacy8259);
+    if (EFI_ERROR (Status)) {
+        goto Done;
+    }
+    
+    InitializeBiosIntCaller(&mThunkContext);
+    InitializeInterruptRedirection(mLegacy8259);
   }
-
 
   //
   // Create child handle and install GraphicsOutputProtocol on it
@@ -425,7 +310,8 @@ BiosVideoDriverBindingStart (
              This,
              Controller,
              PciIo,
-             Legacy8259,
+             mLegacy8259,
+             &mThunkContext,
              ParentDevicePath,
              RemainingDevicePath
              );
@@ -448,6 +334,19 @@ Done:
   return Status;
 }
 
+/**
+  Stop this driver on Controller 
+
+  @param  This              Protocol instance pointer.
+  @param  Controller        Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed Controller.
+  @retval other             This driver was not removed from this device.
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoDriverBindingStop (
@@ -456,32 +355,10 @@ BiosVideoDriverBindingStop (
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
   )
-/*++
-
-  Routine Description:
-
-    Stop.
-
-  Arguments:
-
-  This - Pointer to driver binding protocol
-  Controller - Controller handle to connect
-  NumberOfChilren - Number of children handle created by this driver
-  ChildHandleBuffer - Buffer containing child handle created
-
-  Returns:
-
-  EFI_SUCCESS - Driver disconnected successfully from controller
-  EFI_UNSUPPORTED - Cannot find BIOS_VIDEO_DEV structure
-
---*/
 {
   EFI_STATUS                   Status;
-  BIOS_VIDEO_DEV               *BiosVideoPrivate;
   BOOLEAN                      AllChildrenStopped;
   UINTN                        Index;
-
-  BiosVideoPrivate = NULL;
 
   if (NumberOfChildren == 0) {
     //
@@ -513,32 +390,31 @@ BiosVideoDriverBindingStop (
   return EFI_SUCCESS;
 }
 
+/**
+  Install child hanlde for a detect BiosVideo device and install related protocol
+  into this handle, such as EFI_GRAPHIC_OUTPUT_PROTOCOL.
+
+  @param This                Instance pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param ParentHandle        Parent's controller handle
+  @param ParentPciIo         Parent's EFI_PCI_IO_PROTOCOL instance pointer
+  @param ParentLegacy8259    Parent's EFI_LEGACY_8259_PROTOCOL instance pointer 
+  @param ParentDevicePath    Parent's BIOS Video controller device path
+  @param RemainingDevicePath Remaining device path node instance for children.
+
+  @return whether success to create children handle for a VGA device and install 
+          related protocol into new children handle.
+
+**/
 EFI_STATUS
 BiosVideoChildHandleInstall (
   IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN  EFI_HANDLE                     ParentHandle,
   IN  EFI_PCI_IO_PROTOCOL            *ParentPciIo,
   IN  EFI_LEGACY_8259_PROTOCOL       *ParentLegacy8259,
+  IN  THUNK_CONTEXT                  *ParentThunkContext,
   IN  EFI_DEVICE_PATH_PROTOCOL       *ParentDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-  Install child handles if the Handle supports MBR format.
-
-Arguments:       
-  This       - Calling context.
-  Handle     - Parent Handle 
-  PciIo      - Parent PciIo interface
-  LegacyBios  - Parent LegacyBios interface
-  DevicePath - Parent Device Path
-
-Returns:
-  EFI_SUCCESS - If a child handle was added
-  other       - A child handle was not added
-
---*/
 {
   EFI_STATUS               Status;
   BIOS_VIDEO_DEV           *BiosVideoPrivate;
@@ -569,21 +445,8 @@ Returns:
   // Initialize the child private structure
   //
   BiosVideoPrivate->Signature = BIOS_VIDEO_DEV_SIGNATURE;
-  BiosVideoPrivate->Handle = NULL;
+  BiosVideoPrivate->Handle    = NULL;
 
-  /**
-  Status = gBS->CreateEvent (
-                  EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
-                  EFI_TPL_NOTIFY,
-                  BiosVideoExitBootServices,
-                  BiosVideoPrivate,
-                  &BiosVideoPrivate->ExitBootServicesEvent
-                  );
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-  **/
-  
   //
   // Fill in Graphics Output specific mode structures
   //
@@ -612,15 +475,13 @@ Returns:
   //
   // Child handle need to consume the Legacy Bios protocol
   //
-  BiosVideoPrivate->Legacy8259 = ParentLegacy8259;
-
+  BiosVideoPrivate->Legacy8259   = ParentLegacy8259;
+  BiosVideoPrivate->ThunkContext = ParentThunkContext;
+  
   //
   // When check for VBE, PCI I/O protocol is needed, so use parent's protocol interface temporally
   //
   BiosVideoPrivate->PciIo = ParentPciIo;
-
-  InitializeBiosIntCaller(BiosVideoPrivate);
-  InitializeInterruptRedirection(BiosVideoPrivate);
 
   //
   // Check for VESA BIOS Extensions for modes that are compatible with Graphics Output
@@ -652,9 +513,9 @@ Returns:
   if (BiosVideoPrivate->ProduceGraphicsOutput) {
     if (RemainingDevicePath == NULL) {
       ZeroMem (&AcpiDeviceNode, sizeof (ACPI_ADR_DEVICE_PATH));
-      AcpiDeviceNode.Header.Type = ACPI_DEVICE_PATH;
+      AcpiDeviceNode.Header.Type    = ACPI_DEVICE_PATH;
       AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
-      AcpiDeviceNode.ADR = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
+      AcpiDeviceNode.ADR            = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
       SetDevicePathNodeLength (&AcpiDeviceNode.Header, sizeof (ACPI_ADR_DEVICE_PATH));
 
       BiosVideoPrivate->DevicePath = AppendDevicePathNode (
@@ -720,29 +581,22 @@ Done:
   return Status;
 }
 
+/**
+  Deregister an video child handle and free resources
+
+  @param This            Protocol instance pointer.
+  @param Controller      Video controller handle
+  @param Handle          Video child handle
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 BiosVideoChildHandleUninstall (
   EFI_DRIVER_BINDING_PROTOCOL    *This,
   EFI_HANDLE                     Controller,
   EFI_HANDLE                     Handle
   )
-/*++
-
-Routine Description:
-
-  Deregister an video child handle and free resources
-
-Arguments:
-
-  This            - Protocol instance pointer.
-  Controller      - Video controller handle
-  Handle          - Video child handle
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   EFI_STATUS                   Status;
   EFI_IA32_REGISTER_SET        Regs;
@@ -853,24 +707,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Collect the resource from destroyed bios video device.
+
+  @param BiosVideoPrivate   Video child device private data structure
+
+**/
 VOID
 BiosVideoDeviceReleaseResource (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
-/*++
-Routing Description:
-
-  Release resources of an video child device before stopping it.
-
-Arguments:
-
-  BiosVideoPrivate  -  Video child device private data structure
-
-Returns:
-
-    NONE
-    
----*/
 {
   if (BiosVideoPrivate == NULL) {
     return ;
@@ -940,37 +786,26 @@ Returns:
     gBS->FreePool (BiosVideoPrivate->DevicePath);
   }
 
-  //
-  // Close the ExitBootServices event
-  //
-  if (BiosVideoPrivate->ExitBootServicesEvent != NULL) {
-    gBS->CloseEvent (BiosVideoPrivate->ExitBootServicesEvent);
-  }
-
   gBS->FreePool (BiosVideoPrivate);
 
   return ;
 }
 
+/**
+
+  Generate a search key for a specified timing data.
+
+
+  @param EdidTiming      - Pointer to EDID timing
+
+  @return The 32 bit unique key for search.
+
+**/
 STATIC
 UINT32
 CalculateEdidKey (
   VESA_BIOS_EXTENSIONS_EDID_TIMING       *EdidTiming
   )
-/*++
-
-  Routine Description:
-
-  Generate a search key for a specified timing data.
-
-  Arguments:
-
-  EdidTiming       - Pointer to EDID timing
-
-  Returns:
-  The 32 bit unique key for search.
-
---*/
 {
   UINT32 Key;
 
@@ -981,28 +816,24 @@ CalculateEdidKey (
   return Key;
 }
 
+/**
+
+  Parse the Established Timing and Standard Timing in EDID data block.
+
+
+  @param EdidBuffer      - Pointer to EDID data block
+  @param ValidEdidTiming - Valid EDID timing information
+
+  @return TRUE              - The EDID data is valid.
+          FALSE             - The EDID data is invalid.
+
+**/
 STATIC
 BOOLEAN
 ParseEdidData (
   UINT8                                      *EdidBuffer,
   VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING *ValidEdidTiming
   )
-/*++
-
-  Routine Description:
-
-  Parse the Established Timing and Standard Timing in EDID data block.
-
-  Arguments:
-
-  EdidBuffer       - Pointer to EDID data block
-  ValidEdidTiming  - Valid EDID timing information
-
-  Returns:
-  TRUE              - The EDID data is valid.
-  FALSE             - The EDID data is invalid.
-
---*/
 {
   UINT8  CheckSum;
   UINT32 Index;
@@ -1093,29 +924,24 @@ ParseEdidData (
   return TRUE;
 }
 
+/**
+
+  Search a specified Timing in all the valid EDID timings.
+
+
+  @param ValidEdidTiming - All valid EDID timing information.
+  @param EdidTiming      - The Timing to search for.
+
+  @return TRUE  - Found.
+          FALSE - Not found.
+
+**/
 STATIC
 BOOLEAN
 SearchEdidTiming (
   VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING *ValidEdidTiming,
   VESA_BIOS_EXTENSIONS_EDID_TIMING       *EdidTiming
   )
-/*++
-
-  Routine Description:
-
-  Search a specified Timing in all the valid EDID timings.
-
-  Arguments:
-
-  ValidEdidTiming  - All valid EDID timing information.
-  EdidTiming       - The Timing to search for.
-
-  Returns:
-
-  TRUE  - Found.
-  FALSE - Not found.
-
---*/
 {
   UINT32 Index;
   UINT32 Key;
@@ -1134,6 +960,14 @@ SearchEdidTiming (
 #define PCI_DEVICE_ENABLED  (EFI_PCI_COMMAND_IO_SPACE | EFI_PCI_COMMAND_MEMORY_SPACE)
 
 
+/**
+  Judge whether this device is VGA device.
+
+  @param PciIo      Parent PciIo protocol instance pointer
+
+  @retval TRUE  Is vga device
+  @retval FALSE Is no vga device
+**/
 BOOLEAN
 BiosVideoIsVga (
   IN  EFI_PCI_IO_PROTOCOL       *PciIo
@@ -1182,26 +1016,19 @@ BiosVideoIsVga (
 }
 
 
+/**
+  Check for VBE device
+
+  @param BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
+
+  @retval EFI_SUCCESS VBE device found
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoCheckForVbe (
   IN OUT BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
-/*++
-
-  Routine Description:
-
-  Check for VBE device
-
-  Arguments:
-
-  BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
-
-  Returns:
-
-  EFI_SUCCESS - VBE device found
-
---*/
 {
   EFI_STATUS                             Status;
   EFI_IA32_REGISTER_SET                  Regs;
@@ -1617,26 +1444,18 @@ Done:
   return Status;
 }
 
+/**
+  Check for VGA device
+
+  @param BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
+
+  @retval EFI_SUCCESS  Standard VGA device found
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoCheckForVga (
   IN OUT BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
-/*++
-
-  Routine Description:
-
-    Check for VGA device
-
-  Arguments:
-
-    BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
-
-  Returns:
-
-    EFI_SUCCESS - Standard VGA device found
-
---*/
 {
   EFI_STATUS            Status;
   BIOS_VIDEO_MODE_DATA  *ModeBuffer;
@@ -1719,6 +1538,22 @@ Done:
 //
 // Graphics Output Protocol Member Functions for VESA BIOS Extensions
 //
+/**
+
+  Graphics Output protocol interface to get video mode
+
+
+  @param This            - Protocol instance pointer.
+  @param ModeNumber      - The mode number to return information on.
+  @param SizeOfInfo      - A pointer to the size, in bytes, of the Info buffer.
+  @param Info            - Caller allocated buffer that returns information about ModeNumber.
+
+  @return EFI_SUCCESS           - Mode information returned.
+          EFI_DEVICE_ERROR      - A hardware error occurred trying to retrieve the video mode.
+          EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
+          EFI_INVALID_PARAMETER - One of the input args was NULL.
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputQueryMode (
@@ -1727,25 +1562,6 @@ BiosVideoGraphicsOutputQueryMode (
   OUT UINTN                                 *SizeOfInfo,
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
   )
-/*++
-
-Routine Description:
-
-  Graphics Output protocol interface to get video mode
-
-  Arguments:
-    This                  - Protocol instance pointer.
-    ModeNumber            - The mode number to return information on.
-    Info                  - Caller allocated buffer that returns information about ModeNumber.
-    SizeOfInfo            - A pointer to the size, in bytes, of the Info buffer.
-
-  Returns:
-    EFI_SUCCESS           - Mode information returned.
-    EFI_DEVICE_ERROR      - A hardware error occurred trying to retrieve the video mode.
-    EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
-    EFI_INVALID_PARAMETER - One of the input args was NULL.
-
---*/
 {
   BIOS_VIDEO_DEV        *BiosVideoPrivate;
   EFI_STATUS            Status;
@@ -1784,28 +1600,25 @@ Routine Description:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Graphics Output protocol interface to set video mode
+
+
+  @param This            - Protocol instance pointer.
+  @param ModeNumber      - The mode number to be set.
+
+  @return EFI_SUCCESS      - Graphics mode was changed.
+          EFI_DEVICE_ERROR - The device had an error and could not complete the request.
+          EFI_UNSUPPORTED  - ModeNumber is not supported by this device.
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputSetMode (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
   IN  UINT32                       ModeNumber
   )
-/*++
-
-Routine Description:
-
-  Graphics Output protocol interface to set video mode
-
-  Arguments:
-    This             - Protocol instance pointer.
-    ModeNumber       - The mode number to be set.
-
-  Returns:
-    EFI_SUCCESS      - Graphics mode was changed.
-    EFI_DEVICE_ERROR - The device had an error and could not complete the request.
-    EFI_UNSUPPORTED  - ModeNumber is not supported by this device.
-
---*/
 {
   EFI_STATUS              Status;
   BIOS_VIDEO_DEV          *BiosVideoPrivate;
@@ -1938,6 +1751,23 @@ Routine Description:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Update physical frame buffer, copy 4 bytes block, then copy remaining bytes.
+
+
+  @param PciIo           - The pointer of EFI_PCI_IO_PROTOCOL
+  @param VbeBuffer       - The data to transfer to screen
+  @param MemAddress      - Physical frame buffer base address
+  @param DestinationX    - The X coordinate of the destination for BltOperation
+  @param DestinationY    - The Y coordinate of the destination for BltOperation
+  @param TotalBytes      - The total bytes of copy
+  @param VbePixelWidth   - Bytes per pixel
+  @param BytesPerScanLine - Bytes per scan line
+
+  @return None.
+
+**/
 VOID
 CopyVideoBuffer (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
@@ -1949,28 +1779,6 @@ CopyVideoBuffer (
   IN  UINT32                VbePixelWidth,
   IN  UINTN                 BytesPerScanLine
   )
-/*++
-
-Routine Description:
-
-  Update physical frame buffer, copy 4 bytes block, then copy remaining bytes.
-
-Arguments:
-
-  PciIo             - The pointer of EFI_PCI_IO_PROTOCOL
-  VbeBuffer         - The data to transfer to screen
-  MemAddress        - Physical frame buffer base address
-  DestinationX      - The X coordinate of the destination for BltOperation
-  DestinationY      - The Y coordinate of the destination for BltOperation
-  TotalBytes        - The total bytes of copy
-  VbePixelWidth     - Bytes per pixel
-  BytesPerScanLine  - Bytes per scan line
-
-Returns:
-
-  None.
-
---*/
 {
   UINTN                 FrameBufferAddr;
   UINTN                 CopyBlockNum;
@@ -2054,6 +1862,29 @@ Returns:
 //
 // BUGBUG : Add Blt for 16 bit color, 15 bit color, and 8 bit color modes
 //
+/**
+
+  Graphics Output protocol instance to block transfer for VBE device
+
+
+  @param This            - Pointer to Graphics Output protocol instance
+  @param BltBuffer       - The data to transfer to screen
+  @param BltOperation    - The operation to perform
+  @param SourceX         - The X coordinate of the source for BltOperation
+  @param SourceY         - The Y coordinate of the source for BltOperation
+  @param DestinationX    - The X coordinate of the destination for BltOperation
+  @param DestinationY    - The Y coordinate of the destination for BltOperation
+  @param Width           - The width of a rectangle in the blt rectangle in pixels
+  @param Height          - The height of a rectangle in the blt rectangle in pixels
+  @param Delta           - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
+                         If a Delta of 0 is used, the entire BltBuffer will be operated on.
+                         If a subrectangle of the BltBuffer is used, then Delta represents
+                         the number of bytes in a row of the BltBuffer.
+
+  @return EFI_INVALID_PARAMETER - Invalid parameter passed in
+          EFI_SUCCESS - Blt operation success
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVbeBlt (
@@ -2068,34 +1899,6 @@ BiosVideoGraphicsOutputVbeBlt (
   IN  UINTN                              Height,
   IN  UINTN                              Delta
   )
-/*++
-
-Routine Description:
-
-  Graphics Output protocol instance to block transfer for VBE device
-
-Arguments:
-
-  This          - Pointer to Graphics Output protocol instance
-  BltBuffer     - The data to transfer to screen
-  BltOperation  - The operation to perform
-  SourceX       - The X coordinate of the source for BltOperation
-  SourceY       - The Y coordinate of the source for BltOperation
-  DestinationX  - The X coordinate of the destination for BltOperation
-  DestinationY  - The Y coordinate of the destination for BltOperation
-  Width         - The width of a rectangle in the blt rectangle in pixels
-  Height        - The height of a rectangle in the blt rectangle in pixels
-  Delta         - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
-                  If a Delta of 0 is used, the entire BltBuffer will be operated on.
-                  If a subrectangle of the BltBuffer is used, then Delta represents
-                  the number of bytes in a row of the BltBuffer.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Invalid parameter passed in
-  EFI_SUCCESS - Blt operation success
-
---*/
 {
   BIOS_VIDEO_DEV                 *BiosVideoPrivate;
   BIOS_VIDEO_MODE_DATA           *Mode;
@@ -2324,6 +2127,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Write graphics controller registers
+
+
+  @param PciIo           - Pointer to PciIo protocol instance of the controller
+  @param Address         - Register address
+  @param Data            - Data to be written to register
+
+  @return None
+
+**/
 STATIC
 VOID
 WriteGraphicsController (
@@ -2331,23 +2146,6 @@ WriteGraphicsController (
   IN  UINTN                Address,
   IN  UINTN                Data
   )
-/*++
-
-Routine Description:
-
-  Write graphics controller registers
-
-Arguments:
-
-  PciIo   - Pointer to PciIo protocol instance of the controller
-  Address - Register address
-  Data    - Data to be written to register
-
-Returns:
-
-  None
-
---*/
 {
   Address = Address | (Data << 8);
   PciIo->Io.Write (
@@ -2360,6 +2158,20 @@ Returns:
               );
 }
 
+/**
+
+  Read the four bit plane of VGA frame buffer
+
+
+  @param PciIo           - Pointer to PciIo protocol instance of the controller
+  @param HardwareBuffer  - Hardware VGA frame buffer address
+  @param MemoryBuffer    - Memory buffer address
+  @param WidthInBytes    - Number of bytes in a line to read
+  @param Height          - Height of the area to read
+
+  @return None
+
+**/
 VOID
 VgaReadBitPlanes (
   EFI_PCI_IO_PROTOCOL  *PciIo,
@@ -2368,25 +2180,6 @@ VgaReadBitPlanes (
   UINTN                WidthInBytes,
   UINTN                Height
   )
-/*++
-
-Routine Description:
-
-  Read the four bit plane of VGA frame buffer
-
-Arguments:
-
-  PciIo           - Pointer to PciIo protocol instance of the controller
-  HardwareBuffer  - Hardware VGA frame buffer address
-  MemoryBuffer    - Memory buffer address
-  WidthInBytes    - Number of bytes in a line to read
-  Height          - Height of the area to read
-
-Returns:
-
-  None
-
---*/
 {
   UINTN BitPlane;
   UINTN Rows;
@@ -2432,6 +2225,19 @@ Returns:
   }
 }
 
+/**
+
+  Internal routine to convert VGA color to Grahpics Output color
+
+
+  @param MemoryBuffer    - Buffer containing VGA color
+  @param X               - The X coordinate of pixel on screen
+  @param Y               - The Y coordinate of pixel on screen
+  @param BltBuffer       - Buffer to contain converted Grahpics Output color
+
+  @return None
+
+**/
 VOID
 VgaConvertToGraphicsOutputColor (
   UINT8                          *MemoryBuffer,
@@ -2439,24 +2245,6 @@ VgaConvertToGraphicsOutputColor (
   UINTN                          Y,
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer
   )
-/*++
-
-Routine Description:
-
-  Internal routine to convert VGA color to Grahpics Output color
-
-Arguments:
-
-  MemoryBuffer  - Buffer containing VGA color
-  X             - The X coordinate of pixel on screen
-  Y             - The Y coordinate of pixel on screen
-  BltBuffer     - Buffer to contain converted Grahpics Output color
-
-Returns:
-
-  None
-
---*/
 {
   UINTN Mask;
   UINTN Bit;
@@ -2473,25 +2261,20 @@ Returns:
   *BltBuffer = mVgaColorToGraphicsOutputColor[Color];
 }
 
+/**
+
+  Internal routine to convert Grahpics Output color to VGA color
+
+
+  @param BltBuffer       - buffer containing Grahpics Output color
+
+  @return Converted VGA color
+
+**/
 UINT8
 VgaConvertColor (
   IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL          *BltBuffer
   )
-/*++
-
-Routine Description:
-
-  Internal routine to convert Grahpics Output color to VGA color
-
-Arguments:
-
-  BltBuffer - buffer containing Grahpics Output color
-
-Returns:
-
-  Converted VGA color
-
---*/
 {
   UINT8 Color;
 
@@ -2503,6 +2286,27 @@ Returns:
   return Color;
 }
 
+/**
+  Grahpics Output protocol instance to block transfer for VGA device
+
+  @param This            Pointer to Grahpics Output protocol instance
+  @param BltBuffer       The data to transfer to screen
+  @param BltOperation    The operation to perform
+  @param SourceX         The X coordinate of the source for BltOperation
+  @param SourceY         The Y coordinate of the source for BltOperation
+  @param DestinationX    The X coordinate of the destination for BltOperation
+  @param DestinationY    The Y coordinate of the destination for BltOperation
+  @param Width           The width of a rectangle in the blt rectangle in pixels
+  @param Height          The height of a rectangle in the blt rectangle in pixels
+  @param Delta           Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
+                         If a Delta of 0 is used, the entire BltBuffer will be operated on.
+                         If a subrectangle of the BltBuffer is used, then Delta represents
+                         the number of bytes in a row of the BltBuffer.
+
+  @retval EFI_INVALID_PARAMETER Invalid parameter passed in
+  @retval EFI_SUCCESS           Blt operation success
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVgaBlt (
@@ -2517,34 +2321,6 @@ BiosVideoGraphicsOutputVgaBlt (
   IN  UINTN                              Height,
   IN  UINTN                              Delta
   )
-/*++
-
-Routine Description:
-
-  Grahpics Output protocol instance to block transfer for VGA device
-
-Arguments:
-
-  This          - Pointer to Grahpics Output protocol instance
-  BltBuffer     - The data to transfer to screen
-  BltOperation  - The operation to perform
-  SourceX       - The X coordinate of the source for BltOperation
-  SourceY       - The Y coordinate of the source for BltOperation
-  DestinationX  - The X coordinate of the destination for BltOperation
-  DestinationY  - The Y coordinate of the destination for BltOperation
-  Width         - The width of a rectangle in the blt rectangle in pixels
-  Height        - The height of a rectangle in the blt rectangle in pixels
-  Delta         - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
-                  If a Delta of 0 is used, the entire BltBuffer will be operated on.
-                  If a subrectangle of the BltBuffer is used, then Delta represents
-                  the number of bytes in a row of the BltBuffer.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - Invalid parameter passed in
-  EFI_SUCCESS - Blt operation success
-
---*/
 {
   BIOS_VIDEO_DEV      *BiosVideoPrivate;
   EFI_TPL             OriginalTPL;
@@ -2930,29 +2706,22 @@ Returns:
 //
 // VGA Mini Port Protocol Functions
 //
+/**
+  VgaMiniPort protocol interface to set mode
+
+  @param This             Pointer to VgaMiniPort protocol instance
+  @param ModeNumber       The index of the mode
+
+  @retval EFI_UNSUPPORTED The requested mode is not supported
+  @retval EFI_SUCCESS     The requested mode is set successfully
+
+**/
 EFI_STATUS
 EFIAPI
 BiosVideoVgaMiniPortSetMode (
   IN  EFI_VGA_MINI_PORT_PROTOCOL  *This,
   IN  UINTN                       ModeNumber
   )
-/*++
-
-Routine Description:
-
-  VgaMiniPort protocol interface to set mode
-
-Arguments:
-
-  This        - Pointer to VgaMiniPort protocol instance
-  ModeNumber  - The index of the mode
-
-Returns:
-
-  EFI_UNSUPPORTED - The requested mode is not supported
-  EFI_SUCCESS - The requested mode is set successfully
-
---*/
 {
   BIOS_VIDEO_DEV        *BiosVideoPrivate;
   EFI_IA32_REGISTER_SET Regs;
