@@ -1,13 +1,29 @@
+/** @file
+  Provide legacy thunk interface for accessing Bios Video Rom.
+  
+Copyright (c) 2006 - 2007, Intel Corporation                                                         
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 #include "BiosVideo.h"
 
 #define EFI_CPU_EFLAGS_IF 0x200
 
-THUNK_CONTEXT               mThunkContext;
-
+/**
+  Initialize legacy environment for BIOS INI caller.
+  
+  @param ThunkContext   the instance pointer of THUNK_CONTEXT
+**/
 VOID
 InitializeBiosIntCaller (
-  IN  BIOS_VIDEO_DEV                 *BiosDev
+  THUNK_CONTEXT     *ThunkContext
   )
 {
   EFI_STATUS            Status;
@@ -29,32 +45,27 @@ InitializeBiosIntCaller (
                   );
   ASSERT_EFI_ERROR (Status);
   
-  mThunkContext.RealModeBuffer     = (VOID*)(UINTN)LegacyRegionBase;
-  mThunkContext.RealModeBufferSize = EFI_PAGES_TO_SIZE (RealModeBufferSize);
-  mThunkContext.ThunkAttributes    = 3;
-  AsmPrepareThunk16(&mThunkContext);
+  ThunkContext->RealModeBuffer     = (VOID*)(UINTN)LegacyRegionBase;
+  ThunkContext->RealModeBufferSize = EFI_PAGES_TO_SIZE (RealModeBufferSize);
+  ThunkContext->ThunkAttributes    = 3;
+  AsmPrepareThunk16(ThunkContext);
   
 }
 
+/**
+   Initialize interrupt redirection code and entries, because
+   IDT Vectors 0x68-0x6f must be redirected to IDT Vectors 0x08-0x0f.
+   Or the interrupt will lost when we do thunk.
+   NOTE: We do not reset 8259 vector base, because it will cause pending
+   interrupt lost.
+   
+   @param Legacy8259  Instance pointer for EFI_LEGACY_8259_PROTOCOL.
+   
+**/
 VOID
 InitializeInterruptRedirection (
-  IN  BIOS_VIDEO_DEV                 *BiosDev
+  IN  EFI_LEGACY_8259_PROTOCOL  *Legacy8259
   )
-/*++
-
-  Routine Description:
-    Initialize interrupt redirection code and entries, because
-    IDT Vectors 0x68-0x6f must be redirected to IDT Vectors 0x08-0x0f.
-    Or the interrupt will lost when we do thunk.
-    NOTE: We do not reset 8259 vector base, because it will cause pending
-    interrupt lost.
-
-  Arguments:
-    NONE
-
-  Returns:
-    NONE
---*/
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  LegacyRegionBase;
@@ -94,7 +105,7 @@ InitializeInterruptRedirection (
   //
   // Get VectorBase, it should be 0x68
   //
-  Status = BiosDev->Legacy8259->GetVector (BiosDev->Legacy8259, Efi8259Irq0, &ProtectedModeBaseVector);
+  Status = Legacy8259->GetVector (Legacy8259, Efi8259Irq0, &ProtectedModeBaseVector);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -108,6 +119,19 @@ InitializeInterruptRedirection (
   return ;
 }
 
+/**
+  Thunk to 16-bit real mode and execute a software interrupt with a vector 
+  of BiosInt. Regs will contain the 16-bit register context on entry and 
+  exit.
+  
+  @param  This    Protocol instance pointer.
+  @param  BiosInt Processor interrupt vector to invoke
+  @param  Reg     Register contexted passed into (and returned) from thunk to 16-bit mode
+  
+  @retval TRUE   Thunk completed, and there were no BIOS errors in the target code.
+                 See Regs for status.
+  @retval FALSE  There was a BIOS erro in the target code.  
+**/
 BOOLEAN
 EFIAPI
 LegacyBiosInt86 (
@@ -115,25 +139,6 @@ LegacyBiosInt86 (
   IN  UINT8                           BiosInt,
   IN  EFI_IA32_REGISTER_SET           *Regs
   )
-/*++
-
-  Routine Description:
-    Thunk to 16-bit real mode and execute a software interrupt with a vector 
-    of BiosInt. Regs will contain the 16-bit register context on entry and 
-    exit.
-
-  Arguments:
-    This    - Protocol instance pointer.
-    BiosInt - Processor interrupt vector to invoke
-    Reg     - Register contexted passed into (and returned) from thunk to 
-              16-bit mode
-
-  Returns:
-    FALSE   - Thunk completed, and there were no BIOS errors in the target code.
-              See Regs for status.
-    TRUE    - There was a BIOS erro in the target code.
-
---*/
 {
   UINTN                 Status;
   UINTN                 Eflags;
@@ -178,7 +183,7 @@ LegacyBiosInt86 (
   Status = BiosDev->Legacy8259->SetMode (BiosDev->Legacy8259, Efi8259LegacyMode, NULL, NULL);
   ASSERT_EFI_ERROR (Status);
   
-  Stack16 = (UINT16 *)((UINT8 *) mThunkContext.RealModeBuffer + mThunkContext.RealModeBufferSize - sizeof (UINT16));
+  Stack16 = (UINT16 *)((UINT8 *) BiosDev->ThunkContext->RealModeBuffer + BiosDev->ThunkContext->RealModeBufferSize - sizeof (UINT16));
   Stack16 -= sizeof (ThunkRegSet.E.EFLAGS) / sizeof (UINT16);
   CopyMem (Stack16, &ThunkRegSet.E.EFLAGS, sizeof (ThunkRegSet.E.EFLAGS));
 
@@ -186,8 +191,8 @@ LegacyBiosInt86 (
   ThunkRegSet.E.ESP  = (UINT16) (UINTN) Stack16;
   ThunkRegSet.E.Eip  = (UINT16)((UINT32 *)NULL)[BiosInt];
   ThunkRegSet.E.CS   = (UINT16)(((UINT32 *)NULL)[BiosInt] >> 16);
-  mThunkContext.RealModeState = &ThunkRegSet;
-  AsmThunk16 (&mThunkContext);
+  BiosDev->ThunkContext->RealModeState = &ThunkRegSet;
+  AsmThunk16 (BiosDev->ThunkContext);
 
   //
   // Restore protected mode interrupt state
