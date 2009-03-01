@@ -39,14 +39,18 @@
   UefiBootServicesTableLib
   BaseMemoryLib
   UefiDriverEntryPoint
+  DevicePathLib
   
 [Sources.common]
   BiosVideo.h
   BiosVideo.c
   ComponentName.c
   VesaBiosExtensions.h
-
+  LegacyBiosThunk.c
+  
 [Protocols]
   gEfiPciIoProtocolGuid
   gEfiVgaMiniPortProtocolGuid
   gEfiLegacy8259ProtocolGuid
+  gEfiEdidDiscoveredProtocolGuid
+  gEfiEdidActiveProtocolGuid

@@ -11,15 +11,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  BiosVideo.h
+  UefiBiosVideo.h
     
 Abstract: 
 
 Revision History
 --*/
 
-#ifndef _BIOS_UGA_H
-#define _BIOS_UGA_H
+#ifndef _BIOS_GRAPHICS_OUTPUT_H
+#define _BIOS_GRAPHICS_OUTPUT_H
 
 #include <Uefi.h>
 
@@ -34,24 +34,20 @@ Revision History
 #include <Protocol/UgaDraw.h>
 #include <Protocol/VgaMiniPort.h>
 #include <Protocol/Legacy8259.h>
+#include <Protocol/EdidActive.h>
+#include <Protocol/EdidDiscovered.h>
+#include <Protocol/DevicePath.h>
 #include <Protocol/LegacyBios.h>
 
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DevicePathLib.h>
 
 #include <IndustryStandard/Pci22.h>
 
 #include "VesaBiosExtensions.h"
-//
-// Driver Produced Protocol Prototypes
-//
-//#include EFI_PROTOCOL_DEFINITION (DriverBinding)
-//#include EFI_PROTOCOL_DEFINITION (ComponentName)
-//#include EFI_PROTOCOL_DEFINITION (ComponentName2)
-//#include EFI_PROTOCOL_DEFINITION (UgaDraw)
-//#include EFI_PROTOCOL_DEFINITION (VgaMiniPort)
 
 //
 // Packed format support: The number of bits reserved for each of the colors and the actual
@@ -63,26 +59,29 @@ typedef struct {
 } BIOS_VIDEO_COLOR_PLACEMENT;
 
 //
-// BIOS UGA Draw Graphical Mode Data
+// BIOS Graphics Output Graphical Mode Data
 //
 typedef struct {
   UINT16                      VbeModeNumber;
   UINT16                      BytesPerScanLine;
   VOID                        *LinearFrameBuffer;
+  UINTN                       FrameBufferSize;
   UINT32                      HorizontalResolution;
   UINT32                      VerticalResolution;
-  UINT32                      ColorDepth;
   UINT32                      RefreshRate;
   UINT32                      BitsPerPixel;
   BIOS_VIDEO_COLOR_PLACEMENT  Red;
   BIOS_VIDEO_COLOR_PLACEMENT  Green;
   BIOS_VIDEO_COLOR_PLACEMENT  Blue;
+  BIOS_VIDEO_COLOR_PLACEMENT  Reserved;
+  EFI_GRAPHICS_PIXEL_FORMAT   PixelFormat;
+  EFI_PIXEL_BITMASK           PixelBitMask;
 } BIOS_VIDEO_MODE_DATA;
 
 //
-// BIOS UGA Device Structure
+// BIOS video child handle private data Structure
 //
-#define BIOS_VIDEO_DEV_SIGNATURE  SIGNATURE_32 ('B', 'V', 'M', 'p')
+#define BIOS_VIDEO_DEV_SIGNATURE    SIGNATURE_32 ('B', 'V', 'M', 'p')
 
 typedef struct {
   UINTN                                       Signature;
@@ -92,30 +91,30 @@ typedef struct {
   // Consumed Protocols
   //
   EFI_PCI_IO_PROTOCOL                         *PciIo;
-  //EFI_LEGACY_BIOS_THUNK_PROTOCOL              *LegacyBios;
+  EFI_LEGACY_8259_PROTOCOL                    *Legacy8259;
 
   //
   // Produced Protocols
   //
-  EFI_UGA_DRAW_PROTOCOL                       UgaDraw;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL                GraphicsOutput;
+  EFI_EDID_DISCOVERED_PROTOCOL                EdidDiscovered;
+  EFI_EDID_ACTIVE_PROTOCOL                    EdidActive;
   EFI_VGA_MINI_PORT_PROTOCOL                  VgaMiniPort;
 
   //
   // General fields
   //
-  EFI_EVENT                                   ExitBootServicesEvent;
   BOOLEAN                                     VgaCompatible;
-  BOOLEAN                                     ProduceUgaDraw;
+  BOOLEAN                                     ProduceGraphicsOutput;
+  EFI_EVENT                                   ExitBootServicesEvent;
 
   //
-  // UGA Draw related fields
+  // Graphics Output Protocol related fields
   //
   BOOLEAN                                     HardwareNeedsStarting;
-  UINTN                                       CurrentMode;
-  UINTN                                       MaxMode;
   BIOS_VIDEO_MODE_DATA                        *ModeData;
   UINT8                                       *LineBuffer;
-  EFI_UGA_PIXEL                               *VbeFrameBuffer;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL               *VbeFrameBuffer;
   UINT8                                       *VgaFrameBuffer;
 
   //
@@ -125,6 +124,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS                        PagesBelow1MB;            // Buffer for all VBE Information Blocks
   VESA_BIOS_EXTENSIONS_INFORMATION_BLOCK      *VbeInformationBlock;     // 0x200 bytes.  Must be allocated below 1MB
   VESA_BIOS_EXTENSIONS_MODE_INFORMATION_BLOCK *VbeModeInformationBlock; // 0x100 bytes.  Must be allocated below 1MB
+  VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK        *VbeEdidDataBlock;        // 0x80  bytes.  Must be allocated below 1MB
   VESA_BIOS_EXTENSIONS_CRTC_INFORMATION_BLOCK *VbeCrtcInformationBlock; // 59 bytes.  Must be allocated below 1MB
   UINTN                                       VbeSaveRestorePages;      // Number of 4KB pages in VbeSaveRestoreBuffer
   EFI_PHYSICAL_ADDRESS                        VbeSaveRestoreBuffer;     // Must be allocated below 1MB
@@ -134,9 +134,11 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL                    *DevicePath;
 } BIOS_VIDEO_DEV;
 
-#define BIOS_VIDEO_DEV_FROM_UGA_DRAW_THIS(a)      CR (a, BIOS_VIDEO_DEV, UgaDraw, BIOS_VIDEO_DEV_SIGNATURE)
-
+#define BIOS_VIDEO_DEV_FROM_PCI_IO_THIS(a)      CR (a, BIOS_VIDEO_DEV, PciIo, BIOS_VIDEO_DEV_SIGNATURE)
+#define BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS(a)      CR (a, BIOS_VIDEO_DEV, GraphicsOutput, BIOS_VIDEO_DEV_SIGNATURE)
 #define BIOS_VIDEO_DEV_FROM_VGA_MINI_PORT_THIS(a) CR (a, BIOS_VIDEO_DEV, VgaMiniPort, BIOS_VIDEO_DEV_SIGNATURE)
+
+#define GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER	0xffff
 
 //
 // Global Variables
@@ -156,23 +158,21 @@ BiosVideoDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 /*++
-  
-  Routine Description:
 
-    Supported.
-    
-  Arguments:
+Routine Description:
 
-  This - Pointer to driver binding protocol
-  Controller - Controller handle to connect
-  RemainingDevicePath - A pointer to the remaining portion of a device path
-    
-    
-  Returns:
+  GC_TODO: Add function description
 
-  EFI_STATUS - EFI_SUCCESS:This controller can be managed by this driver,
-               Otherwise, this controller cannot be managed by this driver
-  
+Arguments:
+
+  This                - GC_TODO: add argument description
+  Controller          - GC_TODO: add argument description
+  RemainingDevicePath - GC_TODO: add argument description
+
+Returns:
+
+  GC_TODO: add return values
+
 --*/
 ;
 
@@ -184,21 +184,21 @@ BiosVideoDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 /*++
-  
-  Routine Description:
 
-    Install UGA Draw Protocol onto VGA device handles
-  
-  Arguments:
+Routine Description:
 
-  This - Pointer to driver binding protocol
-  Controller - Controller handle to connect
-  RemainingDevicePath - A pointer to the remaining portion of a device path
-    
-  Returns:
+  GC_TODO: Add function description
 
-    EFI_STATUS
-    
+Arguments:
+
+  This                - GC_TODO: add argument description
+  Controller          - GC_TODO: add argument description
+  RemainingDevicePath - GC_TODO: add argument description
+
+Returns:
+
+  GC_TODO: add return values
+
 --*/
 ;
 
@@ -211,23 +211,22 @@ BiosVideoDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 /*++
-  
-  Routine Description:
 
-    Stop.
-  
-  Arguments:
+Routine Description:
 
-  This - Pointer to driver binding protocol
-  Controller - Controller handle to connect
-  NumberOfChilren - Number of children handle created by this driver
-  ChildHandleBuffer - Buffer containing child handle created
-  
-  Returns:
+  GC_TODO: Add function description
 
-  EFI_SUCCESS - Driver disconnected successfully from controller
-  EFI_UNSUPPORTED - Cannot find BIOS_VIDEO_DEV structure
-  
+Arguments:
+
+  This              - GC_TODO: add argument description
+  Controller        - GC_TODO: add argument description
+  NumberOfChildren  - GC_TODO: add argument description
+  ChildHandleBuffer - GC_TODO: add argument description
+
+Returns:
+
+  GC_TODO: add return values
+
 --*/
 ;
 
@@ -239,19 +238,19 @@ BiosVideoCheckForVbe (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
 /*++
-  
-  Routine Description:
 
-  Check for VBE device   
-  
-  Arguments:
-  
-  BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
-  
-  Returns:
-  
-  EFI_SUCCESS - VBE device found
-  
+Routine Description:
+
+  GC_TODO: Add function description
+
+Arguments:
+
+  BiosVideoPrivate  - GC_TODO: add argument description
+
+Returns:
+
+  GC_TODO: add return values
+
 --*/
 ;
 
@@ -260,112 +259,148 @@ BiosVideoCheckForVga (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
 /*++
-  
-  Routine Description:
 
-    Check for VGA device
-  
+Routine Description:
+
+  GC_TODO: Add function description
+
+Arguments:
+
+  BiosVideoPrivate  - GC_TODO: add argument description
+
+Returns:
+
+  GC_TODO: add return values
+
+--*/
+;
+
+STATIC
+EFI_STATUS
+DeRegisterVideoChildHandle (
+  EFI_DRIVER_BINDING_PROTOCOL    *This,
+  EFI_HANDLE                     Controller,
+  EFI_HANDLE                     Handle
+  )
+/*++
+
+Routine Description:
+
+  Deregister an video child handle and free resources
+
+Arguments:
+
+  This            - Protocol instance pointer.
+  Controller      - Video controller handle
+  Handle          - Video child handle
+
+Returns:
+
+  EFI_STATUS
+
+--*/
+;
+
+VOID
+BiosVideoDeviceReleaseResource (
+  BIOS_VIDEO_DEV  *BiosVideoChildPrivate
+  )
+/*++
+Routing Description:
+
+  Release resources of a video child device before stopping it.
+
+Arguments:
+
+  BiosVideoChildPrivate  -  Video child device private data structure
+
+Returns:
+
+    NONE
+    
+---*/
+;
+
+//
+// BIOS Graphics Output Protocol functions
+//
+EFI_STATUS
+EFIAPI
+BiosVideoGraphicsOutputQueryMode (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL          *This,
+  IN  UINT32                                ModeNumber,
+  OUT UINTN                                 *SizeOfInfo,
+  OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
+  )
+/*++
+
+Routine Description:
+
+  Graphics Output protocol interface to get video mode
+
   Arguments:
-  
-    BiosVideoPrivate - Pointer to BIOS_VIDEO_DEV structure
-  
+    This                  - Protocol instance pointer.
+    ModeNumber            - The mode number to return information on.
+    Info                  - Caller allocated buffer that returns information about ModeNumber.
+    SizeOfInfo            - A pointer to the size, in bytes, of the Info buffer.
+
   Returns:
-  
-    EFI_SUCCESS - Standard VGA device found
-  
---*/
-;
-
-//
-// BIOS UGA Draw Protocol functions
-//
-EFI_STATUS
-EFIAPI
-BiosVideoUgaDrawGetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL  *This,
-  OUT UINT32                 *HorizontalResolution,
-  OUT UINT32                 *VerticalResolution,
-  OUT UINT32                 *ColorDepth,
-  OUT UINT32                 *RefreshRate
-  )
-/*++
-
-Routine Description:
-
-  UGA protocol interface to get video mode
-
-Arguments:
-
-  This                  - Pointer to UGA draw protocol instance
-  HorizontalResolution  - Horizontal Resolution, in pixels
-  VerticalResolution    - Vertical Resolution, in pixels
-  ColorDepth            - Bit number used to represent color value of a pixel 
-  RefreshRate           - Refresh rate, in Hertz
-
-Returns:
-
-  EFI_DEVICE_ERROR - Hardware need starting
-  EFI_INVALID_PARAMETER - Invalid parameter passed in
-  EFI_SUCCESS - Video mode query successfully
+    EFI_SUCCESS           - Mode information returned.
+    EFI_BUFFER_TOO_SMALL  - The Info buffer was too small.
+    EFI_DEVICE_ERROR      - A hardware error occurred trying to retrieve the video mode.
+    EFI_NOT_STARTED       - Video display is not initialized. Call SetMode ()
+    EFI_INVALID_PARAMETER - One of the input args was NULL.
 
 --*/
 ;
 
 EFI_STATUS
 EFIAPI
-BiosVideoUgaDrawSetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL  *This,
-  IN  UINT32                 HorizontalResolution,
-  IN  UINT32                 VerticalResolution,
-  IN  UINT32                 ColorDepth,
-  IN  UINT32                 RefreshRate
+BiosVideoGraphicsOutputSetMode (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
+  IN  UINT32                       ModeNumber
   )
 /*++
 
 Routine Description:
 
-  UGA draw protocol interface to set video mode
+  Graphics Output protocol interface to set video mode
 
-Arguments:
+  Arguments:
+    This             - Protocol instance pointer.
+    ModeNumber       - The mode number to be set.
 
-  This                  - Pointer to UGA draw protocol instance
-  HorizontalResolution  - Horizontal Resolution, in pixels
-  VerticalResolution    - Vertical Resolution, in pixels
-  ColorDepth            - Bit number used to represent color value of a pixel 
-  RefreshRate           - Refresh rate, in Hertz
-
-Returns:
-
-  EFI_DEVICE_ERROR - Device error
-  EFI_SUCCESS - Video mode set successfully
-  EFI_UNSUPPORTED - Cannot support this video mode
+  Returns:
+    EFI_SUCCESS      - Graphics mode was changed.
+    EFI_DEVICE_ERROR - The device had an error and could not complete the request.
+    EFI_UNSUPPORTED  - ModeNumber is not supported by this device.
 
 --*/
 ;
 
 EFI_STATUS
 EFIAPI
-BiosVideoUgaDrawVbeBlt (
-  IN  EFI_UGA_DRAW_PROTOCOL  *This,
-  IN  EFI_UGA_PIXEL          *BltBuffer, OPTIONAL
-  IN  EFI_UGA_BLT_OPERATION  BltOperation,
-  IN  UINTN                  SourceX,
-  IN  UINTN                  SourceY,
-  IN  UINTN                  DestinationX,
-  IN  UINTN                  DestinationY,
-  IN  UINTN                  Width,
-  IN  UINTN                  Height,
-  IN  UINTN                  Delta
+BiosVideoGraphicsOutputVbeBlt (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  UINTN                              SourceX,
+  IN  UINTN                              SourceY,
+  IN  UINTN                              DestinationX,
+  IN  UINTN                              DestinationY,
+  IN  UINTN                              Width,
+  IN  UINTN                              Height,
+  IN  UINTN                              Delta
   )
 /*++
 
 Routine Description:
 
-  UGA draw protocol instance to block transfer for VBE device
+  Graphics Output protocol instance to block transfer for VBE device
 
 Arguments:
 
-  This          - Pointer to UGA draw protocol instance
+  This          - Pointer to Graphics Output protocol instance
   BltBuffer     - The data to transfer to screen
   BltOperation  - The operation to perform
   SourceX       - The X coordinate of the source for BltOperation
@@ -374,9 +409,9 @@ Arguments:
   DestinationY  - The Y coordinate of the destination for BltOperation
   Width         - The width of a rectangle in the blt rectangle in pixels
   Height        - The height of a rectangle in the blt rectangle in pixels
-  Delta         - Not used for EfiUgaVideoFill and EfiUgaVideoToVideo operation.
+  Delta         - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
                   If a Delta of 0 is used, the entire BltBuffer will be operated on.
-                  If a subrectangle of the BltBuffer is used, then Delta represents 
+                  If a subrectangle of the BltBuffer is used, then Delta represents
                   the number of bytes in a row of the BltBuffer.
 
 Returns:
@@ -389,27 +424,27 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-BiosVideoUgaDrawVgaBlt (
-  IN  EFI_UGA_DRAW_PROTOCOL  *This,
-  IN  EFI_UGA_PIXEL          *BltBuffer, OPTIONAL
-  IN  EFI_UGA_BLT_OPERATION  BltOperation,
-  IN  UINTN                  SourceX,
-  IN  UINTN                  SourceY,
-  IN  UINTN                  DestinationX,
-  IN  UINTN                  DestinationY,
-  IN  UINTN                  Width,
-  IN  UINTN                  Height,
-  IN  UINTN                  Delta
+BiosVideoGraphicsOutputVgaBlt (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  UINTN                              SourceX,
+  IN  UINTN                              SourceY,
+  IN  UINTN                              DestinationX,
+  IN  UINTN                              DestinationY,
+  IN  UINTN                              Width,
+  IN  UINTN                              Height,
+  IN  UINTN                              Delta
   )
 /*++
 
 Routine Description:
 
-  UGA draw protocol instance to block transfer for VGA device
+  Grahpics Output protocol instance to block transfer for VGA device
 
 Arguments:
 
-  This          - Pointer to UGA draw protocol instance
+  This          - Pointer to Grahpics Output protocol instance
   BltBuffer     - The data to transfer to screen
   BltOperation  - The operation to perform
   SourceX       - The X coordinate of the source for BltOperation
@@ -418,9 +453,9 @@ Arguments:
   DestinationY  - The Y coordinate of the destination for BltOperation
   Width         - The width of a rectangle in the blt rectangle in pixels
   Height        - The height of a rectangle in the blt rectangle in pixels
-  Delta         - Not used for EfiUgaVideoFill and EfiUgaVideoToVideo operation.
+  Delta         - Not used for EfiBltVideoFill and EfiBltVideoToVideo operation.
                   If a Delta of 0 is used, the entire BltBuffer will be operated on.
-                  If a subrectangle of the BltBuffer is used, then Delta represents 
+                  If a subrectangle of the BltBuffer is used, then Delta represents
                   the number of bytes in a row of the BltBuffer.
 
 Returns:
@@ -508,4 +543,22 @@ BiosVideoIsVga (
 
 #define VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER         0x08
 
+VOID
+InitializeBiosIntCaller (
+  IN  BIOS_VIDEO_DEV                 *BiosDev
+  );
+  
+VOID
+InitializeInterruptRedirection (
+  IN  BIOS_VIDEO_DEV                 *BiosDev
+  );
+  
+BOOLEAN
+EFIAPI
+LegacyBiosInt86 (
+  IN  BIOS_VIDEO_DEV                 *BiosDev,
+  IN  UINT8                           BiosInt,
+  IN  EFI_IA32_REGISTER_SET           *Regs
+  );    
+  
 #endif
