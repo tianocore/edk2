@@ -67,7 +67,7 @@
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
-  
+
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
@@ -94,7 +94,7 @@
   FrameworkIfrSupportLib|IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
   PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   IoLib|IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
-  
+
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
@@ -176,7 +176,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
 
-  
+
 [PcdsDynamicDefault.common.DEFAULT]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|4
@@ -216,7 +216,7 @@
   IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   IntelFrameworkModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
-  
+
   IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
@@ -234,13 +234,12 @@
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
   IntelFrameworkModulePkg/Universal/PcatSingleSegmentPciCfgPei/PcatSingleSegmentPciCfgPei.inf
   IntelFrameworkModulePkg/Universal/VariablePei/VariablePei.inf
-  IntelFrameworkModulePkg/Universal/Legacy8259Dxe/8259.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-  
-  
+
+
 [Components.IA32]
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-  
+
 [Components.X64]
   IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
-  
+
