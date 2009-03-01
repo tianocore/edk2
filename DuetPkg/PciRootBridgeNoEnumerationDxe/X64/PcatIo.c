@@ -630,7 +630,7 @@ ScanPciRootBridgeForRoms(
       //
       // Find Memory Descriptors that are less than 4GB, so the PPB Memory Window can be used for downstream devices
       //
-      if (Descriptors->AddrRangeMax < 0x100000000) {
+      if (Descriptors->AddrRangeMax < 0x100000000ULL) {
         //
         // Find the largest Non-Prefetchable Memory Descriptor that is less than 4GB
         //
