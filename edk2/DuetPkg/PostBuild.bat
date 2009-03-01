@@ -14,6 +14,7 @@
 @if %PROCESSOR%=="" goto WrongArch
 
 @set OUTPUT_DIR=%BUILD_DIR%\%PROCESSOR%\DuetPkg\BootSector\BootSector\OUTPUT
+@set BOOTSECTOR_OUTPUT_DIR=%BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT
 
 @echo Compressing DUETEFIMainFv.FV ...
 @%BASETOOLS_DIR%\TianoCompress -e -o %BUILD_DIR%\FV\DUETEFIMAINFV.z %BUILD_DIR%\FV\DUETEFIMAINFV.Fv
@@ -37,11 +38,11 @@
 
 :GENERATE_IMAGE_X64
 @%BASETOOLS_DIR%\EfiLdrImage.exe -o %BUILD_DIR%\FV\Efildr64 %BUILD_DIR%\%PROCESSOR%\EfiLoader.efi %BUILD_DIR%\FV\DxeIpl.z %BUILD_DIR%\FV\DxeMain.z %BUILD_DIR%\FV\DUETEFIMAINFV.z
-@copy /b %OUTPUT_DIR%\Start64.com+%OUTPUT_DIR%\Efi64.com2+%BUILD_DIR%\FV\Efildr64 %BUILD_DIR%\FV\EfildrPure
+@copy /b %BOOTSECTOR_OUTPUT_DIR%\Start64.com+%BOOTSECTOR_OUTPUT_DIR%\Efi64.com2+%BUILD_DIR%\FV\Efildr64 %BUILD_DIR%\FV\EfildrPure
 @%BASETOOLS_DIR%\GenPage.exe %BUILD_DIR%\FV\EfildrPure -o %BUILD_DIR%\FV\Efildr
-@copy /b %OUTPUT_DIR%\St16_64.com+%OUTPUT_DIR%\Efi64.com2+%BUILD_DIR%\FV\Efildr64 %BUILD_DIR%\FV\Efildr16Pure
+@copy /b %BOOTSECTOR_OUTPUT_DIR%\St16_64.com+%BOOTSECTOR_OUTPUT_DIR%\Efi64.com2+%BUILD_DIR%\FV\Efildr64 %BUILD_DIR%\FV\Efildr16Pure
 @%BASETOOLS_DIR%\GenPage.exe %BUILD_DIR%\FV\Efildr16Pure -o %BUILD_DIR%\FV\Efildr16
-@copy /b %OUTPUT_DIR%\St32_64.com+%OUTPUT_DIR%\Efi64.com2+%BUILD_DIR%\FV\Efildr64 %BUILD_DIR%\FV\Efildr20Pure
+@copy /b %BOOTSECTOR_OUTPUT_DIR%\St32_64.com+%BOOTSECTOR_OUTPUT_DIR%\Efi64.com2+%BUILD_DIR%\FV\Efildr64 %BUILD_DIR%\FV\Efildr20Pure
 @%BASETOOLS_DIR%\GenPage.exe %BUILD_DIR%\FV\Efildr20Pure -o %BUILD_DIR%\FV\Efildr20
 @goto end
 
