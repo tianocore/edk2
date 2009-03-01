@@ -27,7 +27,21 @@ extern UINT32                        mExceptionCodeSize;
 UINTN                                mTimerVector = 0;
 volatile EFI_CPU_INTERRUPT_HANDLER   mTimerHandler = NULL;
 EFI_LEGACY_8259_PROTOCOL             *gLegacy8259 = NULL;
+THUNK_CONTEXT                        mThunkContext;
+#define EFI_CPU_EFLAGS_IF 0x200
 
+VOID
+InitializeBiosIntCaller (
+  VOID
+  );
+  
+BOOLEAN
+EFIAPI
+LegacyBiosInt86 (
+  IN  UINT8                           BiosInt,
+  IN  EFI_IA32_REGISTER_SET           *Regs
+  );
+  
 //
 // The Cpu Architectural Protocol that this Driver produces
 //
@@ -914,13 +928,6 @@ Return
   EFI_IA32_REGISTER_SET           Regs;
   UINT16                          OriginalVideoMode = (UINT16) -1;
   
-  //
-  // See if the Legacy BIOS Protocol is available
-  //
-  Status = gBS->LocateProtocol (&gEfiLegacyBiosThunkProtocolGuid, NULL, (VOID **) &LegacyBios);
-  if (EFI_ERROR (Status)) {
-    return OriginalVideoMode;
-  }
 
   //
   // VESA SuperVGA BIOS - GET CURRENT VIDEO MODE
@@ -931,7 +938,7 @@ Return
   //
   gBS->SetMem (&Regs, sizeof (Regs), 0);
   Regs.X.AX = 0x4F03;
-  LegacyBios->Int86 (LegacyBios, 0x10, &Regs);
+  LegacyBiosInt86 (0x10, &Regs);
   if (Regs.X.AX == 0x004F) {
     OriginalVideoMode = Regs.X.BX;
   } else {
@@ -944,7 +951,7 @@ Return
     //
     gBS->SetMem (&Regs, sizeof (Regs), 0);
     Regs.H.AH = 0x0F;
-    LegacyBios->Int86 (LegacyBios, 0x10, &Regs);
+    LegacyBiosInt86 (0x10, &Regs);
     OriginalVideoMode = Regs.H.AL;
   }
 
@@ -967,7 +974,7 @@ Return
     gBS->SetMem (&Regs, sizeof (Regs), 0);
     Regs.H.AH = 0x00;
     Regs.H.AL = (UINT8) NewVideoMode;
-    LegacyBios->Int86 (LegacyBios, 0x10, &Regs);
+    LegacyBiosInt86 (0x10, &Regs);
 
     //
     // VIDEO - TEXT-MODE CHARGEN - LOAD ROM 8x16 CHARACTER SET (VGA)
@@ -979,7 +986,7 @@ Return
     Regs.H.AH = 0x11;
     Regs.H.AL = 0x14;
     Regs.H.BL = 0;
-    LegacyBios->Int86 (LegacyBios, 0x10, &Regs);
+    LegacyBiosInt86 (0x10, &Regs);
   } else {
     //
     //    VESA SuperVGA BIOS - SET SuperVGA VIDEO MODE
@@ -995,7 +1002,7 @@ Return
     gBS->SetMem (&Regs, sizeof (Regs), 0);
     Regs.X.AX = 0x4F02;
     Regs.X.BX = NewVideoMode;
-    LegacyBios->Int86 (LegacyBios, 0x10, &Regs);
+    LegacyBiosInt86 (0x10, &Regs);
     if (Regs.X.AX != 0x004F) {
       DEBUG ((EFI_D_ERROR, "SORRY: Cannot set to video mode: 0x%04X!\n", NewVideoMode));
       return (UINT16) -1;
@@ -1130,6 +1137,8 @@ Returns:
     InstallInterruptHandler (InterruptVector, SystemTimerHandler);
   }
 
+  InitializeBiosIntCaller();
+  
   //
   // Install CPU Architectural Protocol and the thunk protocol
   //
@@ -1145,3 +1154,126 @@ Returns:
   return EFI_SUCCESS;
 }
 
+VOID
+InitializeBiosIntCaller (
+  VOID
+  )
+{
+  EFI_STATUS            Status;
+  UINT32                RealModeBufferSize;
+  UINT32                ExtraStackSize;
+  EFI_PHYSICAL_ADDRESS  LegacyRegionBase;
+  
+  //
+  // Get LegacyRegion
+  //
+  AsmGetThunk16Properties (&RealModeBufferSize, &ExtraStackSize);
+
+  LegacyRegionBase = 0x100000;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiACPIMemoryNVS,
+                  EFI_SIZE_TO_PAGES(RealModeBufferSize + ExtraStackSize + 200),
+                  &LegacyRegionBase
+                  );
+  ASSERT_EFI_ERROR (Status);
+  
+  mThunkContext.RealModeBuffer     = (VOID*)(UINTN)LegacyRegionBase;
+  mThunkContext.RealModeBufferSize = EFI_PAGES_TO_SIZE (RealModeBufferSize);
+  mThunkContext.ThunkAttributes    = 3;
+  AsmPrepareThunk16(&mThunkContext);
+  
+}
+
+BOOLEAN
+EFIAPI
+LegacyBiosInt86 (
+  IN  UINT8                           BiosInt,
+  IN  EFI_IA32_REGISTER_SET           *Regs
+  )
+{
+  UINTN                 Status;
+  UINTN                 Eflags;
+  IA32_REGISTER_SET     ThunkRegSet;
+  BOOLEAN               Ret;
+  UINT16                *Stack16;
+  
+  Regs->X.Flags.Reserved1 = 1;
+  Regs->X.Flags.Reserved2 = 0;
+  Regs->X.Flags.Reserved3 = 0;
+  Regs->X.Flags.Reserved4 = 0;
+  Regs->X.Flags.IOPL      = 3;
+  Regs->X.Flags.NT        = 0;
+  Regs->X.Flags.IF        = 1;
+  Regs->X.Flags.TF        = 0;
+  Regs->X.Flags.CF        = 0;
+
+  ZeroMem (&ThunkRegSet, sizeof (ThunkRegSet));
+  ThunkRegSet.E.EDI  = Regs->E.EDI;
+  ThunkRegSet.E.ESI  = Regs->E.ESI;
+  ThunkRegSet.E.EBP  = Regs->E.EBP;
+  ThunkRegSet.E.EBX  = Regs->E.EBX;
+  ThunkRegSet.E.EDX  = Regs->E.EDX;
+  ThunkRegSet.E.ECX  = Regs->E.ECX;
+  ThunkRegSet.E.EAX  = Regs->E.EAX;
+  ThunkRegSet.E.DS   = Regs->E.DS;
+  ThunkRegSet.E.ES   = Regs->E.ES;
+
+  CopyMem (&(ThunkRegSet.E.EFLAGS), &(Regs->E.EFlags), sizeof (UINT32));
+ 
+  //
+  // The call to Legacy16 is a critical section to EFI
+  //
+  Eflags = AsmReadEflags ();
+  if ((Eflags | EFI_CPU_EFLAGS_IF) != 0) {
+    DisableInterrupts ();
+  }
+
+  //
+  // Set Legacy16 state. 0x08, 0x70 is legacy 8259 vector bases.
+  //
+  Status = gLegacy8259->SetMode (gLegacy8259, Efi8259LegacyMode, NULL, NULL);
+  ASSERT_EFI_ERROR (Status);
+  
+  Stack16 = (UINT16 *)((UINT8 *) mThunkContext.RealModeBuffer + mThunkContext.RealModeBufferSize - sizeof (UINT16));
+  Stack16 -= sizeof (ThunkRegSet.E.EFLAGS) / sizeof (UINT16);
+  CopyMem (Stack16, &ThunkRegSet.E.EFLAGS, sizeof (ThunkRegSet.E.EFLAGS));
+
+  ThunkRegSet.E.SS   = (UINT16) (((UINTN) Stack16 >> 16) << 12);
+  ThunkRegSet.E.ESP  = (UINT16) (UINTN) Stack16;
+  ThunkRegSet.E.Eip  = (UINT16)((UINT32 *)NULL)[BiosInt];
+  ThunkRegSet.E.CS   = (UINT16)(((UINT32 *)NULL)[BiosInt] >> 16);
+  mThunkContext.RealModeState = &ThunkRegSet;
+  AsmThunk16 (&mThunkContext);
+
+  //
+  // Restore protected mode interrupt state
+  //
+  Status = gLegacy8259->SetMode (gLegacy8259, Efi8259ProtectedMode, NULL, NULL);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // End critical section
+  //
+  if ((Eflags | EFI_CPU_EFLAGS_IF) != 0) {
+    EnableInterrupts ();
+  }
+
+  Regs->E.EDI      = ThunkRegSet.E.EDI;      
+  Regs->E.ESI      = ThunkRegSet.E.ESI;  
+  Regs->E.EBP      = ThunkRegSet.E.EBP;  
+  Regs->E.EBX      = ThunkRegSet.E.EBX;  
+  Regs->E.EDX      = ThunkRegSet.E.EDX;  
+  Regs->E.ECX      = ThunkRegSet.E.ECX;  
+  Regs->E.EAX      = ThunkRegSet.E.EAX;
+  Regs->E.SS       = ThunkRegSet.E.SS;
+  Regs->E.CS       = ThunkRegSet.E.CS;  
+  Regs->E.DS       = ThunkRegSet.E.DS;  
+  Regs->E.ES       = ThunkRegSet.E.ES;
+
+  CopyMem (&(Regs->E.EFlags), &(ThunkRegSet.E.EFLAGS), sizeof (UINT32));
+
+  Ret = (BOOLEAN) (Regs->E.EFlags.CF == 1);
+
+  return Ret;
+}

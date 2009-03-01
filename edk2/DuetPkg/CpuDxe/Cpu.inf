@@ -36,6 +36,7 @@
   UefiDriverEntryPoint
   PrintLib
   UefiBootServicesTableLib
+  BaseMemoryLib
 
 [Sources.IA32]
   Ia32/CpuInterrupt.asm |INTEL
@@ -53,7 +54,6 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid
-  gEfiLegacyBiosThunkProtocolGuid
   gEfiLegacy8259ProtocolGuid
 
 [Depex]

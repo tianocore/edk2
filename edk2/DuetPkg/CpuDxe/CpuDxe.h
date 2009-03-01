@@ -24,9 +24,10 @@ Abstract:
 #include <Protocol/Legacy8259.h>
 
 #include <Protocol/LegacyBios.h>
-#include <Protocol/LegacyBiosThunk.h>
+
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
