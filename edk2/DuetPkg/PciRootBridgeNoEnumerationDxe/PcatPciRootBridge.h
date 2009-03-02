@@ -41,6 +41,8 @@ Abstract:
 
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/Pci.h>
+
+#define PCI_MAX_SEGMENT   0
 //
 // Driver Instance Data Prototypes
 //
