@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "InternalBdsLib.h"
+#include "Bmp.h"
 
 /**
   Check if we need to save the EFI variable with "ConVarName" as name
