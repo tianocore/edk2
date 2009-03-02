@@ -722,7 +722,7 @@
   ## Include/Protocol/HiiConfigAccess.h
   gEfiHiiConfigAccessProtocolGuid =  {0x330d4706, 0xf2a0, 0x4e4f, {0xa3, 0x69, 0xb6, 0x6f, 0xa8, 0xd5, 0x43, 0x85}}
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
 
@@ -741,7 +741,7 @@
   ## If TRUE, UGA Draw Protocol is still consumed.
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE|BOOLEAN|0x00000013
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   ## Indicates the maximum length of unicode string
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
 
@@ -757,9 +757,6 @@
   ## The mask is used to control DebugLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0|UINT8|0x00000005
 
-  ## This flag is used to control the printout of DebugLib
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0|UINT32|0x00000006
-
   ## The mask is used to control ReportStatusCodeLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0|UINT8|0x00000007
 
@@ -769,11 +766,11 @@
   ## The mask is used to control PerformanceLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0|UINT8|0x00000009
 
-  ## This value is used to set the base address of pci express hierarchy
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
-
   ## The mask is used to control PostCodeLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
+
+  ## This flag is used to control the printout of DebugLib
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0|UINT32|0x00000006
 
   ## This value is used to set the FSB clock
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
@@ -844,40 +841,6 @@
   ## Status code value for indicating the reset operation of mouse device
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x3000100c
 
-  ## Indicates the allowable maximum number in extract handler table
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
-
-  ## Indicates the default timeouts for USB transfers in milliseconds
-  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
-
-  ## Default current ISO 639-2 language: English
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-
-  ## Default platform supported RFC 3066 languages: (American) English & French
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
-
-  ## Defualt current RFC 3066 language: (American) English
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
-
-  ## Default current ISO 639-2 language: English & French
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
-
-  ## Indicates the default baud rate of UART
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
-
-  ## Indicates the number of efficient data bit in UART transaction
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
-
-  ## Indicates the setting of data parity in UART transaction
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
-
-  ## Indicates the setting of stop bit in UART transaction
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
-
-  ## Indicates the usable type of terminal
-  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
-
   ## Status code value for indicating the handoff from Pei phase to Dxe phase
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3031001|UINT32|0x3000100d
 
@@ -906,48 +869,20 @@
   ## The base address of IO port space for IA64 arch
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
 
-[PcdsPatchableInModule.common]
-  ## This value is used to set the base address of pci express hierarchy
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
-
+[PcdsFixedAtBuild,PcdsPatchableInModule]
   ## This flag is used to control the printout of DebugLib
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
 
-  ## Default current ISO 639-2 language: English & French
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
-
-  ## Default current ISO 639-2 language: English
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
-
-  ## Default platform supported RFC 3066 languages: (American) English & French
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
-
-  ## Defualt current RFC 3066 language: (American) English
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
-
-  ## Indicates the default baud rate of UART
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200|UINT64|0x00000020
-
-  ## Indicates the number of efficient data bit in UART transaction
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8|UINT8|0x00000021
-
-  ## Indicates the setting of data parity in UART transaction
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1|UINT8|0x00000022
-
-  ## Indicates the setting of stop bit in UART transaction
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
-
-  ## Indicates the usable type of terminal
-  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
-
   ## Indicates the allowable maximum number in extract handler table
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10|UINT32|0x00000025
-  
+
   ## Indicates the default timeouts for USB transfers in milliseconds
   gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
 
-[PcdsDynamic.common]
+[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
+  ## This value is used to set the base address of pci express hierarchy
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
+
   ## Default current ISO 639-2 language: English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
 
@@ -975,6 +910,3 @@
   ## Indicates the usable type of terminal
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
-
-  ## This value is used to set the base address of pci express hierarchy
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
