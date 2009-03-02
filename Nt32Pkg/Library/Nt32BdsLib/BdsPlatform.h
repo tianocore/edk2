@@ -37,7 +37,7 @@ Abstract:
 
 #include <Protocol/WinNtThunk.h>
 #include <Protocol/WinNtIo.h>
-#include <Guid/Bmp.h>
+#include <Guid/Logo.h>
 #include <Guid/WinNtSystemConfig.h>
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
