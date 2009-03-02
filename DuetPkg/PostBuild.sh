@@ -47,9 +47,9 @@ then
 	mkdir -p $BUILD_DIR/FV/Efildr16
 	mkdir -p $BUILD_DIR/FV/Efildr20
 
-	cp $OUTPUT_DIR/start.bin $OUTPUT_DIR/efi32.bin2 $BUILD_DIR/FV/Efildr32 $BUILD_DIR/FV/Efildr
-	cp $OUTPUT_DIR/start16.bin $OUTPUT_DIR/efi32.bin2 $BUILD_DIR/FV/Efildr32 $BUILD_DIR/FV/Efildr16
-	cp $OUTPUT_DIR/start32.bin $OUTPUT_DIR/efi32.bin2 $BUILD_DIR/FV/Efildr32 $BUILD_DIR/FV/Efildr20	
+	cp $OUTPUT_DIR/start.com $OUTPUT_DIR/efi32.com2 $BUILD_DIR/FV/Efildr32 $BUILD_DIR/FV/Efildr
+	cp $OUTPUT_DIR/start16.com $OUTPUT_DIR/efi32.com2 $BUILD_DIR/FV/Efildr32 $BUILD_DIR/FV/Efildr16
+	cp $OUTPUT_DIR/start32.com $OUTPUT_DIR/efi32.com2 $BUILD_DIR/FV/Efildr32 $BUILD_DIR/FV/Efildr20	
 	echo Done!
 fi
 
@@ -60,11 +60,11 @@ then
 	mkdir -p $BUILD_DIR/FV/Efildr16Pure
 	mkdir -p $BUILD_DIR/FV/Efildr20Pure
 
-	cp $OUTPUT_DIR/start64.bin $OUTPUT_DIR/efi64.bin2 $BUILD_DIR/FV/Efildr64 $BUILD_DIR/FV/EfildrPure
+	cp $OUTPUT_DIR/start64.com $OUTPUT_DIR/efi64.com2 $BUILD_DIR/FV/Efildr64 $BUILD_DIR/FV/EfildrPure
 	$BASETOOLS_DIR/GenPage $BUILD_DIR/FV/EfildrPure -o $BUILD_DIR/FV/Efildr
-	cp $OUTPUT_DIR/st16_64.bin $OUTPUT_DIR/efi64.bin2 $BUILD_DIR/FV/Efildr64 $BUILD_DIR/FV/Efildr16Pure
+	cp $OUTPUT_DIR/st16_64.com $OUTPUT_DIR/efi64.com2 $BUILD_DIR/FV/Efildr64 $BUILD_DIR/FV/Efildr16Pure
 	$BASETOOLS_DIR/GenPage $BUILD_DIR/FV/Efildr16Pure -o $BUILD_DIR/FV/Efildr16
-	cp $OUTPUT_DIR/st32_64.bin $OUTPUT_DIR/efi64.bin2 $BUILD_DIR/FV/Efildr64 $BUILD_DIR/FV/Efildr20Pure
+	cp $OUTPUT_DIR/st32_64.com $OUTPUT_DIR/efi64.com2 $BUILD_DIR/FV/Efildr64 $BUILD_DIR/FV/Efildr20Pure
 	$BASETOOLS_DIR/GenPage $BUILD_DIR/FV/Efildr20Pure -o $BUILD_DIR/FV/Efildr20
 	
 	echo Done!
