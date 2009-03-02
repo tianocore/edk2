@@ -146,17 +146,17 @@ LegacyBiosInt86 (
   BOOLEAN               Ret;
   UINT16                *Stack16;
   
-  Regs->X.Flags.Reserved1 = 1;
-  Regs->X.Flags.Reserved2 = 0;
-  Regs->X.Flags.Reserved3 = 0;
-  Regs->X.Flags.Reserved4 = 0;
-  Regs->X.Flags.IOPL      = 3;
-  Regs->X.Flags.NT        = 0;
-  Regs->X.Flags.IF        = 1;
-  Regs->X.Flags.TF        = 0;
-  Regs->X.Flags.CF        = 0;
-
   ZeroMem (&ThunkRegSet, sizeof (ThunkRegSet));
+  ThunkRegSet.E.EFLAGS.Bits.Reserved_0 = 1;
+  ThunkRegSet.E.EFLAGS.Bits.Reserved_1 = 0;
+  ThunkRegSet.E.EFLAGS.Bits.Reserved_2 = 0;
+  ThunkRegSet.E.EFLAGS.Bits.Reserved_3 = 0;
+  ThunkRegSet.E.EFLAGS.Bits.IOPL       = 3;
+  ThunkRegSet.E.EFLAGS.Bits.NT         = 0;
+  ThunkRegSet.E.EFLAGS.Bits.IF         = 1;
+  ThunkRegSet.E.EFLAGS.Bits.TF         = 0;
+  ThunkRegSet.E.EFLAGS.Bits.CF         = 0;
+  
   ThunkRegSet.E.EDI  = Regs->E.EDI;
   ThunkRegSet.E.ESI  = Regs->E.ESI;
   ThunkRegSet.E.EBP  = Regs->E.EBP;
@@ -167,8 +167,6 @@ LegacyBiosInt86 (
   ThunkRegSet.E.DS   = Regs->E.DS;
   ThunkRegSet.E.ES   = Regs->E.ES;
 
-  CopyMem (&(ThunkRegSet.E.EFLAGS), &(Regs->E.EFlags), sizeof (UINT32));
- 
   //
   // The call to Legacy16 is a critical section to EFI
   //
@@ -184,16 +182,15 @@ LegacyBiosInt86 (
   ASSERT_EFI_ERROR (Status);
   
   Stack16 = (UINT16 *)((UINT8 *) BiosDev->ThunkContext->RealModeBuffer + BiosDev->ThunkContext->RealModeBufferSize - sizeof (UINT16));
-  Stack16 -= sizeof (ThunkRegSet.E.EFLAGS) / sizeof (UINT16);
-  CopyMem (Stack16, &ThunkRegSet.E.EFLAGS, sizeof (ThunkRegSet.E.EFLAGS));
 
   ThunkRegSet.E.SS   = (UINT16) (((UINTN) Stack16 >> 16) << 12);
   ThunkRegSet.E.ESP  = (UINT16) (UINTN) Stack16;
+
   ThunkRegSet.E.Eip  = (UINT16)((UINT32 *)NULL)[BiosInt];
   ThunkRegSet.E.CS   = (UINT16)(((UINT32 *)NULL)[BiosInt] >> 16);
   BiosDev->ThunkContext->RealModeState = &ThunkRegSet;
   AsmThunk16 (BiosDev->ThunkContext);
-
+  
   //
   // Restore protected mode interrupt state
   //
