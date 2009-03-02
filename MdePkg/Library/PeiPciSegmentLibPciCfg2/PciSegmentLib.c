@@ -42,7 +42,7 @@
 
 **/
 #define PCI_TO_PCICFG2_ADDRESS(A) \
-  ((((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
+  ((((UINT32)(A) << 4) & 0xff000000) | (((UINT32)(A) >> 4) & 0x00000700) | (((UINT32)(A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
 
 /**
   Gets PCI CFG2 PPI.

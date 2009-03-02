@@ -54,6 +54,6 @@ typedef struct {
 
 **/
 #define PCI_TO_PCI_ROOT_BRIDGE_IO_ADDRESS(A) \
-  ((((A) << 4) & 0xff000000) | (((A) >> 4) & 0x00000700) | (((A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
+  ((((UINT32)(A) << 4) & 0xff000000) | (((UINT32)(A) >> 4) & 0x00000700) | (((UINT32)(A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
 
 #endif
