@@ -1,7 +1,7 @@
 /**@file
   This contains the installation function for the driver.
   
-Copyright (c) 2005 - 2008, Intel Corporation                                                         
+Copyright (c) 2005 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "8259.h"
 
 //
-// Global for the Legacy 8259 Protocol that is prodiced by this driver
+// Global for the Legacy 8259 Protocol that is produced by this driver
 //
 EFI_LEGACY_8259_PROTOCOL  m8259 = {
   Interrupt8259SetVectorBase,
@@ -45,24 +45,21 @@ UINT16                    mLegacyModeEdgeLevel    = 0x0000;
 //
 // Worker Functions
 //
+
+/**
+  Write to mask and edge/level triggered registers of master and slave PICs.
+
+  @param[in]  Mask       low byte for master PIC mask register,
+                         high byte for slave PIC mask register.
+  @param[in]  EdgeLevel  low byte for master PIC edge/level triggered register,
+                         high byte for slave PIC edge/level triggered register.
+
+**/
 VOID
 Interrupt8259WriteMask (
   IN UINT16  Mask,
   IN UINT16  EdgeLevel
   )
-/**
-
-  Routine Description:
-    Sets the 8250 mask to the valud specified by Mask
-
-  Arguments:
-    Mask       - A 16 bit valute that represents the master and slave mask values
-
-  Returns:
-    None
-
-**/
-// TODO:    EdgeLevel - add argument and description to function comment
 {
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, (UINT8) Mask);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, (UINT8) (Mask >> 8));
@@ -70,24 +67,20 @@ Interrupt8259WriteMask (
   IoWrite8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_SLAVE, (UINT8) (EdgeLevel >> 8));
 }
 
-VOID
-Interrupt8259ReadMask (
-  IN UINT16  *Mask,
-  IN UINT16  *EdgeLevel
-  )
 /**
+  Read from mask and edge/level triggered registers of master and slave PICs.
 
-  Routine Description:
-    Sets the 8250 mask to the valud specified by Mask
-
-  Arguments:
-    Mask       - A 16 bit valute that represents the master and slave mask values
-
-  Returns:
-    None
+  @param[out]  Mask       low byte for master PIC mask register,
+                          high byte for slave PIC mask register.
+  @param[out]  EdgeLevel  low byte for master PIC edge/level triggered register,
+                          high byte for slave PIC edge/level triggered register.
 
 **/
-// TODO:    EdgeLevel - add argument and description to function comment
+VOID
+Interrupt8259ReadMask (
+  OUT UINT16  *Mask,
+  OUT UINT16  *EdgeLevel
+  )
 {
   UINT16  MasterValue;
   UINT16  SlaveValue;
@@ -106,58 +99,113 @@ Interrupt8259ReadMask (
     *EdgeLevel = (UINT16) (MasterValue | (SlaveValue << 8));
   }
 }
+
 //
-// Legacy 8259 Protocol Interface Function
+// Legacy 8259 Protocol Interface Functions
 //
+
+/**
+  Sets the base address for the 8259 master and slave PICs.
+
+  @param[in]  This        Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  MasterBase  Interrupt vectors for IRQ0-IRQ7.
+  @param[in]  SlaveBase   Interrupt vectors for IRQ8-IRQ15.
+
+  @retval  EFI_SUCCESS       The 8259 PIC was programmed successfully.
+  @retval  EFI_DEVICE_ERROR  There was an error while writing to the 8259 PIC.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259SetVectorBase (
-  IN  EFI_LEGACY_8259_PROTOCOL  *This,
-  IN  UINT8                     MasterBase,
-  IN  UINT8                     SlaveBase
+  IN EFI_LEGACY_8259_PROTOCOL  *This,
+  IN UINT8                     MasterBase,
+  IN UINT8                     SlaveBase
   )
-/**
-
-  Routine Description:
-    Sets the base vector for the 8250 Master and Slave interrupt controllers
-
-  Arguments:
-    This       - Protocol instance pointer.
-    MasterBase - Base vector of the 8259 Master
-    SlaveBase  - Base vector of the 8259 Slave
-
-  Returns:
-    EFI_SUCCESS       - 8259 programmed
-
-**/
 {
   UINT8 Mask;
 
+  //
+  // Set vector base for slave PIC
+  //
   if (SlaveBase != mSlaveBase) {
     mSlaveBase = SlaveBase;
 
     //
-    // Initialize Slave interrupt controller.
+    // Initialization sequence is needed for setting vector base.
+    //
+
+    //
+    // Preserve interrtup mask register before initialization sequence
+    // because it will be cleared during intialization
     //
     Mask = IoRead8 (LEGACY_8259_MASK_REGISTER_SLAVE);
+
+    //
+    // ICW1: cascade mode, ICW4 write required
+    //
     IoWrite8 (LEGACY_8259_CONTROL_REGISTER_SLAVE, 0x11);
+
+    //
+    // ICW2: new vector base (must be multiple of 8)
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, mSlaveBase);
+
+    //
+    // ICW3: slave indentification code must be 2
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0x02);
+
+    //
+    // ICW4: fully nested mode, non-buffered mode, normal EOI, IA processor
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0x01);
+
+    //
+    // Restore interrupt mask register
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, Mask);
   }
 
+  //
+  // Set vector base for master PIC
+  //
   if (MasterBase != mMasterBase) {
     mMasterBase = MasterBase;
 
     //
-    // Initialize Master interrupt controller.
+    // Initialization sequence is needed for setting vector base.
+    //
+
+    //
+    // Preserve interrtup mask register before initialization sequence
+    // because it will be cleared during intialization
     //
     Mask = IoRead8 (LEGACY_8259_MASK_REGISTER_MASTER);
+
+    //
+    // ICW1: cascade mode, ICW4 write required
+    //
     IoWrite8 (LEGACY_8259_CONTROL_REGISTER_MASTER, 0x11);
+
+    //
+    // ICW2: new vector base (must be multiple of 8)
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, mMasterBase);
+
+    //
+    // ICW3: slave PIC is cascaded on IRQ2
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0x04);
+
+    //
+    // ICW4: fully nested mode, non-buffered mode, normal EOI, IA processor
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0x01);
+
+    //
+    // Restore interrupt mask register
+    //
     IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, Mask);
   }
 
@@ -167,34 +215,28 @@ Interrupt8259SetVectorBase (
   return EFI_SUCCESS;
 }
 
+/**
+  Gets the current 16-bit real mode and 32-bit protected-mode IRQ masks.
+
+  @param[in]   This                Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[out]  LegacyMask          16-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[out]  LegacyEdgeLevel     16-bit mode edge/level mask for IRQ-IRQ15.
+  @param[out]  ProtectedMask       32-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[out]  ProtectedEdgeLevel  32-bit mode edge/level mask for IRQ0-IRQ15.
+
+  @retval  EFI_SUCCESS       The 8259 PIC was programmed successfully.
+  @retval  EFI_DEVICE_ERROR  There was an error while reading the 8259 PIC.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259GetMask (
-  IN  EFI_LEGACY_8259_PROTOCOL  * This,
+  IN  EFI_LEGACY_8259_PROTOCOL  *This,
   OUT UINT16                    *LegacyMask, OPTIONAL
   OUT UINT16                    *LegacyEdgeLevel, OPTIONAL
   OUT UINT16                    *ProtectedMask, OPTIONAL
   OUT UINT16                    *ProtectedEdgeLevel OPTIONAL
   )
-/**
-
-  Routine Description:
-    Get the 8259 master and slave address that maps IRQ to processor interrupt 
-    vector number. Get the Context of the device including the state of the
-    interrupt mask.
-
-  Arguments:
-    This       - Protocol instance pointer.
-
-  Returns:
-    EFI_SUCCESS       - 8259 programmed
-    EFI_DEVICE_ERROR  - Error writting to 8259
-
-**/
-// TODO:    LegacyMask - add argument and description to function comment
-// TODO:    LegacyEdgeLevel - add argument and description to function comment
-// TODO:    ProtectedMask - add argument and description to function comment
-// TODO:    ProtectedEdgeLevel - add argument and description to function comment
 {
   if (LegacyMask != NULL) {
     *LegacyMask = mLegacyModeMask;
@@ -215,33 +257,28 @@ Interrupt8259GetMask (
   return EFI_SUCCESS;
 }
 
+/**
+  Sets the current 16-bit real mode and 32-bit protected-mode IRQ masks.
+
+  @param[in]  This                Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  LegacyMask          16-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[in]  LegacyEdgeLevel     16-bit mode edge/level mask for IRQ-IRQ15.
+  @param[in]  ProtectedMask       32-bit mode interrupt mask for IRQ0-IRQ15.
+  @param[in]  ProtectedEdgeLevel  32-bit mode edge/level mask for IRQ0-IRQ15.
+
+  @retval  EFI_SUCCESS       The 8259 PIC was programmed successfully.
+  @retval  EFI_DEVICE_ERROR  There was an error while writing the 8259 PIC.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259SetMask (
-  IN  EFI_LEGACY_8259_PROTOCOL  * This,
-  IN  UINT16                    *LegacyMask, OPTIONAL
-  IN  UINT16                    *LegacyEdgeLevel, OPTIONAL
-  IN  UINT16                    *ProtectedMask, OPTIONAL
-  IN  UINT16                    *ProtectedEdgeLevel OPTIONAL
+  IN EFI_LEGACY_8259_PROTOCOL  *This,
+  IN UINT16                    *LegacyMask, OPTIONAL
+  IN UINT16                    *LegacyEdgeLevel, OPTIONAL
+  IN UINT16                    *ProtectedMask, OPTIONAL
+  IN UINT16                    *ProtectedEdgeLevel OPTIONAL
   )
-/**
-
-  Routine Description:
-    Set the 8259 interrupt and edge/level masks for legacy and/or protected 
-    mode operation. This routine does not touch the hardware but only the
-    RAM copies of the masks.
-
-  Arguments:
-    This       - Protocol instance pointer.
-
-  Returns:
-    EFI_SUCCESS       - 8259 masks updated
-
-**/
-// TODO:    LegacyMask - add argument and description to function comment
-// TODO:    LegacyEdgeLevel - add argument and description to function comment
-// TODO:    ProtectedMask - add argument and description to function comment
-// TODO:    ProtectedEdgeLevel - add argument and description to function comment
 {
   if (LegacyMask != NULL) {
     mLegacyModeMask = *LegacyMask;
@@ -262,33 +299,26 @@ Interrupt8259SetMask (
   return EFI_SUCCESS;
 }
 
+/**
+  Sets the mode of the PICs.
+
+  @param[in]  This       Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Mode       16-bit real or 32-bit protected mode.
+  @param[in]  Mask       The value with which to set the interrupt mask.
+  @param[in]  EdgeLevel  The value with which to set the edge/level mask.
+
+  @retval  EFI_SUCCESS            The mode was set successfully.
+  @retval  EFI_INVALID_PARAMETER  The mode was not set.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259SetMode (
-  IN  EFI_LEGACY_8259_PROTOCOL  * This,
-  IN  EFI_8259_MODE             Mode,
-  IN  UINT16                    *Mask, OPTIONAL
-  IN  UINT16                    *EdgeLevel OPTIONAL
+  IN EFI_LEGACY_8259_PROTOCOL  *This,
+  IN EFI_8259_MODE             Mode,
+  IN UINT16                    *Mask, OPTIONAL
+  IN UINT16                    *EdgeLevel OPTIONAL
   )
-/**
-
-  Routine Description:
-    Set the 8259 master and slave address that maps IRQ to processor interrupt 
-    vector number. Restore the Context of the device, so that the interrupt
-    mask is put back in it's previous mode.
-
-  Arguments:
-    This  - Protocol instance pointer.
-    Mode  - 
-    Mask  -
-
-  Returns:
-    EFI_SUCCESS       - 8259 programmed
-    EFI_DEVICE_ERROR  - Error writting to 8259
-
-**/
-// TODO:    EdgeLevel - add argument and description to function comment
-// TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
   if (Mode == mMode) {
     return EFI_SUCCESS;
@@ -296,7 +326,9 @@ Interrupt8259SetMode (
 
   if (Mode == Efi8259LegacyMode) {
     //
-    // Save the protected mode mask
+    // In Efi8259ProtectedMode, mask and edge/level trigger registers should
+    // be changed through this protocol, so we can track them in the
+    // corresponding module variables.
     //
     Interrupt8259ReadMask (&mProtectedModeMask, &mProtectedModeEdgeLevel);
 
@@ -317,8 +349,7 @@ Interrupt8259SetMode (
     mMode = Mode;
 
     //
-    // Set 8259 Vector Base
-    //
+    // Write new legacy mode mask/trigger level
     //
     Interrupt8259SetVectorBase (This, LEGACY_MODE_BASE_VECTOR_MASTER, LEGACY_MODE_BASE_VECTOR_SLAVE);
 
@@ -332,7 +363,7 @@ Interrupt8259SetMode (
 
   if (Mode == Efi8259ProtectedMode) {
     //
-    // Save the legacy mode mask
+    // Save the legacy mode mask/trigger level
     //
     Interrupt8259ReadMask (&mLegacyModeMask, &mLegacyModeEdgeLevel);
     //
@@ -358,8 +389,7 @@ Interrupt8259SetMode (
     mMode = Mode;
 
     //
-    // Set 8259 Vector Base
-    //
+    // Write new protected mode mask/trigger level
     //
     Interrupt8259SetVectorBase (This, PROTECTED_MODE_BASE_VECTOR_MASTER, PROTECTED_MODE_BASE_VECTOR_SLAVE);
 
@@ -374,6 +404,17 @@ Interrupt8259SetMode (
   return EFI_INVALID_PARAMETER;
 }
 
+/**
+  Translates the IRQ into a vector.
+
+  @param[in]   This    Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]   Irq     IRQ0-IRQ15.
+  @param[out]  Vector  The vector that is assigned to the IRQ.
+
+  @retval  EFI_SUCCESS            The Vector that matches Irq was returned.
+  @retval  EFI_INVALID_PARAMETER  Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259GetVector (
@@ -381,21 +422,6 @@ Interrupt8259GetVector (
   IN  EFI_8259_IRQ              Irq,
   OUT UINT8                     *Vector
   )
-/**
-
-  Routine Description:
-    Convert from IRQ to processor interrupt vector number.
-
-  Arguments:
-    This    - Protocol instance pointer.
-    Irq     - 8259 IRQ0 - IRQ15
-    Vector  - Processor vector number that matches Irq
-
-  Returns:
-    EFI_SUCCESS           - The Vector matching Irq is returned
-    EFI_INVALID_PARAMETER - Irq not valid
-
-**/
 {
   if (Irq < Efi8259Irq0 || Irq > Efi8259Irq15) {
     return EFI_INVALID_PARAMETER;
@@ -410,28 +436,24 @@ Interrupt8259GetVector (
   return EFI_SUCCESS;
 }
 
+/**
+  Enables the specified IRQ.
+
+  @param[in]  This            Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Irq             IRQ0-IRQ15.
+  @param[in]  LevelTriggered  0 = Edge triggered; 1 = Level triggered.
+
+  @retval  EFI_SUCCESS            The Irq was enabled on the 8259 PIC.
+  @retval  EFI_INVALID_PARAMETER  The Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259EnableIrq (
-  IN  EFI_LEGACY_8259_PROTOCOL  *This,
-  IN  EFI_8259_IRQ              Irq,
-  IN  BOOLEAN                   LevelTriggered
+  IN EFI_LEGACY_8259_PROTOCOL  *This,
+  IN EFI_8259_IRQ              Irq,
+  IN BOOLEAN                   LevelTriggered
   )
-/**
-
-  Routine Description:
-    Enable Irq by unmasking interrupt in 8259
-
-  Arguments:
-    This    - Protocol instance pointer.
-    Irq     - 8259 IRQ0 - IRQ15
-
-  Returns:
-    EFI_SUCCESS           - Irq enabled on 8259
-    EFI_INVALID_PARAMETER - Irq not valid
-
-**/
-// TODO:    LevelTriggered - add argument and description to function comment
 {
   if (Irq < Efi8259Irq0 || Irq > Efi8259Irq15) {
     return EFI_INVALID_PARAMETER;
@@ -449,32 +471,29 @@ Interrupt8259EnableIrq (
   return EFI_SUCCESS;
 }
 
+/**
+  Disables the specified IRQ.
+
+  @param[in]  This  Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Irq   IRQ0-IRQ15.
+
+  @retval  EFI_SUCCESS            The Irq was disabled on the 8259 PIC.
+  @retval  EFI_INVALID_PARAMETER  The Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259DisableIrq (
-  IN  EFI_LEGACY_8259_PROTOCOL  *This,
-  IN  EFI_8259_IRQ              Irq
+  IN EFI_LEGACY_8259_PROTOCOL  *This,
+  IN EFI_8259_IRQ              Irq
   )
-/**
-
-  Routine Description:
-    Disable Irq by masking interrupt in 8259
-
-  Arguments:
-    This    - Protocol instance pointer.
-    Irq     - 8259 IRQ0 - IRQ15
-
-  Returns:
-    EFI_SUCCESS           - Irq disabled on 8259
-    EFI_INVALID_PARAMETER - Irq not valid
-
-**/
 {
   if (Irq < Efi8259Irq0 || Irq > Efi8259Irq15) {
     return EFI_INVALID_PARAMETER;
   }
 
-  mProtectedModeMask      = (UINT16) (mProtectedModeMask | (1 << Irq));
+  mProtectedModeMask = (UINT16) (mProtectedModeMask | (1 << Irq));
+
   mProtectedModeEdgeLevel = (UINT16) (mProtectedModeEdgeLevel & ~(1 << Irq));
 
   Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
@@ -482,6 +501,16 @@ Interrupt8259DisableIrq (
   return EFI_SUCCESS;
 }
 
+/**
+  Reads the PCI configuration space to get the interrupt number that is assigned to the card.
+
+  @param[in]   This       Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]   PciHandle  PCI function for which to return the vector.
+  @param[out]  Vector     IRQ number that corresponds to the interrupt line.
+
+  @retval  EFI_SUCCESS  The interrupt line value was read successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259GetInterruptLine (
@@ -489,48 +518,26 @@ Interrupt8259GetInterruptLine (
   IN  EFI_HANDLE                PciHandle,
   OUT UINT8                     *Vector
   )
-/**
-
-  Routine Description:
-    PciHandle represents a PCI config space of a PCI function. Vector 
-    represents Interrupt Pin (from PCI config space) and it is the data
-    that is programmed into the Interrupt Line (from the PCI config space)
-    register.
-
-  Arguments:
-    This      - Protocol instance pointer.
-    PciHandle - PCI function to return vector for 
-    Vector    - Vector for fucntion that matches 
-
-  Returns:
-    EFI_SUCCESS           - A valid Vector is returned
-    EFI_INVALID_PARAMETER - PciHandle not valid
-
-**/
 {
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Issues the End of Interrupt (EOI) commands to PICs.
+
+  @param[in]  This  Indicates the EFI_LEGACY_8259_PROTOCOL instance.
+  @param[in]  Irq   The interrupt for which to issue the EOI command.
+
+  @retval  EFI_SUCCESS            The EOI command was issued.
+  @retval  EFI_INVALID_PARAMETER  The Irq is not valid.
+
+**/
 EFI_STATUS
 EFIAPI
 Interrupt8259EndOfInterrupt (
-  IN  EFI_LEGACY_8259_PROTOCOL  *This,
-  IN  EFI_8259_IRQ              Irq
+  IN EFI_LEGACY_8259_PROTOCOL  *This,
+  IN EFI_8259_IRQ              Irq
   )
-/**
-
-  Routine Description:
-    Send an EOI to 8259
-
-  Arguments:
-    This    - Protocol instance pointer.
-    Irq     - 8259 IRQ0 - IRQ15
-
-  Returns:
-    EFI_SUCCESS           - EOI successfully sent to 8259
-    EFI_INVALID_PARAMETER - Irq not valid
-
-**/
 {
   if (Irq < Efi8259Irq0 || Irq > Efi8259Irq15) {
     return EFI_INVALID_PARAMETER;
@@ -545,31 +552,22 @@ Interrupt8259EndOfInterrupt (
   return EFI_SUCCESS;
 }
 
-//
-// Legacy 8259 Driver Entry Point
-//
+/**
+  Driver Entry point.
+
+  @param[in]  ImageHandle  ImageHandle of the loaded driver.
+  @param[in]  SystemTable  Pointer to the EFI System Table.
+
+  @retval  EFI_SUCCESS  One or more of the drivers returned a success code.
+  @retval  !EFI_SUCCESS  Error installing Legacy 8259 Protocol.
+
+**/
 EFI_STATUS
 EFIAPI
 Install8259 (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/**
-
-Routine Description:
-  
-
-Arguments:
-
-  (Standard EFI Image entry - EFI_IMAGE_ENTRY_POINT)
-
-Returns:
-
-  EFI_SUCCESS - Legacy 8259  Protocol Installed
-
-**/
-// TODO:    ImageHandle - add argument and description to function comment
-// TODO:    SystemTable - add argument and description to function comment
 {
   EFI_STATUS   Status;
   EFI_8259_IRQ Irq;
