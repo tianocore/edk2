@@ -6,7 +6,7 @@
     PCI-to-PCI Bridge Architecture Specification, Revision 1.2
     PC Card Standard, 8.0
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -20,7 +20,6 @@
 #ifndef _PCI22_H_
 #define _PCI22_H_
 
-#define PCI_MAX_SEGMENT 0
 #define PCI_MAX_BUS     255
 #define PCI_MAX_DEVICE  31
 #define PCI_MAX_FUNC    7
