@@ -1,7 +1,7 @@
 /** @file
   Provide services to access I/O Ports and MMIO registers.
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2514,7 +2514,7 @@ MmioReadBuffer64 (
   @param  Length          The size, in bytes, of Buffer.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT8 *
@@ -2530,7 +2530,7 @@ MmioWriteBuffer8 (
 
   Copy data from system memory specified by Buffer to MMIO region specified 
   by starting address StartAddress by using 16-bit access. The total number 
-  of byte to be copied is specified by Length. Length is returned.
+  of byte to be copied is specified by Length. Buffer is returned.
   
   If StartAddress is not aligned on a 16-bit boundary, then ASSERT().
 
@@ -2545,7 +2545,7 @@ MmioWriteBuffer8 (
   @param  Length          The size, in bytes, of Buffer.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT16 *
@@ -2561,7 +2561,7 @@ MmioWriteBuffer16 (
 
   Copy data from system memory specified by Buffer to MMIO region specified 
   by starting address StartAddress by using 32-bit access. The total number 
-  of byte to be copied is specified by Length. Length is returned.
+  of byte to be copied is specified by Length. Buffer is returned.
   
   If StartAddress is not aligned on a 32-bit boundary, then ASSERT().
 
@@ -2576,7 +2576,7 @@ MmioWriteBuffer16 (
   @param  Length          The size, in bytes, of Buffer.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT32 *
@@ -2592,7 +2592,7 @@ MmioWriteBuffer32 (
 
   Copy data from system memory specified by Buffer to MMIO region specified 
   by starting address StartAddress by using 64-bit access. The total number 
-  of byte to be copied is specified by Length. Length is returned.
+  of byte to be copied is specified by Length. Buffer is returned.
   
   If StartAddress is not aligned on a 64-bit boundary, then ASSERT().
 
@@ -2607,7 +2607,7 @@ MmioWriteBuffer32 (
   @param  Length          The size, in bytes, of Buffer.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT64 *
