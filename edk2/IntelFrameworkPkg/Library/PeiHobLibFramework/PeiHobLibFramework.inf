@@ -1,0 +1,61 @@
+#/** @file
+# Instance of HOB Library using PEI Services.
+#
+# HOB Library implementation that uses PEI Services to retrieve the HOB List.
+# This library instance uses EFI_HOB_TYPE_CV defined in Intel framework HOB specification v0.9
+# to implement HobLib BuildCvHob() API. 
+#
+# Copyright (c) 2006 - 2008, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiHobLib
+  FILE_GUID                      = B6684612-6F5D-425d-952C-F462792EC00B
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HobLib|PEIM PEI_CORE SEC
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+#
+
+[Sources.common]
+  HobLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PeiServicesLib
+  DebugLib
+
+[Guids]
+  gEfiHobMemoryAllocStackGuid                   ## PRODUCES ## HOB
+  gEfiHobMemoryAllocBspStoreGuid                ## PRODUCES ## HOB
+  gEfiHobMemoryAllocModuleGuid                  ## PRODUCES ## HOB
+
+#
+# [Hob]
+#   RESOURCE_DESCRIPTOR   ## PRODUCES
+#   MEMORY_ALLOCATION     ## PRODUCES
+#   GUID_EXTENSION        ## CONSUMES
+#   GUID_EXTENSION        ## PRODUCES
+#   CPU                   ## PRODUCES
+#   FV2                   ## PRODUCES
+#   FV                    ## PRODUCES
+#   
+
