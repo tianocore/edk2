@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __REPORT_STATUS_CODE_LIB_H__
 #define __REPORT_STATUS_CODE_LIB_H__
 
+#include <Uefi/UefiBaseType.h>
 #include <Pi/PiMultiPhase.h>
 #include <Protocol/DevicePath.h>
 
@@ -24,10 +25,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED          0x00000001
 #define REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED             0x00000002
 #define REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED             0x00000004
-
-//
-// Extended Data structure definitions with EFI_STATUS_CODE_DATA headers removed
-//
 
 /**
   Converts a status code to an 8-bit POST code value.
@@ -151,7 +148,7 @@ ReportStatusCodeExtractDebugInfo (
   passed in a zero instance, NULL extended data, and a caller ID of 
   gEfiCallerIdGuid, which is the GUID for the module.  
   
-  ReportStatusCode()must actively prevent recusrsion.  If ReportStatusCode() 
+  ReportStatusCode()must actively prevent recursion.  If ReportStatusCode() 
   is called while processing another any other Report Status Code Library function,
   then ReportStatusCode() must return immediately.
 
