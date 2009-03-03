@@ -77,4 +77,5 @@
   IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
   IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
   IntelFrameworkPkg/Library/HiiLibFramework/HiiLibFramework.inf
+  IntelFrameworkPkg/Library/PeiHobLibFramework/PeiHobLibFramework.inf
 
