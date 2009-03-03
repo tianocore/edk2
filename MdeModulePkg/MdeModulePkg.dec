@@ -209,7 +209,7 @@
   ## Include/Protocol/TcgPlatform.h
   gEfiTcgPlatformProtocolGuid    = { 0x8c4c9a41, 0xbf56, 0x4627, { 0x9e, 0xa, 0xc8, 0x38, 0x6d, 0x66, 0x11, 0x5c }}
   
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
  
@@ -283,7 +283,7 @@
   ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable|TRUE|BOOLEAN|0x0001200a
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicate maximum number of callback function
   #  for a dynamic PCD used in PEI phase.
@@ -302,9 +302,6 @@
   #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
   
-  ## Maximun number of performance log entries during PEI phase.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
-  
   ## Maximum number of FV is supported by PeiCore's dispatching.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
 
@@ -320,9 +317,6 @@
   ## RTC Update Timeout Value
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
   
-  ## Base address of the NV variable range in flash device.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
-  
   ## Size of the NV variable range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
   
@@ -334,37 +328,12 @@
   
   ## Maximum buffer for the total variable store.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
-  
-  ## Base address of the FTW spare block range in flash device.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013
-  
+   
   ## Size of the FTW spare block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x0|UINT32|0x30000014
-  
-  ## Base address of the FTW working block range in flash device.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
-  
+    
   ## Size of the FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
-
-  ## Default timeout value for displaying progressing bar in before boot OS.
-  #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
-
-  ## Error level for hardware recorder.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
-  
-  ##
-  #  This PCD defines the print string.
-  #  This PCD is a sample to explain FixedAtBuild String PCD usage.
-  ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004
-
-  ##
-  #  This PCD defines the times to print hello world string.
-  #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
-  ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
 
 [PcdsFixedAtBuild.IA32]
   ## Default EFI boot path name for IA32 architecture, this path is relative to 
@@ -385,57 +354,26 @@
   ## Default EFI boot path name for EBC architecture, this path is relative to 
   #  EFI boot disk.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDefaultBootFileName|L"\EFI\BOOT\BOOTEBC.EFI"|VOID*|0x40000003
-  
-[PcdsDynamic.common]
-  ## Base address of the NV variable range in flash device 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
-
-  ## Base address of the FTW spare block range in flash device.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013
-
-  ## Base address of the FTW working block range in flash device.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
-
+   
+[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
   ## Default timeout value for displaying progressing bar in before boot OS.
   #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
-
-  ## Error level for hardware recorder.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
-
-  ##
-  #  This PCD defines the print string.
-  #  This PCD is a sample to explain Dynamic PCD usage.
-  ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004
-
-  ##
-  #  This PCD defines the times to print hello world string.
-  #  This PCD is a sample to explain Dynamic UINT32 PCD usage.
-  ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
-
-  ##
-  #  This PCD defines the Console output column and the default value is 25 according to UEFI spec
-  ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|25|UINT32|0x40000006
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001  
   
   ##
-  #  This PCD defines the Console output row and the default value is 80 according to UEFI spec
+  #  This PCD defines the times to print hello world string.
+  #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
   ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
-
-[PcdsPatchableInModule.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
+  
+  ## Error level for hardware recorder.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002 
+  
+[PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
-
-  ## Default timeout value for displaying progressing bar in before boot OS.
-  #  This value can be changed in BDS.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootTimeOutDefault|0xffff|UINT16|0x40000001
-
-  ## Error level for hardware recorder.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1|UINT16|0x40000002
-
+  
+[PcdsPatchableInModule,PcdsDynamic]
   ##
   #  This PCD defines the Console output column and the default value is 25 according to UEFI spec
   ##
@@ -444,13 +382,24 @@
   ##
   #  This PCD defines the Console output row and the default value is 80 according to UEFI spec
   ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007  
+  
+[PcdsFixedAtBuild,PcdsDynamic]
+  ## Base address of the NV variable range in flash device 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
+  
+  ## Base address of the FTW spare block range in flash device.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013 
+  
+  ## Base address of the FTW working block range in flash device.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010 
+  
   ##
-  #  This PCD defines the times to print hello world string.
-  #  This PCD is a sample to explain Patchable UINT32 PCD usage.
+  #  This PCD defines the print string.
+  #  This PCD is a sample to explain FixedAtBuild String PCD usage.
   ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
-
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004 
+  
 [PcdsFeatureFlag.IA32]
   ## If TRUE, the DXE IPL will load a 64-bit DxeCore.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE|BOOLEAN|0x0001003b
