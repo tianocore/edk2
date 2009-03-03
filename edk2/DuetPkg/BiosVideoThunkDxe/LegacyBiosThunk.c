@@ -137,7 +137,7 @@ EFIAPI
 LegacyBiosInt86 (
   IN  BIOS_VIDEO_DEV                 *BiosDev,
   IN  UINT8                           BiosInt,
-  IN  EFI_IA32_REGISTER_SET           *Regs
+  IN  IA32_REGISTER_SET              *Regs
   )
 {
   UINTN                 Status;
@@ -216,9 +216,9 @@ LegacyBiosInt86 (
   Regs->E.DS       = ThunkRegSet.E.DS;  
   Regs->E.ES       = ThunkRegSet.E.ES;
 
-  CopyMem (&(Regs->E.EFlags), &(ThunkRegSet.E.EFLAGS), sizeof (UINT32));
+  CopyMem (&(Regs->E.EFLAGS), &(ThunkRegSet.E.EFLAGS), sizeof (UINT32));
 
-  Ret = (BOOLEAN) (Regs->E.EFlags.CF == 1);
+  Ret = (BOOLEAN) (Regs->E.EFLAGS.Bits.CF == 1);
 
   return Ret;
 }
