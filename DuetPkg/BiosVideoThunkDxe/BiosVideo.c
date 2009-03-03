@@ -493,9 +493,7 @@ BiosVideoChildHandleInstall (
     // for the standard 640x480 16 color VGA mode
     //
     if (BiosVideoPrivate->VgaCompatible) {
-      DEBUG ((EFI_D_INFO, "Before BiosVideoCheckForVga()\n"));
       Status = BiosVideoCheckForVga (BiosVideoPrivate);
-      DEBUG ((EFI_D_INFO, "Status BiosVideoCheckForVga(): %r\n", Status));
     }
 
     if (EFI_ERROR (Status)) {
@@ -1045,7 +1043,6 @@ BiosVideoCheckForVbe (
   VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING ValidEdidTiming;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE      *GraphicsOutputMode;
 
-  DEBUG ((EFI_D_INFO, "Enter BiosVideoCheckForVbe()\n"));
   //
   // Allocate buffer under 1MB for VBE data structures
   //
@@ -1098,11 +1095,7 @@ BiosVideoCheckForVbe (
   Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeInformationBlock);
   Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeInformationBlock);
 
-  DEBUG ((EFI_D_INFO, "Before VESA!\n"));
   LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
-  DEBUG ((EFI_D_INFO, "Call VESA! Return Status=0x%X\n", Regs.X.AX));
-  DEBUG ((EFI_D_INFO, "Call VESA! VESA Signature =0x%X\n", BiosVideoPrivate->VbeInformationBlock->VESASignature));
-  DEBUG ((EFI_D_INFO, "Call VESA! VESA Version =0x%X\n", BiosVideoPrivate->VbeInformationBlock->VESAVersion));
     
   Status = EFI_DEVICE_ERROR;
 
@@ -1110,21 +1103,18 @@ BiosVideoCheckForVbe (
   // See if the VESA call succeeded
   //
   if (Regs.X.AX != VESA_BIOS_EXTENSIONS_STATUS_SUCCESS) {
-    DEBUG ((EFI_D_INFO, "Fail to call VESA! Status=0x%X\n", Regs.X.AX));
     return Status;
   }
   //
   // Check for 'VESA' signature
   //
   if (BiosVideoPrivate->VbeInformationBlock->VESASignature != VESA_BIOS_EXTENSIONS_VESA_SIGNATURE) {
-    DEBUG ((EFI_D_INFO, "Fail to check VESA signature!\n"));
     return Status;
   }
   //
   // Check to see if this is VBE 2.0 or higher
   //
   if (BiosVideoPrivate->VbeInformationBlock->VESAVersion < VESA_BIOS_EXTENSIONS_VERSION_2_0) {
-    DEBUG ((EFI_D_INFO, "VBE version is little than 2.0!\n"));
     return Status;
   }
 
@@ -1526,9 +1516,7 @@ BiosVideoCheckForVga (
   // Test to see if the Video Adapter support the 640x480 16 color mode
   //
   BiosVideoPrivate->GraphicsOutput.Mode->Mode = GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER;
-  DEBUG ((EFI_D_INFO, "BiosVideoCheckForVga: before BiosVideoGraphicsOutputSetMode"));
   Status = BiosVideoGraphicsOutputSetMode (&BiosVideoPrivate->GraphicsOutput, 0);
-  DEBUG ((EFI_D_INFO, "BiosVideoCheckForVga: after BiosVideoGraphicsOutputSetMode, %r", Status));
 
 Done:
   //
@@ -1695,10 +1683,7 @@ BiosVideoGraphicsOutputSetMode (
     //
     // Set VGA Mode
     //
-    //Regs.X.AX = ModeData->VbeModeNumber;
-    Regs.H.AH = 0x0;
-    Regs.H.AL = 0x1;
-    DEBUG ((EFI_D_INFO, "Set VGA Mode, VbeModeNumber AX=0x%X!\n", Regs.X.AX));
+    Regs.X.AX = ModeData->VbeModeNumber;
     LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
 
   } else {
@@ -1723,7 +1708,6 @@ BiosVideoGraphicsOutputSetMode (
     Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
     Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
     
-    DEBUG ((EFI_D_INFO, "Set VBE Mode!\n"));
     LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
     
     //
