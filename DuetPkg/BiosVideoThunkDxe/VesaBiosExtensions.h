@@ -419,7 +419,7 @@ typedef enum {
   memPL = 3,  // Planar memory model
   memPK = 4,  // Packed pixel memory model
   memRGB= 6,  // Direct color RGB memory model
-  memYUV= 7,  // Direct color YUV memory model
+  memYUV= 7   // Direct color YUV memory model
 } VESA_BIOS_EXTENSIONS_MEMORY_MODELS;
 
 //

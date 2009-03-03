@@ -493,7 +493,9 @@ BiosVideoChildHandleInstall (
     // for the standard 640x480 16 color VGA mode
     //
     if (BiosVideoPrivate->VgaCompatible) {
+      DEBUG ((EFI_D_INFO, "Before BiosVideoCheckForVga()\n"));
       Status = BiosVideoCheckForVga (BiosVideoPrivate);
+      DEBUG ((EFI_D_INFO, "Status BiosVideoCheckForVga(): %r\n", Status));
     }
 
     if (EFI_ERROR (Status)) {
@@ -854,7 +856,7 @@ ParseEdidData (
   //
   CheckSum = 0;
   for (Index = 0; Index < VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE; Index ++) {
-    CheckSum = CheckSum + EdidBuffer[Index];
+    CheckSum = (UINT8)(CheckSum + EdidBuffer[Index]);
   }
   if (CheckSum != 0) {
     return FALSE;
@@ -890,26 +892,26 @@ ParseEdidData (
         //
         // A valid Standard Timing
         //
-        HorizontalResolution = BufferIndex[0] * 8 + 248;
-        AspectRatio = BufferIndex[1] >> 6;
+        HorizontalResolution = (UINT8) (BufferIndex[0] * 8 + 248);
+        AspectRatio = (UINT8) (BufferIndex[1] >> 6);
         switch (AspectRatio) {
           case 0:
-            VerticalResolution = HorizontalResolution / 16 * 10;
+            VerticalResolution = (UINT8) (HorizontalResolution / 16 * 10);
             break;
           case 1:
-            VerticalResolution = HorizontalResolution / 4 * 3;
+            VerticalResolution = (UINT8) (HorizontalResolution / 4 * 3);
             break;
           case 2:
-            VerticalResolution = HorizontalResolution / 5 * 4;
+            VerticalResolution = (UINT8) (HorizontalResolution / 5 * 4);
             break;
           case 3:
-            VerticalResolution = HorizontalResolution / 16 * 9;
+            VerticalResolution = (UINT8) (HorizontalResolution / 16 * 9);
             break;
           default:
-            VerticalResolution = HorizontalResolution / 4 * 3;
+            VerticalResolution = (UINT8) (HorizontalResolution / 4 * 3);
             break;
         }
-        RefreshRate = (BufferIndex[1] & 0x1f) + 60;
+        RefreshRate = (UINT8) ((BufferIndex[1] & 0x1f) + 60);
         TempTiming.HorizontalResolution = HorizontalResolution;
         TempTiming.VerticalResolution = VerticalResolution;
         TempTiming.RefreshRate = RefreshRate;
@@ -1524,7 +1526,9 @@ BiosVideoCheckForVga (
   // Test to see if the Video Adapter support the 640x480 16 color mode
   //
   BiosVideoPrivate->GraphicsOutput.Mode->Mode = GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER;
+  DEBUG ((EFI_D_INFO, "BiosVideoCheckForVga: before BiosVideoGraphicsOutputSetMode"));
   Status = BiosVideoGraphicsOutputSetMode (&BiosVideoPrivate->GraphicsOutput, 0);
+  DEBUG ((EFI_D_INFO, "BiosVideoCheckForVga: after BiosVideoGraphicsOutputSetMode, %r", Status));
 
 Done:
   //
@@ -1691,7 +1695,10 @@ BiosVideoGraphicsOutputSetMode (
     //
     // Set VGA Mode
     //
-    Regs.X.AX = ModeData->VbeModeNumber;
+    //Regs.X.AX = ModeData->VbeModeNumber;
+    Regs.H.AH = 0x0;
+    Regs.H.AL = 0x1;
+    DEBUG ((EFI_D_INFO, "Set VGA Mode, VbeModeNumber AX=0x%X!\n", Regs.X.AX));
     LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
 
   } else {
@@ -1715,6 +1722,8 @@ BiosVideoGraphicsOutputSetMode (
     gBS->SetMem (BiosVideoPrivate->VbeCrtcInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_CRTC_INFORMATION_BLOCK), 0);
     Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
     Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
+    
+    DEBUG ((EFI_D_INFO, "Set VBE Mode!\n"));
     LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
     
     //
@@ -2336,7 +2345,7 @@ BiosVideoGraphicsOutputVgaBlt (
   EFI_TPL             OriginalTPL;
   UINT8               *MemAddress;
   UINTN               BytesPerScanLine;
-  UINTN               BytesPerBitPlane;
+  //UINTN               BytesPerBitPlane;
   UINTN               Bit;
   UINTN               Index;
   UINTN               Index1;
@@ -2368,7 +2377,7 @@ BiosVideoGraphicsOutputVgaBlt (
   PciIo             = BiosVideoPrivate->PciIo;
   MemAddress        = BiosVideoPrivate->ModeData[CurrentMode].LinearFrameBuffer;
   BytesPerScanLine  = BiosVideoPrivate->ModeData[CurrentMode].BytesPerScanLine >> 3;
-  BytesPerBitPlane  = BytesPerScanLine * BiosVideoPrivate->ModeData[CurrentMode].VerticalResolution;
+  //BytesPerBitPlane  = BytesPerScanLine * BiosVideoPrivate->ModeData[CurrentMode].VerticalResolution;
   VgaFrameBuffer    = BiosVideoPrivate->VgaFrameBuffer;
 
   if (This == NULL || ((UINTN) BltOperation) >= EfiGraphicsOutputBltOperationMax) {
@@ -2507,7 +2516,7 @@ BiosVideoGraphicsOutputVgaBlt (
     LeftMask      = mVgaLeftMaskTable[DestinationX & 0x07];
     RightMask     = mVgaRightMaskTable[(DestinationX + Width - 1) & 0x07];
     if (Bytes == 0) {
-      LeftMask &= RightMask;
+      LeftMask = (UINT8) (LeftMask & RightMask);
       RightMask = 0;
     }
 
