@@ -599,7 +599,7 @@ BiosVideoChildHandleUninstall (
   )
 {
   EFI_STATUS                   Status;
-  EFI_IA32_REGISTER_SET        Regs;
+  IA32_REGISTER_SET        Regs;
   EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
   EFI_VGA_MINI_PORT_PROTOCOL   *VgaMiniPort;
   BIOS_VIDEO_DEV               *BiosVideoPrivate;
@@ -1031,7 +1031,7 @@ BiosVideoCheckForVbe (
   )
 {
   EFI_STATUS                             Status;
-  EFI_IA32_REGISTER_SET                  Regs;
+  IA32_REGISTER_SET                  Regs;
   UINT16                                 *ModeNumberPtr;
   BOOLEAN                                ModeFound;
   BOOLEAN                                EdidFound;
@@ -1092,7 +1092,7 @@ BiosVideoCheckForVbe (
   Regs.X.AX = VESA_BIOS_EXTENSIONS_RETURN_CONTROLLER_INFORMATION;
   gBS->SetMem (BiosVideoPrivate->VbeInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_INFORMATION_BLOCK), 0);
   BiosVideoPrivate->VbeInformationBlock->VESASignature  = VESA_BIOS_EXTENSIONS_VBE2_SIGNATURE;
-  Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeInformationBlock);
+  Regs.E.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeInformationBlock);
   Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeInformationBlock);
 
   LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
@@ -1126,7 +1126,7 @@ BiosVideoCheckForVbe (
   Regs.X.BX = 1;
   Regs.X.CX = 0;
   Regs.X.DX = 0;
-  Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeEdidDataBlock);
+  Regs.E.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeEdidDataBlock);
   Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeEdidDataBlock);
 
   LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
@@ -1206,7 +1206,7 @@ BiosVideoCheckForVbe (
     Regs.X.AX = VESA_BIOS_EXTENSIONS_RETURN_MODE_INFORMATION;
     Regs.X.CX = *ModeNumberPtr;
     gBS->SetMem (BiosVideoPrivate->VbeModeInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_MODE_INFORMATION_BLOCK), 0);
-    Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeModeInformationBlock);
+    Regs.E.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeModeInformationBlock);
     Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeModeInformationBlock);
 
     LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
@@ -1622,7 +1622,7 @@ BiosVideoGraphicsOutputSetMode (
 {
   EFI_STATUS              Status;
   BIOS_VIDEO_DEV          *BiosVideoPrivate;
-  EFI_IA32_REGISTER_SET   Regs;
+  IA32_REGISTER_SET   Regs;
   BIOS_VIDEO_MODE_DATA    *ModeData;
 
   BiosVideoPrivate = BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (This);
@@ -1705,7 +1705,7 @@ BiosVideoGraphicsOutputSetMode (
     Regs.X.AX = VESA_BIOS_EXTENSIONS_SET_MODE;
     Regs.X.BX = (UINT16) (ModeData->VbeModeNumber | VESA_BIOS_EXTENSIONS_MODE_NUMBER_LINEAR_FRAME_BUFFER);
     gBS->SetMem (BiosVideoPrivate->VbeCrtcInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_CRTC_INFORMATION_BLOCK), 0);
-    Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
+    Regs.E.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
     Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
     
     LegacyBiosInt86 (BiosVideoPrivate, 0x10, &Regs);
@@ -2729,7 +2729,7 @@ BiosVideoVgaMiniPortSetMode (
   )
 {
   BIOS_VIDEO_DEV        *BiosVideoPrivate;
-  EFI_IA32_REGISTER_SET Regs;
+  IA32_REGISTER_SET Regs;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;

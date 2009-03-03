@@ -30,7 +30,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/EdidActive.h>
 #include <Protocol/EdidDiscovered.h>
 #include <Protocol/DevicePath.h>
-#include <Protocol/LegacyBios.h>
 
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
@@ -132,6 +131,9 @@ typedef struct {
 #define BIOS_VIDEO_DEV_FROM_VGA_MINI_PORT_THIS(a) CR (a, BIOS_VIDEO_DEV, VgaMiniPort, BIOS_VIDEO_DEV_SIGNATURE)
 
 #define GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER	0xffff
+
+#define EFI_SEGMENT(_Adr)     (UINT16) ((UINT16) (((UINTN) (_Adr)) >> 4) & 0xf000)
+#define EFI_OFFSET(_Adr)      (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xffff)
 
 //
 // Global Variables
@@ -494,7 +496,7 @@ EFIAPI
 LegacyBiosInt86 (
   IN  BIOS_VIDEO_DEV                 *BiosDev,
   IN  UINT8                           BiosInt,
-  IN  EFI_IA32_REGISTER_SET           *Regs
+  IN  IA32_REGISTER_SET           *Regs
   );    
   
 #endif
