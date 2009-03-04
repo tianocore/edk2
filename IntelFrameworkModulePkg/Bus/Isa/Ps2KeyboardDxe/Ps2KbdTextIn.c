@@ -684,7 +684,11 @@ KeyboardUnregisterKeyNotify (
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   } 
-  
+
+  if (((KEYBOARD_CONSOLE_IN_EX_NOTIFY *) NotificationHandle)->Signature != KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  } 
+   
   ConsoleInDev = TEXT_INPUT_EX_KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (This);
   
   //

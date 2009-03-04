@@ -1102,6 +1102,10 @@ USBKeyboardUnregisterKeyNotify (
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }  
+
+  if (((KEYBOARD_CONSOLE_IN_EX_NOTIFY *) NotificationHandle)->Signature != USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  } 
   
   UsbKeyboardDevice = TEXT_INPUT_EX_USB_KB_DEV_FROM_THIS (This);
   

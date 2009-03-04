@@ -797,7 +797,11 @@ WinNtGopSimpleTextInExUnregisterKeyNotify (
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   } 
-  
+
+  if (((WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY *) NotificationHandle)->Signature != WIN_NT_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  } 
+
   Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
 
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
