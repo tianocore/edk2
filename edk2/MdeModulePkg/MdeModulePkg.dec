@@ -208,6 +208,14 @@
   ## Tcg addtional services to measure PeImage and ActionString.
   ## Include/Protocol/TcgPlatform.h
   gEfiTcgPlatformProtocolGuid    = { 0x8c4c9a41, 0xbf56, 0x4627, { 0x9e, 0xa, 0xc8, 0x38, 0x6d, 0x66, 0x11, 0x5c }}
+
+  ## Fault Tolerant Write protocol provides boot-time service to do fault tolerant write capability for block devices.
+  #  Include/Protocol/FaultTolerantWrite.h
+  gEfiFaultTolerantWriteProtocolGuid = { 0x3EBD9E82, 0x2C78, 0x4DE6, { 0x97, 0x86, 0x8D, 0x4B, 0xFC, 0xB7, 0xC8, 0x81 }}
+  
+  ## This protocol is used to abstract the swap operation of boot block and backup block of boot FV.
+  #  Include/Protocol/SwapAddressRange.h
+  gEfiSwapAddressRangeProtocolGuid = { 0x1259F60D, 0xB754, 0x468E, { 0xA7, 0x89, 0x4D, 0xB8, 0x5D, 0x55, 0xE8, 0x7E }}
   
 [PcdsFeatureFlag]
   ## Indicate whether platform can support update capsule across a system reset
@@ -282,6 +290,11 @@
   #  This PCD is a sample to explain FeatureFlag PCD usage.
   ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable|TRUE|BOOLEAN|0x0001200a
+
+  ##
+  #  If TRUE, FULL FTW protocol services (total six APIs) will be produced.
+  #  If FASLE, only FTW Write service is available.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable|TRUE|BOOLEAN|0x0001200a
 
 [PcdsFixedAtBuild]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
