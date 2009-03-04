@@ -201,21 +201,21 @@ FtwVariableSpace (
   IN UINTN                  BufferSize
   )
 {
-  EFI_STATUS            Status;
-  EFI_HANDLE            FvbHandle;
-  EFI_FTW_LITE_PROTOCOL *FtwLiteProtocol;
-  EFI_LBA               VarLba;
-  UINTN                 VarOffset;
-  UINT8                 *FtwBuffer;
-  UINTN                 FtwBufferSize;
+  EFI_STATUS                         Status;
+  EFI_HANDLE                         FvbHandle;
+  EFI_LBA                            VarLba;
+  UINTN                              VarOffset;
+  UINT8                              *FtwBuffer;
+  UINTN                              FtwBufferSize;
+  EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *FtwProtocol;
 
   //
   // Locate fault tolerant write protocol
   //
   Status = gBS->LocateProtocol (
-                  &gEfiFaultTolerantWriteLiteProtocolGuid,
+                  &gEfiFaultTolerantWriteProtocolGuid,
                   NULL,
-                  (VOID **) &FtwLiteProtocol
+                  (VOID **) &FtwProtocol
                   );
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
@@ -249,13 +249,14 @@ FtwVariableSpace (
   //
   // FTW write record
   //
-  Status = FtwLiteProtocol->Write (
-                              FtwLiteProtocol,
-                              FvbHandle,
+  Status = FtwProtocol->Write (
+                              FtwProtocol,
                               VarLba,         // LBA
                               VarOffset,      // Offset
-                              &FtwBufferSize, // NumBytes
-                              FtwBuffer
+                              FtwBufferSize,  // NumBytes
+                              NULL,           // PrivateData NULL
+                              FvbHandle,      // Fvb Handle
+                              FtwBuffer       // write buffer
                               );
 
   FreePool (FtwBuffer);

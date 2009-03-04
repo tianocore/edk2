@@ -173,11 +173,6 @@
   ## This protocol defines the generic memory test interfaces in Dxe phase.
   ## Include/Protocol/GenericMemoryTest.h
   gEfiGenericMemTestProtocolGuid = { 0x309DE7F1, 0x7F5E, 0x4ACE, { 0xB4, 0x9C, 0x53, 0x1B, 0xE5, 0xAA, 0x95, 0xEF }}
-
-  ## Fault tolerant write lite protocol defines only one interface to write 
-  #  the buffer to the fault tolerant storage.
-  ## Include/Protocol/FaultTolerantWriteLite.h
-  gEfiFaultTolerantWriteLiteProtocolGuid = { 0x3F557189, 0x8DAE, 0x45AE, { 0xA0, 0xB3, 0x2B, 0x99, 0xCA, 0x7A, 0xA7, 0xA0 }}
   
   ## This protocol provides the interfaces to Get/Set the current video mode for GOP/UGA screen
   ## Include/Protocol/ConsoleControl.h

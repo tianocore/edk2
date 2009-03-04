@@ -55,9 +55,9 @@
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           ## SOMETIMES_CONSUMES
-  gEfiFaultTolerantWriteLiteProtocolGuid        ## SOMETIMES_CONSUMES
   gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
   gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
+  gEfiFaultTolerantWriteProtocolGuid            ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
@@ -75,7 +75,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
 
 [Depex]
-  gEfiFirmwareVolumeBlockProtocolGuid AND gEfiFaultTolerantWriteLiteProtocolGuid
+  gEfiFirmwareVolumeBlockProtocolGuid AND gEfiFaultTolerantWriteProtocolGuid
 
 # [Event]
 #   ##
