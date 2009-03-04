@@ -188,7 +188,7 @@ INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  UnixPkg/UnixThunkDxe/UnixThunk.inf
 INF  UnixPkg/CpuRuntimeDxe/Cpu.inf
-INF  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
+INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
 INF  UnixPkg/MiscSubClassPlatformDxe/MiscSubClassDriver.inf
 INF  UnixPkg/TimerDxe/Timer.inf
