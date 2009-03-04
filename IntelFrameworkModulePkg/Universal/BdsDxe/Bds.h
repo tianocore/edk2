@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/MdeModuleHii.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Protocol/DevicePath.h>
-#include <Guid/BootState.h>
 #include <Guid/DataHubRecords.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/CpuIo.h>
