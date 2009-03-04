@@ -229,9 +229,7 @@ BdsMemoryTest (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Background;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Color;
-  UINT8                             Value;
-  UINTN                             DataSize;
-  UINT32                            Attributes;
+  BOOLEAN                           IsFirstBoot;
   UINT32                            TempData;
 
   ReturnStatus = EFI_SUCCESS;
@@ -401,24 +399,13 @@ Done:
 
   FreePool (Pos);
 
-  DataSize = sizeof (Value);
-  Status = gRT->GetVariable (
-                  L"BootState",
-                  &gEfiBootStateGuid,
-                  &Attributes,
-                  &DataSize,
-                  &Value
-                  );
-
-  if (EFI_ERROR (Status)) {
-    Value = 1;
-    gRT->SetVariable (
-          L"BootState",
-          &gEfiBootStateGuid,
-          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-          sizeof (Value),
-          &Value
-          );
+  //
+  // Use a DynamicHii type pcd to save the boot status, which is used to
+  // control configuration mode, such as FULL/MINIMAL/NO_CHANGES configuration.
+  //
+  IsFirstBoot = PcdGetBool(PcdBootState);
+  if (IsFirstBoot) {
+    PcdSetBool(PcdBootState, FALSE);
   }
 
   return ReturnStatus;
