@@ -221,7 +221,9 @@
   #  It can be disabled to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE|BOOLEAN|0x00010038
     
-  ## If TRUE, track statistical information about variable usage stored in the EFI system table.
+  ## If TRUE, enable the statistic functionality about variable usage. Such information is
+  #  stored as a vendor configuration table into the EFI system table.
+  #  If user wants to get variable usage info, this pcd should be set as TRUE.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE|BOOLEAN|0x0001003f
   
   ## If TRUE, Unicode Collation Protocol will be installed.
@@ -245,7 +247,9 @@
   #  It can be set according to the generated image section type.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|TRUE|BOOLEAN|0x00010044
   
-  ## If TRUE, Robustnesss improvement such as for DUET. Default is not required.
+  ## If TRUE, force to switch off the support of legacy usb. So legacy usb device driver can not make use of SMI
+  #  interrupt to access usb device in the case of absence of usb stack.
+  ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
 
   ## If TRUE, HiiImageProtocol will be installed.
@@ -315,13 +319,15 @@
   ## Size of the NV variable range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
   
-  ## Maximum buffer for the single variable.
+  ## Maximum allowable size of a common type variable, that is, non-hardware error type variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400|UINT32|0x30000003
   
-  ## Maximum buffer for Hardware error record variable.
+  ## Maximum allowable size of a single hardware error record variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000|UINT32|0x30000004
   
-  ## Maximum buffer for the total variable store.
+  ## Size of allocated memory for volatile variable store. Variables are stored in such region and 
+  #  total length of all variables should not larger than this value.
+  ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
    
   ## Size of the FTW spare block range.
