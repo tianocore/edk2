@@ -440,7 +440,7 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   UnixPkg/UnixThunkDxe/UnixThunk.inf
   UnixPkg/CpuRuntimeDxe/Cpu.inf
-  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   UnixPkg/MiscSubClassPlatformDxe/MiscSubClassDriver.inf
   UnixPkg/TimerDxe/Timer.inf
