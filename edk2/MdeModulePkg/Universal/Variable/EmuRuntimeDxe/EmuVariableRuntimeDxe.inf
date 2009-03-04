@@ -62,6 +62,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics
 
 [Depex]
   TRUE

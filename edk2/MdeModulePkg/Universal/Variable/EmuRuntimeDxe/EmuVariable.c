@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 ESAL_VARIABLE_GLOBAL  *mVariableModuleGlobal;
 
+VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
 
 /**
   Acquires lock only at boot time. Simply returns at runtime.
@@ -146,6 +147,103 @@ GetEndPointer (
   // The end of variable store
   //
   return (VARIABLE_HEADER *) ((UINTN) VolHeader + VolHeader->Size);
+}
+
+/**
+  Routine used to track statistical information about variable usage. 
+  The data is stored in the EFI system table so it can be accessed later.
+  VariableInfo.efi can dump out the table. Only Boot Services variable 
+  accesses are tracked by this code. The PcdVariableCollectStatistics
+  build flag controls if this feature is enabled. 
+
+  A read that hits in the cache will have Read and Cache true for 
+  the transaction. Data is allocated by this routine, but never
+  freed.
+
+  @param[in] VariableName   Name of the Variable to track
+  @param[in] VendorGuid     Guid of the Variable to track
+  @param[in] Volatile       TRUE if volatile FALSE if non-volatile
+  @param[in] Read           TRUE if GetVariable() was called
+  @param[in] Write          TRUE if SetVariable() was called
+  @param[in] Delete         TRUE if deleted via SetVariable()
+  @param[in] Cache          TRUE for a cache hit.
+
+**/
+VOID
+UpdateVariableInfo (
+  IN  CHAR16                  *VariableName,
+  IN  EFI_GUID                *VendorGuid,
+  IN  BOOLEAN                 Volatile,
+  IN  BOOLEAN                 Read,
+  IN  BOOLEAN                 Write,
+  IN  BOOLEAN                 Delete,
+  IN  BOOLEAN                 Cache
+  )
+{
+  VARIABLE_INFO_ENTRY   *Entry;
+
+  if (FeaturePcdGet (PcdVariableCollectStatistics)) {
+
+    if (EfiAtRuntime ()) {
+      // Don't collect statistics at runtime
+      return;
+    }
+
+    if (gVariableInfo == NULL) {
+      //
+      // on the first call allocate a entry and place a pointer to it in
+      // the EFI System Table
+      //
+      gVariableInfo = AllocateZeroPool (sizeof (VARIABLE_INFO_ENTRY));
+      ASSERT (gVariableInfo != NULL);
+
+      CopyGuid (&gVariableInfo->VendorGuid, VendorGuid);
+      gVariableInfo->Name = AllocatePool (StrLen (VariableName));
+      ASSERT (gVariableInfo->Name != NULL);
+      StrCpy (gVariableInfo->Name, VariableName);
+      gVariableInfo->Volatile = Volatile;
+
+      gBS->InstallConfigurationTable (&gEfiVariableGuid, gVariableInfo);
+    }
+
+    
+    for (Entry = gVariableInfo; Entry != NULL; Entry = Entry->Next) {
+      if (CompareGuid (VendorGuid, &Entry->VendorGuid)) {
+        if (StrCmp (VariableName, Entry->Name) == 0) {
+          if (Read) {
+            Entry->ReadCount++;
+          }
+          if (Write) {
+            Entry->WriteCount++;
+          }
+          if (Delete) {
+            Entry->DeleteCount++;
+          }
+          if (Cache) {
+            Entry->CacheCount++;
+          }
+
+          return;
+        }
+      }
+
+      if (Entry->Next == NULL) {
+        //
+        // If the entry is not in the table add it.
+        // Next iteration of the loop will fill in the data
+        //
+        Entry->Next = AllocateZeroPool (sizeof (VARIABLE_INFO_ENTRY));
+        ASSERT (Entry->Next != NULL);
+
+        CopyGuid (&Entry->Next->VendorGuid, VendorGuid);
+        Entry->Next->Name = AllocatePool (StrLen (VariableName));
+        ASSERT (Entry->Next->Name != NULL);
+        StrCpy (Entry->Next->Name, VariableName);
+        Entry->Next->Volatile = Volatile;
+      }
+
+    }
+  }
 }
 
 /**
@@ -303,6 +401,7 @@ GetVariable (
     }
 
     *DataSize = VarDataSize;
+    UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, TRUE, FALSE, FALSE, FALSE);
     Status = EFI_SUCCESS;
     goto Done;
   } else {
@@ -539,6 +638,7 @@ SetVariable (
     //
     if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
       Variable.CurrPtr->State &= VAR_DELETED;
+      UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, FALSE, TRUE, FALSE);
       Status = EFI_SUCCESS;
       goto Done;
     }
@@ -653,6 +753,8 @@ SetVariable (
     Variable.CurrPtr->State &= VAR_DELETED;
   }
   
+  UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, FALSE, TRUE, FALSE, FALSE);
+
   Status = EFI_SUCCESS;
 Done:
   ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
