@@ -115,31 +115,29 @@ ManageIdtEntryTable (
 
   Status = EFI_SUCCESS;
 
-  if (!FeaturePcdGet (PcdNtEmulatorEnable)) {
-    if (CompareMem (&IdtEntryTable[ExceptionType].NewDesc, &NullDesc, sizeof (IA32_IDT_GATE_DESCRIPTOR)) != 0) {
+  if (CompareMem (&IdtEntryTable[ExceptionType].NewDesc, &NullDesc, sizeof (IA32_IDT_GATE_DESCRIPTOR)) != 0) {
+    //
+    // we've already installed to this vector
+    //
+    if (NewCallback != NULL) {
       //
-      // we've already installed to this vector
+      // if the input handler is non-null, error
       //
-      if (NewCallback != NULL) {
-        //
-        // if the input handler is non-null, error
-        //
-        Status = EFI_ALREADY_STARTED;
-      } else {
-        UnhookEntry (ExceptionType);
-      }
+      Status = EFI_ALREADY_STARTED;
     } else {
+      UnhookEntry (ExceptionType);
+    }
+  } else {
+    //
+    // no user handler installed on this vector
+    //
+    if (NewCallback == NULL) {
       //
-      // no user handler installed on this vector
+      // if the input handler is null, error
       //
-      if (NewCallback == NULL) {
-        //
-        // if the input handler is null, error
-        //
-        Status = EFI_INVALID_PARAMETER;
-      } else {
-        HookEntry (ExceptionType, NewCallback);
-      }
+      Status = EFI_INVALID_PARAMETER;
+    } else {
+      HookEntry (ExceptionType, NewCallback);
     }
   }
 

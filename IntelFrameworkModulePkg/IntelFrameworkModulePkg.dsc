@@ -154,7 +154,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory|TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable|TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfg2Disable|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE
+
 
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
