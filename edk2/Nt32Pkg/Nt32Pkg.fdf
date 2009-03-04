@@ -189,7 +189,7 @@ INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
 INF  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-INF  MdeModulePkg/Universal/FirmwareVolume/FaultTolerantWriteDxe/FtwLite.inf
+INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
 INF  Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
 INF  Nt32Pkg/TimerDxe/TimerDxe.inf
