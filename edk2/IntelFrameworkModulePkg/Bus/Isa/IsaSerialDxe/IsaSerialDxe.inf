@@ -62,9 +62,6 @@
   gEfiSerialIoProtocolGuid                      # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
-[FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable
-
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8

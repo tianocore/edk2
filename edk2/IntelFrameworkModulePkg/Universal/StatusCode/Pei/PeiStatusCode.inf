@@ -69,7 +69,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable
 
 
 [Pcd.common]

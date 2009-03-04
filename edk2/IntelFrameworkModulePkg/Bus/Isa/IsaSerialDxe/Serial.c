@@ -805,14 +805,6 @@ IsaSerialReceiveTransmit (
     do {
       Lsr.Data = READ_LSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
 
-      if (FeaturePcdGet (PcdNtEmulatorEnable)) {
-        //
-        // This is required for NT to avoid a forever-spin...
-        // This would be better if READ_LSR was a polling operation
-        // that would timeout.
-        //
-        Lsr.Bits.THRE = 1;
-      }
       //
       // Flush incomming data to prevent a an overrun during a long write
       //
@@ -1728,17 +1720,13 @@ IsaSerialPortPresent (
   WRITE_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, 0xAA);
 
   if (READ_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress) != 0xAA) {
-    if (!FeaturePcdGet (PcdNtEmulatorEnable)) {
-      Status = FALSE;
-    }
+    Status = FALSE;
   }
 
   WRITE_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, 0x55);
 
   if (READ_SCR (SerialDevice->IsaIo, SerialDevice->BaseAddress) != 0x55) {
-    if (!FeaturePcdGet (PcdNtEmulatorEnable)) {
-      Status = FALSE;
-    }
+    Status = FALSE;
   }
   //
   // Restore SCR

@@ -229,9 +229,6 @@
   #  It can be disabled to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE|BOOLEAN|0x00010038
     
-  ## If this PCD is set as TRUE, the code specific to NT emulator will be enabled.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE|BOOLEAN|0x0001003e
-  
   ## If TRUE, track statistical information about variable usage stored in the EFI system table.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE|BOOLEAN|0x0001003f
   
