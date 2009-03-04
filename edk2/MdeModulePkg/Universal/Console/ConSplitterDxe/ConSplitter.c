@@ -3921,6 +3921,10 @@ ConSplitterTextInUnregisterKeyNotify (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (((TEXT_IN_EX_SPLITTER_NOTIFY *) NotificationHandle)->Signature != TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  } 
+  
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   //

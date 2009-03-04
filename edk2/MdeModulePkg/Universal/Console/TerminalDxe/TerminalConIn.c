@@ -445,6 +445,10 @@ TerminalConInUnregisterKeyNotify (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (((TERMINAL_CONSOLE_IN_EX_NOTIFY *) NotificationHandle)->Signature != TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  } 
+  
   TerminalDevice = TERMINAL_CON_IN_EX_DEV_FROM_THIS (This);
 
   NotifyList = &TerminalDevice->NotifyList;
