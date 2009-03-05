@@ -1,7 +1,7 @@
 #/** @file
-#  PE/COFF Loader Library implementation.
+#  Debug Library with empty functions.
 #
-#  Copyright (c) 2006 - 2008, Intel Corporation.
+#  Copyright (c) 2007 - 2008, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,11 +15,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = BasePeCoffLib
-  FILE_GUID                      = 556f5d10-7309-4af4-b80a-8196bd60946f
+  BASE_NAME                      = PeCoffExtraActionLibNull
+  FILE_GUID                      = 0EB84DA1-267A-40b4-8347-1F48694C8B47
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PeCoffLib 
+  LIBRARY_CLASS                  = PeCoffExtraActionLib 
 
 
 #
@@ -27,20 +27,9 @@
 #
 
 [Sources.common]
-  BasePeCoffLibInternals.h
-  BasePeCoff.c
+  PeCoffExtraActionLib.c
 
-[Sources.Ia32, Sources.X64, Sources.EBC]
-  PeCoffLoaderEx.c
-
-[Sources.IPF]
-  Ipf/PeCoffLoaderEx.c
 
 [Packages]
   MdePkg/MdePkg.dec
-
-[LibraryClasses]
-  DebugLib
-  PeCoffExtraActionLib
-  BaseMemoryLib
 

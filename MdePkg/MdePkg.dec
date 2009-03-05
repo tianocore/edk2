@@ -114,6 +114,9 @@
 
   ##  @libraryclass  Provides services to load and relocate a PE/COFF image.
   PeCoffLib|Include/Library/PeCoffLib.h
+  ##  @libraryclass  Provides extra action services for unloading and relocating a PE/COFF image on some specific platform such
+  ## as NT32 emulator.
+  PeCoffExtraActionLib|Include/Library/PeCoffExtraActionLib.h
 
   ##  @libraryclass  Provides a service to retrieve the PE/COFF entry point from a PE/COFF image.
   PeCoffGetEntryPointLib|Include/Library/PeCoffGetEntryPointLib.h

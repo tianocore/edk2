@@ -540,6 +540,9 @@ PeCoffLoaderRelocateImage (
   // If there are no relocation entries, then we are done
   //
   if (ImageContext->RelocationsStripped) {
+  	// Applies additional environment specific actions to relocate fixups 
+  	// to a PE/COFF image if needed
+  	PeCoffLoaderRelocateImageExtraAction (ImageContext); 	
     return RETURN_SUCCESS;
   }
 
@@ -736,6 +739,11 @@ PeCoffLoaderRelocateImage (
      ImageContext->EntryPoint -= (UINT64) ImageContext->ImageAddress;
      ImageContext->EntryPoint += (UINT64) ImageContext->DestinationAddress;
   }
+  
+  // Applies additional environment specific actions to relocate fixups 
+  // to a PE/COFF image if needed
+  PeCoffLoaderRelocateImageExtraAction (ImageContext);
+  
   return RETURN_SUCCESS;
 }
 
@@ -1411,5 +1419,8 @@ PeCoffLoaderUnloadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+  // Applies additional environment specific actions to unload a 
+  // PE/COFF image if needed
+  PeCoffLoaderUnloadImageExtraAction (ImageContext);
   return RETURN_SUCCESS;
 }
