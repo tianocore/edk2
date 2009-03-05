@@ -247,9 +247,9 @@ QueryCapsuleCapabilities (
   // The support max capsule image size
   //
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0) {
-    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);
+    *MaxiumCapsuleSize = PcdGet32(PcdMaxSizePopulateCapsule);
   } else {
-    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizeNonPopulateCapsule);
+    *MaxiumCapsuleSize = PcdGet32(PcdMaxSizeNonPopulateCapsule);
   }
 
   return EFI_SUCCESS;

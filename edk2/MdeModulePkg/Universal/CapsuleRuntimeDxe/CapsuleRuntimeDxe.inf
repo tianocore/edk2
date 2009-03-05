@@ -55,7 +55,7 @@
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset
 
-[FixedPcd]
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule || PcdSupportUpdateCapsuleReset  ## Populate Image requires reset support.
 
