@@ -151,6 +151,7 @@ PeiInstallPpi (
     //
     // Since PpiData is used for NotifyList and PpiList, max resource
     // is reached if the Install reaches the NotifyList
+    // PcdPeiCoreMaxPpiSupported can be set to a larger value in DSC to satisfy more PPI requirement.
     //
     if (Index == PrivateData->PpiData.NotifyListEnd + 1) {
       return  EFI_OUT_OF_RESOURCES;
@@ -392,6 +393,7 @@ PeiNotifyPpi (
     //
     // Since PpiData is used for NotifyList and InstallList, max resource
     // is reached if the Install reaches the PpiList
+    // PcdPeiCoreMaxPpiSupported can be set to a larger value in DSC to satisfy more Notify PPIs requirement.
     //
     if (Index == PrivateData->PpiData.PpiListEnd - 1) {
       return  EFI_OUT_OF_RESOURCES;

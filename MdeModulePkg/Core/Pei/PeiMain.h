@@ -1006,7 +1006,8 @@ InitializeImageServices (
   Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
 
   @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param FvFileHandle         File handle of a Fv type file.
+  @param ParentFvHandle       Fv handle to parent Fv image that contain this Fv file.
+  @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
   @param AuthenticationState  Pointer to attestation authentication state of image.
                               If return 0, means pass security checking.
 
@@ -1017,7 +1018,8 @@ InitializeImageServices (
 EFI_STATUS
 ProcessFvFile (
   IN  CONST EFI_PEI_SERVICES **PeiServices,
-  IN  EFI_PEI_FILE_HANDLE    FvFileHandle,
+  IN  EFI_PEI_FV_HANDLE      ParentFvHandle,
+  IN  EFI_PEI_FILE_HANDLE    ParentFvFileHandle,
   OUT UINT32                 *AuthenticationState
   );
 

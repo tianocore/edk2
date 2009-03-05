@@ -151,7 +151,6 @@ PeiFindFileEx (
   EFI_FIRMWARE_VOLUME_HEADER           *FwVolHeader;
   EFI_FFS_FILE_HEADER                   **FileHeader;
   EFI_FFS_FILE_HEADER                   *FfsFileHeader;
-  EFI_FIRMWARE_VOLUME_EXT_HEADER        *FwVolExHeaderInfo;
   UINT32                                FileLength;
   UINT32                                FileOccupiedSize;
   UINT32                                FileOffset;
@@ -176,10 +175,6 @@ PeiFindFileEx (
   //
   if ((*FileHeader == NULL) || (FileName != NULL)) {
     FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FwVolHeader + FwVolHeader->HeaderLength);
-    if (FwVolHeader->ExtHeaderOffset != 0) {
-      FwVolExHeaderInfo = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)(((UINT8 *)FwVolHeader) + FwVolHeader->ExtHeaderOffset);
-      FfsFileHeader = (EFI_FFS_FILE_HEADER *)(((UINT8 *)FwVolExHeaderInfo) + FwVolExHeaderInfo->ExtHeaderSize);
-    }
   } else {
     //
     // Length is 24 bits wide so mask upper 8 bits
@@ -332,11 +327,16 @@ FirmwareVolmeInfoPpiNotifyCallback (
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
   if (PrivateData->FvCount >= FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+    DEBUG ((EFI_D_ERROR, "The number of Fv Images (%d) exceed the max supported FVs (%d) in Pei", PrivateData->FvCount + 1, FixedPcdGet32 (PcdPeiCoreMaxFvSupported)));
+    DEBUG ((EFI_D_ERROR, "PcdPeiCoreMaxFvSupported value need be reconfigurated in DSC"));
     ASSERT (FALSE);
   }
 
   Fv = (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *)Ppi;
 
+  //
+  // Only add FileSystem2 Fv to Fv list
+  //
   if (CompareGuid (&Fv->FvFormat, &gEfiFirmwareFileSystem2Guid)) {
     for (FvCount = 0; FvCount < PrivateData->FvCount; FvCount ++) {
       if ((UINTN)PrivateData->Fv[FvCount].FvHeader == (UINTN)Fv->FvInfo) {
@@ -352,9 +352,6 @@ FirmwareVolmeInfoPpiNotifyCallback (
     
     PrivateData->Fv[PrivateData->FvCount++].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Fv->FvInfo;
 
-    //
-    // Only add FileSystem2 Fv to the All list
-    //
     PrivateData->AllFv[PrivateData->AllFvCount++] = (EFI_PEI_FV_HANDLE)Fv->FvInfo;
     
     DEBUG ((EFI_D_INFO, "The %dth FvImage start address is 0x%11p and size is 0x%08x\n", (UINT32)PrivateData->AllFvCount, (VOID *) Fv->FvInfo, Fv->FvInfoSize));
@@ -387,7 +384,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
         //
         // Process FvFile to install FvInfo ppi and build FvHob
         // 
-        ProcessFvFile ((CONST EFI_PEI_SERVICES **) PeiServices, FileHandle, &AuthenticationStatus);
+        ProcessFvFile ((CONST EFI_PEI_SERVICES **) PeiServices, (EFI_PEI_FV_HANDLE)Fv->FvInfo, FileHandle, &AuthenticationStatus);
       }
     } while (FileHandle != NULL);
   }
@@ -809,6 +806,7 @@ PeiFfsGetVolumeInfo (
   if (FwVolHeader.Signature != EFI_FVH_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
   }
+  ZeroMem (VolumeInfo, sizeof (EFI_FV_INFO));
   VolumeInfo->FvAttributes = FwVolHeader.Attributes;
   VolumeInfo->FvStart = (VOID *) VolumeHandle;
   VolumeInfo->FvSize = FwVolHeader.FvLength;
@@ -825,7 +823,8 @@ PeiFfsGetVolumeInfo (
   Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
 
   @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param FvFileHandle         File handle of a Fv type file.
+  @param ParentFvHandle       Fv handle to parent Fv image that contain this Fv image.
+  @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
   @param AuthenticationState  Pointer to attestation authentication state of image.
 
 
@@ -838,13 +837,15 @@ PeiFfsGetVolumeInfo (
 EFI_STATUS
 ProcessFvFile (
   IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  EFI_PEI_FILE_HANDLE         FvFileHandle,
+  IN  EFI_PEI_FV_HANDLE           ParentFvHandle,
+  IN  EFI_PEI_FILE_HANDLE         ParentFvFileHandle,
   OUT UINT32                      *AuthenticationState
   )
 {
   EFI_STATUS            Status;
   EFI_PEI_FV_HANDLE     FvImageHandle;
   EFI_FV_INFO           FvImageInfo;
+  EFI_FV_INFO           ParentFvImageInfo;
   UINT32                FvAlignment;
   VOID                  *FvBuffer;
   EFI_PEI_HOB_POINTERS  HobPtr;
@@ -858,7 +859,7 @@ ProcessFvFile (
   //
   HobPtr.Raw = GetHobList ();
   while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobPtr.Raw)) != NULL) {
-    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobPtr.FirmwareVolume2->FileName)) {
+    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)ParentFvFileHandle)->Name), &HobPtr.FirmwareVolume2->FileName)) {
       //
       // this FILE has been dispatched, it will not be dispatched again.
       //
@@ -873,14 +874,20 @@ ProcessFvFile (
   Status = PeiFfsFindSectionData (
              PeiServices,
              EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
-             FvFileHandle,
+             ParentFvFileHandle,
              (VOID **)&FvImageHandle
              );
 
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
+  //
+  // Collect Parent FvImage Info.
+  //
+  Status = PeiFfsGetVolumeInfo (ParentFvHandle, &ParentFvImageInfo);
+  ASSERT_EFI_ERROR (Status); 
+ 
   //
   // Collect FvImage Info.
   //
@@ -907,7 +914,8 @@ ProcessFvFile (
     //
     // Update FvImageInfo after reload FvImage to new aligned memory
     //
-    PeiFfsGetVolumeInfo ((EFI_PEI_FV_HANDLE) FvBuffer, &FvImageInfo);
+    Status = PeiFfsGetVolumeInfo ((EFI_PEI_FV_HANDLE) FvBuffer, &FvImageInfo);
+    ASSERT_EFI_ERROR (Status);
   }
 
   //
@@ -917,8 +925,8 @@ ProcessFvFile (
     NULL,
     FvImageInfo.FvStart,
     (UINT32) FvImageInfo.FvSize,
-    &(FvImageInfo.FvName),
-    &(((EFI_FFS_FILE_HEADER*)FvFileHandle)->Name)
+    &ParentFvImageInfo.FvName,
+    &(((EFI_FFS_FILE_HEADER*)ParentFvFileHandle)->Name)
     );
 
   //
@@ -936,8 +944,8 @@ ProcessFvFile (
   BuildFv2Hob (
     (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
     FvImageInfo.FvSize,
-    &FvImageInfo.FvName,
-    &(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name)
+    &ParentFvImageInfo.FvName,
+    &(((EFI_FFS_FILE_HEADER *)ParentFvFileHandle)->Name)
     );
 
   return EFI_SUCCESS;

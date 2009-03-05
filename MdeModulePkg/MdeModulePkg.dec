@@ -30,17 +30,20 @@
 
 [LibraryClasses.common]
   ##  @libraryclass  IpIo layer upon EFI IP4 Protocol.
+  #   Ihis library is only intended to be used by UEFI network stack modules.
   IpIoLib|Include/Library/IpIoLib.h
   
   ##  @libraryclass  Basic function for UEFI network stack.
+  #   Ihis library is only intended to be used by UEFI network stack modules.
   NetLib|Include/Library/NetLib.h
-
-  ##  @libraryclass  Defines a set of methods to reset whole system.
-  ResetSystemLib|Include/Library/ResetSystemLib.h
   
   ##  @libraryclass  The helper routines to access UDP service.
+  #   Ihis library is only intended to be used by UEFI network stack modules.
   UdpIoLib|Include/Library/UdpIoLib.h
   
+  ##  @libraryclass  Defines a set of methods to reset whole system.
+  ResetSystemLib|Include/Library/ResetSystemLib.h
+
   ##  @libraryclass  Defines a set of methods related do S3 mode.
   S3Lib|Include/Library/S3Lib.h
   
@@ -48,6 +51,7 @@
   RecoveryLib|Include/Library/RecoveryLib.h
   
   ##  @libraryclass  Basic platform driver override functions.
+  #   Ihis library is only intended to be used by Platform Driver Override Dxe Driver and Application.
   PlatformDriverOverrideLib|Include/Library/PlatformDriverOverrideLib.h
 
   ##  @libraryclass  Provides HII related functions.
@@ -91,9 +95,11 @@
   gPcdDataBaseHobGuid            = { 0xEA296D92, 0x0B69, 0x423C, { 0x8C, 0x28, 0x33, 0xB4, 0xE0, 0xA9, 0x12, 0x68 }}
   
   ## Guid for EDKII implementation GUIDed opcodes
+  #  Include/Guid/MdeModuleHii.h
   gEfiIfrTianoGuid      = { 0xf0b1735, 0x87a0, 0x4193, {0xb2, 0x66, 0x53, 0x8c, 0x38, 0xaf, 0x48, 0xce }}
   
   ## Guid for Framework vfr GUIDed opcodes.
+  #  Include/Guid/MdeModuleHii.h
   gEfiIfrFrameworkGuid  = { 0x31ca5d1a, 0xd511, 0x4931, { 0xb7, 0x82, 0xae, 0x6b, 0x2b, 0x17, 0x8c, 0xd7 }}
   
   ## Guid to specify the System Non Volatile FV
@@ -292,15 +298,7 @@
   #  to store PCD value. 
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
-  
-  ## Indicate the max size of the populated capsule image that the platform can support.
-  #  The default max size is 100MB (0x6400000) for more than one large capsule images. 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x6400000|UINT32|0x0001001e
-  
-  ## Indicate the max size of the non-populated capsule image that the platform can support.
-  #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
-  
+    
   ## Maximum number of FV is supported by PeiCore's dispatching.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
 
@@ -342,6 +340,14 @@
   #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
   ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
+
+  ## Indicate the max size of the populated capsule image that the platform can support.
+  #  The default max size is 100MB (0x6400000) for more than one large capsule images. 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x6400000|UINT32|0x0001001e
+  
+  ## Indicate the max size of the non-populated capsule image that the platform can support.
+  #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Maximun number of performance log entries during PEI phase.

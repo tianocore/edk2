@@ -88,7 +88,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported      ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch	    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch	      ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize      ## CONSUMES
 
