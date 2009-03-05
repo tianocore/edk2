@@ -191,7 +191,10 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   cfsetispeed,
   cfsetospeed,
   tcgetattr,
-  tcsetattr
+  tcsetattr,
+  dlopen,
+  dlerror,
+  dlsym
 };
 
 

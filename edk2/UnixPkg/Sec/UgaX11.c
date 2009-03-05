@@ -15,7 +15,6 @@
 #include <X11/extensions/XShm.h>
 #include <X11/keysym.h>
 
-#include <Guid/PeiPeCoffLoader.h>
 #include <Ppi/StatusCode.h>
 
 #include <Library/PeCoffLib.h>

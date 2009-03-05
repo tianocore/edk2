@@ -53,10 +53,6 @@
   ReportStatusCodeLib
 
 
-[Guids]
-  gEfiPeiPeCoffLoaderGuid                       # ALWAYS_PRODUCED
-
-
 [Ppis]
   gUnixPeiLoadFilePpiGuid                       # PPI ALWAYS_PRODUCED
   gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_PRODUCED
