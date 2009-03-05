@@ -228,7 +228,7 @@ MmioReadBuffer64 (
   @param  Length     Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT8 *
@@ -259,7 +259,7 @@ MmioWriteBuffer8 (
 
   Copy data from system memory specified by Buffer to MMIO region specified
   by starting address StartAddress by using 16-bit access. The total number
-  of byte to be copied is specified by Length. Length is returned.
+  of byte to be copied is specified by Length. Buffer is returned.
 
   If StartAddress is not aligned on a 16-bit boundary, then ASSERT().
 
@@ -274,7 +274,7 @@ MmioWriteBuffer8 (
   @param  Length     Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT16 *
@@ -313,7 +313,7 @@ MmioWriteBuffer16 (
 
   Copy data from system memory specified by Buffer to MMIO region specified
   by starting address StartAddress by using 32-bit access. The total number
-  of byte to be copied is specified by Length. Length is returned.
+  of byte to be copied is specified by Length. Buffer is returned.
 
   If StartAddress is not aligned on a 32-bit boundary, then ASSERT().
 
@@ -328,7 +328,7 @@ MmioWriteBuffer16 (
   @param  Length     Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT32 *
@@ -366,7 +366,7 @@ MmioWriteBuffer32 (
 
   Copy data from system memory specified by Buffer to MMIO region specified
   by starting address StartAddress by using 64-bit access. The total number
-  of byte to be copied is specified by Length. Length is returned.
+  of byte to be copied is specified by Length. Buffer is returned.
 
   If StartAddress is not aligned on a 64-bit boundary, then ASSERT().
 
@@ -381,7 +381,7 @@ MmioWriteBuffer32 (
   @param  Length     Size in bytes of the copy.
   @param  Buffer          Pointer to a system memory buffer containing the data to write.
 
-  @return Size in bytes of the copy.
+  @return Buffer
 
 **/
 UINT64 *
