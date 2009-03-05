@@ -81,13 +81,13 @@ BootSectorEntryPoint:
   mov   ah,8                                ; ah = 8 - Get Drive Parameters Function
   mov   byte ptr [bp+PhysicalDrive],dl      ; BBS defines that BIOS would pass the booting driver number to the loader through DL
   int   13h                                 ; Get Drive Parameters
-  xor   ax,ax                   ; ax = 0
-  mov   al,dh                   ; al = dh
-  inc   al                      ; MaxHead = al + 1
-  push  ax                      ; 0000:7bfe = MaxHead
-  mov   al,cl                   ; al = cl
-  and   al,03fh                 ; MaxSector = al & 0x3f
-  push  ax                      ; 0000:7bfc = MaxSector
+  xor   ax,ax                               ; ax = 0
+  mov   al,dh                               ; al = dh (number of sides (0 based))
+  inc   al                                  ; MaxHead = al + 1
+  push  ax                                  ; 0000:7bfe = MaxHead
+  mov   al,cl                               ; al = cl (CL = sectors per track)
+  and   al,03fh                             ; MaxSector = al & 0x3f
+  push  ax                                  ; 0000:7bfc = MaxSector
 
   cmp   word ptr [bp+SectorSignature],0aa55h  ; Verify Boot Sector Signature
   jne   BadBootSector
@@ -149,7 +149,7 @@ FindNext:
   jmp   NotFoundAll
 
 FoundAll:
-FoundEFILDR:
+FoundEFILDR:                                  ; 0x7cfe
   mov     cx,bx                               ; cx = Start Cluster for EFILDR  <----------------------------------
   mov     ax,cs                               ; Destination = 2000:0000
   add     ax,2000h
@@ -170,8 +170,8 @@ ReadFirstClusterOfEFILDR:
   call    ReadBlocks
   pop     ax
 JumpIntoFirstSectorOfEFILDR:
-  mov     word ptr [bp+JumpSegment],ax
-JumpFarInstruction:
+  mov     word ptr [bp+JumpSegment],ax        ; 0x7d26
+JumpFarInstruction:                           ; 0x7d2a
   db      0eah
 JumpOffset:
   dw      0000h
@@ -252,7 +252,7 @@ LimitTransfer:
 ; ****************************************************************************
 ; ERROR Condition:
 ; ****************************************************************************
-NotFoundAll:
+NotFoundAll:                            ; 0x7da6
   ; if we found EFILDR, continue
   test bx,bx
   jne  FoundEFILDR
