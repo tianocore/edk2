@@ -143,9 +143,6 @@
   ## Include/Guid/StandardErrorDevice.h
   gEfiStandardErrorDeviceGuid    = { 0xD3B36F2D, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   
-  ## PeCoffLoader guid for PeCoffLoader entry in the HOB list.
-  ## Include/Guid/PeiPeCoffLoader.h
-  gEfiPeiPeCoffLoaderGuid        = { 0xD8117CFF, 0x94A6, 0x11D4, { 0x9A, 0x3A, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
   
   ## Guid acted as variable store header's signature and to specify the variable list entries put in the EFI system table.
   ## Include/Guid/VariableFormat.h
