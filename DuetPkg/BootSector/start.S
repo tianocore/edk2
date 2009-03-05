@@ -15,10 +15,9 @@
 #*
 #------------------------------------------------------------------------------
 
-
-
-
-
+        .stack: 
+        .486p: 
+        .code16
 		
 .equ                        FAT_DIRECTORY_ENTRY_SIZE, 0x020
 .equ                        FAT_DIRECTORY_ENTRY_SHIFT, 5
