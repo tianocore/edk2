@@ -49,9 +49,6 @@
   PeCoffLib
   ReportStatusCodeLib
 
-[Guids]
-  gEfiPeiPeCoffLoaderGuid                       # ALWAYS_PRODUCED
-
 
 [Ppis]
   gNtPeiLoadFilePpiGuid                         # PPI ALWAYS_PRODUCED

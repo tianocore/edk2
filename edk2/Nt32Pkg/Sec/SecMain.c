@@ -31,22 +31,6 @@ Abstract:
 #include "SecMain.h"
 
 
-//
-// Globals
-//
-EFI_PEI_PE_COFF_LOADER_PROTOCOL_INSTANCE  mPeiEfiPeiPeCoffLoaderInstance = {
-  {
-    SecNt32PeCoffGetImageInfo,
-    SecNt32PeCoffLoadImage,
-    SecNt32PeCoffRelocateImage,
-    SecNt32PeCoffUnloadimage
-  },
-  NULL
-};
-
-
-
-EFI_PEI_PE_COFF_LOADER_PROTOCOL           *gPeiEfiPeiPeCoffLoader = &mPeiEfiPeiPeCoffLoaderInstance.PeCoff;
 
 NT_PEI_LOAD_FILE_PPI                      mSecNtLoadFilePpi     = { SecWinNtPeiLoadFile };
 
@@ -61,11 +45,6 @@ NT_FWH_PPI                                mSecFwhInformationPpi = { SecWinNtFdAd
 TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
 EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
-  {
-    EFI_PEI_PPI_DESCRIPTOR_PPI,
-    &gEfiPeiPeCoffLoaderGuid,
-    NULL
-  },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gNtPeiLoadFilePpiGuid,
@@ -117,18 +96,16 @@ NT_FD_INFO                                *gFdInfo;
 UINTN                                     gSystemMemoryCount = 0;
 NT_SYSTEM_MEMORY                          *gSystemMemory;
 
-
-UINTN                   mPdbNameModHandleArraySize = 0;
-PDB_NAME_TO_MOD_HANDLE  *mPdbNameModHandleArray = NULL;
-
-
 VOID
 EFIAPI
 SecSwitchStack (
   UINT32   TemporaryMemoryBase,
   UINT32   PermenentMemoryBase
   );
-
+EFI_STATUS
+SecNt32PeCoffRelocateImage (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  );
 INTN
 EFIAPI
 main (
@@ -599,11 +576,6 @@ Returns:
   TopOfStack  = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
   //
-  // Patch value in dispatch table values
-  //
-  gPrivateDispatchTable[0].Ppi = gPeiEfiPeiPeCoffLoader;
-
-  //
   // Bind this information into the SEC hand-off state
   //
   SecCoreData                        = (EFI_SEC_PEI_HAND_OFF*)(UINTN) TopOfStack;
@@ -750,7 +722,7 @@ Returns:
 
   ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) SecImageRead;
 
-  Status                  = gPeiEfiPeiPeCoffLoader->GetImageInfo (gPeiEfiPeiPeCoffLoader, &ImageContext);
+  Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -768,12 +740,12 @@ Returns:
   ImageContext.ImageAddress += ImageContext.SectionAlignment;
   ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
 
-  Status = gPeiEfiPeiPeCoffLoader->LoadImage (gPeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gPeiEfiPeiPeCoffLoader->RelocateImage (gPeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = SecNt32PeCoffRelocateImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -943,138 +915,7 @@ Returns:
 
 
 EFI_STATUS
-AddModHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext,
-  IN  VOID                                 *ModHandle
-  )
-/*++
-
-Routine Description:
-  Store the ModHandle in an array indexed by the Pdb File name.
-  The ModHandle is needed to unload the image. 
-
-Arguments:
-  ImageContext - Input data returned from PE Laoder Library. Used to find the 
-                 .PDB file name of the PE Image.
-  ModHandle    - Returned from LoadLibraryEx() and stored for call to 
-                 FreeLibrary().
-
-Returns:
-  EFI_SUCCESS - ModHandle was stored. 
-
---*/
-{
-  UINTN                   Index;
-  PDB_NAME_TO_MOD_HANDLE  *Array;
-  UINTN                   PreviousSize;
-
-
-  Array = mPdbNameModHandleArray;
-  for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
-    if (Array->PdbPointer == NULL) {
-      //
-      // Make a copy of the stirng and store the ModHandle
-      //
-      Array->PdbPointer = malloc (strlen (ImageContext->PdbPointer) + 1);
-      ASSERT (Array->PdbPointer != NULL);
-
-      strcpy (Array->PdbPointer, ImageContext->PdbPointer);
-      Array->ModHandle = ModHandle;
-      return EFI_SUCCESS;
-    }
-  }
-  
-  //
-  // No free space in mPdbNameModHandleArray so grow it by 
-  // MAX_PDB_NAME_TO_MOD_HANDLE_ARRAY_SIZE entires. realloc will
-  // copy the old values to the new locaiton. But it does
-  // not zero the new memory area.
-  //
-  PreviousSize = mPdbNameModHandleArraySize * sizeof (PDB_NAME_TO_MOD_HANDLE);
-  mPdbNameModHandleArraySize += MAX_PDB_NAME_TO_MOD_HANDLE_ARRAY_SIZE;
-
-  mPdbNameModHandleArray = realloc (mPdbNameModHandleArray, mPdbNameModHandleArraySize * sizeof (PDB_NAME_TO_MOD_HANDLE));
-  if (mPdbNameModHandleArray == NULL) {
-    ASSERT (FALSE);
-    return EFI_OUT_OF_RESOURCES;
-  }
-  
-  memset (mPdbNameModHandleArray + PreviousSize, 0, MAX_PDB_NAME_TO_MOD_HANDLE_ARRAY_SIZE * sizeof (PDB_NAME_TO_MOD_HANDLE));
- 
-  return AddModHandle (ImageContext, ModHandle);
-}
-
-
-VOID *
-RemoveModeHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-/*++
-
-Routine Description:
-  Return the ModHandle and delete the entry in the array.
-
-Arguments:
-  ImageContext - Input data returned from PE Laoder Library. Used to find the 
-                 .PDB file name of the PE Image.
-
-Returns:
-  ModHandle - ModHandle assoicated with ImageContext is returned
-  NULL      - No ModHandle associated with ImageContext
-
---*/
-{
-  UINTN                   Index;
-  PDB_NAME_TO_MOD_HANDLE  *Array;
-
-  if (ImageContext->PdbPointer == NULL) {
-    //
-    // If no PDB pointer there is no ModHandle so return NULL
-    //
-    return NULL;
-  }
-
-  Array = mPdbNameModHandleArray;
-  for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
-    if ((Array->PdbPointer != NULL) && (strcmp(Array->PdbPointer, ImageContext->PdbPointer) == 0)) {
-      //
-      // If you find a match return it and delete the entry
-      //
-      free (Array->PdbPointer);
-      Array->PdbPointer = NULL;
-      return Array->ModHandle;
-    }
-  }
-
-  return NULL;
-}
-
-
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffGetImageInfo (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-{
-  return PeCoffLoaderGetImageInfo (ImageContext);
-}
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffLoadImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-{
-  return PeCoffLoaderLoadImage (ImageContext);
-}
-
-EFI_STATUS
-EFIAPI
 SecNt32PeCoffRelocateImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
@@ -1153,7 +994,6 @@ SecNt32PeCoffRelocateImage (
     }
 
     if ((Library != NULL) && (DllEntryPoint != NULL)) {
-      AddModHandle (ImageContext, Library);
       ImageContext->EntryPoint  = (EFI_PHYSICAL_ADDRESS) (UINTN) DllEntryPoint;
       wprintf (L"LoadLibraryEx (%s,\n               NULL, DONT_RESOLVE_DLL_REFERENCES)\n", DllFileName);
     } else {
@@ -1172,21 +1012,7 @@ SecNt32PeCoffRelocateImage (
 }
 
 
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffUnloadimage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL      *This,
-  IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-{
-  VOID *ModHandle;
 
-  ModHandle = RemoveModeHandle (ImageContext);
-  if (ModHandle != NULL) {
-    FreeLibrary (ModHandle);
-  }
-  return EFI_SUCCESS;
-}
 
 VOID
 _ModuleEntryPoint (

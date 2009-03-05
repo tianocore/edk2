@@ -25,7 +25,6 @@ Abstract:
 #include <WinNtPeim.h>
 #include <Library/BaseLib.h>
 #include <Library/PeCoffLib.h>
-#include <Guid/PeiPeCoffLoader.h>
 #include <Ppi/NtPeiLoadFile.h>
 #include <Ppi/NtAutoscan.h>
 #include <Ppi/NtThunk.h>
@@ -551,34 +550,6 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecNt32PeCoffGetImageInfo (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffLoadImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffRelocateImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffUnloadimage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL      *This,
-  IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
 SecTemporaryRamSupport (
   IN CONST EFI_PEI_SERVICES   **PeiServices,
   IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
@@ -586,9 +557,5 @@ SecTemporaryRamSupport (
   IN UINTN                    CopySize
   );
 
-typedef struct {
-  EFI_PEI_PE_COFF_LOADER_PROTOCOL PeCoff;
-  VOID                            *ModHandle;
-} EFI_PEI_PE_COFF_LOADER_PROTOCOL_INSTANCE;
 
 extern EFI_WIN_NT_THUNK_PROTOCOL  *gWinNt;
