@@ -146,7 +146,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNtEmulatorEnable|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
