@@ -83,6 +83,7 @@
   MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  MdePkg/Library/PeCoffExtraActionLibNull/PeCoffExtraActionLibNull.inf
   MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   MdePkg/Library/BasePostCodeLibDebug/BasePostCodeLibDebug.inf
   MdePkg/Library/BasePostCodeLibPort80/BasePostCodeLibPort80.inf

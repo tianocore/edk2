@@ -19,6 +19,7 @@
 #include <Library/PeCoffLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PeCoffExtraActionLib.h>
 #include <IndustryStandard/PeImage.h>
 
 
