@@ -73,7 +73,7 @@ BootSectorEntryPoint:
 NoVarStore: 
         pushw   %es
 # Set the 5th byte start @ 0:19000 to non-zero indicating we should init var store header in DxeIpl
-        movb    %al, %es:4
+        movb    %al, %es:(4)
         jmp     SaveVolumeId
 
 CheckVarStoreSize: 

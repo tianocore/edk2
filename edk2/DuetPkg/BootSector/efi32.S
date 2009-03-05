@@ -19,10 +19,6 @@
 # Now in 32-bit protected mode.
 ##############################################################################
 
-        .486: 
-        #.MODEL flat
-        .stack: 
-        .code16
         .org 0x21000
 
 .equ                 DEFAULT_HANDLER_SIZE, INT1 - INT0
