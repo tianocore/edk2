@@ -22,7 +22,6 @@ Abstract:
 
 #include <Protocol/UnixThunk.h>
 #include <Pi/PiFirmwareVolume.h>
-#include <Guid/PeiPeCoffLoader.h>
 #include <Ppi/StatusCode.h>
 
 #include <Library/PeCoffLib.h>
@@ -505,44 +504,11 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecNt32PeCoffGetImageInfo (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffLoadImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffRelocateImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffUnloadimage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL      *This,
-  IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  );
-
-EFI_STATUS
-EFIAPI
 SecTemporaryRamSupport (
   IN CONST EFI_PEI_SERVICES   **PeiServices,
   IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
   IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
   IN UINTN                    CopySize
   );
-
-typedef struct {
-  EFI_PEI_PE_COFF_LOADER_PROTOCOL PeCoff;
-  VOID                            *ModHandle;
-} EFI_PEI_PE_COFF_LOADER_PROTOCOL_INSTANCE;
 
 extern EFI_UNIX_THUNK_PROTOCOL  *gUnix;

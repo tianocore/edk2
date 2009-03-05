@@ -46,6 +46,7 @@ Abstract:
 #include <sys/ioctl.h>
 #include <sys/vfs.h>
 #include <utime.h>
+#include <dlfcn.h>
 
 #define EFI_UNIX_THUNK_PROTOCOL_GUID \
   { \
@@ -189,6 +190,19 @@ int
 (*UnixTcsetattr) (int __fd, int __optional_actions,
 		      __const struct termios *__termios_p);
 
+typedef
+VOID *
+(*UnixDlopen) (const char *FileName, int Flag);
+
+typedef
+char *
+(*UnixDlerror) (VOID);
+
+typedef 
+VOID *
+(*UnixDlsym) (VOID* Handle, const char* Symbol);
+
+
 //
 //
 //
@@ -237,6 +251,9 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixCfsetospeed                     Cfsetospeed;
   UnixTcgetattr                       Tcgetattr;
   UnixTcsetattr                       Tcsetattr;
+  UnixDlopen                          Dlopen;
+  UnixDlerror                         Dlerror;
+  UnixDlsym                           Dlsym;
 } EFI_UNIX_THUNK_PROTOCOL;
 
 extern EFI_GUID gEfiUnixThunkProtocolGuid;

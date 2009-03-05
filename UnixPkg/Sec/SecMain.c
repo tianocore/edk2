@@ -41,19 +41,6 @@ Abstract:
 //
 // Globals
 //
-EFI_PEI_PE_COFF_LOADER_PROTOCOL_INSTANCE  mPeiEfiPeiPeCoffLoaderInstance = {
-  {
-    SecNt32PeCoffGetImageInfo,
-    SecNt32PeCoffLoadImage,
-    SecNt32PeCoffRelocateImage,
-    SecNt32PeCoffUnloadimage
-  },
-  NULL
-};
-
-
-
-EFI_PEI_PE_COFF_LOADER_PROTOCOL           *gPeiEfiPeiPeCoffLoader    = &mPeiEfiPeiPeCoffLoaderInstance.PeCoff;
 
 UNIX_PEI_LOAD_FILE_PPI                    mSecNtLoadFilePpi          = { SecWinNtPeiLoadFile };
 
@@ -68,11 +55,6 @@ UNIX_FWH_PPI                              mSecFwhInformationPpi      = { SecWinN
 TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
 EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
-  {
-    EFI_PEI_PPI_DESCRIPTOR_PPI,
-    &gEfiPeiPeCoffLoaderGuid,
-    NULL
-  },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gUnixPeiLoadFilePpiGuid,
@@ -145,6 +127,11 @@ MapFile (
   IN  CHAR8                     *FileName,
   IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
   OUT UINT64                    *Length
+  );
+EFI_STATUS
+EFIAPI
+SecNt32PeCoffRelocateImage (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   );
 
 
@@ -601,11 +588,7 @@ Returns:
   TopOfStack  = (VOID *)((UINTN)TopOfStack - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
   TopOfStack  = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
-  //
-  // Patch value in dispatch table values
-  //
-  gPrivateDispatchTable[0].Ppi = gPeiEfiPeiPeCoffLoader;
-
+  
   //
   // Bind this information into the SEC hand-off state
   //
@@ -754,7 +737,7 @@ Returns:
 
   ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) SecImageRead;
 
-  Status                  = gPeiEfiPeiPeCoffLoader->GetImageInfo (gPeiEfiPeiPeCoffLoader, &ImageContext);
+  Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -772,12 +755,12 @@ Returns:
   ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
 
 
-  Status = gPeiEfiPeiPeCoffLoader->LoadImage (gPeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gPeiEfiPeiPeCoffLoader->RelocateImage (gPeiEfiPeiPeCoffLoader, &ImageContext);
+  Status = SecNt32PeCoffRelocateImage(&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -901,59 +884,6 @@ Returns:
 
 
 
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffGetImageInfo (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = PeCoffLoaderGetImageInfo (ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  switch (ImageContext->ImageType) {
-
-  case EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION:
-    ImageContext->ImageCodeMemoryType = EfiLoaderCode;
-    ImageContext->ImageDataMemoryType = EfiLoaderData;
-    break;
-
-  case EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER:
-    ImageContext->ImageCodeMemoryType = EfiBootServicesCode;
-    ImageContext->ImageDataMemoryType = EfiBootServicesData;
-    break;
-
-  case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
-  case EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER:
-    ImageContext->ImageCodeMemoryType = EfiRuntimeServicesCode;
-    ImageContext->ImageDataMemoryType = EfiRuntimeServicesData;
-    break;
-
-  default:
-    ImageContext->ImageError = IMAGE_ERROR_INVALID_SUBSYSTEM;
-    return RETURN_UNSUPPORTED;
-  }
-
-  return Status;
-}
-
-EFI_STATUS
-EFIAPI
-SecNt32PeCoffLoadImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = PeCoffLoaderLoadImage (ImageContext);
-  return Status;
-}
-
 VOID
 SecUnixLoaderBreak (
   VOID
@@ -964,7 +894,6 @@ SecUnixLoaderBreak (
 EFI_STATUS
 EFIAPI
 SecNt32PeCoffRelocateImage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL          *This,
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
@@ -1003,7 +932,6 @@ SecNt32PeCoffRelocateImage (
 EFI_STATUS
 EFIAPI
 SecNt32PeCoffUnloadimage (
-  IN EFI_PEI_PE_COFF_LOADER_PROTOCOL      *This,
   IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
