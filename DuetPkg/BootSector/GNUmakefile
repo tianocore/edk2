@@ -2,8 +2,6 @@
 ASM=gcc
 DLINK=ld
 
-BASETOOLS_DIR=$(WORKSPACE)/Conf/BaseToolsSource/Source/C/bin
-
 ASSEMBLY_CODE_FILE_LIST = $(MODULE_DIR)/bootsect.S \
                           $(MODULE_DIR)/bs16.S \
                           $(MODULE_DIR)/bs32.S \
@@ -22,11 +20,11 @@ TARGET_FILES = $(OUTPUT_DIR)/bootsect.com \
                $(OUTPUT_DIR)/start.com \
                $(OUTPUT_DIR)/start16.com \
                $(OUTPUT_DIR)/start32.com \
-               $(OUTPUT_DIR)/efi32.com2 
+               $(OUTPUT_DIR)/efi32.com2
                #$(OUTPUT_DIR)/start64.com \
                #$(OUTPUT_DIR)/st16_64.com \
                #$(OUTPUT_DIR)/st32_64.com \
-               #$(OUTPUT_DIR)/efi64.com2 
+               #$(OUTPUT_DIR)/efi64.com2
 
 .PHONY : all
 all: $(TARGET_FILES)
@@ -103,7 +101,7 @@ $(OUTPUT_DIR)/efi32.o: $(MODULE_DIR)/efi32.S
 $(OUTPUT_DIR)/efi32.com: $(OUTPUT_DIR)/efi32.o
 	$(DLINK) --oformat binary -o $(OUTPUT_DIR)/efi32.com $(OUTPUT_DIR)/efi32.o -Ttext 0 -Map $(OUTPUT_DIR)/efi32.map
 $(OUTPUT_DIR)/efi32.com2: $(OUTPUT_DIR)/efi32.com
-	$(BASETOOLS_DIR)/Split -f $(OUTPUT_DIR)/efi32.com -p $(OUTPUT_DIR) -o efi32.com1 -p $(OUTPUT_DIR) -t efi32.com2 -s 135168
+	Split -f $(OUTPUT_DIR)/efi32.com -p $(OUTPUT_DIR) -o efi32.com1 -p $(OUTPUT_DIR) -t efi32.com2 -s 135168
 
 # efi64.S
 $(OUTPUT_DIR)/efi64.o: $(MODULE_DIR)/efi64.S
@@ -111,15 +109,14 @@ $(OUTPUT_DIR)/efi64.o: $(MODULE_DIR)/efi64.S
 $(OUTPUT_DIR)/efi64.com: $(OUTPUT_DIR)/efi64.o
 	$(DLINK) --oformat binary -o $(OUTPUT_DIR)/efi64.com $(OUTPUT_DIR)/efi64.o -Ttext 0 -Map $(OUTPUT_DIR)/efi64.map
 $(OUTPUT_DIR)/efi64.com2: $(OUTPUT_DIR)/efi64.com
-	$(BASETOOLS_DIR)/Split -f $(OUTPUT_DIR)/efi64.com -p $(OUTPUT_DIR) -o efi64.com1 -p $(OUTPUT_DIR) -t efi64.com2 -s 135168
+	Split -f $(OUTPUT_DIR)/efi64.com -p $(OUTPUT_DIR) -o efi64.com1 -p $(OUTPUT_DIR) -t efi64.com2 -s 135168
 
 clean:
 ifneq ($(OUTPUT_DIR), )
 	rm -r $(OUTPUT_DIR)
 endif
 ifneq ($(DEBUG_DIR), )
-	rm -r $(DEBUG_DIR) 
+	rm -r $(DEBUG_DIR)
 endif
-
 
 
