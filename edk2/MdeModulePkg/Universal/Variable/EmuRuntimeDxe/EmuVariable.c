@@ -977,6 +977,7 @@ VariableCommonInitialize (
             );
 
   if (EFI_ERROR (Status)) {
+    FreePool(mVariableModuleGlobal);
     return Status;
   }
   //

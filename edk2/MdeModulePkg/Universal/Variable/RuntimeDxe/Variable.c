@@ -1984,6 +1984,9 @@ VariableCommonInitialize (
                NULL, 
                &ReadyToBootEvent
                );
+  } else {
+    Status = EFI_VOLUME_CORRUPTED;
+    DEBUG((EFI_D_INFO, "Variable Store header is corrupted\n"));
   }
 
 Done:
