@@ -11,7 +11,7 @@
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/PciExpressBaseAddress.h>
 #include <Guid/AcpiDescription.h>
-#include <Guid/PeiPeCoffLoader.h>
+
 #include <Guid/MemoryAllocationHob.h>
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
