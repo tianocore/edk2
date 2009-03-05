@@ -14,6 +14,7 @@
 
 #include <Base.h>
 #include <Library/PeCoffExtraActionLib.h>
+
 /**
   Applies additional actions to relocate fixups to a PE/COFF image.
 
