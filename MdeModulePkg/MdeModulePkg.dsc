@@ -79,7 +79,7 @@
   OemHookStatusCodeLib|IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
-  MemoryTestLib|MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
+  BaseMemoryTestLib|MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
 
 [LibraryClasses.IA32]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -287,6 +287,7 @@
   MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   MdeModulePkg/Library/UefiIfrSupportLib/UefiIfrSupportLib.inf
   MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
+  MdeModulePkg/Library/BaseMemoryTestLib/BaseMemoryTestLib.inf
 
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf

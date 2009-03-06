@@ -1,5 +1,5 @@
 /** @file
-  Null instance of Memory Test Library.
+  Instance of Memory Test Library.
 
 Copyright (c) 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -14,8 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = BaseMemoryTestLibNull
-  FILE_GUID                      = D519E511-9C1C-47F5-AE01-FD216E779269
+  BASE_NAME                      = BaseMemoryTestLib
+  FILE_GUID                      = 216CAA56-AF75-4BBB-9D74-CC0960E92ECB
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BaseMemoryTestLib
@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
 [Sources.common]
-  BaseMemoryTestLibNull.c
+  BaseMemoryTestLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -35,3 +35,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 [LibraryClasses]
   BaseMemoryTestLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DebugLib
+  PcdLib
+  ReportStatusCodeLib
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError

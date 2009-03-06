@@ -28,7 +28,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  ErrorAddress           Address of the memory where error is encountered.
 
   @retval RETURN_SUCCESS         The memory range passes test.
-  @retval RETURNEFI_DEVICE_ERROR The memory range does not pass test.
+  @retval RETURN_DEVICE_ERROR    The memory range does not pass test.
+
+**/
+RETURN_STATUS
+EFIAPI
+QuickMemoryTest (
+  IN  VOID      *StartAddress,
+  IN  UINT64    Length,
+  OUT VOID      **ErrorAddress
+  );
+
+/**
+  Test a system memory range with extensively sampled memory units.
+
+  This function tests a system memory range, whose memory units
+  are sampled extensively. Compared with SparseMemoryTest, it achieves
+  more reliability and less performance.
+
+  @param  StartAddress           Start address of the memory range to test.
+  @param  Length                 Length of the memory range to test.
+  @param  ErrorAddress           Address of the memory where error is encountered.
+
+  @retval RETURN_SUCCESS         The memory range passes test.
+  @retval RETURN_DEVICE_ERROR    The memory range does not pass test.
 
 **/
 RETURN_STATUS
@@ -51,7 +74,7 @@ SparseMemoryTest (
   @param  ErrorAddress           Address of the memory where error is encountered.
 
   @retval RETURN_SUCCESS         The memory range passes test.
-  @retval RETURNEFI_DEVICE_ERROR The memory range does not pass test.
+  @retval RETURN_DEVICE_ERROR    The memory range does not pass test.
 
 **/
 RETURN_STATUS
@@ -63,26 +86,16 @@ ExtensiveMemoryTest (
   );
 
 /**
-  Test a system memory range with every memory unit checked.
+  Check if soft ECC initialzation is needed for system
 
-  This function tests a system memory range, whose memory units
-  are fully checked. It leads to complete reliability with the
-  cost of performance.
-
-  @param  StartAddress           Start address of the memory range to test.
-  @param  Length                 Length of the memory range to test.
-  @param  ErrorAddress           Address of the memory where error is encountered.
-
-  @retval RETURN_SUCCESS         The memory range passes test.
-  @retval RETURNEFI_DEVICE_ERROR The memory range does not pass test.
+  @retval TRUE         Soft ECC initialzation is needed.
+  @retval FALSE        Soft ECC initialzation is not needed.
 
 **/
-RETURN_STATUS
+BOOLEAN
 EFIAPI
-FullMemoryTest (
-  IN  VOID      *StartAddress,
-  IN  UINT64    Length,
-  OUT VOID      **ErrorAddress
+IsSoftEccInitRequired (
+  VOID
   );
 
 #endif
