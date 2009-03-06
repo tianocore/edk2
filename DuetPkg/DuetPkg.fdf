@@ -118,10 +118,8 @@ INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
-FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-  SECTION PE32 = FatBinPkg/EnhancedFatDxe/$(ARCH)/Fat.efi
-  }
-
+  # Binary INF file to support toggle among different CPU architectures.
+INF  FatBinPkg/EnhancedFatDxe/Fat.inf
 
 FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
