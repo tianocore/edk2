@@ -1,5 +1,5 @@
 #/** @file
-#  Debug Library with empty functions.
+#  Null PE/Coff Extra Action library instances with empty functions.
 #
 #  Copyright (c) 2009, Intel Corporation.
 #
