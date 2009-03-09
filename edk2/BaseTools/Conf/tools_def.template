@@ -793,5 +793,5 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 ##################
 # Tiano Compress tool definitions
 ##################
-*_*_*_TIANO_PATH              = TianoCompress.exe
+*_*_*_TIANO_PATH              = TianoCompress
 *_*_*_TIANO_GUID                   = A31280AD-481E-41B6-95E8-127F4C984779
