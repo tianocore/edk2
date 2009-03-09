@@ -37,6 +37,8 @@ VARIABLE_CACHE_ENTRY mVariableCache[] = {
 };
 
 VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
+EFI_EVENT          mFvbRegistration = NULL;
+
 
 /**
   Acquires lock only at boot time. Simply returns at runtime.
@@ -213,7 +215,7 @@ IsValidVariableHeader (
   @param Volatile                Point out the Variable is Volatile or Non-Volatile
   @param SetByIndex              TRUE if target pointer is given as index
                                  FALSE if target pointer is absolute
-  @param Instance                Instance of FV Block services
+  @param Fvb                     Pointer to the writable FVB protocol
   @param DataPtrIndex            Pointer to the Data from the end of VARIABLE_STORE_HEADER
                                  structure
   @param DataSize                Size of data to be written
@@ -225,13 +227,13 @@ IsValidVariableHeader (
 **/
 EFI_STATUS
 UpdateVariableStore (
-  IN  VARIABLE_GLOBAL         *Global,
-  IN  BOOLEAN                 Volatile,
-  IN  BOOLEAN                 SetByIndex,
-  IN  UINTN                   Instance,
-  IN  UINTN                   DataPtrIndex,
-  IN  UINT32                  DataSize,
-  IN  UINT8                   *Buffer
+  IN  VARIABLE_GLOBAL                     *Global,
+  IN  BOOLEAN                             Volatile,
+  IN  BOOLEAN                             SetByIndex,
+  IN  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb,
+  IN  UINTN                               DataPtrIndex,
+  IN  UINT32                              DataSize,
+  IN  UINT8                               *Buffer
   )
 {
   EFI_FV_BLOCK_MAP_ENTRY      *PtrBlockMapEntry;
@@ -255,7 +257,9 @@ UpdateVariableStore (
   // Check if the Data is Volatile
   //
   if (!Volatile) {
-    EfiFvbGetPhysicalAddress (Instance, &FvVolHdr);
+    Status = Fvb->GetPhysicalAddress(Fvb, &FvVolHdr);
+    ASSERT_EFI_ERROR (Status);
+
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvVolHdr);
     //
     // Data Pointer should point to the actual Address where data is to be
@@ -310,18 +314,18 @@ UpdateVariableStore (
       //
       if ((CurrWritePtr >= LinearOffset) && (CurrWritePtr < LinearOffset + PtrBlockMapEntry->Length)) {
         if ((CurrWritePtr + CurrWriteSize) <= (LinearOffset + PtrBlockMapEntry->Length)) {
-          Status = EfiFvbWriteBlock (
-                    Instance,
+          Status = Fvb->Write (
+                    Fvb,
                     LbaNumber,
                     (UINTN) (CurrWritePtr - LinearOffset),
                     &CurrWriteSize,
                     CurrBuffer
                     );
-            return Status;
+          return Status;
         } else {
           Size = (UINT32) (LinearOffset + PtrBlockMapEntry->Length - CurrWritePtr);
-          Status = EfiFvbWriteBlock (
-                    Instance,
+          Status = Fvb->Write (
+                    Fvb,
                     LbaNumber,
                     (UINTN) (CurrWritePtr - LinearOffset),
                     &Size,
@@ -1198,20 +1202,20 @@ RuntimeServiceSetVariable (
   IN VOID                    *Data
   )
 {
-  VARIABLE_POINTER_TRACK  Variable;
-  EFI_STATUS              Status;
-  VARIABLE_HEADER         *NextVariable;
-  UINTN                   VarNameSize;
-  UINTN                   VarNameOffset;
-  UINTN                   VarDataOffset;
-  UINTN                   VarSize;
-  UINT8                   State;
-  BOOLEAN                 Reclaimed;
-  UINTN                   *VolatileOffset;
-  UINTN                   *NonVolatileOffset;
-  UINT32                  Instance;
-  BOOLEAN                 Volatile;
-  EFI_PHYSICAL_ADDRESS    Point;
+  VARIABLE_POINTER_TRACK              Variable;
+  EFI_STATUS                          Status;
+  VARIABLE_HEADER                     *NextVariable;
+  UINTN                               VarNameSize;
+  UINTN                               VarNameOffset;
+  UINTN                               VarDataOffset;
+  UINTN                               VarSize;
+  UINT8                               State;
+  BOOLEAN                             Reclaimed;
+  UINTN                               *VolatileOffset;
+  UINTN                               *NonVolatileOffset;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  BOOLEAN                             Volatile;
+  EFI_PHYSICAL_ADDRESS                Point;
 
   //
   // Check input parameters
@@ -1250,7 +1254,7 @@ RuntimeServiceSetVariable (
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   Reclaimed         = FALSE;
-  Instance          = mVariableModuleGlobal->FvbInstance;
+  Fvb               = mVariableModuleGlobal->FvbInstance;
   VolatileOffset    = &mVariableModuleGlobal->VolatileLastVariableOffset;
 
   //
@@ -1312,7 +1316,7 @@ RuntimeServiceSetVariable (
                  &mVariableModuleGlobal->VariableGlobal,
                  Variable.Volatile,
                  FALSE,
-                 Instance,
+                 Fvb,
                  (UINTN) &Variable.CurrPtr->State,
                  sizeof (UINT8),
                  &State
@@ -1346,7 +1350,7 @@ RuntimeServiceSetVariable (
                  &mVariableModuleGlobal->VariableGlobal,
                  Variable.Volatile,
                  FALSE,
-                 Instance,
+                 Fvb,
                  (UINTN) &Variable.CurrPtr->State,
                  sizeof (UINT8),
                  &State
@@ -1475,7 +1479,7 @@ RuntimeServiceSetVariable (
                &mVariableModuleGlobal->VariableGlobal,
                FALSE,
                TRUE,
-               Instance,
+               Fvb,
                *NonVolatileOffset,
                sizeof (VARIABLE_HEADER),
                (UINT8 *) NextVariable
@@ -1493,7 +1497,7 @@ RuntimeServiceSetVariable (
                &mVariableModuleGlobal->VariableGlobal,
                FALSE,
                TRUE,
-               Instance,
+               Fvb,
                *NonVolatileOffset,
                sizeof (VARIABLE_HEADER),
                (UINT8 *) NextVariable
@@ -1509,7 +1513,7 @@ RuntimeServiceSetVariable (
                &mVariableModuleGlobal->VariableGlobal,
                FALSE,
                TRUE,
-               Instance,
+               Fvb,
                *NonVolatileOffset + sizeof (VARIABLE_HEADER),
                (UINT32) VarSize - sizeof (VARIABLE_HEADER),
                (UINT8 *) NextVariable + sizeof (VARIABLE_HEADER)
@@ -1526,7 +1530,7 @@ RuntimeServiceSetVariable (
                &mVariableModuleGlobal->VariableGlobal,
                FALSE,
                TRUE,
-               Instance,
+               Fvb,
                *NonVolatileOffset,
                sizeof (VARIABLE_HEADER),
                (UINT8 *) NextVariable
@@ -1571,7 +1575,7 @@ RuntimeServiceSetVariable (
                &mVariableModuleGlobal->VariableGlobal,
                TRUE,
                TRUE,
-               Instance,
+               Fvb,
                *VolatileOffset,
                (UINT32) VarSize,
                (UINT8 *) NextVariable
@@ -1594,7 +1598,7 @@ RuntimeServiceSetVariable (
                &mVariableModuleGlobal->VariableGlobal,
                Variable.Volatile,
                FALSE,
-               Instance,
+               Fvb,
                (UINTN) &Variable.CurrPtr->State,
                sizeof (UINT8),
                &State
@@ -1792,7 +1796,6 @@ ReclaimForOS(
 /**
   Initializes variable store area for non-volatile and volatile variable.
 
-  @param  ImageHandle           The Image handle of this driver.
   @param  SystemTable           The pointer of EFI_SYSTEM_TABLE.
 
   @retval EFI_SUCCESS           Function successfully executed.
@@ -1801,25 +1804,20 @@ ReclaimForOS(
 **/
 EFI_STATUS
 VariableCommonInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvbProtocol
   )
 {
   EFI_STATUS                      Status;
-  EFI_FIRMWARE_VOLUME_HEADER      *FwVolHeader;
-  CHAR8                           *CurrPtr;
   VARIABLE_STORE_HEADER           *VolatileVariableStore;
   VARIABLE_STORE_HEADER           *VariableStoreHeader;
   VARIABLE_HEADER                 *NextVariable;
-  UINT32                          Instance;
-  EFI_PHYSICAL_ADDRESS            FvVolHdr;
-  UINT64                          TempVariableStoreHeader;
+  EFI_PHYSICAL_ADDRESS            TempVariableStoreHeader;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
-  UINT64                          BaseAddress;
+  EFI_PHYSICAL_ADDRESS            BaseAddress;
   UINT64                          Length;
   UINTN                           Index;
   UINT8                           Data;
-  UINT64                          VariableStoreBase;
+  EFI_PHYSICAL_ADDRESS            VariableStoreBase;
   UINT64                          VariableStoreLength;
   EFI_EVENT                       ReadyToBootEvent;
 
@@ -1851,6 +1849,7 @@ VariableCommonInitialize (
   //
   mVariableModuleGlobal->VariableGlobal.VolatileVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VolatileVariableStore;
   mVariableModuleGlobal->VolatileLastVariableOffset = (UINTN) GetStartPointer (VolatileVariableStore) - (UINTN) VolatileVariableStore;
+  mVariableModuleGlobal->FvbInstance = FvbProtocol;
 
   CopyGuid (&VolatileVariableStore->Signature, &gEfiVariableGuid);
   VolatileVariableStore->Size                       = FixedPcdGet32(PcdVariableStoreSize);
@@ -1863,11 +1862,11 @@ VariableCommonInitialize (
   // Get non volatile varaible store
   //
 
-  TempVariableStoreHeader = (UINT64) PcdGet32 (PcdFlashNvStorageVariableBase);
+  TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
   VariableStoreBase = TempVariableStoreHeader + \
-                              (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
+                              (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader)) -> HeaderLength);
   VariableStoreLength = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize) - \
-                                (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
+                                (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader)) -> HeaderLength);
   //
   // Mark the variable storage region of the FLASH as RUNTIME
   //
@@ -1892,26 +1891,7 @@ VariableCommonInitialize (
   // Get address of non volatile variable store base
   //
   mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
-
-  //
-  // Check Integrity
-  //
-  //
-  // Find the Correct Instance of the FV Block Service.
-  //
-  Instance  = 0;
-  CurrPtr   = (CHAR8 *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
-  while (EfiFvbGetPhysicalAddress (Instance, &FvVolHdr) == EFI_SUCCESS) {
-    FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvVolHdr);
-    if (CurrPtr >= (CHAR8 *) FwVolHeader && CurrPtr < (((CHAR8 *) FwVolHeader) + FwVolHeader->FvLength)) {
-      mVariableModuleGlobal->FvbInstance = Instance;
-      break;
-    }
-
-    Instance++;
-  }
-
-  VariableStoreHeader = (VARIABLE_STORE_HEADER *) CurrPtr;
+  VariableStoreHeader = (VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase;
   if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
     if (~VariableStoreHeader->Size == 0) {
       Status = UpdateVariableStore (
@@ -1938,18 +1918,17 @@ VariableCommonInitialize (
       }
     }
 
-    mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = (EFI_PHYSICAL_ADDRESS) ((UINTN) CurrPtr);
     //
     // Parse non-volatile variable data and get last variable offset
     //
-    NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *) CurrPtr);
+    NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase);
     Status        = EFI_SUCCESS;
 
     while (IsValidVariableHeader (NextVariable)) {
       NextVariable = GetNextVariablePtr (NextVariable);
     }
 
-    mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) CurrPtr;
+    mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) VariableStoreBase;
 
     //
     // Check if the free area is really free.
@@ -2015,6 +1994,14 @@ VariableClassAddressChangeEvent (
   IN VOID             *Context
   )
 {
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetAttributes);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->SetAttributes);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Read);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Write);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->EraseBlocks);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance);
   EfiConvertPointer (
     0x0,
     (VOID **) &mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase
@@ -2026,6 +2013,114 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
 }
 
+VOID
+EFIAPI
+FvbNotificationEvent (
+  IN  EFI_EVENT       Event,
+  IN  VOID            *Context
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          *HandleBuffer;
+  EFI_HANDLE                          FvbHandle;
+  UINTN                               HandleCount;
+  UINTN                               Index;
+  EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
+  EFI_FVB_ATTRIBUTES_2                Attributes;
+  EFI_SYSTEM_TABLE                    *SystemTable;
+  EFI_PHYSICAL_ADDRESS                NvStorageVariableBase;
+
+  SystemTable = (EFI_SYSTEM_TABLE *)Context;
+  Fvb         = NULL;
+  FvbHandle   = NULL;
+  
+  //
+  // Locate all handles of Fvb protocol
+  //
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiFirmwareVolumeBlockProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    return ;
+  }
+  
+  //
+  // Get the FVB to access variable store
+  //
+  for (Index = 0; Index < HandleCount; Index += 1, Status = EFI_NOT_FOUND) {
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Index],
+                    &gEfiFirmwareVolumeBlockProtocolGuid,
+                    (VOID **) &Fvb
+                    );
+    if (EFI_ERROR (Status)) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    // Ensure this FVB protocol supported Write operation.
+    //
+    Status = Fvb->GetAttributes (Fvb, &Attributes);
+    if (EFI_ERROR (Status) || ((Attributes & EFI_FVB2_WRITE_STATUS) == 0)) {
+      continue;     
+    }
+    //
+    // Compare the address and select the right one
+    //
+    Status = Fvb->GetPhysicalAddress (Fvb, &FvbBaseAddress);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
+    NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
+    if ((NvStorageVariableBase >= FvbBaseAddress) && (NvStorageVariableBase < (FvbBaseAddress + FwVolHeader->FvLength))) {
+      FvbHandle  = HandleBuffer[Index];
+      Status      = EFI_SUCCESS;
+      break;
+    }
+  }
+
+  FreePool (HandleBuffer);
+  if (!EFI_ERROR (Status)) {
+    Status = VariableCommonInitialize (Fvb);
+    ASSERT_EFI_ERROR (Status);
+  
+    SystemTable->RuntimeServices->GetVariable 		  = RuntimeServiceGetVariable;
+    SystemTable->RuntimeServices->GetNextVariableName = RuntimeServiceGetNextVariableName;
+    SystemTable->RuntimeServices->SetVariable 		  = RuntimeServiceSetVariable;
+    SystemTable->RuntimeServices->QueryVariableInfo	  = RuntimeServiceQueryVariableInfo;
+  
+    //
+    // Now install the Variable Runtime Architectural Protocol on a new handle
+    //
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mHandle,
+                  &gEfiVariableArchProtocolGuid, NULL,
+                  &gEfiVariableWriteArchProtocolGuid, NULL,
+                  NULL
+                  );
+    ASSERT_EFI_ERROR (Status);
+  
+    Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  VariableClassAddressChangeEvent,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &mVirtualAddressChangeEvent
+                  );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+}
 
 /**
   Variable Driver main entry point. The Variable driver places the 4 EFI
@@ -2046,36 +2141,16 @@ VariableServiceInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS  Status;
-
-  Status = VariableCommonInitialize (ImageHandle, SystemTable);
-  ASSERT_EFI_ERROR (Status);
-
-  SystemTable->RuntimeServices->GetVariable         = RuntimeServiceGetVariable;
-  SystemTable->RuntimeServices->GetNextVariableName = RuntimeServiceGetNextVariableName;
-  SystemTable->RuntimeServices->SetVariable         = RuntimeServiceSetVariable;
-  SystemTable->RuntimeServices->QueryVariableInfo   = RuntimeServiceQueryVariableInfo;
-
   //
-  // Now install the Variable Runtime Architectural Protocol on a new handle
-  //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mHandle,
-                  &gEfiVariableArchProtocolGuid,        NULL,
-                  &gEfiVariableWriteArchProtocolGuid,   NULL,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  VariableClassAddressChangeEvent,
-                  NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
-                  &mVirtualAddressChangeEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
+  // Register FvbNotificationEvent () notify function.
+  // 
+  EfiCreateProtocolNotifyEvent (
+    &gEfiFirmwareVolumeBlockProtocolGuid,
+    TPL_CALLBACK,
+    FvbNotificationEvent,
+    (VOID *)SystemTable,
+    &mFvbRegistration
+    );
 
   return EFI_SUCCESS;
 }

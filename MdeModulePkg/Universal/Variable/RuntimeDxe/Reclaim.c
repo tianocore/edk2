@@ -44,6 +44,7 @@ GetFvbHandleByAddress (
   EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
   EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
+  EFI_FVB_ATTRIBUTES_2                Attributes;
 
   *FvbHandle = NULL;
   //
@@ -71,6 +72,11 @@ GetFvbHandleByAddress (
     if (EFI_ERROR (Status)) {
       Status = EFI_NOT_FOUND;
       break;
+    }
+
+    Status = Fvb->GetAttributes (Fvb, &Attributes);
+    if (EFI_ERROR (Status) || ((Attributes & EFI_FVB2_WRITE_STATUS) == 0)) {
+      continue;     
     }
     //
     // Compare the address and select the right one
