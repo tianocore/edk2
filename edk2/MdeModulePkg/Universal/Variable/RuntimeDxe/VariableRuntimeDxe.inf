@@ -45,7 +45,6 @@
   SynchronizationLib
   UefiLib
   UefiBootServicesTableLib
-  FvbServiceLib
   BaseMemoryLib
   DebugLib
   UefiRuntimeLib

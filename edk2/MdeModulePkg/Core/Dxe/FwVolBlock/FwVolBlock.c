@@ -86,7 +86,7 @@ FwVolBlockGetAttributes (
   //
   // Since we are read only, it's safe to get attributes data from our in-memory copy.
   //
-  *Attributes = FvbDevice->FvbAttributes;
+  *Attributes = FvbDevice->FvbAttributes & ~EFI_FVB2_WRITE_STATUS;
 
   return EFI_SUCCESS;
 }
