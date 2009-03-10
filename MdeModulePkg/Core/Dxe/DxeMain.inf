@@ -130,7 +130,6 @@
   gEfiDevicePathProtocolGuid                    ## CONSUMES
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiEbcProtocolGuid                           ## SOMETIMES_CONSUMES
-  gEfiTcgPlatformProtocolGuid			        ## CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid         ## PRODUCES
 
 [FixedPcd.common]
