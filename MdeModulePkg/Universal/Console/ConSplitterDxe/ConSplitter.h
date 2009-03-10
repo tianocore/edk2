@@ -29,9 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
 
-#include <Guid/PrimaryStandardErrorDevice.h>
-#include <Guid/PrimaryConsoleOutDevice.h>
-#include <Guid/PrimaryConsoleInDevice.h>
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/StandardErrorDevice.h>
 #include <Guid/ConsoleOutDevice.h>

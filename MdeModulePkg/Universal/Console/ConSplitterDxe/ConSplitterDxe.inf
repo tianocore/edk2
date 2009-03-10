@@ -73,9 +73,7 @@
   gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMES
   gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMES
   gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMES
-  gEfiPrimaryConsoleOutDeviceGuid               ## PRODUCES
-  gEfiPrimaryConsoleInDeviceGuid                ## PRODUCES
-  gEfiPrimaryStandardErrorDeviceGuid            ## PRODUCES
+
 
 [Protocols]
   gEfiConsoleControlProtocolGuid                ## PRODUCES
