@@ -18,33 +18,56 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeMain.h"
 #include "FwVolBlock.h"
 
+FV_MEMMAP_DEVICE_PATH mFvMemmapDevicePathTemplate = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_MEMMAP_DP,
+      {
+        (UINT8)(sizeof (MEMMAP_DEVICE_PATH)),
+        (UINT8)(sizeof (MEMMAP_DEVICE_PATH) >> 8)
+      }
+    },
+    EfiMemoryMappedIO,
+    (EFI_PHYSICAL_ADDRESS) 0,
+    (EFI_PHYSICAL_ADDRESS) 0,
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
+  }
+};
+
+FV_PIWG_DEVICE_PATH mFvPIWGDevicePathTemplate = {
+  {
+    {
+      MEDIA_DEVICE_PATH,
+      MEDIA_PIWG_FW_VOL_DP,
+      {
+        (UINT8)(sizeof (MEDIA_FW_VOL_DEVICE_PATH)),
+        (UINT8)(sizeof (MEDIA_FW_VOL_DEVICE_PATH) >> 8)
+      }
+    },
+    { 0 }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
+  }
+};
 
 EFI_FW_VOL_BLOCK_DEVICE  mFwVolBlock = {
   FVB_DEVICE_SIGNATURE,
   NULL,
-  {
-    {
-      {
-        HARDWARE_DEVICE_PATH,
-        HW_MEMMAP_DP,
-        {
-          (UINT8)(sizeof (MEMMAP_DEVICE_PATH)),
-          (UINT8)(sizeof (MEMMAP_DEVICE_PATH) >> 8)
-        }
-      },
-      EfiMemoryMappedIO,
-      (EFI_PHYSICAL_ADDRESS) 0,
-      (EFI_PHYSICAL_ADDRESS) 0,
-    },
-    {
-      END_DEVICE_PATH_TYPE,
-      END_ENTIRE_DEVICE_PATH_SUBTYPE,
-      {
-        END_DEVICE_PATH_LENGTH,
-        0
-      }
-    },
-  },
+  NULL,
   {
     FwVolBlockGetAttributes,
     (EFI_FVB_SET_ATTRIBUTES)FwVolBlockSetAttributes,
@@ -466,6 +489,7 @@ ProduceFVBProtocolOnBuffer (
     CoreFreePool (FvbDev);
     return EFI_OUT_OF_RESOURCES;
   }
+  
   //
   // Last, fill in the cache with the linear address of the blocks
   //
@@ -482,11 +506,26 @@ ProduceFVBProtocolOnBuffer (
   }
 
   //
-  // Set up the devicepath
+  // Judget whether FV name guid is produced in Fv extension header
   //
-  FvbDev->DevicePath.MemMapDevPath.StartingAddress = BaseAddress;
-  FvbDev->DevicePath.MemMapDevPath.EndingAddress = BaseAddress + FwVolHeader->FvLength - 1;
-
+  if (FwVolHeader->ExtHeaderOffset == 0) {
+    //
+    // FV does not contains extension header, then produce MEMMAP_DEVICE_PATH
+    //
+    FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
+    ((FV_MEMMAP_DEVICE_PATH *) FvbDev->DevicePath)->MemMapDevPath.StartingAddress = BaseAddress;
+    ((FV_MEMMAP_DEVICE_PATH *) FvbDev->DevicePath)->MemMapDevPath.EndingAddress   = BaseAddress + FwVolHeader->FvLength - 1;
+  } else {
+    //
+    // FV contains extension header, then produce MEDIA_FW_VOL_DEVICE_PATH
+    //
+    FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
+    CopyGuid (
+      &((FV_PIWG_DEVICE_PATH *)FvbDev->DevicePath)->FvDevPath.FvName, 
+      (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)
+      );
+  }
+  
   //
   //
   // Attach FvVolBlock Protocol to new handle
@@ -494,7 +533,7 @@ ProduceFVBProtocolOnBuffer (
   Status = CoreInstallMultipleProtocolInterfaces (
              &FvbDev->Handle,
              &gEfiFirmwareVolumeBlockProtocolGuid,     &FvbDev->FwVolBlockInstance,
-             &gEfiDevicePathProtocolGuid,              &FvbDev->DevicePath,
+             &gEfiDevicePathProtocolGuid,              FvbDev->DevicePath,
              NULL
              );
 

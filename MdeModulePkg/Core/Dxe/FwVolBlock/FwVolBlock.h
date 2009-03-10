@@ -25,17 +25,23 @@ typedef struct {
   UINTN                       Length;
 } LBA_CACHE;
 
-
 typedef struct {
   MEMMAP_DEVICE_PATH          MemMapDevPath;
   EFI_DEVICE_PATH_PROTOCOL    EndDevPath;
-} FV_DEVICE_PATH;
+} FV_MEMMAP_DEVICE_PATH;
 
+//
+// UEFI Specification define FV device path format if FV provide name guid in extension header
+//
+typedef struct {
+  MEDIA_FW_VOL_DEVICE_PATH    FvDevPath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevPath;
+} FV_PIWG_DEVICE_PATH;
 
 typedef struct {
   UINTN                                 Signature;
   EFI_HANDLE                            Handle;
-  FV_DEVICE_PATH                        DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    FwVolBlockInstance;
   UINTN                                 NumBlocks;
   LBA_CACHE                             *LbaCache;
