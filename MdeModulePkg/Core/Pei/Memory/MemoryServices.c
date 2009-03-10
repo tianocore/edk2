@@ -128,6 +128,7 @@ PeiAllocatePages (
   EFI_PEI_HOB_POINTERS                    Hob;
   EFI_PHYSICAL_ADDRESS                    *FreeMemoryTop;
   EFI_PHYSICAL_ADDRESS                    *FreeMemoryBottom;
+  UINTN                                   RemainingPages;
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   Hob.Raw     = PrivateData->HobList.Raw;
@@ -159,11 +160,10 @@ PeiAllocatePages (
   //
   // Verify that there is sufficient memory to satisfy the allocation
   //
-  if (*(FreeMemoryTop) - ((Pages * EFI_PAGE_SIZE) + sizeof (EFI_HOB_MEMORY_ALLOCATION)) < 
-      *(FreeMemoryBottom)) {
-    DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%x Pages is available.\n", Pages));
-    DEBUG ((EFI_D_ERROR, "There is only left 0x%x pages memory resource to be allocated.\n", \
-    EFI_SIZE_TO_PAGES ((UINTN) (*(FreeMemoryTop) - *(FreeMemoryBottom)))));
+  RemainingPages = EFI_SIZE_TO_PAGES ((UINTN) (*FreeMemoryTop - *FreeMemoryBottom));
+  if ((INTN) (RemainingPages - EFI_SIZE_TO_PAGES (sizeof (EFI_HOB_MEMORY_ALLOCATION))) < Pages) {
+    DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64) Pages));
+    DEBUG ((EFI_D_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64) RemainingPages));
     return  EFI_OUT_OF_RESOURCES;
   } else {
     //
