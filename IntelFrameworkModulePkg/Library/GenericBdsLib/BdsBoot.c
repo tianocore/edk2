@@ -146,6 +146,7 @@ BdsLibBootViaBootOption (
   EFI_DEVICE_PATH_PROTOCOL  *WorkingDevicePath;
   EFI_ACPI_S3_SAVE_PROTOCOL *AcpiS3Save;
   LIST_ENTRY                TempBootLists;
+  EFI_SECURITY_ARCH_PROTOCOL *SecurityProtocol;
 
   //
   // Record the performance data for End of BDS
@@ -239,6 +240,18 @@ BdsLibBootViaBootOption (
     //
     FreePool (DevicePath); 
     DevicePath = Option->DevicePath;
+  }
+
+  //
+  // Measure GPT Table by SAP protocol.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiSecurityArchProtocolGuid,
+                  NULL,
+                  &SecurityProtocol
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = SecurityProtocol->FileAuthenticationState (SecurityProtocol, 0, DevicePath);
   }
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Booting %S\n", Option->Description));

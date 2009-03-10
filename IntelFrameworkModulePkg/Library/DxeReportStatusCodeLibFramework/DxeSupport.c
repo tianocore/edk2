@@ -30,7 +30,7 @@ InternalGetReportStatusCode (
 
   if (gRT->Hdr.Revision < 0x20000) {
     return ((FRAMEWORK_EFI_RUNTIME_SERVICES*)gRT)->ReportStatusCode;
-  } else if (gBS != NULL) {
+  } else if (gBS != NULL && gBS->LocateProtocol != NULL) {
     Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**)&StatusCodeProtocol);
     if (!EFI_ERROR (Status) && StatusCodeProtocol != NULL) {
       return StatusCodeProtocol->ReportStatusCode;
@@ -99,7 +99,7 @@ InternalReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (gBS == NULL) {
+  if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
     return EFI_UNSUPPORTED;
   }
 
