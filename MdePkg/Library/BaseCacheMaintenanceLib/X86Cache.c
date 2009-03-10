@@ -68,7 +68,11 @@ InvalidateInstructionCacheRange (
   IN      UINTN                     Length
   )
 {
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
+  if (Length == 0) {
+    return Address;
+  }
+
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Address));
   return Address;
 }
 
@@ -127,11 +131,11 @@ WriteBackInvalidateDataCacheRange (
   UINTN                             Start;
   UINTN                             End;
 
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-
   if (Length == 0) {
     return Address;
   }
+
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Address));
 
   Start = (UINTN)Address;
   //
