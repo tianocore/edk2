@@ -54,10 +54,10 @@
   gEfiPeiReadOnlyVariable2PpiGuid               ## CONSUMES
   gPcdPpiGuid                                   ## PRODUCES
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable
 
-[FixedPcd.common]
+[FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry || PcdPeiFullPcdDatabaseEnable
 

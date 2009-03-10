@@ -178,10 +178,6 @@
   ## Include/Protocol/Dpc.h
   gEfiDpcProtocolGuid            = {0x480f8ae9, 0xc46, 0x4aa9,  { 0xbc, 0x89, 0xdb, 0x9f, 0xba, 0x61, 0x98, 0x6 }}
   
-  ## Tcg addtional services to measure PeImage and ActionString.
-  ## Include/Protocol/TcgPlatform.h
-  gEfiTcgPlatformProtocolGuid    = { 0x8c4c9a41, 0xbf56, 0x4627, { 0x9e, 0xa, 0xc8, 0x38, 0x6d, 0x66, 0x11, 0x5c }}
-
   ## Fault Tolerant Write protocol provides boot-time service to do fault tolerant write capability for block devices.
   #  Include/Protocol/FaultTolerantWrite.h
   gEfiFaultTolerantWriteProtocolGuid = { 0x3EBD9E82, 0x2C78, 0x4DE6, { 0x97, 0x86, 0x8D, 0x4B, 0xFC, 0xB7, 0xC8, 0x81 }}

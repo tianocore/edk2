@@ -191,7 +191,6 @@ CoreLoadPeImage (
   BOOLEAN                   DstBufAlocated;
   UINTN                     Size;
   UINTN                     LinkTimeBase;
-  EFI_TCG_PLATFORM_PROTOCOL *TcgPlatformProtocol;
   IMAGE_FILE_HANDLE         *FHandle;
 
   FHandle = NULL;
@@ -342,29 +341,6 @@ CoreLoadPeImage (
         goto Done;
       }
     }
-  }
-
-  //
-  // Measure the image before applying fixup
-  //
-  Status = CoreLocateProtocol (
-             &gEfiTcgPlatformProtocolGuid,
-             NULL,
-             (VOID **) &TcgPlatformProtocol
-             );
-  if (!EFI_ERROR (Status)) {
-    FHandle = (IMAGE_FILE_HANDLE *) Image->ImageContext.Handle;
-    Status = TcgPlatformProtocol->MeasurePeImage (
-                                    BootPolicy,
-                                    (EFI_PHYSICAL_ADDRESS) (UINTN) FHandle->Source,
-                                    FHandle->SourceSize,
-                                    LinkTimeBase,
-                                    Image->ImageContext.ImageType,
-                                    Image->Info.DeviceHandle,
-                                    Image->Info.FilePath
-                                    );
-
-    ASSERT_EFI_ERROR (Status);
   }
 
   //
