@@ -451,7 +451,9 @@ FtwWrite (
   Record->Offset  = Offset;
   Record->Length  = Length;
   Record->FvBaseAddress = FvbPhysicalAddress;
-  CopyMem ((Record + 1), PrivateData, Header->PrivateDataSize);
+  if (PrivateData != NULL) {
+    CopyMem ((Record + 1), PrivateData, Header->PrivateDataSize);
+  }
 
   MyOffset  = (UINT8 *) Record - FtwDevice->FtwWorkSpace;
   MyLength  = RECORD_SIZE (Header->PrivateDataSize);
@@ -828,22 +830,14 @@ FtwGetLastWrite (
   // If this record SpareComplete has not set, then it can not restart.
   //
   if (Record->SpareComplete != FTW_VALID_STATE) {
-    if (IsFirstRecordOfWrites (Header, Record)) {
-      //
-      // The First record cannot be restart and target is still healthy,
-      // so abort() is a safe solution.
-      //
+    Status = GetPreviousRecordOfWrites (Header, &Record);
+    if (EFI_ERROR (Status)) {
       FtwAbort (This);
-
       *Complete = TRUE;
       return EFI_NOT_FOUND;
-    } else {
-      //
-      // Step back to the previous record
-      //
-      GetPreviousRecordOfWrites (Header, &Record);
     }
   }
+
   //
   // Fill all the requested values
   //

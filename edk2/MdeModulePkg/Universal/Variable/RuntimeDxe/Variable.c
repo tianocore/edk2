@@ -2051,7 +2051,7 @@ FvbNotificationEvent (
   //
   // Get the FVB to access variable store
   //
-  for (Index = 0; Index < HandleCount; Index += 1, Status = EFI_NOT_FOUND) {
+  for (Index = 0; Index < HandleCount; Index += 1, Status = EFI_NOT_FOUND, Fvb = NULL) {
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
                     &gEfiFirmwareVolumeBlockProtocolGuid,
@@ -2086,7 +2086,7 @@ FvbNotificationEvent (
   }
 
   FreePool (HandleBuffer);
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && Fvb != NULL) {
     Status = VariableCommonInitialize (Fvb);
     ASSERT_EFI_ERROR (Status);
   
