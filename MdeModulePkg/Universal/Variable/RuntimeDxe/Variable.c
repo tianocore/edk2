@@ -2022,7 +2022,6 @@ FvbNotificationEvent (
 {
   EFI_STATUS                          Status;
   EFI_HANDLE                          *HandleBuffer;
-  EFI_HANDLE                          FvbHandle;
   UINTN                               HandleCount;
   UINTN                               Index;
   EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
@@ -2034,7 +2033,6 @@ FvbNotificationEvent (
 
   SystemTable = (EFI_SYSTEM_TABLE *)Context;
   Fvb         = NULL;
-  FvbHandle   = NULL;
   
   //
   // Locate all handles of Fvb protocol
@@ -2082,7 +2080,6 @@ FvbNotificationEvent (
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
     NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
     if ((NvStorageVariableBase >= FvbBaseAddress) && (NvStorageVariableBase < (FvbBaseAddress + FwVolHeader->FvLength))) {
-      FvbHandle  = HandleBuffer[Index];
       Status      = EFI_SUCCESS;
       break;
     }
