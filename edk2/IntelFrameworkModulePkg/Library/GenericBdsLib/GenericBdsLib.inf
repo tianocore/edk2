@@ -108,6 +108,7 @@
   gEfiConsoleControlProtocolGuid                # PROTOCOL CONSUMES
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL CONSUMES
   gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
+  gEfiSecurityArchProtocolGuid
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
