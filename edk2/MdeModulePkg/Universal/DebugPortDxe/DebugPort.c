@@ -4,7 +4,7 @@
   ALL CODE IN THE SERIALIO STACK MUST BE RE-ENTRANT AND CALLABLE FROM
   INTERRUPT CONTEXT
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -411,18 +411,6 @@ DebugPortStart (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG_CODE_BEGIN ();
-      UINTN  BufferSize;
-
-      BufferSize = 48;
-      DebugPortWrite (
-        &mDebugPortDevice.DebugPortInterface,
-        0,
-        &BufferSize,
-        "DebugPort driver failed to open child controller\n\n"
-        );
-    DEBUG_CODE_END ();
-
     gBS->CloseProtocol (
           ControllerHandle,
           &gEfiSerialIoProtocolGuid,
@@ -431,19 +419,6 @@ DebugPortStart (
           );
     return Status;
   }
-
-  DEBUG_CODE_BEGIN ();
-    UINTN                     BufferSize;
-
-    BufferSize = 38;
-    DebugPortWrite (
-      &mDebugPortDevice.DebugPortInterface,
-      0,
-      &BufferSize,
-      "Hello World from the DebugPort driver\n\n"
-      );
-
-  DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
 }
