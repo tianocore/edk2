@@ -40,6 +40,38 @@ UINT32 TestPattern[] = {
 };
 
 /**
+  Internal function to compare two memory buffers of a given length.
+
+  This is the internal function to compare two memory buffers. We cannot
+  use CompareMem() in BaseLib, for that function ASSERT when buffer address
+  is zero.
+
+  @param  DestinationBuffer First memory buffer
+  @param  SourceBuffer      Second memory buffer
+  @param  Length            Length of DestinationBuffer and SourceBuffer memory
+                            regions to compare.
+
+  @return 0                 All Length bytes of the two buffers are identical.
+  @retval Non-zero          The first mismatched byte in SourceBuffer subtracted from the first
+                            mismatched byte in DestinationBuffer.
+
+**/
+INTN
+CompareMemoryWorker (
+  IN      CONST VOID                *DestinationBuffer,
+  IN      CONST VOID                *SourceBuffer,
+  IN      UINTN                     Length
+  )
+{
+  while ((--Length != 0) &&
+         (*(INT8*)DestinationBuffer == *(INT8*)SourceBuffer)) {
+    DestinationBuffer = (INT8*)DestinationBuffer + 1;
+    SourceBuffer = (INT8*)SourceBuffer + 1;
+  }
+  return (INTN)*(UINT8*)DestinationBuffer - (INTN)*(UINT8*)SourceBuffer;
+}
+
+/**
   Internal worker function for system memory range test.
 
   This function is the internal worker function for system memory range test.
@@ -90,7 +122,7 @@ MemoryTestWorker (
   //
   TempAddress = StartAddress;
   while ((UINTN) TempAddress < (UINTN) StartAddress + Length) {
-    if (CompareMem (TempAddress, TestPattern, sizeof (TestPattern)) != 0) {
+    if (CompareMemoryWorker (TempAddress, TestPattern, sizeof (TestPattern)) != 0) {
       //
       // Value read back does not equal to the value written, so error is detected.
       //
