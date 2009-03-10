@@ -163,6 +163,70 @@ Index: drivers/drivers.c
    ShellCloseHandleEnumerator ();
    LibCheckVarFreeVarList (&ChkPck);
    LibUnInitializeStrings ();
+Index: edit/libEditor.c
+===================================================================
+--- edit/libEditor.c	(revision 30)
++++ edit/libEditor.c	(working copy)
+@@ -88,8 +88,6 @@
+   )
+ {
+   EFI_STATUS  Status;
+-  EFI_HANDLE  *HandleBuffer;
+-  UINTN       HandleCount;
+ 
+   //
+   // basic initialization
+@@ -117,38 +115,22 @@
+         );
+ 
+   //
+-  // Find mouse
++  // Find mouse in System Table ConsoleInHandle
+   //
+-  HandleBuffer = NULL;
+-  Status = LibLocateHandle (
+-            ByProtocol,
+-            &gEfiPrimaryConsoleInDeviceGuid,
+-            NULL,
+-            &HandleCount,
+-            &HandleBuffer
+-            );
++  Status = BS->HandleProtocol (
++                In,
++                &gEfiSimplePointerProtocolGuid,
++                &MainEditor.MouseInterface
++                );
+ 
+-  if (!EFI_ERROR (Status)) {
+-    if (HandleCount > 0) {
+-      Status = BS->HandleProtocol (
+-                    HandleBuffer[0],
+-                    &gEfiSimplePointerProtocolGuid,
+-                    &MainEditor.MouseInterface
+-                    );
+-
+-      if (EFI_ERROR (Status)) {
+-        MainEditor.MouseInterface = NULL;
+-      } else {
+-        MainEditor.MouseAccumulatorX  = 0;
+-        MainEditor.MouseAccumulatorY  = 0;
+-        MainEditor.MouseSupported     = TRUE;
+-      }
+-    }
++  if (EFI_ERROR (Status)) {
++    MainEditor.MouseInterface = NULL;
++  } else {
++    MainEditor.MouseAccumulatorX  = 0;
++    MainEditor.MouseAccumulatorY  = 0;
++    MainEditor.MouseSupported     = TRUE;
+   }
+ 
+-  if (HandleBuffer) {
+-    FreePool (HandleBuffer);
+-  }
+   //
+   // below will call the five components' init function
+   //
 Index: edit/libFileBuffer.c
 ===================================================================
 --- edit/libFileBuffer.c	(revision 30)
@@ -185,6 +249,67 @@ Index: edit/libFileBuffer.c
          //
          // Unicode file's size should be even
          //
+Index: hexedit/libEditor.c
+===================================================================
+--- hexedit/libEditor.c	(revision 30)
++++ hexedit/libEditor.c	(working copy)
+@@ -100,8 +100,6 @@
+ --*/
+ {
+   EFI_STATUS  Status;
+-  EFI_HANDLE  *HandleBuffer;
+-  UINTN       HandleCount;
+ 
+   //
+   // basic initialization
+@@ -129,36 +127,19 @@
+         &(HMainEditor.ScreenSize.Row)
+         );
+ 
+-  HandleBuffer = NULL;
+-  Status = LibLocateHandle (
+-            ByProtocol,
+-            &gEfiPrimaryConsoleInDeviceGuid,
+-            NULL,
+-            &HandleCount,
+-            &HandleBuffer
+-            );
+-
+-  if (!EFI_ERROR (Status)) {
+-
+-    if (HandleCount > 0) {
+-      Status = BS->HandleProtocol (
+-                    HandleBuffer[0],
+-                    &gEfiSimplePointerProtocolGuid,
+-                    &HMainEditor.MouseInterface
+-                    );
+-      if (EFI_ERROR (Status)) {
+-        HMainEditor.MouseInterface = NULL;
+-      } else {
+-        HMainEditor.MouseAccumulatorX = 0;
+-        HMainEditor.MouseAccumulatorY = 0;
+-        HMainEditor.MouseSupported    = TRUE;
+-      }
+-    }
++  Status = BS->HandleProtocol (
++                In,
++                &gEfiSimplePointerProtocolGuid,
++                &HMainEditor.MouseInterface
++                );
++  if (EFI_ERROR (Status)) {
++    HMainEditor.MouseInterface = NULL;
++  } else {
++    HMainEditor.MouseAccumulatorX = 0;
++    HMainEditor.MouseAccumulatorY = 0;
++    HMainEditor.MouseSupported    = TRUE;
+   }
+ 
+-  if (HandleBuffer != NULL) {
+-    FreePool (HandleBuffer);
+-  }
+   //
+   // below will call the five components' init function
+   //
 Index: Library/EfiShellLib.h
 ===================================================================
 --- Library/EfiShellLib.h	(revision 30)
@@ -374,6 +499,176 @@ Index: shellenv/batch.c
    } else {
      *IsAscii = TRUE;
    }
+Index: shellenv/Connect.c
+===================================================================
+--- shellenv/Connect.c	(revision 30)
++++ shellenv/Connect.c	(working copy)
+@@ -831,6 +831,16 @@
+     return Status;
+   }
+ 
++  //
++  // Close proxy console before disconnect all devices.
++  //
++  SEnvCloseConsoleProxy (
++    ST->ConsoleInHandle,
++    &ST->ConIn,
++    ST->ConsoleOutHandle,
++    &ST->ConOut
++    );
++
+   for (Index = 0; Index < AllHandleCount; Index++) {
+     //
+     // Check whether the handle is still in handle database
+@@ -1004,7 +1014,6 @@
+ VOID
+ SEnvConnectConsole (
+   CHAR16      *VariableName,
+-  EFI_GUID    *PrimaryGuid,
+   EFI_GUID    *ConsoleGuid,
+   EFI_HANDLE  *ConsoleHandle,
+   VOID        **ConsoleInterface
+@@ -1018,9 +1027,8 @@
+   EFI_HANDLE                *AllHandleBuffer;
+   VOID                      *Interface;
+ 
+-  *ConsoleHandle    = NULL;
+-  *ConsoleInterface = NULL;
+   ConsoleIndex      = 0;
++  AllHandleBuffer   = NULL;
+ 
+   DevicePath        = LibGetVariable (VariableName, &gEfiGlobalVariableGuid);
+   if (DevicePath != NULL) {
+@@ -1028,17 +1036,19 @@
+     FreePool (DevicePath);
+   }
+ 
+-  AllHandleBuffer = NULL;
+-  Status = BS->LocateHandleBuffer (
+-                ByProtocol,
+-                PrimaryGuid,
+-                NULL,
+-                &AllHandleCount,
+-                &AllHandleBuffer
+-                );
+-  if (!EFI_ERROR (Status) && AllHandleCount > 0) {
+-    *ConsoleHandle = AllHandleBuffer[0];
+-  } else if (*ConsoleHandle == NULL) {
++  Status = EFI_NOT_FOUND;
++  //
++  // Check ConsoleHandle validation whatever it was updated or not.
++  //
++  if (*ConsoleHandle != NULL) {
++    Status = BS->HandleProtocol (
++                  *ConsoleHandle,
++                  ConsoleGuid,
++                  &Interface
++                  );
++  }
++
++  if (EFI_ERROR (Status)) {
+     AllHandleBuffer = NULL;
+     Status = BS->LocateHandleBuffer (
+                   ByProtocol,
+@@ -1063,16 +1073,16 @@
+                       &gEfiDevicePathProtocolGuid,
+                       &Interface
+                       );
+-        if (EFI_ERROR (Status)) {
++        if (!EFI_ERROR (Status)) {
+           ConsoleIndex = Index;
+           break;
+         }
+       }
++      
++      *ConsoleHandle = AllHandleBuffer[ConsoleIndex];
+     }
+   }
+ 
+-  *ConsoleHandle = AllHandleBuffer[ConsoleIndex];
+-
+   if (*ConsoleHandle != NULL) {
+     BS->HandleProtocol (
+           *ConsoleHandle,
+@@ -1081,7 +1091,7 @@
+           );
+   }
+ 
+-  if (AllHandleBuffer) {
++  if (AllHandleBuffer != NULL) {
+     FreePool (AllHandleBuffer);
+   }
+ }
+@@ -1189,8 +1199,7 @@
+   EFI_STATUS  Status;
+ 
+   //
+-  // Check current ConIn and ConOut to ensure it is the ConsoleProxy
+-  // Otherwise, the Console should not be close
++  // Check current ConIn and ConOut to judge it is the ConsoleProxy
+   //
+   Status = SEnvCheckConsoleProxy (
+             ST->ConsoleInHandle,
+@@ -1203,23 +1212,21 @@
+   // Indicate the Console is replaced by redirection operation
+   // It is not safe to connect Console here
+   //
+-  if (EFI_ERROR (Status)) {
+-    return ;
++  if (!EFI_ERROR (Status)) {
++    //
++    // It is proxy console, to prevent the proxy console form being restored to original console,
++    // close it temporary before connect all console
++    //
++    SEnvCloseConsoleProxy (
++      ST->ConsoleInHandle,
++      &ST->ConIn,
++      ST->ConsoleOutHandle,
++      &ST->ConOut
++      );
+   }
+-  //
+-  // To prevent the proxy console form being restored to original console,
+-  // close it temporary before connect all console
+-  //
+-  SEnvCloseConsoleProxy (
+-    ST->ConsoleInHandle,
+-    &ST->ConIn,
+-    ST->ConsoleOutHandle,
+-    &ST->ConOut
+-    );
+ 
+   SEnvConnectConsole (
+     VarErrorOut,
+-    &gEfiPrimaryStandardErrorDeviceGuid,
+     &gEfiSimpleTextOutProtocolGuid,
+     &ST->StandardErrorHandle,
+     (VOID **) &ST->StdErr
+@@ -1227,7 +1234,6 @@
+ 
+   SEnvConnectConsole (
+     VarConsoleOut,
+-    &gEfiPrimaryConsoleOutDeviceGuid,
+     &gEfiSimpleTextOutProtocolGuid,
+     &ST->ConsoleOutHandle,
+     (VOID **) &ST->ConOut
+@@ -1235,7 +1241,6 @@
+ 
+   SEnvConnectConsole (
+     VarConsoleIn,
+-    &gEfiPrimaryConsoleInDeviceGuid,
+     &gEfiSimpleTextInProtocolGuid,
+     &ST->ConsoleInHandle,
+     (VOID **) &ST->ConIn
+@@ -1254,6 +1259,8 @@
+   SetCrc (&ST->Hdr);
+ }
+ 
++
++
+ EFI_STATUS
+ EFIAPI
+ SEnvCmdReconnect (
 Index: SmbiosView/PrintInfo.c
 ===================================================================
 --- SmbiosView/PrintInfo.c	(revision 30)

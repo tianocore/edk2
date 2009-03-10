@@ -13,6 +13,9 @@ This is EDK style package and the following steps can help to build the package:
 3. The ShellHotFix.patch file solves the follow two issues in EDK Shell 1.05 release:
    a. RFC3066 language compatibility issue in drivers command.
    b. "CHAR8" compatibility issue in DmpStore, Edit command and shell script execution. 
+   c. Three GUIDs had been retired, PrimaryConsoleInDeviceGuid, PrimaryConsoleOutDeviceGuid and PrimaryStandardErrorDeviceGuid.
+      Reconnect, Edit, HexEdit command are updated.
+   
    This patch will be integrated into the later official release.
 
 4. The EDK II style DSC file is used to validate build EDK Shell source & EDK compatibility package and can generate the binaries in EdkShellBinPkg.
