@@ -248,7 +248,7 @@ BdsLibBootViaBootOption (
   Status = gBS->LocateProtocol (
                   &gEfiSecurityArchProtocolGuid,
                   NULL,
-                  &SecurityProtocol
+                  (VOID**) &SecurityProtocol
                   );
   if (!EFI_ERROR (Status)) {
     Status = SecurityProtocol->FileAuthenticationState (SecurityProtocol, 0, DevicePath);
