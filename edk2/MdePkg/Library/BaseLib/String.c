@@ -822,7 +822,6 @@ StrHexToUintn (
   }
 
   if (InternalCharToUpper (*String) == L'X') {
-    ASSERT (*(String - 1) == L'0');
     if (*(String - 1) != L'0') {
       return 0;
     }
