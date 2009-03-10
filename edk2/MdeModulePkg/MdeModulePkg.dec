@@ -4,7 +4,7 @@
 # It also provides the defintions(including PPIs/PROTOCOLs/GUIDs and library classes) 
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2008, Intel Corporation.
+# Copyright (c) 2007 - 2009, Intel Corporation.
 #
 # All rights reserved.
 # This program and the accompanying materials are licensed and made available under
@@ -264,6 +264,16 @@
   #  If FASLE, only FTW Write service is available.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable|TRUE|BOOLEAN|0x0001200a
 
+[PcdsFeatureFlag.IA32]
+  ## 
+  # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.
+  # If it is TRUE, DxeIpl will load a 64-bit DxeCore and switch to long mode to hand over to DxeCore;
+  # otherwise, DxeIpl will load a 32-bit DxeCore and perform stack switch to hand over to DxeCore.
+  # It is assumed that 64-bit DxeCore is built in firmware if it is true; otherwise 32-bit DxeCore
+  # is built in firmware.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE|BOOLEAN|0x0001003b
+
 [PcdsFixedAtBuild]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicate maximum number of callback function
@@ -287,9 +297,6 @@
   ## Maximum PPI count is supported by PeiCore's PPI database.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported|64|UINT32|0x00010033
   
-  ## RTC Update Timeout Value
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
-  
   ## Size of the NV variable range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
   
@@ -310,24 +317,12 @@
   ## Size of the FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x0|UINT32|0x30000011
  
-[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]  
-  ##
-  #  This PCD defines the times to print hello world string.
-  #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
-  ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
-
-  ## Indicate the max size of the populated capsule image that the platform can support.
-  #  The default max size is 100MB (0x6400000) for more than one large capsule images. 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x6400000|UINT32|0x0001001e
-  
-  ## Indicate the max size of the non-populated capsule image that the platform can support.
-  #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
-
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
+
+  ## RTC Update Timeout Value
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
   
 [PcdsPatchableInModule,PcdsDynamic]
   ##
@@ -338,7 +333,7 @@
   ##
   #  This PCD defines the Console output row and the default value is 80 according to UEFI spec
   ##
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007  
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
   
 [PcdsFixedAtBuild,PcdsDynamic]
   ## Base address of the NV variable range in flash device 
@@ -352,11 +347,21 @@
   
   ##
   #  This PCD defines the print string.
-  #  This PCD is a sample to explain FixedAtBuild String PCD usage.
+  #  This PCD is a sample to explain String typed PCD usage.
   ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004 
   
-[PcdsFeatureFlag.IA32]
-  ## If TRUE, the DXE IPL will load a 64-bit DxeCore.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE|BOOLEAN|0x0001003b
+[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
+  ##
+  #  This PCD defines the times to print hello world string.
+  #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
+  ##
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
 
+  ## Indicate the max size of the populated capsule image that the platform can support.
+  #  The default max size is 100MB (0x6400000) for more than one large capsule images. 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x6400000|UINT32|0x0001001e
+  
+  ## Indicate the max size of the non-populated capsule image that the platform can support.
+  #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
