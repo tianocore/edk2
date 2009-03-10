@@ -133,6 +133,7 @@ READ_ENABLED_CAP   = TRUE
 READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
+FvNameGuid         = 6D99E806-3D38-42c2-A095-5F4300BFD7DC
 
 ################################################################################
 #

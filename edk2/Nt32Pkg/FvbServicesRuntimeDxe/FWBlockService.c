@@ -52,31 +52,55 @@ Revision History
 
 ESAL_FWB_GLOBAL         *mFvbModuleGlobal;
 
-EFI_FW_VOL_BLOCK_DEVICE mFvbDeviceTemplate = {
-  FVB_DEVICE_SIGNATURE,
+FV_MEMMAP_DEVICE_PATH mFvMemmapDevicePathTemplate = {
   {
     {
+      HARDWARE_DEVICE_PATH,
+      HW_MEMMAP_DP,
       {
-        HARDWARE_DEVICE_PATH,
-        HW_MEMMAP_DP,
-        {
-          sizeof (MEMMAP_DEVICE_PATH),
-          0
-        }
-      },
-      EfiMemoryMappedIO,
-      0,
-      0,
-    },
-    {
-      END_DEVICE_PATH_TYPE,
-      END_ENTIRE_DEVICE_PATH_SUBTYPE,
-      {
-        sizeof (EFI_DEVICE_PATH_PROTOCOL),
-        0
+        (UINT8)(sizeof (MEMMAP_DEVICE_PATH)),
+        (UINT8)(sizeof (MEMMAP_DEVICE_PATH) >> 8)
       }
-    }
+    },
+    EfiMemoryMappedIO,
+    (EFI_PHYSICAL_ADDRESS) 0,
+    (EFI_PHYSICAL_ADDRESS) 0,
   },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
+  }
+};
+
+FV_PIWG_DEVICE_PATH mFvPIWGDevicePathTemplate = {
+  {
+    {
+      MEDIA_DEVICE_PATH,
+      MEDIA_PIWG_FW_VOL_DP,
+      {
+        (UINT8)(sizeof (MEDIA_FW_VOL_DEVICE_PATH)),
+        (UINT8)(sizeof (MEDIA_FW_VOL_DEVICE_PATH) >> 8)
+      }
+    },
+    { 0 }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH,
+      0
+    }
+  }
+};
+
+EFI_FW_VOL_BLOCK_DEVICE mFvbDeviceTemplate = {
+  FVB_DEVICE_SIGNATURE,
+  NULL,
   0,
   {
     FvbProtocolGetAttributes,
@@ -1097,6 +1121,7 @@ Returns:
       ) {
     return EFI_NOT_FOUND;
   }
+  
   //
   // Verify the header checksum
   //
@@ -1113,6 +1138,13 @@ Returns:
     return EFI_NOT_FOUND;
   }
 
+  //
+  // PI specification defines the name guid of FV exists in extension header.
+  //
+  if (FwVolHeader->ExtHeaderOffset == 0) {
+    return EFI_NOT_FOUND;
+  }
+  
   return EFI_SUCCESS;
 }
 
@@ -1143,8 +1175,6 @@ Returns:
   EFI_HANDLE                          FwbHandle;
   EFI_FW_VOL_BLOCK_DEVICE             *FvbDevice;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *OldFwbInterface;
-  EFI_DEVICE_PATH_PROTOCOL            *TempFwbDevicePath;
-  FV_DEVICE_PATH                      TempFvbDevicePathData;
   UINT32                              MaxLbaSize;
   EFI_PHYSICAL_ADDRESS                BaseAddress;
   UINT64                              Length;
@@ -1262,7 +1292,7 @@ Returns:
         FwVolHeader->HeaderLength
         );
     }
-
+    
     FwhInstance->FvBase[FVB_PHYSICAL] = (UINTN) BaseAddress;
     FwhInstance->FvBase[FVB_VIRTUAL]  = (UINTN) BaseAddress;
 
@@ -1297,19 +1327,29 @@ Returns:
 
     FvbDevice->Instance = mFvbModuleGlobal->NumFv;
     mFvbModuleGlobal->NumFv++;
-
+    
+    
     //
     // Set up the devicepath
     //
-    FvbDevice->DevicePath.MemMapDevPath.StartingAddress = BaseAddress;
-    FvbDevice->DevicePath.MemMapDevPath.EndingAddress   = BaseAddress + (FwVolHeader->FvLength - 1);
-
+    if (FwVolHeader->ExtHeaderOffset == 0) {
+        //
+        // FV does not contains extension header, then produce MEMMAP_DEVICE_PATH
+        //
+      FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
+      ((FV_MEMMAP_DEVICE_PATH *) FvbDevice->DevicePath)->MemMapDevPath.StartingAddress = BaseAddress;
+      ((FV_MEMMAP_DEVICE_PATH *) FvbDevice->DevicePath)->MemMapDevPath.EndingAddress   = BaseAddress + FwVolHeader->FvLength - 1;
+    } else {
+      FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
+      CopyGuid (
+        &((FV_PIWG_DEVICE_PATH *)FvbDevice->DevicePath)->FvDevPath.FvName, 
+        (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)
+        );
+    }
     //
     // Find a handle with a matching device path that has supports FW Block protocol
     //
-    TempFwbDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) &TempFvbDevicePathData;
-    CopyMem (TempFwbDevicePath, &FvbDevice->DevicePath, sizeof (FV_DEVICE_PATH));
-    Status = gBS->LocateDevicePath (&gEfiFirmwareVolumeBlockProtocolGuid, &TempFwbDevicePath, &FwbHandle);
+    Status = gBS->LocateDevicePath (&gEfiFirmwareVolumeBlockProtocolGuid, &FvbDevice->DevicePath, &FwbHandle);
     if (EFI_ERROR (Status)) {
       //
       // LocateDevicePath fails so install a new interface and device path
@@ -1324,7 +1364,7 @@ Returns:
                       NULL
                       );
       ASSERT_EFI_ERROR (Status);
-    } else if (IsDevicePathEnd (TempFwbDevicePath)) {
+    } else if (IsDevicePathEnd (FvbDevice->DevicePath)) {
       //
       // Device allready exists, so reinstall the FVB protocol
       //
