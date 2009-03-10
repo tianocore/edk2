@@ -275,9 +275,7 @@ RuntimeDriverSetVirtualAddressMap (
   mVirtualMap               = VirtualMap;
 
   //
-  // Currently the bug in StatusCode/RuntimeLib has been fixed, it will
-  // check whether in Runtime or not (this is judged by looking at
-  // mEfiAtRuntime global So this ReportStatusCode will work
+  // ReporstStatusCodeLib will check and make sure this service can be called in runtime mode.
   //
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdStatusCodeValueSetVirtualAddressMap));
 
