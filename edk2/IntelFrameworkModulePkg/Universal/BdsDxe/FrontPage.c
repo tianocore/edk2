@@ -971,6 +971,7 @@ Exit:
   //
   PERF_END (0, "BdsTimeOut", "BDS", 0);
   Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
-  ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
-
+  if (Status == EFI_SUCCESS) {
+    ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
+  }
 }

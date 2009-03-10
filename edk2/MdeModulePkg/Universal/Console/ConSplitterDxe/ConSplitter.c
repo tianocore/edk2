@@ -429,8 +429,6 @@ ConSplitterDriverEntry(
                     &mStdErr.VirtualHandle,
                     &gEfiSimpleTextOutProtocolGuid,
                     &mStdErr.TextOut,
-                    &gEfiPrimaryStandardErrorDeviceGuid,
-                    NULL,
                     NULL
                     );
   }
@@ -449,8 +447,6 @@ ConSplitterDriverEntry(
                     &mConIn.SimplePointer,
                     &gEfiAbsolutePointerProtocolGuid,
                     &mConIn.AbsolutePointer,
-                    &gEfiPrimaryConsoleInDeviceGuid,
-                    NULL,
                     NULL
                     );
     if (!EFI_ERROR (Status)) {
@@ -480,8 +476,6 @@ ConSplitterDriverEntry(
                       &mConOut.UgaDraw,
                       &gEfiConsoleControlProtocolGuid,
                       &mConOut.ConsoleControl,
-                      &gEfiPrimaryConsoleOutDeviceGuid,
-                      NULL,
                       NULL
                       );
     } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
@@ -497,8 +491,6 @@ ConSplitterDriverEntry(
                       &mConOut.GraphicsOutput,
                       &gEfiConsoleControlProtocolGuid,
                       &mConOut.ConsoleControl,
-                      &gEfiPrimaryConsoleOutDeviceGuid,
-                      NULL,
                       NULL
                       );
     } else {
@@ -516,8 +508,6 @@ ConSplitterDriverEntry(
                       &mConOut.UgaDraw,
                       &gEfiConsoleControlProtocolGuid,
                       &mConOut.ConsoleControl,
-                      &gEfiPrimaryConsoleOutDeviceGuid,
-                      NULL,
                       NULL
                       );
     }
