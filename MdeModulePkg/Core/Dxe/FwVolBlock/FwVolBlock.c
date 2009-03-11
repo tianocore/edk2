@@ -513,6 +513,10 @@ ProduceFVBProtocolOnBuffer (
     // FV does not contains extension header, then produce MEMMAP_DEVICE_PATH
     //
     FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
+    if (FvbDev->DevicePath == NULL) {
+      FreePool (FvbDev);
+      return EFI_OUT_OF_RESOURCES;
+    }
     ((FV_MEMMAP_DEVICE_PATH *) FvbDev->DevicePath)->MemMapDevPath.StartingAddress = BaseAddress;
     ((FV_MEMMAP_DEVICE_PATH *) FvbDev->DevicePath)->MemMapDevPath.EndingAddress   = BaseAddress + FwVolHeader->FvLength - 1;
   } else {
@@ -520,6 +524,10 @@ ProduceFVBProtocolOnBuffer (
     // FV contains extension header, then produce MEDIA_FW_VOL_DEVICE_PATH
     //
     FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
+    if (FvbDev->DevicePath == NULL) {
+      FreePool (FvbDev);
+      return EFI_OUT_OF_RESOURCES;
+    }
     CopyGuid (
       &((FV_PIWG_DEVICE_PATH *)FvbDev->DevicePath)->FvDevPath.FvName, 
       (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)

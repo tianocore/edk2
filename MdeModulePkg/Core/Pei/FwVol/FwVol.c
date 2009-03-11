@@ -935,7 +935,7 @@ ProcessFvFile (
   BuildFvHob (
     (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
     FvImageInfo.FvSize
-  );
+    );
 
   //
   // Makes the encapsulated volume show up in DXE phase to skip processing of
