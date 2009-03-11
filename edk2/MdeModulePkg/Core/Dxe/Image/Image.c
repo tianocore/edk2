@@ -191,9 +191,7 @@ CoreLoadPeImage (
   BOOLEAN                   DstBufAlocated;
   UINTN                     Size;
   UINTN                     LinkTimeBase;
-  IMAGE_FILE_HANDLE         *FHandle;
 
-  FHandle = NULL;
   ZeroMem (&Image->ImageContext, sizeof (Image->ImageContext));
 
   Image->ImageContext.Handle    = Pe32Handle;
@@ -238,10 +236,6 @@ CoreLoadPeImage (
     Image->ImageContext.ImageError = IMAGE_ERROR_INVALID_SUBSYSTEM;
     return EFI_UNSUPPORTED;
   }
-  //
-  // Get the image base address in the original PeImage.
-  //
-  LinkTimeBase = (UINTN) Image->ImageContext.ImageAddress;
 
   //
   // Allocate memory of the correct memory type aligned on the required image boundry
