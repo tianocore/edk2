@@ -190,7 +190,6 @@ CoreLoadPeImage (
   EFI_STATUS                Status;
   BOOLEAN                   DstBufAlocated;
   UINTN                     Size;
-  UINTN                     LinkTimeBase;
 
   ZeroMem (&Image->ImageContext, sizeof (Image->ImageContext));
 
