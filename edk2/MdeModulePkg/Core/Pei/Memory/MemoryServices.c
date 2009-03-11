@@ -161,7 +161,11 @@ PeiAllocatePages (
   // Verify that there is sufficient memory to satisfy the allocation
   //
   RemainingPages = EFI_SIZE_TO_PAGES ((UINTN) (*FreeMemoryTop - *FreeMemoryBottom));
-  if ((INTN) (RemainingPages - EFI_SIZE_TO_PAGES (sizeof (EFI_HOB_MEMORY_ALLOCATION))) < Pages) {
+  //
+  // For page allocation, the overhead sizeof (EFI_HOB_MEMORY_ALLOCATION) needs one extra page.
+  // So the number of remaining pages needs to be greater than that of the request pages.
+  //
+  if (RemainingPages <= Pages) {
     DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64) Pages));
     DEBUG ((EFI_D_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64) RemainingPages));
     return  EFI_OUT_OF_RESOURCES;
