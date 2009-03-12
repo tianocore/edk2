@@ -84,7 +84,7 @@ CheckVarStoreSize:
 
 LoadVarStore: 
         movb    $0, %al
-        movb    %al, %es:4
+        movb    %al, %es:(4)
         movw    (%di), %cx
 #       ES:DI = 1500:0
         xorw    %di, %di
@@ -95,9 +95,9 @@ LoadVarStore:
 SaveVolumeId: 
         popw    %es
         movw    VolId(%bp), %ax
-        movw    %ax, %es:0                     # Save Volume Id to 0:19000. we will find the correct volume according to this VolumeId
+        movw    %ax, %es:(0)                    # Save Volume Id to 0:19000. we will find the correct volume according to this VolumeId
         movw    VolId+2(%bp), %ax
-        movw    %ax, %es:2
+        movw    %ax, %es:(2)
 
 # Read Efildr
         popw    %cx
@@ -239,7 +239,7 @@ ReadCylinderLoop:
 LimitTransfer: 
         pushw   %ax                                 # save ax
         movw    %es, %ax                            # ax = es
-        shrw    %ax                                 # ax = Number of blocks into mem system
+        shrw    $(BLOCK_SHIFT-4), %ax               # ax = Number of blocks into mem system
         andw    $0x7f, %ax                          # ax = Number of blocks into current seg
         addw    %bx, %ax                            # ax = End Block number of transfer
         cmpw    $0x80, %ax                          # See if it crosses a 64K boundry
@@ -271,7 +271,7 @@ NotCrossing64KBoundry:
         addl    %ebx, %esi                          # StartLBA = StartLBA + NumberOfBlocks
         subw    %bx, %cx                            # Blocks = Blocks - NumberOfBlocks
         movw    %es, %ax
-        shlw    %bx
+        shlw    $(BLOCK_SHIFT-4), %bx
         addw    %bx, %ax
         movw    %ax, %es                            # es:di = es:di + NumberOfBlocks*BLOCK_SIZE
         cmpw    $0, %cx
@@ -298,11 +298,11 @@ Halt:
 ErrorString: 
         .byte 'S', 0x0c, 'E', 0x0c, 'r', 0x0c, 'r', 0x0c, 'o', 0x0c, 'r', 0x0c, '!',0x0c
 
-        .org     0x0241 # For Code size overflow, Modified this just for pass build
+        .org     0x01fa
 LBAOffsetForBootSector: 
         .long   0x0
 
-        #.org    0x0227  # For Code size overflow, Modified this just for pass build
+        .org    0x01fe
         .word   0xaa55
 
 #******************************************************************************
