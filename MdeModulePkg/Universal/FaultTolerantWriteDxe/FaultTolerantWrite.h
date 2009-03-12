@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>

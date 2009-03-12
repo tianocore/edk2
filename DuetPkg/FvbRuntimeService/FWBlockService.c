@@ -1632,17 +1632,6 @@ Returns:
       //
       ASSERT (FALSE);
     }
-    //
-    // Install FVB Extension Protocol on the same handle
-    //
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &FwbHandle,
-                    &gEfiAlternateFvBlockGuid,
-                    NULL,
-                    NULL
-                    );
-
-    ASSERT_EFI_ERROR (Status);
 
     FwhInstance = (EFI_FW_VOL_INSTANCE *)
       (

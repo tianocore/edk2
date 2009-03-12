@@ -32,7 +32,6 @@ Abstract:
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Protocol/FirmwareVolumeBlock.h>
-#include <Guid/AlternateFvBlock.h>
 #include <Protocol/DevicePath.h>
 //
 // The Library classes this module consumes

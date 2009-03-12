@@ -22,7 +22,6 @@ Abstract:
 #include "PiDxe.h"
 #include <Guid/EventGroup.h>
 #include <Protocol/FirmwareVolumeBlock.h>
-#include <Guid/AlternateFvBlock.h>
 #include <Protocol/DevicePath.h>
 
 #include <Library/UefiLib.h>

@@ -30,15 +30,15 @@
 
 [LibraryClasses.common]
   ##  @libraryclass  IpIo layer upon EFI IP4 Protocol.
-  #   Ihis library is only intended to be used by UEFI network stack modules.
+  #   This library is only intended to be used by UEFI network stack modules.
   IpIoLib|Include/Library/IpIoLib.h
   
   ##  @libraryclass  Basic function for UEFI network stack.
-  #   Ihis library is only intended to be used by UEFI network stack modules.
+  #   This library is only intended to be used by UEFI network stack modules.
   NetLib|Include/Library/NetLib.h
   
   ##  @libraryclass  The helper routines to access UDP service.
-  #   Ihis library is only intended to be used by UEFI network stack modules.
+  #   This library is only intended to be used by UEFI network stack modules.
   UdpIoLib|Include/Library/UdpIoLib.h
   
   ##  @libraryclass  Defines a set of methods to reset whole system.
@@ -51,7 +51,7 @@
   RecoveryLib|Include/Library/RecoveryLib.h
   
   ##  @libraryclass  Basic platform driver override functions.
-  #   Ihis library is only intended to be used by Platform Driver Override Dxe Driver and Application.
+  #   This library is only intended to be used by Platform Driver Override Dxe Driver and Application.
   PlatformDriverOverrideLib|Include/Library/PlatformDriverOverrideLib.h
 
   ##  @libraryclass  Provides HII related functions.
@@ -101,11 +101,6 @@
   ## Include/Guid/SystemNvDataGuid.h
   gEfiSystemNvDataFvGuid         = { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
   
-  ## Alternate Firmware Volume Block Guid specify that the additional 
-  #  FVB protocol is installed into FVB handle
-  ## Include/Guid/AlternateFvBlock.h
-  gEfiAlternateFvBlockGuid       = { 0xF496922D, 0x172F, 0x4BBC, { 0xA1, 0xEB, 0x0E, 0xEB, 0x94, 0x9C, 0x34, 0x86 }}
-  
   ## Guid specify the device is the console out device.
   ## Include/Guid/ConsoleOutDevice.h
   gEfiConsoleOutDeviceGuid       = { 0xD3B36F2C, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
@@ -121,11 +116,10 @@
   ## Capsule update hob and variable guid
   ## Include/Guid/CapsuleVendor.h
   gEfiCapsuleVendorGuid          = { 0x711C703F, 0xC285, 0x4B10, { 0xA3, 0xB0, 0x36, 0xEC, 0xBD, 0x3C, 0x8B, 0xE2 }}
- 
+  
   ## Guid specifiy the device is the StdErr device.
   ## Include/Guid/StandardErrorDevice.h
   gEfiStandardErrorDeviceGuid    = { 0xD3B36F2D, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
-  
   
   ## Guid acted as variable store header's signature and to specify the variable list entries put in the EFI system table.
   ## Include/Guid/VariableFormat.h
