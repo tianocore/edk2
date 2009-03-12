@@ -31,7 +31,7 @@
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
 .globl ASM_PFX(InternalMemSetMem)
-ASM_PFX(InternalMemZeroMem):
+ASM_PFX(InternalMemSetMem):
     push    rdi
     push    rbx
     push    rcx         # push Buffer
