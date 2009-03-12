@@ -89,6 +89,17 @@ PeiInstallPeiMemory (
   DEBUG ((EFI_D_INFO, "PeiInstallPeiMemory MemoryBegin 0x%LX, MemoryLength 0x%LX\n", MemoryBegin, MemoryLength));
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
+  //
+  // PEI_SERVICE.InstallPeiMemory should only be called one time during whole PEI phase.
+  // If it is invoked more than one time, ASSERT information is given for developer debugging in debug tip and
+  // simply return EFI_SUCESS in release tip to ignore it.
+  // 
+  if (PrivateData->PeiMemoryInstalled) {
+    DEBUG ((EFI_D_ERROR, "ERROR: PeiInstallPeiMemory is called more than once!\n"));
+    ASSERT (PrivateData->PeiMemoryInstalled);
+    return EFI_SUCCESS;
+  }
+  
   PrivateData->PhysicalMemoryBegin   = MemoryBegin;
   PrivateData->PhysicalMemoryLength  = MemoryLength;
   PrivateData->FreePhysicalMemoryTop = MemoryBegin + MemoryLength;
