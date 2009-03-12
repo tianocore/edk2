@@ -22,7 +22,6 @@ Revision History
 #include "PiDxe.h"
 #include <Guid/EventGroup.h>
 #include <Protocol/FirmwareVolumeBlock.h>
-#include <Guid/AlternateFvBlock.h>
 #include <Protocol/DevicePath.h>
 
 #include <Library/UefiLib.h>
@@ -1354,15 +1353,6 @@ Returns:
       //
       ASSERT (FALSE);
     }
-
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &FwbHandle,
-                    &gEfiAlternateFvBlockGuid,
-                    NULL,
-                    NULL
-                    );
-
-    ASSERT_EFI_ERROR (Status);
 
     FwhInstance = (EFI_FW_VOL_INSTANCE *)
       (

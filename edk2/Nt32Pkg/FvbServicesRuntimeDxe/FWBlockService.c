@@ -29,7 +29,6 @@ Revision History
 //
 #include <Guid/EventGroup.h>
 #include <Protocol/FirmwareVolumeBlock.h>
-#include <Guid/AlternateFvBlock.h>
 #include <Protocol/DevicePath.h>
 //
 // The Library classes this module consumes
@@ -1389,15 +1388,6 @@ Returns:
       //
       ASSERT (FALSE);
     }
-
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &FwbHandle,
-                    &gEfiAlternateFvBlockGuid,
-                    NULL,
-                    NULL
-                    );
-
-    ASSERT_EFI_ERROR (Status);
 
     FwhInstance = (EFI_FW_VOL_INSTANCE *)
       (

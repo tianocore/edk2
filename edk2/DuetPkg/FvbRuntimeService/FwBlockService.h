@@ -31,7 +31,6 @@ Abstract:
 #include <Guid/EventGroup.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Protocol/FirmwareVolumeBlock.h>
-#include <Guid/AlternateFvBlock.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/BlockIo.h>
@@ -39,7 +38,6 @@ Abstract:
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/FlashMapHob.h>
 #include <Guid/HobList.h>
-#include <Guid/AlternateFvBlock.h>
 
 //
 // The Library classes this module consumes

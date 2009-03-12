@@ -51,7 +51,6 @@
 [Guids]
   gEfiFlashMapHobGuid
   gEfiHobListGuid
-  gEfiAlternateFvBlockGuid
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid

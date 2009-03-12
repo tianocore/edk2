@@ -44,6 +44,7 @@
   BaseMemoryLib
   UefiDriverEntryPoint
   DebugLib
+  UefiLib
 
 [Guids]
   gEfiSystemNvDataFvGuid                        ## CONSUMES ## FV Signature of Working Space Header
@@ -63,5 +64,5 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
 [Depex]
-  gEfiFirmwareVolumeBlockProtocolGuid AND gEfiAlternateFvBlockGuid  ## gEfiAlternateFvBlockGuid specifies FVB protocol with read, write/erase flash access.
+  gEfiFirmwareVolumeBlockProtocolGuid
 

@@ -59,8 +59,6 @@
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED  Create Event: EVENT_GROUP_GUID
-  gEfiAlternateFvBlockGuid                      # ALWAYS_PRODUCED
-
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
