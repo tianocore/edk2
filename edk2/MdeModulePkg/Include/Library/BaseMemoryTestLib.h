@@ -17,11 +17,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  Test a system memory range with sparsely sampled memory units.
+  Perform a quick system memory range test.
 
-  This function tests a system memory range, whose memory units
-  are sampled sparsely. It leads to quick performance but less
-  reliability.
+  This function performs a quick system memory range test. It leads to quick performance
+  but least reliability.
 
   @param  StartAddress           Start address of the memory range to test.
   @param  Length                 Length of the memory range to test.
@@ -40,11 +39,11 @@ QuickMemoryTest (
   );
 
 /**
-  Test a system memory range with extensively sampled memory units.
+  Test a system memory range with sparsely sampled memory units.
 
   This function tests a system memory range, whose memory units
-  are sampled extensively. Compared with SparseMemoryTest, it achieves
-  more reliability and less performance.
+  are sampled sparsely. It leads to relatively good performance
+  and partial reliability.
 
   @param  StartAddress           Start address of the memory range to test.
   @param  Length                 Length of the memory range to test.
