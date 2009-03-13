@@ -136,9 +136,9 @@ SectionLoop:
     cmpw    $0, %bx
     jne     SectionLoop
 
-    movzwl  Idtr, %eax                  # get size of IDT
+    movzwl  (Idtr), %eax                  # get size of IDT
     incl    %eax
-    addl    Idtr + 2, %eax             # add to base of IDT to get location of memory map... 
+    addl    2(Idtr), %eax             # add to base of IDT to get location of memory map... 
     pushl   %eax                        # push memory map location on stack for call to EFILDR...
 
     pushl   %eax                        # push return address (useless, just for stack balance)
@@ -501,7 +501,7 @@ ClearScreen:
     pushl   %eax
     pushl   %ecx
 
-    movb    ' ', %al
+    movb    0x00, %al
     movb    $0xc, %ah
     movl    $0xb8000, %edi
     movl    $80*24, %ecx
