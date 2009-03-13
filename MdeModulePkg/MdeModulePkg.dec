@@ -78,7 +78,7 @@
 
   ##  @libraryclass  Provides APIs for system memory test.
   ##
-  BaseMemoryTestLib|Include/Library/BaseMemoryTestLib.h
+  MemoryTestLib|Include/Library/MemoryTestLib.h
 
 [Guids.common]
   ## MdeModule package token space guid

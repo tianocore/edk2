@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   FILE_GUID                      = 216CAA56-AF75-4BBB-9D74-CC0960E92ECB
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseMemoryTestLib
+  LIBRARY_CLASS                  = MemoryTestLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  BaseMemoryTestLib
+  MemoryTestLib
   BaseMemoryLib
   CacheMaintenanceLib
   DebugLib

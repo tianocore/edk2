@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include <Base.h>
-#include <Library/BaseMemoryTestLib.h>
+#include <Library/MemoryTestLib.h>
 
 /**
   Perform a quick system memory range test.

@@ -77,7 +77,7 @@
   PlatformDriverOverrideLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
-  BaseMemoryTestLib|MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
+  MemoryTestLib|MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
 
 [LibraryClasses.IA32]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
