@@ -501,7 +501,7 @@ ClearScreen:
     pushl   %eax
     pushl   %ecx
 
-    movb    0x00, %al
+    movb    $0x00, %al
     movb    $0xc, %ah
     movl    $0xb8000, %edi
     movl    $80*24, %ecx
