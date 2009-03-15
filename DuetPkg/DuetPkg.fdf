@@ -101,10 +101,10 @@ INF  IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 #IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
 
   # Usb Support
-INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+#INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+#INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+#INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+#INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   # ISA Support
 INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
@@ -116,10 +116,10 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
+#INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
   # Binary INF file to support toggle among different CPU architectures.
-INF  FatBinPkg/EnhancedFatDxe/Fat.inf
+#INF  FatBinPkg/EnhancedFatDxe/Fat.inf
 
 FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp

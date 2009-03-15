@@ -17,7 +17,6 @@ if [ \
 then
 	echo Error! Please specific the architecture. 
 	echo Usage: "./PostBuild.sh [IA32|X64]"
-    exit 1
 fi
 
 case "$1" in
@@ -29,7 +28,6 @@ case "$1" in
      ;;
    *)
      echo Invalid Architecture string, should be only IA32 or X64
-     exit 1
 esac
 
 #
@@ -74,4 +72,3 @@ then
 	echo Done!
 fi
 
-exit 0
