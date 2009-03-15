@@ -57,8 +57,6 @@ EfiLoader (
   
   PrintHeader ('A');
   
-  CpuDeadLoop();
-
   AsciiSPrint (PrintBuffer, 256, "Enter DUET Loader ...\n", BiosMemoryMapBaseAddress);
   PrintString (PrintBuffer);
 
