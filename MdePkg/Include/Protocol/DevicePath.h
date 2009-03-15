@@ -5,7 +5,7 @@
   from a software point of view. It also must persist from boot to boot, so 
   it can not contain things like PCI bus numbers that change from boot to boot.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -662,8 +662,6 @@ typedef VENDOR_DEVICE_PATH        VENDOR_DEFINED_DEVICE_PATH;
 #define DEVICE_PATH_MESSAGING_VT_100      EFI_VT_100_GUID
 #define DEVICE_PATH_MESSAGING_VT_100_PLUS EFI_VT_100_PLUS_GUID
 #define DEVICE_PATH_MESSAGING_VT_UTF8     EFI_VT_UTF8_GUID
-
-#define DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL   EFI_UART_DEVICE_PATH_GUID
 
 ///
 /// A new device path node is defined to declare flow control characteristics.

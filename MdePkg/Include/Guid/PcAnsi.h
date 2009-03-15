@@ -1,7 +1,7 @@
 /** @file
   Terminal Device Path Vendor Guid.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -38,7 +38,7 @@
     0xad15a0d6, 0x8bec, 0x4acf, {0xa0, 0x73, 0xd0, 0x1d, 0xe7, 0x7e, 0x2d, 0x88 } \
   }
 
-#define EFI_UART_DEVICE_PATH_GUID \
+#define DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL \
   { \
     0x37499a9d, 0x542f, 0x4c89, {0xa0, 0x26, 0x35, 0xda, 0x14, 0x20, 0x94, 0xe4 } \
   }
