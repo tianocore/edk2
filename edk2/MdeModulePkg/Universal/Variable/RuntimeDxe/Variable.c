@@ -930,7 +930,7 @@ FindVariable (
   InDeletedVariable     = NULL;
   InDeletedStorageIndex = 0;
   for (Index = 0; Index < 2; Index++) {
-    while (IsValidVariableHeader (Variable[Index]) && (Variable[Index] <= GetEndPointer (VariableStoreHeader[Index]))) {
+    while ((Variable[Index] < GetEndPointer (VariableStoreHeader[Index])) && IsValidVariableHeader (Variable[Index])) {
       if (Variable[Index]->State == VAR_ADDED || 
           Variable[Index]->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
          ) {
@@ -2090,10 +2090,10 @@ FvbNotificationEvent (
     Status = VariableCommonInitialize (Fvb);
     ASSERT_EFI_ERROR (Status);
   
-    SystemTable->RuntimeServices->GetVariable 		  = RuntimeServiceGetVariable;
+    SystemTable->RuntimeServices->GetVariable         = RuntimeServiceGetVariable;
     SystemTable->RuntimeServices->GetNextVariableName = RuntimeServiceGetNextVariableName;
-    SystemTable->RuntimeServices->SetVariable 		  = RuntimeServiceSetVariable;
-    SystemTable->RuntimeServices->QueryVariableInfo	  = RuntimeServiceQueryVariableInfo;
+    SystemTable->RuntimeServices->SetVariable         = RuntimeServiceSetVariable;
+    SystemTable->RuntimeServices->QueryVariableInfo   = RuntimeServiceQueryVariableInfo;
   
     //
     // Now install the Variable Runtime Architectural Protocol on a new handle
