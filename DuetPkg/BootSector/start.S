@@ -218,7 +218,7 @@ FoundLastCluster:
 
 ReadBlocks: 
         pusha
-        addl    LBAOffsetForBootSector(%bp), %eax            # Add LBAOffsetForBootSector to Start LBA
+        addl    LBAOffsetForBootSector(%bp), %eax   # Add LBAOffsetForBootSector to Start LBA
         addl    HiddenSectors(%bp), %eax            # Add HiddenSectors to Start LBA
         movl    %eax, %esi                          # esi = Start LBA
         movw    %bx, %cx                            # cx = Number of blocks to read
@@ -315,7 +315,7 @@ LBAOffsetForBootSector:
 .equ                 WRITE_DATA_PORT_CMD, 0x0d1  # 8042 command to write the data port
 .equ                 ENABLE_A20_CMD, 0x0df       # 8042 command to enable A20
 
-        #.org     0x200
+        .org     0x200
         jmp start
 Em64String: 
         .byte 'E', 0x0c, 'm', 0x0c, '6', 0x0c, '4', 0x0c, 'T', 0x0c, ' ', 0x0c, 'U', 0x0c, 'n', 0x0c, 's', 0x0c, 'u', 0x0c, 'p', 0x0c, 'p', 0x0c, 'o', 0x0c, 'r', 0x0c, 't', 0x0c, 'e', 0x0c, 'd', 0x0c, '!', 0x0c
@@ -353,11 +353,11 @@ MemMapDone:
         xorl    %ebx, %ebx
         movw    %cs, %bx                    # BX=segment
         shll    $4, %ebx                    # BX="linear" address of segment base
-        leal    GDT_BASE(%ebx), %eax        #
-        movl    %eax, (gdtr + 2)            #
-        leal    IDT_BASE(%ebx), %eax        #
-        movl    %eax, (idtr + 2)            #
-        leal    MemoryMapSize(%ebx), %edx   #
+        leal    GDT_BASE(%ebx), %eax        # EAX=PHYSICAL address of gdt
+        movl    %eax, (gdtr + 2)            # Put address of gdt into the gdtr
+        leal    IDT_BASE(%ebx), %eax        # EAX=PHYSICAL address of idt
+        movl    %eax, (idtr + 2)            # Put address of idt into the idtr
+        leal    MemoryMapSize(%ebx), %edx   # Physical base address of the memory map
 
         addl $0x1000, %ebx                  # Source of EFI32
         movl %ebx, JUMP+2
