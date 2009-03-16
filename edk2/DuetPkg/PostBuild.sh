@@ -58,10 +58,6 @@ fi
 if [ $PROCESSOR = X64 ]
 then
 	$BASETOOLS_DIR/EfiLdrImage -o $BUILD_DIR/FV/Efildr64 $BUILD_DIR/$PROCESSOR/EfiLoader.efi $BUILD_DIR/FV/DxeIpl.z $BUILD_DIR/FV/DxeMain.z $BUILD_DIR/FV/DUETEFIMAINFV.z
-	mkdir -p $BUILD_DIR/FV/EfildrPure
-	mkdir -p $BUILD_DIR/FV/Efildr16Pure
-	mkdir -p $BUILD_DIR/FV/Efildr20Pure
-
 	cat $OUTPUT_DIR/start64.com $OUTPUT_DIR/efi64.com2 $BUILD_DIR/FV/Efildr64 > $BUILD_DIR/FV/EfildrPure
 	$BASETOOLS_DIR/GenPage $BUILD_DIR/FV/EfildrPure -o $BUILD_DIR/FV/Efildr
 	cat $OUTPUT_DIR/st16_64.com $OUTPUT_DIR/efi64.com2 $BUILD_DIR/FV/Efildr64 > $BUILD_DIR/FV/Efildr16Pure
