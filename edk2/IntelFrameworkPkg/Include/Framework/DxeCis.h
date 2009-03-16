@@ -32,44 +32,39 @@
 typedef
 VOID
 (EFIAPI *EFI_AP_PROCEDURE)(
-  IN  VOID                              *Buffer
+  IN  VOID                          *Buffer
   );
 
 typedef struct {
-  EFI_TABLE_HEADER              Hdr;
-
+  EFI_TABLE_HEADER                  Hdr;
   //
   // Time services
   //
-  EFI_GET_TIME                  GetTime;
-  EFI_SET_TIME                  SetTime;
-  EFI_GET_WAKEUP_TIME           GetWakeupTime;
-  EFI_SET_WAKEUP_TIME           SetWakeupTime;
-
+  EFI_GET_TIME                      GetTime;
+  EFI_SET_TIME                      SetTime;
+  EFI_GET_WAKEUP_TIME               GetWakeupTime;
+  EFI_SET_WAKEUP_TIME               SetWakeupTime;
   //
   // Virtual memory services
   //
-  EFI_SET_VIRTUAL_ADDRESS_MAP   SetVirtualAddressMap;
-  EFI_CONVERT_POINTER           ConvertPointer;
-
+  EFI_SET_VIRTUAL_ADDRESS_MAP       SetVirtualAddressMap;
+  EFI_CONVERT_POINTER               ConvertPointer;
   //
   // Variable services
   //
-  EFI_GET_VARIABLE              GetVariable;
-  EFI_GET_NEXT_VARIABLE_NAME    GetNextVariableName;
-  EFI_SET_VARIABLE              SetVariable;
-
+  EFI_GET_VARIABLE                  GetVariable;
+  EFI_GET_NEXT_VARIABLE_NAME        GetNextVariableName;
+  EFI_SET_VARIABLE                  SetVariable;
   //
   // Misc
   //
-  EFI_GET_NEXT_HIGH_MONO_COUNT  GetNextHighMonotonicCount;
-  EFI_RESET_SYSTEM              ResetSystem;
-
+  EFI_GET_NEXT_HIGH_MONO_COUNT      GetNextHighMonotonicCount;
+  EFI_RESET_SYSTEM                  ResetSystem;
   //
   // Framework extension to UEFI 2.0 runtime table
   // It was moved to a protocol to not conflict with UEFI 2.0
   //
-  EFI_REPORT_STATUS_CODE        ReportStatusCode;
+  EFI_REPORT_STATUS_CODE            ReportStatusCode;
 } FRAMEWORK_EFI_RUNTIME_SERVICES;
 
 #define EFI_EVENT_RUNTIME_CONTEXT       0x20000000
@@ -77,18 +72,16 @@ typedef struct {
 #define EFI_EVENT_SIGNAL_READY_TO_BOOT  0x00000203
 #define EFI_EVENT_SIGNAL_LEGACY_BOOT    0x00000204
 
-
 typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL  Header;
-  EFI_GUID                  TianoSpecificDevicePath;
-  UINT32                    Type;
+  EFI_DEVICE_PATH_PROTOCOL          Header;
+  EFI_GUID                          TianoSpecificDevicePath;
+  UINT32                            Type;
 } TIANO_DEVICE_PATH;
 
-#define TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE         0x01
+#define TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE    0x01
 typedef struct {
-  TIANO_DEVICE_PATH     Tiano;
-  EFI_GUID              NameGuid;
+  TIANO_DEVICE_PATH                 Tiano;
+  EFI_GUID                          NameGuid;
 } FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
-
 
 #endif
