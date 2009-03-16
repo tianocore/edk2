@@ -30,7 +30,7 @@
     #                          be done to maintain the consistency of the size
     #                          of entry points...
     .byte   0xe9                        # jmp 16 bit relative
-    .long      commonIdtEntry - . - 4  # A problem     
+    .long      commonIdtEntry - . - 4   # offset to jump to     
 .endm
 
 Start:  
@@ -53,7 +53,7 @@ Start:
     movl    (Idtr + 2), %esi
     movl    (%esi), %edi
 
-LOOP_1:                                             # loop through all IDT entries exception handlers and initialize to default handler
+LOOP_1:                                         # loop through all IDT entries exception handlers and initialize to default handler
     movw    %bx, (%edi)                         # write bits 15..0 of offset
     movw    $0x20, 2(%edi)                      # SYS_CODE_SEL from GDT
     movw    $(0x0e00 | 0x8000), 4(%edi)     		# type = 386 interrupt gate, present
@@ -136,9 +136,9 @@ SectionLoop:
     cmpw    $0, %bx
     jne     SectionLoop
 
-    movzwl  (Idtr), %eax                  # get size of IDT
+    movzwl  (Idtr), %eax                # get size of IDT
     incl    %eax
-    addl    (Idtr + 2), %eax             # add to base of IDT to get location of memory map... 
+    addl    (Idtr + 2), %eax            # add to base of IDT to get location of memory map... 
     pushl   %eax                        # push memory map location on stack for call to EFILDR...
 
     pushl   %eax                        # push return address (useless, just for stack balance)
