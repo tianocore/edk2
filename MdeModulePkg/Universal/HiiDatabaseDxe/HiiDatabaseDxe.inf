@@ -62,14 +62,13 @@
   gEfiDevicePathProtocolGuid                                            ## SOMETIMES_CONSUMES
   gEfiHiiStringProtocolGuid                                             ## PRODUCES
   gEfiHiiImageProtocolGuid |PcdSupportHiiImageProtocol                  ## PRODUCES
-  gEfiHiiConfigRoutingProtocolGuid |PcdSupportFullConfigRoutingProtocol ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid                                      ## PRODUCES
   gEfiHiiDatabaseProtocolGuid                                           ## PRODUCES
   gEfiHiiFontProtocolGuid                                               ## PRODUCES
   gEfiHiiConfigAccessProtocolGuid                                       ## CONSUMES
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportFullConfigRoutingProtocol
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang

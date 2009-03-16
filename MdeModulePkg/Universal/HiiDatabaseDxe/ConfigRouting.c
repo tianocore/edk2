@@ -452,15 +452,6 @@ HiiConfigRoutingExtractConfig (
   EFI_STRING                          AccessResults;
   BOOLEAN                             FirstElement;
 
-  //
-  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
-  // as FALSE. But this renders the system to not 100% compliant with
-  // UEFI 2.1. Use this with caution.
-  //
-  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
-    return EFI_UNSUPPORTED;
-  }
-
   if (This == NULL || Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -660,15 +651,6 @@ HiiConfigRoutingExportConfig (
   UINTN                               NumberConfigAccessHandles;
   BOOLEAN                             FirstElement;
 
-  //
-  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
-  // as FALSE. But this renders the system to not 100% compliant with
-  // UEFI 2.1. Use this with caution.
-  //
-  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
-    return EFI_UNSUPPORTED;
-  }
-
   if (This == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -783,15 +765,6 @@ HiiConfigRoutingRouteConfig (
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
-
-  //
-  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
-  // as FALSE. But this renders the system to not 100% compliant with
-  // UEFI 2.1. Use this with caution.
-  //
-  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
-    return EFI_UNSUPPORTED;
-  }
 
   if (This == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1489,15 +1462,6 @@ HiiGetAltCfg (
   BOOLEAN                             GuidFlag;
   BOOLEAN                             NameFlag;
   BOOLEAN                             PathFlag;
-
-  //
-  // For size reduction, please define PcdSupportFullConfigRoutingProtocol 
-  // as FALSE. But this renders the system to not 100% compliant with
-  // UEFI 2.1. Use this with caution.
-  //
-  if (!FeaturePcdGet (PcdSupportFullConfigRoutingProtocol)) {
-    return EFI_UNSUPPORTED;
-  }
 
   HdrStart = NULL;
   HdrEnd   = NULL;
