@@ -642,21 +642,12 @@ EfiPxeBcDhcp (
 
     ASSERT (Dhcp4Mode.State == Dhcp4Bound);
 
-    CopyMem (
-      &Private->StationIp, 
-      &Dhcp4Mode.ClientAddress, 
-      sizeof (EFI_IPv4_ADDRESS)
-      );
-    CopyMem (
-      &Private->SubnetMask, 
-      &Dhcp4Mode.SubnetMask, 
-      sizeof (EFI_IPv4_ADDRESS)
-      );
-    CopyMem (
-      &Private->GatewayIp, 
-      &Dhcp4Mode.RouterAddress, 
-      sizeof (EFI_IPv4_ADDRESS)
-      );
+    CopyMem (&Private->StationIp, &Dhcp4Mode.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Private->SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Private->GatewayIp, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
+
+    CopyMem (&Mode->StationIp, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Mode->SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
 
     //
     // Check the selected offer to see whether BINL is required, if no or BINL is
@@ -1138,10 +1129,6 @@ EfiPxeBcMtftp (
               BufferSize
               );
 
-    if (!EFI_ERROR (Status)) {
-      Status = EFI_BUFFER_TOO_SMALL;
-    }
-
     break;
 
   case EFI_PXE_BASE_CODE_TFTP_READ_FILE:
@@ -1603,9 +1590,10 @@ TRY_AGAIN:
     RxData  = Token.Packet.RxData;
     Session = &RxData->UdpSession;
 
-    Matched = FALSE;
+    Matched = TRUE;
 
     if ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_USE_FILTER) != 0) {
+      Matched = FALSE;
       //
       // Check UDP package by IP filter settings
       //
@@ -2509,16 +2497,24 @@ DiscoverBootFile (
     Packet = &Private->Dhcp4Ack;
   }
 
-  CopyMem (&Private->ServerIp, &Packet->Packet.Offer.Dhcp4.Header.ServerAddr, sizeof (EFI_IPv4_ADDRESS));
-  if (Private->ServerIp.Addr[0] == 0) {
-    //
-    // next server ip address is zero, use option 54 instead
-    //
+  //
+  // use option 54, if zero, use siaddr in header
+  //
+  if (Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID] != NULL) {
     CopyMem (
       &Private->ServerIp,
       Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID]->Data,
       sizeof (EFI_IPv4_ADDRESS)
       );
+  } else {
+    CopyMem (
+      &Private->ServerIp, 
+      &Packet->Packet.Offer.Dhcp4.Header.ServerAddr, 
+      sizeof (EFI_IPv4_ADDRESS)
+      );
+  }
+  if (Private->ServerIp.Addr[0] == 0) {
+    return EFI_DEVICE_ERROR;
   }
 
   ASSERT (Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL);
@@ -2658,10 +2654,25 @@ EfiPxeLoadFile (
 
     if (sizeof (UINTN) < sizeof (UINT64) && (TmpBufSize > 0xFFFFFFFF)) {
       Status = EFI_DEVICE_ERROR;
-    } else {
+    } else if (*BufferSize >= (UINTN) TmpBufSize && Buffer != NULL) {
       *BufferSize = (UINTN) TmpBufSize;
+      Status = PxeBc->Mtftp (
+                        PxeBc,
+                        EFI_PXE_BASE_CODE_TFTP_READ_FILE,
+                        Buffer,
+                        FALSE,
+                        &TmpBufSize,
+                        &BlockSize,
+                        &Private->ServerIp,
+                        (UINT8 *) Private->BootFileName,
+                        NULL,
+                        FALSE
+                        );
+	} else {
+      *BufferSize = (UINTN) TmpBufSize;
+      Status      = EFI_BUFFER_TOO_SMALL;
     }
-  } else if (Buffer == NULL) {
+  } else if (Buffer == NULL || Private->FileSize > *BufferSize) {
     *BufferSize = Private->FileSize;
     Status      = EFI_BUFFER_TOO_SMALL;
   } else {
