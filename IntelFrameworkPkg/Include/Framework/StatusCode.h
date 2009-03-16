@@ -6,13 +6,12 @@
 
 <pre>
   Section:    Contents:
-  1           General Status Code Definitions
-  2           Class definitions
-  3           Computing Unit Subclasses, Progress and Error Codes
-  4           Peripheral Subclasses, Progress and Error Codes.
-  5           IO Bus Subclasses, Progress and Error Codes.
-  6           Software Subclasses, Progress and Error Codes.
-  7           Debug Codes
+  1           Class definitions
+  2           Computing Unit Subclasses, Progress and Error Codes
+  3           Peripheral Subclasses, Progress and Error Codes.
+  4           IO Bus Subclasses, Progress and Error Codes.
+  5           Software Subclasses, Progress and Error Codes.
+  6           Debug Codes
 </pre>
 
   Copyright (c) 2007, Intel Corporation
@@ -37,10 +36,7 @@
 #include <PiPei.h>
 
 //
-// /////////////////////////////////////////////////////////////////////////////
 // Section 1
-///////////////////////////////////////////////////////////////////////////////
-//
 // Class definitions
 // Values of 4-127 are reserved for future use by this
 // specification.
@@ -60,11 +56,8 @@
 #define EFI_SUBCLASS_SPECIFIC 0x1000
 #define EFI_OEM_SPECIFIC      0x8000
 
-//
-// /////////////////////////////////////////////////////////////////////////////
+// 
 // Section 2
-///////////////////////////////////////////////////////////////////////////////
-//
 // Computing Unit Subclass definitions.
 // Values of 8-127 are reserved for future use by this
 // specification.
@@ -195,10 +188,8 @@
 // Computing Unit Chipset Subclass Error Code definitions.
 //
 
-///////////////////////////////////////////////////////////////////////////////
-// Section 4
-///////////////////////////////////////////////////////////////////////////////
 //
+// Section 3
 // Peripheral Subclass definitions.
 // Values of 12-127 are reserved for future use by this
 // specification.
@@ -336,10 +327,8 @@
 // Peripheral Class Network Subclass Error Code definitions.
 //
 
-///////////////////////////////////////////////////////////////////////////////
-// Section 5
-///////////////////////////////////////////////////////////////////////////////
 //
+// Section 4
 // IO Bus Subclass definitions.
 // Values of 14-127 are reserved for future use by this
 // specification.
@@ -475,10 +464,8 @@
 // IO Bus Class I2C Subclass Error Code definitions.
 //
 
-///////////////////////////////////////////////////////////////////////////////
-// Section 6
-///////////////////////////////////////////////////////////////////////////////
 //
+// Section 5
 // Software Subclass definitions.
 // Values of 14-127 are reserved for future use by this
 // specification.
@@ -870,10 +857,8 @@
 // Software Class EFI DXE Service Subclass Error Code definitions.
 //
 
-///////////////////////////////////////////////////////////////////////////////
-// Section 7
-///////////////////////////////////////////////////////////////////////////////
 //
+// Section 6
 // Debug Code definitions for all classes and subclass
 // Only one debug code is defined at this point and should
 // be used for anything that gets sent to debug stream.

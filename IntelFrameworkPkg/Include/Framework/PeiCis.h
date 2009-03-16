@@ -36,8 +36,8 @@ typedef struct _FRAMEWORK_EFI_PEI_SERVICES FRAMEWORK_EFI_PEI_SERVICES;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEIM_ENTRY_POINT)(
-  IN EFI_FFS_FILE_HEADER       *FfsHeader,
-  IN EFI_PEI_SERVICES          **PeiServices
+  IN EFI_FFS_FILE_HEADER            *FfsHeader,
+  IN EFI_PEI_SERVICES               **PeiServices
   );
   
 /**
@@ -58,9 +58,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_NEXT_VOLUME)(
-  IN FRAMEWORK_EFI_PEI_SERVICES      **PeiServices,
-  IN UINTN                           Instance,
-  IN OUT EFI_FIRMWARE_VOLUME_HEADER  **FwVolHeader
+  IN FRAMEWORK_EFI_PEI_SERVICES     **PeiServices,
+  IN UINTN                          Instance,
+  IN OUT EFI_FIRMWARE_VOLUME_HEADER **FwVolHeader
   );
     
 /**
@@ -76,18 +76,18 @@ EFI_STATUS
   @param  FileHeader       Pointer to the current file from which to begin searching.This pointer will be 
                            updated upon return to reflect the file found.
 
-  @retval EFI_SUCCESS           The file was found.
-  @retval EFI_NOT_FOUND         The file was not found.
-  @retval EFI_NOT_FOUND         The header checksum was not zero.
+  @retval EFI_SUCCESS      The file was found.
+  @retval EFI_NOT_FOUND    The file was not found.
+  @retval EFI_NOT_FOUND    The header checksum was not zero.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_NEXT_FILE)(
-  IN FRAMEWORK_EFI_PEI_SERVICES  **PeiServices,
-  IN EFI_FV_FILETYPE             SearchType,
-  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER     **FileHeader
+  IN FRAMEWORK_EFI_PEI_SERVICES     **PeiServices,
+  IN EFI_FV_FILETYPE                SearchType,
+  IN EFI_FIRMWARE_VOLUME_HEADER     *FwVolHeader,
+  IN OUT EFI_FFS_FILE_HEADER        **FileHeader
   );
 
 /**
@@ -99,72 +99,73 @@ EFI_STATUS
   @param  FfsFileHeader    A pointer to the file header that contains the set of sections to be searched.
   @param  SectionData      A pointer to the discovered section, if successful.
 
-  @retval EFI_SUCCESS           The section was found.
-  @retval EFI_NOT_FOUND         The section was not found.
+  @retval EFI_SUCCESS      The section was found.
+  @retval EFI_NOT_FOUND    The section was not found.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_FIND_SECTION_DATA)(
-  IN FRAMEWORK_EFI_PEI_SERVICES  **PeiServices,
-  IN EFI_SECTION_TYPE            SectionType,
-  IN EFI_FFS_FILE_HEADER         *FfsFileHeader,
-  IN OUT VOID                    **SectionData
+  IN FRAMEWORK_EFI_PEI_SERVICES     **PeiServices,
+  IN EFI_SECTION_TYPE               SectionType,
+  IN EFI_FFS_FILE_HEADER            *FfsFileHeader,
+  IN OUT VOID                       **SectionData
   );
         
 struct _FRAMEWORK_EFI_PEI_SERVICES {
-  EFI_TABLE_HEADER            Hdr;
+  EFI_TABLE_HEADER                  Hdr;
   //
   // PPI Functions
   //
-  EFI_PEI_INSTALL_PPI         InstallPpi;
-  EFI_PEI_REINSTALL_PPI       ReInstallPpi;
-  EFI_PEI_LOCATE_PPI          LocatePpi;
-  EFI_PEI_NOTIFY_PPI          NotifyPpi;
+  EFI_PEI_INSTALL_PPI               InstallPpi;
+  EFI_PEI_REINSTALL_PPI             ReInstallPpi;
+  EFI_PEI_LOCATE_PPI                LocatePpi;
+  EFI_PEI_NOTIFY_PPI                NotifyPpi;
   //
   // Boot Mode Functions
   //
-  EFI_PEI_GET_BOOT_MODE       GetBootMode;
-  EFI_PEI_SET_BOOT_MODE       SetBootMode;
+  EFI_PEI_GET_BOOT_MODE             GetBootMode;
+  EFI_PEI_SET_BOOT_MODE             SetBootMode;
   //
   // HOB Functions
   //
-  EFI_PEI_GET_HOB_LIST        GetHobList;
-  EFI_PEI_CREATE_HOB          CreateHob;
+  EFI_PEI_GET_HOB_LIST              GetHobList;
+  EFI_PEI_CREATE_HOB                CreateHob;
   //
   // Firmware Volume Functions
   //
-  EFI_PEI_FFS_FIND_NEXT_VOLUME   FfsFindNextVolume;
-  EFI_PEI_FFS_FIND_NEXT_FILE     FfsFindNextFile;
-  EFI_PEI_FFS_FIND_SECTION_DATA  FfsFindSectionData;
+  EFI_PEI_FFS_FIND_NEXT_VOLUME      FfsFindNextVolume;
+  EFI_PEI_FFS_FIND_NEXT_FILE        FfsFindNextFile;
+  EFI_PEI_FFS_FIND_SECTION_DATA     FfsFindSectionData;
   //
   // PEI Memory Functions
   //
-  EFI_PEI_INSTALL_PEI_MEMORY  InstallPeiMemory;
-  EFI_PEI_ALLOCATE_PAGES      AllocatePages;
-  EFI_PEI_ALLOCATE_POOL       AllocatePool;
-  EFI_PEI_COPY_MEM            CopyMem;
-  EFI_PEI_SET_MEM             SetMem;
+  EFI_PEI_INSTALL_PEI_MEMORY        InstallPeiMemory;
+  EFI_PEI_ALLOCATE_PAGES            AllocatePages;
+  EFI_PEI_ALLOCATE_POOL             AllocatePool;
+  EFI_PEI_COPY_MEM                  CopyMem;
+  EFI_PEI_SET_MEM                   SetMem;
   //
   // Status Code
-  EFI_PEI_REPORT_STATUS_CODE  ReportStatusCode;
+  //
+  EFI_PEI_REPORT_STATUS_CODE        ReportStatusCode;
   //
   // Reset
   //
-  EFI_PEI_RESET_SYSTEM        ResetSystem;
+  EFI_PEI_RESET_SYSTEM              ResetSystem;
   //
   // (the following interfaces are installed by publishing PEIM)
   //
   // I/O Abstractions
   //
-  EFI_PEI_CPU_IO_PPI          *CpuIo;
-  EFI_PEI_PCI_CFG_PPI        *PciCfg;
+  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  EFI_PEI_PCI_CFG_PPI               *PciCfg;
 };
 
 typedef struct {
-  UINTN                   BootFirmwareVolume;
-  UINTN                   SizeOfCacheAsRam;
-  EFI_PEI_PPI_DESCRIPTOR  *DispatchTable;
+  UINTN                             BootFirmwareVolume;
+  UINTN                             SizeOfCacheAsRam;
+  EFI_PEI_PPI_DESCRIPTOR            *DispatchTable;
 } EFI_PEI_STARTUP_DESCRIPTOR;
 
 #endif  
