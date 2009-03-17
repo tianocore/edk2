@@ -353,10 +353,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
 
 [PcdsDynamicHii.common.DEFAULT]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x0|80 # Variable: L"Setup"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0x0053 0x0065 0x0074 0x0075 0x0070|gEfiWinNtSystemConfigGuid|0x4|25 # Variable: L"Setup"
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0x0054 0x0069 0x006D 0x0065 0x006F 0x0075 0x0074|gEfiGlobalVariableGuid|0x0|10 # Variable: L"Timeout"
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0x0048 0x0077 0x0045 0x0072 0x0072 0x0052 0x0065 0x0063 0x0053 0x0075 0x0070 0x0070 0x006F 0x0072 0x0074|gEfiGlobalVariableGuid|0x0|1 # Variable: L"HwErrRecSupport"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEfiWinNtSystemConfigGuid|0x0|80
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEfiWinNtSystemConfigGuid|0x4|25
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|L"HwErrRecSupport"|gEfiGlobalVariableGuid|0x0|1
   
 ###################################################################################################
 #
