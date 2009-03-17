@@ -271,7 +271,7 @@ HOB_TEMPLATE  gHobTemplate = {
         sizeof (TABLE_HOB),                // Hob size
         0                                  // reserved
       },
-      EFI_SMBIOS_TABLE_GUID
+      SMBIOS_TABLE_GUID
     },
     0
   },
