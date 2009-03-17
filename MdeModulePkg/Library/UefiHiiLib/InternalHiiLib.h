@@ -36,6 +36,10 @@
 
 #define HII_LIB_DEFAULT_STRING_SIZE     0x200
 
+///
+/// The size of a 3 character ISO639 language code.
+///
+#define ISO_639_2_ENTRY_SIZE    3
 
 extern CONST EFI_HII_DATABASE_PROTOCOL         *mHiiDatabaseProt;
 extern CONST EFI_HII_STRING_PROTOCOL           *mHiiStringProt;
