@@ -184,11 +184,6 @@ typedef union {
 #define RFC_3066_ENTRY_SIZE             (42 + 1)
 
 ///
-/// The size of a 3 character ISO639 language code.
-///
-#define ISO_639_2_ENTRY_SIZE            3
-
-///
 /// PE32+ Machine type for IA32 UEFI images
 ///
 #define EFI_IMAGE_MACHINE_IA32      0x014C
