@@ -22,6 +22,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define ONE_SECOND  10000000
 
+///
+/// The size of a 3 character ISO639 language code.
+///
+#define ISO_639_2_ENTRY_SIZE   3
+
 //
 // This is the VFR compiler generated header file which defines the
 // string identifiers.
