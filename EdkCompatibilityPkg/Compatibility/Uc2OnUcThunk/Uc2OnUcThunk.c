@@ -32,6 +32,10 @@ Module Name:
 #include <Library/HiiLib.h>
 
 
+///
+/// The size of a 3 character ISO639 language code.
+///
+#define ISO_639_2_ENTRY_SIZE            3
 
 /**
   Performs a case-insensitive comparison of two Null-terminated Unicode 
