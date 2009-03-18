@@ -119,90 +119,47 @@ INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 #INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
   # Binary INF file to support toggle among different CPU architectures.
-#INF  FatBinPkg/EnhancedFatDxe/Fat.inf
+INF  FatBinPkg/EnhancedFatDxe/Fat.inf
 
 FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
 
-[Rule.Common.PEI_CORE]
-  FILE PEI_CORE = $(NAMED_GUID) {
-    PE32     PE32           |.efi
-    UI       STRING ="$(MODULE_NAME)" Optional
-    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
-
-[Rule.Common.PEIM]
-  FILE PEIM = $(NAMED_GUID) {
-     PEI_DEPEX PEI_DEPEX Optional        |.depex
-     PE32      PE32                      |.efi
-     UI       STRING="$(MODULE_NAME)" Optional
-     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
-
-[Rule.Common.PEIM.TIANOCOMPRESSED]
-  FILE PEIM = $(NAMED_GUID) DEBUG_MYTOOLS_IA32 {
-    PEI_DEPEX PEI_DEPEX Optional         |.depex
-    GUIDED A31280AD-481E-41B6-95E8-127F4C984779 PROCESSING_REQUIRED = TRUE {
-      PE32      PE32                     |.efi
-      UI        STRING="$(MODULE_NAME)" Optional
-      VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-    }
-  }
-
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
-    COMPRESS PI_STD {
       PE32     PE32           |.efi
       UI       STRING="$(MODULE_NAME)" Optional
       VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-    }
   }
 
 [Rule.Common.UEFI_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      |.depex
-    COMPRESS PI_STD {
-      GUIDED {
         PE32     PE32                    |.efi
         UI       STRING="$(MODULE_NAME)" Optional
         VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-      }
-    }
   }
 
 [Rule.Common.DXE_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      |.depex
-    COMPRESS PI_STD {
-      GUIDED {
         PE32     PE32                    |.efi
         UI       STRING="$(MODULE_NAME)" Optional
         VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-      }
-    }
   }
 
 [Rule.Common.DXE_RUNTIME_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      |.depex
-    COMPRESS PI_STD {
-      GUIDED {
         PE32     PE32                    |.efi
         UI       STRING="$(MODULE_NAME)" Optional
         VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-      }
-    }
   }
 
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
-    COMPRESS PI_STD {
-      GUIDED {
         PE32     PE32                    |.efi
         UI       STRING="$(MODULE_NAME)" Optional
         VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-      }
-    }
   }
 
