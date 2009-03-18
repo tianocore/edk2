@@ -69,6 +69,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FRAMEWORK_RESERVED_VARSTORE_ID 0x0001
 #define FRAMEWORK_RESERVED_VARSTORE_NAME L"Setup"
 
+///
+/// The size of a 3 character ISO639 language code.
+///
+#define ISO_639_2_ENTRY_SIZE            3
+
+
 
 #pragma pack (1)
 typedef struct {
