@@ -81,7 +81,7 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       {
         0,
       },  // Reserved[1]
-      1,  // Revision
+      2,  // Revision
       {
         FixedPcdGet32 (PcdWinNtFlashFvRecoverySize)/FixedPcdGet32 (PcdWinNtFirmwareBlockSize),
         FixedPcdGet32 (PcdWinNtFirmwareBlockSize),
@@ -121,7 +121,7 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       {
         0,
       },  // Reserved[1]
-      1,  // Revision
+      2,  // Revision
       {
        (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
         FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
