@@ -2087,6 +2087,12 @@ FvbNotificationEvent (
 
   FreePool (HandleBuffer);
   if (!EFI_ERROR (Status) && Fvb != NULL) {
+    //
+    // Close the notify event to avoid install gEfiVariableArchProtocolGuid & gEfiVariableWriteArchProtocolGuid again.
+    //
+    Status = gBS->CloseEvent (Event);	
+    ASSERT_EFI_ERROR (Status);
+
     Status = VariableCommonInitialize (Fvb);
     ASSERT_EFI_ERROR (Status);
   
