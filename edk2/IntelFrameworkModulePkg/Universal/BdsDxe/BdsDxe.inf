@@ -145,7 +145,6 @@
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
   gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMES
-  gEfiConsoleControlProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
   gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMES
   gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES

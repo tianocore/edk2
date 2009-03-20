@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/BlockIo.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/CapsuleVendor.h>
-#include <Protocol/ConsoleControl.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/FormBrowser2.h>
 #include <Protocol/HiiConfigAccess.h>

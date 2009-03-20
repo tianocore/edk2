@@ -5,7 +5,7 @@
 #  2) BDS boot device connect interface;
 #  3) BDS Misc interfaces for mainting boot variable, ouput string, etc.
 #  
-#  Copyright (c) 2007 - 2008, Intel Corporation. <BR>
+#  Copyright (c) 2007 - 2009, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -105,7 +105,6 @@
   gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL CONSUMES
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
   gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
-  gEfiConsoleControlProtocolGuid                # PROTOCOL CONSUMES
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL CONSUMES
   gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
   gEfiSecurityArchProtocolGuid
