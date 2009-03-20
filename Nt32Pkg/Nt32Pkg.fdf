@@ -196,7 +196,7 @@ INF  Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
 INF  Nt32Pkg/TimerDxe/TimerDxe.inf
 INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-INF  MdeModulePkg/Universal/WatchDogTimerDxe/WatchDogTimer.inf
+INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
