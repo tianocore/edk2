@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which contain all the code to connect console device
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -728,16 +728,7 @@ LockKeyboards (
   IN  CHAR16    *Password
   )
 {
-  EFI_STATUS                    Status;
-  EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
-
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
-  if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
-  }
-
-  Status = ConsoleControl->LockStdIn (ConsoleControl, Password);
-  return Status;
 }
 
 
@@ -758,7 +749,6 @@ EnableQuietBoot (
   )
 {
   EFI_STATUS                    Status;
-  EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
   EFI_OEM_BADGING_PROTOCOL      *Badging;
   UINT32                        SizeOfX;
   UINT32                        SizeOfY;
@@ -780,11 +770,6 @@ EnableQuietBoot (
   UINT32                        RefreshRate;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
 
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
-  }
-
   UgaDraw = NULL;
   //
   // Try to open GOP first
@@ -801,16 +786,13 @@ EnableQuietBoot (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Erase Cursor from screen
+  //
+  gST->ConOut->EnableCursor (gST->ConOut, FALSE);
+
   Badging = NULL;
   Status  = gBS->LocateProtocol (&gEfiOEMBadgingProtocolGuid, NULL, (VOID **) &Badging);
-
-  //
-  // Set console control to graphics mode.
-  //
-  Status = ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenGraphics);
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
-  }
 
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
@@ -1004,17 +986,11 @@ DisableQuietBoot (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  EFI_CONSOLE_CONTROL_PROTOCOL  *ConsoleControl;
-
-  Status = gBS->LocateProtocol (&gEfiConsoleControlProtocolGuid, NULL, (VOID **) &ConsoleControl);
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
-  }
 
   //
-  // Set console control to text mode.
+  // Enable Cursor on Screen
   //
-  return ConsoleControl->SetMode (ConsoleControl, EfiConsoleControlScreenText);
+  gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+  return EFI_SUCCESS;
 }
 

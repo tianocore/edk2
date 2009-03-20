@@ -1,7 +1,7 @@
 /** @file
   Perform the platform memory test
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -222,7 +222,7 @@ BdsMemoryTest (
   BOOLEAN                           ErrorOut;
   BOOLEAN                           TestAbort;
   EFI_INPUT_KEY                     Key;
-  CHAR16                            StrPercent[16];
+  CHAR16                            StrPercent[80];
   CHAR16                            *StrTotalMemory;
   CHAR16                            *Pos;
   CHAR16                            *TmpStr;
@@ -255,10 +255,6 @@ BdsMemoryTest (
 
   RequireSoftECCInit = FALSE;
 
-  gST->ConOut->ClearScreen (gST->ConOut);
-  gST->ConOut->SetAttribute (gST->ConOut, EFI_YELLOW | EFI_BRIGHT);
-  gST->ConOut->EnableCursor (gST->ConOut, FALSE);
-
   Status = gBS->LocateProtocol (
                   &gEfiGenericMemTestProtocolGuid,
                   NULL,
@@ -286,11 +282,10 @@ BdsMemoryTest (
     return EFI_SUCCESS;
   }
 
-  gST->ConOut->SetCursorPosition (gST->ConOut, 0, 2);
   TmpStr = GetStringById (STRING_TOKEN (STR_ESC_TO_SKIP_MEM_TEST));
 
   if (TmpStr != NULL) {
-    gST->ConOut->OutputString (gST->ConOut, TmpStr);
+    PrintXY (10, 10, NULL, NULL, TmpStr);
     FreePool (TmpStr);
   }
 
@@ -306,8 +301,6 @@ BdsMemoryTest (
       TmpStr = GetStringById (STRING_TOKEN (STR_SYSTEM_MEM_ERROR));
       if (TmpStr != NULL) {
         PrintXY (10, 10, NULL, NULL, TmpStr);
-        gST->ConOut->SetCursorPosition (gST->ConOut, 0, 4);
-        gST->ConOut->OutputString (gST->ConOut, TmpStr);
         FreePool (TmpStr);
       }
 
@@ -321,10 +314,13 @@ BdsMemoryTest (
                             );
     if (TestPercent != PreviousValue) {
       UnicodeValueToString (StrPercent, 0, TestPercent, 0);
-      gST->ConOut->SetCursorPosition (gST->ConOut, 0, 0);
       TmpStr = GetStringById (STRING_TOKEN (STR_MEMORY_TEST_PERCENT));
       if (TmpStr != NULL) {
-        BdsLibOutputStrings (gST->ConOut, StrPercent, TmpStr, NULL);
+        //
+        // TmpStr size is 64, StrPercent is reserved to 16.
+        //
+        StrCat (StrPercent, TmpStr);
+        PrintXY (10, 10, NULL, NULL, StrPercent);
         FreePool (TmpStr);
       }
 
@@ -360,8 +356,7 @@ BdsMemoryTest (
           FreePool (TmpStr);
         }
 
-        gST->ConOut->SetCursorPosition (gST->ConOut, 0, 0);
-        gST->ConOut->OutputString (gST->ConOut, L"100");
+        PrintXY (10, 10, NULL, NULL, L"100");
         Status = GenMemoryTest->Finished (GenMemoryTest);
         goto Done;
       }
@@ -384,10 +379,7 @@ Done:
     FreePool (TmpStr);
   }
 
-  gST->ConOut->ClearScreen (gST->ConOut);
-  gST->ConOut->SetAttribute (gST->ConOut, EFI_YELLOW | EFI_BRIGHT);
-  gST->ConOut->EnableCursor (gST->ConOut, FALSE);
-  gST->ConOut->OutputString (gST->ConOut, StrTotalMemory);
+  PrintXY (10, 10, NULL, NULL, StrTotalMemory);
   PlatformBdsShowProgress (
     Foreground,
     Background,
