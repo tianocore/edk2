@@ -550,33 +550,14 @@ ConSpliterGraphicsOutputBlt (
   )
 {
   EFI_STATUS                      Status;
+  EFI_STATUS                      ReturnStatus = EFI_DEVICE_ERROR;
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
   UINTN                           Index;
-  EFI_STATUS                      ReturnStatus;
   EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput;
   EFI_UGA_DRAW_PROTOCOL           *UgaDraw;
 
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
-  //
-  // Sync up DevNull GOP device
-  //
-  ReturnStatus = DevNullGraphicsOutputBlt (
-                  Private,
-                  BltBuffer,
-                  BltOperation,
-                  SourceX,
-                  SourceY,
-                  DestinationX,
-                  DestinationY,
-                  Width,
-                  Height,
-                  Delta
-                  );
-
-  if (Private->ConsoleOutputMode != EfiConsoleControlScreenGraphics) {
-    return ReturnStatus;
-  }
   //
   // return the worst status met
   //
