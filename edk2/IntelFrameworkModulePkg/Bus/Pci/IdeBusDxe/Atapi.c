@@ -1791,7 +1791,7 @@ AtapiBlkIoReadBlocks (
   //
   if (LBA == 0 && (IdeBlkIoDevice->Cache == NULL)) {
     IdeBlkIoDevice->Cache = AllocatePool (BlockSize);
-    if (IdeBlkIoDevice != NULL) {
+    if (IdeBlkIoDevice->Cache!= NULL) {
       CopyMem ((UINT8 *) IdeBlkIoDevice->Cache, (UINT8 *) Buffer, BlockSize);
     }
   }

@@ -63,6 +63,9 @@ ATAIdentify (
   //  the ATA Identify command
   //
   AtaIdentifyPointer = (EFI_IDENTIFY_DATA *) AllocateZeroPool (sizeof (EFI_IDENTIFY_DATA));
+  if (AtaIdentifyPointer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   //  use ATA PIO Data In protocol to send ATA Identify command
@@ -1824,6 +1827,9 @@ AtaSMARTSupport (
     // Detect if this feature is enabled
     //
     TmpAtaIdentifyPointer = (EFI_IDENTIFY_DATA *) AllocateZeroPool (sizeof (EFI_IDENTIFY_DATA));
+    if (TmpAtaIdentifyPointer == NULL) {
+      return;
+    }
 
     DeviceSelect          = (UINT8) ((IdeDev->Device) << 4);
     Status = AtaPioDataIn (

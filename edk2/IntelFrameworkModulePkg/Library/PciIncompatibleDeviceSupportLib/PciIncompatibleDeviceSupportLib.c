@@ -137,6 +137,9 @@ PciResourceUpdateCheck (
       AcpiPtr = AllocateZeroPool (
                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * Index + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
                 );
+      if (AcpiPtr == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
 
       OldAcpiPtr = AcpiPtr;
 
@@ -255,6 +258,9 @@ PciRegisterUpdateCheck (
 
             Dsc = (EFI_PCI_REGISTER_VALUE_DATA *) (ListPtr + 2);
             RegisterPtr = AllocateZeroPool (sizeof (EFI_PCI_REGISTER_VALUE_DATA));
+            if (RegisterPtr == NULL) {
+              return EFI_SUCCESS;
+            }
 
             RegisterPtr->AndValue      = Dsc->AndValue;
             RegisterPtr->OrValue       = Dsc->OrValue;
@@ -356,6 +362,9 @@ PciRegisterAccessCheck (
           if((Dsc->StartOffset <= Offset) && (Dsc->EndOffset > Offset)) {
 
             RegisterPtr = AllocateZeroPool (sizeof (EFI_PCI_REGISTER_ACCESS_DATA));
+            if (RegisterPtr == NULL) {
+              return EFI_OUT_OF_RESOURCES;
+            }
 
             RegisterPtr->StartOffset      = Dsc->StartOffset;
             RegisterPtr->EndOffset        = Dsc->EndOffset;
