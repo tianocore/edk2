@@ -1,7 +1,7 @@
 /** @file
   Framework PEIM to provide the Variable functionality
   
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2009 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -426,6 +426,14 @@ FindVariable (
       Variable = IndexTable->StartPtr;
     } else {
       VariableBase = (UINT8 *) (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
+
+      //
+      // Check if FV header is valid.
+      //
+      if (((EFI_FIRMWARE_VOLUME_HEADER *) VariableBase)->Signature != EFI_FVH_SIGNATURE) {
+        return EFI_UNSUPPORTED;
+      }
+
       VariableStoreHeader = (VARIABLE_STORE_HEADER *) (VariableBase + \
                             ((EFI_FIRMWARE_VOLUME_HEADER *) (VariableBase)) -> HeaderLength);
 
