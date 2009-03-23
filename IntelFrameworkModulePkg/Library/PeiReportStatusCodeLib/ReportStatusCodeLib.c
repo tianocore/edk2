@@ -471,7 +471,9 @@ ReportStatusCodeEx (
     ExtendedDataGuid = &gEfiStatusCodeSpecificDataGuid;
   }
   CopyGuid (&StatusCodeData->Type, ExtendedDataGuid);
-  CopyMem (StatusCodeData + 1, ExtendedData, ExtendedDataSize);
+  if (ExtendedData != NULL) {
+    CopyMem (StatusCodeData + 1, ExtendedData, ExtendedDataSize);
+  }
   if (CallerId == NULL) {
     CallerId = &gEfiCallerIdGuid;
   }

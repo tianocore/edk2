@@ -125,7 +125,9 @@ InternalReportStatusCodeEx (
   //
   // Fill in the extended data buffer
   //
-  CopyMem (StatusCodeData + 1, ExtendedData, ExtendedDataSize);
+  if (ExtendedData != NULL) {
+    CopyMem (StatusCodeData + 1, ExtendedData, ExtendedDataSize);
+  }
 
   //
   // Report the status code

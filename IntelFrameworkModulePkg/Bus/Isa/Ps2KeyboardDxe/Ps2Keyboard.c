@@ -353,11 +353,13 @@ ErrorExit:
   // Since there will be no timer handler for keyboard input any more,
   // exhaust input data just in case there is still keyboard data left
   //
-  Status1 = EFI_SUCCESS;
-  while (!EFI_ERROR (Status1)) {
-    Status1 = KeyboardRead (ConsoleIn, &Data);;
+  if (ConsoleIn != NULL) {
+    Status1 = EFI_SUCCESS;
+    while (!EFI_ERROR (Status1)) {
+      Status1 = KeyboardRead (ConsoleIn, &Data);;
+    }
   }
-
+  
   if (ConsoleIn != NULL) {
     gBS->FreePool (ConsoleIn);
   }
