@@ -550,7 +550,7 @@ ConSpliterGraphicsOutputBlt (
   )
 {
   EFI_STATUS                      Status;
-  EFI_STATUS                      ReturnStatus = EFI_DEVICE_ERROR;
+  EFI_STATUS                      ReturnStatus;
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
   UINTN                           Index;
   EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput;
@@ -558,6 +558,7 @@ ConSpliterGraphicsOutputBlt (
 
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
+  ReturnStatus = EFI_SUCCESS;
   //
   // return the worst status met
   //
