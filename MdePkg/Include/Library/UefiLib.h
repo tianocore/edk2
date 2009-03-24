@@ -619,6 +619,104 @@ FreeUnicodeStringTable (
   IN EFI_UNICODE_STRING_TABLE  *UnicodeStringTable
   );
 
+
+/**
+  Returns a pointer to an allocated buffer that contains the contents of a 
+  variable retrieved through the UEFI Runtime Service GetVariable().  The 
+  returned buffer is allocated using AllocatePool().  The caller is responsible
+  for freeing this buffer with FreePool().
+
+  If Name is NULL, then ASSERT().
+  If Guid is NULL, then ASSERT().
+
+  @param[in]  Name  Pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  Pointer to an EFI_GUID structure
+
+  @retval NULL   The variable could not be retrieved.
+  @retval NULL   There are not enough resources available for the variable contents.
+  @retval Other  A pointer to allocated buffer containing the variable contents.
+
+**/
+VOID *
+EFIAPI
+GetVariable (
+  IN CONST CHAR16    *Name,
+  IN CONST EFI_GUID  *Guid
+  );
+
+/**
+  Returns a pointer to an allocated buffer that contains the contents of a 
+  variable retrieved through the UEFI Runtime Service GetVariable().  This 
+  function always uses the EFI_GLOBAL_VARIABLE GUID to retrieve variables.
+  The returned buffer is allocated using AllocatePool().  The caller is 
+  responsible for freeing this buffer with FreePool().
+
+  If Name is NULL, then ASSERT().
+
+  @param[in]  Name  Pointer to a Null-terminated Unicode string.
+
+  @retval NULL   The variable could not be retrieved.
+  @retval NULL   There are not enough resources available for the variable contents.
+  @retval Other  A pointer to allocated buffer containing the variable contents.
+
+**/
+VOID *
+EFIAPI
+GetEfiGlobalVariable (
+  IN CONST CHAR16  *Name
+  );
+
+
+/**
+  Returns a pointer to an allocated buffer that contains the best matching language 
+  from a set of supported languages.  
+  
+  This function supports both ISO 639-2 and RFC 4646 language codes, but language 
+  code types may not be mixed in a single call to this function.  The language 
+  code returned is allocated using AllocatePool().  The caller is responsible for 
+  freeing the allocated buffer using FreePool().  This function supports a variable
+  argument list that allows the caller to pass in a prioritized list of language 
+  codes to test against all the language codes in SupportedLanguages. 
+
+  If SupportedLanguages is NULL, then ASSERT().
+
+  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string that
+                                  contains a set of language codes in the format 
+                                  specified by Iso639Language.
+  @param[in]  Iso639Language      If TRUE, then all language codes are assumed to be
+                                  in ISO 639-2 format.  If FALSE, then all language
+                                  codes are assumed to be in RFC 4646 language format
+  @param[in]  ...                 A variable argument list that contains pointers to 
+                                  Null-terminated ASCII strings that contain one or more
+                                  language codes in the format specified by Iso639Language.
+                                  The first language code from each of these language
+                                  code lists is used to determine if it is an exact or
+                                  close match to any of the language codes in 
+                                  SupportedLanguages.  Close matches only apply to RFC 4646
+                                  language codes, and the matching algorithm from RFC 4647
+                                  is used to determine if a close match is present.  If 
+                                  an exact or close match is found, then the matching
+                                  language code from SupportedLanguages is returned.  If
+                                  no matches are found, then the next variable argument
+                                  parameter is evaluated.  The variable argument list 
+                                  is terminated by a NULL.
+
+  @retval NULL   The best matching language could not be found in SupportedLanguages.
+  @retval NULL   There are not enough resources available to return the best matching 
+                 language.
+  @retval Other  A pointer to a Null-terminated ASCII string that is the best matching 
+                 language in SupportedLanguages.
+
+**/
+CHAR8 *
+EFIAPI
+GetBestLanguage (
+  IN CONST CHAR8  *SupportedLanguages, 
+  IN BOOLEAN      Iso639Language,
+  ...
+  );
+
+
 /**
   Retrieves the width of a Unicode character.
 
