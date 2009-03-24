@@ -54,11 +54,12 @@
   BaseLib
   UefiBootServicesTableLib
   DevicePathLib
+  UefiRuntimeServicesTableLib
   
 [Guids]
   gEfiEventReadyToBootGuid                      ## CONSUMES  ## Event
   gEfiEventLegacyBootGuid                       ## CONSUMES  ## Event
-
+  gEfiGlobalVariableGuid                        ## CONSUMES  ## Variable
 
 [Protocols]
   gEfiDriverBindingProtocolGuid                   ## PRODUCES
