@@ -30,7 +30,6 @@ Revision History
 #include <Guid/FileInfo.h>
 #include <Guid/FileSystemInfo.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
-#include <Guid/GlobalVariable.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/SimpleFileSystem.h>

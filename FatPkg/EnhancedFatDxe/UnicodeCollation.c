@@ -1,8 +1,8 @@
 /** @file
-  Unicode Collation Library that hides the trival difference of Unicode Collation
+  Unicode Collation Support component that hides the trivial difference of Unicode Collation
   and Unicode collation 2 Protocol.
 
-  Copyright (c) 2007, Intel Corporation<BR>
+  Copyright (c) 2007 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,130 +15,65 @@
 
 #include "Fat.h"
 
-STATIC EFI_UNICODE_COLLATION_PROTOCOL  *mUnicodeCollationInterface = NULL;
+EFI_UNICODE_COLLATION_PROTOCOL  *mUnicodeCollationInterface = NULL;
 
-typedef
-BOOLEAN
-(* SEARCH_LANG_CODE) (
-  IN CONST CHAR8    *Languages,
-  IN CONST CHAR8    *MatchLangCode
-  );
+/**
+  Worker function to initialize Unicode Collation support.
 
-struct _UNICODE_INTERFACE {
-  CHAR16            *VariableName;
-  CHAR8             *DefaultLangCode;
-  SEARCH_LANG_CODE  SearchLangCode;
-  EFI_GUID          *UnicodeProtocolGuid;
-};
+  This function searches Initialized Unicode Collation support based on PCDs:
+  PcdUnicodeCollation2Support and PcdUnicodeCollationSupport.
+  It first tries to locate Unicode Collation 2 protocol and matches it with current
+  platform language code. If for any reason the first attempt fails, it then tries to
+  use Unicode Collation Protocol.
 
-typedef struct _UNICODE_INTERFACE UNICODE_INTERFACE;
+  @param  AgentHandle          The handle used to open Unicode Collation (2) protocol.
+  @param  ProtocolGuid         The pointer to Unicode Collation (2) protocol GUID.
+  @param  VariableName         The name of the RFC 4646 or ISO 639-2 language variable.
+  @param  DefaultLanguage      The default language in case the RFC 4646 or ISO 639-2 language is absent.
 
-STATIC
-BOOLEAN
-SearchIso639LangCode (
-  IN CONST CHAR8    *Languages,
-  IN CONST CHAR8    *MatchLangCode
-  )
-{
-  CONST CHAR8       *LangCode;
+  @retval EFI_SUCCESS          The Unicode Collation (2) protocol has been successfully located.
+  @retval Others               The Unicode Collation (2) protocol has not been located.
 
-  for (LangCode = Languages; *LangCode != '\0'; LangCode += 3) {
-    if (CompareMem (LangCode, MatchLangCode, 3) == 0) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-STATIC
-BOOLEAN
-SearchRfc3066LangCode (
-  IN CONST CHAR8    *Languages,
-  IN CONST CHAR8    *MatchLangCode
-  )
-{
-  CHAR8       *SubStr;
-  CHAR8       Terminal;
-
-  SubStr = AsciiStrStr (Languages, MatchLangCode);
-  if (SubStr == NULL) {
-    return FALSE;
-  }
-
-  if (SubStr != Languages && *(SubStr - 1) != ';') {
-    return FALSE;
-  }
-
-  Terminal = *(SubStr + AsciiStrLen (MatchLangCode));
-  if (Terminal != '\0' && Terminal != ';') {
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-GLOBAL_REMOVE_IF_UNREFERENCED UNICODE_INTERFACE mIso639Lang = {
-  L"Lang",
-  (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultLang),
-  SearchIso639LangCode,
-  &gEfiUnicodeCollationProtocolGuid,
-};
-
-GLOBAL_REMOVE_IF_UNREFERENCED UNICODE_INTERFACE mRfc3066Lang = {
-  L"PlatformLang",
-  (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang),
-  SearchRfc3066LangCode,
-  &gEfiUnicodeCollation2ProtocolGuid,
-};
-
-STATIC
+**/
 EFI_STATUS
-InitializeUnicodeCollationSupportWithConfig (
+InitializeUnicodeCollationSupportWorker (
   IN EFI_HANDLE         AgentHandle,
-  IN UNICODE_INTERFACE  *UnicodeInterface
+  IN EFI_GUID           *ProtocolGuid,
+  IN CONST CHAR16       *VariableName,
+  IN CONST CHAR8        *DefaultLanguage
   )
 {
   EFI_STATUS                      Status;
-  CHAR8                           Buffer[100];
-  UINTN                           BufferSize;
+  UINTN                           NumHandles;
   UINTN                           Index;
-  CHAR8                           *LangCode;
-  UINTN                           NoHandles;
   EFI_HANDLE                      *Handles;
   EFI_UNICODE_COLLATION_PROTOCOL  *Uci;
-
-  LangCode   = Buffer;
-  BufferSize = sizeof (Buffer);
-  Status = gRT->GetVariable (
-                  UnicodeInterface->VariableName,
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &BufferSize,
-                  Buffer
-                  );
-  if (EFI_ERROR (Status)) {
-    LangCode = UnicodeInterface->DefaultLangCode;
-  }
+  BOOLEAN                         Iso639Language;
+  CHAR8                           *Language;
+  CHAR8                           *BestLanguage;
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  UnicodeInterface->UnicodeProtocolGuid,
+                  ProtocolGuid,
                   NULL,
-                  &NoHandles,
+                  &NumHandles,
                   &Handles
                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  for (Index = 0; Index < NoHandles; Index++) {
+  Iso639Language = (BOOLEAN) (ProtocolGuid == &gEfiUnicodeCollationProtocolGuid);
+  Language = GetEfiGlobalVariable(VariableName);
+
+  Status = EFI_UNSUPPORTED;
+  for (Index = 0; Index < NumHandles; Index++) {
     //
     // Open Unicode Collation Protocol
     //
     Status = gBS->OpenProtocol (
                     Handles[Index],
-                    UnicodeInterface->UnicodeProtocolGuid,
+                    ProtocolGuid,
                     (VOID **) &Uci,
                     AgentHandle,
                     NULL,
@@ -148,15 +83,42 @@ InitializeUnicodeCollationSupportWithConfig (
       continue;
     }
 
-    if (UnicodeInterface->SearchLangCode (Uci->SupportedLanguages, LangCode)) {
+    //
+    // Find the best matching matching language from the supported languages
+    // of Unicode Collation (2) protocol. 
+    //
+    if (Language == NULL) {
+      BestLanguage = GetBestLanguage (
+                       Uci->SupportedLanguages,
+                       Iso639Language,
+                       DefaultLanguage,
+                       NULL
+                       );
+    } else {
+      BestLanguage = GetBestLanguage (
+                       Uci->SupportedLanguages,
+                       Iso639Language,
+                       Language,
+                       Iso639Language,
+                       DefaultLanguage,
+                       NULL
+                       );
+    }
+    if (BestLanguage != NULL) {
+      FreePool (BestLanguage);
       mUnicodeCollationInterface = Uci;
+      Status = EFI_SUCCESS;
       break;
     }
   }
 
+  if (Language != NULL) {
+    FreePool (Language);
+  }
+
   FreePool (Handles);
 
-  return (mUnicodeCollationInterface != NULL)? EFI_SUCCESS : EFI_NOT_FOUND;
+  return Status;
 }
 
 /**
@@ -185,10 +147,15 @@ InitializeUnicodeCollationSupport (
   Status = EFI_UNSUPPORTED;
 
   //
-  // First try to use RFC 3066 Unicode Collation 2 Protocol.
+  // First try to use RFC 4646 Unicode Collation 2 Protocol.
   //
   if (FeaturePcdGet (PcdUnicodeCollation2Support)) {
-    Status = InitializeUnicodeCollationSupportWithConfig (AgentHandle, &mRfc3066Lang);
+    Status = InitializeUnicodeCollationSupportWorker (
+               AgentHandle,
+               &gEfiUnicodeCollation2ProtocolGuid,
+               L"PlatformLang",
+               (CONST CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang)
+               );
   }
 
   //
@@ -196,11 +163,17 @@ InitializeUnicodeCollationSupport (
   // on the ISO 639-2 Unicode Collation Protocol.
   //
   if (FeaturePcdGet (PcdUnicodeCollationSupport) && EFI_ERROR (Status)) {
-    Status = InitializeUnicodeCollationSupportWithConfig (AgentHandle, &mIso639Lang);
+    Status = InitializeUnicodeCollationSupportWorker (
+               AgentHandle,
+               &gEfiUnicodeCollationProtocolGuid,
+               L"Lang",
+               (CONST CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultLang)
+               );
   }
 
   return Status;
 }
+
 
 /**
   Performs a case-insensitive comparison of two Null-terminated Unicode strings.
