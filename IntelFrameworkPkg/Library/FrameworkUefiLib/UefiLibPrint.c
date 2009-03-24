@@ -393,7 +393,7 @@ InternalPrintGraphic (
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
     VerticalResolution = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+  } else if (UgaDraw != NULL) {
     UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
   } else {
     Status = EFI_UNSUPPORTED;
@@ -466,8 +466,7 @@ InternalPrintGraphic (
                          NULL
                          );
 
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
-    ASSERT (UgaDraw!= NULL);
+  } else if (UgaDraw != NULL) {
 
     Blt->Image.Bitmap = AllocateZeroPool (Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     ASSERT (Blt->Image.Bitmap != NULL);
