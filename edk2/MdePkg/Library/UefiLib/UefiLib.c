@@ -1209,9 +1209,9 @@ If Guid is NULL, then ASSERT().
 VOID *
 EFIAPI
 GetVariable (
-             IN CONST CHAR16    *Name,
-             IN CONST EFI_GUID  *Guid
-             )
+  IN CONST CHAR16    *Name,
+  IN CONST EFI_GUID  *Guid
+  )
 {
   EFI_STATUS  Status;
   UINTN       Size;
