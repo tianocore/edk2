@@ -62,11 +62,12 @@
   ExtendedIfrSupportLib
   BaseMemoryLib
   MemoryAllocationLib
-  UefiRuntimeServicesTableLib
   DevicePathLib
   
 [Guids]
-  gEfiGlobalVariableGuid                        ## CONSUMED ## Variable:L"PlatformLang" this variable specifies the platform supported language string (RFC 3066 format)
+##  This GUID C Name is not required for build since it is from UefiLib and not directly used by this module source.
+##  gEfiGlobalVariableGuid                      ## SOMETIMES_CONSUMED ## Variable:L"PlatformLang" this variable specifies the platform supported language string (RFC 4646 format)
+##  gEfiGlobalVariableGuid                      ## SOMETIMES_CONSUMED ## Variable:L"Lang" this variable specifies the platform supported language string (ISO 639-2 format)
 
 [Protocols]
   gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMED (Get Driver Name if ComponentName2Protocol exists)
