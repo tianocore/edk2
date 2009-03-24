@@ -1104,10 +1104,6 @@ Returns:
 
 --*/
 {
-  UINT16  *Ptr;
-  UINT16  HeaderLength;
-  UINT16  Checksum;
-
   //
   // Verify the header revision, header signature, length
   // Length of FvBlock cannot be 2**64-1
@@ -1124,26 +1120,10 @@ Returns:
   //
   // Verify the header checksum
   //
-  HeaderLength  = (UINT16) (FwVolHeader->HeaderLength / 2);
-  Ptr           = (UINT16 *) FwVolHeader;
-  Checksum      = 0;
-  while (HeaderLength > 0) {
-    Checksum = (UINT16)(Checksum + (*Ptr));
-    HeaderLength--;
-    Ptr++;
-  }
-
-  if (Checksum != 0) {
+  if (CalculateCheckSum16 ((UINT16 *) FwVolHeader, FwVolHeader->HeaderLength) != 0) {
     return EFI_NOT_FOUND;
   }
 
-  //
-  // PI specification defines the name guid of FV exists in extension header.
-  //
-  if (FwVolHeader->ExtHeaderOffset == 0) {
-    return EFI_NOT_FOUND;
-  }
-  
   return EFI_SUCCESS;
 }
 
@@ -1180,7 +1160,7 @@ Returns:
   UINTN                               NumOfBlocks;
   EFI_PEI_HOB_POINTERS                FvHob;
 
-   //
+  //
   // Get the DXE services table
   //
   DxeServices = gDS;
