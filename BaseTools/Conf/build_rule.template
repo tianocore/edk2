@@ -221,7 +221,7 @@
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) $(STATIC_LIBRARY_FILES)
 
     <Command.GCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
+        "$(DLINK)" -o ${dst} -Map $(DEBUG_DIR)(+)$(MODULE_NAME).map $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
 
 [Static-Library-File.USER_DEFINED]
     <InputFile>
