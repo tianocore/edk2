@@ -39,8 +39,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePathToText.h>
 #include <Protocol/DevicePath.h>
 
-#include <Guid/GlobalVariable.h>
-
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
@@ -53,7 +51,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/ExtendedIfrSupportLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 #include "PlatOverMngr.h"
 
@@ -93,7 +90,6 @@ EFI_LOADED_IMAGE_PROTOCOL    *mDriverImageProtocol[MAX_CHOICE_NUM];
 EFI_DEVICE_PATH_PROTOCOL     *mControllerDevicePathProtocol[MAX_CHOICE_NUM];
 UINTN                        mSelectedDriverImageNum;
 UINTN                        mLastSavedDriverImageNum;
-CHAR8                        mLanguage[RFC_3066_ENTRY_SIZE];
 UINT16                       mCurrentPage;
 
 /**
@@ -113,54 +109,70 @@ DevicePathToStr (
   );
 
 /**
-  Do string convertion for the ComponentName supported language. It do
-  the convertion just for english language code from RFC 3066 to ISO 639-2.
-  Then it will check whether the converted language is in the supported language list.
-  If not supported, NULL is returned.
-  If Language is not english, NULL is returned.
+  Worker function to get the driver name by ComponentName or ComponentName2 protocol 
+  according to the driver binding handle.
 
-  @param SupportedLanguages        Pointer to ComponentName supported language string list. ISO 639-2 language
-  @param Language                  The language string. RFC 3066 language
+  @param  DriverBindingHandle  The Handle of DriverBinding.
+  @param  ProtocolGuid         The pointer to Component Name (2) protocol GUID.
+  @param  VariableName         The name of the RFC 4646 or ISO 639-2 language variable.
 
-  @return  English language string (ISO 639-2)
-  @return  NULL if the conertion is not successful.
+  @retval !NULL               Pointer into the image name if the image name is found,
+  @retval NULL                Pointer to NULL if the image name is not found.
 
 **/
-CHAR8 *
-ConvertComponentNameSupportLanguage (
-  IN CHAR8                           *SupportedLanguages,
-  IN CHAR8                           *Language
+CHAR16 *
+GetComponentNameWorker (
+  IN EFI_HANDLE                      DriverBindingHandle,
+  IN EFI_GUID                        *ProtocolGuid,
+  IN CONST CHAR16                    *VariableName
   )
 {
-  CHAR8    *LangCode;
-  LangCode = NULL;
+  EFI_STATUS                         Status;
+  EFI_COMPONENT_NAME_PROTOCOL        *ComponentName;
+  CHAR16                             *DriverName;
+  CHAR8                              *Language;
+  CHAR8                              *BestLanguage;
 
-  //
-  // Check the input language is English
-  //
-  if (AsciiStrnCmp (Language, "en-", 3) != 0) {
+  Status = gBS->OpenProtocol (
+                  DriverBindingHandle,
+                  ProtocolGuid,
+                  (VOID *) &ComponentName,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
     return NULL;
   }
-  
+
   //
-  // Check SupportedLanguages format
+  // Find the best matching language.
   //
-  if (AsciiStrStr (SupportedLanguages, "en-") != NULL) {
-    //
-    // Create RFC 3066 language
-    //
-    LangCode = AllocateZeroPool(AsciiStrSize (Language));
-    AsciiStrCpy (LangCode, Language);
-  } else if (AsciiStrStr (SupportedLanguages, "en") != NULL) {
-    //
-    // Create ISO 639-2 Language
-    //
-    LangCode = AllocateZeroPool(4);
-    AsciiStrCpy (LangCode, "eng");    
+  Language = GetEfiGlobalVariable (VariableName);
+  BestLanguage = GetBestLanguage (
+                   ComponentName->SupportedLanguages,
+                   (BOOLEAN) (ProtocolGuid == &gEfiComponentNameProtocolGuid),
+                   Language,
+                   NULL
+                   );
+
+  DriverName = NULL;
+  if (BestLanguage != NULL) {
+    ComponentName->GetDriverName (
+                     ComponentName,
+                     BestLanguage,
+                     &DriverName
+                     );
+    FreePool (BestLanguage);
   }
-  
-  return LangCode;
+
+  if (Language != NULL) {
+    FreePool (Language);
+  }
+
+  return DriverName;
 }
+
 
 /**
   Get the driver name by ComponentName or ComponentName2 protocol 
@@ -177,59 +189,17 @@ GetComponentName (
   IN EFI_HANDLE                      DriverBindingHandle
   )
 {
-  EFI_STATUS                   Status;
-  EFI_COMPONENT_NAME_PROTOCOL  *ComponentName;
-  EFI_COMPONENT_NAME2_PROTOCOL *ComponentName2;
-  CHAR8                        *SupportedLanguage;
-  CHAR16                       *DriverName;
+  CHAR16                    *DriverName;
 
-  ComponentName  = NULL;
-  ComponentName2 = NULL;
-  Status = gBS->OpenProtocol (
-                 DriverBindingHandle,
-                 &gEfiComponentName2ProtocolGuid,
-                 (VOID **) &ComponentName2,
-                 NULL,
-                 NULL,
-                 EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                 );
-  if (EFI_ERROR(Status)) {
-    Status = gBS->OpenProtocol (
-                   DriverBindingHandle,
-                   &gEfiComponentNameProtocolGuid,
-                   (VOID **) &ComponentName,
-                   NULL,
-                   NULL,
-                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                   );
-  }
-
-  Status     = EFI_SUCCESS;
-  DriverName = NULL;
-  if (ComponentName != NULL) {
-    if (ComponentName->GetDriverName != NULL) {
-      SupportedLanguage = ConvertComponentNameSupportLanguage (ComponentName->SupportedLanguages, mLanguage);
-      if (SupportedLanguage != NULL) {
-        Status = ComponentName->GetDriverName (
-                                  ComponentName,
-                                  SupportedLanguage,
-                                  &DriverName
-                                  );
-        FreePool (SupportedLanguage);
-      }
-    }
-  } else if (ComponentName2 != NULL) {
-    if (ComponentName2->GetDriverName != NULL) {
-      Status = ComponentName2->GetDriverName (
-                                 ComponentName2,
-                                 mLanguage,
-                                 &DriverName
-                                 );
-    }
-  }
-
-  if (EFI_ERROR (Status)) {
-    return NULL;
+  //
+  // Try RFC 4646 Component Name 2 protocol first.
+  //
+  DriverName = GetComponentNameWorker (DriverBindingHandle, &gEfiComponentName2ProtocolGuid, L"PlatformLang");
+  if (DriverName == NULL) {
+    //
+    // If we can not get driver name from Component Name 2 protocol, we can try ISO 639-2 Component Name protocol. 
+    //
+    DriverName = GetComponentNameWorker (DriverBindingHandle, &gEfiComponentNameProtocolGuid, L"Lang");
   }
 
   return DriverName;
@@ -237,7 +207,7 @@ GetComponentName (
 
 /**
   Get the image name from EFI UI section.
-  Get FV protocol by its loaded image protoocl to abastract EFI UI section.
+  Get FV protocol by its loaded image protocol to abstract EFI UI section.
 
   @param Image            Pointer to the loaded image protocol
 
@@ -340,7 +310,6 @@ UpdateDeviceSelectPage (
 {
   EFI_HII_UPDATE_DATA                       UpdateData;
   EFI_STATUS                                Status;
-  UINTN                                     LangSize;
   UINTN                                     Index;
   UINTN                                     DevicePathHandleCount;
   CHAR16                                    *NewString;
@@ -356,19 +325,6 @@ UpdateDeviceSelectPage (
   //
   mCurrentPage = FORM_ID_DEVICE;  
   
-  //
-  // Get Platform supported Language (RFC_3066 format)
-  //
-  LangSize = RFC_3066_ENTRY_SIZE;
-  Status = gRT->GetVariable (
-              L"PlatformLang",
-              &gEfiGlobalVariableGuid,
-              NULL,
-              &LangSize,
-              mLanguage
-              );
-  ASSERT_EFI_ERROR (Status);
-
   //
   // Initial the mapping database in memory
   //
