@@ -70,14 +70,16 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       EFI_FIRMWARE_FILE_SYSTEM2_GUID,
       FixedPcdGet32 (PcdWinNtFlashFvRecoverySize),
       EFI_FVH_SIGNATURE,
-      EFI_FVB2_READ_ENABLED_CAP |
+      EFI_FVB2_MEMORY_MAPPED |  
+        EFI_FVB2_READ_ENABLED_CAP |
         EFI_FVB2_READ_STATUS |
         EFI_FVB2_WRITE_ENABLED_CAP |
         EFI_FVB2_WRITE_STATUS |
-        EFI_FVB2_ERASE_POLARITY,
+        EFI_FVB2_ERASE_POLARITY |
+        EFI_FVB2_ALIGNMENT_16,
       sizeof (EFI_FIRMWARE_VOLUME_HEADER) + sizeof (EFI_FV_BLOCK_MAP_ENTRY),
-      0,  // CheckSum
-      0,  // ExtHeaderOffset
+      0xE947,   // CheckSum
+      0,        // ExtHeaderOffset
       {
         0,
       },  // Reserved[1]
@@ -110,14 +112,16 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
       FixedPcdGet32 (PcdWinNtFlashNvStorageEventLogSize),
       EFI_FVH_SIGNATURE,
-      EFI_FVB2_READ_ENABLED_CAP |
+      EFI_FVB2_MEMORY_MAPPED |  
+        EFI_FVB2_READ_ENABLED_CAP |
         EFI_FVB2_READ_STATUS |
         EFI_FVB2_WRITE_ENABLED_CAP |
         EFI_FVB2_WRITE_STATUS |
-        EFI_FVB2_ERASE_POLARITY,
+        EFI_FVB2_ERASE_POLARITY |
+        EFI_FVB2_ALIGNMENT_16,
       sizeof (EFI_FIRMWARE_VOLUME_HEADER) + sizeof (EFI_FV_BLOCK_MAP_ENTRY),
-      0,  // CheckSum
-      0,  // ExtHeaderOffset
+      0xFBFF,  // CheckSum
+      0,       // ExtHeaderOffset
       {
         0,
       },  // Reserved[1]
