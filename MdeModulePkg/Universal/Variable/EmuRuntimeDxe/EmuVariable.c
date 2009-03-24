@@ -360,7 +360,7 @@ FindVariable (
 **/
 EFI_STATUS
 EFIAPI
-GetVariable (
+EmuGetVariable (
   IN      CHAR16            *VariableName,
   IN      EFI_GUID          * VendorGuid,
   OUT     UINT32            *Attributes OPTIONAL,
@@ -436,7 +436,7 @@ Done:
 **/
 EFI_STATUS
 EFIAPI
-GetNextVariableName (
+EmuGetNextVariableName (
   IN OUT  UINTN             *VariableNameSize,
   IN OUT  CHAR16            *VariableName,
   IN OUT  EFI_GUID          *VendorGuid,
@@ -550,7 +550,7 @@ Done:
 **/
 EFI_STATUS
 EFIAPI
-SetVariable (
+EmuSetVariable (
   IN CHAR16                  *VariableName,
   IN EFI_GUID                *VendorGuid,
   IN UINT32                  Attributes,
@@ -785,7 +785,7 @@ Done:
 **/
 EFI_STATUS
 EFIAPI
-QueryVariableInfo (
+EmuQueryVariableInfo (
   IN  UINT32                 Attributes,
   OUT UINT64                 *MaximumVariableStorageSize,
   OUT UINT64                 *RemainingVariableStorageSize,
