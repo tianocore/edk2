@@ -443,6 +443,10 @@ ExtractDataFromHiiHandle (
   SizeOfNvStore = 0;
   CachedStart   = 0;
 
+  if (DefaultImage == NULL || Guid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   Status        = GetHiiInterface (&Hii);
   if (EFI_ERROR (Status)) {
     return Status;
