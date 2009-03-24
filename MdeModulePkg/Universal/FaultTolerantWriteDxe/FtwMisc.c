@@ -808,7 +808,7 @@ FtwGetLastWriteHeader (
 
   *FtwWriteHeader = NULL;
   FtwHeader       = (EFI_FAULT_TOLERANT_WRITE_HEADER *) (FtwWorkSpaceHeader + 1);
-  Offset          = sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER);
+  Offset          = sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER);
 
   while (FtwHeader->Complete == FTW_VALID_STATE) {
     Offset += WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
