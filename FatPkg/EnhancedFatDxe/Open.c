@@ -243,19 +243,14 @@ Returns:
   default:
     return EFI_INVALID_PARAMETER;
   }
+  
   //
-  // Check for valid attributes
+  // Check for valid Attributes for file creation case. 
   //
-  if (Attributes & (~EFI_FILE_VALID_ATTR)) {
-    return EFI_INVALID_PARAMETER;
+  if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) && (Attributes & (EFI_FILE_READ_ONLY | (~EFI_FILE_VALID_ATTR))) != 0) {
+	return EFI_INVALID_PARAMETER;
   }
-  //
-  // Can't open for create and apply the read only attribute
-  //
-  if ((OpenMode & EFI_FILE_MODE_CREATE) && (Attributes & EFI_FILE_READ_ONLY)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
+  
   IFile = IFILE_FROM_FHAND (FHand);
   OFile = IFile->OFile;
 
