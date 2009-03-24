@@ -45,7 +45,7 @@ RuntimeServiceGetVariable (
   OUT VOID         *Data
   )
 {
-  return GetVariable (
+  return EmuGetVariable (
           VariableName,
           VendorGuid,
           Attributes OPTIONAL,
@@ -78,7 +78,7 @@ RuntimeServiceGetNextVariableName (
   IN OUT EFI_GUID  *VendorGuid
   )
 {
-  return GetNextVariableName (
+  return EmuGetNextVariableName (
           VariableNameSize,
           VariableName,
           VendorGuid,
@@ -115,7 +115,7 @@ RuntimeServiceSetVariable (
   IN VOID          *Data
   )
 {
-  return SetVariable (
+  return EmuSetVariable (
           VariableName,
           VendorGuid,
           Attributes,
@@ -155,7 +155,7 @@ RuntimeServiceQueryVariableInfo (
   OUT UINT64                 *MaximumVariableSize
   )
 {
-  return QueryVariableInfo (
+  return EmuQueryVariableInfo (
           Attributes,
           MaximumVariableStorageSize,
           RemainingVariableStorageSize,
