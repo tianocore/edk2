@@ -233,7 +233,7 @@ Ip4IsUnicast (
   IN IP4_ADDR               NetMask
   );
 
-extern IP4_ADDR gIp4AllMasks [IP4_MASK_NUM];
+extern IP4_ADDR gIp4AllMasks[IP4_MASK_NUM];
 
 
 extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
