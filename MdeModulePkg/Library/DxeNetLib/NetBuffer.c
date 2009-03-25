@@ -168,7 +168,7 @@ NetbufFreeVector (
     // isn't NULL. If NET_VECTOR_OWN_FIRST is set, release the
     // first block since it is allocated by us
     //
-    if (Vector->Flag & NET_VECTOR_OWN_FIRST) {
+    if ((Vector->Flag & NET_VECTOR_OWN_FIRST) != 0) {
       gBS->FreePool (Vector->Block[0].Bulk);
     }
 
@@ -978,7 +978,7 @@ NetbufFromBufList (
     NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
     for (Index = 0; Index < Nbuf->BlockOpNum; Index++) {
-      if (Nbuf->BlockOp[Index].Size) {
+      if (Nbuf->BlockOp[Index].Size != 0) {
         Fragment[Current].Bulk = Nbuf->BlockOp[Index].Head;
         Fragment[Current].Len  = Nbuf->BlockOp[Index].Size;
         Current++;
