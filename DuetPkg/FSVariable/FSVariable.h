@@ -107,7 +107,7 @@ VariableClassAddressChangeEvent (
 
 EFI_STATUS
 EFIAPI
-GetVariable (
+DuetGetVariable (
   IN      CHAR16            *VariableName,
   IN      EFI_GUID          *VendorGuid,
   OUT     UINT32            *Attributes OPTIONAL,
