@@ -496,7 +496,7 @@ TcpDeliverData (
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
     }
 
-    if (Nbuf->TotalSize) {
+    if (Nbuf->TotalSize != 0) {
       Urgent = 0;
 
       if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_URG) &&
@@ -1353,7 +1353,7 @@ StepSix:
 
   if ((Tcb->State != TCP_CLOSED) &&
       (TcpToSendData (Tcb, 0) == 0) &&
-      (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW) || Nbuf->TotalSize)) {
+      (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW) || (Nbuf->TotalSize != 0))) {
 
     TcpToSendAck (Tcb);
   }
