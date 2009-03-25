@@ -265,15 +265,6 @@ CallDeviceManager (
       );
   }
 
-  IfrLibUpdateForm (
-    HiiHandle,
-    &mDeviceManagerGuid,
-    DEVICE_MANAGER_FORM_ID,
-    LABEL_VBIOS,
-    FALSE,
-    &UpdateData[0]
-    );
-
   ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
   Status = gFormBrowser2->SendForm (
                            gFormBrowser2,
