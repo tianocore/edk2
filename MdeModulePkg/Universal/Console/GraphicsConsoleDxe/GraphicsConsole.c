@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2009 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,13 +47,13 @@ GRAPHICS_CONSOLE_DEV    mGraphicsConsoleDevTemplate = {
     { 100,31, 0, 0, 0, 0 },  // Mode 2
     {  0,  0, 0, 0, 0, 0 }   // Mode 3
   },
-  (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL,
-  (EFI_HII_HANDLE ) 0
+  (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL
 };
 
 EFI_HII_DATABASE_PROTOCOL   *mHiiDatabase;
 EFI_HII_FONT_PROTOCOL       *mHiiFont;
-BOOLEAN                     mFirstAccessFlag = TRUE;
+EFI_HII_HANDLE              mHiiHandle;
+EFI_EVENT                   mHiiRegistration;
 
 EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, {0xac, 0x8d, 0xd6, 0x1d, 0xfb, 0x7b, 0xc6, 0xad}};
 
@@ -234,7 +234,6 @@ GraphicsConsoleControllerDriverStart (
 {
   EFI_STATUS                           Status;
   GRAPHICS_CONSOLE_DEV                 *Private;
-  UINT32                               NarrowFontSize;
   UINT32                               HorizontalResolution;
   UINT32                               VerticalResolution;
   UINT32                               ColorDepth;
@@ -243,11 +242,6 @@ GraphicsConsoleControllerDriverStart (
   UINTN                                Columns;
   UINTN                                Rows;
   UINT32                               ModeNumber;
-  EFI_HII_SIMPLE_FONT_PACKAGE_HDR      *SimplifiedFont;
-  UINT32                               PackageLength;
-  EFI_HII_PACKAGE_LIST_HEADER          *PackageList;
-  UINT8                                *Package;
-  UINT8                                *Location;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    *Mode;
   ModeNumber = 0;
 
@@ -288,52 +282,6 @@ GraphicsConsoleControllerDriverStart (
     goto Error;
   }
 
-  NarrowFontSize  = mNarrowFontSize;
-
-  if (mFirstAccessFlag) {
-    //
-    // Add 4 bytes to the header for entire length for HiiLibPreparePackageList use only.
-    // Looks ugly. Might be updated when font tool is ready.
-    //
-    //    +--------------------------------+ <-- Package
-    //    |                                |
-    //    |    PackageLength(4 bytes)      |
-    //    |                                |
-    //    |--------------------------------| <-- SimplifiedFont
-    //    |                                |
-    //    |EFI_HII_SIMPLE_FONT_PACKAGE_HDR |
-    //    |                                |
-    //    |--------------------------------| <-- Location
-    //    |                                |
-    //    |     gUsStdNarrowGlyphData      |
-    //    |                                |
-    //    +--------------------------------+
-
-    PackageLength   = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + NarrowFontSize + 4;
-    Package = AllocateZeroPool (PackageLength);
-    if (Package == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    WriteUnaligned32((UINT32 *) Package,PackageLength);
-    SimplifiedFont = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR *) (Package + 4);
-    SimplifiedFont->Header.Length        = (UINT32) (PackageLength - 4);
-    SimplifiedFont->Header.Type          = EFI_HII_PACKAGE_SIMPLE_FONTS;
-    SimplifiedFont->NumberOfNarrowGlyphs = (UINT16) (NarrowFontSize / sizeof (EFI_NARROW_GLYPH));
-
-    Location = (UINT8 *) (&SimplifiedFont->NumberOfWideGlyphs + 1);
-    CopyMem (Location, gUsStdNarrowGlyphData, NarrowFontSize);
-
-    //
-    // Add this simplified font package to a package list then install it.
-    //
-    PackageList = HiiLibPreparePackageList (1, &mFontPackageListGuid, Package);
-    Status = mHiiDatabase->NewPackageList (mHiiDatabase, PackageList, NULL, &(Private->HiiHandle));
-    ASSERT_EFI_ERROR (Status);
-    FreePool (PackageList);
-    FreePool (Package);
-
-    mFirstAccessFlag = FALSE;
-  }
   //
   // If the current mode information can not be retrieved, then attempt to set the default mode
   // of 800x600, 32 bit color, 60 Hz refresh.
@@ -631,14 +579,6 @@ GraphicsConsoleControllerDriverStop (
             This->DriverBindingHandle,
             Controller
             );
-    }
-
-    //
-    // Remove the font pack
-    //
-    if (Private->HiiHandle != NULL) {
-      HiiLibRemovePackages (Private->HiiHandle);
-      mFirstAccessFlag = TRUE;
     }
 
     if (Private->LineBuffer != NULL) {
@@ -1907,6 +1847,71 @@ EraseCursor (
   return EFI_SUCCESS;
 }
 
+VOID
+EFIAPI
+RegisterFontPackage (
+  IN  EFI_EVENT       Event,
+  IN  VOID            *Context
+  )
+{
+  EFI_STATUS                           Status;
+  EFI_HII_SIMPLE_FONT_PACKAGE_HDR      *SimplifiedFont;
+  UINT32                               PackageLength;
+  EFI_HII_PACKAGE_LIST_HEADER          *PackageList;
+  UINT8                                *Package;
+  UINT8                                *Location;
+  EFI_HII_DATABASE_PROTOCOL            *HiiDatabase;
+
+  //
+  // Locate HII Database Protocol
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiDatabaseProtocolGuid,
+                  NULL,
+                  (VOID **) &HiiDatabase
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Add 4 bytes to the header for entire length for HiiLibPreparePackageList use only.
+  //
+  //    +--------------------------------+ <-- Package
+  //    |                                |
+  //    |    PackageLength(4 bytes)      |
+  //    |                                |
+  //    |--------------------------------| <-- SimplifiedFont
+  //    |                                |
+  //    |EFI_HII_SIMPLE_FONT_PACKAGE_HDR |
+  //    |                                |
+  //    |--------------------------------| <-- Location
+  //    |                                |
+  //    |     gUsStdNarrowGlyphData      |
+  //    |                                |
+  //    +--------------------------------+
+
+  PackageLength   = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + mNarrowFontSize + 4;
+  Package = AllocateZeroPool (PackageLength);
+  ASSERT (Package != NULL);
+
+  WriteUnaligned32((UINT32 *) Package,PackageLength);
+  SimplifiedFont = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR *) (Package + 4);
+  SimplifiedFont->Header.Length        = (UINT32) (PackageLength - 4);
+  SimplifiedFont->Header.Type          = EFI_HII_PACKAGE_SIMPLE_FONTS;
+  SimplifiedFont->NumberOfNarrowGlyphs = (UINT16) (mNarrowFontSize / sizeof (EFI_NARROW_GLYPH));
+
+  Location = (UINT8 *) (&SimplifiedFont->NumberOfWideGlyphs + 1);
+  CopyMem (Location, gUsStdNarrowGlyphData, mNarrowFontSize);
+
+  //
+  // Add this simplified font package to a package list then install it.
+  //
+  PackageList = HiiLibPreparePackageList (1, &mFontPackageListGuid, Package);
+  Status = HiiDatabase->NewPackageList (HiiDatabase, PackageList, NULL, &mHiiHandle);
+  ASSERT_EFI_ERROR (Status);
+  FreePool (PackageList);
+  FreePool (Package);
+}
+
 /**
   The user Entry Point for module GraphicsConsole. The user code starts with this function.
 
@@ -1925,6 +1930,17 @@ InitializeGraphicsConsole (
   )
 {
   EFI_STATUS              Status;
+
+  //
+  // Register notify function on HII Database Protocol to add font package.
+  // 
+  EfiCreateProtocolNotifyEvent (
+    &gEfiHiiDatabaseProtocolGuid,
+    TPL_CALLBACK,
+    RegisterFontPackage,
+    NULL,
+    &mHiiRegistration
+    );
 
   //
   // Install driver model protocol(s).

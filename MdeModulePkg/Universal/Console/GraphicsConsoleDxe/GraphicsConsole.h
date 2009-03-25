@@ -1,7 +1,7 @@
 /** @file
   Header file for GraphicsConsole driver.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -79,7 +79,6 @@ typedef struct {
   EFI_SIMPLE_TEXT_OUTPUT_MODE      SimpleTextOutputMode;
   GRAPHICS_CONSOLE_MODE_DATA       ModeData[GRAPHICS_MAX_MODE];
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *LineBuffer;
-  EFI_HII_HANDLE                   HiiHandle;
 } GRAPHICS_CONSOLE_DEV;
 
 #define GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS(a) \
