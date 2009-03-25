@@ -1536,7 +1536,7 @@ HiiGetLanguages (
       ) {
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
     ResultSize += AsciiStrSize (StringPackage->StringPkgHdr->Language);
-    if (ResultSize < *LanguagesSize) {
+    if (ResultSize <= *LanguagesSize) {
       AsciiStrCpy (Languages, StringPackage->StringPkgHdr->Language);
       Languages += AsciiStrSize (StringPackage->StringPkgHdr->Language);
       *(Languages - 1) = L';';
