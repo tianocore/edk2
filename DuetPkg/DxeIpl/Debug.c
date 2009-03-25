@@ -92,5 +92,10 @@ PrintString (
       mCursor += 2;
     }
   }
+  
+  //
+  // All information also output to serial port.
+  //
+  DebugSerialPrint (String);
 }
 
