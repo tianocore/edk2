@@ -532,7 +532,7 @@ IpIoTransmitHandlerDpc (
 
   IpIo      = SndEntry->IpIo;
 
-  if (IpIo->PktSentNotify && SndEntry->NotifyData) {
+  if ((IpIo->PktSentNotify != NULL) && (SndEntry->NotifyData != NULL)) {
     IpIo->PktSentNotify (
             SndEntry->SndToken->Status,
             SndEntry->Context,
