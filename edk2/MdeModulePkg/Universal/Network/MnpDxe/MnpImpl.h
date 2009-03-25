@@ -353,8 +353,8 @@ MnpAllocNbuf (
 /**
   Try to reclaim the Nbuf into the buffer pool.
 
-  @param[in,out]  MnpServiceData        Pointer to the mnp service context data.
-  @param[in,out]  Nbuf                  Pointer to the NET_BUF to free.
+  @param[in, out]  MnpServiceData        Pointer to the mnp service context data.
+  @param[in, out]  Nbuf                  Pointer to the NET_BUF to free.
 
 **/
 VOID
