@@ -87,23 +87,13 @@ InitializeUnicodeCollationSupportWorker (
     // Find the best matching matching language from the supported languages
     // of Unicode Collation (2) protocol. 
     //
-    if (Language == NULL) {
-      BestLanguage = GetBestLanguage (
-                       Uci->SupportedLanguages,
-                       Iso639Language,
-                       DefaultLanguage,
-                       NULL
-                       );
-    } else {
-      BestLanguage = GetBestLanguage (
-                       Uci->SupportedLanguages,
-                       Iso639Language,
-                       Language,
-                       Iso639Language,
-                       DefaultLanguage,
-                       NULL
-                       );
-    }
+    BestLanguage = GetBestLanguage (
+                     Uci->SupportedLanguages,
+                     Iso639Language,
+                     (Language == NULL) ? Language : "",
+                     DefaultLanguage,
+                     NULL
+                     );
     if (BestLanguage != NULL) {
       FreePool (BestLanguage);
       mUnicodeCollationInterface = Uci;
