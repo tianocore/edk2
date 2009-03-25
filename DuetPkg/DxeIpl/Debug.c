@@ -19,6 +19,7 @@ Revision History:
 **/
 
 #include "DxeIpl.h"
+#include "SerialStatusCode.h"
 
 UINT8 *mCursor;
 UINT8 mHeaderIndex = 10;
