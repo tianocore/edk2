@@ -2089,12 +2089,17 @@ HiiStringIdToImage (
 {
   EFI_STATUS                          Status;
   HII_DATABASE_PRIVATE_DATA           *Private;
+  EFI_HII_STRING_PROTOCOL             *HiiString;
   EFI_STRING                          String;
   UINTN                               StringSize;
   UINTN                               FontLen;
   EFI_FONT_INFO                       *StringFontInfo;
   EFI_FONT_DISPLAY_INFO               *NewStringInfo;
-  CHAR8                               CurrentLang[RFC_3066_ENTRY_SIZE];
+  CHAR8                               TempSupportedLanguages;
+  CHAR8                               *SupportedLanguages;
+  UINTN                               SupportedLanguagesSize;
+  CHAR8                               *CurrentLanguage;
+  CHAR8                               *BestLanguage;
 
   if (This == NULL || PackageList == NULL || Blt == NULL || PackageList == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2105,57 +2110,104 @@ HiiStringIdToImage (
   }
 
   //
-  // When Language points to NULL, current system language is used.
+  // Initialize string pointers to be NULL
   //
-  if (Language != NULL) {
-    AsciiStrCpy (CurrentLang, (CHAR8 *) Language);
-  } else {
-    GetCurrentLanguage (CurrentLang);
-  }
+  SupportedLanguages = NULL;
+  CurrentLanguage    = NULL;
+  BestLanguage       = NULL;
+  String             = NULL;
+  StringInfo         = NULL;
+  StringFontInfo     = NULL;
+  NewStringInfo      = NULL;
 
   //
   // Get the string to be displayed.
   //
+  Private   = HII_FONT_DATABASE_PRIVATE_DATA_FROM_THIS (This);
+  HiiString = &Private->HiiString;
 
-  StringSize = MAX_STRING_LENGTH;
-  String = (EFI_STRING) AllocateZeroPool (StringSize);
-  if (String == NULL) {
+  //
+  // Get the size of supported language.
+  //
+  SupportedLanguagesSize = 0;
+  Status = HiiString->GetLanguages (
+                        HiiString,
+                        PackageList,
+                        &TempSupportedLanguages,
+                        &SupportedLanguagesSize
+                        );
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return Status;
+  }
+
+  SupportedLanguages = AllocatePool (SupportedLanguagesSize);
+  if (SupportedLanguages == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Private        = HII_FONT_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-  StringFontInfo = NULL;
-  NewStringInfo  = NULL;
-  
-  Status = Private->HiiString.GetString (
-                                &Private->HiiString,
-                                CurrentLang,
-                                PackageList,
-                                StringId,
-                                String,
-                                &StringSize,
-                                &StringFontInfo
-                                );
+  Status = HiiString->GetLanguages (
+                        HiiString,
+                        PackageList,
+                        SupportedLanguages,
+                        &SupportedLanguagesSize
+                        );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+ 
+  if (Language == NULL) {
+    Language = "";
+  }
+  CurrentLanguage = GetEfiGlobalVariable (L"PlatformLang");
+  BestLanguage = GetBestLanguage (
+                   SupportedLanguages,
+                   FALSE,
+                   Language,
+                   (CurrentLanguage == NULL) ? CurrentLanguage : "",
+                   (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang),
+                   NULL
+                   );
+  if (BestLanguage == NULL) {
+    Status = EFI_NOT_FOUND;
+    goto Exit;
+  }
+    
+  StringSize = MAX_STRING_LENGTH;
+  String = (EFI_STRING) AllocateZeroPool (StringSize);
+  if (String == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  Status = HiiString->GetString (
+                        HiiString,
+                        BestLanguage,
+                        PackageList,
+                        StringId,
+                        String,
+                        &StringSize,
+                        &StringFontInfo
+                        );
   if (Status == EFI_BUFFER_TOO_SMALL) {
     FreePool (String);
     String = (EFI_STRING) AllocateZeroPool (StringSize);
     if (String == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
     }
-    Status = Private->HiiString.GetString (
-                                  &Private->HiiString,
-                                  Language,
-                                  PackageList,
-                                  StringId,
-                                  String,
-                                  &StringSize,
-                                  NULL
-                                  );
-
+    Status = HiiString->GetString (
+                          HiiString,
+                          BestLanguage,
+                          PackageList,
+                          StringId,
+                          String,
+                          &StringSize,
+                          NULL
+                          );
   }
 
   if (EFI_ERROR (Status)) {
-      goto Exit;
+    goto Exit;
   }
     
   //
@@ -2204,6 +2256,15 @@ HiiStringIdToImage (
            );
 
 Exit:
+  if (SupportedLanguages != NULL) {
+    FreePool (SupportedLanguages);
+  }
+  if (CurrentLanguage != NULL) {
+    FreePool (CurrentLanguage);
+  }
+  if (BestLanguage != NULL) {
+    FreePool (BestLanguage);
+  }
   if (String != NULL) {
     FreePool (String);
   }
