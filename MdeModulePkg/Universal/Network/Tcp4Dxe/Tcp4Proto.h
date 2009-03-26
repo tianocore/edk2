@@ -259,8 +259,8 @@ struct _TCP_CB {
   // configuration for tcp provided by user
   //
   BOOLEAN           UseDefaultAddr;
-  UINT8             TOS;
-  UINT8             TTL;
+  UINT8             Tos;
+  UINT8             Ttl;
   EFI_IPv4_ADDRESS  SubnetMask;
 
   IP_IO_IP_INFO     *IpInfo;        ///<pointer reference to Ip used to send pkt

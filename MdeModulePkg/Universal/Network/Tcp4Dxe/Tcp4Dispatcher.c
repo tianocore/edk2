@@ -96,8 +96,8 @@ Tcp4GetMode (
     AccessPoint                     = &(ConfigData->AccessPoint);
     Option                          = ConfigData->ControlOption;
 
-    ConfigData->TypeOfService       = Tcb->TOS;
-    ConfigData->TimeToLive          = Tcb->TTL;
+    ConfigData->TypeOfService       = Tcb->Tos;
+    ConfigData->TimeToLive          = Tcb->Ttl;
 
     AccessPoint->UseDefaultAddress  = Tcb->UseDefaultAddr;
 
@@ -424,8 +424,8 @@ Tcp4ConfigurePcb (
   //
   // initialize Tcb in the light of CfgData
   //
-  Tcb->TTL            = CfgData->TimeToLive;
-  Tcb->TOS            = CfgData->TypeOfService;
+  Tcb->Ttl            = CfgData->TimeToLive;
+  Tcb->Tos            = CfgData->TypeOfService;
 
   Tcb->UseDefaultAddr = CfgData->AccessPoint.UseDefaultAddress;
 
