@@ -1582,7 +1582,7 @@ typedef struct {
   ///
   /// Bit-mapped list describing the capsule attributes. The Flag values
   /// of 0x0000 - 0xFFFF are defined by CapsuleGuid. Flag values
-  /// of 0x10000 - 0xFFFF0000 are defined by this specification
+  /// of 0x10000 - 0xFFFFFFFF are defined by this specification
   ///
   UINT32            Flags;
   ///
@@ -1628,8 +1628,9 @@ typedef struct {
   @retval EFI_SUCCESS           Valid capsule was passed. If
                                 CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set, the
                                 capsule has been successfully processed by the firmware.
+  @retval EFI_INVALID_PARAMETER CapsuleSize or HeaderSize is NULL.
+  @retval EFI_INVALID_PARAMETER CapsuleCount is 0.
   @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
-  @retval EFI_INVALID_PARAMETER CapsuleSize is NULL.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform.
   @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the capsule.
 
