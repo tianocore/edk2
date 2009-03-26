@@ -32,24 +32,22 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
   ChildHandle is NULL the driver is requesting information from
   the platform about the ControllerHandle that is being started.
   Information returned from Query may lead to the drivers Start()
-  function failing. If the UEFI driver is a bus driver and
-  producing a ChildHandle the driver must call Query after the
-  child handle has been created and an EFI_DEVICE_PATH_PROTOCOL
-  has been placed on that handle, but before any time consuming
-  operation is performed. If information return by Query may lead
-  the driver to decide to not create the ChildHandle. The driver
-  must then cleanup and remove the ChildHandle from the system.
-  The UEFI driver repeatedly calls Query, processes the
-  information returned by the platform, and calls Response passing
-  in the arguments returned from Query. The Instance value passed
-  into Response must be the same value returned from the
-  corresponding call to Query. The UEFI driver must continuously
-  call Query and Response until EFI_NOT_FOUND is returned by
-  Query. The only value of Instance that has meaning to the UEFI
-  driver is zero. An Instance value of zero means return the first
-  ParameterBlock in the set of unprocessed parameter blocks. If a
-  ParameterBlock has been processed via a Query and corresponding
-  Response call it must not be returned again via a Query call.
+  function failing.
+  If the UEFI driver is a bus driver and producing a ChildHandle
+  the driver must call Query after the child handle has been created
+  and an EFI_DEVICE_PATH_PROTOCOL has been placed on that handle,
+  but before any time consuming operation is performed. If information
+  return by Query may lead the driver to decide to not create the
+  ChildHandle. The driver must then cleanup and remove the ChildHandle
+  from the system.
+  The UEFI driver repeatedly calls Query, processes the information
+  returned by the platform, and calls Response passing in the
+  arguments returned from Query. The Instance value passed into
+  Response must be the same value passed into the corresponding
+  call to Query.
+  An Instance value of zero means return the first ParameterBlock
+  in the set of unprocessed parameter blocks. The driver should
+  increment the Instance value by one for each successive call to Query.
 
   @param This                 A pointer to the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL instance.
   
@@ -66,18 +64,16 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
                               options for one of its child controllers.
   
   
-  @param Instance             Pointer to the Instance value. On output the
-                              instance associated with the parameter data
-                              return. On input zero means return the first
-                              query data or pass in a valid instance
-                              number returned from a previous call to
-                              Query.
+  @param Instance             Pointer to the Instance value. Zero means
+                              return the first query data. The caller should
+                              increment this value by one each time to retrieve
+                              successive data.
 
-  @param ParameterTypeGuid    An EFI_GUID that defines the
-                              contents of ParameterBlock. UEFI
-                              drivers must use the
-                              ParameterTypeGuid to determine how
-                              to parser the ParameterBlock.
+  @param ParameterTypeGuid    An EFI_GUID that defines the contents
+                              of ParameterBlock. UEFI drivers must
+                              use the ParameterTypeGuid to determine
+                              how to parse the ParameterBlock. The caller
+                              should not attempt to free ParameterTypeGuid.
 
   @param ParameterBlock       The platform returns a pointer to the
                               ParameterBlock structure which
@@ -127,10 +123,10 @@ EFI_STATUS
   IN CONST  EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL *This,
   IN CONST  EFI_HANDLE  ControllerHandle,
   IN CONST  EFI_HANDLE  ChildHandle OPTIONAL,
-  IN OUT    UINTN       *Instance,
-  IN OUT    EFI_GUID    **ParameterTypeGuid,
-  IN OUT    VOID        **ParameterBlock,
-  IN OUT    UINTN       *ParameterBlockSize
+  IN CONST  UINTN       *Instance,
+  OUT       EFI_GUID    **ParameterTypeGuid,
+  OUT       VOID        **ParameterBlock,
+  OUT       UINTN       *ParameterBlockSize
 );
 
 typedef enum {
@@ -220,6 +216,8 @@ typedef enum {
                             options for one of its child controllers.
                             Instance Instance data returned from
                             Query().
+
+  @param Instance           Instance data passed to Query().
 
   @param ParameterTypeGuid  ParameterTypeGuid returned from Query.
 
