@@ -60,6 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   IScsiConfig.c
   IScsiConfig.h
   IScsiImpl.h
+  IScsiConfigNVDataStruc.h
 
 [Packages]
   MdePkg/MdePkg.dec

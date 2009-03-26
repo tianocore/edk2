@@ -415,10 +415,10 @@ typedef struct _ISCSI_LOGIN_REQUEST {
   UINT8   VersionMin;
   UINT8   TotalAHSLength;
   UINT8   DataSegmentLength[3];
-  UINT8   ISID[6];
-  UINT16  TSIH;
+  UINT8   Isid[6];
+  UINT16  Tsih;
   UINT32  InitiatorTaskTag;
-  UINT16  CID;
+  UINT16  Cid;
   UINT16  Reserved1;
   UINT32  CmdSN;
   UINT32  ExpStatSN;
@@ -443,8 +443,8 @@ typedef struct _ISCSI_LOGIN_RESPONSE {
   UINT8   VersionActive;
   UINT8   TotalAHSLength;
   UINT8   DataSegmentLength[3];
-  UINT8   ISID[6];
-  UINT16  TSIH;
+  UINT8   Isid[6];
+  UINT16  Tsih;
   UINT32  InitiatorTaskTag;
   UINT32  Reserved1;
   UINT32  StatSN;
@@ -470,7 +470,7 @@ typedef struct _ISCSI_LOGOUT_REQUEST {
   UINT8   DataSegmentLength[3];
   UINT32  Reserved2[2];
   UINT32  InitiatorTaskTag;
-  UINT16  CID;
+  UINT16  Cid;
   UINT16  Reserved3;
   UINT32  CmdSN;
   UINT32  ExpStatSN;

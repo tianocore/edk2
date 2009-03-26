@@ -205,7 +205,7 @@ IScsiCreateConnection (
   Conn->ExpStatSN       = 0;
   Conn->PartialReqSent  = FALSE;
   Conn->PartialRspRcvd  = FALSE;
-  Conn->CID             = Session->NextCID++;
+  Conn->Cid             = Session->NextCid++;
 
   Status = gBS->CreateEvent (
                   EVT_TIMER,
@@ -501,9 +501,9 @@ IScsiPrepareLoginReq (
   ISCSI_SET_STAGES (LoginReq, Conn->CurrentStage, Conn->NextStage);
   LoginReq->VersionMax        = ISCSI_VERSION_MAX;
   LoginReq->VersionMin        = ISCSI_VERSION_MIN;
-  LoginReq->TSIH              = HTONS (Session->TSIH);
+  LoginReq->Tsih              = HTONS (Session->Tsih);
   LoginReq->InitiatorTaskTag  = HTONL (Session->InitiatorTaskTag);
-  LoginReq->CID               = HTONS (Conn->CID);
+  LoginReq->Cid               = HTONS (Conn->Cid);
   LoginReq->CmdSN             = HTONL (Session->CmdSN);
 
   //
@@ -514,7 +514,7 @@ IScsiPrepareLoginReq (
   // with their increasing StatSN values.
   //
   LoginReq->ExpStatSN = HTONL (Conn->ExpStatSN);
-  CopyMem (LoginReq->ISID, Session->ISID, sizeof (LoginReq->ISID));
+  CopyMem (LoginReq->Isid, Session->Isid, sizeof (LoginReq->Isid));
 
   if (Conn->PartialRspRcvd) {
     //
@@ -655,7 +655,7 @@ IScsiProcessLoginRsp (
       (CurrentStage != Conn->CurrentStage) ||
       (!Conn->TransitInitiated && Transit) ||
       (Transit && (NextStage != Conn->NextStage)) ||
-      (CompareMem (Session->ISID, LoginRsp->ISID, sizeof (LoginRsp->ISID)) != 0) ||
+      (CompareMem (Session->Isid, LoginRsp->Isid, sizeof (LoginRsp->Isid)) != 0) ||
       (LoginRsp->InitiatorTaskTag != Session->InitiatorTaskTag)
       ) {
     //
@@ -753,7 +753,7 @@ IScsiProcessLoginRsp (
       // CurrentStage is iSCSI Full Feature, it's the Login-Final Response,
       // get the TSIH from the Login Response.
       //
-      Session->TSIH = NTOHS (LoginRsp->TSIH);
+      Session->Tsih = NTOHS (LoginRsp->Tsih);
     }
   }
   //
@@ -2673,22 +2673,22 @@ IScsiSessionInit (
 
     Random              = NET_RANDOM (NetRandomInitSeed ());
 
-    Session->ISID[0]    = ISID_BYTE_0;
-    Session->ISID[1]    = ISID_BYTE_1;
-    Session->ISID[2]    = ISID_BYTE_2;
-    Session->ISID[3]    = ISID_BYTE_3;
-    Session->ISID[4]    = (UINT8) Random;
-    Session->ISID[5]    = (UINT8) (Random >> 8);
+    Session->Isid[0]    = ISID_BYTE_0;
+    Session->Isid[1]    = ISID_BYTE_1;
+    Session->Isid[2]    = ISID_BYTE_2;
+    Session->Isid[3]    = ISID_BYTE_3;
+    Session->Isid[4]    = (UINT8) Random;
+    Session->Isid[5]    = (UINT8) (Random >> 8);
 
     InitializeListHead (&Session->Conns);
     InitializeListHead (&Session->TcbList);
   }
 
-  Session->TSIH                 = 0;
+  Session->Tsih                 = 0;
 
   Session->CmdSN                = 1;
   Session->InitiatorTaskTag     = 1;
-  Session->NextCID              = 1;
+  Session->NextCid              = 1;
 
   Session->TargetPortalGroupTag = 0;
   Session->MaxConnections       = ISCSI_MAX_CONNS_PER_SESSION;

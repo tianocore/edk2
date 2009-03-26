@@ -50,15 +50,15 @@ struct _ISCSI_SESSION {
   UINTN                     InitiatorNameLength;
   UINT8                     State;
 
-  UINT8                     ISID[6];
-  UINT16                    TSIH;
+  UINT8                     Isid[6];
+  UINT16                    Tsih;
 
   UINT32                    CmdSN;
   UINT32                    ExpCmdSN;
   UINT32                    MaxCmdSN;
 
   UINT32                    InitiatorTaskTag;
-  UINT16                    NextCID;
+  UINT16                    NextCid;
 
   LIST_ENTRY                Conns;
   UINT32                    NumConns;
@@ -103,7 +103,7 @@ struct _ISCSI_CONNECTION {
 
   BOOLEAN           TransitInitiated;
 
-  UINT16            CID;
+  UINT16            Cid;
   UINT32            ExpStatSN;
 
   //
