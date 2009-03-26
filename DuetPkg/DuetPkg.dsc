@@ -13,20 +13,16 @@
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
-  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
-  ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
@@ -45,66 +41,30 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   OemHookStatusCodeLib|IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
-  PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   TimerLib|DuetPkg/Library/DuetTimerLib/DuetTimerLib.inf
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-
-[LibraryClasses.common.DXE_DRIVER]
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-
+  
+  #
+  # To save size, use NULL library for DebugLib and ReportStatusCodeLib.
+  # If need status code output, do library instance overriden as below DxeMain.inf does
+  #
+  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+  
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
-  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-  ReportStatusCodeLib|DuetPkg/Library/DxeCoreReportStatusCodeLibFromHob/DxeCoreReportStatusCodeLibFromHob.inf
-  SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
 
-
-[LibraryClasses.common.DXE_RUNTIME_DRIVER]
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-
-[LibraryClasses.common.UEFI_DRIVER]
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-
-[LibraryClasses.common.UEFI_APPLICATION]
-  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-  SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
-
 [PcdsFixedAtBuild]
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
-
-[PcdsPatchableInModule]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000042
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
-  gEfiSioTokenSpaceGuid.PcdSerialRegisterBase|0x3F8
-  gEfiSioTokenSpaceGuid.PcdSerialLineControl|0x07
-  gEfiSioTokenSpaceGuid.PcdSerialBoudRate|115200
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
-
-[PcdsFeatureFlag]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|TRUE
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x0
 
 ###################################################################################################
 #
@@ -129,9 +89,20 @@
   DuetPkg/DxeIpl/DxeIpl.inf {
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   }
 
-  MdeModulePkg/Core/Dxe/DxeMain.inf
+  MdeModulePkg/Core/Dxe/DxeMain.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000042
+    <LibraryClasses>
+      DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+      ReportStatusCodeLib|DuetPkg/Library/DxeCoreReportStatusCodeLibFromHob/DxeCoreReportStatusCodeLibFromHob.inf
+      SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
+  }
+  
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -141,7 +112,6 @@
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf {
     <LibraryClasses>
@@ -202,6 +172,11 @@
   # Bios Thunk
   DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
+  #
+  # Sample Application
+  #
+  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  
 [Components.IA32]
   DuetPkg/BootSector/BootSector.inf
 

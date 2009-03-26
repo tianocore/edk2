@@ -61,7 +61,6 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -121,45 +120,35 @@ INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   # Binary INF file to support toggle among different CPU architectures.
 INF  FatBinPkg/EnhancedFatDxe/Fat.inf
 
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
-    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-  }
+#FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+#    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
+#  }
 
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
       PE32     PE32           |.efi
-      UI       STRING="$(MODULE_NAME)" Optional
-      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.UEFI_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      |.depex
         PE32     PE32                    |.efi
-        UI       STRING="$(MODULE_NAME)" Optional
-        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.DXE_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      |.depex
         PE32     PE32                    |.efi
-        UI       STRING="$(MODULE_NAME)" Optional
-        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.DXE_RUNTIME_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      |.depex
         PE32     PE32                    |.efi
-        UI       STRING="$(MODULE_NAME)" Optional
-        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
         PE32     PE32                    |.efi
-        UI       STRING="$(MODULE_NAME)" Optional
-        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
