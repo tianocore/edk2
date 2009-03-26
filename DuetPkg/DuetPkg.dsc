@@ -88,11 +88,20 @@
 [Components.common]
   DuetPkg/DxeIpl/DxeIpl.inf {
     <LibraryClasses>
-      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      #
+      # If no following overriden for ReportStatusCodeLib library class, 
+      # All other module can *not* output debug information even they are use not NULL library
+      # instance for DebugLib and ReportStatusCodeLib
+      #
       ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   }
 
   MdeModulePkg/Core/Dxe/DxeMain.inf {
+    #
+    # Enable debug output for DxeCore module, this is a sample for how to enable debug output
+    # for a module. If need turn on debug output for other module, please copy following overriden
+    # PCD and library instance to other module's override section.
+    #
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
