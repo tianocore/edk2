@@ -248,10 +248,8 @@ UcNotificationEvent (
     //
     // Fill in rest of private data structure
     //
-    Private->UC2.SupportedLanguages = AllocateZeroPool (RFC_3066_ENTRY_SIZE);
-    Status = ConvertIso639LanguageToRfc3066Language (Private->UC->SupportedLanguages, Private->UC2.SupportedLanguages);
-
-    if (!EFI_ERROR (Status)) {
+    Private->UC2.SupportedLanguages = ConvertIso639LanguageToRfc3066Language (Private->UC->SupportedLanguages);
+    if (Private->UC2.SupportedLanguages != NULL) {
 
       //
       // Install Firmware Volume Protocol onto same handle
