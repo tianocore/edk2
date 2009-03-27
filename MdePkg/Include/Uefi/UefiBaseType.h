@@ -18,7 +18,7 @@
 #include <Base.h>
 
 //
-// Basical data type definitions introduced in UEFI.
+// Basic data type definitions introduced in UEFI.
 //
 
 ///
@@ -178,12 +178,6 @@ typedef union {
 #define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
 
 ///
-/// Limited buffer size for a language code recommended by RFC3066
-/// (42 characters plus a NULL terminator)
-///
-#define RFC_3066_ENTRY_SIZE             (42 + 1)
-
-///
 /// PE32+ Machine type for IA32 UEFI images
 ///
 #define EFI_IMAGE_MACHINE_IA32      0x014C
@@ -228,7 +222,7 @@ typedef union {
 #elif defined (MDE_CPU_EBC)
 
 ///
-/// This is just to make sure you can cross compile with the EBC compiiler.
+/// This is just to make sure you can cross compile with the EBC compiler.
 /// It does not make sense to have a PE loader coded in EBC. You need to 
 /// understand the basic 
 ///
