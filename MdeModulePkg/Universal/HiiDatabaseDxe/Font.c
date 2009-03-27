@@ -2545,7 +2545,11 @@ HiiGetFontInfo (
       goto Exit;
     }
   }
-
+  
+  //
+  // StringInfoIn must not be NULL if it is not system default font info.
+  //
+  ASSERT (StringInfoIn != NULL);
   //
   // Check the font information mask to make sure it is valid.
   //
