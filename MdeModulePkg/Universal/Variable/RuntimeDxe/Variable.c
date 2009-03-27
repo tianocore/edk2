@@ -1716,7 +1716,7 @@ RuntimeServiceQueryVariableInfo (
   //
   // Now walk through the related variable store.
   //
-  while (IsValidVariableHeader (Variable) && (Variable < GetEndPointer (VariableStoreHeader))) {
+  while ((Variable < GetEndPointer (VariableStoreHeader)) && IsValidVariableHeader (Variable)) {
     NextVariable = GetNextVariablePtr (Variable);
     VariableSize = (UINT64) (UINTN) NextVariable - (UINT64) (UINTN) Variable;
 
