@@ -787,8 +787,6 @@ ConSpliterUgaDrawSetMode (
   //
   for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
 
-    ReturnStatus = EFI_UNSUPPORTED;
-
     GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
     if (GraphicsOutput != NULL) {
       //
