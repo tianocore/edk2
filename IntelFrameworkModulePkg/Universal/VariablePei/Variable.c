@@ -463,7 +463,7 @@ FindVariable (
   PtrTrack->StartPtr  = IndexTable->StartPtr;
   PtrTrack->EndPtr    = IndexTable->EndPtr;
 
-  while (IsValidVariableHeader (Variable) && (Variable <= IndexTable->EndPtr)) {
+  while ((Variable < IndexTable->EndPtr) && IsValidVariableHeader (Variable)) {
     if (Variable->State == VAR_ADDED) {
       //
       // Record Variable in VariableIndex HOB
