@@ -553,10 +553,15 @@ ConvertIso639LanguageToRfc3066Language (
   )
 {
   UINTN Index;
+  CHAR8 *Rfc3066Language;
   
   for (Index = 0; Iso639ToRfc3066ConversionTable[Index] != 0; Index += 5) {
     if (CompareMem (LanguageIso639, &Iso639ToRfc3066ConversionTable[Index], 3) == 0) {
-      return AllocateCopyPool (2, &Iso639ToRfc3066ConversionTable[Index + 3]);
+      Rfc3066Language = AllocateZeroPool (3);
+      if (Rfc3066Language != NULL) {
+        Rfc3066Language = CopyMem (Rfc3066Language, &Iso639ToRfc3066ConversionTable[Index + 3], 2);
+      }
+      return Rfc3066Language;
     }
   }
 
