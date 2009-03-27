@@ -312,7 +312,7 @@ LangCodes3066To639 (
   )
 {
   CHAR8                      *AsciiLangCodes;
-  CHAR8                      Lang[RFC_3066_ENTRY_SIZE];
+  CHAR8                      *Lang;
   UINTN                      Index;
   UINTN                      Count;
   EFI_STATUS                 Status;
@@ -320,6 +320,14 @@ LangCodes3066To639 (
   ASSERT (LangCodes3066 != NULL);
   ASSERT (LangCodes639 != NULL);
   
+  //
+  // Allocate working buffer to contain substring of LangCodes3066.
+  //
+  Lang = AllocatePool (AsciiStrSize (LangCodes3066));
+  if (Lang != NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   //
   // Count the number of RFC 3066 language codes.
   //
@@ -337,7 +345,8 @@ LangCodes3066To639 (
   //
   *LangCodes639 = AllocateZeroPool (ISO_639_2_ENTRY_SIZE * Count + 1);
   if (*LangCodes639 == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
   }
 
   AsciiLangCodes = LangCodes3066;
@@ -348,7 +357,11 @@ LangCodes3066To639 (
     ASSERT_EFI_ERROR (Status);
   }
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Done:
+  FreePool (Lang);
+  return Status;
 }
 
 /**
@@ -454,9 +467,9 @@ HiiGetSecondaryLanguages (
   OUT EFI_STRING                    *LanguageString
   )
 {
-  HII_THUNK_PRIVATE_DATA *Private;
+  HII_THUNK_PRIVATE_DATA     *Private;
   EFI_HII_HANDLE             UefiHiiHandle;
-  CHAR8                      PrimaryLang3066[RFC_3066_ENTRY_SIZE];
+  CHAR8                      *PrimaryLang3066;
   CHAR8                      *PrimaryLang639;
   CHAR8                      *SecLangCodes3066;
   CHAR8                      *SecLangCodes639;
@@ -465,8 +478,9 @@ HiiGetSecondaryLanguages (
 
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  SecLangCodes639         = NULL;
-  SecLangCodes3066        = NULL;
+  SecLangCodes639        = NULL;
+  SecLangCodes3066       = NULL;
+  PrimaryLang3066        = NULL;
   UnicodeSecLangCodes639 = NULL;
 
   UefiHiiHandle = FwHiiHandleToUefiHiiHandle (Private, Handle);
@@ -482,8 +496,8 @@ HiiGetSecondaryLanguages (
 
   UnicodeStrToAsciiStr (PrimaryLanguage, PrimaryLang639);
 
-  Status = ConvertIso639LanguageToRfc3066Language (PrimaryLang639, PrimaryLang3066);
-  ASSERT_EFI_ERROR (Status);
+  PrimaryLang3066 = ConvertIso639LanguageToRfc3066Language (PrimaryLang639);
+  ASSERT_EFI_ERROR (PrimaryLang3066 != NULL);
 
   SecLangCodes3066 = HiiLibGetSupportedSecondaryLanguages (UefiHiiHandle, PrimaryLang3066);
 
@@ -512,9 +526,15 @@ Done:
   if (PrimaryLang639 != NULL) {
     FreePool (PrimaryLang639);
   }
+
   if (SecLangCodes639 != NULL) {
     FreePool (SecLangCodes639);
   }
+
+  if (PrimaryLang3066 != NULL) {
+    FreePool (PrimaryLang3066);
+  }
+
   if (SecLangCodes3066 != NULL) {
     FreePool (SecLangCodes3066);
   }
