@@ -130,7 +130,7 @@ HiiLibGetSupportedLanguageNumber (
   CHAR8   *Languages;
   CHAR8   *LanguageString;
   UINT16  LangNumber;
-  CHAR8   Lang[RFC_3066_ENTRY_SIZE];
+  CHAR8   *Lang;
 
   Languages = HiiLibGetSupportedLanguages (HiiHandle);
   if (Languages == NULL) {
@@ -138,10 +138,15 @@ HiiLibGetSupportedLanguageNumber (
   }
 
   LangNumber = 0;
-  LanguageString = Languages;
-  while (*LanguageString != 0) {
-    HiiLibGetNextLanguage (&LanguageString, Lang);
-    LangNumber++;
+  Lang = AllocatePool (AsciiStrSize (Languages));
+  if (Lang != NULL) {
+    LanguageString = Languages;
+    while (*LanguageString != 0) {
+      HiiLibGetNextLanguage (&LanguageString, Lang);
+      LangNumber++;
+    }
+
+    FreePool (Lang);
   }
   FreePool (Languages);
 
@@ -201,52 +206,6 @@ HiiLibGetSupportedSecondaryLanguages (
   }
 
   return LanguageString;
-}
-
-
-/**
-  Determine what is the current language setting. The space reserved for Lang
-  must be at least RFC_3066_ENTRY_SIZE bytes;
-
-  If Lang is NULL, then ASSERT.
-
-  @param  Lang                   Pointer of system language. Lang will always be filled with 
-                                 a valid RFC 3066 language string. If "PlatformLang" is not
-                                 set in the system, the default language specifed by PcdUefiVariableDefaultPlatformLang
-                                 is returned.
-
-  @return  EFI_SUCCESS     If the EFI Variable with "PlatformLang" is set and return in Lang.
-  @return  EFI_NOT_FOUND If the EFI Variable with "PlatformLang" is not set, but a valid default language is return in Lang.
-
-**/
-EFI_STATUS
-EFIAPI
-GetCurrentLanguage (
-  OUT     CHAR8               *Lang
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       Size;
-
-  ASSERT (Lang != NULL);
-
-  //
-  // Get current language setting
-  //
-  Size = RFC_3066_ENTRY_SIZE;
-  Status = gRT->GetVariable (
-                  L"PlatformLang",
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &Size,
-                  Lang
-                  );
-
-  if (EFI_ERROR (Status)) {
-    AsciiStrCpy (Lang, (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang));
-  }
-
-  return Status;
 }
 
 
