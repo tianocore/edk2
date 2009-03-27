@@ -148,11 +148,11 @@ typedef enum {
 
 typedef enum{
   ///
-  /// A DHCPDISCOVER packet is about to be sent.
+  /// The packet to start the configuration sequence is about to be sent.
   ///
   Dhcp4SendDiscover   = 0x01,
   ///
-  /// A DHCPOFFER packet was just received.
+  /// A reply packet was just received.
   ///
   Dhcp4RcvdOffer      = 0x02,
   ///
@@ -225,8 +225,11 @@ typedef enum{
   @param  NewPacket             The packet that is used to replace the above Packet.
 
   @retval EFI_SUCCESS           Tells the EFI DHCPv4 Protocol driver to continue the DHCP process.
+                                When it is in the Dhcp4Selecting state, it tells the EFI DHCPv4 Protocol
+                                driver to stop collecting additional packets. The driver will exit
+                                the Dhcp4Selecting state and enter the Dhcp4Requesting state.
   @retval EFI_NOT_READY         Only used in the Dhcp4Selecting state. The EFI DHCPv4 Protocol
-                                driver will continue to wait for more DHCPOFFER packets until the retry
+                                driver will continue to wait for more packets until the retry
                                 timeout expires.
   @retval EFI_ABORTED           Tells the EFI DHCPv4 Protocol driver to abort the current process and
                                 return to the Dhcp4Init or Dhcp4InitReboot state.
@@ -245,32 +248,35 @@ EFI_STATUS
 
 typedef struct {
   ///
-  /// Number of times to try sending DHCPDISCOVER packets and 
-  /// waiting for DHCPOFFER packets before accepting failure.
+  /// Number of times to try sending a packet during the Dhcp4SendDiscover
+  /// event and waiting for a response during the Dhcp4RcvdOffer event.
   /// Set to zero to use the default try counts and timeout values.
   ///
   UINT32                      DiscoverTryCount;
   ///
-  /// Maximum amount of time (in seconds) to wait for DHCPOFFER packets in each 
+  /// Maximum amount of time (in seconds) to wait for returned packets in each 
   /// of the retries. Timeout values of zero will default to a timeout value 
   /// of one second. Set to NULL to use default timeout values.
   ///
   UINT32                      *DiscoverTimeout;
   ///
-  /// Number of times to try sending DHCPREQUEST packets and waiting for DHCPACK 
-  /// packets before accepting failure. Set to zero to use the default try counts and timeout values.
+  /// Number of times to try sending a packet during the Dhcp4SendRequest event
+  /// and waiting for a response during the Dhcp4RcvdAck event before accepting
+  /// failure. Set to zero to use the default try counts and timeout values.
   ///
   UINT32                      RequestTryCount;
   ///
-  /// Maximum amount of time (in seconds) to wait for DHCPACK packets in each of the retries. 
+  /// Maximum amount of time (in seconds) to wait for return packets in each of the retries. 
   /// Timeout values of zero will default to a timeout value of one second. 
   /// Set to NULL to use default timeout values.
   ///
   UINT32                      *RequestTimeout;
   ///
-  /// Setting this parameter to the previously allocated IP address will cause 
-  /// the EFI DHCPv4 Protocol driver to enter the Dhcp4InitReboot state. 
-  /// Set this field to 0.0.0.0 to enter the Dhcp4Init state.
+  /// For a DHCPDISCOVER, setting this parameter to the previously allocated IP
+  /// address will cause the EFI DHCPv4 Protocol driver to enter the Dhcp4InitReboot state. 
+  /// And set this field to 0.0.0.0 to enter the Dhcp4Init state.
+  /// For a DHCPINFORM this parameter should be set to the client network address
+  /// which was assigned to the client during a DHCPDISCOVER.
   ///
   EFI_IPv4_ADDRESS            ClientAddress;
   ///
@@ -287,8 +293,11 @@ typedef struct {
   ///
   UINT32                      OptionCount;
   ///
-  /// List of DHCP options to be included in every DHCPDISCOVER packet and 
-  /// subsequent DHCPREQUEST packet that is generated from DHCPOFFER packets.
+  /// List of DHCP options to be included in every packet that is sent during the
+  /// Dhcp4SendDiscover event. Pad options are appended automatically by DHCP driver
+  /// in outgoing DHCP packets. If OptionList itself contains pad option, they are
+  /// ignored by the driver. OptionList can be freed after EFI_DHCP4_PROTOCOL.Configure()
+  /// returns. Ignored if OptionCount is zero.
   ///
   EFI_DHCP4_PACKET_OPTION     **OptionList;
 } EFI_DHCP4_CONFIG_DATA;
@@ -457,8 +466,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Init or
                                 Dhcp4InitReboot state, if the original state of this driver
-                                was Dhcp4Stopped and the value of Dhcp4CfgData was
-                                not NULL. Otherwise, the state was left unchanged.
+                                was Dhcp4Stopped, Dhcp4Init,Dhcp4InitReboot, or Dhcp4Bound
+                                and the value of Dhcp4CfgData was not NULL.
+                                Otherwise, the state was left unchanged.
   @retval EFI_ACCESS_DENIED     This instance of the EFI DHCPv4 Protocol driver was not in the
                                 Dhcp4Stopped, Dhcp4Init, Dhcp4InitReboot, or Dhcp4Bound state;
                                 Or onother instance of this EFI DHCPv4 Protocol driver is already
