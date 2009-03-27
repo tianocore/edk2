@@ -473,29 +473,24 @@ ConvertRfc3066LanguageToIso639Language (
 ;
 
 /**
-  Convert language code from ISO639-2 to RFC3066.
+  Convert language code from ISO639-2 to RFC3066 and return the converted language.
+  Caller is responsible for freeing the allocated buffer.
 
   LanguageIso639 contain a single ISO639-2 code such as
   "eng" or "fra".
-
-  The LanguageRfc3066 must be a buffer large enough
-  for RFC_3066_ENTRY_SIZE characters.
 
   If LanguageIso639 is NULL, then ASSERT.
   If LanguageRfc3066 is NULL, then ASSERT.
 
   @param  LanguageIso639         ISO639-2 language code.
-  @param  LanguageRfc3066        RFC3066 language code.
 
-  @retval EFI_SUCCESS            Language code converted.
-  @retval EFI_NOT_FOUND          Language code not found.
+  @return the allocated buffer or NULL, if the language is not found.
 
 **/
-EFI_STATUS
+CHAR8*
 EFIAPI
 ConvertIso639LanguageToRfc3066Language (
-  IN  CONST CHAR8   *LanguageIso639,
-  OUT CHAR8         *LanguageRfc3066
+  IN  CONST CHAR8   *LanguageIso639
   )
 ;
 
@@ -514,29 +509,6 @@ CHAR8 *
 EFIAPI
 Rfc3066ToIso639 (
   CHAR8  *SupportedLanguages
-  )
-;
-
-
-/**
-  Determine what is the current language setting. The space reserved for Lang
-  must be at least RFC_3066_ENTRY_SIZE bytes;
-
-  If Lang is NULL, then ASSERT.
-
-  @param  Lang                   Pointer of system language. Lang will always be filled with 
-                                         a valid RFC 3066 language string. If "PlatformLang" is not
-                                         set in the system, the default language specifed by PcdUefiVariableDefaultPlatformLang
-                                         is returned.
-
-  @return  EFI_SUCCESS     If the EFI Variable with "PlatformLang" is set and return in Lang.
-  @return  EFI_NOT_FOUND If the EFI Variable with "PlatformLang" is not set, but a valid default language is return in Lang.
-
-**/
-EFI_STATUS
-EFIAPI
-GetCurrentLanguage (
-  OUT     CHAR8               *Lang
   )
 ;
 

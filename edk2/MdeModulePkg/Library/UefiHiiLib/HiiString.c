@@ -191,7 +191,7 @@ HiiLibNewString (
   EFI_STATUS  Status;
   CHAR8       *Languages;
   CHAR8       *LangStrings;
-  CHAR8       Lang[RFC_3066_ENTRY_SIZE];
+  CHAR8       *Lang;
 
   ASSERT (String != NULL);
   ASSERT (StringId != NULL);
@@ -200,6 +200,11 @@ HiiLibNewString (
 
   Languages = HiiLibGetSupportedLanguages (PackageList);
   ASSERT (Languages != NULL);
+  //
+  // Allocate working buffer to contain substring of Languages.
+  //
+  Lang = AllocatePool (AsciiStrSize (Languages));
+  ASSERT (Lang != NULL);
 
   LangStrings = Languages;
   while (*LangStrings != 0) {
@@ -223,6 +228,7 @@ HiiLibNewString (
     }
   }
 
+  FreePool (Lang);
   FreePool (Languages);
 
   return Status;
@@ -258,7 +264,7 @@ HiiLibSetString (
   EFI_STATUS  Status;
   CHAR8       *Languages;
   CHAR8       *LangStrings;
-  CHAR8       Lang[RFC_3066_ENTRY_SIZE];
+  CHAR8       *Lang;
 
   ASSERT (IsHiiHandleRegistered (PackageList));
 
@@ -266,6 +272,12 @@ HiiLibSetString (
 
   Languages = HiiLibGetSupportedLanguages (PackageList);
   ASSERT (Languages != NULL);
+
+  //
+  // Allocate working buffer to contain substring of Languages.
+  //
+  Lang = AllocatePool (AsciiStrSize (Languages));
+  ASSERT (Lang != NULL);
 
   LangStrings = Languages;
   while (*LangStrings != 0) {
@@ -288,6 +300,7 @@ HiiLibSetString (
     }
   }
 
+  FreePool (Lang);
   FreePool (Languages);
 
   return Status;
@@ -390,44 +403,43 @@ HiiLibGetString (
 {
   EFI_STATUS  Status;
   CHAR8       *Languages;
-  CHAR8       *LangStrings;
-  CHAR8       Lang[RFC_3066_ENTRY_SIZE];
-  CHAR8       CurrentLang[RFC_3066_ENTRY_SIZE];
+  CHAR8       *CurrentLang;
+  CHAR8       *BestLanguage;
 
   ASSERT (StringSize != NULL);
   ASSERT (!(*StringSize != 0 && String == NULL));
   ASSERT (IsHiiHandleRegistered (PackageList));
 
-  GetCurrentLanguage (CurrentLang);
+  Languages = HiiLibGetSupportedLanguages (PackageList);
+  ASSERT (Languages != NULL);
 
-  Status = mHiiStringProt->GetString (
+  CurrentLang = GetEfiGlobalVariable (L"PlatformLang");
+  
+  Status = EFI_NOT_FOUND;
+  BestLanguage = GetBestLanguage (
+                   Languages,
+                   FALSE,
+                   (CurrentLang != NULL) ? CurrentLang : "",
+                   (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang),
+                   Languages,
+                   NULL
+                   );
+  if (BestLanguage != NULL ) {
+     Status = mHiiStringProt->GetString (
                                mHiiStringProt,
-                               CurrentLang,
+                               BestLanguage,
                                PackageList,
                                StringId,
                                String,
                                StringSize,
                                NULL
                                );
-
-  if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
-    Languages = HiiLibGetSupportedLanguages (PackageList);
-    ASSERT (Languages != NULL);
-    
-    LangStrings = Languages;
-    HiiLibGetNextLanguage (&LangStrings, Lang);
-    FreePool (Languages);
-
-    Status = mHiiStringProt->GetString (
-                                 mHiiStringProt,
-                                 Lang,
-                                 PackageList,
-                                 StringId,
-                                 String,
-                                 StringSize,
-                                 NULL
-                                 );
+     FreePool (BestLanguage);
   }
+  if (CurrentLang != NULL) {
+    FreePool (CurrentLang);
+  }
+  FreePool (Languages);
 
   return Status;
 }
@@ -520,41 +532,35 @@ ConvertRfc3066LanguageToIso639Language (
 
 
 /**
-  Convert language code from ISO639-2 to RFC3066.
+  Convert language code from ISO639-2 to RFC3066 and return the converted language.
+  Caller is responsible for freeing the allocated buffer.
 
   LanguageIso639 contain a single ISO639-2 code such as
   "eng" or "fra".
-
-  The LanguageRfc3066 must be a buffer large enough
-  for RFC_3066_ENTRY_SIZE characters.
 
   If LanguageIso639 is NULL, then ASSERT.
   If LanguageRfc3066 is NULL, then ASSERT.
 
   @param  LanguageIso639         ISO639-2 language code.
-  @param  LanguageRfc3066        RFC3066 language code.
 
-  @retval EFI_SUCCESS            Language code converted.
-  @retval EFI_NOT_FOUND          Language code not found.
+  @return the allocated buffer or NULL, if the language is not found.
 
 **/
-EFI_STATUS
+CHAR8*
 EFIAPI
 ConvertIso639LanguageToRfc3066Language (
-  IN  CONST CHAR8   *LanguageIso639,
-  OUT CHAR8         *LanguageRfc3066
+  IN  CONST CHAR8   *LanguageIso639
   )
 {
   UINTN Index;
   
   for (Index = 0; Iso639ToRfc3066ConversionTable[Index] != 0; Index += 5) {
     if (CompareMem (LanguageIso639, &Iso639ToRfc3066ConversionTable[Index], 3) == 0) {
-      CopyMem (LanguageRfc3066, &Iso639ToRfc3066ConversionTable[Index + 3], 2);
-      return EFI_SUCCESS;
+      return AllocateCopyPool (2, &Iso639ToRfc3066ConversionTable[Index + 3]);
     }
   }
 
-  return EFI_NOT_FOUND;
+  return NULL;
 }
 
 /**
@@ -575,15 +581,25 @@ Rfc3066ToIso639 (
   CHAR8       *Languages;
   CHAR8       *ReturnValue;
   CHAR8       *LangCodes;
-  CHAR8       LangRfc3066[RFC_3066_ENTRY_SIZE];
+  CHAR8       *LangRfc3066;
   CHAR8       LangIso639[ISO_639_2_ENTRY_SIZE];
+  UINTN       LanguageSize;
   EFI_STATUS  Status;
 
-  ReturnValue = AllocateZeroPool (AsciiStrSize (SupportedLanguages));
+  LanguageSize = AsciiStrSize (SupportedLanguages);
+  ReturnValue = AllocateZeroPool (LanguageSize);
   if (ReturnValue == NULL) {
     return ReturnValue;
   }
 
+  //
+  // Allocate working buffer to contain substring in SupportedLanguages;
+  //
+  LangRfc3066 = AllocatePool (LanguageSize);
+  if (LangRfc3066 == NULL) {
+    FreePool (ReturnValue);
+    return NULL;
+  }
   Languages = ReturnValue;
   LangCodes = SupportedLanguages;
   while (*LangCodes != 0) {
@@ -596,6 +612,7 @@ Rfc3066ToIso639 (
     }
   }
 
+  FreePool (LangRfc3066);
   return ReturnValue;
 }
 
