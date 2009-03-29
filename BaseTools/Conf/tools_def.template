@@ -431,7 +431,7 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 DEFINE UNIXGCC_DLINK_FLAGS_COMMON        = -nostdlib -s --pie
 *_UNIXGCC_*_ASLCC_FLAGS                  = -x c
 *_UNIXGCC_*_DLINK_FLAGS                  = DEF(UNIXGCC_DLINK_FLAGS_COMMON) --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-*_UNIXGCC_*_ASLDLINK_FLAGS               = DEF(UNIXGCC_DLINK_FLAGS_COMMON) --entry _AcpiTable
+*_UNIXGCC_*_ASLDLINK_FLAGS               = DEF(UNIXGCC_DLINK_FLAGS_COMMON) --entry _ReferenceAcpiTable
 *_UNIXGCC_*_ASM_FLAGS                    = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_PP_FLAGS                     = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_ASLPP_FLAGS                  = -x c -E -P
@@ -595,8 +595,8 @@ DEFINE UNIXGCC_DLINK_FLAGS_COMMON        = -nostdlib -s --pie
 *_ICC_*_APP_FLAGS                        = /nologo /E /TC
 *_ICC_*_PP_FLAGS                         = /nologo /E /TC /FIAutoGen.h
 
-*_ICC_*_ASLCC_FLAGS                      = /Y- /TC /WX-
-*_ICC_*_ASLDLINK_FLAGS                   = /NODEFAULTLIB /ENTRY:main /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
+*_ICC_*_ASLCC_FLAGS                      = /Y- /TC /WX- /Dmain=ReferenceAcpiTable
+*_ICC_*_ASLDLINK_FLAGS                   = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
 *_ICC_*_ASLPP_FLAGS                      = /nologo /EP /C
 
 ##################
@@ -800,8 +800,8 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 ##################
 # Asl Compiler definitions
 ##################
-*_*_*_ASLCC_FLAGS                  = /GL- /Y- /TC
-*_*_*_ASLDLINK_FLAGS               = /NODEFAULTLIB /ENTRY:main
+*_*_*_ASLCC_FLAGS                  = /GL- /Y- /TC /Dmain=ReferenceAcpiTable
+*_*_*_ASLDLINK_FLAGS               = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable
 *_*_*_ASLPP_FLAGS                  = /nologo /EP /C
 *_*_*_ASL_FLAGS                    =
 
