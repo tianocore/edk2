@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006-2007, Intel Corporation
+#  Copyright (c) 2006-2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -47,9 +47,10 @@ DEFINE EBC_BIN    = C:\Program Files\Intel\EBC\Bin
 
 DEFINE ELFGCC_BIN    = /usr/bin
 
+#
 # Option 1: Hard coded full path to compiler suite
-#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
+DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
+DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
 #
 # Option 2: Use an environment variable
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(IA32_PETOOLS_PREFIX)
@@ -63,9 +64,12 @@ DEFINE ELFGCC_BIN    = /usr/bin
 # Links needed: gcc, ar & ld
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(WORKSPACE)/BaseTools/Bin/gcc/Ia32
 #DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(WORKSPACE)/BaseTools/Bin/gcc/X64
-
-DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
+#
+# Option 5: Create links under the BaseTools/Bin/gcc/ARCH directory
+#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(HOME)/programs/gcc/ia32/bin/i686-pc-mingw32-
+#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-
+#DEFINE UNIXGCC_IASL                = ENV(HOME)/programs/iasl
+#
 
 DEFINE CYGWIN_BIN    = c:/cygwin/bin
 DEFINE CYGWIN_BIN32  = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
@@ -424,33 +428,44 @@ RELEASE_WINDDK3790x1830_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 #   UINIXGCC         - UINIX GCC
 *_UNIXGCC_*_*_FAMILY               = GCC
 
-*_UNIXGCC_*_DLINK_FLAGS                  = -nostdlib -s --pie --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map --image-base 0x0
+DEFINE UNIXGCC_DLINK_FLAGS_COMMON        = -nostdlib -s --pie
+*_UNIXGCC_*_ASLCC_FLAGS                  = -x c
+*_UNIXGCC_*_DLINK_FLAGS                  = DEF(UNIXGCC_DLINK_FLAGS_COMMON) --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_UNIXGCC_*_ASLDLINK_FLAGS               = DEF(UNIXGCC_DLINK_FLAGS_COMMON) --entry _AcpiTable
 *_UNIXGCC_*_ASM_FLAGS                    = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 *_UNIXGCC_*_PP_FLAGS                     = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_UNIXGCC_*_ASLPP_FLAGS                  = -x c -E -P
 *_UNIXGCC_*_VFRPP_FLAGS                  = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 *_UNIXGCC_*_MAKE_PATH                    = make
+*_UNIXGCC_*_ASL_PATH                     = DEF(UNIXGCC_IASL)
 
 ##################
 # IA32 definitions
 ##################
-*_UNIXGCC_IA32_CC_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_SLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/ar
-*_UNIXGCC_IA32_DLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/ld
-*_UNIXGCC_IA32_ASM_PATH             = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_PP_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_VFRPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
+*_UNIXGCC_IA32_CC_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_ASLCC_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_SLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ar
+*_UNIXGCC_IA32_DLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ld
+*_UNIXGCC_IA32_ASLDLINK_PATH        = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ld
+*_UNIXGCC_IA32_ASM_PATH             = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_PP_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_ASLPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_VFRPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
 
 *_UNIXGCC_IA32_CC_FLAGS                  = -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -fshort-wchar -fno-strict-aliasing -Wall -Wno-missing-braces -c -include AutoGen.h -D EFI32
 
 ##################
 # X64 definitions
 ##################
-*_UNIXGCC_X64_CC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_SLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ar
-*_UNIXGCC_X64_DLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ld
-*_UNIXGCC_X64_ASM_PATH              = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_PP_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
+*_UNIXGCC_X64_CC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_ASLCC_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_SLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ar
+*_UNIXGCC_X64_DLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ld
+*_UNIXGCC_X64_ASLDLINK_PATH         = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ld
+*_UNIXGCC_X64_ASM_PATH              = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_PP_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_ASLPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
 
 *_UNIXGCC_X64_CC_FLAGS                   = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-address -Wno-array-bounds -c -include AutoGen.h -D_EFI_P64
 
