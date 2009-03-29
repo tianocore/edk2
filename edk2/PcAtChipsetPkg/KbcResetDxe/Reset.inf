@@ -27,7 +27,6 @@
   ENTRY_POINT                    = InitializeReset
 
 [Packages]
-  DuetPkg/DuetPkg.dec
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
 
