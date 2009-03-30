@@ -8,7 +8,7 @@
     <Description>
       This Database tracks all packages and archives installed in this workspace.
     </Description>
-    <Copyright>Copyright (c) 2007,  Intel Corporation    All rights reserved.</Copyright>
+    <Copyright>Copyright (c) 2007 - 2009,  Intel Corporation    All rights reserved.</Copyright>
     <License>
       This program and the accompanying materials are licensed and made available
       under the terms and conditions of the BSD License which accompanies this
@@ -20,9 +20,9 @@
     <Specification>FRAMEWORK_PACKAGING_SPECIFICATION 0x00090000</Specification>
   </FdbHeader>
   <PackageList>
-    <Filename>MdePkg/MdePkg.nspd</Filename>
-    <Filename>MdeModulePkg/MdeModulePkg.nspd</Filename>
-    <Filename>IntelFrameworkModulePkg/IntelFrameworkModulePkg.nspd</Filename>
-    <Filename>IntelFrameworkPkg/IntelFrameworkPkg.nspd</Filename>
+    <Filename>MdePkg/MdePkg.dec</Filename>
+    <Filename>MdeModulePkg/MdeModulePkg.dec</Filename>
+    <Filename>IntelFrameworkPkg/IntelFrameworkPkg.dec</Filename>
+    <Filename>IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec</Filename>
   </PackageList>
 </FrameworkDatabase>
