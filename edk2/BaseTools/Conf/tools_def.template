@@ -51,6 +51,7 @@ DEFINE ELFGCC_BIN    = /usr/bin
 # Option 1: Hard coded full path to compiler suite
 DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
 DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
+DEFINE UNIXGCC_IASL                = /usr/bin/iasl
 #
 # Option 2: Use an environment variable
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(IA32_PETOOLS_PREFIX)
@@ -65,7 +66,7 @@ DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-ming
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(WORKSPACE)/BaseTools/Bin/gcc/Ia32
 #DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(WORKSPACE)/BaseTools/Bin/gcc/X64
 #
-# Option 5: Create links under the BaseTools/Bin/gcc/ARCH directory
+# Option 5: Install programs under user's home directory
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(HOME)/programs/gcc/ia32/bin/i686-pc-mingw32-
 #DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-
 #DEFINE UNIXGCC_IASL                = ENV(HOME)/programs/iasl
@@ -76,7 +77,6 @@ DEFINE CYGWIN_BIN32  = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
 DEFINE CYGWIN_BINX64 = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
 
 DEFINE ASL_BIN           = C:\ASL
-DEFINE UNIXGCC_IASL      = ENV(HOME)/programs/iasl
 
 ####################################################################################
 #
