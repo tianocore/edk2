@@ -97,6 +97,6 @@ PrintString (
   //
   // All information also output to serial port.
   //
-  DebugSerialPrint (String);
+  DebugSerialPrint ((CHAR8*)String);
 }
 
