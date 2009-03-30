@@ -75,7 +75,8 @@ DEFINE CYGWIN_BIN    = c:/cygwin/bin
 DEFINE CYGWIN_BIN32  = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
 DEFINE CYGWIN_BINX64 = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
 
-DEFINE ASL_BIN = C:\ASL
+DEFINE ASL_BIN           = C:\ASL
+DEFINE UNIXGCC_IASL      = ENV(HOME)/programs/iasl
 
 ####################################################################################
 #
