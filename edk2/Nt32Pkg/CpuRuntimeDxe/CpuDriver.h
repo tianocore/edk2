@@ -33,7 +33,7 @@ Abstract:
 #include <Protocol/WinNtIo.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/FrameworkHiiLib.h>
+#include <Library/HiiLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
