@@ -36,7 +36,7 @@ Abstract:
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/FrameworkHiiLib.h>
+#include <Library/HiiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
