@@ -73,7 +73,6 @@
   IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
   IntelFrameworkPkg/Library/FrameworkUefiLib/FrameworkUefiLib.inf
   IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
-  IntelFrameworkPkg/Library/FrameworkHiiLib/HiiLib.inf
   IntelFrameworkPkg/Library/FrameworkIfrSupportLib/IfrSupportLib.inf
   IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
   IntelFrameworkPkg/Library/HiiLibFramework/HiiLibFramework.inf
