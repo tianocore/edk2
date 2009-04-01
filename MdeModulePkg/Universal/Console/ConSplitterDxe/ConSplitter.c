@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE,
   (EFI_HANDLE) NULL,
+
   {
     ConSplitterTextInReset,
     ConSplitterTextInReadKeyStroke,
@@ -43,6 +44,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   0,
   (EFI_SIMPLE_TEXT_INPUT_PROTOCOL **) NULL,
   0,
+
   {
     ConSplitterTextInResetEx,
     ConSplitterTextInReadKeyStrokeEx,
@@ -82,7 +84,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
     (EFI_EVENT) NULL,
     (EFI_ABSOLUTE_POINTER_MODE *) NULL
   },
-
   {
     0,       // AbsoluteMinX
     0,       // AbsoluteMinY
@@ -96,22 +97,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
   (EFI_ABSOLUTE_POINTER_PROTOCOL **) NULL,
   0,
   FALSE,
-
-  FALSE,
-  {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  },
-  0,
-  {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  },
-  (EFI_EVENT) NULL,
 
   FALSE,
   FALSE
@@ -164,6 +149,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
     0,
     FALSE,
   },
+
   {
     NULL,
     NULL,
@@ -173,35 +159,23 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   0,
   0,
   0,
-  (EFI_UGA_PIXEL *) NULL,
+
   {
     NULL,
     NULL,
     NULL,
     NULL
   },
-  (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL,
   (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *) NULL,
   0,
   0,
   TRUE,
-  {
-    ConSpliterConsoleControlGetMode,
-    ConSpliterConsoleControlSetMode,
-    ConSpliterConsoleControlLockStdIn
-  },
 
   0,
   (TEXT_OUT_AND_GOP_DATA *) NULL,
   0,
   (TEXT_OUT_SPLITTER_QUERY_DATA *) NULL,
   0,
-  (INT32 *) NULL,
-
-  EfiConsoleControlScreenText,
-  0,
-  0,
-  (CHAR16 *) NULL,
   (INT32 *) NULL
 };
 
@@ -231,6 +205,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
     0,
     FALSE,
   },
+
   {
     NULL,
     NULL,
@@ -240,35 +215,23 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
   0,
   0,
   0,
-  (EFI_UGA_PIXEL *) NULL,
+
   {
     NULL,
     NULL,
     NULL,
     NULL
   },
-  (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL,
   (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *) NULL,
   0,
   0,
   TRUE,
-  {
-    ConSpliterConsoleControlGetMode,
-    ConSpliterConsoleControlSetMode,
-    ConSpliterConsoleControlLockStdIn
-  },
 
   0,
   (TEXT_OUT_AND_GOP_DATA *) NULL,
   0,
   (TEXT_OUT_SPLITTER_QUERY_DATA *) NULL,
   0,
-  (INT32 *) NULL,
-
-  EfiConsoleControlScreenText,
-  0,
-  0,
-  (CHAR16 *) NULL,
   (INT32 *) NULL
 };
 
@@ -474,8 +437,6 @@ ConSplitterDriverEntry(
                       &mConOut.TextOut,
                       &gEfiUgaDrawProtocolGuid,
                       &mConOut.UgaDraw,
-                      &gEfiConsoleControlProtocolGuid,
-                      &mConOut.ConsoleControl,
                       NULL
                       );
     } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
@@ -489,8 +450,6 @@ ConSplitterDriverEntry(
                       &mConOut.TextOut,
                       &gEfiGraphicsOutputProtocolGuid,
                       &mConOut.GraphicsOutput,
-                      &gEfiConsoleControlProtocolGuid,
-                      &mConOut.ConsoleControl,
                       NULL
                       );
     } else {
@@ -506,8 +465,6 @@ ConSplitterDriverEntry(
                       &mConOut.GraphicsOutput,
                       &gEfiUgaDrawProtocolGuid,
                       &mConOut.UgaDraw,
-                      &gEfiConsoleControlProtocolGuid,
-                      &mConOut.ConsoleControl,
                       NULL
                       );
     }
@@ -565,17 +522,7 @@ ConSplitterTextInConstructor (
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-  //
-  // Create Event to support locking StdIn Device
-  //
-  Status = gBS->CreateEvent (
-                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  ConSpliterConsoleControlLockStdInEvent,
-                  NULL,
-                  &ConInPrivate->LockEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
+
   //
   // Create Event to wait for a key
   //
@@ -725,15 +672,16 @@ ConSplitterTextOutConstructor (
   }
 
   //
-  // Setup the DevNullTextOut console to 80 x 25
+  // Setup the default console to 80 x 25 and mode to 0
   //
   ConOutPrivate->TextOutQueryData[0].Columns  = 80;
   ConOutPrivate->TextOutQueryData[0].Rows     = 25;
-  DevNullTextOutSetMode (ConOutPrivate, 0);
+  TextOutSetMode (ConOutPrivate, 0);
+
 
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
     //
-    // Setup the DevNullUgaDraw to 800 x 600 x 32 bits per pixel, 60Hz.
+    // Setup the UgaDraw to 800 x 600 x 32 bits per pixel, 60Hz.
     //
     ConSpliterUgaDrawSetMode (&ConOutPrivate->UgaDraw, 800, 600, 32, 60);
   }
@@ -2974,7 +2922,6 @@ ConSplitterTextOutAddDevice (
 {
   EFI_STATUS                           Status;
   UINTN                                CurrentNumOfConsoles;
-  INT32                                CurrentMode;
   INT32                                MaxMode;
   UINT32                               UgaHorizontalResolution;
   UINT32                               UgaVerticalResolution;
@@ -3014,18 +2961,6 @@ ConSplitterTextOutAddDevice (
   TextAndGop->GraphicsOutput = GraphicsOutput;
   TextAndGop->UgaDraw        = UgaDraw;
 
-  if ((GraphicsOutput == NULL) && (UgaDraw == NULL)) {
-    //
-    // If No GOP/UGA device then use the ConOut device
-    //
-    TextAndGop->TextOutEnabled = TRUE;
-  } else {
-    //
-    // If GOP/UGA device use ConOut device only used if screen is in Text mode
-    //
-    TextAndGop->TextOutEnabled = (BOOLEAN) (Private->ConsoleOutputMode == EfiConsoleControlScreenText);
-  }
-
   if (CurrentNumOfConsoles == 0) {
     //
     // Add the first device's output mode to console splitter's mode list
@@ -3044,7 +2979,6 @@ ConSplitterTextOutAddDevice (
   //
   ConSplitterGetIntersectionBetweenConOutAndStrErr ();
 
-  CurrentMode = Private->TextOutMode.Mode;
   MaxMode     = Private->TextOutMode.MaxMode;
   ASSERT (MaxMode >= 1);
 
@@ -3102,32 +3036,10 @@ ConSplitterTextOutAddDevice (
                 );
   }
 
-  if (Private->ConsoleOutputMode == EfiConsoleControlScreenGraphics && GraphicsOutput != NULL) {
-    //
-    // We just added a new GOP or UGA device in graphics mode
-    //
-    if (FeaturePcdGet (PcdConOutGopSupport)) {
-      //
-      // Sync display output on new device based on GOP settings.
-      //
-      DevNullGopSync (Private, TextAndGop->GraphicsOutput, TextAndGop->UgaDraw);
-    } else if (FeaturePcdGet (PcdConOutUgaSupport)) {
-      //
-      // Sync display output on new device based on UGA settings.
-      //
-      DevNullUgaSync (Private, TextAndGop->GraphicsOutput, TextAndGop->UgaDraw);
-    }
-  } else if ((CurrentMode >= 0) && ((GraphicsOutput != NULL) || (UgaDraw != NULL)) && (CurrentMode < Private->TextOutMode.MaxMode)) {
-    //
-    // The new console supports the same mode of the current console so sync up
-    //
-    DevNullSyncStdOut (Private);
-  } else {
-    //
-    // If ConOut, then set the mode to Mode #0 which us 80 x 25
-    //
-    Private->TextOut.SetMode (&Private->TextOut, 0);
-  }
+  //
+  // If ConOut, then set the mode to Mode #0 which us 80 x 25
+  //
+  Private->TextOut.SetMode (&Private->TextOut, 0);
 
   //
   // After adding new console device, all existing console devices should be
@@ -3192,13 +3104,13 @@ ConSplitterTextOutDeleteDevice (
 
   if (CurrentNumOfConsoles == 0) {
     //
-    // If the number of consoles is zero clear the Dev NULL device
+    // If the number of consoles is zero, reset all parameters
     //
     Private->CurrentNumberOfConsoles      = 0;
     Private->TextOutMode.MaxMode          = 1;
     Private->TextOutQueryData[0].Columns  = 80;
     Private->TextOutQueryData[0].Rows     = 25;
-    DevNullTextOutSetMode (Private, 0);
+    TextOutSetMode (Private, 0);
 
     return EFI_SUCCESS;
   }
@@ -3330,157 +3242,10 @@ ConSplitterTextInPrivateReadKeyStroke (
   return EFI_NOT_READY;
 }
 
-/**
-  Return TRUE if StdIn is locked. The ConIn device on the virtual handle is
-  the only device locked.
-
-  @retval TRUE                     StdIn locked
-  @retval FALSE                    StdIn working normally
-
-**/
-BOOLEAN
-ConSpliterConssoleControlStdInLocked (
-  VOID
-  )
-{
-  return mConIn.PasswordEnabled;
-}
-
-
-/**
-  Record and check key sequence on StdIn.
-
-  This timer event will fire when StdIn is locked. It will record the key sequence
-  on StdIn and also check to see if it matches the password. Any error in the
-  password will cause the check to reset. As long as a mConIn.PasswordEnabled is
-  TRUE, the StdIn splitter will not report any input.
-
-  @param  Event                  The Event this notify function registered to.
-  @param  Context                Pointer to the context data registerd to the
-                                 Event.
-**/
-VOID
-EFIAPI
-ConSpliterConsoleControlLockStdInEvent (
-  IN  EFI_EVENT                       Event,
-  IN  VOID                            *Context
-  )
-{
-  EFI_STATUS    Status;
-  EFI_INPUT_KEY Key;
-  CHAR16        BackSpaceString[2];
-  CHAR16        SpaceString[2];
-
-  do {
-    Status = ConSplitterTextInPrivateReadKeyStroke (&mConIn, &Key);
-    if (!EFI_ERROR (Status)) {
-      //
-      // If key read successfully
-      //
-      if ((Key.UnicodeChar == CHAR_CARRIAGE_RETURN) && (Key.ScanCode == SCAN_NULL)) {
-        //
-        // If it's an ENTER, match password
-        //
-        mConIn.PwdAttempt[mConIn.PwdIndex] = CHAR_NULL;
-        if (StrCmp (mConIn.Password, mConIn.PwdAttempt) != 0) {
-          //
-          // Password not match
-          //
-          ConSplitterTextOutOutputString (&mConOut.TextOut, (CHAR16 *) L"\n\rPassword not correct\n\r");
-          mConIn.PwdIndex = 0;
-        } else {
-          //
-          // Key matches password sequence
-          //
-          gBS->SetTimer (mConIn.LockEvent, TimerPeriodic, 0);
-          mConIn.PasswordEnabled  = FALSE;
-          Status                  = EFI_NOT_READY;
-        }
-      } else if ((Key.UnicodeChar == CHAR_BACKSPACE) && (Key.ScanCode == SCAN_NULL)) {
-        //
-        // BackSpace met
-        //
-        if (mConIn.PwdIndex > 0) {
-          BackSpaceString[0]  = CHAR_BACKSPACE;
-          BackSpaceString[1]  = 0;
-
-          SpaceString[0]      = L' ';
-          SpaceString[1]      = 0;
-
-          ConSplitterTextOutOutputString (&mConOut.TextOut, BackSpaceString);
-          ConSplitterTextOutOutputString (&mConOut.TextOut, SpaceString);
-          ConSplitterTextOutOutputString (&mConOut.TextOut, BackSpaceString);
-
-          mConIn.PwdIndex--;
-        }
-      } else if ((Key.ScanCode == SCAN_NULL) && (Key.UnicodeChar >= 32)) {
-        //
-        // If it's not an ENTER, neigher a function key, nor a CTRL-X or ALT-X, record the input,
-        // value 32 stands for a Blank Space key.
-        //
-        if (mConIn.PwdIndex < (MAX_STD_IN_PASSWORD - 1)) {
-          if (mConIn.PwdIndex == 0) {
-            ConSplitterTextOutOutputString (&mConOut.TextOut, (CHAR16 *) L"\n\r");
-          }
-
-          ConSplitterTextOutOutputString (&mConOut.TextOut, (CHAR16 *) L"*");
-          mConIn.PwdAttempt[mConIn.PwdIndex] = Key.UnicodeChar;
-          mConIn.PwdIndex++;
-        }
-      }
-    }
-  } while (!EFI_ERROR (Status));
-}
-
-
-/**
-  If Password is NULL or the Password is too big, then return an error. If the
-  Password is valid, then store the password, lock StdIn and arm the periodic timer.
-
-  @param  This                     Console Control protocol pointer.
-  @param  Password                 The password input.
-
-  @retval EFI_SUCCESS              Lock the StdIn device.
-  @retval EFI_INVALID_PARAMETER    Password is NULL.
-  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the password fails.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSpliterConsoleControlLockStdIn (
-  IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
-  IN  CHAR16                          *Password
-  )
-{
-  if (Password == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (StrLen (Password) >= MAX_STD_IN_PASSWORD) {
-    //
-    // Currently have a max password size
-    //
-    return EFI_OUT_OF_RESOURCES;
-  }
-  //
-  // Save the password, initialize state variables and arm event timer
-  //
-  StrCpy (mConIn.Password, Password);
-  mConIn.PasswordEnabled  = TRUE;
-  mConIn.PwdIndex         = 0;
-  //
-  // Lock Timer Periodic is 25ms.
-  //
-  gBS->SetTimer (mConIn.LockEvent, TimerPeriodic, 10000 * 25);
-
-  return EFI_SUCCESS;
-}
-
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
-  If the ConIn is password locked make it look like no keystroke is availible
 
   @param  This                     Protocol instance pointer.
   @param  Key                      Driver may perform diagnostics on reset.
@@ -3501,12 +3266,6 @@ ConSplitterTextInReadKeyStroke (
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
 
   Private = TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-  if (Private->PasswordEnabled) {
-    //
-    // If StdIn Locked return not ready
-    //
-    return EFI_NOT_READY;
-  }
 
   Private->KeyEventSignalState = FALSE;
 
@@ -3517,7 +3276,6 @@ ConSplitterTextInReadKeyStroke (
 /**
   This event aggregates all the events of the ConIn devices in the spliter.
 
-  If the ConIn is password locked then return.
   If any events of physical ConIn devices are signaled, signal the ConIn
   spliter event. This will cause the calling code to call
   ConSplitterTextInReadKeyStroke ().
@@ -3538,13 +3296,6 @@ ConSplitterTextInWaitForKey (
   UINTN                         Index;
 
   Private = (TEXT_IN_SPLITTER_PRIVATE_DATA *) Context;
-
-  if (Private->PasswordEnabled) {
-    //
-    // If StdIn Locked return not ready
-    //
-    return ;
-  }
 
   if (Private->KeyEventSignalState) {
     //
@@ -3691,12 +3442,6 @@ ConSplitterTextInReadKeyStrokeEx (
   }
 
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-  if (Private->PasswordEnabled) {
-    //
-    // If StdIn Locked return not ready
-    //
-    return EFI_NOT_READY;
-  }
 
   Private->KeyEventSignalState = FALSE;
 
@@ -4076,7 +3821,6 @@ ConSplitterSimplePointerPrivateGetState (
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
-  If the ConIn is password locked make it look like no keystroke is availible
 
   @param  This                     A pointer to protocol instance.
   @param  State                    A pointer to state information on the pointer device
@@ -4097,12 +3841,6 @@ ConSplitterSimplePointerGetState (
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
 
   Private = TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_SIMPLE_POINTER_THIS (This);
-  if (Private->PasswordEnabled) {
-    //
-    // If StdIn Locked return not ready
-    //
-    return EFI_NOT_READY;
-  }
 
   Private->InputEventSignalState = FALSE;
 
@@ -4112,7 +3850,6 @@ ConSplitterSimplePointerGetState (
 
 /**
   This event agregates all the events of the ConIn devices in the spliter.
-  If the ConIn is password locked then return.
   If any events of physical ConIn devices are signaled, signal the ConIn
   spliter event. This will cause the calling code to call
   ConSplitterTextInReadKeyStroke ().
@@ -4133,12 +3870,6 @@ ConSplitterSimplePointerWaitForInput (
   UINTN                         Index;
 
   Private = (TEXT_IN_SPLITTER_PRIVATE_DATA *) Context;
-  if (Private->PasswordEnabled) {
-    //
-    // If StdIn Locked return not ready
-    //
-    return ;
-  }
 
   //
   // if InputEventSignalState is flagged before, and not cleared by Reset() or ReadKeyStroke()
@@ -4236,12 +3967,6 @@ ConSplitterAbsolutePointerGetState (
 
 
   Private = TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_ABSOLUTE_POINTER_THIS (This);
-  if (Private->PasswordEnabled) {
-    //
-    // If StdIn Locked return not ready
-    //
-    return EFI_NOT_READY;
-  }
 
   Private->AbsoluteInputEventSignalState = FALSE;
 
@@ -4290,7 +4015,6 @@ ConSplitterAbsolutePointerGetState (
 
 /**
   This event agregates all the events of the pointer devices in the splitter.
-  If the ConIn is password locked then return.
   If any events of physical pointer devices are signaled, signal the pointer
   splitter event. This will cause the calling code to call
   ConSplitterAbsolutePointerGetState ().
@@ -4311,12 +4035,6 @@ ConSplitterAbsolutePointerWaitForInput (
   UINTN                         Index;
 
   Private = (TEXT_IN_SPLITTER_PRIVATE_DATA *) Context;
-  if (Private->PasswordEnabled) {
-    //
-    // If StdIn Locked return not ready
-    //
-    return ;
-  }
 
   //
   // if AbsoluteInputEventSignalState is flagged before,
@@ -4369,25 +4087,21 @@ ConSplitterTextOutReset (
   // return the worst status met
   //
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-
-    if (Private->TextOutList[Index].TextOutEnabled) {
-
-      Status = Private->TextOutList[Index].TextOut->Reset (
-                                                      Private->TextOutList[Index].TextOut,
-                                                      ExtendedVerification
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    Status = Private->TextOutList[Index].TextOut->Reset (
+                                                    Private->TextOutList[Index].TextOut,
+                                                    ExtendedVerification
+                                                    );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
 
   This->SetAttribute (This, EFI_TEXT_ATTR (This->Mode->Attribute & 0x0F, EFI_BLACK));
 
-  Status = DevNullTextOutSetMode (Private, 0);
-  if (EFI_ERROR (Status)) {
-    ReturnStatus = Status;
-  }
+  //
+  // reset all mode parameters
+  //
+  TextOutSetMode (Private, 0);
 
   return ReturnStatus;
 }
@@ -4449,23 +4163,18 @@ ConSplitterTextOutOutputString (
   //
   // return the worst status met
   //
-  Status = DevNullTextOutOutputString (Private, TargetString);
-  if (EFI_ERROR (Status)) {
-    ReturnStatus = Status;
-  }
-
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-
-    if (Private->TextOutList[Index].TextOutEnabled) {
-      Status = Private->TextOutList[Index].TextOut->OutputString (
-                                                      Private->TextOutList[Index].TextOut,
-                                                      TargetString
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    Status = Private->TextOutList[Index].TextOut->OutputString (
+                                                    Private->TextOutList[Index].TextOut,
+                                                    TargetString
+                                                    );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
+
+  Private->TextOutMode.CursorColumn = Private->TextOutList[0].TextOut->Mode->CursorColumn;
+  Private->TextOutMode.CursorRow    = Private->TextOutList[0].TextOut->Mode->CursorRow;
 
   if (BackSpaceCount > 0) {
     FreePool (TargetString);
@@ -4508,14 +4217,12 @@ ConSplitterTextOutTestString (
   // return the worst status met
   //
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-    if (Private->TextOutList[Index].TextOutEnabled) {
-      Status = Private->TextOutList[Index].TextOut->TestString (
-                                                      Private->TextOutList[Index].TextOut,
-                                                      WString
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    Status = Private->TextOutList[Index].TextOut->TestString (
+                                                    Private->TextOutList[Index].TextOut,
+                                                    WString
+                                                    );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
   //
@@ -4642,32 +4349,27 @@ ConSplitterTextOutSetMode (
   //
   TextOutModeMap = Private->TextOutModeMap + Private->TextOutListCount * ModeNumber;
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
+    Status = Private->TextOutList[Index].TextOut->SetMode (
+                                                    Private->TextOutList[Index].TextOut,
+                                                    TextOutModeMap[Index]
+                                                    );
+    //
+    // If this console device is based on a GOP or UGA device, then sync up the bitmap from
+    // the GOP/UGA splitter and reclear the text portion of the display in the new mode.
+    //
+    if ((Private->TextOutList[Index].GraphicsOutput != NULL) || (Private->TextOutList[Index].UgaDraw != NULL)) {
+      Private->TextOutList[Index].TextOut->ClearScreen (Private->TextOutList[Index].TextOut);
+    }
 
-    if (Private->TextOutList[Index].TextOutEnabled) {
-      Status = Private->TextOutList[Index].TextOut->SetMode (
-                                                      Private->TextOutList[Index].TextOut,
-                                                      TextOutModeMap[Index]
-                                                      );
-      //
-      // If this console device is based on a GOP or UGA device, then sync up the bitmap from
-      // the GOP/UGA splitter and reclear the text portion of the display in the new mode.
-      //
-      if ((Private->TextOutList[Index].GraphicsOutput != NULL) || (Private->TextOutList[Index].UgaDraw != NULL)) {
-        Private->TextOutList[Index].TextOut->ClearScreen (Private->TextOutList[Index].TextOut);
-      }
-
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
+
   //
-  // The DevNull Console will support any possible mode as it allocates memory
+  // Set mode parameter to specified mode number
   //
-  Status = DevNullTextOutSetMode (Private, ModeNumber);
-  if (EFI_ERROR (Status)) {
-    ReturnStatus = Status;
-  }
+  TextOutSetMode (Private, ModeNumber);
 
   return ReturnStatus;
 }
@@ -4715,15 +4417,12 @@ ConSplitterTextOutSetAttribute (
   // return the worst status met
   //
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-
-    if (Private->TextOutList[Index].TextOutEnabled) {
-      Status = Private->TextOutList[Index].TextOut->SetAttribute (
-                                                      Private->TextOutList[Index].TextOut,
-                                                      Attribute
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    Status = Private->TextOutList[Index].TextOut->SetAttribute (
+                                                    Private->TextOutList[Index].TextOut,
+                                                    Attribute
+                                                    );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
 
@@ -4762,19 +4461,20 @@ ConSplitterTextOutClearScreen (
   // return the worst status met
   //
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-
-    if (Private->TextOutList[Index].TextOutEnabled) {
-      Status = Private->TextOutList[Index].TextOut->ClearScreen (Private->TextOutList[Index].TextOut);
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    Status = Private->TextOutList[Index].TextOut->ClearScreen (Private->TextOutList[Index].TextOut);
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
 
-  Status = DevNullTextOutClearScreen (Private);
-  if (EFI_ERROR (Status)) {
-    ReturnStatus = Status;
-  }
+  //
+  // No need to do extra check here as whether (Column, Row) is valid has
+  // been checked in ConSplitterTextOutSetCursorPosition. And (0, 0) should
+  // always be supported.
+  //
+  Private->TextOutMode.CursorColumn = 0;
+  Private->TextOutMode.CursorRow    = 0;
+  Private->TextOutMode.CursorVisible = TRUE;
 
   return ReturnStatus;
 }
@@ -4841,20 +4541,23 @@ ConSplitterTextOutSetCursorPosition (
   // return the worst status met
   //
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-
-    if (Private->TextOutList[Index].TextOutEnabled) {
-      Status = Private->TextOutList[Index].TextOut->SetCursorPosition (
-                                                      Private->TextOutList[Index].TextOut,
-                                                      Column,
-                                                      Row
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    Status = Private->TextOutList[Index].TextOut->SetCursorPosition (
+                                                    Private->TextOutList[Index].TextOut,
+                                                    Column,
+                                                    Row
+                                                    );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
 
-  DevNullTextOutSetCursorPosition (Private, Column, Row);
+  //
+  // No need to do extra check here as whether (Column, Row) is valid has
+  // been checked in ConSplitterTextOutSetCursorPosition. And (0, 0) should
+  // always be supported.
+  //
+  Private->TextOutMode.CursorColumn = (INT32) Column;
+  Private->TextOutMode.CursorRow    = (INT32) Row;
 
   return ReturnStatus;
 }
@@ -4892,19 +4595,16 @@ ConSplitterTextOutEnableCursor (
   // return the worst status met
   //
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-
-    if (Private->TextOutList[Index].TextOutEnabled) {
-      Status = Private->TextOutList[Index].TextOut->EnableCursor (
-                                                      Private->TextOutList[Index].TextOut,
-                                                      Visible
-                                                      );
-      if (EFI_ERROR (Status)) {
-        ReturnStatus = Status;
-      }
+    Status = Private->TextOutList[Index].TextOut->EnableCursor (
+                                                    Private->TextOutList[Index].TextOut,
+                                                    Visible
+                                                    );
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
     }
   }
 
-  DevNullTextOutEnableCursor (Private, Visible);
+  Private->TextOutMode.CursorVisible = Visible;
 
   return ReturnStatus;
 }
