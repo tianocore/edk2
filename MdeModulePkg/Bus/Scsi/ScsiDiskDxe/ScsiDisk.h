@@ -74,6 +74,11 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 #define ACTION_READ_CAPACITY        0x01
 #define ACTION_RETRY_COMMAND_LATER  0x02
 
+#define SCSI_COMMAND_VERSION_1      0x01
+#define SCSI_COMMAND_VERSION_2      0x02
+#define SCSI_COMMAND_VERSION_3      0x03
+
+
 /**
   Test to see if this driver supports ControllerHandle.
 
@@ -649,13 +654,14 @@ ScsiDiskWrite10 (
   Get information from media read capacity command.
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
-  @param  Capacity        The pointer of EFI_SCSI_DISK_CAPACITY_DATA
-
+  @param  Capacity10      The pointer of EFI_SCSI_DISK_CAPACITY_DATA
+  @param  Capacity16      The pointer of EFI_SCSI_DISK_CAPACITY_DATA16
 **/
 VOID
 GetMediaInfo (
-  IN  OUT  SCSI_DISK_DEV                 *ScsiDiskDevice,
-  IN       EFI_SCSI_DISK_CAPACITY_DATA   *Capacity
+  SCSI_DISK_DEV                   *ScsiDiskDevice,
+  EFI_SCSI_DISK_CAPACITY_DATA     *Capacity10,
+  EFI_SCSI_DISK_CAPACITY_DATA16   *Capacity16
   );
 
 /**
