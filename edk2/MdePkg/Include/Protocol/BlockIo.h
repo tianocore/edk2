@@ -182,9 +182,24 @@ typedef struct {
   /// If the media changes, then this field is updated. 
   ///
   EFI_LBA LastBlock; 
+
+  ///
+  /// Only present if EFI_BLOCK_IO_PROTOCOL.Revision is greater than or equal to
+  /// EFI_BLOCK_IO_PROTOCOL_REVISION2. Returns the first LBA is aligned to 
+  /// a physical block boundary. 
+  ///
+  EFI_LBA LowestAlignedLba;
+
+  ///
+  /// Only present if EFI_BLOCK_IO_PROTOCOL.Revision is greater than or equal to
+  /// EFI_BLOCK_IO_PROTOCOL_REVISION2. Returns the number of logical blocks 
+  /// per physical block.
+  ///
+  UINT32 LogicalBlocksPerPhysicalBlock;
 } EFI_BLOCK_IO_MEDIA;
 
 #define EFI_BLOCK_IO_PROTOCOL_REVISION  0x00010000
+#define EFI_BLOCK_IO_PROTOCOL_REVISION2 0x00020001
 
 ///
 /// Revision defined in EFI1.1.
