@@ -10,7 +10,7 @@
 # Note: If only UGA Draw protocol is installed in system table, PcdUgaConsumeSupport
 # should be set to TRUE.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -76,7 +76,6 @@
 
 
 [Protocols]
-  gEfiConsoleControlProtocolGuid                ## PRODUCES
   gEfiSimplePointerProtocolGuid                 ## BY_START
   gEfiAbsolutePointerProtocolGuid               ## BY_START
   gEfiSimpleTextInProtocolGuid                  ## BY_START
@@ -95,10 +94,3 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
 
-# [Event]
-#   ##
-#   # mConIn.LockEvent, used to record and check key sequence on StdIn. Periodic is 25ms.
-#   #
-#   EVENT_TYPE_PREIODIC_TIMER                   ## PRODUCES
-#
-#

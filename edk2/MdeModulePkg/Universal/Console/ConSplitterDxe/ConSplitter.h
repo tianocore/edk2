@@ -1,7 +1,7 @@
 /** @file
   Private data structures for the Console Splitter driver
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
-#include <Protocol/ConsoleControl.h>
 #include <Protocol/SimplePointer.h>
 #include <Protocol/AbsolutePointer.h>
 #include <Protocol/SimpleTextOut.h>
@@ -77,7 +76,6 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
 //
 #define CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT  32
 #define CONSOLE_SPLITTER_MODES_ALLOC_UNIT     32
-#define MAX_STD_IN_PASSWORD                   80
 
 
 typedef struct {
@@ -146,12 +144,6 @@ typedef struct {
   UINTN                              AbsolutePointerListCount;
   BOOLEAN                            AbsoluteInputEventSignalState;
 
-  BOOLEAN                            PasswordEnabled;
-  CHAR16                             Password[MAX_STD_IN_PASSWORD];
-  UINTN                              PwdIndex;
-  CHAR16                             PwdAttempt[MAX_STD_IN_PASSWORD];
-  EFI_EVENT                          LockEvent;
-
   BOOLEAN                            KeyEventSignalState;
   BOOLEAN                            InputEventSignalState;
 } TEXT_IN_SPLITTER_PRIVATE_DATA;
@@ -190,7 +182,6 @@ typedef struct {
   EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
   EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
-  BOOLEAN                          TextOutEnabled;
 } TEXT_OUT_AND_GOP_DATA;
 
 //
@@ -207,16 +198,12 @@ typedef struct {
   UINT32                                UgaVerticalResolution;
   UINT32                                UgaColorDepth;
   UINT32                                UgaRefreshRate;
-  EFI_UGA_PIXEL                         *UgaBlt;
 
   EFI_GRAPHICS_OUTPUT_PROTOCOL          GraphicsOutput;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL         *GraphicsOutputBlt;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GraphicsOutputModeBuffer;
   UINTN                                 CurrentNumberOfGraphicsOutput;
   UINTN                                 CurrentNumberOfUgaDraw;
   BOOLEAN                               HardwareNeedsStarting;
-
-  EFI_CONSOLE_CONTROL_PROTOCOL          ConsoleControl;
 
   UINTN                                 CurrentNumberOfConsoles;
   TEXT_OUT_AND_GOP_DATA                 *TextOutList;
@@ -224,13 +211,6 @@ typedef struct {
   TEXT_OUT_SPLITTER_QUERY_DATA          *TextOutQueryData;
   UINTN                                 TextOutQueryDataCount;
   INT32                                 *TextOutModeMap;
-
-  EFI_CONSOLE_CONTROL_SCREEN_MODE       ConsoleOutputMode;
-
-  UINTN                                 DevNullColumns;
-  UINTN                                 DevNullRows;
-  CHAR16                                *DevNullScreen;
-  INT32                                 *DevNullAttributes;
 
 } TEXT_OUT_SPLITTER_PRIVATE_DATA;
 
@@ -713,7 +693,7 @@ ConSplitterAbsolutePointerGetState (
 
 /**
   This event agregates all the events of the pointer devices in the splitter.
-  If the ConIn is password locked then return.
+
   If any events of physical pointer devices are signaled, signal the pointer
   splitter event. This will cause the calling code to call
   ConSplitterAbsolutePointerGetState ().
@@ -1283,7 +1263,6 @@ ConSplitterTextInReset (
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
-  If the ConIn is password locked make it look like no keystroke is availible
 
   @param  This                     Protocol instance pointer.
   @param  Key                      Driver may perform diagnostics on reset.
@@ -1455,7 +1434,6 @@ ConSplitterTextInUnregisterKeyNotify (
 /**
   This event aggregates all the events of the ConIn devices in the spliter.
 
-  If the ConIn is password locked then return.
   If any events of physical ConIn devices are signaled, signal the ConIn
   spliter event. This will cause the calling code to call
   ConSplitterTextInReadKeyStroke ().
@@ -1471,57 +1449,6 @@ ConSplitterTextInWaitForKey (
   IN  VOID                            *Context
   );
 
-/**
-  Return TRUE if StdIn is locked. The ConIn device on the virtual handle is
-  the only device locked.
-
-  @retval TRUE                     StdIn locked
-  @retval FALSE                    StdIn working normally
-
-**/
-BOOLEAN
-ConSpliterConssoleControlStdInLocked (
-  VOID
-  );
-
-/**
-  Record and check key sequence on StdIn.
-
-  This timer event will fire when StdIn is locked. It will record the key sequence
-  on StdIn and also check to see if it matches the password. Any error in the
-  password will cause the check to reset. As long as a mConIn.PasswordEnabled is
-  TRUE, the StdIn splitter will not report any input.
-
-  @param  Event                  The Event this notify function registered to.
-  @param  Context                Pointer to the context data registerd to the
-                                 Event.
-**/
-VOID
-EFIAPI
-ConSpliterConsoleControlLockStdInEvent (
-  IN  EFI_EVENT                       Event,
-  IN  VOID                            *Context
-  );
-
-/**
-  If Password is NULL unlock the password state variable and set the event
-  timer. If the Password is too big return an error. If the Password is valid
-  Copy the Password and enable state variable and then arm the periodic timer
-
-  @param  This                     Console Control protocol pointer.
-  @param  Password                 The password input.
-
-  @retval EFI_SUCCESS              Lock the StdIn device
-  @retval EFI_INVALID_PARAMETER    Password is NULL
-  @retval EFI_OUT_OF_RESOURCES     Buffer allocation to store the password fails
-
-**/
-EFI_STATUS
-EFIAPI
-ConSpliterConsoleControlLockStdIn (
-  IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
-  IN  CHAR16                          *Password
-  );
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -1564,7 +1491,6 @@ ConSplitterSimplePointerReset (
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
-  If the ConIn is password locked make it look like no keystroke is availible
 
   @param  This                     A pointer to protocol instance.
   @param  State                    A pointer to state information on the pointer device
@@ -1584,7 +1510,6 @@ ConSplitterSimplePointerGetState (
 
 /**
   This event agregates all the events of the ConIn devices in the spliter.
-  If the ConIn is password locked then return.
   If any events of physical ConIn devices are signaled, signal the ConIn
   spliter event. This will cause the calling code to call
   ConSplitterTextInReadKeyStroke ().
@@ -1830,48 +1755,6 @@ ConSplitterGrowBuffer (
   );
 
 /**
-  Return the current video mode information. Also returns info about existence
-  of Graphics Output devices or UGA Draw devices in system, and if the Std In device is locked. All the
-  arguments are optional and only returned if a non NULL pointer is passed in.
-
-  @param  This                    Protocol instance pointer.
-  @param  Mode                    Are we in text of grahics mode.
-  @param  GopUgaExists            TRUE if Console Spliter has found a GOP or UGA device
-  @param  StdInLocked             TRUE if StdIn device is keyboard locked
-
-  @retval EFI_SUCCESS             Mode information returned.
-  @retval EFI_INVALID_PARAMETER   Invalid parameters.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSpliterConsoleControlGetMode (
-  IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
-  OUT EFI_CONSOLE_CONTROL_SCREEN_MODE *Mode,
-  OUT BOOLEAN                         *GopUgaExists,
-  OUT BOOLEAN                         *StdInLocked
-  );
-
-/**
-  Set the current mode to either text or graphics. Graphics is
-  for Quiet Boot.
-
-  @param  This                    Console Control Protocol instance pointer.
-  @param  Mode                    Mode to set.
-
-  @retval EFI_SUCCESS             Mode information returned.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_UNSUPPORTED         Operation unsupported.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSpliterConsoleControlSetMode (
-  IN  EFI_CONSOLE_CONTROL_PROTOCOL    *This,
-  IN  EFI_CONSOLE_CONTROL_SCREEN_MODE Mode
-  );
-
-/**
   Returns information for an available graphics mode that the graphics device
   and the set of active video output devices supports.
 
@@ -1978,26 +1861,6 @@ ConSpliterGraphicsOutputBlt (
   IN  UINTN                                         Delta         OPTIONAL
   );
 
-/**
-  Write data from the buffer to video display based on Graphics Output setting.
-
-  @param  Private                 Consplitter Text Out pointer.
-  @param  GraphicsOutput          Graphics Output protocol pointer.
-  @param  UgaDraw                 UGA Draw protocol pointer.
-
-  @retval EFI_UNSUPPORTED         No graphics devcie available .
-  @retval EFI_SUCCESS             The Blt operation completed.
-  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
-  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video buffer.
-
-
-**/
-EFI_STATUS
-DevNullGopSync (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
-  IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
-  );
 
 /**
   Return the current video mode information.
@@ -2112,137 +1975,17 @@ ConSpliterUgaDrawBlt (
   );
 
 /**
-  Write data from the buffer to video display based on UGA Draw setting.
-
-  @param  Private                 Consplitter Text Out pointer.
-  @param  GraphicsOutput          Graphics Output protocol pointer.
-  @param  UgaDraw                 UGA Draw protocol pointer.
-
-  @retval EFI_UNSUPPORTED         No graphics devcie available .
-  @retval EFI_SUCCESS             The Blt operation completed.
-  @retval EFI_INVALID_PARAMETER   BltOperation is not valid.
-  @retval EFI_DEVICE_ERROR        A hardware error occured writting to the video buffer.
-
-**/
-EFI_STATUS
-DevNullUgaSync (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
-  IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
-  );
-
-/**
-  Write a Unicode string to the output device.
-
-  @param  Private                 Pointer to the console output splitter's private
-                                  data. It indicates the calling context.
-  @param  WString                 The NULL-terminated Unicode string to be
-                                  displayed on the output device(s). All output
-                                  devices must also support the Unicode drawing
-                                  defined in this file.
-
-  @retval EFI_SUCCESS             The string was output to the device.
-  @retval EFI_DEVICE_ERROR        The device reported an error while attempting to
-                                  output the text.
-  @retval EFI_UNSUPPORTED         The output device's mode is not currently in a
-                                  defined text mode.
-  @retval EFI_WARN_UNKNOWN_GLYPH  This warning code indicates that some of the
-                                  characters in the Unicode string could not be
-                                  rendered and were skipped.
-
-**/
-EFI_STATUS
-DevNullTextOutOutputString (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  CHAR16                          *WString
-  );
-
-/**
   Sets the output device(s) to a specified mode.
 
   @param  Private                 Text Out Splitter pointer.
   @param  ModeNumber              The mode number to set.
 
-  @retval EFI_SUCCESS             The requested text mode was set.
-  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
-                                  the request.
-  @retval EFI_UNSUPPORTED         The mode number was not valid.
-  @retval EFI_OUT_OF_RESOURCES    Out of resources.
-
 **/
-EFI_STATUS
-DevNullTextOutSetMode (
+VOID
+TextOutSetMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  UINTN                           ModeNumber
   );
 
-/**
-  Clears the output device(s) display to the currently selected background
-  color.
-
-  @param  Private                 Text Out Splitter pointer.
-
-  @retval EFI_SUCCESS             The operation completed successfully.
-  @retval EFI_DEVICE_ERROR        The device had an error and could not complete
-                                  the request.
-  @retval EFI_UNSUPPORTED         The output device is not in a valid text mode.
-
-**/
-EFI_STATUS
-DevNullTextOutClearScreen (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
-  );
-
-/**
-  Sets the current coordinates of the cursor position on NULL device.
-
-  @param  Private                  Text Out Splitter pointer.
-  @param  Column                   The column position to set the cursor to. Must be
-                                   greater than or equal to zero and less than the
-                                   number of columns by QueryMode ().
-  @param  Row                      The row position to set the cursor to. Must be
-                                   greater than or equal to zero and less than the
-                                   number of rows by QueryMode ().
-
-  @retval EFI_SUCCESS              Always returned.
-
-**/
-EFI_STATUS
-DevNullTextOutSetCursorPosition (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  UINTN                           Column,
-  IN  UINTN                           Row
-  );
-
-/**
-  Set cursor visibility property on NULL device.
-
-  @param  Private                 Text Out Splitter pointer.
-  @param  Visible                 If TRUE, the cursor is set to be visible, If
-                                  FALSE, the cursor is set to be invisible.
-
-  @retval EFI_SUCCESS             Always returned.
-
-**/
-EFI_STATUS
-DevNullTextOutEnableCursor (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  BOOLEAN                         Visible
-  );
-
-/**
-  Take the DevNull TextOut device and update the Simple Text Out on every
-  UGA device.
-
-  @param  Private                 Text Out Splitter pointer.
-
-  @retval EFI_SUCCESS             The request is valid.
-  @retval other                   Return status of TextOut->OutputString ()
-
-**/
-EFI_STATUS
-DevNullSyncStdOut (
-  IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private
-  );
 
 #endif
