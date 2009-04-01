@@ -378,6 +378,53 @@ ScsiReadCapacityCommand (
 
 
 /**
+  Function to submit read capacity16 command.
+
+  @param  ScsiIo            A pointer to SCSI IO protocol.
+  @param  Timeout           The length of timeout period.
+  @param  SenseData         A pointer to output sense data.
+  @param  SenseDataLength   The length of output sense data.
+  @param  HostAdapterStatus The status of Host Adapter.
+  @param  TargetStatus      The status of the target.
+  @param  DataBuffer        A pointer to a data buffer.
+  @param  DataLength        The length of data buffer.
+  @param  PMI               Partial medium indicator.
+
+  @retval  EFI_SUCCESS            The status of the unit is tested successfully.
+  @retval  EFI_BAD_BUFFER_SIZE    The SCSI Request Packet was executed, 
+                                  but the entire DataBuffer could not be transferred.
+                                  The actual number of bytes transferred is returned
+                                  in TransferLength.
+  @retval  EFI_NOT_READY          The SCSI Request Packet could not be sent because 
+                                  there are too many SCSI Command Packets already 
+                                  queued.
+  @retval  EFI_DEVICE_ERROR       A device error occurred while attempting to send 
+                                  the SCSI Request Packet.
+  @retval  EFI_INVALID_PARAMETER  The contents of CommandPacket are invalid.  
+  @retval  EFI_UNSUPPORTED        The command described by the SCSI Request Packet
+                                  is not supported by the SCSI initiator(i.e., SCSI 
+                                  Host Controller).
+  @retval  EFI_TIMEOUT            A timeout occurred while waiting for the SCSI 
+                                  Request Packet to execute.
+
+**/
+
+EFI_STATUS
+EFIAPI
+ScsiReadCapacity16Command (
+  IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN  UINT64                Timeout,
+  IN  VOID                  *SenseData,
+  IN OUT UINT8              *SenseDataLength,
+  OUT UINT8                 *HostAdapterStatus,
+  OUT UINT8                 *TargetStatus,
+  OUT VOID                  *DataBuffer,
+  IN OUT UINT32             *DataLength,
+  IN  BOOLEAN               PMI
+  );
+
+
+/**
   Execute Read(10) SCSI command on a specific SCSI target.
 
   Executes the SCSI Read(10) command on the SCSI target specified by ScsiIo.

@@ -49,6 +49,7 @@
 #define EFI_SCSI_OP_READ6           0x08
 #define EFI_SCSI_OP_READ10          0x28
 #define EFI_SCSI_OP_READ_CAPACITY   0x25
+#define EFI_SCSI_OP_READ_CAPACITY16 0x9e
 #define EFI_SCSI_OP_READ_DEFECT     0x37
 #define EFI_SCSI_OP_READ_LONG       0x3e
 #define EFI_SCSI_OP_REASSIGN_BLK    0x07
@@ -239,6 +240,27 @@ typedef struct {
   UINT8 BlockSize1;
   UINT8 BlockSize0;
 } EFI_SCSI_DISK_CAPACITY_DATA;
+
+typedef struct {
+  UINT8 LastLba7;
+  UINT8 LastLba6;
+  UINT8 LastLba5;
+  UINT8 LastLba4;
+  UINT8 LastLba3;
+  UINT8 LastLba2;
+  UINT8 LastLba1;
+  UINT8 LastLba0;
+  UINT8 BlockSize3;
+  UINT8 BlockSize2;
+  UINT8 BlockSize1;
+  UINT8 BlockSize0;
+  UINT8 Protection;
+  UINT8 LogicPerPhysical;
+  UINT8 LowestAlignLogic2;  
+  UINT8 LowestAlignLogic1;    
+  UINT8 Reserved[16];  
+} EFI_SCSI_DISK_CAPACITY_DATA16;
+
 
 #pragma pack()
 
