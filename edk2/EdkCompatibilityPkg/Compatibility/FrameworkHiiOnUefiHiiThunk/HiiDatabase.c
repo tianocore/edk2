@@ -324,7 +324,7 @@ LangCodes3066To639 (
   // Allocate working buffer to contain substring of LangCodes3066.
   //
   Lang = AllocatePool (AsciiStrSize (LangCodes3066));
-  if (Lang != NULL) {
+  if (Lang == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
