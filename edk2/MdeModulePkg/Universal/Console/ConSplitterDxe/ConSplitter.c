@@ -4146,6 +4146,10 @@ ConSplitterTextOutOutputString (
 
   BackSpaceCount  = 0;
   for (TargetString = WString; *TargetString != L'\0'; TargetString++) {
+    if (*TargetString == L'a' && *(TargetString + 1) == L'b' && *(TargetString + 2) == L'c') {
+;//       CpuBreakpoint ();
+    }
+
     if (*TargetString == CHAR_BACKSPACE) {
       BackSpaceCount++;
     }
@@ -4173,8 +4177,10 @@ ConSplitterTextOutOutputString (
     }
   }
 
-  Private->TextOutMode.CursorColumn = Private->TextOutList[0].TextOut->Mode->CursorColumn;
-  Private->TextOutMode.CursorRow    = Private->TextOutList[0].TextOut->Mode->CursorRow;
+  if (Private->CurrentNumberOfConsoles > 0) {
+    Private->TextOutMode.CursorColumn = Private->TextOutList[0].TextOut->Mode->CursorColumn;
+    Private->TextOutMode.CursorRow    = Private->TextOutList[0].TextOut->Mode->CursorRow;
+  }
 
   if (BackSpaceCount > 0) {
     FreePool (TargetString);
