@@ -96,7 +96,7 @@ DevPathToTextPci (
   PCI_DEVICE_PATH *Pci;
 
   Pci = DevPath;
-  CatPrint (Str, L"Pci(0x%x,0x%x)", Pci->Device, Pci->Function);
+  CatPrint (Str, L"Pci(0x%x,0x%x)", (UINTN) Pci->Device, (UINTN) Pci->Function);
 }
 
 /**
@@ -123,7 +123,7 @@ DevPathToTextPccard (
   PCCARD_DEVICE_PATH  *Pccard;
 
   Pccard = DevPath;
-  CatPrint (Str, L"PcCard(0x%x)", Pccard->FunctionNumber);
+  CatPrint (Str, L"PcCard(0x%x)", (UINTN) Pccard->FunctionNumber);
 }
 
 /**
@@ -153,7 +153,7 @@ DevPathToTextMemMap (
   CatPrint (
     Str,
     L"MemoryMapped(0x%x,0x%lx,0x%lx)",
-    MemMap->MemoryType,
+    (UINTN) MemMap->MemoryType,
     MemMap->StartingAddress,
     MemMap->EndingAddress
     );
@@ -234,7 +234,7 @@ DevPathToTextVendor (
           L"SAS(0x%lx,0x%lx,0x%x,",
           ((SAS_DEVICE_PATH *) Vendor)->SasAddress,
           ((SAS_DEVICE_PATH *) Vendor)->Lun,
-          ((SAS_DEVICE_PATH *) Vendor)->RelativeTargetPort
+          (UINTN) ((SAS_DEVICE_PATH *) Vendor)->RelativeTargetPort
           );
         Info = (((SAS_DEVICE_PATH *) Vendor)->DeviceTopology);
         if ((Info & 0x0f) == 0) {
@@ -250,13 +250,13 @@ DevPathToTextVendor (
           if ((Info & 0x0f) == 1) {
             CatPrint (Str, L"0,");
           } else {
-            CatPrint (Str, L"0x%x,", (Info >> 8) & 0xff);
+            CatPrint (Str, L"0x%x,",(UINTN) (Info >> 8) & 0xff);
           }
         } else {
           CatPrint (Str, L"0,0,0,0,");
         }
 
-        CatPrint (Str, L"0x%x)", ((SAS_DEVICE_PATH *) Vendor)->Reserved);
+        CatPrint (Str, L"0x%x)", (UINTN) ((SAS_DEVICE_PATH *) Vendor)->Reserved);
         return ;
       } else if (CompareGuid (&Vendor->Guid, &gEfiDebugPortProtocolGuid)) {
         CatPrint (Str, L"DebugPort()");
@@ -279,7 +279,7 @@ DevPathToTextVendor (
   if (DataLength != 0) {
     CatPrint (Str, L",");
     for (Index = 0; Index < DataLength; Index++) {
-      CatPrint (Str, L"%02x", ((VENDOR_DEVICE_PATH_WITH_DATA *) Vendor)->VendorDefinedData[Index]);
+      CatPrint (Str, L"%02x", (UINTN) ((VENDOR_DEVICE_PATH_WITH_DATA *) Vendor)->VendorDefinedData[Index]);
     }
   }
 
@@ -313,7 +313,7 @@ DevPathToTextController (
   CatPrint (
     Str,
     L"Ctrl(0x%x)",
-    Controller->ControllerNumber
+    (UINTN) Controller->ControllerNumber
     );
 }
 
@@ -344,31 +344,31 @@ DevPathToTextAcpi (
   if ((Acpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
     switch (EISA_ID_TO_NUM (Acpi->HID)) {
     case 0x0a03:
-      CatPrint (Str, L"PciRoot(0x%x)", Acpi->UID);
+      CatPrint (Str, L"PciRoot(0x%x)", (UINTN) Acpi->UID);
       break;
 
     case 0x0604:
-      CatPrint (Str, L"Floppy(0x%x)", Acpi->UID);
+      CatPrint (Str, L"Floppy(0x%x)", (UINTN) Acpi->UID);
       break;
 
     case 0x0301:
-      CatPrint (Str, L"Keyboard(0x%x)", Acpi->UID);
+      CatPrint (Str, L"Keyboard(0x%x)", (UINTN) Acpi->UID);
       break;
 
     case 0x0501:
-      CatPrint (Str, L"Serial(0x%x)", Acpi->UID);
+      CatPrint (Str, L"Serial(0x%x)", (UINTN) Acpi->UID);
       break;
 
     case 0x0401:
-      CatPrint (Str, L"ParallelPort(0x%x)", Acpi->UID);
+      CatPrint (Str, L"ParallelPort(0x%x)", (UINTN) Acpi->UID);
       break;
 
     default:
-      CatPrint (Str, L"Acpi(PNP%04x,0x%x)", EISA_ID_TO_NUM (Acpi->HID), Acpi->UID);
+      CatPrint (Str, L"Acpi(PNP%04x,0x%x)", (UINTN) EISA_ID_TO_NUM (Acpi->HID), (UINTN) Acpi->UID);
       break;
     }
   } else {
-    CatPrint (Str, L"Acpi(0x%08x,0x%x)", Acpi->HID, Acpi->UID);
+    CatPrint (Str, L"Acpi(0x%08x,0x%x)", (UINTN) Acpi->HID, (UINTN) Acpi->UID);
   }
 }
 
@@ -464,7 +464,7 @@ DevPathToTextAcpiEx (
       if (AcpiEx->UID == 0) {
         CatPrint (Str, L"%a,", UIDStr);
       } else {
-        CatPrint (Str, L"0x%x,", AcpiEx->UID);
+        CatPrint (Str, L"0x%x,", (UINTN) AcpiEx->UID);
       }
 
       if (AcpiEx->CID == 0) {
@@ -478,7 +478,7 @@ DevPathToTextAcpiEx (
         L"AcpiEx(%s,%s,0x%x,%a,%a,%a)",
         HIDText,
         CIDText,
-        AcpiEx->UID,
+        (UINTN) AcpiEx->UID,
         HIDStr,
         CIDStr,
         UIDStr
@@ -517,9 +517,9 @@ DevPathToTextAcpiAdr (
   Length             = (UINT16) DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) AcpiAdr);
   AdditionalAdrCount = (UINT16) ((Length - 8) / 4);
 
-  CatPrint (Str, L"AcpiAdr(0x%x", AcpiAdr->ADR);
+  CatPrint (Str, L"AcpiAdr(0x%x", (UINTN) AcpiAdr->ADR);
   for (Index = 0; Index < AdditionalAdrCount; Index++) {
-    CatPrint (Str, L",0x%x", *(UINT32 *) ((UINT8 *) AcpiAdr + 8 + Index * 4));
+    CatPrint (Str, L",0x%x", (UINTN) *(UINT32 *) ((UINT8 *) AcpiAdr + 8 + Index * 4));
   }
   CatPrint (Str, L")");
 }
@@ -550,14 +550,14 @@ DevPathToTextAtapi (
   Atapi = DevPath;
 
   if (DisplayOnly) {
-    CatPrint (Str, L"Ata(0x%x)", Atapi->Lun);
+    CatPrint (Str, L"Ata(0x%x)", (UINTN) Atapi->Lun);
   } else {
     CatPrint (
       Str,
       L"Ata(%s,%s,0x%x)",
       (Atapi->PrimarySecondary == 1) ? L"Secondary" : L"Primary",
       (Atapi->SlaveMaster == 1) ? L"Slave" : L"Master",
-      Atapi->Lun
+      (UINTN) Atapi->Lun
       );
   }
 }
@@ -586,7 +586,7 @@ DevPathToTextScsi (
   SCSI_DEVICE_PATH  *Scsi;
 
   Scsi = DevPath;
-  CatPrint (Str, L"Scsi(0x%x,0x%x)", Scsi->Pun, Scsi->Lun);
+  CatPrint (Str, L"Scsi(0x%x,0x%x)", (UINTN) Scsi->Pun, (UINTN) Scsi->Lun);
 }
 
 /**
@@ -716,9 +716,9 @@ DevPathToTextUsbWWID (
   CatPrint (
     Str,
     L"UsbWwid(0x%x,0x%x,0x%x,\"%s\")",
-    UsbWWId->VendorId,
-    UsbWWId->ProductId,
-    UsbWWId->InterfaceNumber,
+    (UINTN) UsbWWId->VendorId,
+    (UINTN) UsbWWId->ProductId,
+    (UINTN) UsbWWId->InterfaceNumber,
     SerialNumberStr
     );
 }
@@ -747,7 +747,7 @@ DevPathToTextLogicalUnit (
   DEVICE_LOGICAL_UNIT_DEVICE_PATH *LogicalUnit;
 
   LogicalUnit = DevPath;
-  CatPrint (Str, L"Unit(0x%x)", LogicalUnit->Lun);
+  CatPrint (Str, L"Unit(0x%x)", (UINTN) LogicalUnit->Lun);
 }
 
 /**
@@ -836,10 +836,10 @@ DevPathToTextUsbClass (
     CatPrint (
       Str,
       L"(0x%x,0x%x,0x%x,0x%x)",
-      UsbClass->VendorId,
-      UsbClass->ProductId,
-      UsbClass->DeviceSubClass,
-      UsbClass->DeviceProtocol
+      (UINTN) UsbClass->VendorId,
+      (UINTN) UsbClass->ProductId,
+      (UINTN) UsbClass->DeviceSubClass,
+      (UINTN) UsbClass->DeviceProtocol
       );
     return;
   }
@@ -849,27 +849,27 @@ DevPathToTextUsbClass (
       CatPrint (
         Str,
         L"UsbDeviceFirmwareUpdate(0x%x,0x%x,0x%x)",
-        UsbClass->VendorId,
-        UsbClass->ProductId,
-        UsbClass->DeviceProtocol
+        (UINTN) UsbClass->VendorId,
+        (UINTN) UsbClass->ProductId,
+        (UINTN) UsbClass->DeviceProtocol
         );
       return;
     } else if (UsbClass->DeviceSubClass == USB_SUBCLASS_IRDA_BRIDGE) {
       CatPrint (
         Str,
         L"UsbIrdaBridge(0x%x,0x%x,0x%x)",
-        UsbClass->VendorId,
-        UsbClass->ProductId,
-        UsbClass->DeviceProtocol
+        (UINTN) UsbClass->VendorId,
+        (UINTN) UsbClass->ProductId,
+        (UINTN) UsbClass->DeviceProtocol
         );
       return;
     } else if (UsbClass->DeviceSubClass == USB_SUBCLASS_TEST) {
       CatPrint (
         Str,
         L"UsbTestAndMeasurement(0x%x,0x%x,0x%x)",
-        UsbClass->VendorId,
-        UsbClass->ProductId,
-        UsbClass->DeviceProtocol
+        (UINTN) UsbClass->VendorId,
+        (UINTN) UsbClass->ProductId,
+        (UINTN) UsbClass->DeviceProtocol
         );
       return;
     }
@@ -878,11 +878,11 @@ DevPathToTextUsbClass (
   CatPrint (
     Str,
     L"UsbClass(0x%x,0x%x,0x%x,0x%x,0x%x)",
-    UsbClass->VendorId,
-    UsbClass->ProductId,
-    UsbClass->DeviceClass,
-    UsbClass->DeviceSubClass,
-    UsbClass->DeviceProtocol
+    (UINTN) UsbClass->VendorId,
+    (UINTN) UsbClass->ProductId,
+    (UINTN) UsbClass->DeviceClass,
+    (UINTN) UsbClass->DeviceSubClass,
+    (UINTN) UsbClass->DeviceProtocol
     );
 }
 
@@ -910,13 +910,22 @@ DevPathToTextSata (
   SATA_DEVICE_PATH *Sata;
 
   Sata = DevPath;
-  CatPrint (
-    Str,
-    L"Sata(0x%x,0x%x,0x%x)",
-    (UINTN) Sata->HBAPortNumber,
-    (UINTN) Sata->PortMultiplierPortNumber,
-    (UINTN) Sata->Lun
-    );
+  if (Sata->PortMultiplierPortNumber & SATA_HBA_DIRECT_CONNECT_FLAG) {
+    CatPrint (
+      Str,
+      L"Sata(0x%x,0x%x)",
+      (UINTN) Sata->HBAPortNumber,
+      (UINTN) Sata->Lun
+      );
+  } else {
+    CatPrint (
+      Str,
+      L"Sata(0x%x,0x%x,0x%x)",
+      (UINTN) Sata->HBAPortNumber,
+      (UINTN) Sata->PortMultiplierPortNumber,
+      (UINTN) Sata->Lun
+      );
+  }
 }
 
 /**
@@ -943,7 +952,7 @@ DevPathToTextI2O (
   I2O_DEVICE_PATH *I2ODevPath;
 
   I2ODevPath = DevPath;
-  CatPrint (Str, L"I2O(0x%x)", I2ODevPath->Tid);
+  CatPrint (Str, L"I2O(0x%x)", (UINTN) I2ODevPath->Tid);
 }
 
 /**
@@ -981,10 +990,10 @@ DevPathToTextMacAddr (
   CatPrint (Str, L"MAC(");
 
   for (Index = 0; Index < HwAddressSize; Index++) {
-    CatPrint (Str, L"%02x", MacDevPath->MacAddress.Addr[Index]);
+    CatPrint (Str, L"%02x", (UINTN) MacDevPath->MacAddress.Addr[Index]);
   }
 
-  CatPrint (Str, L",0x%x)", MacDevPath->IfType);
+  CatPrint (Str, L",0x%x)", (UINTN) MacDevPath->IfType);
 }
 
 /**
@@ -1015,10 +1024,10 @@ DevPathToTextIPv4 (
     CatPrint (
       Str,
       L"IPv4(%d.%d.%d.%d)",
-      IPDevPath->RemoteIpAddress.Addr[0],
-      IPDevPath->RemoteIpAddress.Addr[1],
-      IPDevPath->RemoteIpAddress.Addr[2],
-      IPDevPath->RemoteIpAddress.Addr[3]
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[0],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[1],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[2],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[3]
       );
     return ;
   }
@@ -1026,16 +1035,16 @@ DevPathToTextIPv4 (
   CatPrint (
     Str,
     L"IPv4(%d.%d.%d.%d,%s,%s,%d.%d.%d.%d)",
-    IPDevPath->RemoteIpAddress.Addr[0],
-    IPDevPath->RemoteIpAddress.Addr[1],
-    IPDevPath->RemoteIpAddress.Addr[2],
-    IPDevPath->RemoteIpAddress.Addr[3],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[0],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[1],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[2],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[3],
     (IPDevPath->Protocol == 1) ? L"TCP" : L"UDP",
     IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
-    IPDevPath->LocalIpAddress.Addr[0],
-    IPDevPath->LocalIpAddress.Addr[1],
-    IPDevPath->LocalIpAddress.Addr[2],
-    IPDevPath->LocalIpAddress.Addr[3]
+    (UINTN) IPDevPath->LocalIpAddress.Addr[0],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[1],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[2],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[3]
     );
 }
 
@@ -1067,22 +1076,22 @@ DevPathToTextIPv6 (
     CatPrint (
       Str,
       L"IPv6(%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
-      IPDevPath->RemoteIpAddress.Addr[0],
-      IPDevPath->RemoteIpAddress.Addr[1],
-      IPDevPath->RemoteIpAddress.Addr[2],
-      IPDevPath->RemoteIpAddress.Addr[3],
-      IPDevPath->RemoteIpAddress.Addr[4],
-      IPDevPath->RemoteIpAddress.Addr[5],
-      IPDevPath->RemoteIpAddress.Addr[6],
-      IPDevPath->RemoteIpAddress.Addr[7],
-      IPDevPath->RemoteIpAddress.Addr[8],
-      IPDevPath->RemoteIpAddress.Addr[9],
-      IPDevPath->RemoteIpAddress.Addr[10],
-      IPDevPath->RemoteIpAddress.Addr[11],
-      IPDevPath->RemoteIpAddress.Addr[12],
-      IPDevPath->RemoteIpAddress.Addr[13],
-      IPDevPath->RemoteIpAddress.Addr[14],
-      IPDevPath->RemoteIpAddress.Addr[15]
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[0],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[1],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[2],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[3],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[4],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[5],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[6],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[7],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[8],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[9],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[10],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[11],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[12],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[13],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[14],
+      (UINTN) IPDevPath->RemoteIpAddress.Addr[15]
       );
     return ;
   }
@@ -1090,40 +1099,40 @@ DevPathToTextIPv6 (
   CatPrint (
     Str,
     L"IPv6(%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x,%s,%s,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
-    IPDevPath->RemoteIpAddress.Addr[0],
-    IPDevPath->RemoteIpAddress.Addr[1],
-    IPDevPath->RemoteIpAddress.Addr[2],
-    IPDevPath->RemoteIpAddress.Addr[3],
-    IPDevPath->RemoteIpAddress.Addr[4],
-    IPDevPath->RemoteIpAddress.Addr[5],
-    IPDevPath->RemoteIpAddress.Addr[6],
-    IPDevPath->RemoteIpAddress.Addr[7],
-    IPDevPath->RemoteIpAddress.Addr[8],
-    IPDevPath->RemoteIpAddress.Addr[9],
-    IPDevPath->RemoteIpAddress.Addr[10],
-    IPDevPath->RemoteIpAddress.Addr[11],
-    IPDevPath->RemoteIpAddress.Addr[12],
-    IPDevPath->RemoteIpAddress.Addr[13],
-    IPDevPath->RemoteIpAddress.Addr[14],
-    IPDevPath->RemoteIpAddress.Addr[15],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[0],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[1],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[2],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[3],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[4],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[5],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[6],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[7],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[8],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[9],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[10],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[11],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[12],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[13],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[14],
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[15],
     (IPDevPath->Protocol == 1) ? L"TCP" : L"UDP",
     IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
-    IPDevPath->LocalIpAddress.Addr[0],
-    IPDevPath->LocalIpAddress.Addr[1],
-    IPDevPath->LocalIpAddress.Addr[2],
-    IPDevPath->LocalIpAddress.Addr[3],
-    IPDevPath->LocalIpAddress.Addr[4],
-    IPDevPath->LocalIpAddress.Addr[5],
-    IPDevPath->LocalIpAddress.Addr[6],
-    IPDevPath->LocalIpAddress.Addr[7],
-    IPDevPath->LocalIpAddress.Addr[8],
-    IPDevPath->LocalIpAddress.Addr[9],
-    IPDevPath->LocalIpAddress.Addr[10],
-    IPDevPath->LocalIpAddress.Addr[11],
-    IPDevPath->LocalIpAddress.Addr[12],
-    IPDevPath->LocalIpAddress.Addr[13],
-    IPDevPath->LocalIpAddress.Addr[14],
-    IPDevPath->LocalIpAddress.Addr[15]
+    (UINTN) IPDevPath->LocalIpAddress.Addr[0],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[1],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[2],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[3],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[4],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[5],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[6],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[7],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[8],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[9],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[10],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[11],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[12],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[13],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[14],
+    (UINTN) IPDevPath->LocalIpAddress.Addr[15]
     );
 }
 
@@ -1154,7 +1163,7 @@ DevPathToTextInfiniBand (
   CatPrint (
     Str,
     L"Infiniband(0x%x,%g,0x%lx,0x%lx,0x%lx)",
-    InfiniBand->ResourceFlags,
+    (UINTN) InfiniBand->ResourceFlags,
     InfiniBand->PortGid,
     InfiniBand->ServiceId,
     InfiniBand->TargetPortId,
@@ -1226,7 +1235,7 @@ DevPathToTextUart (
   if (Uart->DataBits == 0) {
     CatPrint (Str, L"DEFAULT,");
   } else {
-    CatPrint (Str, L"%d,", Uart->DataBits);
+    CatPrint (Str, L"%d,", (UINTN) Uart->DataBits);
   }
 
   CatPrint (Str, L"%c,", Parity);
@@ -1283,7 +1292,7 @@ DevPathToTextiSCSI (
     Str,
     L"iSCSI(%a,0x%x,0x%lx,",
     ISCSIDevPath->iSCSITargetName,
-    ISCSIDevPath->TargetPortalGroupTag,
+    (UINTN) ISCSIDevPath->TargetPortalGroupTag,
     ISCSIDevPath->Lun
     );
 
@@ -1331,9 +1340,9 @@ DevPathToTextHardDrive (
     CatPrint (
       Str,
       L"HD(%d,%s,0x%08x,",
-      Hd->PartitionNumber,
+      (UINTN) Hd->PartitionNumber,
       L"MBR",
-      *((UINT32 *) (&(Hd->Signature[0])))
+      (UINTN) *((UINT32 *) (&(Hd->Signature[0])))
       );
     break;
 
@@ -1341,7 +1350,7 @@ DevPathToTextHardDrive (
     CatPrint (
       Str,
       L"HD(%d,%s,%g,",
-      Hd->PartitionNumber,
+      (UINTN) Hd->PartitionNumber,
       L"GPT",
       (EFI_GUID *) &(Hd->Signature[0])
       );
@@ -1351,8 +1360,8 @@ DevPathToTextHardDrive (
     CatPrint (
       Str,
       L"HD(%d,%d,0,",
-      Hd->PartitionNumber,
-      Hd->SignatureType
+      (UINTN) Hd->PartitionNumber,
+      (UINTN) Hd->SignatureType
       );
     break;
   }
@@ -1385,11 +1394,11 @@ DevPathToTextCDROM (
 
   Cd = DevPath;
   if (DisplayOnly) {
-    CatPrint (Str, L"CDROM(0x%x)", Cd->BootEntry);
+    CatPrint (Str, L"CDROM(0x%x)", (UINTN) Cd->BootEntry);
     return ;
   }
 
-  CatPrint (Str, L"CDROM(0x%x,0x%lx,0x%lx)", Cd->BootEntry, Cd->PartitionStart, Cd->PartitionSize);
+  CatPrint (Str, L"CDROM(0x%x,0x%lx,0x%lx)", (UINTN) Cd->BootEntry, Cd->PartitionStart, Cd->PartitionSize);
 }
 
 /**
@@ -1558,7 +1567,7 @@ DevPathToTextBBS (
   if (Type != NULL) {
     CatPrint (Str, L"BBS(%s,%a", Type, Bbs->String);
   } else {
-    CatPrint (Str, L"BBS(0x%x,%a", Bbs->DeviceType, Bbs->String);
+    CatPrint (Str, L"BBS(0x%x,%a", (UINTN) Bbs->DeviceType, Bbs->String);
   }
 
   if (DisplayOnly) {
@@ -1566,7 +1575,7 @@ DevPathToTextBBS (
     return ;
   }
 
-  CatPrint (Str, L",0x%x)", Bbs->StatusFlag);
+  CatPrint (Str, L",0x%x)", (UINTN) Bbs->StatusFlag);
 }
 
 /**
@@ -1646,7 +1655,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable
   {MEDIA_DEVICE_PATH, MEDIA_HARDDRIVE_DP, DevPathToTextHardDrive},
   {MEDIA_DEVICE_PATH, MEDIA_CDROM_DP, DevPathToTextCDROM},
   {MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP, DevPathToTextVendor},
-  {MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP, DevPathToTextFilePath},
   {MEDIA_DEVICE_PATH, MEDIA_PROTOCOL_DP, DevPathToTextMediaProtocol},
   {MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP, DevPathToTextFilePath},
   {MEDIA_DEVICE_PATH, MEDIA_PIWG_FW_VOL_DP, DevPathToTextFv},
