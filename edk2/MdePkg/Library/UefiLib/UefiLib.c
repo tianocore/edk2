@@ -456,9 +456,9 @@ EfiReleaseLock (
                                function.
 
   @retval EFI_SUCCESS          ControllerHandle is managed by the driver
-                               specifed by DriverBindingHandle.
+                               specified by DriverBindingHandle.
   @retval EFI_UNSUPPORTED      ControllerHandle is not managed by the driver
-                               specifed by DriverBindingHandle.
+                               specified by DriverBindingHandle.
 
 **/
 EFI_STATUS
@@ -581,7 +581,7 @@ EfiTestChildHandle (
 
   @retval EFI_SUCCESS             The Unicode string that matches the language 
                                   specified by Language was found
-                                  in the table of Unicoide strings UnicodeStringTable, 
+                                  in the table of Unicode strings UnicodeStringTable, 
                                   and it was returned in UnicodeString.
   @retval EFI_INVALID_PARAMETER   Language is NULL.
   @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
@@ -661,7 +661,7 @@ LookupUnicodeString (
                                RFC 4646 language code for the Unicode string to look up and
                                return. If Iso639Language is TRUE, then this ASCII string is
                                not assumed to be Null-terminated, and only the first three
-                               chacters are used. If Iso639Language is FALSE, then this ASCII
+                               characters are used. If Iso639Language is FALSE, then this ASCII
                                string must be Null-terminated. 
   @param  SupportedLanguages   A pointer to a Null-terminated ASCII string that contains a
                                set of ISO 639-2 or RFC 4646 language codes that the Unicode
@@ -1191,19 +1191,20 @@ FreeUnicodeStringTable (
 }
 
 /**
-Returns a pointer to an allocated buffer that contains the contents of a 
-variable retrieved through the UEFI Runtime Service GetVariable().  The 
-returned buffer is allocated using AllocatePool().  The caller is responsible
-for freeing tis buffer with FreePool().
+  Returns a pointer to an allocated buffer that contains the contents of a 
+  variable retrieved through the UEFI Runtime Service GetVariable().  The 
+  returned buffer is allocated using AllocatePool().  The caller is responsible
+  for freeing this buffer with FreePool().
 
-If Name is NULL, then ASSERT().
-If Guid is NULL, then ASSERT().
+  If Name is NULL, then ASSERT().
+  If Guid is NULL, then ASSERT().
 
-@param[in]  Name  Pointer to a Null-terminated Unicode string.
-@param[in]  Guid  Pointer to an EFI_GUID structure
+  @param[in]  Name  Pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  Pointer to an EFI_GUID structure
 
-@retval NULL   The variable could not be retrieved.
-@retval Other  A pointer to allocated buffer containing the variable contents
+  @retval NULL   The variable could not be retrieved.
+  @retval NULL   There are not enough resources available for the variable contents.
+  @retval Other  A pointer to allocated buffer containing the variable contents.
 
 **/
 VOID *

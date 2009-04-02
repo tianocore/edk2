@@ -62,7 +62,7 @@ typedef struct {
   Macro that returns the number of 100 ns units for a specified number of microseconds.
   Useful for managing EFI timer events.
 
-  @param  Microseconds           Number of microseonds.
+  @param  Microseconds           Number of microseconds.
 
   @return The number of 100 ns units equivalent to the number of microseconds specified
           by Microseconds.
@@ -71,7 +71,7 @@ typedef struct {
 #define EFI_TIMER_PERIOD_MICROSECONDS(Microseconds) MultU64x32((UINT64)(Microseconds), 10)
 
 /**
-  Macro that returns the number of 100 ns units for a specified number of milliseoconds.
+  Macro that returns the number of 100 ns units for a specified number of milliseconds.
   Useful for managing EFI timer events.
 
   @param  Milliseconds           Number of milliseconds.
@@ -83,7 +83,7 @@ typedef struct {
 #define EFI_TIMER_PERIOD_MILLISECONDS(Milliseconds) MultU64x32((UINT64)(Milliseconds), 10000)
 
 /**
-  Macro that returns the number of 100 ns units for a specified number of seoconds.
+  Macro that returns the number of 100 ns units for a specified number of seconds.
   Useful for managing EFI timer events.
 
   @param  Seconds                Number of seconds.
@@ -378,9 +378,9 @@ EfiReleaseLock (
                                function.
 
   @retval EFI_SUCCESS          ControllerHandle is managed by the driver
-                               specifed by DriverBindingHandle.
+                               specified by DriverBindingHandle.
   @retval EFI_UNSUPPORTED      ControllerHandle is not managed by the driver
-                               specifed by DriverBindingHandle.
+                               specified by DriverBindingHandle.
 
 **/
 EFI_STATUS
@@ -436,7 +436,7 @@ EfiTestChildHandle (
 
   @retval EFI_SUCCESS             The Unicode string that matches the language 
                                   specified by Language was found
-                                  in the table of Unicoide strings UnicodeStringTable, 
+                                  in the table of Unicode strings UnicodeStringTable, 
                                   and it was returned in UnicodeString.
   @retval EFI_INVALID_PARAMETER   Language is NULL.
   @retval EFI_INVALID_PARAMETER   UnicodeString is NULL.
@@ -468,7 +468,7 @@ LookupUnicodeString (
                                RFC 4646 language code for the Unicode string to look up and
                                return. If Iso639Language is TRUE, then this ASCII string is
                                not assumed to be Null-terminated, and only the first three
-                               chacters are used. If Iso639Language is FALSE, then this ASCII
+                               characters are used. If Iso639Language is FALSE, then this ASCII
                                string must be Null-terminated. 
   @param  SupportedLanguages   A pointer to a Null-terminated ASCII string that contains a
                                set of ISO 639-2 or RFC 4646 language codes that the Unicode
@@ -1064,7 +1064,7 @@ AsciiErrorPrint (
 
   @param  X            X coordinate to print the string.
   @param  Y            Y coordinate to print the string.
-  @param  ForeGround   The forground color of the string being printed.  This is
+  @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
@@ -1112,7 +1112,7 @@ PrintXY (
 
   @param  X            X coordinate to print the string.
   @param  Y            Y coordinate to print the string.
-  @param  ForeGround   The forground color of the string being printed.  This is
+  @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
@@ -1262,7 +1262,7 @@ EfiLibInstallDriverBindingComponentName2 (
   @param  ImageHandle           The image handle of the driver.
   @param  SystemTable           The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding         A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle   The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle   The handle that DriverBinding is to be installed onto.  If this
                                 parameter is NULL, then a new handle is created.
   @param  ComponentName         A Component Name Protocol instance that this driver is producing.
   @param  ComponentName2        A Component Name 2 Protocol instance that this driver is producing.

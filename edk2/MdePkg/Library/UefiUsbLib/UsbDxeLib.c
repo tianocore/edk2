@@ -37,7 +37,7 @@
 
   @retval EFI_SUCCESS           The request executed successfully.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed because the
-                                buffer specifed by DescriptorLength and Descriptor
+                                buffer specified by DescriptorLength and Descriptor
                                 is not large enough to hold the result of the request.
   @retval EFI_TIMEOUT           A timeout occurred executing the request.
   @retval EFI_DEVICE_ERROR      The request failed due to a device error. The transfer

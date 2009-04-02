@@ -22,11 +22,11 @@
   Initialize the serial device hardware.
   
   If no initialization is required, then return RETURN_SUCCESS.
-  If the serial device was successfuly initialized, then return RETURN_SUCCESS.
+  If the serial device was successfully initialized, then return RETURN_SUCCESS.
   If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
   
   @retval RETURN_SUCCESS        The serial device was initialized.
-  @retval RETURN_DEVICE_ERROR   The serail device could not be initialized.
+  @retval RETURN_DEVICE_ERROR   The serial device could not be initialized.
 
 **/
 RETURN_STATUS
@@ -95,7 +95,7 @@ SerialPortRead (
 /**
   Polls a serial device to see if there is any data waiting to be read.
 
-  Polls aserial device to see if there is any data waiting to be read.
+  Polls a serial device to see if there is any data waiting to be read.
   If there is data waiting to be read from the serial device, then TRUE is returned.
   If there is no data waiting to be read from the serial device, then FALSE is returned.
 

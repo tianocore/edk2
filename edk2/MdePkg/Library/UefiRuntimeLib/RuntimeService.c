@@ -33,7 +33,7 @@
   Calling this interface with ResetType of EfiResetShutdown causes the system to enter a power state equivalent to the
   ACPI G2/S5 or G3 states. If the system does not support this reset type, then when the system is rebooted, it should
   exhibit the EfiResetCold attributes.
-  The platform may optionally log the parmeters from any non-normal reset that occurs.
+  The platform may optionally log the parameters from any non-normal reset that occurs.
   The ResetSystem() function does not return.
 
   @param  ResetType   The type of reset to perform.
@@ -208,7 +208,7 @@ EfiSetWakeupTime (
   @param  VendorGuid   Unify identifier for vendor.
   @param  Attributes   Point to memory location to return the attributes of variable. If the point
                        is NULL, the parameter would be ignored.
-  @param  DataSize     As input, point to the maxinum size of return Data-Buffer.
+  @param  DataSize     As input, point to the maximum size of return Data-Buffer.
                        As output, point to the actual size of the returned Data-Buffer.
   @param  Data         Point to return Data-Buffer.
 
@@ -246,8 +246,8 @@ EfiGetVariable (
   variable name data. When the entire variable list has been returned, the error EFI_NOT_FOUND
   is returned.
 
-  @param  VariableNameSize As input, point to maxinum size of variable name.
-                           As output, point to actual size of varaible name.
+  @param  VariableNameSize As input, point to maximum size of variable name.
+                           As output, point to actual size of variable name.
   @param  VariableName     As input, supplies the last VariableName that was returned by
                            GetNextVariableName().
                            As output, returns the name of variable. The name
