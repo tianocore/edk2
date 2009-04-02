@@ -1,5 +1,8 @@
 /** @file
-  Component name for module DxeIpIoLib.
+  Instance of DxeIpIoLib.
+
+  This module provides IP services by consuming EFI IP4 Service Binding Protocol and
+  EFI IP4 Protocol.
 
 Copyright (c) 2006, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
