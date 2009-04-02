@@ -178,10 +178,17 @@ typedef struct {
   UINT16  command_set_feature_enb_86; // word 86
   UINT16  command_set_feature_default; // word 87
   UINT16  ultra_dma_mode; // word 88
-  UINT16  reserved_89_127[39];
+  UINT16  reserved_89_105[17];
+  UINT16  phy_logic_sector_support; // word 106
+  UINT16  reserved_107_116[10];
+  UINT16  logic_sector_size_lo; // word 117
+  UINT16  logic_sector_size_hi; // word 118
+  UINT16  reserved_119_127[9];
   UINT16  security_status;
   UINT16  vendor_data_129_159[31];
-  UINT16  reserved_160_255[96];
+  UINT16  reserved_160_208[49];
+  UINT16  alignment_logic_in_phy_blocks; // word 209
+  UINT16  reserved_210_255[46];
 } EFI_ATA_IDENTIFY_DATA;
 
 #pragma pack()
