@@ -140,7 +140,7 @@ DevPathMemMap (
   CatPrint (
     Str,
     L"MemMap(%d:%lx-%lx)",
-    MemMap->MemoryType,
+    (UINTN) MemMap->MemoryType,
     MemMap->StartingAddress,
     MemMap->EndingAddress
     );
@@ -239,7 +239,7 @@ DevPathVendor (
         L"SAS(%lx,%lx,%x,",
         ((SAS_DEVICE_PATH *) Vendor)->SasAddress,
         ((SAS_DEVICE_PATH *) Vendor)->Lun,
-        ((SAS_DEVICE_PATH *) Vendor)->RelativeTargetPort
+        (UINTN) ((SAS_DEVICE_PATH *) Vendor)->RelativeTargetPort
         );
       Info = (((SAS_DEVICE_PATH *) Vendor)->DeviceTopology);
       if ((Info & 0x0f) == 0) {
@@ -345,16 +345,12 @@ DevPathExtendedAcpi (
   UINT16                          Anchor;
   CHAR8                           *AsChar8Array;
 
-  ASSERT (Str != NULL);
-  ASSERT (DevPath != NULL);
-
   HIDSTRIdx    = 0;
   UIDSTRIdx    = 0;
   CIDSTRIdx    = 0;
   ExtendedAcpi = DevPath;
   Length       = (UINT16) DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) ExtendedAcpi);
 
-  ASSERT (Length >= 19);
   AsChar8Array = (CHAR8 *) ExtendedAcpi;
 
   //
@@ -560,7 +556,7 @@ DevPath1394 (
   F1394_DEVICE_PATH *F1394Path;
 
   F1394Path = DevPath;
-  CatPrint (Str, L"1394(%g)", &F1394Path->Guid);
+  CatPrint (Str, L"1394(%lx)", &F1394Path->Guid);
 }
 
 /**
@@ -684,13 +680,22 @@ DevPathSata (
   SATA_DEVICE_PATH *Sata;
 
   Sata = DevPath;
-  CatPrint (
-    Str,
-    L"Sata(%x,%x,%x)",
-    (UINTN) Sata->HBAPortNumber,
-    (UINTN) Sata->PortMultiplierPortNumber,
-    (UINTN) Sata->Lun
-    );
+  if (Sata->PortMultiplierPortNumber & SATA_HBA_DIRECT_CONNECT_FLAG) {
+    CatPrint (
+      Str,
+      L"Sata(%x,%x)",
+      (UINTN) Sata->HBAPortNumber,
+      (UINTN) Sata->Lun
+      );
+  } else {
+    CatPrint (
+      Str,
+      L"Sata(%x,%x,%x)",
+      (UINTN) Sata->HBAPortNumber,
+      (UINTN) Sata->PortMultiplierPortNumber,
+      (UINTN) Sata->Lun
+      );
+  }
 }
 
 /**
@@ -905,7 +910,7 @@ DevPathUart (
   if (Uart->BaudRate == 0) {
     CatPrint (Str, L"Uart(DEFAULT,%c,", Parity);
   } else {
-    CatPrint (Str, L"Uart(%d,%c,", Uart->BaudRate, Parity);
+    CatPrint (Str, L"Uart(%ld,%c,", Uart->BaudRate, Parity);
   }
 
   if (Uart->DataBits == 0) {
@@ -956,15 +961,12 @@ DevPathiSCSI (
   ISCSI_DEVICE_PATH_WITH_NAME *IScsi;
   UINT16                      Options;
 
-  ASSERT (Str != NULL);
-  ASSERT (DevPath != NULL);
-
   IScsi = DevPath;
   CatPrint (
     Str,
-    L"iSCSI(%s,%x,%lx,",
+    L"iSCSI(%a,%x,%lx,",
     IScsi->iSCSITargetName,
-    IScsi->TargetPortalGroupTag,
+    (UINTN) IScsi->TargetPortalGroupTag,
     IScsi->Lun
     );
 
@@ -1214,6 +1216,27 @@ DevPathNodeUnknown (
 {
   CatPrint (Str, L"?");
 }
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maximum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
+VOID
+DevPathFvPath (
+  IN OUT POOL_PRINT       *Str,
+  IN VOID                 *DevPath
+  )
+{
+  MEDIA_FW_VOL_DEVICE_PATH *FvPath;
+
+  FvPath = DevPath;
+  CatPrint (Str, L"Fv(%g)", &FvPath->FvName);
+}
 
 DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
   {
@@ -1365,6 +1388,11 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
     MEDIA_DEVICE_PATH,
     MEDIA_PROTOCOL_DP,
     DevPathMediaProtocol
+  },
+  {
+    MEDIA_DEVICE_PATH,
+    MEDIA_PIWG_FW_VOL_DP,
+    DevPathFvPath,
   },
   {
     MEDIA_DEVICE_PATH,
