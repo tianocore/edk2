@@ -1785,7 +1785,7 @@ ConvertDevicePathToText (
       DumpNode = DevPathToTextNodeUnknown;
     }
     //
-    //  Put a path seperator in if needed
+    //  Put a path separator in if needed
     //
     if ((Str.Len != 0) && DumpNode != DevPathToTextEndInstance) {
       if (*(Str.Str + Str.Len / sizeof (CHAR16) - 1) != L',') {
