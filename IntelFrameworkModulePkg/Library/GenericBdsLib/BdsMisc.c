@@ -938,7 +938,7 @@ SetupResetReminder (
       // Popup a menu to notice user
       //
       do {
-        IfrLibCreatePopUp (2, &Key, StringBuffer1, StringBuffer2);
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
       } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
       FreePool (StringBuffer1);
