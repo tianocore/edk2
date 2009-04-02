@@ -306,7 +306,7 @@ EfiLibInstallDriverBindingComponentName2 (
   @param  ImageHandle           The image handle of the driver.
   @param  SystemTable           The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding         A Driver Binding Protocol instance that this driver is producing.
-  @param  DriverBindingHandle   The handle that DriverBinding is to be installe onto.  If this
+  @param  DriverBindingHandle   The handle that DriverBinding is to be installed onto.  If this
                                 parameter is NULL, then a new handle is created.
   @param  ComponentName         A Component Name Protocol instance that this driver is producing.
   @param  ComponentName2        A Component Name 2 Protocol instance that this driver is producing.
