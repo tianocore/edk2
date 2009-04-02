@@ -1165,6 +1165,22 @@ AtaSMARTSupport (
   IN  IDE_BLK_IO_DEV  *IdeDev
   );
 
+
+/**
+  Enable Long Physical Sector Feature for ATA device.
+
+  @param   IdeDev  The IDE device data
+
+  @retval  EFI_SUCCESS      The ATA device supports Long Physical Sector feature
+                            and corresponding fields in BlockIo structure is updated.
+  @retval  EFI_UNSUPPORTED  The device is not ATA device or Long Physical Sector
+                            feature is not supported.
+**/
+EFI_STATUS
+AtaEnableLongPhysicalSector (
+  IN  IDE_BLK_IO_DEV  *IdeDev
+  );
+
 /**
   TODO: Add function description
 
