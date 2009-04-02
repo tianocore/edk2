@@ -2663,7 +2663,7 @@ DevPathFromTextSata (
     Sata->PortMultiplierPortNumber = (UINT16) Xtoi (Param2);
     Param2                   = Param3;
   } else {
-    Sata->PortMultiplierPortNumber = 0;
+    Sata->PortMultiplierPortNumber = SATA_HBA_DIRECT_CONNECT_FLAG;
   }
   Sata->Lun = (UINT16) Xtoi (Param2);
 
