@@ -36,6 +36,31 @@ DEVICE_MANAGER_MENU_ITEM  mDeviceManagerMenuItemTable[] = {
   { STRING_TOKEN (STR_OTHER_DEVICE),    EFI_OTHER_DEVICE_CLASS }
 };
 
+HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {102579A0-3686-466e-ACD8-80C087044F4A}
+    //
+    { 0x102579a0, 0x3686, 0x466e, { 0xac, 0xd8, 0x80, 0xc0, 0x87, 0x4, 0x4f, 0x4a } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 #define MENU_ITEM_NUM  \
   (sizeof (mDeviceManagerMenuItemTable) / sizeof (DEVICE_MANAGER_MENU_ITEM))
 
@@ -100,21 +125,15 @@ InitializeDeviceManager (
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
 
   //
-  // Create driver handle used by HII database
+  // Install Device Path Protocol and Config Access protocol to driver handle
   //
-  Status = HiiLibCreateHiiDriverHandle (&gDeviceManagerPrivate.DriverHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Install Config Access protocol to driver handle
-  //
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &gDeviceManagerPrivate.DriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mDeviceManagerHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &gDeviceManagerPrivate.ConfigAccess
+                  &gDeviceManagerPrivate.ConfigAccess,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
 

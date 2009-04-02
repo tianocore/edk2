@@ -79,7 +79,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   PrintLib
   HiiLib
   IfrSupportLib
-  ExtendedHiiLib
   ExtendedIfrSupportLib
   NetLib
 

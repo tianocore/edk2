@@ -37,6 +37,31 @@ FRONT_PAGE_CALLBACK_DATA  gFrontPagePrivate = {
   }
 };
 
+HII_VENDOR_DEVICE_PATH  mFrontPageHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {8E6D99EE-7531-48f8-8745-7F6144468FF2}
+    //
+    { 0x8e6d99ee, 0x7531, 0x48f8, { 0x87, 0x45, 0x7f, 0x61, 0x44, 0x46, 0x8f, 0xf2 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 /**
   This function allows a caller to extract the current configuration for one
   or more named elements from the target driver.
@@ -324,21 +349,15 @@ InitializeFrontPage (
     }
 
     //
-    // Create driver handle used by HII database
+    // Install Device Path Protocol and Config Access protocol to driver handle
     //
-    Status = HiiLibCreateHiiDriverHandle (&gFrontPagePrivate.DriverHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Install Config Access protocol to driver handle
-    //
-    Status = gBS->InstallProtocolInterface (
+    Status = gBS->InstallMultipleProtocolInterfaces (
                     &gFrontPagePrivate.DriverHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    &mFrontPageHiiVendorDevicePath,
                     &gEfiHiiConfigAccessProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &gFrontPagePrivate.ConfigAccess
+                    &gFrontPagePrivate.ConfigAccess,
+                    NULL
                     );
     ASSERT_EFI_ERROR (Status);
 

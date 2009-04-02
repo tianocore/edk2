@@ -24,6 +24,31 @@ LIST_ENTRY      mIScsiConfigFormList = {
   &mIScsiConfigFormList
 };
 
+HII_VENDOR_DEVICE_PATH  mIScsiHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {49D7B73E-143D-4716-977B-C45F1CB038CC}
+    //
+    { 0x49d7b73e, 0x143d, 0x4716, { 0x97, 0x7b, 0xc4, 0x5f, 0x1c, 0xb0, 0x38, 0xcc } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 /**
   Convert the IPv4 address into a dotted string.
 
@@ -908,7 +933,7 @@ IScsiConfigFormInit (
     return Status;
   }
 
-  CallbackInfo = (ISCSI_FORM_CALLBACK_INFO *) AllocatePool (sizeof (ISCSI_FORM_CALLBACK_INFO));
+  CallbackInfo = (ISCSI_FORM_CALLBACK_INFO *) AllocateZeroPool (sizeof (ISCSI_FORM_CALLBACK_INFO));
   if (CallbackInfo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -928,22 +953,15 @@ IScsiConfigFormInit (
   }
 
   //
-  // Create driver handle used by HII database
+  // Install Device Path Protocol and Config Access protocol to driver handle
   //
-  Status = HiiLibCreateHiiDriverHandle (&CallbackInfo->DriverHandle);
-  if (EFI_ERROR (Status)) {
-    FreePool(CallbackInfo);
-    return Status;
-  }
-  
-  //
-  // Install Config Access protocol to driver handle
-  //
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &CallbackInfo->DriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mIScsiHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &CallbackInfo->ConfigAccess
+                  &CallbackInfo->ConfigAccess,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
   
@@ -1010,13 +1028,14 @@ IScsiConfigFormUnload (
   //
   // Uninstall EFI_HII_CONFIG_ACCESS_PROTOCOL
   //
-  gBS->UninstallProtocolInterface (
-        mCallbackInfo->DriverHandle,
-        &gEfiHiiConfigAccessProtocolGuid,
-        &mCallbackInfo->ConfigAccess
-        );
-  HiiLibDestroyHiiDriverHandle (mCallbackInfo->DriverHandle);
-
+  gBS->UninstallMultipleProtocolInterfaces (
+         mCallbackInfo->DriverHandle,
+         &gEfiDevicePathProtocolGuid,
+         &mIScsiHiiVendorDevicePath,
+         &gEfiHiiConfigAccessProtocolGuid,
+         &mCallbackInfo->ConfigAccess,
+         NULL
+         );
   gBS->FreePool (mCallbackInfo);
 
   return EFI_SUCCESS;

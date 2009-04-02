@@ -60,7 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/CapsuleLib.h>
 #include <Library/HiiLib.h>
-#include <Library/ExtendedHiiLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 
 #include <Library/GenericBdsLib.h>
@@ -72,6 +72,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       Bds,                                              \
       EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE          \
       )
+
+#pragma pack(1)
+
+///
+/// HII specific Vendor Device Path definition.
+///
+typedef struct {
+  VENDOR_DEVICE_PATH             VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL       End;
+} HII_VENDOR_DEVICE_PATH;
+
+#pragma pack()
 
 /**
 

@@ -107,7 +107,6 @@
   DebugLib
   PrintLib
   HiiLib
-  ExtendedHiiLib
   UefiDriverEntryPoint
   PlatformBdsLib
   CapsuleLib

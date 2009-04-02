@@ -525,7 +525,6 @@ InitializeSetup (
   )
 {
   EFI_STATUS                  Status;
-  EFI_HANDLE                  HiiDriverHandle;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
 
   //
@@ -555,15 +554,12 @@ InitializeSetup (
   //
   // Publish our HII data
   //
-  Status = HiiLibCreateHiiDriverHandle (&HiiDriverHandle);
-  ASSERT_EFI_ERROR (Status);
-
   PackageList = HiiLibPreparePackageList (1, &gSetupBrowserGuid, SetupBrowserStrings);
   ASSERT (PackageList != NULL);
   Status = mHiiDatabase->NewPackageList (
                            mHiiDatabase,
                            PackageList,
-                           HiiDriverHandle,
+                           ImageHandle,
                            &gHiiHandle
                            );
   ASSERT_EFI_ERROR (Status);

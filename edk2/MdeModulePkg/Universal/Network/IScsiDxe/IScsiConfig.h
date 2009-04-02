@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/HiiConfigRouting.h>
 #include <Library/HiiLib.h>
-#include <Library/ExtendedHiiLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/IfrSupportLib.h>
 #include <Library/ExtendedIfrSupportLib.h>
 #include <Library/DebugLib.h>
@@ -102,6 +102,18 @@ typedef struct _ISCSI_FORM_CALLBACK_INFO {
   EFI_HII_HANDLE                   RegisteredHandle;
   ISCSI_CONFIG_FORM_ENTRY          *Current;
 } ISCSI_FORM_CALLBACK_INFO;
+
+#pragma pack(1)
+
+///
+/// HII specific Vendor Device Path definition.
+///
+typedef struct {
+  VENDOR_DEVICE_PATH             VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL       End;
+} HII_VENDOR_DEVICE_PATH;
+
+#pragma pack()
 
 /**
   Updates the iSCSI configuration form to add/delete an entry for the iSCSI

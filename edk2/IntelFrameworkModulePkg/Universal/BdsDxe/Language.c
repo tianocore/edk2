@@ -259,23 +259,13 @@ ExportFonts (
   VOID
   )
 {
-  EFI_STATUS                   Status;
-  EFI_HANDLE                   DriverHandle;
   EFI_HII_HANDLE               HiiHandle;
   EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
-
-  //
-  // Create driver handle used by HII database
-  //
-  Status = HiiLibCreateHiiDriverHandle (&DriverHandle);
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
 
   PackageList = HiiLibPreparePackageList (1, &mFontPackageGuid, &mFontBin);
   ASSERT (PackageList != NULL);
 
-  gHiiDatabase->NewPackageList (gHiiDatabase, PackageList, DriverHandle, &HiiHandle);
+  gHiiDatabase->NewPackageList (gHiiDatabase, PackageList, mBdsImageHandle, &HiiHandle);
   FreePool (PackageList);
 }
 

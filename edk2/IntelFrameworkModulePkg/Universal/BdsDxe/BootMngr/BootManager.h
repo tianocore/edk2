@@ -86,7 +86,7 @@ BootManagerCallback (
   Registers HII packages for the Boot Manger to HII Database.
   It also registers the browser call back function.
 
-  @return Status of HiiLibCreateHiiDriverHandle() and gHiiDatabase->NewPackageList()
+  @return Status of gBS->InstallMultipleProtocolInterfaces() and gHiiDatabase->NewPackageList()
 **/
 EFI_STATUS
 InitializeBootManager (

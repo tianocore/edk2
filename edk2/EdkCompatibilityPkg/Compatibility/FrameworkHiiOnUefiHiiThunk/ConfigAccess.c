@@ -19,6 +19,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 BOOLEAN            mHiiPackageListUpdated = FALSE;
 
+HII_VENDOR_DEVICE_PATH  mUefiHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {2A1F1827-03E2-4b2f-83DE-89B6073A0182}
+    //
+    { 0x2a1f1827, 0x3e2, 0x4b2f, { 0x83, 0xde, 0x89, 0xb6, 0x7, 0x3a, 0x1, 0x82 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 CONFIG_ACCESS_PRIVATE gConfigAccessPrivateTempate = {
   CONFIG_ACCESS_PRIVATE_SIGNATURE,
   {
@@ -198,9 +223,6 @@ InstallDefaultConfigAccessProtocol (
 
   ASSERT (ThunkContext->IfrPackageCount != 0);
 
-  Status = HiiLibCreateHiiDriverHandle (&ThunkContext->UefiHiiDriverHandle);
-  ASSERT_EFI_ERROR (Status);
-  
   ConfigAccessInstance = AllocateCopyPool (
                            sizeof (CONFIG_ACCESS_PRIVATE), 
                            &gConfigAccessPrivateTempate
@@ -209,6 +231,8 @@ InstallDefaultConfigAccessProtocol (
   
   Status = gBS->InstallMultipleProtocolInterfaces (
           &ThunkContext->UefiHiiDriverHandle,
+          &gEfiDevicePathProtocolGuid,          
+          &mUefiHiiVendorDevicePath,
           &gEfiHiiConfigAccessProtocolGuid,
           &ConfigAccessInstance->ConfigAccessProtocol,
           NULL
@@ -237,8 +261,6 @@ UninstallDefaultConfigAccessProtocol (
   EFI_STATUS                      Status;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   
-  HiiLibDestroyHiiDriverHandle (ThunkContext->UefiHiiDriverHandle);
-
   Status = gBS->HandleProtocol (
                   ThunkContext->UefiHiiDriverHandle,
                   &gEfiHiiConfigAccessProtocolGuid,
@@ -246,10 +268,13 @@ UninstallDefaultConfigAccessProtocol (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->UninstallProtocolInterface (
+  Status = gBS->UninstallMultipleProtocolInterfaces (
                   ThunkContext->UefiHiiDriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mUefiHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  ConfigAccess
+                  ConfigAccess,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
 

@@ -34,18 +34,9 @@ InitializeStringSupport (
   )
 {
   EFI_STATUS                   Status;
-  EFI_HANDLE                   DriverHandle;
   EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
 
   Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &gHiiDatabase);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Create driver handle used by HII database
-  //
-  Status = HiiLibCreateHiiDriverHandle (&DriverHandle);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -56,7 +47,7 @@ InitializeStringSupport (
   Status = gHiiDatabase->NewPackageList (
                            gHiiDatabase,
                            PackageList,
-                           DriverHandle,
+                           mBdsImageHandle,
                            &gStringPackHandle
                            );
 

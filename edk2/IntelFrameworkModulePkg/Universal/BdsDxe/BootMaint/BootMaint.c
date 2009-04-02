@@ -28,6 +28,55 @@ EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {
   }
 };
 
+HII_VENDOR_DEVICE_PATH  mBmmHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {165A028F-0BB2-4b5f-8747-77592E3F6499}
+    //
+    { 0x165a028f, 0xbb2, 0x4b5f, { 0x87, 0x47, 0x77, 0x59, 0x2e, 0x3f, 0x64, 0x99 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
+HII_VENDOR_DEVICE_PATH  mFeHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {91DB4238-B0C8-472e-BBCF-F3A6541010F4}
+    //
+    { 0x91db4238, 0xb0c8, 0x472e, { 0xbb, 0xcf, 0xf3, 0xa6, 0x54, 0x10, 0x10, 0xf4 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
 
 EFI_GUID EfiLegacyDevOrderGuid  = EFI_LEGACY_DEV_ORDER_VARIABLE_GUID;
 EFI_GUID mBootMaintGuid         = BOOT_MAINT_FORMSET_GUID;
@@ -850,42 +899,30 @@ InitializeBM (
   BmmCallbackInfo->FeDisplayContext              = UNKNOWN_CONTEXT;
 
   //
-  // Create driver handle used by HII database
+  // Install Device Path Protocol and Config Access protocol to driver handle
   //
-  Status = HiiLibCreateHiiDriverHandle (&BmmCallbackInfo->BmmDriverHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Install Config Access protocol to driver handle
-  //
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &BmmCallbackInfo->BmmDriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mBmmHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &BmmCallbackInfo->BmmConfigAccess
+                  &BmmCallbackInfo->BmmConfigAccess,
+                  NULL
                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // Create driver handle used by HII database
+  // Install Device Path Protocol and Config Access protocol to driver handle
   //
-  Status = HiiLibCreateHiiDriverHandle (&BmmCallbackInfo->FeDriverHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Install Config Access protocol to driver handle
-  //
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &BmmCallbackInfo->FeDriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mFeHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &BmmCallbackInfo->FeConfigAccess
+                  &BmmCallbackInfo->FeConfigAccess,
+                  NULL
                   );
   if (EFI_ERROR (Status)) {
     return Status;
