@@ -123,7 +123,7 @@ AppendDeviceNodeProtocolInterface (
   path.
 
   This function creates a new device path by appending a copy of the device path instance specified
-  by DevicePathInstance to a copy of the device path secified by DevicePath in a allocated buffer.
+  by DevicePathInstance to a copy of the device path specified by DevicePath in a allocated buffer.
   The end-of-device-path device node is moved after the end of the appended device path instance
   and a new end-of-device-path-instance node is inserted between.
   If DevicePath is NULL, then a copy if DevicePathInstance is returned.
