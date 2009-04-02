@@ -2,7 +2,7 @@
 #  Module that produces EBC Interprete and EBC Debug Support protocols.
 #  
 #  This module implements EFI Byte Code (EBC) Virtual Machine that can provide 
-#  platform and processor-independent mechanisms forloading and executing EFI
+#  platform and processor-independent mechanisms for loading and executing EFI
 #  device drivers.
 #
 #  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
