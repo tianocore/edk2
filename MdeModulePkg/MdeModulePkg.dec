@@ -60,11 +60,6 @@
   ##  @libraryclass  Provides a set of interfaces to do IFR opcode creation and interact with a UEFI Form Browser.
   IfrSupportLib|Include/Library/IfrSupportLib.h
   
-  ##  @libraryclass  Includes two extended HII functions to create and destory Hii Package 
-  #                  by create the virtual Driver Handle.
-  ##
-  ExtendedHiiLib|Include/Library/ExtendedHiiLib.h
-  
   ##  @libraryclass  Defines APIs that is related to IFR operations but specific to EDK II
   #                  implementation.
   ##

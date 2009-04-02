@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePathToText.h>
 #include <Protocol/DevicePath.h>
 
+#include <Library/DevicePathLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
@@ -47,7 +48,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PlatformDriverOverrideLib.h>
 #include <Library/HiiLib.h>
 #include <Library/IfrSupportLib.h>
-#include <Library/ExtendedHiiLib.h>
 #include <Library/ExtendedIfrSupportLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -65,6 +65,18 @@ typedef struct {
   EFI_HII_CONFIG_ROUTING_PROTOCOL *HiiConfigRouting;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
 } EFI_CALLBACK_INFO;
+
+#pragma pack(1)
+
+///
+/// HII specific Vendor Device Path definition.
+///
+typedef struct {
+  VENDOR_DEVICE_PATH             VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL       End;
+} HII_VENDOR_DEVICE_PATH;
+
+#pragma pack()
 
 //
 // uni string and Vfr Binary data.
@@ -91,6 +103,31 @@ EFI_DEVICE_PATH_PROTOCOL     *mControllerDevicePathProtocol[MAX_CHOICE_NUM];
 UINTN                        mSelectedDriverImageNum;
 UINTN                        mLastSavedDriverImageNum;
 UINT16                       mCurrentPage;
+
+HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {99936717-BF3D-4b04-9787-76CEE324D76F}
+    //
+    { 0x99936717, 0xbf3d, 0x4b04, { 0x97, 0x87, 0x76, 0xce, 0xe3, 0x24, 0xd7, 0x6f } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
 
 /**
   Converting a given device to an unicode string. 
@@ -1276,8 +1313,7 @@ PlatOverMngrInit (
   EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
   EFI_CALLBACK_INFO           *CallbackInfo;
-  EFI_HANDLE                  DriverHandle;
-  EFI_FORM_BROWSER2_PROTOCOL       *FormBrowser2;
+  EFI_FORM_BROWSER2_PROTOCOL  *FormBrowser2;
   
   //
   // There should only be one HII protocol
@@ -1314,22 +1350,15 @@ PlatOverMngrInit (
   CallbackInfo->ConfigAccess.Callback      = PlatOverMngrCallback;
 
   //
-  // Create driver handle used by HII database
+  // Install Device Path Protocol and Config Access protocol to driver handle
   //
-  Status = HiiLibCreateHiiDriverHandle (&DriverHandle);
-  if (EFI_ERROR (Status)) {
-    goto Finish;
-  }
-  CallbackInfo->DriverHandle = DriverHandle;
-
-  //
-  // Install Config Access protocol to driver handle
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &DriverHandle,
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &CallbackInfo->DriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &CallbackInfo->ConfigAccess
+                  &CallbackInfo->ConfigAccess,
+                  NULL
                   );
   if (EFI_ERROR (Status)) {
     goto Finish;
@@ -1349,7 +1378,7 @@ PlatOverMngrInit (
   Status = HiiDatabase->NewPackageList (
                            HiiDatabase,
                            PackageList,
-                           DriverHandle,
+                           CallbackInfo->DriverHandle,
                            &CallbackInfo->RegisteredHandle
                            );
   FreePool (PackageList);
@@ -1405,7 +1434,14 @@ PlatOverMngrInit (
 
 Finish:
   if (CallbackInfo->DriverHandle != NULL) {
-    HiiLibDestroyHiiDriverHandle (CallbackInfo->DriverHandle);
+    gBS->UninstallMultipleProtocolInterfaces (
+           CallbackInfo->DriverHandle,
+           &gEfiDevicePathProtocolGuid,
+           &mHiiVendorDevicePath,
+           &gEfiHiiConfigAccessProtocolGuid,
+           &CallbackInfo->ConfigAccess,
+           NULL
+           );
   }
   if (CallbackInfo != NULL) {
     FreePool (CallbackInfo);

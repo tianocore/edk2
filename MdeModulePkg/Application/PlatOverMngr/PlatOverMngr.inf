@@ -58,7 +58,6 @@
   PlatformDriverOverrideLib
   HiiLib
   IfrSupportLib
-  ExtendedHiiLib
   ExtendedIfrSupportLib
   BaseMemoryLib
   MemoryAllocationLib

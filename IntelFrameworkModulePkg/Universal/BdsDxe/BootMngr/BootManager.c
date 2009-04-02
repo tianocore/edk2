@@ -19,6 +19,31 @@ EFI_GUID           mBootManagerGuid = BOOT_MANAGER_FORMSET_GUID;
 LIST_ENTRY         *mBootOptionsList;
 BDS_COMMON_OPTION  *gOption;
 
+HII_VENDOR_DEVICE_PATH  mBootManagerHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {1DDDBE15-481D-4d2b-8277-B191EAF66525}
+    //
+    { 0x1dddbe15, 0x481d, 0x4d2b, { 0x82, 0x77, 0xb1, 0x91, 0xea, 0xf6, 0x65, 0x25 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 BOOT_MANAGER_CALLBACK_DATA  gBootManagerPrivate = {
   BOOT_MANAGER_CALLBACK_DATA_SIGNATURE,
   NULL,
@@ -104,7 +129,7 @@ BootManagerCallback (
   Registers HII packages for the Boot Manger to HII Database.
   It also registers the browser call back function.
 
-  @return Status of HiiLibCreateHiiDriverHandle() and gHiiDatabase->NewPackageList()
+  @return Status of gBS->InstallMultipleProtocolInterfaces() and gHiiDatabase->NewPackageList()
 
 **/
 EFI_STATUS
@@ -116,21 +141,15 @@ InitializeBootManager (
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
 
   //
-  // Create driver handle used by HII database
+  // Install Device Path Protocol and Config Access protocol to driver handle
   //
-  Status = HiiLibCreateHiiDriverHandle (&gBootManagerPrivate.DriverHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Install Config Access protocol to driver handle
-  //
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &gBootManagerPrivate.DriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mBootManagerHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &gBootManagerPrivate.ConfigAccess
+                  &gBootManagerPrivate.ConfigAccess,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
 

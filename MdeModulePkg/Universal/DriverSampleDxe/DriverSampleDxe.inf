@@ -53,7 +53,6 @@
   DebugLib
   HiiLib
   IfrSupportLib
-  ExtendedHiiLib
   ExtendedIfrSupportLib
 
 [Protocols]

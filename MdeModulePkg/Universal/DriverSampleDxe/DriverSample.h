@@ -42,7 +42,7 @@ Revision History
 #include <Library/IfrSupportLib.h>
 #include <Library/ExtendedIfrSupportLib.h>
 #include <Library/HiiLib.h>
-#include <Library/ExtendedHiiLib.h>
+#include <Library/DevicePathLib.h>
 
 #include "NVDataStruc.h"
 
@@ -96,5 +96,17 @@ typedef struct {
 } DRIVER_SAMPLE_PRIVATE_DATA;
 
 #define DRIVER_SAMPLE_PRIVATE_FROM_THIS(a)  CR (a, DRIVER_SAMPLE_PRIVATE_DATA, ConfigAccess, DRIVER_SAMPLE_PRIVATE_SIGNATURE)
+
+#pragma pack(1)
+
+///
+/// HII specific Vendor Device Path definition.
+///
+typedef struct {
+  VENDOR_DEVICE_PATH             VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL       End;
+} HII_VENDOR_DEVICE_PATH;
+
+#pragma pack()
 
 #endif

@@ -23,6 +23,56 @@ EFI_GUID   mInventoryGuid = INVENTORY_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
 
+HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {C153B68D-EBFC-488e-B110-662867745B87}
+    //
+    { 0xc153b68d, 0xebfc, 0x488e, { 0xb1, 0x10, 0x66, 0x28, 0x67, 0x74, 0x5b, 0x87 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
+HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath2 = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {06F37F07-0C48-40e9-8436-0A08A0BB76B0}
+    //
+    { 0x6f37f07, 0xc48, 0x40e9, { 0x84, 0x36, 0xa, 0x8, 0xa0, 0xbb, 0x76, 0xb0 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 /**
   Encode the password using a simple algorithm.
   
@@ -689,7 +739,7 @@ DriverSampleInit (
   EFI_STATUS                      SavedStatus;
   EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
   EFI_HII_HANDLE                  HiiHandle[2];
-  EFI_HANDLE                      DriverHandle[2];
+  EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
   DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData;
   EFI_SCREEN_DESCRIPTOR           Screen;
   EFI_HII_DATABASE_PROTOCOL       *HiiDatabase;
@@ -766,22 +816,17 @@ DriverSampleInit (
   }
   PrivateData->HiiConfigRouting = HiiConfigRouting;
 
-  //
-  // Install Config Access protocol
-  //
-  Status = HiiLibCreateHiiDriverHandle (&DriverHandle[0]);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  PrivateData->DriverHandle[0] = DriverHandle[0];
-
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &DriverHandle[0],
+                  &gEfiDevicePathProtocolGuid,
+                  &mHiiVendorDevicePath1,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &PrivateData->ConfigAccess
+                  &PrivateData->ConfigAccess,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
+
+  PrivateData->DriverHandle[0] = DriverHandle[0];
 
   //
   // Publish our HII data
@@ -811,10 +856,14 @@ DriverSampleInit (
   //
   // Publish another Fromset
   //
-  Status = HiiLibCreateHiiDriverHandle (&DriverHandle[1]);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &DriverHandle[1],
+                  &gEfiDevicePathProtocolGuid,
+                  &mHiiVendorDevicePath2,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   PrivateData->DriverHandle[1] = DriverHandle[1];
 
   PackageList = HiiLibPreparePackageList (

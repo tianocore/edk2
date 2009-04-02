@@ -42,7 +42,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/IfrSupportLib.h>
 #include <Library/ExtendedIfrSupportLib.h>
 #include <Library/HiiLib.h>
-#include <Library/ExtendedHiiLib.h>
 #include <Library/PcdLib.h>
 
 #include "Colors.h"

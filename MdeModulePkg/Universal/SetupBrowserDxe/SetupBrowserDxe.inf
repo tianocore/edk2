@@ -61,7 +61,6 @@
   PrintLib
   IfrSupportLib
   HiiLib
-  ExtendedHiiLib
 
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES  ## GUID

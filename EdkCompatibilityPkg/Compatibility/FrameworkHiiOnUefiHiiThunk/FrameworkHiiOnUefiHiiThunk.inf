@@ -76,7 +76,6 @@
   DebugLib
   BaseLib
   HiiLib
-  ExtendedHiiLib
   IfrSupportLib
   ExtendedIfrSupportLib
   PrintLib

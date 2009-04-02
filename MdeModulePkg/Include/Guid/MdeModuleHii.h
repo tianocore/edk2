@@ -25,26 +25,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define BROWSER_STATE_VALIDATE_PASSWORD  0
 #define BROWSER_STATE_SET_PASSWORD       1
 
-
-///
-/// HII specific Vendor Device Path Node definition.
-///
-#pragma pack(1)
-typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  UINT32                         Reserved;
-  UINT64                         UniqueId;
-} HII_VENDOR_DEVICE_PATH_NODE;
-#pragma pack()
-
-///
-/// HII specific Vendor Device Path definition.
-///
-typedef struct {
-  HII_VENDOR_DEVICE_PATH_NODE    Node;
-  EFI_DEVICE_PATH_PROTOCOL       End;
-} HII_VENDOR_DEVICE_PATH;
-
 ///
 /// GUIDed opcodes defined for EDKII implementation
 ///
