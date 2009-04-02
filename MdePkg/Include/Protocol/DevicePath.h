@@ -478,6 +478,11 @@ typedef struct {
 } SATA_DEVICE_PATH;
 
 ///
+/// Flag for if the device is directly connected to the HBA.
+///
+#define SATA_HBA_DIRECT_CONNECT_FLAG 0x8000
+
+///
 /// I2O Device Path SubType
 ///
 #define MSG_I2O_DP                0x06
