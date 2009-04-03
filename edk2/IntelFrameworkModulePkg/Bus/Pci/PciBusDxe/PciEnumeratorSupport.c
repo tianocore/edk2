@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1664,13 +1664,10 @@ CreatePciIoDevice (
   // Initialize the PCI I/O instance structure
   //
 
-  Status  = InitializePciIoInstance (PciIoDevice);
-  Status  = InitializePciDriverOverrideInstance (PciIoDevice);
+  InitializePciIoInstance (PciIoDevice);
+  InitializePciDriverOverrideInstance (PciIoDevice);
+  InitializePciLoadFile2 (PciIoDevice);
 
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (PciIoDevice);
-    return NULL;
-  }
 
   //
   // Initialize the reserved resource list

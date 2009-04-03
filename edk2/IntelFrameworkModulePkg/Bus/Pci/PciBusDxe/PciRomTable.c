@@ -83,75 +83,32 @@ PciRomAddImageMapping (
 }
 
 /**
-  Load all option rom image to PCI driver list.
-  
-  @param This             Pointer to protocol instance EFI_DRIVER_BINDING_PROTOCOL
-  @param PciRootBridgeIo  Root bridge Io instance
-  @param PciIoDevice      device instance
-**/
-EFI_STATUS
-PciRomGetRomResourceFromPciOptionRomTable (
-  IN EFI_DRIVER_BINDING_PROTOCOL      *This,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
-  PCI_IO_DEVICE                       *PciIoDevice
-  )
-{
-  EFI_STATUS                    Status;
-  EFI_PCI_OPTION_ROM_TABLE      *PciOptionRomTable;
-  EFI_PCI_OPTION_ROM_DESCRIPTOR *PciOptionRomDescriptor;
-  UINTN                         Index;
-
-  Status = EfiGetSystemConfigurationTable (&gEfiPciOptionRomTableGuid, (VOID **) &PciOptionRomTable);
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
-
-  for (Index = 0; Index < PciOptionRomTable->PciOptionRomCount; Index++) {
-    PciOptionRomDescriptor = &PciOptionRomTable->PciOptionRomDescriptors[Index];
-    if (PciOptionRomDescriptor->Seg == PciRootBridgeIo->SegmentNumber &&
-        PciOptionRomDescriptor->Bus == PciIoDevice->BusNumber         &&
-        PciOptionRomDescriptor->Dev == PciIoDevice->DeviceNumber      &&
-        PciOptionRomDescriptor->Func == PciIoDevice->FunctionNumber ) {
-
-      PciIoDevice->PciIo.RomImage = (VOID *) (UINTN) PciOptionRomDescriptor->RomAddress;
-      PciIoDevice->PciIo.RomSize  = (UINTN) PciOptionRomDescriptor->RomLength;
-    }
-  }
-
-  for (Index = 0; Index < mNumberOfPciRomImages; Index++) {
-    if (mRomImageTable[Index].Seg  == PciRootBridgeIo->SegmentNumber &&
-        mRomImageTable[Index].Bus  == PciIoDevice->BusNumber         &&
-        mRomImageTable[Index].Dev  == PciIoDevice->DeviceNumber      &&
-        mRomImageTable[Index].Func == PciIoDevice->FunctionNumber    ) {
-
-      AddDriver (PciIoDevice, mRomImageTable[Index].ImageHandle);
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Get Option rom driver's mapping for PCI device.
   
   @param PciIoDevice Device instance.
 
+  @retval TRUE   Found Image mapping.
+  @retval FALSE
+
 **/
-EFI_STATUS
+BOOLEAN
 PciRomGetImageMapping (
   PCI_IO_DEVICE                       *PciIoDevice
   )
 {
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   UINTN                           Index;
+  BOOLEAN                         Found;
 
   PciRootBridgeIo = PciIoDevice->PciRootBridgeIo;
+  Found           = FALSE;
 
   for (Index = 0; Index < mNumberOfPciRomImages; Index++) {
     if (mRomImageTable[Index].Seg  == PciRootBridgeIo->SegmentNumber &&
         mRomImageTable[Index].Bus  == PciIoDevice->BusNumber         &&
         mRomImageTable[Index].Dev  == PciIoDevice->DeviceNumber      &&
         mRomImageTable[Index].Func == PciIoDevice->FunctionNumber    ) {
+        Found = TRUE;
 
       if (mRomImageTable[Index].ImageHandle != NULL) {
         AddDriver (PciIoDevice, mRomImageTable[Index].ImageHandle);
@@ -162,5 +119,5 @@ PciRomGetImageMapping (
     }
   }
 
-  return EFI_SUCCESS;
+  return Found;
 }

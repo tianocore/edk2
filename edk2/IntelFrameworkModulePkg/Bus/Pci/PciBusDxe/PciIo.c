@@ -90,15 +90,13 @@ ReportErrorStatusCode (
   
   @param PciIoDevice  Pci device instance.
   
-  @retval EFI_SUCCESS  Success operation.
 **/
-EFI_STATUS
+VOID
 InitializePciIoInstance (
   PCI_IO_DEVICE  *PciIoDevice
   )
 {
   CopyMem (&PciIoDevice->PciIo, &PciIoInterface, sizeof (EFI_PCI_IO_PROTOCOL));
-  return EFI_SUCCESS;
 }
 
 /**

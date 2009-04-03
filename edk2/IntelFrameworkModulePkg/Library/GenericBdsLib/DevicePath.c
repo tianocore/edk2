@@ -1134,6 +1134,33 @@ DevPathFvFilePath (
 
 **/
 VOID
+DevPathRelativeOffsetRange (
+  IN OUT POOL_PRINT       *Str,
+  IN VOID                 *DevPath
+  )
+{
+  MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH *Offset;
+
+  Offset = DevPath;
+  CatPrint (
+    Str,
+    L"Offset(%lx,%lx)",
+    Offset->StartingOffset,
+    Offset->EndingOffset
+    );
+}
+
+/**
+  Convert Device Path to a Unicode string for printing.
+
+  @param Str             The buffer holding the output string.
+                         This buffer contains the length of the
+                         string and the maixmum length reserved
+                         for the string buffer.
+  @param DevPath         The device path.
+
+**/
+VOID
 DevPathBssBss (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath
@@ -1398,6 +1425,11 @@ DEVICE_PATH_STRING_TABLE  DevPathTable[] = {
     MEDIA_DEVICE_PATH,
     MEDIA_PIWG_FW_FILE_DP,
     DevPathFvFilePath
+  },
+  {
+    MEDIA_DEVICE_PATH,
+    MEDIA_RELATIVE_OFFSET_RANGE_DP,
+    DevPathRelativeOffsetRange,
   },
   {
     BBS_DEVICE_PATH,
