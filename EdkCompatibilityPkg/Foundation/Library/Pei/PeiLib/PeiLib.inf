@@ -76,6 +76,7 @@ COMPONENT_TYPE    = LIBRARY
 [libraries.common]
   EdkGuidLib
   EfiCommonLib
+  EdkFrameworkPpiLib
 
 [libraries.ia32]
   CpuIA32Lib
