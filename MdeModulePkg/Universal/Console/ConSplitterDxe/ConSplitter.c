@@ -379,22 +379,10 @@ ConSplitterDriverEntry(
           FeaturePcdGet (PcdConOutUgaSupport));
 
   //
-  // The driver creates virtual handles for ConIn, ConOut, and StdErr.
+  // The driver creates virtual handles for ConIn, ConOut.
   // The virtual handles will always exist even if no console exist in the
   // system. This is need to support hotplug devices like USB.
   //
-  //
-  // Create virtual device handle for StdErr Splitter
-  //
-  Status = ConSplitterTextOutConstructor (&mStdErr);
-  if (!EFI_ERROR (Status)) {
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mStdErr.VirtualHandle,
-                    &gEfiSimpleTextOutProtocolGuid,
-                    &mStdErr.TextOut,
-                    NULL
-                    );
-  }
   //
   // Create virtual device handle for ConIn Splitter
   //
@@ -1327,6 +1315,25 @@ ConSplitterStdErrDriverBindingStart (
   EFI_STATUS                       Status;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
 
+  if (mStdErr.CurrentNumberOfConsoles == 0) {
+    //
+    // Create virtual device handle for StdErr Splitter
+    //
+    Status = ConSplitterTextOutConstructor (&mStdErr);
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mStdErr.VirtualHandle,
+                      &gEfiSimpleTextOutProtocolGuid,
+                      &mStdErr.TextOut,
+                      NULL
+                      );
+    }
+    
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
   // agrogated console device on first call Start for a StandardError handle.
@@ -1360,6 +1367,19 @@ ConSplitterStdErrDriverBindingStart (
   }
 
   if (mStdErr.CurrentNumberOfConsoles == 1) {
+    //
+    // Create virtual device handle for StdErr Splitter
+    //
+    Status = ConSplitterTextOutConstructor (&mStdErr);
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mStdErr.VirtualHandle,
+                      &gEfiSimpleTextOutProtocolGuid,
+                      &mStdErr.TextOut,
+                      NULL
+                      );
+    }
+
     gST->StandardErrorHandle  = mStdErr.VirtualHandle;
     gST->StdErr               = &mStdErr.TextOut;
     //
@@ -1726,6 +1746,16 @@ ConSplitterStdErrDriverBindingStop (
           gST->Hdr.HeaderSize,
           &gST->Hdr.CRC32
           );
+
+    //
+    // Uninstall Simple Text Output protocol from StdErr Handle.
+    //
+    gBS->UninstallMultipleProtocolInterfaces (
+           mStdErr.VirtualHandle,
+           &gEfiSimpleTextOutProtocolGuid,
+           &mStdErr.TextOut,
+           NULL
+           );
   }
 
   return Status;
@@ -4145,6 +4175,7 @@ ConSplitterTextOutOutputString (
   Private         = TEXT_OUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   BackSpaceCount  = 0;
+
   for (TargetString = WString; *TargetString != L'\0'; TargetString++) {
     if (*TargetString == CHAR_BACKSPACE) {
       BackSpaceCount++;
