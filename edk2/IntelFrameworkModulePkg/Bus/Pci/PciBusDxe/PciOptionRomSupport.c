@@ -85,7 +85,6 @@ LocalLoadFile2 (
        ) {
 
     ImageSize               = (UINT32) EfiRomHeader->InitializationSize * 512;
-    
     ImageBuffer             = (UINT8 *) EfiRomHeader + EfiRomHeader->EfiImageHeaderOffset;
     ImageLength             = ImageSize - EfiRomHeader->EfiImageHeaderOffset;
 
@@ -106,7 +105,7 @@ LocalLoadFile2 (
       //
       // Compressed: Uncompress before copying
       //
-      Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, &Decompress);
+      Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **) &Decompress);
       if (EFI_ERROR (Status)) {
         return EFI_DEVICE_ERROR;
       }
