@@ -1504,11 +1504,8 @@ USBParseKey (
       break;
 
     //
-    // F11, F12, PrintScreen, Pause/Break
-    // could not be retrieved via SimpleTextInEx protocol
+    // PrintScreen, Pause/Break could not be retrieved via SimpleTextInEx protocol
     //
-    case EFI_FUNCTION_KEY_ELEVEN_MODIFIER:
-    case EFI_FUNCTION_KEY_TWELVE_MODIFIER:
     case EFI_PAUSE_MODIFIER:
     case EFI_BREAK_MODIFIER:
       //
