@@ -110,6 +110,7 @@
   gEfiLoadPeImageProtocolGuid                   ## PRODUCES
   gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
   gEfiLoadFileProtocolGuid                      ## CONSUMES
+  gEfiLoadFile2ProtocolGuid                     ## CONSUMES
   gEfiResetArchProtocolGuid                     ## CONSUMES
   gEfiRealTimeClockArchProtocolGuid             ## CONSUMES
   gEfiRuntimeArchProtocolGuid                   ## CONSUMES
