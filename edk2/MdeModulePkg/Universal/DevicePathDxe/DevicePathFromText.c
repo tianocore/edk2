@@ -2574,6 +2574,39 @@ DevPathFromTextFvFile (
 }
 
 /**
+  Converts a text device path node to text relative offset device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created Text device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextRelativeOffsetRange (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16              *StartingOffsetStr;
+  CHAR16              *EndingOffsetStr;
+  MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH
+                      *Offset;
+
+  StartingOffsetStr = GetNextParamStr (&TextDeviceNode);
+  EndingOffsetStr   = GetNextParamStr (&TextDeviceNode);
+  Offset            = (MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH *) 
+                        CreateDeviceNode (
+                          MEDIA_DEVICE_PATH,
+                          MEDIA_RELATIVE_OFFSET_RANGE_DP,
+                          sizeof (MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH)
+                          );
+
+  Strtoi64 (StartingOffsetStr, &Offset->StartingOffset);
+  Strtoi64 (EndingOffsetStr, &Offset->EndingOffset);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) Offset;
+}
+
+/**
   Converts a text device path node to BIOS Boot Specification device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -2728,6 +2761,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[]
   {L"Media", DevPathFromTextMedia},
   {L"Fv", DevPathFromTextFv},
   {L"FvFile", DevPathFromTextFvFile},
+  {L"Offset", DevPathFromTextRelativeOffsetRange},
   {L"BBS", DevPathFromTextBBS},
   {L"Sata", DevPathFromTextSata},
   {NULL, NULL}
