@@ -1206,16 +1206,11 @@ IScsiCheckOpParams (
   Session->ImmediateData = (BOOLEAN) (Session->ImmediateData && (AsciiStrCmp (Value, "Yes") == 0));
 
   //
-  // MaxRecvDataSegmentLength, result function is Mininum.
+  // MaxRecvDataSegmentLength is declarative.
   //
   Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_MAX_RECV_DATA_SEGMENT_LENGTH);
   if (Value != NULL) {
-    //
-    // MaxRecvDataSegmentLength is declarative.
-    //
-    NumericValue                    = AsciiStrDecimalToUintn (Value);
-
-    Conn->MaxRecvDataSegmentLength  = (UINT32) MIN (Conn->MaxRecvDataSegmentLength, NumericValue);
+    Conn->MaxRecvDataSegmentLength = (UINT32) AsciiStrDecimalToUintn (Value);
   }
   //
   // MaxBurstLength, result funtion is Mininum.
