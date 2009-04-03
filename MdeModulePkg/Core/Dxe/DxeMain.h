@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Protocol/Runtime.h>
 #include <Protocol/LoadFile.h>
+#include <Protocol/LoadFile2.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/VariableWrite.h>
 #include <Protocol/PlatformDriverOverride.h>

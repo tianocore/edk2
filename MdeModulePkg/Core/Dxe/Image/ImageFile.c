@@ -90,6 +90,7 @@ CoreOpenImageFile (
   EFI_FILE_HANDLE                   FileHandle;
   EFI_FILE_HANDLE                   LastHandle;
   EFI_LOAD_FILE_PROTOCOL            *LoadFile;
+  EFI_LOAD_FILE2_PROTOCOL           *LoadFile2;
   EFI_FIRMWARE_VOLUME2_PROTOCOL     *FwVol;
   EFI_SECTION_TYPE                  SectionType;
   UINT8                             *Pe32Buffer;
@@ -315,6 +316,52 @@ CoreOpenImageFile (
     }
   }
 
+  //
+  // Try LoadFile2 style
+  //
+  if (!BootPolicy) {
+    TempFilePath = *FilePath;
+    Status = CoreDevicePathToInterface (
+               &gEfiLoadFile2ProtocolGuid,
+               &TempFilePath,
+               (VOID*)&LoadFile2,
+               DeviceHandle
+               );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Call LoadFile2 with the correct buffer size
+      //    
+      ASSERT (ImageFileHandle->SourceSize == 0);
+      ASSERT (ImageFileHandle->Source == NULL);
+      
+      Status = LoadFile2->LoadFile (
+                           LoadFile2,
+                           TempFilePath,
+                           BootPolicy,
+                           &ImageFileHandle->SourceSize,
+                           ImageFileHandle->Source
+                           );
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        ImageFileHandle->Source = AllocatePool (ImageFileHandle->SourceSize);
+        if (ImageFileHandle->Source == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        } else {
+          Status = LoadFile2->LoadFile (
+                               LoadFile2,
+                               TempFilePath,
+                               BootPolicy,
+                               &ImageFileHandle->SourceSize,
+                               ImageFileHandle->Source
+                               );
+        }
+      }
+
+      if (!EFI_ERROR (Status)) {
+        ImageFileHandle->FreeBuffer = TRUE;
+        goto Done;
+      }
+    }
+  }
 
   //
   // Try LoadFile style
