@@ -32,9 +32,8 @@ typedef struct {
 
   @param  PciIoDevice   Device instance.
 
-  @retval EFI_SUCCESS Operation success.
 **/
-EFI_STATUS
+VOID
 InitializePciDriverOverrideInstance (
   PCI_IO_DEVICE  *PciIoDevice
   );

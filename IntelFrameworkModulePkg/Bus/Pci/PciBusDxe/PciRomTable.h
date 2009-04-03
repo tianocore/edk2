@@ -1,7 +1,7 @@
 /** @file
   Option Rom Support for PCI Bus Driver
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -36,27 +36,17 @@ PciRomAddImageMapping (
   IN UINT64      RomAddress,
   IN UINT64      RomLength
   );
-/**
-  Load all option rom image to PCI driver list.
-  
-  @param This             Pointer to protocol instance EFI_DRIVER_BINDING_PROTOCOL.
-  @param PciRootBridgeIo  Root bridge Io instance.
-  @param PciIoDevice      device instance.
-**/
-EFI_STATUS
-PciRomGetRomResourceFromPciOptionRomTable (
-  IN EFI_DRIVER_BINDING_PROTOCOL      *This,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
-  PCI_IO_DEVICE                       *PciIoDevice
-  );
 
 /**
   Get Option rom driver's mapping for PCI device.
   
   @param PciIoDevice Device instance.
 
+  @retval TRUE   Found Image mapping.
+  @retval FALSE
+
 **/
-EFI_STATUS
+BOOLEAN
 PciRomGetImageMapping (
   PCI_IO_DEVICE                       *PciIoDevice
   );

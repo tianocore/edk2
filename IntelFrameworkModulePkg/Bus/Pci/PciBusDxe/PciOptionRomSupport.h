@@ -14,6 +14,66 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_PCI_OP_ROM_SUPPORT_H_
 #define _EFI_PCI_OP_ROM_SUPPORT_H_
 
+#include <Protocol/LoadFile2.h>
+
+/**
+  Initialize a PCI LoadFile2 instance
+  
+  @param PciIoDevice - PCI IO Device
+
+**/
+VOID
+InitializePciLoadFile2 (
+  PCI_IO_DEVICE       *PciIoDevice
+  );
+
+/**
+  Causes the driver to load a specified file.
+  
+  @param This        Indicates a pointer to the calling context.
+  @param FilePath    The device specific path of the file to load.
+  @param BootPolicy  Should always be FALSE.
+  @param BufferSize  On input the size of Buffer in bytes. On output with a return 
+                     code of EFI_SUCCESS, the amount of data transferred to Buffer. 
+                     On output with a return code of EFI_BUFFER_TOO_SMALL, 
+                     the size of Buffer required to retrieve the requested file. 
+  @param Buffer      The memory buffer to transfer the file to. If Buffer is NULL, 
+                    then no the size of the requested file is returned in BufferSize.
+
+  @retval EFI_SUCCESS           The file was loaded. 
+  @retval EFI_UNSUPPORTED       BootPolicy is TRUE.
+  @retval EFI_BUFFER_TOO_SMALL  The BufferSize is too small to read the current directory entry.
+                                BufferSize has been updated with the size needed to complete the request.
+  
+**/
+EFI_STATUS
+EFIAPI
+LoadFile2 (
+  IN EFI_LOAD_FILE2_PROTOCOL  *This,
+  IN EFI_DEVICE_PATH_PROTOCOL *FilePath,
+  IN BOOLEAN                  BootPolicy,
+  IN OUT UINTN                *BufferSize,
+  IN VOID                     *Buffer      OPTIONAL
+  );
+
+/**
+
+  Check if the RomImage contains EFI Images.
+
+  @param  RomImage  The ROM address of Image for check. 
+  @param  RomSize   Size of ROM for check.
+
+  @retval TRUE     ROM contain EFI Image.
+  @retval FALSE    ROM not contain EFI Image.
+  
+**/
+BOOLEAN
+ContainEfiImage (
+  IN VOID            *RomImage,
+  IN UINT64          RomSize
+  ); 
+
+
 /**
   Get Pci device's oprom infor bits.
   

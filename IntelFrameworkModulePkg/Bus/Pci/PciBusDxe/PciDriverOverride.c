@@ -19,15 +19,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  PciIoDevice   Device instance.
 
-  @retval EFI_SUCCESS Operation success.
 **/
-EFI_STATUS
+VOID
 InitializePciDriverOverrideInstance (
   PCI_IO_DEVICE  *PciIoDevice
   )
 {
   PciIoDevice->PciDriverOverride.GetDriver = GetDriver;
-  return EFI_SUCCESS;
 }
 
 /**

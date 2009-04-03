@@ -20,9 +20,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   
   @param PciIoDevice  Pci device instance.
   
-  @retval EFI_SUCCESS  Success operation.
 **/
-EFI_STATUS
+VOID
 InitializePciIoInstance (
   PCI_IO_DEVICE  *PciIoDevice
   );

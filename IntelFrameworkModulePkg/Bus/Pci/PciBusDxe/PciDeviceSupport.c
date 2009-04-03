@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -220,6 +220,7 @@ RegisterPciDevice (
   UINT8               PciExpressCapRegOffset;
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT8               Data8;
+  BOOLEAN             HasEfiImage;
 
   //
   // Install the pciio protocol, device path protocol
@@ -261,7 +262,6 @@ RegisterPciDevice (
   // Process OpRom
   //
   if (!PciIoDevice->AllOpRomProcessed) {
-    PciIoDevice->AllOpRomProcessed = TRUE;
 
     //
     // Get the OpRom provided by platform
@@ -279,7 +279,7 @@ RegisterPciDevice (
         PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
         //
         // For OpROM read from gPciPlatformProtocol:
-        //   Add the Rom Image to internal database for later PCI light enumeration
+        // Add the Rom Image to internal database for later PCI light enumeration
         //
         PciRomAddImageMapping (
           NULL,
@@ -290,16 +290,46 @@ RegisterPciDevice (
           (UINT64) (UINTN) PciIoDevice->PciIo.RomImage,
           PciIoDevice->PciIo.RomSize
           );
-        
       }
     }
+  }
+
+  //
+  // Determine if there are EFI images in the option rom
+  //
+  HasEfiImage = ContainEfiImage (PciIoDevice->PciIo.RomImage, PciIoDevice->PciIo.RomSize);
+
+  if (HasEfiImage) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &PciIoDevice->Handle,
+                    &gEfiLoadFile2ProtocolGuid,
+                    &PciIoDevice->LoadFile2,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      gBS->UninstallMultipleProtocolInterfaces (
+             &PciIoDevice->Handle,
+             &gEfiDevicePathProtocolGuid,
+             PciIoDevice->DevicePath,
+             &gEfiPciIoProtocolGuid,
+             &PciIoDevice->PciIo,
+             NULL
+             );
+      return Status;
+    }
+  }
+
+
+  if (!PciIoDevice->AllOpRomProcessed) {
+
+    PciIoDevice->AllOpRomProcessed = TRUE;
 
     //
     // Dispatch the EFI OpRom for the PCI device.
     // The OpRom is got from platform in the above code
-    //   or loaded from device in previous bus enumeration
+    // or loaded from device in the previous round of bus enumeration
     //
-    if (PciIoDevice->RomSize > 0) {
+    if (HasEfiImage) {
       ProcessOpRomImage (PciIoDevice);
     }
   }
@@ -323,6 +353,14 @@ RegisterPciDevice (
              &PciIoDevice->PciIo,
              NULL
              );
+      if (HasEfiImage) {
+        gBS->UninstallMultipleProtocolInterfaces (
+               &PciIoDevice->Handle,
+               &gEfiLoadFile2ProtocolGuid,
+               &PciIoDevice->LoadFile2,
+               NULL
+               );
+      }
 
       return Status;
     }
@@ -506,6 +544,33 @@ DeRegisterPciDevice (
                       NULL
                       );
     }
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // Try to uninstall LoadFile2 protocol if exists
+      //
+      Status = gBS->OpenProtocol (
+                      Handle,
+                      &gEfiLoadFile2ProtocolGuid,
+                      NULL,
+                      gPciBusDriverBinding.DriverBindingHandle,
+                      Controller,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                      );
+      if (!EFI_ERROR (Status)) {
+        Status = gBS->UninstallMultipleProtocolInterfaces (
+                        Handle,
+                        &gEfiLoadFile2ProtocolGuid,
+                        &PciIoDevice->LoadFile2,
+                        NULL
+                        );
+      }
+      //
+      // Restore Status
+      //
+      Status = EFI_SUCCESS;
+    }
+
 
     if (EFI_ERROR (Status)) {
       gBS->OpenProtocol (
@@ -825,8 +890,9 @@ CreateRootBridge (
   //
   // Initialize the PCI I/O instance structure
   //
-  Status  = InitializePciIoInstance (Dev);
-  Status  = InitializePciDriverOverrideInstance (Dev);
+  InitializePciIoInstance (Dev);
+  InitializePciDriverOverrideInstance (Dev);
+  InitializePciLoadFile2 (Dev);
 
   //
   // Initialize reserved resource list and

@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciIo.h>
+#include <Protocol/LoadFile2.h>
 #include <Guid/PciHotplugDevice.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/PciHotPlugRequest.h>
@@ -129,6 +130,7 @@ typedef struct _PCI_IO_DEVICE {
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL PciDriverOverride;
   EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL           *PciRootBridgeIo;
+  EFI_LOAD_FILE2_PROTOCOL                   LoadFile2;
 
   //
   // PCI configuration space header type
@@ -229,6 +231,9 @@ typedef struct _PCI_IO_DEVICE {
 
 #define PCI_IO_DEVICE_FROM_LINK(a) \
   CR (a, PCI_IO_DEVICE, Link, PCI_IO_DEVICE_SIGNATURE)
+
+#define PCI_IO_DEVICE_FROM_LOAD_FILE2_THIS(a) \
+  CR (a, PCI_IO_DEVICE, LoadFile2, PCI_IO_DEVICE_SIGNATURE)
 
 //
 // Global Variables
