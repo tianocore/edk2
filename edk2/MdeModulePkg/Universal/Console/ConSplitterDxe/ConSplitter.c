@@ -3666,7 +3666,6 @@ ConSplitterTextInRegisterKeyNotify (
   @retval EFI_SUCCESS              The notification function was unregistered
                                    successfully.
   @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid.
-  @retval EFI_NOT_FOUND            Can not find the matching entry in database.
 
 **/
 EFI_STATUS
@@ -3720,8 +3719,10 @@ ConSplitterTextInUnregisterKeyNotify (
     }
   }
 
-  return EFI_NOT_FOUND;
-
+  //
+  // NotificationHandle is not found in database
+  //
+  return EFI_INVALID_PARAMETER;
 }
 
 

@@ -665,7 +665,6 @@ Exit:
   
     @retval EFI_SUCCESS             - The notification function was unregistered successfully.
     @retval EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    @retval EFI_NOT_FOUND           - Can not find the matching entry in database.  
                               
 **/   
 EFI_STATUS
@@ -718,7 +717,7 @@ KeyboardUnregisterKeyNotify (
   //
   // Can not find the specified Notification Handle
   //
-  Status = EFI_NOT_FOUND;
+  Status = EFI_INVALID_PARAMETER;
 Exit:
   //
   // Leave critical section and return

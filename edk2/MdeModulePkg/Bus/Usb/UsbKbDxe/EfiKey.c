@@ -1084,7 +1084,6 @@ USBKeyboardRegisterKeyNotify (
 
   @retval EFI_SUCCESS              The notification function was unregistered successfully.
   @retval EFI_INVALID_PARAMETER    The NotificationHandle is invalid
-  @retval EFI_NOT_FOUND            Cannot find the matching entry in database.
 
 **/
 EFI_STATUS
@@ -1133,6 +1132,9 @@ USBKeyboardUnregisterKeyNotify (
     }
   }
 
-  return EFI_NOT_FOUND;  
+  //
+  // Cannot find the matching entry in database.
+  //
+  return EFI_INVALID_PARAMETER;  
 }
 
