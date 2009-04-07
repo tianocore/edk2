@@ -57,6 +57,8 @@ typedef struct {
   VARIABLE_GLOBAL VariableGlobal;
   UINTN           VolatileLastVariableOffset;
   UINTN           NonVolatileLastVariableOffset;
+  UINTN           CommonVariableTotalSize;
+  UINTN           HwErrVariableTotalSize;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvbInstance;
 } VARIABLE_MODULE_GLOBAL;
 
