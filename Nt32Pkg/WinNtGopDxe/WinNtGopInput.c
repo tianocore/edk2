@@ -786,7 +786,6 @@ WinNtGopSimpleTextInExUnregisterKeyNotify (
   Returns:
     EFI_SUCCESS             - The notification function was unregistered successfully.
     EFI_INVALID_PARAMETER   - The NotificationHandle is invalid.
-    EFI_NOT_FOUND           - Can not find the matching entry in database.  
                               
 --*/   
 {
@@ -825,7 +824,7 @@ WinNtGopSimpleTextInExUnregisterKeyNotify (
   //
   // Can not find the specified Notification Handle
   //
-  return EFI_NOT_FOUND;
+  return EFI_INVALID_PARAMETER;
 }
 
 /**
