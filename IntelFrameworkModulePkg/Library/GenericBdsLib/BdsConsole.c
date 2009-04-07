@@ -60,8 +60,12 @@ IsNvNeed (
                              On OUT, new console hanlde in system table.
   @param  ProtocolInterface  On IN,  console protocol on console handle in System Table to be checked. 
                              On OUT, new console protocol on new console hanlde in system table.
+
+  @retval TRUE               System Table has been updated.
+  @retval FALSE              System Table hasn't been updated.
+
 **/
-VOID 
+BOOLEAN 
 UpdateSystemTableConsole (
   IN     CHAR16                          *VarName,
   IN     EFI_GUID                        *ConsoleGuid,
@@ -93,7 +97,7 @@ UpdateSystemTableConsole (
       // If ConsoleHandle is valid and console protocol on this handle also
       // also matched, just return.
       //
-      return;
+      return FALSE;
     }
   }
   
@@ -109,7 +113,7 @@ UpdateSystemTableConsole (
     //
     // If there is no any console device, just return.
     //
-    return ;
+    return FALSE;
   }
 
   FullDevicePath = VarConsole;
@@ -147,7 +151,7 @@ UpdateSystemTableConsole (
         //
         *ConsoleHandle     = NewHandle;
         *ProtocolInterface = Interface;
-        return ;
+        return TRUE;
       }
     }
 
@@ -156,7 +160,7 @@ UpdateSystemTableConsole (
   //
   // No any available console devcie found.
   //
-  ASSERT (FALSE);  
+  return FALSE;
 }
 
 /**
@@ -485,6 +489,7 @@ BdsLibConnectAllDefaultConsoles (
   )
 {
   EFI_STATUS                Status;
+  BOOLEAN                   SystemTableUpdated;
 
   //
   // Connect all default console variables
@@ -517,12 +522,31 @@ BdsLibConnectAllDefaultConsoles (
   //
   BdsLibConnectConsoleVariable (L"ErrOut");
 
+  SystemTableUpdated = FALSE;
   //
   // Fill console handles in System Table if no console device assignd.
   //
-  UpdateSystemTableConsole (L"ConIn", &gEfiSimpleTextInProtocolGuid, &gST->ConsoleInHandle, (VOID **) &gST->ConIn);
-  UpdateSystemTableConsole (L"ConOut", &gEfiSimpleTextOutProtocolGuid, &gST->ConsoleOutHandle, (VOID **) &gST->ConOut);
-  UpdateSystemTableConsole (L"ErrOut", &gEfiSimpleTextOutProtocolGuid, &gST->StandardErrorHandle, (VOID **) &gST->StdErr);
+  if (UpdateSystemTableConsole (L"ConIn", &gEfiSimpleTextInProtocolGuid, &gST->ConsoleInHandle, (VOID **) &gST->ConIn)) {
+    SystemTableUpdated = TRUE;
+  }
+  if (UpdateSystemTableConsole (L"ConOut", &gEfiSimpleTextOutProtocolGuid, &gST->ConsoleOutHandle, (VOID **) &gST->ConOut)) {
+    SystemTableUpdated = TRUE;
+  }
+  if (UpdateSystemTableConsole (L"ErrOut", &gEfiSimpleTextOutProtocolGuid, &gST->StandardErrorHandle, (VOID **) &gST->StdErr)) {
+    SystemTableUpdated = TRUE;
+  }
+
+  if (SystemTableUpdated) {
+    //
+    // Update the CRC32 in the EFI System Table header
+    //
+    gST->Hdr.CRC32 = 0;
+    gBS->CalculateCrc32 (
+          (UINT8 *) &gST->Hdr,
+          gST->Hdr.HeaderSize,
+          &gST->Hdr.CRC32
+          );
+  }
 
   return EFI_SUCCESS;
 
