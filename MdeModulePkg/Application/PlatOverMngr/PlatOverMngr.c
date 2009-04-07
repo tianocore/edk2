@@ -1268,7 +1268,7 @@ PlatOverMngrCallback (
   if (KeyValue == KEY_VALUE_ORDER_SAVE_AND_EXIT) {
     Status = CommintChanges (Private, KeyValue, FakeNvData);
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    if (!EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Single Override Info too large, Saving Error!", NULL);
       return EFI_DEVICE_ERROR;
     }
