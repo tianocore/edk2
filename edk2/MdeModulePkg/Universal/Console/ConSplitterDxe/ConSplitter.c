@@ -1317,18 +1317,9 @@ ConSplitterStdErrDriverBindingStart (
 
   if (mStdErr.CurrentNumberOfConsoles == 0) {
     //
-    // Create virtual device handle for StdErr Splitter
+    // Construct console output devices' private data
     //
     Status = ConSplitterTextOutConstructor (&mStdErr);
-    if (!EFI_ERROR (Status)) {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mStdErr.VirtualHandle,
-                      &gEfiSimpleTextOutProtocolGuid,
-                      &mStdErr.TextOut,
-                      NULL
-                      );
-    }
-    
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1370,14 +1361,14 @@ ConSplitterStdErrDriverBindingStart (
     //
     // Create virtual device handle for StdErr Splitter
     //
-    Status = ConSplitterTextOutConstructor (&mStdErr);
-    if (!EFI_ERROR (Status)) {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mStdErr.VirtualHandle,
-                      &gEfiSimpleTextOutProtocolGuid,
-                      &mStdErr.TextOut,
-                      NULL
-                      );
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mStdErr.VirtualHandle,
+                    &gEfiSimpleTextOutProtocolGuid,
+                    &mStdErr.TextOut,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
 
     gST->StandardErrorHandle  = mStdErr.VirtualHandle;
@@ -1779,8 +1770,8 @@ ConSplitterStdErrDriverBindingStop (
 **/
 EFI_STATUS
 ConSplitterGrowBuffer (
-  IN  UINTN                           SizeOfCount,
-  IN  UINTN                           *Count,
+  IN      UINTN                       SizeOfCount,
+  IN OUT  UINTN                       *Count,
   IN OUT  VOID                        **Buffer
   )
 {
@@ -2968,6 +2959,7 @@ ConSplitterTextOutAddDevice (
   // If the Text Out List is full, enlarge it by calling ConSplitterGrowBuffer().
   //
   while (CurrentNumOfConsoles >= Private->TextOutListCount) {
+    CpuBreakpoint ();
     Status = ConSplitterGrowBuffer (
               sizeof (TEXT_OUT_AND_GOP_DATA),
               &Private->TextOutListCount,

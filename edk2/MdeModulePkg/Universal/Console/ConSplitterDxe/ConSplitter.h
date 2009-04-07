@@ -1749,8 +1749,8 @@ ConSplitterTextOutEnableCursor (
 **/
 EFI_STATUS
 ConSplitterGrowBuffer (
-  IN  UINTN                           SizeOfCount,
-  IN  UINTN                           *Count,
+  IN      UINTN                       SizeOfCount,
+  IN OUT  UINTN                       *Count,
   IN OUT  VOID                        **Buffer
   );
 
