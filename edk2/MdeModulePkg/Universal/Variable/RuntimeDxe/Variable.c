@@ -596,6 +596,13 @@ Reclaim (
   CHAR16                *UpdatingVariableNamePtr;
 
   VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) VariableBase);
+  //
+  // recaluate the total size of Common/HwErr type variables in non-volatile area.
+  //
+  if (!IsVolatile) {
+    mVariableModuleGlobal->CommonVariableTotalSize = 0;
+    mVariableModuleGlobal->HwErrVariableTotalSize  = 0;
+  }
 
   //
   // Start Pointers for the variable.
@@ -661,6 +668,11 @@ Reclaim (
       VariableSize = (UINTN) NextVariable - (UINTN) Variable;
       CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
       CurrPtr += VariableSize;
+      if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+      } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+      }
     }
     Variable = NextVariable;
   }
@@ -672,6 +684,11 @@ Reclaim (
     VariableSize = (UINTN)(GetNextVariablePtr (UpdatingVariable)) - (UINTN)UpdatingVariable;
     CopyMem (CurrPtr, (UINT8 *) UpdatingVariable, VariableSize);
     CurrPtr += VariableSize;
+    if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+    } else if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+    }
   }
 
   //
@@ -713,6 +730,11 @@ Reclaim (
         CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
         ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
         CurrPtr += VariableSize;
+        if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+          mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+        } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+          mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+        }
       }
     }
 
@@ -1216,6 +1238,8 @@ RuntimeServiceSetVariable (
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
   BOOLEAN                             Volatile;
   EFI_PHYSICAL_ADDRESS                Point;
+  UINTN                               ScratchSize;
+  UINTN                               NonVolatileVarableStoreSize;
 
   //
   // Check input parameters
@@ -1397,8 +1421,9 @@ RuntimeServiceSetVariable (
   // as a temporary storage.
   //
   NextVariable = GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
+  ScratchSize = MAX(FixedPcdGet32(PcdMaxVariableSize), FixedPcdGet32(PcdMaxHardwareErrorVariableSize));
 
-  SetMem (NextVariable, FixedPcdGet32(PcdMaxVariableSize), 0xff);
+  SetMem (NextVariable, ScratchSize, 0xff);
 
   NextVariable->StartId     = VARIABLE_DATA;
   NextVariable->Attributes  = Attributes;
@@ -1438,10 +1463,11 @@ RuntimeServiceSetVariable (
     // Create a nonvolatile variable
     //
     Volatile = FALSE;
-    
-    if ((UINT32) (VarSize +*NonVolatileOffset) >
-          ((VARIABLE_STORE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase)))->Size
-          ) {
+    NonVolatileVarableStoreSize = ((VARIABLE_STORE_HEADER *)(UINTN)(mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase))->Size;
+    if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) 
+      && ((VarSize + mVariableModuleGlobal->HwErrVariableTotalSize) > FixedPcdGet32(PcdHwErrStorageSize)))
+      || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) 
+      && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > NonVolatileVarableStoreSize - sizeof (VARIABLE_STORE_HEADER) - FixedPcdGet32(PcdHwErrStorageSize)))) {
       if (EfiAtRuntime ()) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
@@ -1456,9 +1482,10 @@ RuntimeServiceSetVariable (
       //
       // If still no enough space, return out of resources
       //
-      if ((UINT32) (VarSize +*NonVolatileOffset) >
-            ((VARIABLE_STORE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase)))->Size
-            ) {
+      if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) 
+        && ((VarSize + mVariableModuleGlobal->HwErrVariableTotalSize) > FixedPcdGet32(PcdHwErrStorageSize)))
+        || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) 
+        && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > NonVolatileVarableStoreSize - sizeof (VARIABLE_STORE_HEADER) - FixedPcdGet32(PcdHwErrStorageSize)))) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
@@ -1542,6 +1569,11 @@ RuntimeServiceSetVariable (
 
     *NonVolatileOffset = HEADER_ALIGN (*NonVolatileOffset + VarSize);
 
+    if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) {
+      mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VarSize);
+    } else {
+      mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VarSize);
+    }
   } else {
     //
     // Create a volatile variable
@@ -1653,11 +1685,16 @@ RuntimeServiceQueryVariableInfo (
   VARIABLE_HEADER        *NextVariable;
   UINT64                 VariableSize;
   VARIABLE_STORE_HEADER  *VariableStoreHeader;
+  UINT64                 CommonVariableTotalSize;
+  UINT64                 HwErrVariableTotalSize;
+
+  CommonVariableTotalSize = 0;
+  HwErrVariableTotalSize = 0;
 
   if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL || Attributes == 0) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == 0) {
     //
     // Make sure the Attributes combination is supported by the platform.
@@ -1671,6 +1708,11 @@ RuntimeServiceQueryVariableInfo (
   } else if (EfiAtRuntime () && ((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0)) {
     //
     // Make sure RT Attribute is set if we are in Runtime phase.
+    //
+    return EFI_INVALID_PARAMETER;
+  } else if ((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+    //
+    // Make sure Hw Attribute is set with NV.
     //
     return EFI_INVALID_PARAMETER;
   }
@@ -1694,18 +1736,23 @@ RuntimeServiceQueryVariableInfo (
   // with the storage size (excluding the storage header size).
   //
   *MaximumVariableStorageSize   = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
-  *RemainingVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
-
-  //
-  // Let *MaximumVariableSize be FixedPcdGet32(PcdMaxVariableSize) with the exception of the variable header size.
-  //
-  *MaximumVariableSize = FixedPcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
 
   //
   // Harware error record variable needs larger size.
   //
-  if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+  if ((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+    *MaximumVariableStorageSize = FixedPcdGet32(PcdHwErrStorageSize);
     *MaximumVariableSize = FixedPcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER);
+  } else {
+    if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
+      ASSERT (FixedPcdGet32(PcdHwErrStorageSize) < VariableStoreHeader->Size);
+      *MaximumVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER) - FixedPcdGet32(PcdHwErrStorageSize);
+    }
+
+    //
+    // Let *MaximumVariableSize be FixedPcdGet32(PcdMaxVariableSize) with the exception of the variable header size.
+    //
+    *MaximumVariableSize = FixedPcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
   }
 
   //
@@ -1727,14 +1774,22 @@ RuntimeServiceQueryVariableInfo (
       // since the space occupied by variables not marked with
       // VAR_ADDED is not allowed to be reclaimed in Runtime.
       //
-      *RemainingVariableStorageSize -= VariableSize;
+      if ((NextVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+        HwErrVariableTotalSize += VariableSize;
+      } else {
+        CommonVariableTotalSize += VariableSize;
+      }
     } else {
       //
       // Only care about Variables with State VAR_ADDED,because
       // the space not marked as VAR_ADDED is reclaimable now.
       //
       if (Variable->State == VAR_ADDED) {
-        *RemainingVariableStorageSize -= VariableSize;
+        if ((NextVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+          HwErrVariableTotalSize += VariableSize;
+        } else {
+          CommonVariableTotalSize += VariableSize;
+        }
       }
     }
 
@@ -1742,6 +1797,12 @@ RuntimeServiceQueryVariableInfo (
     // Go to the next one
     //
     Variable = NextVariable;
+  }
+
+  if ((Attributes  & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD){
+    *RemainingVariableStorageSize = *MaximumVariableStorageSize - HwErrVariableTotalSize;
+  }else {
+    *RemainingVariableStorageSize = *MaximumVariableStorageSize - CommonVariableTotalSize;
   }
 
   if (*RemainingVariableStorageSize < sizeof (VARIABLE_HEADER)) {
@@ -1773,22 +1834,29 @@ ReclaimForOS(
   VOID       *Context
   )
 {
-  UINT32                          VarSize;
   EFI_STATUS                      Status;
+  UINTN                          CommonVariableSpace;
+  UINTN                          RemainingCommonVariableSpace;
+  UINTN                          RemainingHwErrVariableSpace;
 
-  VarSize = ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase))->Size;
   Status  = EFI_SUCCESS; 
 
+  CommonVariableSpace = ((VARIABLE_STORE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase)))->Size - sizeof (VARIABLE_STORE_HEADER) - PcdGet32(PcdHwErrStorageSize); //Allowable max size of common variable storage space
+
+  RemainingCommonVariableSpace = CommonVariableSpace - mVariableModuleGlobal->CommonVariableTotalSize;
+
+  RemainingHwErrVariableSpace = PcdGet32 (PcdHwErrStorageSize) - mVariableModuleGlobal->HwErrVariableTotalSize;
   //
   // Check if the free area is blow a threshold
   //
-  if ((VarSize - mVariableModuleGlobal->NonVolatileLastVariableOffset) < VARIABLE_RECLAIM_THRESHOLD) {
+  if ((RemainingCommonVariableSpace < PcdGet32 (PcdMaxVariableSize))
+    || (RemainingHwErrVariableSpace < PcdGet32 (PcdMaxHardwareErrorVariableSize))){
     Status = Reclaim (
-              mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
-              &mVariableModuleGlobal->NonVolatileLastVariableOffset,
-              FALSE,
-              NULL
-              );
+            mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
+            &mVariableModuleGlobal->NonVolatileLastVariableOffset,
+            FALSE,
+            NULL
+            );
     ASSERT_EFI_ERROR (Status);
   }
 }
@@ -1820,6 +1888,7 @@ VariableCommonInitialize (
   EFI_PHYSICAL_ADDRESS            VariableStoreBase;
   UINT64                          VariableStoreLength;
   EFI_EVENT                       ReadyToBootEvent;
+  UINTN                           ScratchSize;
 
   Status = EFI_SUCCESS;
   //
@@ -1832,17 +1901,20 @@ VariableCommonInitialize (
 
   EfiInitializeLock(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock, TPL_NOTIFY);
   mVariableModuleGlobal->VariableGlobal.ReentrantState = 0;
+  mVariableModuleGlobal->CommonVariableTotalSize = 0;
+  mVariableModuleGlobal->HwErrVariableTotalSize = 0;
 
   //
-  // Allocate memory for volatile variable store
+  // Allocate memory for volatile variable store, note that there is a scratch space to store scratch data.
   //
-  VolatileVariableStore = AllocateRuntimePool (FixedPcdGet32(PcdVariableStoreSize) + FixedPcdGet32(PcdMaxVariableSize));
+  ScratchSize = MAX(FixedPcdGet32(PcdMaxVariableSize), FixedPcdGet32(PcdMaxHardwareErrorVariableSize));
+  VolatileVariableStore = AllocateRuntimePool (FixedPcdGet32(PcdVariableStoreSize) + ScratchSize);
   if (VolatileVariableStore == NULL) {
     FreePool (mVariableModuleGlobal);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  SetMem (VolatileVariableStore, FixedPcdGet32(PcdVariableStoreSize) + FixedPcdGet32(PcdMaxVariableSize), 0xff);
+  SetMem (VolatileVariableStore, FixedPcdGet32(PcdVariableStoreSize) + ScratchSize, 0xff);
 
   //
   //  Variable Specific Data
@@ -1925,6 +1997,14 @@ VariableCommonInitialize (
     Status        = EFI_SUCCESS;
 
     while (IsValidVariableHeader (NextVariable)) {
+      UINTN VariableSize = 0;
+      VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
+      if ((NextVariable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
+      } else {
+        mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VariableSize);
+      }
+
       NextVariable = GetNextVariablePtr (NextVariable);
     }
 
