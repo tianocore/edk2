@@ -63,7 +63,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  FatPkg/FatPkg.dec
 
 [LibraryClasses]
   UefiRuntimeServicesTableLib
@@ -87,10 +86,6 @@
   gEfiSimpleFileSystemProtocolGuid
   gEfiUnicodeCollationProtocolGuid
   gEfiUnicodeCollation2ProtocolGuid
-
-[FeaturePcd]
-  gEfiFatPkgTokenSpaceGuid.PcdUnicodeCollationSupport
-  gEfiFatPkgTokenSpaceGuid.PcdUnicodeCollation2Support
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang

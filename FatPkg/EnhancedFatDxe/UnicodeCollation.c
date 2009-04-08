@@ -20,11 +20,8 @@ EFI_UNICODE_COLLATION_PROTOCOL  *mUnicodeCollationInterface = NULL;
 /**
   Worker function to initialize Unicode Collation support.
 
-  This function searches Initialized Unicode Collation support based on PCDs:
-  PcdUnicodeCollation2Support and PcdUnicodeCollationSupport.
-  It first tries to locate Unicode Collation 2 protocol and matches it with current
-  platform language code. If for any reason the first attempt fails, it then tries to
-  use Unicode Collation Protocol.
+  It tries to locate Unicode Collation (2) protocol and matches it with current
+  platform language code.
 
   @param  AgentHandle          The handle used to open Unicode Collation (2) protocol.
   @param  ProtocolGuid         The pointer to Unicode Collation (2) protocol GUID.
@@ -114,9 +111,7 @@ InitializeUnicodeCollationSupportWorker (
 /**
   Initialize Unicode Collation support.
 
-  This function searches Initialized Unicode Collation support based on PCDs:
-  PcdUnicodeCollation2Support and PcdUnicodeCollationSupport.
-  It first tries to locate Unicode Collation 2 protocol and matches it with current
+  It tries to locate Unicode Collation 2 protocol and matches it with current
   platform language code. If for any reason the first attempt fails, it then tries to
   use Unicode Collation Protocol.
 
@@ -139,20 +134,17 @@ InitializeUnicodeCollationSupport (
   //
   // First try to use RFC 4646 Unicode Collation 2 Protocol.
   //
-  if (FeaturePcdGet (PcdUnicodeCollation2Support)) {
-    Status = InitializeUnicodeCollationSupportWorker (
-               AgentHandle,
-               &gEfiUnicodeCollation2ProtocolGuid,
-               L"PlatformLang",
-               (CONST CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang)
-               );
-  }
-
+  Status = InitializeUnicodeCollationSupportWorker (
+             AgentHandle,
+             &gEfiUnicodeCollation2ProtocolGuid,
+             L"PlatformLang",
+             (CONST CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang)
+             );
   //
   // If the attempt to use Unicode Collation 2 Protocol fails, then we fall back
   // on the ISO 639-2 Unicode Collation Protocol.
   //
-  if (FeaturePcdGet (PcdUnicodeCollationSupport) && EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status)) {
     Status = InitializeUnicodeCollationSupportWorker (
                AgentHandle,
                &gEfiUnicodeCollationProtocolGuid,
