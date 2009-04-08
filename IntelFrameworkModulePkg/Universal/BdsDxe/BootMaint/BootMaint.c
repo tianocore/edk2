@@ -910,7 +910,7 @@ InitializeBM (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   //
@@ -925,7 +925,7 @@ InitializeBM (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   //
@@ -962,9 +962,8 @@ InitializeBM (
   gUpdateData.BufferSize = UPDATE_DATA_SIZE;
   gUpdateData.Data = AllocateZeroPool (UPDATE_DATA_SIZE);
   if (gUpdateData.Data == NULL) {
-    FreePool (BmmCallbackInfo->LoadContext);
-    FreePool (BmmCallbackInfo);
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
   }
 
   InitializeStringDepository ();
@@ -1065,10 +1064,34 @@ InitializeBM (
 
   FreeAllMenu ();
 
-  FreePool (BmmCallbackInfo->LoadContext);
-  FreePool (BmmCallbackInfo);
   FreePool (gUpdateData.Data);
   gUpdateData.Data = NULL;
+
+Exit:
+  if (BmmCallbackInfo->FeDriverHandle != NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           BmmCallbackInfo->FeDriverHandle,
+           &gEfiDevicePathProtocolGuid,
+           &mFeHiiVendorDevicePath,
+           &gEfiHiiConfigAccessProtocolGuid,
+           &BmmCallbackInfo->FeConfigAccess,
+           NULL
+           );
+  }
+
+  if (BmmCallbackInfo->BmmDriverHandle != NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           BmmCallbackInfo->BmmDriverHandle,
+           &gEfiDevicePathProtocolGuid,
+           &mBmmHiiVendorDevicePath,
+           &gEfiHiiConfigAccessProtocolGuid,
+           &BmmCallbackInfo->BmmConfigAccess,
+           NULL
+           );
+  }
+
+  FreePool (BmmCallbackInfo->LoadContext);
+  FreePool (BmmCallbackInfo);
 
   return Status;
 }
