@@ -123,55 +123,64 @@ IScsiAsciiStrToLun (
   OUT UINT8  *Lun
   )
 {
-  UINT32  Index;
-  CHAR8   *LunUnitStr[4];
-  CHAR8   Digit;
-  UINTN   Temp;
-
+  UINTN   Index, IndexValue, IndexNum, SizeStr;
+  CHAR8   TemStr[2];
+  UINT8   TemValue;
+  UINT16  Value [4];
+  
   ZeroMem (Lun, 8);
-  ZeroMem (LunUnitStr, sizeof (LunUnitStr));
+  ZeroMem (TemStr, 2);
+  ZeroMem ((UINT8 *) Value, sizeof (Value));
+  SizeStr    = AsciiStrLen (Str);  
+  IndexValue = 0;
+  IndexNum   = 0;
 
-  Index         = 0;
-  LunUnitStr[0] = Str;
-
-  if (!IsHexDigit ((UINT8 *) &Digit, *Str)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  while (*Str != '\0') {
-    //
-    // Legal representations of LUN:
-    //   4752-3A4F-6b7e-2F99,
-    //   6734-9-156f-127,
-    //   4186-9
-    //
-    if (*Str == '-') {
-      *Str = '\0';
-      Index++;
-
-      if (*(Str + 1) != '\0') {
-        if (!IsHexDigit ((UINT8 *) &Digit, *(Str + 1))) {
-          return EFI_INVALID_PARAMETER;
-        }
-
-        LunUnitStr[Index] = Str + 1;
+  for (Index = 0; Index < SizeStr; Index ++) {
+    TemStr[0] = Str[Index];
+    TemValue = (UINT8) AsciiStrHexToUint64 (TemStr);
+    if (TemValue == 0 && TemStr[0] != '0') {
+      if ((TemStr[0] != '-') || (IndexNum == 0)) {
+        //
+        // Invalid Lun Char
+        //
+        return EFI_INVALID_PARAMETER;
       }
-    } else if (!IsHexDigit ((UINT8 *) &Digit, *Str)) {
+    }
+    
+    if ((TemValue == 0) && (TemStr[0] == '-')) {
+      //
+      // Next Lun value
+      //
+      if (++IndexValue >= 4) {
+        //
+        // Max 4 Lun value
+        //
+        return EFI_INVALID_PARAMETER;
+      }
+      //
+      // Restart str index for the next lun value
+      //
+      IndexNum = 0;
+      continue;
+    }
+    
+    if (++IndexNum > 4) {
+      //     
+      // Each Lun Str can't exceed size 4, because it will be as UINT16 value
+      //
       return EFI_INVALID_PARAMETER;
     }
-
-    Str++;
+    
+    //
+    // Combine UINT16 value
+    //
+    Value[IndexValue] = (UINT16) ((Value[IndexValue] << 4) + TemValue);
   }
-
-  for (Index = 0; (Index < 4) && (LunUnitStr[Index] != NULL); Index++) {
-    if (AsciiStrLen (LunUnitStr[Index]) > 4) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    Temp = AsciiStrHexToUintn (LunUnitStr[Index]);
-    *((UINT16 *) &Lun[Index * 2]) = HTONS (Temp);
+ 
+  for (Index = 0; Index <= IndexValue; Index ++) {
+    *((UINT16 *) &Lun[Index * 2]) =  HTONS (Value[Index]);
   }
-
+  
   return EFI_SUCCESS;
 }
 
@@ -434,52 +443,38 @@ IScsiHexToBin (
   )
 {
   UINTN   Index;
-  UINT32  HexCount;
-  CHAR8   *HexBuf;
+  UINTN   Length;
   UINT8   Digit;
-  UINT8   Byte;
-
-  Digit = 0;
+  CHAR8   TemStr[2];
+  
+  ZeroMem (TemStr, sizeof (TemStr));
 
   //
   // Find out how many hex characters the string has.
   //
-  HexBuf = HexStr;
-  if ((HexBuf[0] == '0') && ((HexBuf[1] == 'x') || (HexBuf[1] == 'X'))) {
-    HexBuf += 2;
+  if ((HexStr[0] == '0') && ((HexStr[1] == 'x') || (HexStr[1] == 'X'))) {
+    HexStr += 2;
   }
+  
+  Length = AsciiStrLen (HexStr);
 
-  for (Index = 0, HexCount = 0; IsHexDigit (&Digit, HexBuf[Index]); Index++, HexCount++)
-    ;
-
-  if (HexCount == 0) {
-    *BinLength = 0;
-    return EFI_SUCCESS;
-  }
-  //
-  // Test if buffer is passed enough.
-  //
-  if (((HexCount + 1) / 2) > *BinLength) {
-    *BinLength = (HexCount + 1) / 2;
-    return EFI_BUFFER_TOO_SMALL;
-  }
-
-  *BinLength = (HexCount + 1) / 2;
-
-  for (Index = 0; Index < HexCount; Index++) {
-
-    IsHexDigit (&Digit, HexBuf[HexCount - 1 - Index]);
-
-    if ((Index & 1) == 0) {
-      Byte = Digit;
-    } else {
-      Byte = BinBuffer[*BinLength - 1 - Index / 2];
-      Byte &= 0x0F;
-      Byte = (UINT8) (Byte | (Digit << 4));
+  for (Index = 0; Index < Length; Index ++) {
+    TemStr[0] = HexStr[Index];
+    Digit = (UINT8) AsciiStrHexToUint64 (TemStr);
+    if (Digit == 0 && TemStr[0] != '0') {
+      //
+      // Invalid Lun Char
+      //
+      break;
     }
-
-    BinBuffer[*BinLength - 1 - Index / 2] = Byte;
+    if ((Index & 1) == 0) {
+      BinBuffer [Index/2] = Digit;
+    } else {
+      BinBuffer [Index/2] = (UINT8) ((BinBuffer [Index/2] << 4) + Digit);
+    }
   }
+  
+  *BinLength = (UINT32) ((Index + 1)/2);
 
   return EFI_SUCCESS;
 }

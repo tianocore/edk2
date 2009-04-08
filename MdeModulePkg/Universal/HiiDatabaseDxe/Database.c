@@ -809,7 +809,7 @@ InsertStringPackage (
   AsciiStrCpy (Language, (CHAR8 *) PackageHdr + HeaderSize - LanguageSize);
   for (Link = PackageList->StringPkgHdr.ForwardLink; Link != &PackageList->StringPkgHdr; Link = Link->ForwardLink) {
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-    if (R8_EfiLibCompareLanguage (Language, StringPackage->StringPkgHdr->Language)) {
+    if (HiiCompareLanguage (Language, StringPackage->StringPkgHdr->Language)) {
       FreePool (Language);
       return EFI_UNSUPPORTED;
     }
