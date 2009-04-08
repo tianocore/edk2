@@ -333,7 +333,7 @@ InitializePpiServices (
 
 /**
 
-  Migrate the Hob list from the CAR stack to PEI installed memory.
+  Migrate the Hob list from the temporary memory stack to PEI installed memory.
 
   @param PrivateData         Pointer to PeiCore's private data structure.
   @param OldCheckingBottom   Bottom of temporary memory range. All Ppi in this range
@@ -765,7 +765,7 @@ PeiAllocatePages (
 
 /**
 
-  Memory allocation service on the CAR.
+  Memory allocation service on the temporary memory.
 
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
