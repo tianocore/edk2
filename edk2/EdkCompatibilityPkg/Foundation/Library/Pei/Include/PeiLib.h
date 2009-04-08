@@ -464,7 +464,7 @@ MigrateIdtTable (
 
 Routine Description:
 
-  Migrate IDT from CAR to real memory where preceded with 4 bytes for
+  Migrate IDT from temporary memory to real memory where preceded with 4 bytes for
   storing PeiService pointer.
 
 Arguments:
