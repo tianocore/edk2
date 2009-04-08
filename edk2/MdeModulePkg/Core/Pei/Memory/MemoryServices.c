@@ -149,7 +149,7 @@ PeiAllocatePages (
   //
   if (!PrivateData->PeiMemoryInstalled) {
     //
-    // When PeiInstallMemory is called but CAR has *not* been moved to temporary memory,
+    // When PeiInstallMemory is called but temporary memory has *not* been moved to temporary memory,
     // the AllocatePage will depend on the field of PEI_CORE_INSTANCE structure.
     //
     if (!PrivateData->SwitchStackSignal) {
@@ -207,7 +207,7 @@ PeiAllocatePages (
 /**
 
   Pool allocation service. Before permenent memory is discoveried, the pool will 
-  be allocated the heap in the CAR. Genenrally, the size of heap in temporary 
+  be allocated the heap in the temporary memory. Genenrally, the size of heap in temporary 
   memory does not exceed to 64K, so the biggest pool size could be allocated is 
   64K.
 

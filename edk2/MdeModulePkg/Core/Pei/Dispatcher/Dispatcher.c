@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PeiMain.h"
 
 ///
-/// CAR is filled with this initial value during SEC phase
+/// temporary memory is filled with this initial value during SEC phase
 ///
 #define INIT_CAR_VALUE 0x5AA55AA5
 
@@ -442,7 +442,7 @@ PeiDispatcher (
 
             if (Private->SwitchStackSignal) {
               //
-              // Before switch stack from CAR to permenent memory, caculate the heap and stack
+              // Before switch stack from temporary memory to permenent memory, caculate the heap and stack
               // usage in temporary memory for debuging.
               //
               DEBUG_CODE_BEGIN ();
@@ -453,11 +453,11 @@ PeiDispatcher (
                      && (*StackPointer == INIT_CAR_VALUE);
                      StackPointer ++);
                      
-                DEBUG ((EFI_D_INFO, "Total Cache as RAM:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
-                DEBUG ((EFI_D_INFO, "  CAR stack ever used: %d bytes.\n",
+                DEBUG ((EFI_D_INFO, "Total temporary memory:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
+                DEBUG ((EFI_D_INFO, "  temporary memory stack ever used: %d bytes.\n",
                        (SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
                       ));
-                DEBUG ((EFI_D_INFO, "  CAR heap used:       %d bytes.\n",
+                DEBUG ((EFI_D_INFO, "  temporary memory heap used:       %d bytes.\n",
                        ((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom -
                        (UINTN) Private->HobList.Raw)
                       ));
@@ -498,7 +498,7 @@ PeiDispatcher (
               NewPermenentMemoryBase = Private->PhysicalMemoryBegin + StackGap;
               
               //
-              // Caculate stack offset and heap offset between CAR and new permement 
+              // Caculate stack offset and heap offset between temporary memory and new permement 
               // memory seperately.
               //
               StackOffset            = (UINTN) NewPermenentMemoryBase - (UINTN) SecCoreData->StackBase;
@@ -529,7 +529,7 @@ PeiDispatcher (
                 // Temporary Ram support Ppi is provided by platform, it will copy 
                 // temporary memory to permenent memory and do stack switching.
                 // After invoken temporary Ram support, following code's stack is in 
-                // memory but not in CAR.
+                // memory but not in temporary memory.
                 //
                 TemporaryRamSupportPpi->TemporaryRamMigration (
                                           (CONST EFI_PEI_SERVICES **) PeiServices,
