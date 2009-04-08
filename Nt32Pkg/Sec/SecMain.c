@@ -1055,7 +1055,7 @@ SecTemporaryRamSupport (
   //
 
   //
-  // Simulate to invalid CAR, terminate CAR
+  // Simulate to invalid temporary memory, terminate temporary memory
   // 
   //ZeroMem ((VOID*)(UINTN)TemporaryMemoryBase, CopySize);
   
