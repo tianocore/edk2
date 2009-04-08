@@ -1014,7 +1014,7 @@ HiiNewString (
        Link = Link->ForwardLink
       ) {
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-    if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
+    if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
       Matched = TRUE;
       break;
     }
@@ -1353,7 +1353,7 @@ HiiGetString (
          Link =  Link->ForwardLink
         ) {
         StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-        if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
+        if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
           Status = GetStringWorker (Private, StringPackage, StringId, String, StringSize, StringFontInfo);
           if (Status != EFI_NOT_FOUND) {
             return Status;
@@ -1446,7 +1446,7 @@ HiiSetString (
          Link =  Link->ForwardLink
         ) {
       StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-      if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
+      if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
         OldPackageLen = StringPackage->StringPkgHdr->Header.Length;
         Status = SetStringWorker (
                    Private,
@@ -1635,7 +1635,7 @@ HiiGetSecondaryLanguages (
          Link1 = Link1->ForwardLink
         ) {
     StringPackage = CR (Link1, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-    if (R8_EfiLibCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) FirstLanguage)) {
+    if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) FirstLanguage)) {
       Languages = StringPackage->StringPkgHdr->Language;
       //
       // Language is a series of ';' terminated strings, first one is primary
@@ -1663,3 +1663,41 @@ HiiGetSecondaryLanguages (
   return EFI_INVALID_LANGUAGE;
 }
 
+/**
+  Compare whether two names of languages are identical.
+
+  @param  Language1              Name of language 1
+  @param  Language2              Name of language 2
+
+  @retval TRUE                   same
+  @retval FALSE                  not same
+
+**/
+BOOLEAN
+HiiCompareLanguage (
+  IN  CHAR8  *Language1,
+  IN  CHAR8  *Language2
+  )
+{
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete.
+  // Include the source code to user code.
+  //
+  UINTN Index;
+
+  for (Index = 0; (Language1[Index] != 0) && (Language2[Index] != 0); Index++) {
+    if (Language1[Index] != Language2[Index]) {
+      return FALSE;
+    }
+  }
+
+  if (((Language1[Index] == 0) && (Language2[Index] == 0))   || 
+  	  ((Language1[Index] == 0) && (Language2[Index] != ';')) ||
+  	  ((Language1[Index] == ';') && (Language2[Index] != 0)) ||
+  	  ((Language1[Index] == ';') && (Language2[Index] != ';'))) {
+    return TRUE;
+  }
+
+  return FALSE;
+}

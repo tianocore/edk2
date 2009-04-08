@@ -65,21 +65,6 @@ IScsiIpToStr (
 }
 
 /**
-  Pop up an invalid notify which displays the message in Warning.
-
-  @param[in]  Warning  The warning message.
-**/
-VOID
-PopUpInvalidNotify (
-  IN CHAR16 *Warning
-  )
-{
-  EFI_INPUT_KEY             Key;
-
-  IfrLibCreatePopUp (1, &Key, Warning);
-}
-
-/**
   Update the list of iSCSI devices the iSCSI driver is controlling.
   
   @retval EFI_SUCCESS            The callback successfully handled the action.
@@ -512,6 +497,7 @@ IScsiFormCallback (
   EFI_IP_ADDRESS            SubnetMask;
   EFI_IP_ADDRESS            Gateway;
   EFI_STATUS                Status;
+  EFI_INPUT_KEY             Key;
 
   Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
 
@@ -534,7 +520,7 @@ IScsiFormCallback (
 
     Status      = gIScsiInitiatorName.Set (&gIScsiInitiatorName, &BufferSize, IScsiName);
     if (EFI_ERROR (Status)) {
-      PopUpInvalidNotify (L"Invalid iSCSI Name!");
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid iSCSI Name!", NULL);
     }
 
     break;
@@ -543,7 +529,7 @@ IScsiFormCallback (
     IScsiUnicodeStrToAsciiStr (IfrNvData->LocalIp, Ip4String);
     Status = IScsiAsciiStrToIp (Ip4String, &HostIp.v4);
     if (EFI_ERROR (Status) || !Ip4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
-      PopUpInvalidNotify (L"Invalid IP address!");
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
       Status = EFI_INVALID_PARAMETER;
     } else {
       CopyMem (&Private->Current->SessionConfigData.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
@@ -555,7 +541,7 @@ IScsiFormCallback (
     IScsiUnicodeStrToAsciiStr (IfrNvData->SubnetMask, Ip4String);
     Status = IScsiAsciiStrToIp (Ip4String, &SubnetMask.v4);
     if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (IScsiGetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
-      PopUpInvalidNotify (L"Invalid Subnet Mask!");
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
       Status = EFI_INVALID_PARAMETER;
     } else {
       CopyMem (&Private->Current->SessionConfigData.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
@@ -567,7 +553,7 @@ IScsiFormCallback (
     IScsiUnicodeStrToAsciiStr (IfrNvData->Gateway, Ip4String);
     Status = IScsiAsciiStrToIp (Ip4String, &Gateway.v4);
     if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !Ip4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
-      PopUpInvalidNotify (L"Invalid Gateway!");
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
       Status = EFI_INVALID_PARAMETER;
     } else {
       CopyMem (&Private->Current->SessionConfigData.Gateway, &Gateway.v4, sizeof (Gateway.v4));
@@ -579,7 +565,7 @@ IScsiFormCallback (
     IScsiUnicodeStrToAsciiStr (IfrNvData->TargetIp, Ip4String);
     Status = IScsiAsciiStrToIp (Ip4String, &HostIp.v4);
     if (EFI_ERROR (Status) || !Ip4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
-      PopUpInvalidNotify (L"Invalid IP address!");
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
       Status = EFI_INVALID_PARAMETER;
     } else {
       CopyMem (&Private->Current->SessionConfigData.TargetIp, &HostIp.v4, sizeof (HostIp.v4));
@@ -591,7 +577,7 @@ IScsiFormCallback (
     IScsiUnicodeStrToAsciiStr (IfrNvData->TargetName, IScsiName);
     Status = IScsiNormalizeName (IScsiName, AsciiStrLen (IScsiName));
     if (EFI_ERROR (Status)) {
-      PopUpInvalidNotify (L"Invalid iSCSI Name!");
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid iSCSI Name!", NULL);
     } else {
       AsciiStrCpy (Private->Current->SessionConfigData.TargetName, IScsiName);
     }
@@ -609,7 +595,7 @@ IScsiFormCallback (
     IScsiUnicodeStrToAsciiStr (IfrNvData->BootLun, LunString);
     Status = IScsiAsciiStrToLun (LunString, (UINT8 *) &Lun);
     if (EFI_ERROR (Status)) {
-      PopUpInvalidNotify (L"Invalid LUN string!");
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid LUN string!", NULL);
     } else {
       CopyMem (Private->Current->SessionConfigData.BootLun, &Lun, sizeof (Lun));
     }
@@ -661,11 +647,11 @@ IScsiFormCallback (
 
         if ((Gateway.Addr[0] != 0)) {
           if (SubnetMask.Addr[0] == 0) {
-            PopUpInvalidNotify (L"Gateway address is set but subnet mask is zero.");
+            CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Gateway address is set but subnet mask is zero.", NULL);
             Status = EFI_INVALID_PARAMETER;
             break;
           } else if (!IP4_NET_EQUAL (HostIp.Addr[0], Gateway.Addr[0], SubnetMask.Addr[0])) {
-            PopUpInvalidNotify (L"Local IP and Gateway are not in the same subnet.");
+            CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Local IP and Gateway are not in the same subnet.", NULL);
             Status = EFI_INVALID_PARAMETER;
             break;
           }
@@ -677,7 +663,7 @@ IScsiFormCallback (
       if (!Private->Current->SessionConfigData.TargetInfoFromDhcp) {
         CopyMem (&HostIp.v4, &Private->Current->SessionConfigData.TargetIp, sizeof (HostIp.v4));
         if (!Ip4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
-          PopUpInvalidNotify (L"Target IP is invalid!");
+          CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Target IP is invalid!", NULL);
           Status = EFI_INVALID_PARAMETER;
           break;
         }
@@ -685,7 +671,7 @@ IScsiFormCallback (
 
       if (IfrNvData->CHAPType != ISCSI_CHAP_NONE) {
         if ((IfrNvData->CHAPName[0] == '\0') || (IfrNvData->CHAPSecret[0] == '\0')) {
-          PopUpInvalidNotify (L"CHAP Name or CHAP Secret is invalid!");
+          CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"CHAP Name or CHAP Secret is invalid!", NULL);
           Status = EFI_INVALID_PARAMETER;
           break;
         }
@@ -693,7 +679,7 @@ IScsiFormCallback (
         if ((IfrNvData->CHAPType == ISCSI_CHAP_MUTUAL) &&
             ((IfrNvData->ReverseCHAPName[0] == '\0') || (IfrNvData->ReverseCHAPSecret[0] == '\0'))
             ) {
-          PopUpInvalidNotify (L"Reverse CHAP Name or Reverse CHAP Secret is invalid!");
+          CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Reverse CHAP Name or Reverse CHAP Secret is invalid!", NULL);
           Status = EFI_INVALID_PARAMETER;
           break;
         }

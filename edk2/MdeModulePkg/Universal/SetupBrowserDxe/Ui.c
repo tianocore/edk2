@@ -1506,6 +1506,9 @@ UiDisplayMenu (
   UINT16                          DefaultId;
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
   FORM_BROWSER_STATEMENT          *Statement;
+  CHAR16                          TemStr[2];
+  UINT8                           *DevicePathBuffer;
+  UINT8                           DigitUint8;
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
@@ -2358,8 +2361,27 @@ UiDisplayMenu (
           }
           BufferSize = StrLen (StringPtr) / 2;
           DevicePath = AllocatePool (BufferSize);
+          
+          //
+          // Convert from Device Path String to DevicePath Buffer in the reverse order.
+          //
+          DevicePathBuffer = (UINT8 *) DevicePath;
+          for (Index = 0; StringPtr[Index] != L'\0'; Index ++) {
+            TemStr[0] = StringPtr[Index];
+            DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+            if (DigitUint8 == 0 && TemStr[0] != L'0') {
+              //
+              // Invalid Hex Char as the tail.
+              //
+              break;
+            }
+            if ((Index & 1) == 0) {
+              DevicePathBuffer [Index/2] = DigitUint8;
+            } else {
+              DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
+            }
+          }
 
-          HexStringToBufInReverseOrder ((UINT8 *) DevicePath, &BufferSize, StringPtr);
           Selection->Handle = HiiLibDevicePathToHiiHandle (DevicePath);
           if (Selection->Handle == NULL) {
             //

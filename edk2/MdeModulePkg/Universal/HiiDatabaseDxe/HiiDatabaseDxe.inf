@@ -36,9 +36,6 @@
   String.c
   Database.c
   Font.c
-  R8Lib.h
-  R8Lib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -57,6 +54,7 @@
   UefiLib
   PcdLib
   UefiRuntimeServicesTableLib
+  PrintLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid                                            ## SOMETIMES_CONSUMES

@@ -80,6 +80,10 @@ GetDevicePath (
   UINTN      Length;
   EFI_STRING PathHdr;
   EFI_STRING DevicePathString;
+  UINT8      *DevicePathBuffer;
+  CHAR16     TemStr[2];
+  UINTN      Index;
+  UINT8      DigitUint8;
 
   if (String == NULL || DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -114,21 +118,52 @@ GetDevicePath (
   // as the device path resides in RAM memory.
   // Translate the data into binary.
   //
-  Length /= 2;
-  *DevicePath = (UINT8 *) AllocateZeroPool (Length);
-  if (*DevicePath == NULL) {
+  DevicePathBuffer = (UINT8 *) AllocateZeroPool ((Length + 1) / 2);
+  if (DevicePathBuffer == NULL) {
     FreePool (DevicePathString);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  HexStringToBufInReverseOrder (*DevicePath, &Length, DevicePathString);
+  ZeroMem (TemStr, sizeof (TemStr));
+  for (Index = 0; DevicePathString[Index] != L'\0'; Index ++) {
+    TemStr[0] = DevicePathString[Index];
+    DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+    if ((Index & 1) == 0) {
+      DevicePathBuffer [Index/2] = DigitUint8;
+    } else {
+      DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
+    }
+  }
 
   FreePool (DevicePathString);
+  
+  *DevicePath = DevicePathBuffer;
 
   return EFI_SUCCESS;
 
 }
 
+/**
+  Converts the unicode character of the string from uppercase to lowercase.
+  This is a internal function.
+
+  @param Str     String to be converted
+
+**/
+VOID
+EFIAPI
+HiiToLower (
+  IN OUT CHAR16    *Str
+  )
+{
+  CHAR16      *Ptr;
+  
+  for (Ptr = Str; *Ptr != L'\0'; Ptr++) {
+    if (*Ptr >= L'A' && *Ptr <= L'Z') {
+      *Ptr = (CHAR16) (*Ptr - L'A' + L'a');
+    }
+  }
+}
 
 /**
   Generate a sub string then output it.
@@ -159,8 +194,11 @@ GenerateSubStr (
 {
   UINTN       Length;
   EFI_STRING  Str;
-  EFI_STATUS  Status;
   EFI_STRING  StringHeader;
+  CHAR16      *TemString;
+  CHAR16      *TemName;
+  UINT8       *TemBuffer;
+  UINTN       Index;
 
   ASSERT (String != NULL && SubStr != NULL);
 
@@ -171,34 +209,55 @@ GenerateSubStr (
   }
 
   Length = StrLen (String) + BufferLen * 2 + 1 + 1;
-  Str = AllocateZeroPool (Length * sizeof (CHAR16));
+  Str    = AllocateZeroPool (Length * sizeof (CHAR16));
   ASSERT (Str != NULL);
 
   StrCpy (Str, String);
   Length = (BufferLen * 2 + 1) * sizeof (CHAR16);
 
-  Status       = EFI_SUCCESS;
   StringHeader = Str + StrLen (String);
+  TemString    = (CHAR16 *) StringHeader;
 
   switch (Flag) {
   case 1:
-    Status = BufInReverseOrderToHexString (StringHeader, (UINT8 *) Buffer, BufferLen);
+    //
+    // Convert Buffer to Hex String in reverse order
+    //
+    TemBuffer = ((UINT8 *) Buffer);
+    for (Index = 0; Index < BufferLen; Index ++, TemBuffer ++) {
+      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+    }
     break;
   case 2:
-    Status = UnicodeToConfigString (StringHeader, &Length, (CHAR16 *) Buffer);
+    //
+    // Check buffer is enough
+    //
+    TemName = (CHAR16 *) Buffer;
+    ASSERT (Length < ((StrLen (TemName) * 4 + 1) * sizeof (CHAR16)));
+    //
+    // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+    //
+    for (; *TemName != L'\0'; TemName++) {
+      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+    }
     break;
   case 3:
-    Status = BufToHexString (StringHeader, &Length, (UINT8 *) Buffer, BufferLen);
     //
-    // Convert the uppercase to lowercase since <HexAf> is defined in lowercase format.
+    // Convert Buffer to Hex String
     //
-    ToLower (StringHeader);
+    TemBuffer = ((UINT8 *) Buffer) + BufferLen - 1;
+    for (Index = 0; Index < BufferLen; Index ++, TemBuffer --) {
+      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+    }
     break;
   default:
     break;
   }
 
-  ASSERT_EFI_ERROR (Status);
+  //
+  // Convert the uppercase to lowercase since <HexAf> is defined in lowercase format.
+  //
+  HiiToLower (StringHeader);
   StrCat (Str, L"&");
 
   *SubStr = Str;
@@ -344,14 +403,17 @@ GetValueOfNumber (
   EFI_STRING               Str;
   UINT8                    *Buf;
   EFI_STATUS               Status;
+  UINT8                    DigitUint8;
+  UINTN                    Index;
+  CHAR16                   TemStr[2];
 
   ASSERT (StringPtr != NULL && Number != NULL && Len != NULL);
-  ASSERT (*StringPtr != 0);
+  ASSERT (*StringPtr != L'\0');
 
   Buf = NULL;
 
   TmpPtr = StringPtr;
-  while (*StringPtr != 0 && *StringPtr != L'&') {
+  while (*StringPtr != L'\0' && *StringPtr != L'&') {
     StringPtr++;
   }
   *Len   = StringPtr - TmpPtr;
@@ -363,7 +425,7 @@ GetValueOfNumber (
     goto Exit;
   }
   CopyMem (Str, TmpPtr, *Len * sizeof (CHAR16));
-  *(Str + *Len) = 0;
+  *(Str + *Len) = L'\0';
 
   Length = (Length + 1) / 2;
   Buf = (UINT8 *) AllocateZeroPool (Length);
@@ -371,10 +433,17 @@ GetValueOfNumber (
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
-
-  Status = HexStringToBuf (Buf, &Length, Str, NULL);
-  if (EFI_ERROR (Status)) {
-    goto Exit;
+  
+  Length = *Len;
+  ZeroMem (TemStr, sizeof (TemStr));
+  for (Index = 0; Index < Length; Index ++) {
+    TemStr[0] = Str[Length - Index - 1];
+    DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+    if ((Index & 1) == 0) {
+      Buf [Index/2] = DigitUint8;
+    } else {
+      Buf [Index/2] = (UINT8) ((Buf [Index/2] << 4) + DigitUint8);
+    }
   }
 
   *Number = Buf;
@@ -384,6 +453,7 @@ Exit:
   if (Str != NULL) {
     FreePool (Str);
   }
+
   return Status;
 }
 
@@ -959,6 +1029,9 @@ HiiBlockToConfig (
   UINT8                               *Value;
   EFI_STRING                          ValueStr;
   EFI_STRING                          ConfigElement;
+  UINTN                               Index;
+  UINT8                               *TemBuffer;
+  CHAR16                              *TemString;
 
   if (This == NULL || Progress == NULL || Config == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1107,10 +1180,13 @@ HiiBlockToConfig (
       Status = EFI_OUT_OF_RESOURCES;
       goto Exit;
     }
-
-    Status = BufToHexString (ValueStr, &Length, Value, Width);
-    ASSERT_EFI_ERROR (Status);
-    ToLower (ValueStr);
+    
+    TemString = ValueStr;
+    TemBuffer = Value + Width - 1;
+    for (Index = 0; Index < Width; Index ++, TemBuffer --) {
+      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+    }
+    HiiToLower (ValueStr);
 
     FreePool (Value);
     Value = NULL;

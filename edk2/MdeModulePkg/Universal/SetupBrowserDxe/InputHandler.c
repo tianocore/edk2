@@ -605,7 +605,13 @@ EnterCarriageReturn:
     default:
       if (ManualInput) {
         if (HexInput) {
-          if (!IsHexDigit (&Digital, Key.UnicodeChar)) {
+          if ((Key.UnicodeChar >= L'0') && (Key.UnicodeChar <= L'9')) {
+            Digital = (UINT8) (Key.UnicodeChar - L'0');
+          } else if ((Key.UnicodeChar >= L'A') && (Key.UnicodeChar <= L'F')) {
+            Digital = (UINT8) (Key.UnicodeChar - L'A' + 0x0A);
+          } else if ((Key.UnicodeChar >= L'a') && (Key.UnicodeChar <= L'f')) {
+            Digital = (UINT8) (Key.UnicodeChar - L'a' + 0x0A);
+          } else {
             UpdateStatusBar (INPUT_ERROR, Question->QuestionFlags, TRUE);
             break;
           }

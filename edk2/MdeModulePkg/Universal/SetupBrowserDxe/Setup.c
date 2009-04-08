@@ -1018,8 +1018,12 @@ GetQuestionValue (
   CHAR16              *Value;
   CHAR16              *StringPtr;
   UINTN               Length;
+  UINTN               Index;
+  UINTN               LengthStr;
   BOOLEAN             IsBufferStorage;
   BOOLEAN             IsString;
+  CHAR16              TemStr[5];
+  UINT8               DigitUint8;
 
   Status = EFI_SUCCESS;
 
@@ -1141,15 +1145,44 @@ GetQuestionValue (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-
+      
+      LengthStr = StrLen (Value);
+      Status    = EFI_SUCCESS;
       if (IsString) {
         //
         // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
+        // Add string tail char L'\0' into Length
         //
-        Length = StorageWidth + sizeof (CHAR16);
-        Status = ConfigStringToUnicode ((CHAR16 *) Dst, &Length, Value);
+        Length    = StorageWidth + sizeof (CHAR16);
+        if (Length < ((LengthStr / 4 + 1) * 2)) {
+          Status = EFI_BUFFER_TOO_SMALL;
+        } else {
+          StringPtr = (CHAR16 *) Dst;
+          ZeroMem (TemStr, sizeof (TemStr));
+          for (Index = 0; Index < LengthStr; Index += 4) {
+            StrnCpy (TemStr, Value + Index, 4);
+            StringPtr[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
+          }
+          //
+          // Add tailing L'\0' character
+          //
+          StringPtr[Index/4] = L'\0';
+        }
       } else {
-        Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
+        if (StorageWidth < ((LengthStr + 1) / 2)) {
+          Status = EFI_BUFFER_TOO_SMALL;
+        } else {
+          ZeroMem (TemStr, sizeof (TemStr));
+          for (Index = 0; Index < LengthStr; Index ++) {
+            TemStr[0] = Value[LengthStr - Index - 1];
+            DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+            if ((Index & 1) == 0) {
+              Dst [Index/2] = DigitUint8;
+            } else {
+              Dst [Index/2] = (UINT8) ((Dst [Index/2] << 4) + DigitUint8);
+            }
+          }
+        }
       }
 
       FreePool (Value);
@@ -1222,18 +1255,48 @@ GetQuestionValue (
     }
     *StringPtr = L'\0';
 
+    LengthStr = StrLen (Value);
+    Status    = EFI_SUCCESS;
     if (!IsBufferStorage && IsString) {
       //
       // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
+      // Add string tail char L'\0' into Length
       //
-      Length = StorageWidth + sizeof (CHAR16);
-      Status = ConfigStringToUnicode ((CHAR16 *) Dst, &Length, Value);
-    } else {
-      Status = HexStringToBuf (Dst, &StorageWidth, Value, NULL);
-      if (EFI_ERROR (Status)) {
-        FreePool (Result);
-        return Status;
+      Length    = StorageWidth + sizeof (CHAR16);
+      if (Length < ((LengthStr / 4 + 1) * 2)) {
+        Status = EFI_BUFFER_TOO_SMALL;
+      } else {
+        StringPtr = (CHAR16 *) Dst;
+        ZeroMem (TemStr, sizeof (TemStr));
+        for (Index = 0; Index < LengthStr; Index += 4) {
+          StrnCpy (TemStr, Value + Index, 4);
+          StringPtr[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
+        }
+        //
+        // Add tailing L'\0' character
+        //
+        StringPtr[Index/4] = L'\0';
       }
+    } else {
+      if (StorageWidth < ((LengthStr + 1) / 2)) {
+        Status = EFI_BUFFER_TOO_SMALL;
+      } else {
+        ZeroMem (TemStr, sizeof (TemStr));
+        for (Index = 0; Index < LengthStr; Index ++) {
+          TemStr[0] = Value[LengthStr - Index - 1];
+          DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+          if ((Index & 1) == 0) {
+            Dst [Index/2] = DigitUint8;
+          } else {
+            Dst [Index/2] = (UINT8) ((Dst [Index/2] << 4) + DigitUint8);
+          }
+        }
+      }
+    }
+
+    if (EFI_ERROR (Status)) {
+      FreePool (Result);
+      return Status;
     }
 
     //
@@ -1244,6 +1307,7 @@ GetQuestionValue (
     } else {
       SetValueByName (Storage, Question->VariableName, Value);
     }
+
     FreePool (Result);
   }
 
@@ -1286,6 +1350,10 @@ SetQuestionValue (
   UINTN               Length;
   BOOLEAN             IsBufferStorage;
   BOOLEAN             IsString;
+  UINT8               *TemBuffer;
+  CHAR16              *TemName;
+  CHAR16              *TemString;
+  UINTN               Index;
 
   Status = EFI_SUCCESS;
 
@@ -1397,20 +1465,32 @@ SetQuestionValue (
   } else {
     if (IsString) {
       //
-      // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+      // Allocate enough string buffer.
       //
       Value = NULL;
       BufferLen = ((StrLen ((CHAR16 *) Src) * 4) + 1) * sizeof (CHAR16);
       Value = AllocateZeroPool (BufferLen);
       ASSERT (Value != NULL);
-      Status = UnicodeToConfigString (Value, &BufferLen, (CHAR16 *) Src);
-      ASSERT_EFI_ERROR (Status);
+      //
+      // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+      //
+      TemName = (CHAR16 *) Src;
+      TemString = Value;
+      for (; *TemName != L'\0'; TemName++) {
+        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+      }
     } else {
       BufferLen = StorageWidth * 2 + 1;
       Value = AllocateZeroPool (BufferLen * sizeof (CHAR16));
       ASSERT (Value != NULL);
-      BufToHexString (Value, &BufferLen, Src, StorageWidth);
-      ToLower (Value);
+      //
+      // Convert Buffer to Hex String
+      //
+      TemBuffer = Src + StorageWidth - 1;
+      TemString = Value;
+      for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
+        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+      }
     }
 
     Status = SetValueByName (Storage, Question->VariableName, Value);
@@ -1446,17 +1526,34 @@ SetQuestionValue (
     }
 
     Value = ConfigResp + StrLen (ConfigResp);
+
     if (!IsBufferStorage && IsString) {
       //
       // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
       //
-      BufferLen = ((StrLen ((CHAR16 *) Src) * 4) + 1) * sizeof (CHAR16);
-      Status = UnicodeToConfigString (Value, &BufferLen, (CHAR16 *) Src);
-      ASSERT_EFI_ERROR (Status);
+      TemName = (CHAR16 *) Src;
+      TemString = Value;
+      for (; *TemName != L'\0'; TemName++) {
+        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+      }
     } else {
-      BufferLen = StorageWidth * 2 + 1;
-      BufToHexString (Value, &BufferLen, Src, StorageWidth);
-      ToLower (Value);
+      //
+      // Convert Buffer to Hex String
+      //
+      TemBuffer = Src + StorageWidth - 1;
+      TemString = Value;
+      for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
+        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+      }
+    }
+    
+    //
+    // Convert to lower char.
+    //
+    for (TemString = Value; *Value != L'\0'; Value++) {
+      if (*Value >= L'A' && *Value <= L'Z') {
+        *Value = (CHAR16) (*Value - L'A' + L'a');
+      }
     }
 
     //
