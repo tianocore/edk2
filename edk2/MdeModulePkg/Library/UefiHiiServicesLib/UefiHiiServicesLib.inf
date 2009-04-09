@@ -1,0 +1,66 @@
+#/** @file
+# UEFI HII Services Library implementation.
+# 
+# Copyright (c) 2007 - 2009, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiHiiServicesLib
+  FILE_GUID                      = 894DC1B6-07A3-4a9d-8CDD-333580B3D4B1
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiHiiServicesLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+
+  CONSTRUCTOR                    = UefiHiiServicesLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  UefiHiiServicesLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  DebugLib
+  
+[Protocols]
+  gEfiHiiFontProtocolGuid
+  gEfiHiiStringProtocolGuid
+  gEfiHiiImageProtocolGuid
+  gEfiHiiDatabaseProtocolGuid
+  gEfiHiiConfigRoutingProtocolGuid
+
+[Depex.common.DXE_DRIVER]
+  gEfiHiiStringProtocolGuid        AND
+  gEfiHiiDatabaseProtocolGuid      AND
+  gEfiHiiConfigRoutingProtocolGuid
+
+[Depex.common.DXE_RUNTIME_DRIVER]
+  gEfiHiiStringProtocolGuid        AND
+  gEfiHiiDatabaseProtocolGuid      AND
+  gEfiHiiConfigRoutingProtocolGuid
+
+[Depex.common.DXE_SAL_DRIVER]
+  gEfiHiiStringProtocolGuid        AND
+  gEfiHiiDatabaseProtocolGuid      AND
+  gEfiHiiConfigRoutingProtocolGuid
+
+[Depex.common.DXE_SMM_DRIVER]
+  gEfiHiiStringProtocolGuid        AND
+  gEfiHiiDatabaseProtocolGuid      AND
+  gEfiHiiConfigRoutingProtocolGuid
