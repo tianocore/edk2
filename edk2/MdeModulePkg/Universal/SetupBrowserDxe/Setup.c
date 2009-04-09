@@ -1179,7 +1179,7 @@ GetQuestionValue (
             if ((Index & 1) == 0) {
               Dst [Index/2] = DigitUint8;
             } else {
-              Dst [Index/2] = (UINT8) ((Dst [Index/2] << 4) + DigitUint8);
+              Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
             }
           }
         }
@@ -1288,7 +1288,7 @@ GetQuestionValue (
           if ((Index & 1) == 0) {
             Dst [Index/2] = DigitUint8;
           } else {
-            Dst [Index/2] = (UINT8) ((Dst [Index/2] << 4) + DigitUint8);
+            Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
           }
         }
       }

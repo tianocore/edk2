@@ -442,7 +442,7 @@ GetValueOfNumber (
     if ((Index & 1) == 0) {
       Buf [Index/2] = DigitUint8;
     } else {
-      Buf [Index/2] = (UINT8) ((Buf [Index/2] << 4) + DigitUint8);
+      Buf [Index/2] = (UINT8) ((DigitUint8 << 4) + Buf [Index/2]);
     }
   }
 
