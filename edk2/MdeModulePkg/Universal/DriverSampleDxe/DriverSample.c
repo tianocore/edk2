@@ -16,14 +16,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DriverSample.h"
 
-#define DISPLAY_ONLY_MY_ITEM  0x0002
+#define DISPLAY_ONLY_MY_ITEM  0x0000
 
 EFI_GUID   mFormSetGuid = FORMSET_GUID;
 EFI_GUID   mInventoryGuid = INVENTORY_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
 
-HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
+EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
+DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData = NULL;
+
+HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath0 = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -48,7 +51,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
   }
 };
 
-HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath2 = {
+HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -739,8 +742,6 @@ DriverSampleInit (
   EFI_STATUS                      SavedStatus;
   EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
   EFI_HII_HANDLE                  HiiHandle[2];
-  EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
-  DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData;
   EFI_SCREEN_DESCRIPTOR           Screen;
   EFI_HII_DATABASE_PROTOCOL       *HiiDatabase;
   EFI_HII_STRING_PROTOCOL         *HiiString;
@@ -819,7 +820,7 @@ DriverSampleInit (
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &DriverHandle[0],
                   &gEfiDevicePathProtocolGuid,
-                  &mHiiVendorDevicePath1,
+                  &mHiiVendorDevicePath0,
                   &gEfiHiiConfigAccessProtocolGuid,
                   &PrivateData->ConfigAccess,
                   NULL
@@ -859,7 +860,7 @@ DriverSampleInit (
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &DriverHandle[1],
                   &gEfiDevicePathProtocolGuid,
-                  &mHiiVendorDevicePath2,
+                  &mHiiVendorDevicePath1,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -937,40 +938,68 @@ DriverSampleInit (
   //
   // Example of how to display only the item we sent to HII
   //
-  if (DISPLAY_ONLY_MY_ITEM == 0x0001) {
-    //
-    // Have the browser pull out our copy of the data, and only display our data
-    //
-    //    Status = FormConfig->SendForm (FormConfig, TRUE, HiiHandle, NULL, NULL, NULL, &Screen, NULL);
-    //
-    Status = FormBrowser2->SendForm (
-                             FormBrowser2,
-                             HiiHandle,
-                             1,
-                             NULL,
-                             0,
-                             NULL,
-                             NULL
-                             );
-    SavedStatus = Status;
+  //
+  // Have the browser pull out our copy of the data, and only display our data
+  //
+  Status = FormBrowser2->SendForm (
+                           FormBrowser2,
+                           &(HiiHandle[DISPLAY_ONLY_MY_ITEM]),
+                           1,
+                           NULL,
+                           0,
+                           NULL,
+                           NULL
+                           );
+  SavedStatus = Status;
 
-    Status = HiiDatabase->RemovePackageList (HiiDatabase, HiiHandle[0]);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  Status = HiiDatabase->RemovePackageList (HiiDatabase, HiiHandle[0]);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-    Status = HiiDatabase->RemovePackageList (HiiDatabase, HiiHandle[1]);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  Status = HiiDatabase->RemovePackageList (HiiDatabase, HiiHandle[1]);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-    return SavedStatus;
-  } else {
-    //
-    // Have the browser pull out all the data in the HII Database and display it.
-    //
-    //    Status = FormConfig->SendForm (FormConfig, TRUE, 0, NULL, NULL, NULL, NULL, NULL);
-    //
+  return SavedStatus;
+}
+
+/**
+  Unloads the application and its installed protocol.
+
+  @param[in]  ImageHandle       Handle that identifies the image to be unloaded.
+
+  @retval EFI_SUCCESS           The image has been unloaded.
+**/
+EFI_STATUS
+EFIAPI
+DriverSampleUnload (
+  IN EFI_HANDLE  ImageHandle
+  )
+{
+  if (DriverHandle[0] != NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (
+            DriverHandle[0],
+            &gEfiDevicePathProtocolGuid,
+            &mHiiVendorDevicePath0,
+            &gEfiHiiConfigAccessProtocolGuid,
+            &PrivateData->ConfigAccess,
+            NULL
+           );
+  }
+
+  if (DriverHandle[1] != NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (
+            DriverHandle[1],
+            &gEfiDevicePathProtocolGuid,
+            &mHiiVendorDevicePath1,
+            NULL
+           );
+  }
+
+  if (PrivateData != NULL) {
+    FreePool (PrivateData);
   }
 
   return EFI_SUCCESS;
