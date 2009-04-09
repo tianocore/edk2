@@ -22,24 +22,25 @@ BOOLEAN            mHiiPackageListUpdated = FALSE;
 HII_VENDOR_DEVICE_PATH  mUefiHiiVendorDevicePath = {
   {
     {
-      HARDWARE_DEVICE_PATH,
-      HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
-      }
+        HARDWARE_DEVICE_PATH,
+        HW_VENDOR_DP,
+        {
+          (UINT8) (sizeof (HII_VENDOR_DEVICE_PATH_NODE)),
+          (UINT8) ((sizeof (HII_VENDOR_DEVICE_PATH_NODE)) >> 8)
+        }
+      },
+      EFI_CALLER_ID_GUID
     },
-    //
-    // {2A1F1827-03E2-4b2f-83DE-89B6073A0182}
-    //
-    { 0x2a1f1827, 0x3e2, 0x4b2f, { 0x83, 0xde, 0x89, 0xb6, 0x7, 0x3a, 0x1, 0x82 } }
+    0,
+    0
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     { 
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+      (UINT8) (sizeof (EFI_DEVICE_PATH_PROTOCOL)),
+      (UINT8) ((sizeof (EFI_DEVICE_PATH_PROTOCOL)) >> 8)
     }
   }
 };
@@ -220,6 +221,7 @@ InstallDefaultConfigAccessProtocol (
 {
   EFI_STATUS                                  Status;
   CONFIG_ACCESS_PRIVATE                       *ConfigAccessInstance;
+  HII_VENDOR_DEVICE_PATH                      *HiiVendorPath;
 
   ASSERT (ThunkContext->IfrPackageCount != 0);
 
@@ -228,11 +230,23 @@ InstallDefaultConfigAccessProtocol (
                            &gConfigAccessPrivateTempate
                            );
   ASSERT (ConfigAccessInstance != NULL);
-  
+
+  //
+  // Use memory address as unique ID to distinguish from different device paths
+  // This function may be called multi times by the framework HII driver.
+  //
+  HiiVendorPath = AllocateCopyPool (
+                           sizeof (HII_VENDOR_DEVICE_PATH), 
+                           &mUefiHiiVendorDevicePath
+                           );
+  ASSERT (HiiVendorPath != NULL);
+
+  HiiVendorPath->Node.UniqueId = (UINT64) ((UINTN) HiiVendorPath);
+
   Status = gBS->InstallMultipleProtocolInterfaces (
           &ThunkContext->UefiHiiDriverHandle,
           &gEfiDevicePathProtocolGuid,          
-          &mUefiHiiVendorDevicePath,
+          HiiVendorPath,
           &gEfiHiiConfigAccessProtocolGuid,
           &ConfigAccessInstance->ConfigAccessProtocol,
           NULL

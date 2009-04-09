@@ -45,7 +45,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/HiiLib.h>
-#include <Library/DevicePathLib.h>
 #include <Library/UefiLib.h>
 
 #include <Library/IfrSupportLib.h>
@@ -186,15 +185,22 @@ typedef struct {
 } BUFFER_STORAGE_ENTRY;
 
 #pragma pack(1)
+///
+/// HII specific Vendor Device Path Node definition.
+///
+typedef struct {
+  VENDOR_DEVICE_PATH             VendorDevicePath;
+  UINT32                         Reserved;
+  UINT64                         UniqueId;
+} HII_VENDOR_DEVICE_PATH_NODE;
 
 ///
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
+  HII_VENDOR_DEVICE_PATH_NODE    Node;
   EFI_DEVICE_PATH_PROTOCOL       End;
 } HII_VENDOR_DEVICE_PATH;
-
 #pragma pack()
 
 #define CONFIG_ACCESS_PRIVATE_SIGNATURE            SIGNATURE_32 ('H', 'T', 'c', 'a')
