@@ -9,13 +9,25 @@
 #*   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 #*   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 #*   
-#*    bootsect.asm
+#*   bootsect.S
 #*  
-#*   Abstract:
+#*   bootsect.S is built as 16-bit binary file in 512 bytes and patched to disk/partition's 
+#*   first section - boot sector. 
+#*
+#*   The startup sequence for DUET disk boot sector is:
+#*
+#*   1, LegacyBios check 0xAA55 signature at boot sectore offset 0x1FE to judget 
+#*      whether disk/partition is bootable.
+#*   2, LegacyBios will load boot sector to 0x7c00 in real mode, pass BPB data and
+#*      hand off control to 0x7c00 code.
+#*   3, boot sector code simply parse FAT format in boot disk and find EfiLdr binary file 
+#*      and EfiVar.bin if exists. For first boot, EfiVar.bin does not exist.
+#*   4, boot sector load the first sector of EfiLdr binary which is start.com to
+#*      0x2000:0x0000 address.
+#*   5, boot sector handoff control to 0x2000:0x0000 for start.com binary.
 #*
 #------------------------------------------------------------------------------
 
-        #.MODEL small
         .stack: 
         .486p: 
         .code16
