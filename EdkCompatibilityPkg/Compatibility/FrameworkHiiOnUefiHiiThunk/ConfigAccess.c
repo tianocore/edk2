@@ -274,7 +274,8 @@ UninstallDefaultConfigAccessProtocol (
 {
   EFI_STATUS                      Status;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  
+  HII_VENDOR_DEVICE_PATH          *HiiVendorPath;
+
   Status = gBS->HandleProtocol (
                   ThunkContext->UefiHiiDriverHandle,
                   &gEfiHiiConfigAccessProtocolGuid,
@@ -282,10 +283,17 @@ UninstallDefaultConfigAccessProtocol (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  Status = gBS->HandleProtocol (
+                  ThunkContext->UefiHiiDriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &HiiVendorPath
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   ThunkContext->UefiHiiDriverHandle,
                   &gEfiDevicePathProtocolGuid,
-                  &mUefiHiiVendorDevicePath,
+                  HiiVendorPath,
                   &gEfiHiiConfigAccessProtocolGuid,
                   ConfigAccess,
                   NULL
