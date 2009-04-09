@@ -56,6 +56,7 @@ typedef UINT32 size_t ;
 #undef InterlockedDecrement
 #undef InterlockedCompareExchange64
 #undef InterlockedCompareExchangePointer
+#undef CreateEventEx
 
 #define VOID void
 
