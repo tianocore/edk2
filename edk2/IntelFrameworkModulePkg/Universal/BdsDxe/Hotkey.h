@@ -19,9 +19,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Bds.h"
 #include "String.h"
 
-#define GET_KEY_CODE_COUNT(KeyOptions)      (((KeyOptions) & EFI_KEY_CODE_COUNT) >> 8)
+#define GET_BOOT_OPTION_SUPPORT_KEY_COUNT(a) (((a) & EFI_BOOT_OPTION_SUPPORT_COUNT) >> 8)
+#define SET_BOOT_OPTION_SUPPORT_KEY_COUNT(a, c) {  \
+      (a) = ((a) & ~EFI_BOOT_OPTION_SUPPORT_COUNT) | (((c) << 8) & EFI_BOOT_OPTION_SUPPORT_COUNT); \
+      }
 
 #define BDS_HOTKEY_OPTION_SIGNATURE SIGNATURE_32 ('B', 'd', 'K', 'O')
+
+
 typedef struct {
   UINTN                     Signature;
   LIST_ENTRY                Link;
