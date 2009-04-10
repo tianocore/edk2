@@ -1585,6 +1585,10 @@ HiiStringToImage (
     Background = SystemDefault->BackgroundColor;
 
   } else {
+    //
+    //  StringInfo must not be NULL if it is not system info.
+    //
+    ASSERT (StringInfo != NULL);
     Status = HiiGetFontInfo (This, &FontHandle, (EFI_FONT_DISPLAY_INFO *) StringInfo, &StringInfoOut, NULL);
     if (Status == EFI_NOT_FOUND) {
       //
