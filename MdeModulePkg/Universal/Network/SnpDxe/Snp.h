@@ -1,7 +1,7 @@
 /** @file
     Declaration of strctures and functions for SnpDxe driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR> 
+Copyright (c) 2004 - 2009, Intel Corporation. <BR> 
 All rights reserved. This program and the accompanying materials are licensed 
 and made available under the terms and conditions of the BSD License which 
 accompanies this distribution. The full text of the license may be found at 
@@ -21,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/PciIo.h>
 #include <Protocol/NetworkInterfaceIdentifier.h>
 #include <Protocol/DevicePath.h>
+
+#include <Guid/EventGroup.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -118,6 +120,8 @@ typedef struct {
     EFI_PHYSICAL_ADDRESS  VirtualAddress;
     VOID                  *MapCookie;
   } MapList[MAX_MAP_LENGTH];
+
+  EFI_EVENT              ExitBootServicesEvent;
 } SNP_DRIVER;
 
 #define EFI_SIMPLE_NETWORK_DEV_FROM_THIS(a) CR (a, SNP_DRIVER, Snp, SNP_DRIVER_SIGNATURE)

@@ -72,6 +72,8 @@
   DebugLib
   PcdLib
 
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## PRODUCES ## Event
 
 [Protocols]
   gEfiPciIoProtocolGuid                         ## TO_START

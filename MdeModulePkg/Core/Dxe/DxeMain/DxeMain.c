@@ -631,14 +631,14 @@ CoreExitBootServices (
   }
 
   //
-  // Notify other drivers that we are exiting boot services.
-  //
-  CoreNotifySignalList (&gEfiEventExitBootServicesGuid);
-
-  //
   // Disable Timer
   //
   gTimer->SetTimerPeriod (gTimer, 0);
+
+  //
+  // Notify other drivers that we are exiting boot services.
+  //
+  CoreNotifySignalList (&gEfiEventExitBootServicesGuid);
 
   //
   // Disable CPU Interrupts

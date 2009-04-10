@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/PciIo.h>
 
+#include <Guid/EventGroup.h>
+
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -119,6 +121,12 @@ struct _USB2_HC_DEV {
   //
   EHC_QTD                  *ShortReadStop;
   EFI_EVENT                 PollTimer;
+
+  //
+  // ExitBootServicesEvent is used to stop the EHC DMA operation 
+  // after exit boot service.
+  //
+  EFI_EVENT                 ExitBootServiceEvent;
 
   //
   // Asynchronous(bulk and control) transfer schedule data:

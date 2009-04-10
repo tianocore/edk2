@@ -2,7 +2,7 @@
 
   The definition for UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/UsbHostController.h>
 #include <Protocol/PciIo.h>
+
+#include <Guid/EventGroup.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -137,6 +139,12 @@ struct _USB_HC_DEV {
   USBHC_MEM_POOL            *MemPool;
   EFI_UNICODE_STRING_TABLE  *CtrlNameTable;
   VOID                      *FrameMapping;
+
+  //
+  // ExitBootServicesEvent is used to stop the EHC DMA operation 
+  // after exit boot service.
+  //
+  EFI_EVENT                 ExitBootServiceEvent;
 };
 
 extern EFI_DRIVER_BINDING_PROTOCOL   gUhciDriverBinding;
