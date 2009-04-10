@@ -1,7 +1,7 @@
 /** @file
   The driver binding for IP4 CONFIG protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -72,6 +72,7 @@ EfiIp4ConfigUnload (
 
 **/
 EFI_STATUS
+EFIAPI
 Ip4ConfigDriverEntryPoint (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_SYSTEM_TABLE       *SystemTable

@@ -1,7 +1,7 @@
 /** @file
   Dhcp and Discover routines for PxeBc.
 
-Copyright (c) 2007, Intel Corporation.<BR>
+Copyright (c) 2007, 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -373,6 +373,7 @@ PxeBcCheckSelectedOffer (
 
 **/
 EFI_STATUS
+EFIAPI
 PxeBcDhcpCallBack (
   IN EFI_DHCP4_PROTOCOL                * This,
   IN VOID                              *Context,

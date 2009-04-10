@@ -2,7 +2,7 @@
 Utility functions which helps in opcode creation, HII configuration string manipulations, 
 pop up window creations, setup browser persistence data set and get.
 
-Copyright (c) 2007- 2008, Intel Corporation
+Copyright (c) 2007- 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1053,6 +1053,7 @@ ConstructConfigHdr (
 
 **/
 BOOLEAN
+EFIAPI
 IsConfigHdrMatch (
   IN EFI_STRING                ConfigString,
   IN EFI_GUID                  *StorageGuid, OPTIONAL

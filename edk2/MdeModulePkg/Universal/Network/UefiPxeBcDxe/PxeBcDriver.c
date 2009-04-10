@@ -1,7 +1,7 @@
 /** @file
   The driver binding for UEFI PXEBC protocol.
   
-Copyright (c) 2007 - 2008, Intel Corporation.<BR>
+Copyright (c) 2007 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,6 +37,7 @@ EFI_DRIVER_BINDING_PROTOCOL gPxeBcDriverBinding = {
 
 **/
 EFI_STATUS
+EFIAPI
 PxeBcDriverEntryPoint (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_SYSTEM_TABLE       *SystemTable

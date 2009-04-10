@@ -5,7 +5,7 @@
   The DebugSupport protocol is used by source level debuggers to abstract the
   processor and handle context save and restore operations.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -495,7 +495,7 @@ typedef union {
 **/
 typedef
 VOID
-(*EFI_EXCEPTION_CALLBACK)(
+(EFIAPI *EFI_EXCEPTION_CALLBACK)(
   IN     EFI_EXCEPTION_TYPE               ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT               SystemContext
   );
@@ -508,7 +508,7 @@ VOID
 **/
 typedef
 VOID
-(*EFI_PERIODIC_CALLBACK)(
+(EFIAPI *EFI_PERIODIC_CALLBACK)(
   IN OUT EFI_SYSTEM_CONTEXT               SystemContext
   );
 

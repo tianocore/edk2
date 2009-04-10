@@ -1,6 +1,6 @@
 /** @file
   Support routines for PxeBc.
-Copyright (c) 2007 - 2008, Intel Corporation.<BR>                                                         
+Copyright (c) 2007 - 2009, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,6 +42,7 @@ GetSmbiosSystemGuidAndSerialNumber (
 
 **/
 VOID
+EFIAPI
 PxeBcCommonNotify (
   IN EFI_EVENT           Event,
   IN VOID                *Context
