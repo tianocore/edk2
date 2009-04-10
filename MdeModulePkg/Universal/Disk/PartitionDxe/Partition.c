@@ -602,7 +602,7 @@ PartitionInstallChildHandle (
   Private->BlockIo.Revision = ParentBlockIo->Revision;
 
   Private->BlockIo.Media    = &Private->Media;
-  CopyMem (Private->BlockIo.Media, ParentBlockIo->Media, SIZE_OF_EFI_BLOCK_IO_MEDIA_REV1);
+  CopyMem (Private->BlockIo.Media, ParentBlockIo->Media, sizeof (EFI_BLOCK_IO_MEDIA));
   Private->Media.LogicalPartition = TRUE;
   Private->Media.LastBlock = DivU64x32 (
                                MultU64x32 (
