@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -52,7 +52,7 @@
 
 ASM_PFX(m16Size):         .word      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
 ASM_PFX(mThunk16Attr):    .word      _ThunkAttr - ASM_PFX(m16Start)
-ASM_PFX(m16Gdt):          .word      _NullSeg - ASM_PFX(m16Start)
+ASM_PFX(m16Gdt):          .word      ASM_PFX(NullSeg) - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase):     .word      _16GdtrBase - ASM_PFX(m16Start)
 ASM_PFX(mTransition):     .word      _EntryPoint - ASM_PFX(m16Start)
 
@@ -145,7 +145,7 @@ L_64BitCode:
 _EntryPoint: .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
              .word      CODE16
 _16Gdtr:     .word      GDT_SIZE - 1
-_16GdtrBase: .quad      _NullSeg
+_16GdtrBase: .quad      ASM_PFX(NullSeg)
 _16Idtr:     .word      0x3ff
              .long      0
 
@@ -190,26 +190,26 @@ L_RealMode:
     .byte 0x66                          # make the following retf 32-bit
     lret                                # transfer control to user code
 
-.equ  CODE16,  ASM_PFX(16Code) - .
-.equ  DATA16,  ASM_PFX(16Data) - .
-.equ  DATA32,  ASM_PFX(32Data) - .
+.equ  CODE16,  ASM_PFX(_16Code) - .
+.equ  DATA16,  ASM_PFX(_16Data) - .
+.equ  DATA32,  ASM_PFX(_32Data) - .
 
-_NullSeg:   .quad      0
-ASM_PFX(16Code):
+ASM_PFX(NullSeg):   .quad      0
+ASM_PFX(_16Code):
             .word -1
             .word 0
             .byte 0
             .byte 0x9b
             .byte 0x8f                  # 16-bit segment, 4GB limit
             .byte 0
-ASM_PFX(16Data):
+ASM_PFX(_16Data):
             .word -1
             .word 0
             .byte 0
             .byte 0x93
             .byte 0x8f                  # 16-bit segment, 4GB limit
             .byte 0
-ASM_PFX(32Data):
+ASM_PFX(_32Data):
             .word -1
             .word 0
             .byte 0
