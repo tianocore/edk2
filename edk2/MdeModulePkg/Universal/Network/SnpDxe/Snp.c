@@ -1,7 +1,7 @@
 /** @file
     Implementation of driver entry point and driver binding protocol.
  
-Copyright (c) 2004 - 2008, Intel Corporation. <BR> 
+Copyright (c) 2004 - 2009, Intel Corporation. <BR> 
 All rights reserved. This program and the accompanying materials are licensed 
 and made available under the terms and conditions of the BSD License which 
 accompanies this distribution. The full text of the license may be found at 
@@ -22,6 +22,30 @@ V2P                         *mV2p = NULL; // undi3.0 map_list head
 // End Global variables
 //
 
+/**
+  One notified function to stop UNDI device when gBS->ExitBootServices() called.
+
+  @param  Event                   Pointer to this event
+  @param  Context                 Event hanlder private data
+
+**/
+VOID
+EFIAPI
+SnpNotifyExitBootServices (
+  EFI_EVENT Event,
+  VOID      *Context
+  )
+{
+  SNP_DRIVER             *Snp;
+
+  Snp  = (SNP_DRIVER *)Context;
+
+  //
+  // Shutdown and stop UNDI driver
+  //
+  PxeShutdown (Snp);
+  PxeStop (Snp);
+}
 
 /**
   Send command to UNDI. It does nothing currently.
@@ -635,6 +659,21 @@ SimpleNetworkDriverStart (
   PxeStop (Snp);
 
   //
+  // Create EXIT_BOOT_SERIVES Event
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  SnpNotifyExitBootServices,
+                  Snp,
+                  &gEfiEventExitBootServicesGuid,
+                  &Snp->ExitBootServicesEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Error_DeleteSNP;
+  }
+
+  //
   //  add SNP to the undi handle
   //
   Status = gBS->InstallProtocolInterface (
@@ -737,6 +776,11 @@ SimpleNetworkDriverStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Close EXIT_BOOT_SERIVES Event
+  //
+  gBS->CloseEvent (Snp->ExitBootServicesEvent);
 
   Status = gBS->CloseProtocol (
                   Controller,

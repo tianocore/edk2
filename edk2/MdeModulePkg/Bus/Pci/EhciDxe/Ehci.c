@@ -1449,6 +1449,33 @@ EhcCreateUsb2Hc (
   return Ehc;
 }
 
+/**
+  One notified function to stop the Host Controller when gBS->ExitBootServices() called.
+
+  @param  Event                   Pointer to this event
+  @param  Context                 Event hanlder private data
+
+**/
+VOID
+EFIAPI
+EhcExitBootService (
+  EFI_EVENT                      Event,
+  VOID                           *Context
+  )
+
+{
+  USB2_HC_DEV   *Ehc;
+
+  Ehc = (USB2_HC_DEV *) Context;
+
+  //
+  // Stop the Host Controller
+  //
+  EhcHaltHC (Ehc, EHC_GENERIC_TIMEOUT);
+
+  return;
+}
+
 
 /**
   Starting the Usb EHCI Driver.
@@ -1585,6 +1612,21 @@ EhcDriverBindingStart (
   }
 
   //
+  // Create event to stop the HC when exit boot service.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  EhcExitBootService,
+                  Ehc,
+                  &gEfiEventExitBootServicesGuid,
+                  &Ehc->ExitBootServiceEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UNINSTALL_USBHC;
+  }
+
+  //
   // Install the component name protocol, don't fail the start
   // because of something for display.
   //
@@ -1710,6 +1752,10 @@ EhcDriverBindingStop (
 
   if (Ehc->PollTimer != NULL) {
     gBS->CloseEvent (Ehc->PollTimer);
+  }
+
+  if (Ehc->ExitBootServiceEvent != NULL) {
+    gBS->CloseEvent (Ehc->ExitBootServiceEvent);
   }
 
   EhcFreeSched (Ehc);

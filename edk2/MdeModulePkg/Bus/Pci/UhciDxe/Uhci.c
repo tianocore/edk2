@@ -2,7 +2,7 @@
 
   The UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1517,6 +1517,10 @@ UhciFreeDev (
     gBS->CloseEvent (Uhc->AsyncIntMonitor);
   }
 
+  if (Uhc->ExitBootServiceEvent != NULL) {
+    gBS->CloseEvent (Uhc->ExitBootServiceEvent);
+  }
+  
   if (Uhc->MemPool != NULL) {
     UsbHcFreeMemPool (Uhc->MemPool);
   }
@@ -1572,6 +1576,31 @@ UhciCleanDevUp (
   UhciFreeDev (Uhc);
 }
 
+/**
+  One notified function to stop the Host Controller when gBS->ExitBootServices() called.
+
+  @param  Event                   Pointer to this event
+  @param  Context                 Event hanlder private data
+
+**/
+VOID
+EFIAPI
+UhcExitBootService (
+  EFI_EVENT                      Event,
+  VOID                           *Context
+  )
+{
+  USB_HC_DEV   *Uhc;
+
+  Uhc = (USB_HC_DEV *) Context;
+
+  //
+  // Stop the Host Controller
+  //
+  UhciStopHc (Uhc, UHC_GENERIC_TIMEOUT);
+
+  return;
+}
 
 /**
   Starting the Usb UHCI Driver.
@@ -1704,6 +1733,21 @@ UhciDriverBindingStart (
   }
 
   //
+  // Create event to stop the HC when exit boot service.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  UhcExitBootService,
+                  Uhc,
+                  &gEfiEventExitBootServicesGuid,
+                  &Uhc->ExitBootServiceEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UNINSTALL_USBHC;
+  }
+
+  //
   // Install the component name protocol
   //
   Uhc->CtrlNameTable = NULL;
@@ -1730,6 +1774,14 @@ UhciDriverBindingStart (
   UhciWriteReg (Uhc->PciIo, USBCMD_OFFSET, USBCMD_RS | USBCMD_MAXP);
 
   return EFI_SUCCESS;
+  
+UNINSTALL_USBHC:
+  gBS->UninstallMultipleProtocolInterfaces (
+         Controller,
+         &gEfiUsb2HcProtocolGuid,
+         &Uhc->Usb2Hc,
+         NULL
+         );
 
 FREE_UHC:
   UhciFreeDev (Uhc);
