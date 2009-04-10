@@ -66,6 +66,7 @@
   DebugLib
   PcdLib
   UefiUsbLib
+  HiiLib
 
 [Guids]
   ##

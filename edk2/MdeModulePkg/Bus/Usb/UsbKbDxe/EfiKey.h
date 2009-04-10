@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiUsbLib.h>
+#include <Library/HiiLib.h>
 
 #include <IndustryStandard/Usb.h>
 
@@ -98,6 +99,7 @@ typedef struct {
 ///
 typedef struct {
   UINTN                             Signature;
+  EFI_HANDLE                        ControllerHandle;
   EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
   EFI_EVENT                         DelayedRecoveryEvent;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL    SimpleInput;

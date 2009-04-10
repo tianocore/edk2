@@ -256,7 +256,7 @@ USBKeyboardDriverBindingStart (
   UsbKeyboardDevice->SimpleInputEx.ReadKeyStrokeEx     = USBKeyboardReadKeyStrokeEx;
   UsbKeyboardDevice->SimpleInputEx.SetState            = USBKeyboardSetState;
   UsbKeyboardDevice->SimpleInputEx.RegisterKeyNotify   = USBKeyboardRegisterKeyNotify;
-  UsbKeyboardDevice->SimpleInputEx.UnregisterKeyNotify = USBKeyboardUnregisterKeyNotify; 
+  UsbKeyboardDevice->SimpleInputEx.UnregisterKeyNotify = USBKeyboardUnregisterKeyNotify;
   
   InitializeListHead (&UsbKeyboardDevice->NotifyList);
   
@@ -279,12 +279,6 @@ USBKeyboardDriverBindingStart (
                   UsbKeyboardDevice,
                   &(UsbKeyboardDevice->SimpleInput.WaitForKey)
                   );
-
-  if (EFI_ERROR (Status)) {
-    goto ErrorExit;
-  }
-
-  Status = InitKeyboardLayout (UsbKeyboardDevice);
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
@@ -307,6 +301,21 @@ USBKeyboardDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
+
+  UsbKeyboardDevice->ControllerHandle = Controller;
+  Status = InitKeyboardLayout (UsbKeyboardDevice);
+  if (EFI_ERROR (Status)) {
+    gBS->UninstallMultipleProtocolInterfaces (
+      Controller,
+      &gEfiSimpleTextInProtocolGuid,
+      &UsbKeyboardDevice->SimpleInput,
+      &gEfiSimpleTextInputExProtocolGuid,
+      &UsbKeyboardDevice->SimpleInputEx,
+      NULL
+      );
+    goto ErrorExit;
+  }
+
 
   //
   // Reset USB Keyboard Device exhaustively.

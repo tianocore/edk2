@@ -18,6 +18,48 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "EfiKey.h"
 
+#define USB_KEYBOARD_LAYOUT_PACKAGE_GUID \
+  { \
+    0xc0f3b43, 0x44de, 0x4907, { 0xb4, 0x78, 0x22, 0x5f, 0x6f, 0x62, 0x89, 0xdc } \
+  }
+
+#define USB_KEYBOARD_LAYOUT_KEY_GUID \
+  { \
+    0x3a4d7a7c, 0x18a, 0x4b42, { 0x81, 0xb3, 0xdc, 0x10, 0xe3, 0xb5, 0x91, 0xbd } \
+  }
+
+#define USB_KEYBOARD_KEY_COUNT            104
+
+#define USB_KEYBOARD_LANGUAGE_STR_LEN     5         // RFC4646 Language Code: "en-US"
+#define USB_KEYBOARD_DESCRIPTION_STR_LEN  (16 + 1)  // Description: "English Keyboard"
+
+#pragma pack (1)
+typedef struct {
+  //
+  // This 4-bytes total array length is required by PreparePackageList()
+  //
+  UINT32                 Length;
+
+  //
+  // Keyboard Layout package definition
+  //
+  EFI_HII_PACKAGE_HEADER PackageHeader;
+  UINT16                 LayoutCount;
+
+  //
+  // EFI_HII_KEYBOARD_LAYOUT
+  //
+  UINT16                 LayoutLength;
+  EFI_GUID               Guid;
+  UINT32                 LayoutDescriptorStringOffset;
+  UINT8                  DescriptorCount;
+  EFI_KEY_DESCRIPTOR     KeyDescriptor[USB_KEYBOARD_KEY_COUNT];
+  UINT16                 DescriptionCount;
+  CHAR16                 Language[USB_KEYBOARD_LANGUAGE_STR_LEN];
+  CHAR16                 Space;
+  CHAR16                 DescriptionString[USB_KEYBOARD_DESCRIPTION_STR_LEN];
+} USB_KEYBOARD_LAYOUT_PACK_BIN;
+#pragma pack()
 /**
   Uses USB I/O to check whether the device is a USB keyboard device.
 

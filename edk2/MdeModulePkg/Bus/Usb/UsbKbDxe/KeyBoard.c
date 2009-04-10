@@ -14,126 +14,141 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "KeyBoard.h"
 
-//
-// Default English keyboard layout
-// Format:<efi key>, <unicode without shift>, <unicode with shift>, <Modifier>, <AffectedAttribute>
-//
-// According to Universal Serial Bus HID Usage Tables document ver 1.12,
-// a Boot Keyboard should support the keycode range from 0x0 to 0x65 and 0xE0 to 0xE7.
-// 0x0 to 0x3 are reserved for typical keyboard status or keyboard errors, so they are excluded.
-//
-UINT8 KeyboardLayoutTable[NUMBER_OF_VALID_USB_KEYCODE][5] = {
-  {EfiKeyC1,         'a',      'A',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x04
-  {EfiKeyB5,         'b',      'B',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x05
-  {EfiKeyB3,         'c',      'C',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x06
-  {EfiKeyC3,         'd',      'D',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x07
-  {EfiKeyD3,         'e',      'E',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x08
-  {EfiKeyC4,         'f',      'F',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x09
-  {EfiKeyC5,         'g',      'G',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x0A
-  {EfiKeyC6,         'h',      'H',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x0B
-  {EfiKeyD8,         'i',      'I',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x0C
-  {EfiKeyC7,         'j',      'J',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x0D
-  {EfiKeyC8,         'k',      'K',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x0E
-  {EfiKeyC9,         'l',      'L',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x0F
-  {EfiKeyB7,         'm',      'M',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x10
-  {EfiKeyB6,         'n',      'N',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x11
-  {EfiKeyD9,         'o',      'O',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x12
-  {EfiKeyD10,        'p',      'P',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x13
-  {EfiKeyD1,         'q',      'Q',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x14
-  {EfiKeyD4,         'r',      'R',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x15
-  {EfiKeyC2,         's',      'S',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x16
-  {EfiKeyD5,         't',      'T',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x17
-  {EfiKeyD7,         'u',      'U',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x18
-  {EfiKeyB4,         'v',      'V',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x19
-  {EfiKeyD2,         'w',      'W',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x1A
-  {EfiKeyB2,         'x',      'X',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x1B
-  {EfiKeyD6,         'y',      'Y',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x1C
-  {EfiKeyB1,         'z',      'Z',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},   // 0x1D
-  {EfiKeyE1,         '1',      '!',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x1E
-  {EfiKeyE2,         '2',      '@',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x1F
-  {EfiKeyE3,         '3',      '#',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x20
-  {EfiKeyE4,         '4',      '$',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x21
-  {EfiKeyE5,         '5',      '%',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x22
-  {EfiKeyE6,         '6',      '^',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x23
-  {EfiKeyE7,         '7',      '&',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x24
-  {EfiKeyE8,         '8',      '*',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x25
-  {EfiKeyE9,         '9',      '(',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x26
-  {EfiKeyE10,        '0',      ')',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x27
-  {EfiKeyEnter,      0x0d,     0x0d,  EFI_NULL_MODIFIER,   0},                                // 0x28   Enter
-  {EfiKeyEsc,        0x1b,     0x1b,  EFI_NULL_MODIFIER,   0},                                // 0x29   Esc
-  {EfiKeyBackSpace,  0x08,     0x08,  EFI_NULL_MODIFIER,   0},                                // 0x2A   Backspace
-  {EfiKeyTab,        0x09,     0x09,  EFI_NULL_MODIFIER,   0},                                // 0x2B   Tab
-  {EfiKeySpaceBar,   ' ',      ' ',   EFI_NULL_MODIFIER,   0},                                // 0x2C   Spacebar
-  {EfiKeyE11,        '-',      '_',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x2D
-  {EfiKeyE12,        '=',      '+',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x2E
-  {EfiKeyD11,        '[',      '{',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x2F
-  {EfiKeyD12,        ']',      '}',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x30
-  {EfiKeyD13,        '\\',     '|',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x31
-  {EfiKeyC12,        '\\',     '|',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x32  Keyboard Non-US # and ~
-  {EfiKeyC10,        ';',      ':',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x33
-  {EfiKeyC11,        '\'',     '"',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x34
-  {EfiKeyE0,         '`',      '~',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x35  Keyboard Grave Accent and Tlide
-  {EfiKeyB8,         ',',      '<',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x36
-  {EfiKeyB9,         '.',      '>',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x37
-  {EfiKeyB10,        '/',      '?',   EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},   // 0x38
-  {EfiKeyCapsLock,   0x00,     0x00,  EFI_CAPS_LOCK_MODIFIER,            0},                  // 0x39   CapsLock
-  {EfiKeyF1,         0x00,     0x00,  EFI_FUNCTION_KEY_ONE_MODIFIER,     0},                  // 0x3A
-  {EfiKeyF2,         0x00,     0x00,  EFI_FUNCTION_KEY_TWO_MODIFIER,     0},                  // 0x3B
-  {EfiKeyF3,         0x00,     0x00,  EFI_FUNCTION_KEY_THREE_MODIFIER,   0},                  // 0x3C
-  {EfiKeyF4,         0x00,     0x00,  EFI_FUNCTION_KEY_FOUR_MODIFIER,    0},                  // 0x3D
-  {EfiKeyF5,         0x00,     0x00,  EFI_FUNCTION_KEY_FIVE_MODIFIER,    0},                  // 0x3E
-  {EfiKeyF6,         0x00,     0x00,  EFI_FUNCTION_KEY_SIX_MODIFIER,     0},                  // 0x3F
-  {EfiKeyF7,         0x00,     0x00,  EFI_FUNCTION_KEY_SEVEN_MODIFIER,   0},                  // 0x40
-  {EfiKeyF8,         0x00,     0x00,  EFI_FUNCTION_KEY_EIGHT_MODIFIER,   0},                  // 0x41
-  {EfiKeyF9,         0x00,     0x00,  EFI_FUNCTION_KEY_NINE_MODIFIER,    0},                  // 0x42
-  {EfiKeyF10,        0x00,     0x00,  EFI_FUNCTION_KEY_TEN_MODIFIER,     0},                  // 0x43
-  {EfiKeyF11,        0x00,     0x00,  EFI_FUNCTION_KEY_ELEVEN_MODIFIER,  0},                  // 0x44   F11
-  {EfiKeyF12,        0x00,     0x00,  EFI_FUNCTION_KEY_TWELVE_MODIFIER,  0},                  // 0x45   F12
-  {EfiKeyPrint,      0x00,     0x00,  EFI_PRINT_MODIFIER,                0},                  // 0x46   PrintScreen
-  {EfiKeySLck,       0x00,     0x00,  EFI_SCROLL_LOCK_MODIFIER,          0},                  // 0x47   Scroll Lock
-  {EfiKeyPause,      0x00,     0x00,  EFI_PAUSE_MODIFIER,                0},                  // 0x48   Pause
-  {EfiKeyIns,        0x00,     0x00,  EFI_INSERT_MODIFIER,               0},                  // 0x49
-  {EfiKeyHome,       0x00,     0x00,  EFI_HOME_MODIFIER,                 0},                  // 0x4A
-  {EfiKeyPgUp,       0x00,     0x00,  EFI_PAGE_UP_MODIFIER,              0},                  // 0x4B
-  {EfiKeyDel,        0x00,     0x00,  EFI_DELETE_MODIFIER,               0},                  // 0x4C
-  {EfiKeyEnd,        0x00,     0x00,  EFI_END_MODIFIER,                  0},                  // 0x4D
-  {EfiKeyPgDn,       0x00,     0x00,  EFI_PAGE_DOWN_MODIFIER,            0},                  // 0x4E
-  {EfiKeyRightArrow, 0x00,     0x00,  EFI_RIGHT_ARROW_MODIFIER,          0},                  // 0x4F
-  {EfiKeyLeftArrow,  0x00,     0x00,  EFI_LEFT_ARROW_MODIFIER,           0},                  // 0x50
-  {EfiKeyDownArrow,  0x00,     0x00,  EFI_DOWN_ARROW_MODIFIER,           0},                  // 0x51
-  {EfiKeyUpArrow,    0x00,     0x00,  EFI_UP_ARROW_MODIFIER,             0},                  // 0x52
-  {EfiKeyNLck,       0x00,     0x00,  EFI_NUM_LOCK_MODIFIER,             0},                  // 0x53   NumLock
-  {EfiKeySlash,      '/',      '/',   EFI_NULL_MODIFIER,                 0},                  // 0x54
-  {EfiKeyAsterisk,   '*',      '*',   EFI_NULL_MODIFIER,                 0},                  // 0x55
-  {EfiKeyMinus,      '-',      '-',   EFI_NULL_MODIFIER,                 0},                  // 0x56
-  {EfiKeyPlus,       '+',      '+',   EFI_NULL_MODIFIER,                 0},                  // 0x57
-  {EfiKeyEnter,      0x0d,     0x0d,  EFI_NULL_MODIFIER,                 0},                  // 0x58
-  {EfiKeyOne,        '1',      '1',   EFI_END_MODIFIER,         EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x59
-  {EfiKeyTwo,        '2',      '2',   EFI_DOWN_ARROW_MODIFIER,  EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x5A
-  {EfiKeyThree,      '3',      '3',   EFI_PAGE_DOWN_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x5B
-  {EfiKeyFour,       '4',      '4',   EFI_LEFT_ARROW_MODIFIER,  EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x5C
-  {EfiKeyFive,       '5',      '5',   EFI_NULL_MODIFIER,        EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x5D
-  {EfiKeySix,        '6',      '6',   EFI_RIGHT_ARROW_MODIFIER, EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x5E
-  {EfiKeySeven,      '7',      '7',   EFI_HOME_MODIFIER,        EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x5F
-  {EfiKeyEight,      '8',      '8',   EFI_UP_ARROW_MODIFIER,    EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x60
-  {EfiKeyNine,       '9',      '9',   EFI_PAGE_UP_MODIFIER,     EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x61
-  {EfiKeyZero,       '0',      '0',   EFI_INSERT_MODIFIER,      EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x62
-  {EfiKeyPeriod,     '.',      '.',   EFI_DELETE_MODIFIER,      EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},   // 0x63
-  {EfiKeyB0,         '\\',     '|',   EFI_NULL_MODIFIER,        EFI_AFFECTED_BY_STANDARD_SHIFT}, // 0x64 Keyboard Non-US \ and |
-  {EfiKeyA4,         0x00,     0x00,  EFI_MENU_MODIFIER,        0},                              // 0x65 Keyboard Application
+EFI_GUID  mUsbKeyboardLayoutPackageGuid = USB_KEYBOARD_LAYOUT_PACKAGE_GUID;
+EFI_GUID  mUsbKeyboardLayoutKeyGuid = USB_KEYBOARD_LAYOUT_KEY_GUID;
 
-  {EfiKeyLCtrl,      0,        0,     EFI_LEFT_CONTROL_MODIFIER,    0},  // 0xe0
-  {EfiKeyLShift,     0,        0,     EFI_LEFT_SHIFT_MODIFIER,      0},  // 0xe1
-  {EfiKeyLAlt,       0,        0,     EFI_LEFT_ALT_MODIFIER,        0},  // 0xe2
-  {EfiKeyA0,         0,        0,     EFI_LEFT_LOGO_MODIFIER,       0},  // 0xe3
-  {EfiKeyRCtrl,      0,        0,     EFI_RIGHT_CONTROL_MODIFIER,   0},  // 0xe4
-  {EfiKeyRShift,     0,        0,     EFI_RIGHT_SHIFT_MODIFIER,     0},  // 0xe5
-  {EfiKeyA2,         0,        0,     EFI_RIGHT_ALT_MODIFIER,       0},  // 0xe6
-  {EfiKeyA3,         0,        0,     EFI_RIGHT_LOGO_MODIFIER,      0},  // 0xe7
+USB_KEYBOARD_LAYOUT_PACK_BIN  mUsbKeyboardLayoutBin = {
+  sizeof (USB_KEYBOARD_LAYOUT_PACK_BIN),   // Binary size
+
+  //
+  // EFI_HII_PACKAGE_HEADER
+  //
+  {
+    sizeof (USB_KEYBOARD_LAYOUT_PACK_BIN) - sizeof (UINT32),
+    EFI_HII_PACKAGE_KEYBOARD_LAYOUT
+  },
+  1,  // LayoutCount
+  sizeof (USB_KEYBOARD_LAYOUT_PACK_BIN) - sizeof (UINT32) - sizeof (EFI_HII_PACKAGE_HEADER) - sizeof (UINT16), // LayoutLength
+  USB_KEYBOARD_LAYOUT_KEY_GUID,  // KeyGuid
+  sizeof (UINT16) + sizeof (EFI_GUID) + sizeof (UINT32) + sizeof (UINT8) + (USB_KEYBOARD_KEY_COUNT * sizeof (EFI_KEY_DESCRIPTOR)), // LayoutDescriptorStringOffset
+  USB_KEYBOARD_KEY_COUNT, // DescriptorCount
+  {
+    //
+    // EFI_KEY_DESCRIPTOR (total number is USB_KEYBOARD_KEY_COUNT)
+    //
+    {EfiKeyC1,         'a',      'A',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyB5,         'b',      'B',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyB3,         'c',      'C',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC3,         'd',      'D',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD3,         'e',      'E',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC4,         'f',      'F',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC5,         'g',      'G',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC6,         'h',      'H',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD8,         'i',      'I',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC7,         'j',      'J',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC8,         'k',      'K',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC9,         'l',      'L',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyB7,         'm',      'M',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyB6,         'n',      'N',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD9,         'o',      'O',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD10,        'p',      'P',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD1,         'q',      'Q',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD4,         'r',      'R',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyC2,         's',      'S',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD5,         't',      'T',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD7,         'u',      'U',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyB4,         'v',      'V',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD2,         'w',      'W',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyB2,         'x',      'X',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyD6,         'y',      'Y',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyB1,         'z',      'Z',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_CAPS_LOCK},
+    {EfiKeyE1,         '1',      '!',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE2,         '2',      '@',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE3,         '3',      '#',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE4,         '4',      '$',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE5,         '5',      '%',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE6,         '6',      '^',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE7,         '7',      '&',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE8,         '8',      '*',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE9,         '9',      '(',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE10,        '0',      ')',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyEnter,      0x0d,     0x0d, 0, 0,  EFI_NULL_MODIFIER,   0},
+    {EfiKeyEsc,        0x1b,     0x1b, 0, 0,  EFI_NULL_MODIFIER,   0},
+    {EfiKeyBackSpace,  0x08,     0x08, 0, 0,  EFI_NULL_MODIFIER,   0},
+    {EfiKeyTab,        0x09,     0x09, 0, 0,  EFI_NULL_MODIFIER,   0},
+    {EfiKeySpaceBar,   ' ',      ' ',  0, 0,  EFI_NULL_MODIFIER,   0},
+    {EfiKeyE11,        '-',      '_',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE12,        '=',      '+',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyD11,        '[',      '{',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyD12,        ']',      '}',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyD13,        '\\',     '|',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyC10,        ';',      ':',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyC11,        '\'',     '"',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyE0,         '`',      '~',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyB8,         ',',      '<',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyB9,         '.',      '>',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyB10,        '/',      '?',  0, 0,  EFI_NULL_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT},
+    {EfiKeyCapsLock,   0x00,     0x00, 0, 0,  EFI_CAPS_LOCK_MODIFIER,            0},
+    {EfiKeyF1,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_ONE_MODIFIER,     0},
+    {EfiKeyF2,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_TWO_MODIFIER,     0},
+    {EfiKeyF3,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_THREE_MODIFIER,   0},
+    {EfiKeyF4,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_FOUR_MODIFIER,    0},
+    {EfiKeyF5,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_FIVE_MODIFIER,    0},
+    {EfiKeyF6,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_SIX_MODIFIER,     0},
+    {EfiKeyF7,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_SEVEN_MODIFIER,   0},
+    {EfiKeyF8,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_EIGHT_MODIFIER,   0},
+    {EfiKeyF9,         0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_NINE_MODIFIER,    0},
+    {EfiKeyF10,        0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_TEN_MODIFIER,     0},
+    {EfiKeyF11,        0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_ELEVEN_MODIFIER,  0},
+    {EfiKeyF12,        0x00,     0x00, 0, 0,  EFI_FUNCTION_KEY_TWELVE_MODIFIER,  0},
+    {EfiKeyPrint,      0x00,     0x00, 0, 0,  EFI_PRINT_MODIFIER,                0},
+    {EfiKeySLck,       0x00,     0x00, 0, 0,  EFI_SCROLL_LOCK_MODIFIER,          0},
+    {EfiKeyPause,      0x00,     0x00, 0, 0,  EFI_PAUSE_MODIFIER,                0},
+    {EfiKeyIns,        0x00,     0x00, 0, 0,  EFI_INSERT_MODIFIER,               0},
+    {EfiKeyHome,       0x00,     0x00, 0, 0,  EFI_HOME_MODIFIER,                 0},
+    {EfiKeyPgUp,       0x00,     0x00, 0, 0,  EFI_PAGE_UP_MODIFIER,              0},
+    {EfiKeyDel,        0x00,     0x00, 0, 0,  EFI_DELETE_MODIFIER,               0},
+    {EfiKeyEnd,        0x00,     0x00, 0, 0,  EFI_END_MODIFIER,                  0},
+    {EfiKeyPgDn,       0x00,     0x00, 0, 0,  EFI_PAGE_DOWN_MODIFIER,            0},
+    {EfiKeyRightArrow, 0x00,     0x00, 0, 0,  EFI_RIGHT_ARROW_MODIFIER,          0},
+    {EfiKeyLeftArrow,  0x00,     0x00, 0, 0,  EFI_LEFT_ARROW_MODIFIER,           0},
+    {EfiKeyDownArrow,  0x00,     0x00, 0, 0,  EFI_DOWN_ARROW_MODIFIER,           0},
+    {EfiKeyUpArrow,    0x00,     0x00, 0, 0,  EFI_UP_ARROW_MODIFIER,             0},
+    {EfiKeyNLck,       0x00,     0x00, 0, 0,  EFI_NUM_LOCK_MODIFIER,             0},
+    {EfiKeySlash,      '/',      '/',  0, 0,  EFI_NULL_MODIFIER,                 0},
+    {EfiKeyAsterisk,   '*',      '*',  0, 0,  EFI_NULL_MODIFIER,                 0},
+    {EfiKeyMinus,      '-',      '-',  0, 0,  EFI_NULL_MODIFIER,                 0},
+    {EfiKeyPlus,       '+',      '+',  0, 0,  EFI_NULL_MODIFIER,                 0},
+    {EfiKeyEnter,      0x0d,     0x0d, 0, 0,  EFI_NULL_MODIFIER,                 0},
+    {EfiKeyOne,        '1',      '1',  0, 0,  EFI_END_MODIFIER,         EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyTwo,        '2',      '2',  0, 0,  EFI_DOWN_ARROW_MODIFIER,  EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyThree,      '3',      '3',  0, 0,  EFI_PAGE_DOWN_MODIFIER,   EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyFour,       '4',      '4',  0, 0,  EFI_LEFT_ARROW_MODIFIER,  EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyFive,       '5',      '5',  0, 0,  EFI_NULL_MODIFIER,        EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeySix,        '6',      '6',  0, 0,  EFI_RIGHT_ARROW_MODIFIER, EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeySeven,      '7',      '7',  0, 0,  EFI_HOME_MODIFIER,        EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyEight,      '8',      '8',  0, 0,  EFI_UP_ARROW_MODIFIER,    EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyNine,       '9',      '9',  0, 0,  EFI_PAGE_UP_MODIFIER,     EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyZero,       '0',      '0',  0, 0,  EFI_INSERT_MODIFIER,      EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyPeriod,     '.',      '.',  0, 0,  EFI_DELETE_MODIFIER,      EFI_AFFECTED_BY_STANDARD_SHIFT | EFI_AFFECTED_BY_NUM_LOCK},
+    {EfiKeyA4,         0x00,     0x00, 0, 0,  EFI_MENU_MODIFIER,            0},
+    {EfiKeyLCtrl,      0,        0,    0, 0,  EFI_LEFT_CONTROL_MODIFIER,    0},
+    {EfiKeyLShift,     0,        0,    0, 0,  EFI_LEFT_SHIFT_MODIFIER,      0},
+    {EfiKeyLAlt,       0,        0,    0, 0,  EFI_LEFT_ALT_MODIFIER,        0},
+    {EfiKeyA0,         0,        0,    0, 0,  EFI_LEFT_LOGO_MODIFIER,       0},
+    {EfiKeyRCtrl,      0,        0,    0, 0,  EFI_RIGHT_CONTROL_MODIFIER,   0},
+    {EfiKeyRShift,     0,        0,    0, 0,  EFI_RIGHT_SHIFT_MODIFIER,     0},
+    {EfiKeyA2,         0,        0,    0, 0,  EFI_RIGHT_ALT_MODIFIER,       0},
+    {EfiKeyA3,         0,        0,    0, 0,  EFI_RIGHT_LOGO_MODIFIER,      0},
+  },
+  1,                          // DescriptionCount
+  {'e', 'n', '-', 'U', 'S'},  // RFC4646 language code
+  ' ',                        // Space
+  {'E', 'n', 'g', 'l', 'i', 's', 'h', ' ', 'K', 'e', 'y', 'b', 'o', 'a', 'r', 'd', '\0'}, // DescriptionString[]
 };
 
 //
-// EFI_KEY to USB Keycode convertion table
+// EFI_KEY to USB Keycode conversion table
 // EFI_KEY is defined in UEFI spec.
 // USB Keycode is defined in USB HID Firmware spec.
 //
@@ -287,37 +302,56 @@ UINT8 ModifierValueToEfiScanCodeConvertionTable[] = {
 };
 
 /**
-  Initialize Key Convertion Table by using default keyboard layout.
+  Initialize Key Convention Table by using default keyboard layout.
 
   @param  UsbKeyboardDevice    The USB_KB_DEV instance.
 
+  @retval EFI_SUCCESS          The default keyboard layout was installed successfully
+  @retval Others               Failure to install default keyboard layout.
 **/
-VOID
+EFI_STATUS
 EFIAPI
-LoadDefaultKeyboardLayout (
-  IN OUT USB_KB_DEV                 *UsbKeyboardDevice
+InstallDefaultKeyboardLayout (
+   IN OUT USB_KB_DEV           *UsbKeyboardDevice
   )
 {
-  UINTN               Index;
-  EFI_KEY_DESCRIPTOR  *KeyDescriptor;
+  EFI_STATUS                   Status;
+  EFI_HII_DATABASE_PROTOCOL    *HiiDatabase;
+  EFI_HII_HANDLE               HiiHandle;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
 
   //
-  // Construct KeyConvertionTable by default keyboard layout
+  // Locate Hii database protocol
   //
-  KeyDescriptor = &UsbKeyboardDevice->KeyConvertionTable[0];
-
-  for (Index = 0; Index < (NUMBER_OF_VALID_USB_KEYCODE); Index++) {
-    KeyDescriptor->Key                 = (EFI_KEY) KeyboardLayoutTable[Index][0];
-    KeyDescriptor->Unicode             = KeyboardLayoutTable[Index][1];
-    KeyDescriptor->ShiftedUnicode      = KeyboardLayoutTable[Index][2];
-    KeyDescriptor->AltGrUnicode        = 0;
-    KeyDescriptor->ShiftedAltGrUnicode = 0;
-    KeyDescriptor->Modifier            = KeyboardLayoutTable[Index][3];
-    KeyDescriptor->AffectedAttribute   = KeyboardLayoutTable[Index][4];
-
-    KeyDescriptor++;
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiDatabaseProtocolGuid,
+                  NULL,
+                  (VOID **) &HiiDatabase
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  //
+  // Install Keyboard Layout package to HII database
+  //
+  PackageList = HiiLibPreparePackageList (1, &mUsbKeyboardLayoutPackageGuid, &mUsbKeyboardLayoutBin);
+  ASSERT (PackageList != NULL);
+
+  Status = HiiDatabase->NewPackageList (HiiDatabase, PackageList, UsbKeyboardDevice->ControllerHandle, &HiiHandle);
+  FreePool (PackageList);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Set current keyboard layout
+  //
+  Status = HiiDatabase->SetKeyboardLayout (HiiDatabase, &mUsbKeyboardLayoutKeyGuid);
+
+  return Status;
 }
+
 
 /**
   Uses USB I/O to check whether the device is a USB keyboard device.
@@ -743,7 +777,7 @@ InitKeyboardLayout (
     // If no keyboard layout can be retrieved from HII database, and default layout
     // is enabled, then load the default keyboard layout.
     //
-    LoadDefaultKeyboardLayout (UsbKeyboardDevice);
+    InstallDefaultKeyboardLayout (UsbKeyboardDevice);
   }
   
   return EFI_SUCCESS;
