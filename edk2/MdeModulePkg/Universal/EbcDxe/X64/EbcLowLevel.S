@@ -36,8 +36,8 @@
 .global _CopyMem;
 
 # VOID EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
-.global _EbcLLCALLEXNative;
-_EbcLLCALLEXNative:
+.global ASM_PFX(EbcLLCALLEXNative);
+ASM_PFX(EbcLLCALLEXNative):
       push   %rbp
       push   %rbx
       mov    %rsp, %rbp
@@ -51,7 +51,7 @@ _EbcLLCALLEXNative:
       sub    %rsp, %r8
       mov    %rsp, %rcx
       sub    %rsp, 0x20
-      call   _CopyMem
+      call   ASM_PFX(CopyMem)
       add    %rsp, 0x20
 
       # Considering the worst case, load 4 potiential arguments
@@ -84,8 +84,8 @@ _EbcLLCALLEXNative:
 # Returns:
 #     The contents of the register in which the entry point is passed.
 #
-.global _EbcLLGetEbcEntryPoint;
-_EbcLLGetEbcEntryPoint:
+.global ASM_PFX(EbcLLGetEbcEntryPoint);
+ASM_PFX(EbcLLGetEbcEntryPoint):
     ret
 
 #/*++
@@ -107,16 +107,16 @@ _EbcLLGetEbcEntryPoint:
 #--*/
 
 # UINTN EbcLLGetStackPointer()
-.global _EbcLLGetStackPointer;
-_EbcLLGetStackPointer:
+.global ASM_PFX(EbcLLGetStackPointer);
+ASM_PFX(EbcLLGetStackPointer):
     mov    %rsp, %rax
     # Stack adjusted by this much when we were called,
     # For this function, it's 4.
     add   $4, %rax
     ret
 
-.global _EbcLLGetReturnValue;
-_EbcLLGetReturnValue:
+.global ASM_PFX(EbcLLGetReturnValue);
+ASM_PFX(EbcLLGetReturnValue):
 # UINT64 EbcLLGetReturnValue(VOID);
 # Routine Description:
 #   When EBC calls native, on return the VM has to stuff the return
