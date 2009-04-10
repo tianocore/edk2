@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types x64 (Intel(r) EM64T, AMD64).
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -348,7 +348,11 @@ typedef INT64   INTN;
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify their member functions with EFIAPI.
 //
-#if defined(_MSC_EXTENSIONS)
+#ifdef EFIAPI
+  ///
+  /// If EFIAPI is already defined, then we use that definition.
+  ///
+#elif defined(_MSC_EXTENSIONS)
   ///
   /// Microsoft* compiler specific method for EFIAPI calling convension
   /// 
