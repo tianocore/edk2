@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP related configuration routines.
 
-Copyright (c) 2004 - 2007, Intel Corporation.<BR>
+Copyright (c) 2004 - 2007, 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -184,6 +184,7 @@ ON_EXIT:
   @retval Others           Other errors as indicated.
 **/
 EFI_STATUS
+EFIAPI
 IScsiDhcpSelectOffer (
   IN  EFI_DHCP4_PROTOCOL  * This,
   IN  VOID                *Context,

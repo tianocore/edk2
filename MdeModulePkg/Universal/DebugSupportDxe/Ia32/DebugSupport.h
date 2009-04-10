@@ -1,7 +1,7 @@
 /** @file
   Generic debug support macros, typedefs and prototypes for IA32/x64.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -42,7 +42,7 @@ typedef struct {
   DEBUG_PROC                OrigVector;
   IA32_IDT_GATE_DESCRIPTOR  NewDesc;
   DEBUG_PROC                StubEntry;
-  VOID (*RegisteredCallback) ();
+  VOID (EFIAPI *RegisteredCallback) ();
 } IDT_ENTRY;
 
 extern UINT8                     InterruptEntryStub[];
@@ -258,7 +258,7 @@ GetInterruptHandleFromIdt (
 **/
 EFI_STATUS
 ManageIdtEntryTable (
-  VOID               (*NewCallback)(),
+  VOID               (EFIAPI *NewCallback)(),
   EFI_EXCEPTION_TYPE ExceptionType
   );
 
@@ -277,7 +277,7 @@ ManageIdtEntryTable (
 VOID
 HookEntry (
   IN EFI_EXCEPTION_TYPE            ExceptionType,
-  IN VOID                         (*NewCallback) ()
+  IN VOID                         (EFIAPI *NewCallback) ()
   );
 
 /**

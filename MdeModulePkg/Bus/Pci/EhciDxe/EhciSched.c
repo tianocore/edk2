@@ -883,6 +883,7 @@ EhcUpdateAsyncRequest (
 
 **/
 VOID
+EFIAPI
 EhcMonitorAsyncRequests (
   IN EFI_EVENT            Event,
   IN VOID                 *Context

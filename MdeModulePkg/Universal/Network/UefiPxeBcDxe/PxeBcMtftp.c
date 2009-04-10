@@ -1,7 +1,7 @@
 /** @file
   PxeBc MTFTP functions.
   
-Copyright (c) 2007, Intel Corporation.<BR>
+Copyright (c) 2007, 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,6 +43,7 @@ CHAR8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
 
 **/
 EFI_STATUS
+EFIAPI
 PxeBcCheckPacket (
   IN EFI_MTFTP4_PROTOCOL        *This,
   IN EFI_MTFTP4_TOKEN           *Token,
