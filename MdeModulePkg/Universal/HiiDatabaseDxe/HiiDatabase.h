@@ -37,7 +37,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/IfrSupportLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>

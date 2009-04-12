@@ -50,7 +50,6 @@
   UefiDriverEntryPoint
   BaseMemoryLib
   DebugLib
-  IfrSupportLib
   UefiLib
   PcdLib
   UefiRuntimeServicesTableLib
