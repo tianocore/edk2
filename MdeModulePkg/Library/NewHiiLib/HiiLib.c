@@ -868,6 +868,7 @@ InternalHiiBlockToConfig (
   If ConfigResp is NULL, then ASSERT().
 
   @param[in] ConfigResp  Pointer to a Null-terminated Unicode string.
+  @param[in] BufferSize  Length in bytes of buffer to hold retrived data. 
 
   @retval NULL   The block could not be generated..
   @retval Other  Pointer to the allocated block.
@@ -876,31 +877,15 @@ InternalHiiBlockToConfig (
 UINT8 *
 EFIAPI
 InternalHiiConfigToBlock (
-  IN CONST EFI_STRING  ConfigResp
+  IN  EFI_STRING  ConfigResp,
+  IN  UINTN       BlockSize
   )
 {
   EFI_STATUS  Status;
-  UINTN       BlockSize;
-  UINT8       TempBlock;
   CHAR16      *Progress;
   UINT8       *Block;
 
   ASSERT (ConfigResp != NULL);
-
-  //
-  // Get the size of the buffer required for <ConfigResp> conversion
-  //
-  BlockSize = 0;
-  Status = gHiiConfigRouting->ConfigToBlock (
-                                gHiiConfigRouting,
-                                ConfigResp,
-                                &TempBlock,
-                                &BlockSize,
-                                &Progress
-                                );
-  if (Status != EFI_BUFFER_TOO_SMALL) {
-    return NULL;
-  }
 
   //
   // Allocate a buffer to hold the <ConfigResp> conversion
@@ -1583,6 +1568,7 @@ HiiIsConfigHdrMatch (
                             is an optional parameter that may be NULL.
   @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
                             parameter that may be NULL.
+  @param[in]  BufferSize    Length in bytes of buffer to hold retrived data. 
 
   @retval NULL   The uncommitted data could not be retrieved.
   @retval Other  A pointer to a buffer containing the uncommitted data.
@@ -1592,7 +1578,8 @@ UINT8 *
 EFIAPI
 HiiGetBrowserData (
   IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
-  IN CONST CHAR16    *VariableName   OPTIONAL
+  IN CONST CHAR16    *VariableName,  OPTIONAL
+  IN UINTN           BlockSize
   )
 {
   EFI_STRING  ResultsData;
@@ -1614,8 +1601,10 @@ HiiGetBrowserData (
   Size = (StrLen (mConfigHdrTemplate) + 1 + StrLen (ResultsData) + 1) * sizeof (CHAR16);
   ConfigResp = AllocateZeroPool (Size);
   UnicodeSPrint (ConfigResp, Size, L"%s&%s", mConfigHdrTemplate, ResultsData);
-
-
+  
+  //
+  // Free the allocated buffer
+  //
   FreePool (ResultsData);
   if (ConfigResp == NULL) {
     return NULL;
@@ -1624,12 +1613,9 @@ HiiGetBrowserData (
   //
   // Convert <ConfigResp> to a buffer
   //
-  Block = InternalHiiConfigToBlock (ConfigResp);
+  Block = InternalHiiConfigToBlock (ConfigResp, BlockSize);
   FreePool (ConfigResp);
 
-  //
-  // Return converted buffer
-  //
   return Block;
 }
 
@@ -2665,12 +2651,6 @@ InternalHiiUpdateFormPackageData (
             //
             if ((UpdateIfrOpHdr->Length == IfrOpHdr->Length) && \
                 (CompareMem (IfrOpHdr, UpdateIfrOpHdr, UpdateIfrOpHdr->Length) == 0)) {
-              //
-              // Keep the End opcode flag
-              //
-              CopyMem (BufferPos, IfrOpHdr, IfrOpHdr->Length);
-              BufferPos           += IfrOpHdr->Length;
-              UpdatePackageLength += IfrOpHdr->Length;
               break;
             }
             //
@@ -2700,6 +2680,15 @@ InternalHiiUpdateFormPackageData (
 
           AddOpCode = (EFI_IFR_OP_HEADER *) ((UINT8 *) (AddOpCode) + AddOpCode->Length);
           AddSize += AddOpCode->Length;          
+        }
+
+        if (OpCodeBufferEnd != NULL) {
+          //
+          // Add the end opcode
+          //
+          CopyMem (BufferPos, IfrOpHdr, IfrOpHdr->Length);
+          BufferPos           += IfrOpHdr->Length;
+          UpdatePackageLength += IfrOpHdr->Length;
         }
         //
         // Set update flag

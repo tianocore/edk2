@@ -365,6 +365,7 @@ HiiIsConfigHdrMatch (
                             is an optional parameter that may be NULL.
   @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
                             parameter that may be NULL.
+  @param[in]  BufferSize    Length in bytes of buffer to hold retrived data. 
 
   @retval NULL   The uncommitted data could not be retrieved.
   @retval Other  A pointer to a buffer containing the uncommitted data.
@@ -374,7 +375,8 @@ UINT8 *
 EFIAPI
 HiiGetBrowserData (
   IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
-  IN CONST CHAR16    *VariableName   OPTIONAL
+  IN CONST CHAR16    *VariableName,  OPTIONAL
+  IN UINTN           BlockSize
   );
 
 /**
