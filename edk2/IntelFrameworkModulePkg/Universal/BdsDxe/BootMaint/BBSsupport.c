@@ -401,6 +401,7 @@ BdsIsLegacyBootOption (
   @retval EFI_NOT_FOUND           Fail to retrive variable of boot order.
 **/
 EFI_STATUS
+EFIAPI
 BdsDeleteAllInvalidLegacyBootOptions (
   VOID
   )
@@ -682,6 +683,7 @@ BdsCreateOneLegacyBootOption (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsAddNonExistingLegacyBootOptions (
   VOID
   )
@@ -974,6 +976,7 @@ BdsCreateDevOrder (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsUpdateLegacyDevOrder (
   VOID
   )
@@ -1531,6 +1534,7 @@ PrintBbsTable (
   @return status of BdsSetBootPriority4SameTypeDev()
 **/
 EFI_STATUS
+EFIAPI
 BdsRefreshBbsTableForBoot (
   IN BDS_COMMON_OPTION        *Entry
   )

@@ -122,6 +122,7 @@ GetResponse (
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverConfigurationSetOptions (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
   IN  EFI_HANDLE                                             ControllerHandle,
@@ -219,6 +220,7 @@ IDEBusDriverConfigurationSetOptions (
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverConfigurationOptionsValid (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL               *This,
   IN  EFI_HANDLE                                      ControllerHandle,
@@ -294,6 +296,7 @@ IDEBusDriverConfigurationOptionsValid (
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverConfigurationForceDefaults (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
   IN  EFI_HANDLE                                             ControllerHandle,

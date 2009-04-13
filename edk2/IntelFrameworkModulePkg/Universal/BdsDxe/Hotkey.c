@@ -311,6 +311,7 @@ UnregisterHotkey (
   @return  EFI_NOT_FOUND Fail to find boot option variable.
 **/
 EFI_STATUS
+EFIAPI
 HotkeyCallback (
   IN EFI_KEY_DATA     *KeyData
 )
