@@ -127,6 +127,7 @@
 
     <Command.GCC>
         "$(CC)" -o ${dst} $(CC_FLAGS) $(INC) ${src}
+        "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
 [C-Header-File]
     <InputFile>
@@ -142,7 +143,7 @@
         ?.asm, ?.Asm, ?.ASM
 
     <InputFile.GCC>
-        ?.S
+        ?.S, ?.s
 
     <ExtraDependency>
         $(MAKE_FILE)
@@ -203,10 +204,10 @@
         $(OUTPUT_DIR)(+)$(MODULE_NAME).lib
 
     <Command.MSFT, Command.INTEL>
-        "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} $(OBJECT_FILES)
+        "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} @$(OBJECT_FILES_LIST)
 
     <Command.GCC>
-        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) $(OBJECT_FILES)
+        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) @$(OBJECT_FILES_LIST)
 
 [Static-Library-File]
     <InputFile>
@@ -219,10 +220,11 @@
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
     <Command.MSFT, Command.INTEL>
-        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) $(STATIC_LIBRARY_FILES)
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.GCC>
-        "$(DLINK)" -o ${dst} -Map $(DEBUG_DIR)(+)$(MODULE_NAME).map $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
+        "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
 [Static-Library-File.USER_DEFINED]
     <InputFile>
@@ -235,10 +237,10 @@
         $(DEBUG_DIR)(+)$(MODULE_NAME)
 
     <Command.MSFT, Command.INTEL>
-        "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(STATIC_LIBRARY_FILES)
+        "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.GCC>
-        "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
+        "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
 
 [Dynamic-Library-File]
     <InputFile>
@@ -278,12 +280,12 @@
     <Command.MSFT, Command.INTEL>
         Trim --asl-file -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i ${src}
         "$(ASLPP)" $(ASLPP_FLAGS) $(INC) /I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
-        "$(ASL)" -p ${dst} $(ASL_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        "$(ASL)" $(ASL_FLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
 
     <Command.GCC>
         Trim --asl-file -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i ${src}
         "$(ASLPP)" $(ASLPP_FLAGS) $(INC) -I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
-        "$(ASL)" -p ${dst} $(ASL_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        "$(ASL)" $(ASL_FLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
 
 [C-Code-File.AcpiTable]
     <InputFile>
