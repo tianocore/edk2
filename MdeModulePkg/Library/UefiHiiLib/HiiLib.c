@@ -700,7 +700,7 @@ InternalHiiLowerConfigString (
     } else if (*String == L'&') {
       Lower = FALSE;
     } else if (Lower && *String > L'A' && *String <= L'F') {
-      *String = *String - L'A' + L'a';
+      *String = (CHAR16) (*String - L'A' + L'a');
     }
   }
 
@@ -1093,6 +1093,8 @@ HiiConstructConfigAltResp (
   VA_LIST       Args;
   UINTN         AltCfgId;
   UINT16        Width;
+  UINT16        OffsetValue;
+  UINT16        WidthValue;
 
   ASSERT (Guid != NULL);
   ASSERT (Name != NULL);
@@ -1156,13 +1158,16 @@ HiiConstructConfigAltResp (
     //
     // Append &OFFSET=XXXX&WIDTH=YYYY
     //
+    OffsetValue = ReadUnaligned16 ((UINT16 *)Buffer);
+    WidthValue  = ReadUnaligned16 ((UINT16 *)(Buffer + sizeof (UINT16)));
     UnicodeSPrint (
       String, 
       (8 + 4 + 7 + 4) * sizeof (CHAR16), 
       L"&OFFSET=%04X&WIDTH=%04X", 
-      ReadUnaligned16 ((UINT16 *)Buffer), 
-      ReadUnaligned16 ((UINT16 *)(Buffer + sizeof (UINT16)))
-      );
+      OffsetValue, 
+      WidthValue
+    );
+
     String += StrLen (String);
     Buffer += (sizeof (UINT16) + sizeof (UINT16));
   }
@@ -1491,9 +1496,10 @@ HiiGetBrowserData (
   }
 
   //
-  // Construct <ConfigResp>
+  // Construct <ConfigResp> mConfigHdrTemplate L'&' ResultsData L'\0'
   //
-  Size = (StrLen (mConfigHdrTemplate) + 1 + StrLen (ResultsData) + 1) * sizeof (CHAR16);
+  Size = (StrLen (mConfigHdrTemplate) + 1) * sizeof (CHAR16);
+  Size = Size + (StrLen (ResultsData) + 1) * sizeof (CHAR16);
   ConfigResp = AllocateZeroPool (Size);
   UnicodeSPrint (ConfigResp, Size, L"%s&%s", mConfigHdrTemplate, ResultsData);
   
@@ -1568,7 +1574,8 @@ HiiSetBrowserData (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template 
     // followed by <RequestElement> followed by a Null-terminator
     //
-    Size = (StrLen (mConfigHdrTemplate) + StrLen (RequestElement) + 1) * sizeof (CHAR16);
+    Size = StrLen (mConfigHdrTemplate) * sizeof (CHAR16);
+    Size = Size + (StrLen (RequestElement) + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     UnicodeSPrint (ConfigRequest, Size, L"%s%s", mConfigHdrTemplate, RequestElement);
   }
@@ -1957,7 +1964,7 @@ HiiCreateGuidOpCode (
   ASSERT (OpCodeSize >= sizeof (OpCode));
 
   ZeroMem (&OpCode, sizeof (OpCode));
-  CopyGuid (&OpCode.Guid, Guid);
+  CopyGuid ((EFI_GUID *)(VOID *)&OpCode.Guid, Guid);
 
   OpCodePointer = (EFI_IFR_GUID *)InternalHiiCreateOpCodeExtended (
                                     OpCodeHandle, 
