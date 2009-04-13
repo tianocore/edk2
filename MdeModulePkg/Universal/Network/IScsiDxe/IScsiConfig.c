@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IScsiImpl.h"
 
 EFI_GUID        mVendorGuid              = ISCSI_CONFIG_GUID;
+CHAR16          mVendorStorageName[]     = L"ISCSI_CONFIG_IFR_NVDATA";
 BOOLEAN         mIScsiDeviceListUpdated  = FALSE;
 UINTN           mNumberOfIScsiDevices    = 0;
 ISCSI_FORM_CALLBACK_INFO  *mCallbackInfo = NULL;
@@ -504,14 +505,12 @@ IScsiFormCallback (
   //
   // Retrive uncommitted data from Browser
   //
-  BufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
-  IfrNvData = AllocateZeroPool (BufferSize);
-  ASSERT (IfrNvData != NULL);
-  Status = GetBrowserData (NULL, NULL, &BufferSize, (UINT8 *) IfrNvData);
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (IfrNvData);
-    return Status;
+  IfrNvData = (ISCSI_CONFIG_IFR_NVDATA *) HiiGetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA));
+  if (IfrNvData == NULL) {
+    return EFI_NOT_FOUND;
   }
+  
+  Status = EFI_SUCCESS;
 
   switch (QuestionId) {
   case KEY_INITIATOR_NAME:
@@ -730,11 +729,10 @@ IScsiFormCallback (
     //
     // Pass changed uncommitted data back to Form Browser
     //
-    BufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
-    Status = SetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
+    HiiSetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData, NULL);
   }
 
-  gBS->FreePool (IfrNvData);
+  FreePool (IfrNvData);
   return Status;
 }
 
@@ -761,12 +759,14 @@ IScsiConfigUpdateForm (
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
   BOOLEAN                     EntryExisted;
   EFI_STATUS                  Status;
-  EFI_HII_UPDATE_DATA         UpdateData;
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
   CHAR16                      PortString[128];
   UINT16                      FormIndex;
   UINTN                       BufferSize;
-
+  VOID                        *StartOpCodeHandle;
+  VOID                        *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL          *StartLabel;
+  EFI_IFR_GUID_LABEL          *EndLabel;
 
   ConfigFormEntry = NULL;
   EntryExisted    = FALSE;
@@ -861,36 +861,56 @@ IScsiConfigUpdateForm (
   //
   // Allocate space for creation of Buffer
   //
-  UpdateData.BufferSize = 0x1000;
-  UpdateData.Data = AllocateZeroPool (0x1000);
-  UpdateData.Offset = 0;
+
+  //
+  // Init OpCode Handle
+  //
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
+
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number       = DEVICE_ENTRY_LABEL;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = LABEL_END;
 
   FormIndex = 0;
   NET_LIST_FOR_EACH (Entry, &mIScsiConfigFormList) {
     ConfigFormEntry = NET_LIST_USER_STRUCT (Entry, ISCSI_CONFIG_FORM_ENTRY, Link);
 
-    CreateGotoOpCode (
-      FORMID_DEVICE_FORM,
-      ConfigFormEntry->PortTitleToken,
-      ConfigFormEntry->PortTitleHelpToken,
-      EFI_IFR_FLAG_CALLBACK,
-      (UINT16)(KEY_DEVICE_ENTRY_BASE + FormIndex),
-      &UpdateData
+    HiiCreateGotoOpCode (
+      StartOpCodeHandle,                            // Container for dynamic created opcodes
+      FORMID_DEVICE_FORM,                           // Target Form ID
+      ConfigFormEntry->PortTitleToken,              // Prompt text
+      ConfigFormEntry->PortTitleHelpToken,          // Help text
+      EFI_IFR_FLAG_CALLBACK,                        // Question flag
+      (UINT16)(KEY_DEVICE_ENTRY_BASE + FormIndex)   // Question ID
       );
 
     FormIndex++;
   }
 
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     mCallbackInfo->RegisteredHandle,
     &mVendorGuid,
     FORMID_MAIN_FORM,
-    DEVICE_ENTRY_LABEL,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle, // Label DEVICE_ENTRY_LABEL
+    EndOpCodeHandle    // LABEL_END
     );
 
-  gBS->FreePool (UpdateData.Data);
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
 
   return EFI_SUCCESS;
 }

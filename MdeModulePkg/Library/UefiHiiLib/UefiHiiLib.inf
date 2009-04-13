@@ -25,7 +25,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   EFI_SPECIFICATION_VERSION      = 0x0002000A 
-  CONSTRUCTOR                    = HiiLibConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
@@ -49,21 +48,13 @@
   UefiBootServicesTableLib
   DevicePathLib
   UefiLib
+  UefiHiiServicesLib
+  PrintLib
   PcdLib
-  UefiRuntimeServicesTableLib
 
 [Protocols]
-  gEfiHiiDatabaseProtocolGuid  ## CONSUMES
-  gEfiHiiStringProtocolGuid    ## CONSUMES
+  gEfiFormBrowser2ProtocolGuid ## CONSUMES
   gEfiDevicePathProtocolGuid   ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
-
-[Guids]  
-  gEfiGlobalVariableGuid        ## SOMETIMES_CONSUMES ## Variable:L"PlatformLang"
-
-[Depex]
-  gEfiHiiDatabaseProtocolGuid AND
-  gEfiHiiStringProtocolGuid
-  

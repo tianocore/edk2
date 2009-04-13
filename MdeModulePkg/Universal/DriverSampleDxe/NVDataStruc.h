@@ -71,6 +71,12 @@ typedef struct {
   UINT8         OrderedList[3];
 } MY_DATA2;
 
+//
+// Labels definition
+//
+#define LABEL_UPDATE1               0x1234
+#define LABEL_UPDATE2               0x2234
+#define LABEL_END                   0x2223
 
 #pragma pack()
 

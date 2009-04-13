@@ -323,40 +323,25 @@ InitializeConfigHdr (
   IN OUT FORMSET_STORAGE   *Storage
   )
 {
-  EFI_STATUS  Status;
-  UINTN       StrBufferLen;
   CHAR16      *Name;
-
+  
   if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
     Name = Storage->Name;
   } else {
     Name = NULL;
   }
-
-  StrBufferLen = 0;
-  Status = ConstructConfigHdr (
-             Storage->ConfigHdr,
-             &StrBufferLen,
-             &Storage->Guid,
-             Name,
-             FormSet->DriverHandle
-             );
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    Storage->ConfigHdr = AllocateZeroPool (StrBufferLen);
-    Status = ConstructConfigHdr (
-               Storage->ConfigHdr,
-               &StrBufferLen,
-               &Storage->Guid,
-               Name,
-               FormSet->DriverHandle
-               );
+  
+  Storage->ConfigHdr = HiiConstructConfigHdr (
+                         &Storage->Guid,
+                         Name,
+                         FormSet->DriverHandle
+                         );
+  
+  if (Storage->ConfigHdr == NULL) {
+    return EFI_NOT_FOUND;
   }
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Storage->ConfigRequest = AllocateCopyPool (StrBufferLen, Storage->ConfigHdr);
+  Storage->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigHdr), Storage->ConfigHdr);
   Storage->SpareStrLen = 0;
 
   return EFI_SUCCESS;

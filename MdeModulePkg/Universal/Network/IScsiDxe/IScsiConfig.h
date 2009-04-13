@@ -15,11 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _ISCSI_CONFIG_H_
 #define _ISCSI_CONFIG_H_
 
+#include <Guid/MdeModuleHii.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Library/HiiLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/IfrSupportLib.h>
-#include <Library/ExtendedIfrSupportLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>

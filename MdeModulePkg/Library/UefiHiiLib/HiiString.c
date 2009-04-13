@@ -214,8 +214,8 @@ HiiLibNewString (
     // For each language supported by the package,
     // a string token is created.
     //
-    Status = mHiiStringProt->NewString (
-                                 mHiiStringProt,
+    Status = gHiiString->NewString (
+                                 gHiiString,
                                  PackageList,
                                  StringId,
                                  Lang,
@@ -287,8 +287,8 @@ HiiLibSetString (
     // For each language supported by the package,
     // the string is updated.
     //
-    Status = mHiiStringProt->SetString (
-                                 mHiiStringProt,
+    Status = gHiiString->SetString (
+                                 gHiiString,
                                  PackageList,
                                  StringId,
                                  Lang,
@@ -425,8 +425,8 @@ HiiLibGetString (
                    NULL
                    );
   if (BestLanguage != NULL ) {
-     Status = mHiiStringProt->GetString (
-                               mHiiStringProt,
+     Status = gHiiString->GetString (
+                               gHiiString,
                                BestLanguage,
                                PackageList,
                                StringId,

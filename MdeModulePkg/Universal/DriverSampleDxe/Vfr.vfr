@@ -49,7 +49,6 @@
 #define LABEL_1_VALUE               0x01
 #define LABEL_2_VALUE               0x1000
 #define LABEL_UPDATE_BBS            0x2222
-#define LABEL_END                   0x2223
 
 formset
   guid     = FORMSET_GUID,
@@ -519,7 +518,7 @@ formset
             refresh interval = 3             // Refresh interval in seconds
     endnumeric;
 
-    label 0x2234;
+    label LABEL_UPDATE2;
     label LABEL_END;
 
   endform;
@@ -531,7 +530,7 @@ formset
   form formid = 0x1234,            // Dynamically created page,
        title = STRING_TOKEN(STR_DYNAMIC_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
 
-    label 0x1234;
+    label LABEL_UPDATE1;
     //
     // This is where we will insert dynamic created opcodes
     //
