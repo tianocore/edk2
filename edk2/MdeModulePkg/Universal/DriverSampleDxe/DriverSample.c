@@ -968,7 +968,7 @@ DriverSampleInit (
     // based on default values stored in IFR
     //
     BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
-    Status = IfrLibExtractDefault (Configuration, &BufferSize, 1, VfrMyIfrNVDataDefault0000);
+    Status = HiiIfrLibExtractDefault (Configuration, &BufferSize, 1, VfrMyIfrNVDataDefault0000);
 
     if (!EFI_ERROR (Status)) {
       gRT->SetVariable(
