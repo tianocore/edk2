@@ -2,7 +2,7 @@
   This file contains just some basic definitions that are needed by drivers
   that dealing with ATA/ATAPI interface.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,61 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _ATAPI_H_
 
 #pragma pack(1)
+
+///
+/// ATA_IDENTIFY_DATA is defined in ATA-5
+///
+typedef struct {    
+  UINT16  config;             ///< General Configuration 
+  UINT16  cylinders;          ///< Number of Cylinders 
+  UINT16  reserved_2; 
+  UINT16  heads;              ///< Number of logical heads 
+  UINT16  vendor_data1; 
+  UINT16  vendor_data2; 
+  UINT16  sectors_per_track; 
+  UINT16  vendor_specific_7_9[3]; 
+  CHAR8   SerialNo[20];       ///< ASCII  
+  UINT16  vendor_specific_20_21[2];  
+  UINT16  ecc_bytes_available;    
+  CHAR8   FirmwareVer[8];     ///< ASCII  
+  CHAR8   ModelName[40];      ///< ASCII    
+  UINT16  multi_sector_cmd_max_sct_cnt; 
+  UINT16  reserved_48; 
+  UINT16  capabilities; 
+  UINT16  reserved_50;     
+  UINT16  pio_cycle_timing;    
+  UINT16  reserved_52;             
+  UINT16  field_validity;     
+  UINT16  current_cylinders; 
+  UINT16  current_heads; 
+  UINT16  current_sectors;    
+  UINT16  CurrentCapacityLsb; 
+  UINT16  CurrentCapacityMsb;     
+  UINT16  reserved_59;     
+  UINT16  user_addressable_sectors_lo; 
+  UINT16  user_addressable_sectors_hi; 
+  UINT16  reserved_62;     
+  UINT16  multi_word_dma_mode;    
+  UINT16  advanced_pio_modes; 
+  UINT16  min_multi_word_dma_cycle_time; 
+  UINT16  rec_multi_word_dma_cycle_time; 
+  UINT16  min_pio_cycle_time_without_flow_control; 
+  UINT16  min_pio_cycle_time_with_flow_control; 
+  UINT16  reserved_69_79[11];     
+  UINT16  major_version_no; 
+  UINT16  minor_version_no; 
+  UINT16  command_set_supported_82;    ///< word 82 
+  UINT16  command_set_supported_83;    ///< word 83 
+  UINT16  command_set_feature_extn;    ///< word 84 
+  UINT16  command_set_feature_enb_85;  ///< word 85 
+  UINT16  command_set_feature_enb_86;  ///< word 86 
+  UINT16  command_set_feature_default; ///< word 87 
+  UINT16  ultra_dma_mode;              ///< word 88 
+  UINT16  reserved_89_127[39]; 
+  UINT16  security_status; 
+  UINT16  vendor_data_129_159[31]; 
+  UINT16  reserved_160_255[96]; 
+} ATA_IDENTIFY_DATA;
 
 ///
 /// ATAPI_IDENTIFY_DATA is defined in ATA-6
@@ -306,12 +361,12 @@ typedef union {
 //
 // ATA Packet Command Code
 //
-#define ATA_CMD_SOFT_RESET                  0x08   ///< defined in ATA-6
-#define ATA_CMD_PACKET                      0xA0   ///< defined in ATA-6
-#define ATA_CMD_IDENTIFY_DEVICE             0xA1   ///< defined in ATA-6
-#define ATA_CMD_SERVICE                     0xA2   ///< defined in ATA-6
-#define ATA_CMD_TEST_UNIT_READY             0x00   ///< defined in ATA-6
-#define ATA_CMD_REQUEST_SENSE               0x03   ///< defined in ATA-6
+#define ATA_CMD_SOFT_RESET                  0x08   ///< defined from ATA-3
+#define ATA_CMD_PACKET                      0xA0   ///< defined from ATA-3
+#define ATA_CMD_IDENTIFY_DEVICE             0xA1   ///< defined from ATA-3
+#define ATA_CMD_SERVICE                     0xA2   ///< defined from ATA-3
+#define ATA_CMD_TEST_UNIT_READY             0x00   ///< defined from ATA-1
+#define ATA_CMD_REQUEST_SENSE               0x03   ///< defined from ATA-4
 #define ATA_CMD_INQUIRY                     0x12   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_READ_FORMAT_CAPACITY        0x23   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_READ_CAPACITY               0x25   ///< defined in ATAPI Removable Rewritable Media Devcies
@@ -325,71 +380,71 @@ typedef union {
 //
 // Class 1: PIO Data-In Commands
 //
-#define ATA_CMD_IDENTIFY_DRIVE          0xec
-#define ATA_CMD_READ_BUFFER             0xe4
-#define ATA_CMD_READ_SECTORS            0x20   ///< defined in ATA-5     
-#define ATA_CMD_READ_SECTORS_WITH_RETRY 0x21   ///< defined in ATA-5
-#define ATA_CMD_READ_LONG               0x22   ///< defined in ATA-5
-#define ATA_CMD_READ_LONG_WITH_RETRY    0x23   ///< defined in ATA-5
-#define ATA_CMD_READ_SECTORS_EXT        0x24   ///< defined in ATA-6
+#define ATA_CMD_IDENTIFY_DRIVE          0xec   ///< defined from ATA-3
+#define ATA_CMD_READ_BUFFER             0xe4   ///< defined from ATA-1
+#define ATA_CMD_READ_SECTORS            0x20   ///< defined from ATA-1     
+#define ATA_CMD_READ_SECTORS_WITH_RETRY 0x21   ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_READ_LONG               0x22   ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_READ_LONG_WITH_RETRY    0x23   ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_READ_SECTORS_EXT        0x24   ///< defined from ATA-6
 
 //
 // Class 2: PIO Data-Out Commands
 //
-#define ATA_CMD_FORMAT_TRACK              0x50  ///< defined in ATA-3
-#define ATA_CMD_WRITE_BUFFER              0xe8  ///< defined in ATA-6  
-#define ATA_CMD_WRITE_SECTORS             0x30  ///< defined in ATA-6
-#define ATA_CMD_WRITE_SECTORS_WITH_RETRY  0x31  ///< defined in ATA-4
-#define ATA_CMD_WRITE_LONG                0x32  ///< defined in ATA-3
-#define ATA_CMD_WRITE_LONG_WITH_RETRY     0x33  ///< defined in ATA-3
-#define ATA_CMD_WRITE_VERIFY              0x3c  ///< defined in ATA-3
-#define ATA_CMD_WRITE_SECTORS_EXT         0x34  ///< defined in ATA-6
+#define ATA_CMD_FORMAT_TRACK              0x50  ///< defined from ATA-1, obsoleted from ATA-4
+#define ATA_CMD_WRITE_BUFFER              0xe8  ///< defined from ATA-1  
+#define ATA_CMD_WRITE_SECTORS             0x30  ///< defined from ATA-1
+#define ATA_CMD_WRITE_SECTORS_WITH_RETRY  0x31  ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_WRITE_LONG                0x32  ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_WRITE_LONG_WITH_RETRY     0x33  ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_WRITE_VERIFY              0x3c  ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_WRITE_SECTORS_EXT         0x34  ///< defined from ATA-6
 
 //
 // Class 3 No Data Command
 //
-#define ATA_CMD_ACK_MEDIA_CHANGE        0xdb  ///< defined in ATA-2
-#define ATA_CMD_BOOT_POST_BOOT          0xdc  ///< defined in ATA-2
-#define ATA_CMD_BOOT_PRE_BOOT           0xdd  ///< defined in ATA-2
-#define ATA_CMD_CHECK_POWER_MODE        0x98  ///< defined in ATA-3
-#define ATA_CMD_CHECK_POWER_MODE_ALIAS  0xe5  ///< defined in ATA-6
-#define ATA_CMD_DOOR_LOCK               0xde  ///< defined in ATA-6
-#define ATA_CMD_DOOR_UNLOCK             0xdf  ///< defined in ATA-6
-#define ATA_CMD_EXEC_DRIVE_DIAG         0x90  ///< defined in ATA-6
-#define ATA_CMD_IDLE_ALIAS              0x97  ///< defined in ATA-3
-#define ATA_CMD_IDLE                    0xe3  ///< defined in ATA-6
-#define ATA_CMD_IDLE_IMMEDIATE          0x95  ///< defined in ATA-3
-#define ATA_CMD_IDLE_IMMEDIATE_ALIAS    0xe1  ///< defined in ATA-6
-#define ATA_CMD_INIT_DRIVE_PARAM        0x91  ///< defined in ATA-5
-#define ATA_CMD_RECALIBRATE             0x10  ///< defined in ATA-3
-#define ATA_CMD_READ_DRIVE_STATE        0xe9  ///< defined in ATA-2
-#define ATA_CMD_SET_MULTIPLE_MODE       0xC6  ///< defined in ATA-6
-#define ATA_CMD_READ_VERIFY             0x40  ///< defined in ATA-6
-#define ATA_CMD_READ_VERIFY_WITH_RETRY  0x41  ///< defined in ATA-4
-#define ATA_CMD_SEEK                    0x70  ///< defined in ATA-6
-#define ATA_CMD_SET_FEATURES            0xef  ///< defined in ATA-6
-#define ATA_CMD_STANDBY                 0x96  ///< defined in ATA-3
-#define ATA_CMD_STANDBY_ALIAS           0xe2  ///< defined in ATA-6
-#define ATA_CMD_STANDBY_IMMEDIATE       0x94  ///< defined in ATA-3
-#define ATA_CMD_STANDBY_IMMEDIATE_ALIAS 0xe0  ///< defined in ATA-6
+#define ATA_CMD_ACK_MEDIA_CHANGE        0xdb  ///< defined from ATA-1, obsoleted from ATA-5 
+#define ATA_CMD_BOOT_POST_BOOT          0xdc  ///< defined from ATA-1, obsoleted from ATA-3
+#define ATA_CMD_BOOT_PRE_BOOT           0xdd  ///< defined from ATA-1, obsoleted from ATA-3
+#define ATA_CMD_CHECK_POWER_MODE        0x98  ///< defined from ATA-1, obsoleted from ATA-4
+#define ATA_CMD_CHECK_POWER_MODE_ALIAS  0xe5  ///< defined from ATA-1
+#define ATA_CMD_DOOR_LOCK               0xde  ///< defined from ATA-1
+#define ATA_CMD_DOOR_UNLOCK             0xdf  ///< defined from ATA-1
+#define ATA_CMD_EXEC_DRIVE_DIAG         0x90  ///< defined from ATA-1
+#define ATA_CMD_IDLE_ALIAS              0x97  ///< defined from ATA-1, obsoleted from ATA-4
+#define ATA_CMD_IDLE                    0xe3  ///< defined from ATA-1
+#define ATA_CMD_IDLE_IMMEDIATE          0x95  ///< defined from ATA-1, obsoleted from ATA-4
+#define ATA_CMD_IDLE_IMMEDIATE_ALIAS    0xe1  ///< defined from ATA-1
+#define ATA_CMD_INIT_DRIVE_PARAM        0x91  ///< defined from ATA-1, obsoleted from ATA-6
+#define ATA_CMD_RECALIBRATE             0x10  ///< defined from ATA-1, obsoleted from ATA-4
+#define ATA_CMD_READ_DRIVE_STATE        0xe9  ///< defined from ATA-1, obsoleted from ATA-3
+#define ATA_CMD_SET_MULTIPLE_MODE       0xC6  ///< defined from ATA-2
+#define ATA_CMD_READ_VERIFY             0x40  ///< defined from ATA-1
+#define ATA_CMD_READ_VERIFY_WITH_RETRY  0x41  ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_SEEK                    0x70  ///< defined from ATA-1
+#define ATA_CMD_SET_FEATURES            0xef  ///< defined from ATA-1
+#define ATA_CMD_STANDBY                 0x96  ///< defined from ATA-1, obsoleted from ATA-4
+#define ATA_CMD_STANDBY_ALIAS           0xe2  ///< defined from ATA-1
+#define ATA_CMD_STANDBY_IMMEDIATE       0x94  ///< defined from ATA-1, obsoleted from ATA-4
+#define ATA_CMD_STANDBY_IMMEDIATE_ALIAS 0xe0  ///< defined from ATA-1
 //
 // S.M.A.R.T
 //
-#define ATA_CMD_SMART               0xb0
-#define ATA_CONSTANT_C2             0xc2
-#define ATA_CONSTANT_4F             0x4f
-#define ATA_SMART_ENABLE_OPERATION  0xd8
-#define ATA_SMART_RETURN_STATUS     0xda
+#define ATA_CMD_SMART               0xb0  ///< defined from ATA-3
+#define ATA_CONSTANT_C2             0xc2  ///< reserved
+#define ATA_CONSTANT_4F             0x4f  ///< reserved
+#define ATA_SMART_ENABLE_OPERATION  0xd8  ///< reserved
+#define ATA_SMART_RETURN_STATUS     0xda  ///< defined from ATA-3
 
 //
 // Class 4: DMA Command
 //
-#define ATA_CMD_READ_DMA              0xc8   ///< defined in ATA-6
-#define ATA_CMD_READ_DMA_WITH_RETRY   0xc9   ///< defined in ATA-4
-#define ATA_CMD_READ_DMA_EXT          0x25   ///< defined in ATA-6
-#define ATA_CMD_WRITE_DMA             0xca   ///< defined in ATA-6
-#define ATA_CMD_WRITE_DMA_WITH_RETRY  0xcb   ///< defined in ATA-4
-#define ATA_CMD_WRITE_DMA_EXT         0x35   ///< defined in ATA-6
+#define ATA_CMD_READ_DMA              0xc8   ///< defined from ATA-1
+#define ATA_CMD_READ_DMA_WITH_RETRY   0xc9   ///< defined from ATA-1, obsoleted from ATA-5
+#define ATA_CMD_READ_DMA_EXT          0x25   ///< defined from ATA-6
+#define ATA_CMD_WRITE_DMA             0xca   ///< defined from ATA-1
+#define ATA_CMD_WRITE_DMA_WITH_RETRY  0xcb   ///< defined from ATA-1, obsoleted from ATA-
+#define ATA_CMD_WRITE_DMA_EXT         0x35   ///< defined from ATA-6
         
 ///
 /// default content of device control register, disable INT,
@@ -456,26 +511,27 @@ typedef union {
 //
 // Error Register
 //
-#define ATA_ERRREG_BBK   BIT7  ///< Bad block detected      defined in ATA-1
-#define ATA_ERRREG_UNC   BIT6  ///< Uncorrectable Data      defined in ATA-3
-#define ATA_ERRREG_MC    BIT5  ///< Media Change            defined in ATA-3
-#define ATA_ERRREG_IDNF  BIT4  ///< ID Not Found            defined in ATA-3
-#define ATA_ERRREG_MCR   BIT3  ///< Media Change Requested  defined in ATA-3
-#define ATA_ERRREG_ABRT  BIT2  ///< Aborted Command         defined in ATA-6
-#define ATA_ERRREG_TK0NF BIT1  ///< Track 0 Not Found       defined in ATA-3
-#define ATA_ERRREG_AMNF  BIT0  ///< Address Mark Not Found  defined in ATA-3
+#define ATA_ERRREG_BBK   BIT7  ///< Bad block detected      defined from ATA-1, obsoleted from ATA-2
+#define ATA_ERRREG_UNC   BIT6  ///< Uncorrectable Data      defined from ATA-1, obsoleted from ATA-4
+#define ATA_ERRREG_MC    BIT5  ///< Media Change            defined from ATA-1, obsoleted from ATA-4
+#define ATA_ERRREG_IDNF  BIT4  ///< ID Not Found            defined from ATA-1, obsoleted from ATA-4
+#define ATA_ERRREG_MCR   BIT3  ///< Media Change Requested  defined from ATA-1, obsoleted from ATA-4
+#define ATA_ERRREG_ABRT  BIT2  ///< Aborted Command         defined from ATA-1
+#define ATA_ERRREG_TK0NF BIT1  ///< Track 0 Not Found       defined from ATA-1, obsoleted from ATA-4
+#define ATA_ERRREG_AMNF  BIT0  ///< Address Mark Not Found  defined from ATA-1, obsoleted from ATA-4
 
 //
 // Status Register
 //
-#define ATA_STSREG_BSY   BIT7  ///< Controller Busy         defined in ATA-6
-#define ATA_STSREG_DRDY  BIT6  ///< Drive Ready             defined in ATA-6
-#define ATA_STSREG_DWF   BIT5  ///< Drive Write Fault       defined in ATA-6
-#define ATA_STSREG_DSC   BIT4  ///< Disk Seek Complete      defined in ATA-3
-#define ATA_STSREG_DRQ   BIT3  ///< Data Request            defined in ATA-6
-#define ATA_STSREG_CORR  BIT2  ///< Corrected Data          defined in ATA-3
-#define ATA_STSREG_IDX   BIT1  ///< Index                   defined in ATA-3
-#define ATA_STSREG_ERR   BIT0  ///< Error                   defined in ATA-6
+#define ATA_STSREG_BSY   BIT7  ///< Controller Busy         defined from ATA-1
+#define ATA_STSREG_DRDY  BIT6  ///< Drive Ready             defined from ATA-1
+#define ATA_STSREG_DWF   BIT5  ///< Drive Write Fault       defined from ATA-1, obsoleted from ATA-4
+#define ATA_STSREG_DF    BIT5  ///< Drive Fault             defined from ATA-6
+#define ATA_STSREG_DSC   BIT4  ///< Disk Seek Complete      defined from ATA-1, obsoleted from ATA-4
+#define ATA_STSREG_DRQ   BIT3  ///< Data Request            defined from ATA-1
+#define ATA_STSREG_CORR  BIT2  ///< Corrected Data          defined from ATA-1, obsoleted from ATA-4
+#define ATA_STSREG_IDX   BIT1  ///< Index                   defined from ATA-1, obsoleted from ATA-4
+#define ATA_STSREG_ERR   BIT0  ///< Error                   defined from ATA-1
 
 //
 // Device Control Register
