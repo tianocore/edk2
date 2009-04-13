@@ -78,8 +78,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   DebugLib
   PrintLib
   HiiLib
-  IfrSupportLib
-  ExtendedIfrSupportLib
   NetLib
 
 [Protocols]
@@ -97,3 +95,4 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 [Guids]
   gEfiEventExitBootServicesGuid
+  gEfiIfrTianoGuid                              ## CONSUMES ## Guid

@@ -39,8 +39,6 @@ Revision History
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/IfrSupportLib.h>
-#include <Library/ExtendedIfrSupportLib.h>
 #include <Library/HiiLib.h>
 #include <Library/DevicePathLib.h>
 

@@ -23,7 +23,6 @@
 #include "PlatOverMngr.h"
 
 #define EFI_DISK_DEVICE_CLASS          0x01
-#define LABEL_END                      0xffff
 
 formset
   guid     = PLAT_OVER_MNGR_GUID,

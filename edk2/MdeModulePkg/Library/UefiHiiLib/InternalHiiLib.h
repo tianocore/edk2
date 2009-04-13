@@ -20,6 +20,7 @@
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/FormBrowser2.h>
 
 #include <Guid/GlobalVariable.h>
 
@@ -30,7 +31,9 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/UefiHiiServicesLib.h>
 #include <Library/UefiLib.h>
+#include <Library/PrintLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 

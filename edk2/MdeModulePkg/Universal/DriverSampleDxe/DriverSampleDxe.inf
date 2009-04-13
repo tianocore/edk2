@@ -53,8 +53,9 @@
   BaseMemoryLib
   DebugLib
   HiiLib
-  IfrSupportLib
-  ExtendedIfrSupportLib
+
+[Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES ## Guid
 
 [Protocols]
   gEfiHiiStringProtocolGuid                     ## CONSUMES

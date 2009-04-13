@@ -47,6 +47,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define VARSTORE_ID_PLAT_OVER_MNGR     0x1000
 
+#define LABEL_END                      0xffff
+
 typedef struct {
   UINT8   DriSelection[MAX_CHOICE_NUM];
   UINT8   DriOrder[MAX_CHOICE_NUM];

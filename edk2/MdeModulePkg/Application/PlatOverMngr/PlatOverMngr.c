@@ -38,6 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/DevicePathToText.h>
 #include <Protocol/DevicePath.h>
+#include <Guid/MdeModuleHii.h>
 
 #include <Library/DevicePathLib.h>
 #include <Library/BaseLib.h>
@@ -46,12 +47,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PlatformDriverOverrideLib.h>
-#include <Library/HiiLib.h>
-#include <Library/IfrSupportLib.h>
-#include <Library/ExtendedIfrSupportLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/HiiLib.h>
+
 #include "PlatOverMngr.h"
 
 #define EFI_CALLBACK_INFO_SIGNATURE SIGNATURE_32 ('C', 'l', 'b', 'k')
@@ -88,6 +88,7 @@ extern UINT8  PlatOverMngrStrings[];
 // module global data
 //
 EFI_GUID                     mPlatformOverridesManagerGuid = PLAT_OVER_MNGR_GUID;
+CHAR16                       mVariableName[] = L"Data";
 LIST_ENTRY                   mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
 
 EFI_HANDLE                   *mDevicePathHandleBuffer;
@@ -103,6 +104,7 @@ EFI_DEVICE_PATH_PROTOCOL     *mControllerDevicePathProtocol[MAX_CHOICE_NUM];
 UINTN                        mSelectedDriverImageNum;
 UINTN                        mLastSavedDriverImageNum;
 UINT16                       mCurrentPage;
+EFI_CALLBACK_INFO           *mCallbackInfo;
 
 HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
   {
@@ -114,10 +116,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
-    //
-    // {99936717-BF3D-4b04-9787-76CEE324D76F}
-    //
-    { 0x99936717, 0xbf3d, 0x4b04, { 0x97, 0x87, 0x76, 0xce, 0xe3, 0x24, 0xd7, 0x6f } }
+    EFI_CALLER_ID_GUID
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -345,7 +344,6 @@ UpdateDeviceSelectPage (
   IN PLAT_OVER_MNGR_DATA              *FakeNvData
   )
 {
-  EFI_HII_UPDATE_DATA                       UpdateData;
   EFI_STATUS                                Status;
   UINTN                                     Index;
   UINTN                                     DevicePathHandleCount;
@@ -356,9 +354,13 @@ UpdateDeviceSelectPage (
   EFI_PCI_IO_PROTOCOL                       *PciIo;
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL *BusSpecificDriverOverride;
   UINTN                                     Len;
-  
+  VOID                                      *StartOpCodeHandle;
+  VOID                                      *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL                        *StartLabel;
+  EFI_IFR_GUID_LABEL                        *EndLabel;  
+
   //
-  // set current page form ID.
+  // Set current page form ID.
   //
   mCurrentPage = FORM_ID_DEVICE;  
   
@@ -366,25 +368,40 @@ UpdateDeviceSelectPage (
   // Initial the mapping database in memory
   //
   FreeMappingDatabase (&mMappingDataBase);
-  Status = InitOverridesMapping (&mMappingDataBase);
+  InitOverridesMapping (&mMappingDataBase);
 
   //
-  // Clear all the content in the first page
+  // Init OpCode Handle
   //
-  UpdateData.BufferSize = UPDATE_DATA_SIZE;
-  UpdateData.Offset = 0;
-  UpdateData.Data = AllocateZeroPool (UPDATE_DATA_SIZE);
-  ASSERT (UpdateData.Data != NULL);
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
+
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number = FORM_ID_DEVICE;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = LABEL_END;
+
   //
   // Clear first page form
   //
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     Private->RegisteredHandle,
     &mPlatformOverridesManagerGuid,
     FORM_ID_DEVICE,
-    FORM_ID_DEVICE,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle, // Label FORM_ID_DEVICE
+    EndOpCodeHandle    // LABEL_END
     );
 
   //
@@ -499,30 +516,31 @@ UpdateDeviceSelectPage (
     // Save the device path string toke for next access use
     //
     mControllerToken[Index] = NewStringToken;
-
-    CreateGotoOpCode (
+      
+    HiiCreateGotoOpCode (
+      StartOpCodeHandle,
       FORM_ID_DRIVER,
       NewStringToken,
       STRING_TOKEN (STR_GOTO_HELP_DRIVER),
       EFI_IFR_FLAG_CALLBACK,
-      (UINT16) (Index + KEY_VALUE_DEVICE_OFFSET),
-      &UpdateData
+      (UINT16) (Index + KEY_VALUE_DEVICE_OFFSET)
       );
   }
 
   //
   // Update first page form
   //
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     Private->RegisteredHandle,
     &mPlatformOverridesManagerGuid,
     FORM_ID_DEVICE,
-    FORM_ID_DEVICE,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle, // Label FORM_ID_DEVICE
+    EndOpCodeHandle    // LABEL_END
     );
 
-  FreePool (UpdateData.Data);
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
+
   return EFI_SUCCESS;
 }
 
@@ -613,7 +631,6 @@ UpdateBindingDriverSelectPage (
   IN PLAT_OVER_MNGR_DATA              *FakeNvData
   )
 {
-  EFI_HII_UPDATE_DATA                       UpdateData;
   EFI_STATUS                                Status;
   UINTN                                     Index;
   CHAR16                                    *NewString;
@@ -626,6 +643,10 @@ UpdateBindingDriverSelectPage (
   EFI_DEVICE_PATH_PROTOCOL                  *LoadedImageDevicePath;
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL *BusSpecificDriverOverride;
   EFI_HANDLE                                DriverBindingHandle;
+  VOID                                      *StartOpCodeHandle;
+  VOID                                      *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL                        *StartLabel;
+  EFI_IFR_GUID_LABEL                        *EndLabel;
 
   //
   // If user select a controller item in the first page  the following code will be run.
@@ -641,26 +662,42 @@ UpdateBindingDriverSelectPage (
   // Switch the item callback key value to its NO. in mDevicePathHandleBuffer
   //
   mSelectedCtrIndex = KeyValue - KEY_VALUE_DEVICE_OFFSET;
-  ASSERT (mSelectedCtrIndex > 0 && mSelectedCtrIndex < MAX_CHOICE_NUM);
+  ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
 
   mLastSavedDriverImageNum = 0;
+
   //
-  // Clear all the content in dynamic page
+  // Init OpCode Handle
   //
-  UpdateData.BufferSize = UPDATE_DATA_SIZE;
-  UpdateData.Offset = 0;
-  UpdateData.Data = AllocateZeroPool (UPDATE_DATA_SIZE);
-  ASSERT (UpdateData.Data != NULL);
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
+
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number       = FORM_ID_DRIVER;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = LABEL_END;
+
   //
   // Clear second page form
   //
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     Private->RegisteredHandle,
     &mPlatformOverridesManagerGuid,
     FORM_ID_DRIVER,
-    FORM_ID_DRIVER,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle,
+    EndOpCodeHandle
     );
 
   //
@@ -816,7 +853,8 @@ UpdateBindingDriverSelectPage (
     FreePool (NewString);
     FreePool (DriverName);
 
-    CreateCheckBoxOpCode (
+    HiiCreateCheckBoxOpCode (
+      StartOpCodeHandle,
       (UINT16) (DRIVER_SELECTION_QUESTION_ID + Index),
       VARSTORE_ID_PLAT_OVER_MNGR,
       (UINT16) (DRIVER_SELECTION_VAR_OFFSET + Index),
@@ -824,23 +862,23 @@ UpdateBindingDriverSelectPage (
       NewStringHelpToken,
       0,
       0,
-      &UpdateData
+      NULL
       );
   }
 
   //
   // Update second page form
   //
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     Private->RegisteredHandle,
     &mPlatformOverridesManagerGuid,
     FORM_ID_DRIVER,
-    FORM_ID_DRIVER,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle, // Label FORM_ID_DRIVER
+    EndOpCodeHandle    // LABEL_END
     );
 
-  FreePool (UpdateData.Data);
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
   return EFI_SUCCESS;
 }
 
@@ -862,15 +900,19 @@ UpdatePrioritySelectPage (
   IN PLAT_OVER_MNGR_DATA              *FakeNvData
   )
 {
-  EFI_HII_UPDATE_DATA                       UpdateData;
   UINTN                                     Index;
   EFI_DEVICE_PATH_PROTOCOL                  *LoadedImageDevicePath;
-  IFR_OPTION                                *IfrOptionList;
   UINTN                                     SelectedDriverImageNum;
   UINT32                                    DriverImageNO;
   UINTN                                     MinNO;
   UINTN                                     Index1;
   UINTN                                     TempNO[100];
+  UINTN                                     OrderNO[100];
+  VOID                                      *StartOpCodeHandle;
+  VOID                                      *EndOpCodeHandle;
+  VOID                                      *OptionsOpCodeHandle;
+  EFI_IFR_GUID_LABEL                        *StartLabel;
+  EFI_IFR_GUID_LABEL                        *EndLabel;
 
   //
   // Following code will be run if user select 'order ... priority' item in second page
@@ -878,20 +920,38 @@ UpdatePrioritySelectPage (
   //
   mCurrentPage = FORM_ID_ORDER;
 
-  UpdateData.BufferSize = UPDATE_DATA_SIZE;
-  UpdateData.Offset = 0;
-  UpdateData.Data = AllocateZeroPool (UPDATE_DATA_SIZE);
-  ASSERT (UpdateData.Data != NULL);
+  //
+  // Init OpCode Handle
+  //
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
+
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number       = FORM_ID_ORDER;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = LABEL_END;
+
   //
   // Clear third page form
   //
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     Private->RegisteredHandle,
     &mPlatformOverridesManagerGuid,
     FORM_ID_ORDER,
-    FORM_ID_ORDER,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle,
+    EndOpCodeHandle
     );
 
   //
@@ -908,21 +968,26 @@ UpdatePrioritySelectPage (
   if (SelectedDriverImageNum == 0) {
     return EFI_SUCCESS;
   }
-  
-  IfrOptionList = AllocateZeroPool (sizeof (IFR_OPTION) * mSelectedDriverImageNum);
-  ASSERT (IfrOptionList != NULL);
+
+  OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (OptionsOpCodeHandle != NULL);
+
   //
   // Create order list for those selected drivers
   //
   SelectedDriverImageNum = 0;
   for (Index = 0; Index < mDriverImageHandleCount; Index++) {
     if (FakeNvData->DriSelection[Index] != 0) {
-      IfrOptionList[SelectedDriverImageNum].StringToken = mDriverImageToken[Index];
       //
       // Use the NO. in driver binding buffer as value, will use it later
       //
-      IfrOptionList[SelectedDriverImageNum].Value.u8 = (UINT8) (Index + 1);
-      IfrOptionList[SelectedDriverImageNum].Flags = 0;
+      HiiCreateOneOfOptionOpCode (
+        OptionsOpCodeHandle,
+        mDriverImageToken[Index],
+        0,
+        EFI_IFR_NUMERIC_SIZE_1,
+        Index + 1
+        );
 
       //
       // Get the EFI Loaded Image Device Path Protocol
@@ -951,6 +1016,7 @@ UpdatePrioritySelectPage (
         mLastSavedDriverImageNum++;
       }
       TempNO[SelectedDriverImageNum] = DriverImageNO;
+      OrderNO[SelectedDriverImageNum] = Index + 1;
       SelectedDriverImageNum ++;
     }
   }
@@ -978,11 +1044,15 @@ UpdatePrioritySelectPage (
     //
     // the IfrOptionList[MinNO].Value = the driver NO. in driver binding buffer
     //
-    FakeNvData->DriOrder[Index] =IfrOptionList[MinNO].Value.u8;
+    FakeNvData->DriOrder[Index] = (UINT8) OrderNO[MinNO];
     TempNO[MinNO] = MAX_CHOICE_NUM + 1;
   }
-
-  CreateOrderedListOpCode (
+  
+  //
+  // Create Order List OpCode
+  //
+  HiiCreateOrderedListOpCode (
+    StartOpCodeHandle,
     (UINT16) DRIVER_ORDER_QUESTION_ID,
     VARSTORE_ID_PLAT_OVER_MNGR,
     (UINT16) DRIVER_ORDER_VAR_OFFSET,
@@ -992,25 +1062,25 @@ UpdatePrioritySelectPage (
     0,
     EFI_IFR_NUMERIC_SIZE_1,
     (UINT8) MAX_CHOICE_NUM,
-    IfrOptionList,
-    SelectedDriverImageNum,
-    &UpdateData
+    OptionsOpCodeHandle,
+    NULL
     );
 
   //
   // Update third page form
   //
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     Private->RegisteredHandle,
     &mPlatformOverridesManagerGuid,
     FORM_ID_ORDER,
-    FORM_ID_ORDER,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle, // Label FORM_ID_ORDER
+    EndOpCodeHandle    // LABEL_END
     );
 
-  FreePool (IfrOptionList);
-  FreePool (UpdateData.Data);
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
+  HiiFreeOpCodeHandle (OptionsOpCodeHandle);
+
   return EFI_SUCCESS;
 }
 
@@ -1102,7 +1172,7 @@ PlatOverMngrExtractConfig (
   EFI_STATUS                       Status;
   EFI_CALLBACK_INFO                *Private;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
-
+  
   if (Request == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -1148,18 +1218,13 @@ PlatOverMngrRouteConfig (
   )
 {
   EFI_CALLBACK_INFO                         *Private;
-  EFI_STATUS                                Status;
   UINT16                                    KeyValue;
-  UINTN                                     BufferSize;
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
 
-  Private     = EFI_CALLBACK_INFO_FROM_THIS (This);
-
-  FakeNvData = &Private->FakeNvData;
-  BufferSize = sizeof (PLAT_OVER_MNGR_DATA);
-  Status = GetBrowserData (NULL, NULL, &BufferSize, (UINT8 *) FakeNvData);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
+  FakeNvData = (PLAT_OVER_MNGR_DATA *) HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA));
+  if (FakeNvData == NULL) {
+    return EFI_NOT_FOUND;
   }
 
   if (mCurrentPage == FORM_ID_DRIVER) {
@@ -1178,6 +1243,11 @@ PlatOverMngrRouteConfig (
     KeyValue = KEY_VALUE_ORDER_SAVE_AND_EXIT;
     CommintChanges (Private, KeyValue, FakeNvData);
   }
+
+  if (FakeNvData != NULL) {
+    FreePool (FakeNvData);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -1216,17 +1286,13 @@ PlatOverMngrCallback (
   EFI_CALLBACK_INFO                         *Private;
   EFI_STATUS                                Status;
   EFI_STRING_ID                             NewStringToken;
-  UINTN                                     BufferSize;
-  PLAT_OVER_MNGR_DATA                       *FakeNvData;
   EFI_INPUT_KEY                             Key;
-
+  PLAT_OVER_MNGR_DATA                       *FakeNvData;
+  
   Private = EFI_CALLBACK_INFO_FROM_THIS (This);
-
-  FakeNvData = &Private->FakeNvData;
-  BufferSize = sizeof (PLAT_OVER_MNGR_DATA);
-  Status = GetBrowserData (NULL, NULL, &BufferSize, (UINT8 *) FakeNvData);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  FakeNvData = (PLAT_OVER_MNGR_DATA *) HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA));
+  if (FakeNvData == NULL) {
+    return EFI_NOT_FOUND;
   }
 
   if (KeyValue == KEY_VALUE_DEVICE_REFRESH ||
@@ -1285,8 +1351,15 @@ PlatOverMngrCallback (
   //
   // Pass changed uncommitted data back to Form Browser
   //
-  BufferSize = sizeof (PLAT_OVER_MNGR_DATA);
-  Status = SetBrowserData (NULL, NULL, BufferSize, (UINT8 *) FakeNvData, NULL);
+  HiiSetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
+  
+  //
+  // Update local configuration buffer.
+  //
+  CopyMem (&Private->FakeNvData, FakeNvData, sizeof (PLAT_OVER_MNGR_DATA));
+  if (FakeNvData != NULL) {
+    FreePool (FakeNvData);
+  }
 
   return EFI_SUCCESS;
 }
@@ -1312,7 +1385,6 @@ PlatOverMngrInit (
   EFI_STATUS                  Status;
   EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-  EFI_CALLBACK_INFO           *CallbackInfo;
   EFI_FORM_BROWSER2_PROTOCOL  *FormBrowser2;
   
   //
@@ -1339,25 +1411,25 @@ PlatOverMngrInit (
     return Status;
   }
 
-  CallbackInfo = AllocateZeroPool (sizeof (EFI_CALLBACK_INFO));
-  if (CallbackInfo == NULL) {
+  mCallbackInfo = AllocateZeroPool (sizeof (EFI_CALLBACK_INFO));
+  if (mCallbackInfo == NULL) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  CallbackInfo->Signature = EFI_CALLBACK_INFO_SIGNATURE;
-  CallbackInfo->ConfigAccess.ExtractConfig = PlatOverMngrExtractConfig;
-  CallbackInfo->ConfigAccess.RouteConfig   = PlatOverMngrRouteConfig;
-  CallbackInfo->ConfigAccess.Callback      = PlatOverMngrCallback;
+  mCallbackInfo->Signature = EFI_CALLBACK_INFO_SIGNATURE;
+  mCallbackInfo->ConfigAccess.ExtractConfig = PlatOverMngrExtractConfig;
+  mCallbackInfo->ConfigAccess.RouteConfig   = PlatOverMngrRouteConfig;
+  mCallbackInfo->ConfigAccess.Callback      = PlatOverMngrCallback;
 
   //
   // Install Device Path Protocol and Config Access protocol to driver handle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &CallbackInfo->DriverHandle,
+                  &mCallbackInfo->DriverHandle,
                   &gEfiDevicePathProtocolGuid,
                   &mHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
-                  &CallbackInfo->ConfigAccess,
+                  &mCallbackInfo->ConfigAccess,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
@@ -1378,8 +1450,8 @@ PlatOverMngrInit (
   Status = HiiDatabase->NewPackageList (
                            HiiDatabase,
                            PackageList,
-                           CallbackInfo->DriverHandle,
-                           &CallbackInfo->RegisteredHandle
+                           mCallbackInfo->DriverHandle,
+                           &mCallbackInfo->RegisteredHandle
                            );
   FreePool (PackageList);
 
@@ -1393,7 +1465,7 @@ PlatOverMngrInit (
   Status = gBS->LocateProtocol (
                   &gEfiHiiConfigRoutingProtocolGuid,
                   NULL,
-                  (VOID **) &CallbackInfo->HiiConfigRouting
+                  (VOID **) &mCallbackInfo->HiiConfigRouting
                   );
   if (EFI_ERROR (Status)) {
     goto Finish;
@@ -1414,37 +1486,34 @@ PlatOverMngrInit (
   //
   Status = FormBrowser2->SendForm (
                            FormBrowser2,
-                           &CallbackInfo->RegisteredHandle,
+                           &mCallbackInfo->RegisteredHandle,
                            1,
                            NULL,
                            0,
                            NULL,
                            NULL
                            );
-  if (EFI_ERROR (Status)) {
-    goto Finish;
-  }
 
-  Status = HiiDatabase->RemovePackageList (HiiDatabase, CallbackInfo->RegisteredHandle);
+  HiiDatabase->RemovePackageList (HiiDatabase, mCallbackInfo->RegisteredHandle);
+
   if (EFI_ERROR (Status)) {
     goto Finish;
   }
-  
-  return EFI_SUCCESS;
 
 Finish:
-  if (CallbackInfo->DriverHandle != NULL) {
+  if (mCallbackInfo->DriverHandle != NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
-           CallbackInfo->DriverHandle,
+           mCallbackInfo->DriverHandle,
            &gEfiDevicePathProtocolGuid,
            &mHiiVendorDevicePath,
            &gEfiHiiConfigAccessProtocolGuid,
-           &CallbackInfo->ConfigAccess,
+           &mCallbackInfo->ConfigAccess,
            NULL
            );
   }
-  if (CallbackInfo != NULL) {
-    FreePool (CallbackInfo);
+
+  if (mCallbackInfo != NULL) {
+    FreePool (mCallbackInfo);
   }
 
   return Status;
