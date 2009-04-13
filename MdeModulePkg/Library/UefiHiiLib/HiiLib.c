@@ -699,7 +699,7 @@ InternalHiiLowerConfigString (
       Lower = TRUE;
     } else if (*String == L'&') {
       Lower = FALSE;
-    } else if (Lower && *String > L'A' && *String <= L'F') {
+    } else if (Lower && *String >= L'A' && *String <= L'F') {
       *String = (CHAR16) (*String - L'A' + L'a');
     }
   }
@@ -928,7 +928,6 @@ InternalHiiBrowserCallback (
                             to a 2 Unicode character hexidecimal string.
 
   @retval NULL   DriverHandle does not support the Device Path Protocol.
-  @retval NULL   DriverHandle does not support the Device Path Protocol.
   @retval Other  A pointer to the Null-terminate Unicode <ConfigHdr> string
 
 **/
@@ -957,18 +956,21 @@ HiiConstructConfigHdr (
     NameLength = StrLen (Name);
   }
 
+  DevicePath = NULL;
+  DevicePathSize = 0;
   //
   // Retrieve DevicePath Protocol associated with DriverHandle
   //
-  DevicePath = DevicePathFromHandle (DriverHandle);
-  if (DevicePath == NULL) {
-    return NULL;
+  if (DriverHandle != NULL) {
+    DevicePath = DevicePathFromHandle (DriverHandle);
+    if (DevicePath == NULL) {
+      return NULL;
+    }
+    //
+    // Compute the size of the device path in bytes
+    //
+    DevicePathSize = GetDevicePathSize (DevicePath);
   }
-
-  //
-  // Compute the size of the device path in bytes
-  //
-  DevicePathSize = GetDevicePathSize (DevicePath);
 
   //
   // GUID=<HexCh>32&NAME=<Char>NameLength&PATH=<HexChar>DevicePathSize <Null>
