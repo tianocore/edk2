@@ -1015,7 +1015,6 @@ BdsLibConnectUsbDevByShortFormDP(
 
 **/
 VOID
-EFIAPI
 DevPathVendor (
   IN OUT POOL_PRINT       *Str,
   IN VOID                 *DevPath

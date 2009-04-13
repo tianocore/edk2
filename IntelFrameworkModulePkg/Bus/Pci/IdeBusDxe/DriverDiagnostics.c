@@ -89,6 +89,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gIDEBusDriverDiag
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverDiagnosticsRunDiagnostics (
   IN  EFI_DRIVER_DIAGNOSTICS_PROTOCOL               *This,
   IN  EFI_HANDLE                                    ControllerHandle,

@@ -211,6 +211,7 @@ IDEBusDriverBindingStop (
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverConfigurationSetOptions (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
   IN  EFI_HANDLE                                             ControllerHandle,
@@ -230,6 +231,7 @@ IDEBusDriverConfigurationSetOptions (
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverConfigurationOptionsValid (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL               *This,
   IN  EFI_HANDLE                                      ControllerHandle,
@@ -249,6 +251,7 @@ IDEBusDriverConfigurationOptionsValid (
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverConfigurationForceDefaults (
   IN  EFI_DRIVER_CONFIGURATION_PROTOCOL                      *This,
   IN  EFI_HANDLE                                             ControllerHandle,
@@ -276,6 +279,7 @@ IDEBusDriverConfigurationForceDefaults (
 
 **/
 EFI_STATUS
+EFIAPI
 IDEBusDriverDiagnosticsRunDiagnostics (
   IN  EFI_DRIVER_DIAGNOSTICS_PROTOCOL               *This,
   IN  EFI_HANDLE                                    ControllerHandle,

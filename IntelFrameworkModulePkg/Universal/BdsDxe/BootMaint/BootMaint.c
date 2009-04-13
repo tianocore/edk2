@@ -1383,6 +1383,7 @@ FormSetDispatcher (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsDeleteBootOption (
   IN UINTN                       OptionNumber,
   IN OUT UINT16                  *BootOrder,
