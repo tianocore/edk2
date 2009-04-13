@@ -1444,7 +1444,7 @@ HiiUpdateForm (
 **/
 EFI_STATUS
 EFIAPI
-IfrLibExtractDefault(
+HiiIfrLibExtractDefault(
   IN VOID                         *Buffer,
   IN UINTN                        *BufferSize,
   UINTN                           Number,

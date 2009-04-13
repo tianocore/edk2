@@ -22,7 +22,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR16 mConfigHdrTemplate[] = L"GUID=0000000
 //
 // Form Browser2 Protocol
 //
-EFI_FORM_BROWSER2_PROTOCOL  *mFormBrowser2 = NULL;
+EFI_FORM_BROWSER2_PROTOCOL  *mUefiFormBrowser2 = NULL;
 
 /**
   This funciton build the package list based on the package number,
@@ -846,9 +846,9 @@ InternalHiiBrowserCallback (
   //
   // Locate protocols
   //
-  if (mFormBrowser2 == NULL) {
-    Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &mFormBrowser2);
-    if (EFI_ERROR (Status) || mFormBrowser2 == NULL) {
+  if (mUefiFormBrowser2 == NULL) {
+    Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &mUefiFormBrowser2);
+    if (EFI_ERROR (Status) || mUefiFormBrowser2 == NULL) {
       return NULL;
     }
   }
@@ -864,8 +864,8 @@ InternalHiiBrowserCallback (
     //
     // Retrieve the length of the buffer required ResultsData from the Browser Callback
     //
-    Status = mFormBrowser2->BrowserCallback (
-                              mFormBrowser2,
+    Status = mUefiFormBrowser2->BrowserCallback (
+                              mUefiFormBrowser2,
                               &ResultsDataSize,
                               &TempResultsData,
                               TRUE,
@@ -888,8 +888,8 @@ InternalHiiBrowserCallback (
   //
   // Retrieve or set the ResultsData from the Browser Callback
   //
-  Status = mFormBrowser2->BrowserCallback (
-                            mFormBrowser2,
+  Status = mUefiFormBrowser2->BrowserCallback (
+                            mUefiFormBrowser2,
                             &ResultsDataSize,
                             ResultsData,
                             (BOOLEAN)(SetResultsData == NULL),
@@ -2856,7 +2856,7 @@ Finish:
 **/
 EFI_STATUS
 EFIAPI
-IfrLibExtractDefault(
+HiiIfrLibExtractDefault(
   IN VOID                         *Buffer,
   IN UINTN                        *BufferSize,
   UINTN                           Number,
