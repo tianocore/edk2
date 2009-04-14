@@ -34,12 +34,12 @@ HII_THUNK_PRIVATE_DATA mHiiThunkPrivateDataTempate = {
     HiiNewString,
     HiiGetPrimaryLanguages,
     HiiGetSecondaryLanguages,
-    HiiGetString,
+    HiiThunkGetString,
     HiiResetStrings,
     HiiGetLine,
     HiiGetForms,
     HiiGetDefaultImage,
-    HiiUpdateForm,
+    HiiThunkUpdateForm,
     
     HiiGetKeyboardLayout
   },
