@@ -311,7 +311,7 @@ HiiNewString (
 
 EFI_STATUS
 EFIAPI
-HiiGetString (
+HiiThunkGetString (
   IN     EFI_HII_PROTOCOL           *This,
   IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
   IN     STRING_REF                 Token,
@@ -388,7 +388,7 @@ HiiGetDefaultImage (
 
 EFI_STATUS
 EFIAPI
-HiiUpdateForm (
+HiiThunkUpdateForm (
   IN EFI_HII_PROTOCOL                   *This,
   IN FRAMEWORK_EFI_HII_HANDLE           Handle,
   IN EFI_FORM_LABEL                     Label,

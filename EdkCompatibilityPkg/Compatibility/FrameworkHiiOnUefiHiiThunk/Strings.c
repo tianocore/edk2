@@ -378,7 +378,7 @@ HiiResetStrings (
 **/
 EFI_STATUS
 EFIAPI
-HiiGetString (
+HiiThunkGetString (
   IN     EFI_HII_PROTOCOL           *This,
   IN     FRAMEWORK_EFI_HII_HANDLE   Handle,
   IN     STRING_REF                 Token,
