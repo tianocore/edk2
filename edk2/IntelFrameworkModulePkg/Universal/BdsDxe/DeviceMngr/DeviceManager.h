@@ -104,8 +104,8 @@ DeviceManagerCallback (
 
   This function registers HII packages to HII database.
 
-  @retval EFI_SUCCESS This function complete successfully.
-  @return Other value if failed to register HII packages.
+  @retval  EFI_SUCCESS           HII packages for the Device Manager were registered successfully.
+  @retval  EFI_OUT_OF_RESOURCES  HII packages for the Device Manager failed to be registered.
 
 **/
 EFI_STATUS

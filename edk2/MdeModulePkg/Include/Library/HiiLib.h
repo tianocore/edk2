@@ -17,280 +17,206 @@
 
 
 /**
-  Assemble EFI_HII_PACKAGE_LIST according to the passed in packages.
+  Registers a list of packages in the HII Database and returns the HII Handle
+  associated with that registration.  If an HII Handle has already been registered
+  with the same PackageListGuid, then NULL is returned.  If there are not enough 
+  resources to perform the registration, then NULL is returned.  If an empty list 
+  of packages is passed in, then NULL is returned.  If the size of the list of 
+  package is 0, then NULL is returned.
 
-  If GuidId is NULL, then ASSERT.
-  If not enough resource to complete the operation, then ASSERT.
+  The variable arguments are pointers which point to package header that defined 
+  by UEFI VFR compiler and StringGather tool.
 
-  @param  NumberOfPackages       Number of packages.
-  @param  GuidId                 Package GUID.
-  @param  ...                    Variable argument list for packages to be assembled.
+  #pragma pack (push, 1)
+  typedef struct {
+    UINT32                  BinaryLength;
+    EFI_HII_PACKAGE_HEADER  PackageHeader;
+  } EDKII_AUTOGEN_PACKAGES_HEADER;
+  #pragma pack (pop)
+  
+  @param[in]  PackageListGuid  The GUID of the package list.
+  @param[in]  DeviceHandle     If not NULL, the Device Handle on which 
+                               an instance of DEVICE_PATH_PROTOCOL is installed.
+                               This Device Handle uniquely defines the device that 
+                               the added packages are associated with.
+  @param[in]  ...              The variable argument list that contains pointers 
+                               to packages terminated by a NULL.
 
-  @return Pointer of EFI_HII_PACKAGE_LIST_HEADER.
+  @retval NULL   A HII Handle has already been registered in the HII Database with
+                 the same PackageListGuid.
+  @retval NULL   The HII Handle could not be created.
+  @retval NULL   An empty list of packages was passed in.
+  @retval NULL   All packages are empty.
+  @retval Other  The HII Handle associated with the newly registered package list.
 
 **/
-EFI_HII_PACKAGE_LIST_HEADER *
+EFI_HII_HANDLE
 EFIAPI
-HiiLibPreparePackageList (
-  IN UINTN                    NumberOfPackages,
-  IN CONST EFI_GUID                 *GuidId,
+HiiAddPackages (
+  IN CONST EFI_GUID    *PackageListGuid,
+  IN       EFI_HANDLE  DeviceHandle  OPTIONAL,
   ...
   )
 ;
 
 /**
-  This function allocates pool for an EFI_HII_PACKAGE_LIST structure
-  with additional space that is big enough to host all packages described by the variable 
-  argument list of package pointers.  The allocated structure is initialized using NumberOfPackages, 
-  GuidId,  and the variable length argument list of package pointers.
-
-  Then, EFI_HII_PACKAGE_LIST will be register to the default System HII Database. The
-  Handle to the newly registered Package List is returned throught HiiHandle.
+  Removes a package list from the HII database.
 
   If HiiHandle is NULL, then ASSERT.
+  If HiiHandle is not a valid EFI_HII_HANDLE in the HII database, then ASSERT.
 
-  @param  NumberOfPackages    The number of HII packages to register.
-  @param  GuidId              Package List GUID ID.
-  @param  DriverHandle        Optional. If not NULL, the DriverHandle on which an instance of DEVICE_PATH_PROTOCOL is installed.
-                              This DriverHandle uniquely defines the device that the added packages are associated with.
-  @param  HiiHandle           On output, the HiiHandle is update with the handle which can be used to retrieve the Package 
-                              List later. If the functions failed to add the package to the default HII database, this value will
-                              be set to NULL.
-  @param  ...                 The variable argument list describing all HII Package.
-
-  @return  EFI_SUCCESS         If the packages are successfully added to the default HII database.
-  @return  EFI_OUT_OF_RESOURCE Not enough resource to complete the operation.
-
-**/
-EFI_STATUS
-EFIAPI
-HiiLibAddPackages (
-  IN       UINTN               NumberOfPackages,
-  IN CONST EFI_GUID            *GuidId,
-  IN       EFI_HANDLE          DriverHandle, OPTIONAL
-  OUT      EFI_HII_HANDLE      *HiiHandle,
-  ...
-  )
-;
-
-/**
-  Removes a package list from the default HII database.
-
-  If HiiHandle is NULL, then ASSERT.
-  If HiiHandle is not a valid EFI_HII_HANDLE in the default HII database, then ASSERT.
-
-  @param  HiiHandle                The handle that was previously registered to the data base that is requested for removal.
-                                             List later.
+  @param[in]  HiiHandle   The handle that was previously registered in the HII database
 
 **/
 VOID
 EFIAPI
-HiiLibRemovePackages (
+HiiRemovePackages (
   IN      EFI_HII_HANDLE      HiiHandle
   )
 ;
 
 /**
-  This function adds the string into String Package of each language
-  supported by the package list.
+  This function create a new string in String Package or updates an existing 
+  string in a String Package.  If StringId is 0, then a new string is added to
+  a String Package.  If StringId is not zero, then a string in String Package is
+  updated.  If SupportedLanguages is NULL, then the string is added or updated
+  for all the languages that the String Package supports.  If SupportedLanguages
+  is not NULL, then the string is added or updated for the set of languages 
+  specified by SupportedLanguages.
+    
+  If HiiHandle is NULL, then ASSERT().
+  If String is NULL, then ASSERT().
 
-  If String is NULL, then ASSERT.
-  If StringId is NULL, the ASSERT.
-  If PackageList could not be found in the default HII database, then ASSERT.
+  @param[in]  HiiHandle           A handle that was previously registered in the 
+                                  HII Database.
+  @param[in]  StringId            If zero, then a new string is created in the 
+                                  String Package associated with HiiHandle.  If 
+                                  non-zero, then the string specified by StringId 
+                                  is updated in the String Package  associated 
+                                  with HiiHandle. 
+  @param[in]  String              A pointer to the Null-terminated Unicode string 
+                                  to add or update in the String Package associated 
+                                  with HiiHandle.
+  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string of 
+                                  language codes.  If this parameter is NULL, then 
+                                  String is added or updated in the String Package 
+                                  associated with HiiHandle for all the languages 
+                                  that the String Package supports.  If this 
+                                  parameter is not NULL, then then String is added 
+                                  or updated in the String Package associated with 
+                                  HiiHandle for the set oflanguages specified by 
+                                  SupportedLanguages.  The format of 
+                                  SupportedLanguages must follow the language 
+                                  format assumed the HII Database.
 
-  @param  PackageList            Handle of the package list where this string will
-                                            be added.
-  @param  StringId               On return, contains the new strings id, which is
-                                          unique within PackageList.
-  @param  String                 Points to the new null-terminated string.
-
-  @retval EFI_SUCCESS             The new string was added successfully.
-  @retval EFI_OUT_OF_RESOURCES   Could not add the string due to lack of resources.
+  @retval 0      The string could not be added or updated in the String Package.
+  @retval Other  The EFI_STRING_ID of the newly added or updated string.
 
 **/
-EFI_STATUS
+EFI_STRING_ID
 EFIAPI
-HiiLibNewString (
-  IN  EFI_HII_HANDLE                  PackageList,
-  OUT EFI_STRING_ID                   *StringId,
-  IN  CONST EFI_STRING                String
+HiiSetString (
+  IN EFI_HII_HANDLE    HiiHandle,
+  IN EFI_STRING_ID     StringId,            OPTIONAL
+  IN CONST EFI_STRING  String,
+  IN CONST CHAR8       *SupportedLanguages  OPTIONAL
   )
 ;
 
 /**
-  This function update the specified string in String Package of each language
-  supported by the package list.
+  Retrieves a string from a string package in a specific language.  If the language
+  is not specified, then a string from a string package in the current platform 
+  language is retrieved.  If the string can not be retrieved using the specified 
+  language or the current platform language, then the string is retrieved from 
+  the string package in the first language the string package supports.  The 
+  returned string is allocated using AllocatePool().  The caller is responsible 
+  for freeing the allocated buffer using FreePool().
+  
+  If HiiHandle is NULL, then ASSERT().
+  If StringId is 0, then ASSET.
 
-  If String is NULL, then ASSERT.
-  If PackageList could not be found in the default HII database, then ASSERT.
-  If StringId is not found in PackageList, then ASSERT.
+  @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
+  @param[in]  StringId   The identifier of the string to retrieved from the string 
+                         package associated with HiiHandle.
+  @param[in]  Language   The language of the string to retrieve.  If this parameter 
+                         is NULL, then the current platform language is used.  The 
+                         format of Language must follow the language format assumed 
+                         the HII Database.
 
-  @param  PackageList            Handle of the package list where this string will
-                                            be added.
-  @param  StringId               Ths String Id to be updated.
-  @param  String                 Points to the new null-terminated string.
-
-  @retval EFI_SUCCESS            The new string was added successfully.
-  @retval EFI_OUT_OF_RESOURCES   Could not add the string due to lack of resources.
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
 
 **/
-EFI_STATUS
+EFI_STRING
 EFIAPI
-HiiLibSetString (
-  IN  EFI_HII_HANDLE                  PackageList,
-  IN  EFI_STRING_ID                   StringId,
-  IN  CONST EFI_STRING                String
+HiiGetString (
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN EFI_STRING_ID   StringId,
+  IN CONST CHAR8     *Language  OPTIONAL
   )
 ;
 
 /**
-  This function try to retrieve string from String package of current language.
-  If fails, it try to retrieve string from String package of first language it support.
+  Retrieves a string from a string package names by GUID in a specific language.  
+  If the language is not specified, then a string from a string package in the 
+  current platform  language is retrieved.  If the string can not be retrieved 
+  using the specified language or the current platform language, then the string 
+  is retrieved from the string package in the first language the string package 
+  supports.  The returned string is allocated using AllocatePool().  The caller 
+  is responsible for freeing the allocated buffer using FreePool().
+  
+  If PackageListGuid is NULL, then ASSERT().
+  If StringId is 0, then ASSERT.
 
-  If StringSize is NULL, then ASSERT.
-  If String is NULL and *StringSize is not 0, then ASSERT.
-  If PackageList could not be found in the default HII database, then ASSERT.
-  If StringId is not found in PackageList, then ASSERT.
+  @param[in]  PackageListGuid  The GUID of a package list that was previously 
+                               registered in the HII Database.
+  @param[in]  StringId         The identifier of the string to retrieved from the 
+                               string package associated with PackageListGuid.
+  @param[in]  Language         The language of the string to retrieve.  If this 
+                               parameter is NULL, then the current platform 
+                               language is used.  The format of Language must 
+                               follow the language format assumed the HII Database.
 
-  @param  PackageList     The package list in the HII database to search for
-                                     the specified string.
-  @param  StringId          The string's id, which is unique within
-                                      PackageList.
-  @param  String             Points to the new null-terminated string.
-  @param  StringSize       On entry, points to the size of the buffer pointed
-                                 to by String, in bytes. On return, points to the
-                                 length of the string, in bytes.
-
-  @retval EFI_SUCCESS            The string was returned successfully.
-  @retval EFI_NOT_FOUND          The string specified by StringId is not available.
-  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by StringLength is too small
-                                 to hold the string.
+  @retval NULL   The package list specified by PackageListGuid is not present in the
+                 HII Database.
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
 
 **/
-EFI_STATUS
+EFI_STRING
 EFIAPI
-HiiLibGetString (
-  IN  EFI_HII_HANDLE                  PackageList,
-  IN  EFI_STRING_ID                   StringId,
-  OUT EFI_STRING                      String,
-  IN  OUT UINTN                       *StringSize
+HiiGetPackageString (
+  IN CONST EFI_GUID  *PackageListGuid,
+  IN EFI_STRING_ID   StringId,
+  IN CONST CHAR8     *Language  OPTIONAL
   )
 ;
 
 /**
-  Get string specified by StringId form the HiiHandle. The caller
-  is responsible to free the *String.
+  Retrieves the array of all the HII Handles or the HII handle of a specific
+  package list in the HII Database.
+  This array is terminated with a NULL HII Handle.
+  This function allocates the returned array using AllocatePool().
+  The caller is responsible for freeing the array with FreePool().
 
-  If String is NULL, then ASSERT.
-  If HiiHandle could not be found in the default HII database, then ASSERT.
-  If StringId is not found in PackageList, then ASSERT.
+  @param[in]  PackageListGuid  An optional parameter that is used to request 
+                               an HII Handle that is associatd with a specific
+                               Package List GUID.  If this parameter is NULL
+                               then all the HII Handles in the HII Database
+                               are returned.  If this parameter is not NULL
+                               then at most 1 HII Handle is returned.
 
-  @param  HiiHandle              The HII handle of package list.
-  @param  StringId               The String ID.
-  @param  String                 The output string.
-
-  @retval EFI_NOT_FOUND          String is not found.
-  @retval EFI_SUCCESS            Operation is successful.
-  @retval EFI_OUT_OF_RESOURCES   There is not enought memory in the system.
-
-**/
-EFI_STATUS
-EFIAPI
-HiiLibGetStringFromHandle (
-  IN  EFI_HII_HANDLE                  HiiHandle,
-  IN  EFI_STRING_ID                   StringId,
-  OUT EFI_STRING                      *String
-  )
-;
-
-/**
-  Get the string given the StringId and String package Producer's Guid. The caller
-  is responsible to free the *String.
-
-  If PackageList with the matching ProducerGuid is not found, then ASSERT.
-  If PackageList with the matching ProducerGuid is found but no String is
-  specified by StringId is found, then ASSERT.
-
-  @param  ProducerGuid           The Guid of String package list.
-  @param  StringId               The String ID.
-  @param  String                 The output string.
-
-  @retval EFI_SUCCESS            Operation is successful.
-  @retval EFI_OUT_OF_RESOURCES   There is not enought memory in the system.
+  @retval NULL   No HII handles were found in the HII database
+  @retval NULL   The array of HII Handles could not be retrieved
+  @retval Other  A pointer to the NULL terminated array of HII Handles
 
 **/
-EFI_STATUS
+EFI_HII_HANDLE *
 EFIAPI
-HiiLibGetStringFromToken (
-  IN  EFI_GUID                        *ProducerGuid,
-  IN  EFI_STRING_ID                   StringId,
-  OUT EFI_STRING                      *String
+HiiGetHiiHandles (
+  IN CONST EFI_GUID  *PackageListGuid  OPTIONAL
   )
 ;
-
-/**
-  Determines the handles that are currently active in the database.
-  It's the caller's responsibility to free handle buffer.
-
-  If HandleBufferLength is NULL, then ASSERT.
-  If HiiHandleBuffer is NULL, then ASSERT.
-
-  @param  HandleBufferLength     On input, a pointer to the length of the handle
-                                 buffer. On output, the length of the handle buffer
-                                 that is required for the handles found.
-  @param  HiiHandleBuffer        Pointer to an array of Hii Handles returned.
-
-  @retval EFI_SUCCESS            Get an array of Hii Handles successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-HiiLibGetHiiHandles (
-  IN OUT UINTN                     *HandleBufferLength,
-  OUT    EFI_HII_HANDLE            **HiiHandleBuffer
-  )
-;
-
-/**
-  Extract Hii package list GUID for given HII handle.
-
-  If HiiHandle could not be found in the default HII database, then ASSERT.
-  If Guid is NULL, then ASSERT.
-
-  @param  Handle              Hii handle
-  @param  Guid                Package list GUID
-
-  @retval EFI_SUCCESS            Successfully extract GUID from Hii database.
-
-**/
-EFI_STATUS
-EFIAPI
-HiiLibExtractGuidFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle,
-  OUT     EFI_GUID            *Guid
-  )
-;
-
-/**
-  Find HII Handle in the default HII database associated with given Device Path.
-
-  If DevicePath is NULL, then ASSERT.
-
-  @param  DevicePath             Device Path associated with the HII package list
-                                 handle.
-
-  @retval Handle                 HII package list Handle associated with the Device
-                                        Path.
-  @retval NULL                   Hii Package list handle is not found.
-
-**/
-EFI_HII_HANDLE
-EFIAPI
-HiiLibDevicePathToHiiHandle (
-  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
-  )
-;
-
 
 /**
   Get next language from language code list (with separator ';').
@@ -313,135 +239,27 @@ HiiLibGetNextLanguage (
 ;
 
 /**
-  This function returns the list of supported languages, in the format specified
-  in UEFI specification Appendix M.
+  Retrieves a pointer to the a Null-terminated ASCII string containing the list 
+  of languages that an HII handle in the HII Database supports.  The returned 
+  string is allocated using AllocatePool().  The caller is responsible for freeing
+  the returned string using FreePool().  The format of the returned string follows
+  the language format assumed the HII Database.
+  
+  If HiiHandle is NULL, then ASSERT().
 
-  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
+  @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
 
-  @param  HiiHandle              The HII package list handle.
-
-  @retval   !NULL  The supported languages.
-  @retval   NULL    If Supported Languages can not be retrived.
+  @retval NULL   HiiHandle is not registered in the HII database
+  @retval NULL   There are not enough resources available to retrieve the suported 
+                 languages.
+  @retval NULL   The list of suported languages could not be retrieved.
+  @retval Other  A pointer to the Null-terminated ASCII string of supported languages.
 
 **/
 CHAR8 *
 EFIAPI
-HiiLibGetSupportedLanguages (
+HiiGetSupportedLanguages (
   IN EFI_HII_HANDLE           HiiHandle
-  )
-;
-
-/**
-  This function returns the list of supported 2nd languages, in the format specified
-  in UEFI specification Appendix M.
-
-  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
-  If not enough resource to complete the operation, then ASSERT.
-
-  @param  HiiHandle              The HII package list handle.
-  @param  FirstLanguage          Pointer to language name buffer.
-  
-  @return The supported languages.
-
-**/
-CHAR8 *
-EFIAPI
-HiiLibGetSupportedSecondaryLanguages (
-  IN EFI_HII_HANDLE           HiiHandle,
-  IN CONST CHAR8              *FirstLanguage
-  )
-;
-
-
-/**
-  This function returns the number of supported languages on HiiHandle.
-
-  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
-  If not enough resource to complete the operation, then ASSERT.
-
-  @param  HiiHandle              The HII package list handle.
-
-  @return The  number of supported languages.
-
-**/
-UINT16
-EFIAPI
-HiiLibGetSupportedLanguageNumber (
-  IN EFI_HII_HANDLE           HiiHandle
-  )
-;
-
-/**
-  Exports the contents of one or all package lists in the HII database into a buffer.
-
-  If Handle is not NULL and not a valid EFI_HII_HANDLE registered in the database, 
-  then ASSERT.
-  If PackageListHeader is NULL, then ASSERT.
-  If PackageListSize is NULL, then ASSERT.
-
-  @param  Handle                 The HII Handle.
-  @param  PackageListHeader      A pointer to a buffer that will contain the results of 
-                                 the export function.
-  @param  PackageListSize        On output, the length of the buffer that is required for the exported data.
-
-  @retval EFI_SUCCESS            Package exported.
-
-  @retval EFI_OUT_OF_RESOURCES   Not enought memory to complete the operations.
-
-**/
-EFI_STATUS 
-EFIAPI
-HiiLibExportPackageLists (
-  IN EFI_HII_HANDLE                    Handle,
-  OUT EFI_HII_PACKAGE_LIST_HEADER      **PackageListHeader,
-  OUT UINTN                            *PackageListSize
-  )
-;
-
-/**
-  
-  This function returns a list of the package handles of the   
-  specified type that are currently active in the HII database. The   
-  pseudo-type EFI_HII_PACKAGE_TYPE_ALL will cause all package   
-  handles to be listed.
-
-  If HandleBufferLength is NULL, then ASSERT.
-  If HandleBuffer is NULL, the ASSERT.
-  If PackageType is EFI_HII_PACKAGE_TYPE_GUID and PackageGuid is
-  NULL, then ASSERT.
-  If PackageType is not EFI_HII_PACKAGE_TYPE_GUID and PackageGuid is not
-  NULL, then ASSERT.
-  
-  
-  @param PackageType          Specifies the package type of the packages
-                              to list or EFI_HII_PACKAGE_TYPE_ALL for
-                              all packages to be listed.
-  
-  @param PackageGuid          If PackageType is
-                              EFI_HII_PACKAGE_TYPE_GUID, then this is
-                              the pointer to the GUID which must match
-                              the Guid field of
-                              EFI_HII_PACKAGE_GUID_HEADER. Otherwise, it
-                              must be NULL.
-  
-  @param HandleBufferLength   On output, the length of the handle buffer
-                              that is required for the handles found.
-
-  @param HandleBuffer         On output, an array of EFI_HII_HANDLE  instances returned.
-                              The caller is responcible to free this pointer allocated.
-
-  @retval EFI_SUCCESS           The matching handles are outputed successfully.
-                                HandleBufferLength is updated with the actual length.
-  @retval EFI_OUT_OF_RESOURCES  Not enough resource to complete the operation.
-  @retval EFI_NOT_FOUND         No matching handle could not be found in database.
-**/
-EFI_STATUS
-EFIAPI
-HiiLibListPackageLists (
-  IN        UINT8                     PackageType,
-  IN CONST  EFI_GUID                  *PackageGuid,
-  IN OUT    UINTN                     *HandleBufferLength,
-  OUT       EFI_HII_HANDLE            **Handle
   )
 ;
 

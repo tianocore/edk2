@@ -752,7 +752,7 @@ UpdateConModePage (
     ASSERT ((StrLen (ModeString)  + TempStringLen) < (sizeof (ModeString) / sizeof (ModeString[0])));
     StrCat (ModeString, RowString);
 
-    HiiLibNewString (CallbackData->BmmHiiHandle, &ModeToken[Index], ModeString);
+    ModeToken[Index] = HiiSetString (CallbackData->BmmHiiHandle, 0, ModeString, NULL);
 
     IfrOptionList[Index].StringToken  = ModeToken[Index];
     IfrOptionList[Index].Value.u16    = (UINT16) Mode;
@@ -1246,12 +1246,10 @@ UpdateSetLegacyDeviceOrderPage (
       // Create the string for oneof tag
       //
       UnicodeSPrint (String, sizeof (String), TypeStr, Index);
-      StrRef = 0;
-      HiiLibNewString (CallbackData->BmmHiiHandle, &StrRef, String);
+      StrRef = HiiSetString (CallbackData->BmmHiiHandle, 0, String, NULL);
 
       UnicodeSPrint (String, sizeof (String), TypeStrHelp, Index);
-      StrRefHelp = 0;
-      HiiLibNewString (CallbackData->BmmHiiHandle, &StrRefHelp, String);
+      StrRefHelp = HiiSetString (CallbackData->BmmHiiHandle, 0, String, NULL);
 
       CreateOneOfOpCode (
         (EFI_QUESTION_ID) (Key + Index),

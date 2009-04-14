@@ -65,7 +65,7 @@ ConvertIso639ToRfc3066 (
                          If all glyphs in the string are available, the index is the index of the terminator 
                          of the string. 
   @param GlyphBufferSize A pointer to a value. On output, if the function returns EFI_SUCCESS, 
-                         it contains the amount of memory that is required to store the string¡¯s glyph equivalent.
+                         it contains the amount of memory that is required to store the string? glyph equivalent.
 
   @retval EFI_UNSUPPORTED  The function performs nothing and return EFI_UNSUPPORTED.
 **/
@@ -148,73 +148,17 @@ UpdateString (
   )
 {
   EFI_STRING_ID                             NewStringId;
-  EFI_STATUS                                Status;
 
-
-  NewStringId = 0;
-  
-  if (*StringId == 0) {
-    //
-    // Create a new string token.
-    //
-    if (Rfc3066AsciiLanguage == NULL) {
-      //
-      // For all languages in the package list.
-      //
-      Status = HiiLibNewString (ThunkContext->UefiHiiHandle, &NewStringId, NewString);
-    } else {
-      //
-      // For specified language.
-      //
-      Status = mHiiStringProtocol->NewString (
-                                     mHiiStringProtocol,
-                                     ThunkContext->UefiHiiHandle,
-                                     &NewStringId,
-                                     Rfc3066AsciiLanguage,
-                                     NULL,
-                                     NewString,
-                                     NULL
-                                     );
-    }
-  } else {
-    //
-    // Update the existing string token.
-    //
-    if (Rfc3066AsciiLanguage == NULL) {
-      //
-      // For all languages in the package list.
-      //
-      Status = HiiLibSetString (ThunkContext->UefiHiiHandle, *StringId, NewString);
-    } else {
-      //
-      // For specified language.
-      //
-      Status = mHiiStringProtocol->SetString (
-                                   mHiiStringProtocol,
-                                   ThunkContext->UefiHiiHandle,
-                                   *StringId,
-                                   Rfc3066AsciiLanguage,
-                                   NewString,
-                                   NULL
-                                   );
-    }
-  }
-  
-  if (!EFI_ERROR (Status)) {
-    if (*StringId == 0) {
-      //
-      // When creating new string, return the newly created String Token.
-      //
-      *StringId = NewStringId;
-    }
-  } else {
+  NewStringId = HiiSetString (ThunkContext->UefiHiiHandle, *StringId, NewString, Rfc3066AsciiLanguage);
+  *StringId = NewStringId;
+  if (NewStringId == 0) {
     //
     // Only EFI_INVALID_PARAMETER is defined in HII 0.92 specification.
     //
-    *StringId = 0;
+    return EFI_INVALID_PARAMETER;
+  } else {
+    return EFI_SUCCESS;
   }
-
-  return Status;
 }
 
 /**
@@ -388,9 +332,12 @@ HiiThunkGetString (
   OUT    EFI_STRING                 StringBuffer
   )
 {
-  CHAR8                                 *Iso639AsciiLanguage;
   HII_THUNK_PRIVATE_DATA                *Private;
+  CHAR8                                 *Iso639AsciiLanguage;
   CHAR8                                 *Rfc3066AsciiLanguage;
+  CHAR8                                 *SupportedLanguages;
+  CHAR8                                 *PlatformLanguage;
+  CHAR8                                 *BestLanguage;
   EFI_HII_HANDLE                        UefiHiiHandle;
   EFI_STATUS                            Status;
 
@@ -427,7 +374,51 @@ HiiThunkGetString (
   }
 
   if (Rfc3066AsciiLanguage == NULL) {
-    Status =  HiiLibGetString (UefiHiiHandle, Token, StringBuffer, BufferLengthTemp);
+    //
+    // Get the languages that the package specified by HiiHandle supports
+    //
+    SupportedLanguages = HiiGetSupportedLanguages (UefiHiiHandle);
+    if (SupportedLanguages == NULL) {
+      goto Error2;
+    }
+
+    //
+    // Get the current platform language setting
+    //
+    PlatformLanguage = GetEfiGlobalVariable (L"PlatformLang");
+    if (PlatformLanguage == NULL) {
+      goto Error1;
+    }
+
+    //
+    // Get the best matching language from SupportedLanguages
+    //
+    BestLanguage = GetBestLanguage (
+                     SupportedLanguages, 
+                     FALSE,                // RFC 4646 mode
+                     PlatformLanguage,     // Next highest priority
+                     SupportedLanguages,   // Lowest priority 
+                     NULL
+                     );
+    if (BestLanguage == NULL) {
+      FreePool (PlatformLanguage);
+Error1:
+      FreePool (SupportedLanguages);
+Error2:
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    Status = mHiiStringProtocol->GetString (
+                                 mHiiStringProtocol,
+                                 BestLanguage,
+                                 UefiHiiHandle,
+                                 Token,
+                                 StringBuffer,
+                                 BufferLengthTemp,
+                                 NULL
+                                 );
+    FreePool (BestLanguage);
   } else {
     Status = mHiiStringProtocol->GetString (
                                  mHiiStringProtocol,

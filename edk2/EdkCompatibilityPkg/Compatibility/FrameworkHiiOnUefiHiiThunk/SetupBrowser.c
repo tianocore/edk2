@@ -40,13 +40,9 @@ GetStringById (
   IN  EFI_STRING_ID   Id
   )
 {
-  CHAR16 *String;
-
-  String = NULL;
-  HiiLibGetStringFromHandle (gStringPackHandle, Id, &String);
-
-  return String;
+  return HiiGetString (gStringPackHandle, Id, NULL);
 }
+
 /**
 
   Show progress bar with title above it. It only works in Graphics mode.
@@ -544,12 +540,14 @@ InitSetBrowserStrings (
   VOID
   )
 {
-  EFI_STATUS Status;
-  
   //
   // Initialize strings to HII database
   //
-  Status = HiiLibAddPackages (1, &gEfiHiiThunkProducerGuid, NULL, &gStringPackHandle, STRING_ARRAY_NAME);
-  ASSERT_EFI_ERROR (Status);
-
+  gStringPackHandle = HiiAddPackages (
+                        &gEfiHiiThunkProducerGuid,
+                        NULL,
+                        STRING_ARRAY_NAME,
+                        NULL
+                        );
+  ASSERT (gStringPackHandle != NULL);
 }

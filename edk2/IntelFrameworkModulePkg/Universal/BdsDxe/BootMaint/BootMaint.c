@@ -128,20 +128,22 @@ CreateMenuStringToken (
   for (Index = 0; Index < MenuOption->MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (MenuOption, Index);
 
-    HiiLibNewString (
-      HiiHandle,
-      &NewMenuEntry->DisplayStringToken,
-      NewMenuEntry->DisplayString
-      );
+    NewMenuEntry->DisplayStringToken = HiiSetString (
+                                         HiiHandle,
+                                         0,
+                                         NewMenuEntry->DisplayString,
+                                         NULL
+                                         );
 
     if (NULL == NewMenuEntry->HelpString) {
       NewMenuEntry->HelpStringToken = NewMenuEntry->DisplayStringToken;
     } else {
-      HiiLibNewString (
-        HiiHandle,
-        &NewMenuEntry->HelpStringToken,
-        NewMenuEntry->HelpString
-        );
+      NewMenuEntry->HelpStringToken = HiiSetString (
+                                        HiiHandle,
+                                        0,
+                                        NewMenuEntry->HelpString,
+                                        NULL
+                                        );
     }
   }
 
@@ -848,7 +850,6 @@ InitializeBM (
   )
 {
   EFI_LEGACY_BIOS_PROTOCOL    *LegacyBios;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
   BMM_CALLBACK_DATA           *BmmCallbackInfo;
   EFI_STATUS                  Status;
   UINT8                       *Ptr;
@@ -931,30 +932,26 @@ InitializeBM (
   //
   // Post our Boot Maint VFR binnary to the HII database.
   //
-  PackageList = HiiLibPreparePackageList (2, &mBootMaintGuid, BmBin, BdsDxeStrings);
-  ASSERT (PackageList != NULL);
-
-  Status = gHiiDatabase->NewPackageList (
-                           gHiiDatabase,
-                           PackageList,
-                           BmmCallbackInfo->BmmDriverHandle,
-                           &BmmCallbackInfo->BmmHiiHandle
-                           );
-  FreePool (PackageList);
+  BmmCallbackInfo->BmmHiiHandle = HiiAddPackages (
+                                    &mBootMaintGuid,
+                                    BmmCallbackInfo->BmmDriverHandle,
+                                    BmBin,
+                                    BdsDxeStrings,
+                                    NULL
+                                    );
+  ASSERT (BmmCallbackInfo->BmmHiiHandle != NULL);
 
   //
   // Post our File Explorer VFR binary to the HII database.
   //
-  PackageList = HiiLibPreparePackageList (2, &mFileExplorerGuid, FEBin, BdsDxeStrings);
-  ASSERT (PackageList != NULL);
-
-  Status = gHiiDatabase->NewPackageList (
-                           gHiiDatabase,
-                           PackageList,
-                           BmmCallbackInfo->FeDriverHandle,
-                           &BmmCallbackInfo->FeHiiHandle
-                           );
-  FreePool (PackageList);
+  BmmCallbackInfo->FeHiiHandle = HiiAddPackages (
+                                   &mFileExplorerGuid,
+                                   BmmCallbackInfo->FeDriverHandle,
+                                   FEBin,
+                                   BdsDxeStrings,
+                                   NULL
+                                   );
+  ASSERT (BmmCallbackInfo->FeHiiHandle != NULL);
 
   //
   // Allocate space for creation of Buffer
@@ -1057,8 +1054,8 @@ InitializeBM (
   //
   // Remove our IFR data from HII database
   //
-  gHiiDatabase->RemovePackageList (gHiiDatabase, BmmCallbackInfo->BmmHiiHandle);
-  gHiiDatabase->RemovePackageList (gHiiDatabase, BmmCallbackInfo->FeHiiHandle);
+  HiiRemovePackages (BmmCallbackInfo->BmmHiiHandle);
+  HiiRemovePackages (BmmCallbackInfo->FeHiiHandle);
 
   CleanUpStringDepository ();
 
@@ -1192,7 +1189,7 @@ GetStringTokenFromDepository (
     //
     NextListNode = AllocateZeroPool (sizeof (STRING_LIST_NODE));
     ASSERT (NextListNode != NULL);
-    HiiLibNewString (CallbackData->BmmHiiHandle, &(NextListNode->StringToken), L" ");
+    NextListNode->StringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, L" ", NULL);
     ASSERT (NextListNode->StringToken != 0);
 
     StringDepository->TotalNodeNumber++;

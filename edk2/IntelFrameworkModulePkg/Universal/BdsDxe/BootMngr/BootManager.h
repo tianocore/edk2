@@ -86,7 +86,9 @@ BootManagerCallback (
   Registers HII packages for the Boot Manger to HII Database.
   It also registers the browser call back function.
 
-  @return Status of gBS->InstallMultipleProtocolInterfaces() and gHiiDatabase->NewPackageList()
+  @retval  EFI_SUCCESS           HII packages for the Boot Manager were registered successfully.
+  @retval  EFI_OUT_OF_RESOURCES  HII packages for the Boot Manager failed to be registered.
+
 **/
 EFI_STATUS
 InitializeBootManager (

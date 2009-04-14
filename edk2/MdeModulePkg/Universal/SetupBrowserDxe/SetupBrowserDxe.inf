@@ -59,7 +59,8 @@
   DebugLib
   PrintLib
   HiiLib
-  
+  DevicePathLib
+
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES  ## GUID
   gEfiIfrFrameworkGuid                          ## CONSUMES  ## GUID

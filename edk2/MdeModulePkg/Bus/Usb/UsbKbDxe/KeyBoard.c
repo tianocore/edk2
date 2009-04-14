@@ -318,7 +318,6 @@ InstallDefaultKeyboardLayout (
   EFI_STATUS                   Status;
   EFI_HII_DATABASE_PROTOCOL    *HiiDatabase;
   EFI_HII_HANDLE               HiiHandle;
-  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
 
   //
   // Locate Hii database protocol
@@ -335,13 +334,14 @@ InstallDefaultKeyboardLayout (
   //
   // Install Keyboard Layout package to HII database
   //
-  PackageList = HiiLibPreparePackageList (1, &mUsbKeyboardLayoutPackageGuid, &mUsbKeyboardLayoutBin);
-  ASSERT (PackageList != NULL);
-
-  Status = HiiDatabase->NewPackageList (HiiDatabase, PackageList, UsbKeyboardDevice->ControllerHandle, &HiiHandle);
-  FreePool (PackageList);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  HiiHandle = HiiAddPackages (
+                &mUsbKeyboardLayoutPackageGuid,
+                UsbKeyboardDevice->ControllerHandle,
+                &mUsbKeyboardLayoutBin,
+                NULL
+                );
+  if (HiiHandle == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   //

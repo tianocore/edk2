@@ -112,8 +112,8 @@ DeviceManagerCallback (
 
   This function registers HII packages to HII database.
 
-  @retval EFI_SUCCESS This function complete successfully.
-  @return Other value if failed to register HII packages.
+  @retval  EFI_SUCCESS           HII packages for the Device Manager were registered successfully.
+  @retval  EFI_OUT_OF_RESOURCES  HII packages for the Device Manager failed to be registered.
 
 **/
 EFI_STATUS
@@ -122,7 +122,6 @@ InitializeDeviceManager (
   )
 {
   EFI_STATUS                  Status;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
 
   //
   // Install Device Path Protocol and Config Access protocol to driver handle
@@ -140,17 +139,18 @@ InitializeDeviceManager (
   //
   // Publish our HII data
   //
-  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsDxeStrings);
-  ASSERT (PackageList != NULL);
-
-  Status = gHiiDatabase->NewPackageList (
-                           gHiiDatabase,
-                           PackageList,
-                           gDeviceManagerPrivate.DriverHandle,
-                           &gDeviceManagerPrivate.HiiHandle
-                           );
-  FreePool (PackageList);
-
+  gDeviceManagerPrivate.HiiHandle = HiiAddPackages (
+                                      &mDeviceManagerGuid,
+                                      gDeviceManagerPrivate.DriverHandle,
+                                      DeviceManagerVfrBin,
+                                      BdsDxeStrings,
+                                      NULL
+                                      );
+  if (gDeviceManagerPrivate.HiiHandle == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+  } else {
+    Status = EFI_SUCCESS;
+  }
   return Status;
 }
 
@@ -174,23 +174,18 @@ CallDeviceManager (
   EFI_STATUS                  Status;
   UINTN                       Count;
   UINTN                       Index;
-  CHAR16                      *String;
-  UINTN                       StringLength;
+  EFI_STRING                  String;
   EFI_HII_UPDATE_DATA         UpdateData[MENU_ITEM_NUM];
   EFI_STRING_ID               Token;
   EFI_STRING_ID               TokenHelp;
   EFI_HII_HANDLE              *HiiHandles;
-  UINTN                       HandleBufferLength;
-  UINTN                       NumberOfHiiHandles;
   EFI_HII_HANDLE              HiiHandle;
   UINT16                      FormSetClass;
   EFI_STRING_ID               FormSetTitle;
   EFI_STRING_ID               FormSetHelp;
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
 
   HiiHandles          = NULL;
-  HandleBufferLength  = 0;
 
   Status        = EFI_SUCCESS;
   gCallbackKey  = 0;
@@ -221,37 +216,30 @@ CallDeviceManager (
   //
   // Get all the Hii handles
   //
-  Status = HiiLibGetHiiHandles (&HandleBufferLength, &HiiHandles);
-  ASSERT_EFI_ERROR (Status && (HiiHandles != NULL));
+  HiiHandles = HiiGetHiiHandles (NULL);
+  ASSERT (HiiHandles != NULL);
 
   HiiHandle = gDeviceManagerPrivate.HiiHandle;
-
-  StringLength  = 0x1000;
-  String        = AllocateZeroPool (StringLength);
-  ASSERT (String != NULL);
 
   //
   // Search for formset of each class type
   //
-  NumberOfHiiHandles = HandleBufferLength / sizeof (EFI_HII_HANDLE);
-  for (Index = 0; Index < NumberOfHiiHandles; Index++) {
+  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
     IfrLibExtractClassFromHiiHandle (HiiHandles[Index], &FormSetClass, &FormSetTitle, &FormSetHelp);
 
     if (FormSetClass == EFI_NON_DEVICE_CLASS) {
       continue;
     }
 
-    Token = 0;
-    *String = 0;
-    StringLength = 0x1000;
-    HiiLibGetString (HiiHandles[Index], FormSetTitle, String, &StringLength);
-    HiiLibNewString (HiiHandle, &Token, String);
+    String = HiiGetString (HiiHandles[Index], FormSetTitle, NULL);
+    ASSERT (String != NULL);
+    Token = HiiSetString (HiiHandle, 0, String, NULL);
+    FreePool (String);
 
-    TokenHelp = 0;
-    *String = 0;
-    StringLength = 0x1000;
-    HiiLibGetString (HiiHandles[Index], FormSetHelp, String, &StringLength);
-    HiiLibNewString (HiiHandle, &TokenHelp, String);
+    String = HiiGetString (HiiHandles[Index], FormSetHelp, NULL);
+    ASSERT (String != NULL);
+    TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
+    FreePool (String);
 
     for (Count = 0; Count < MENU_ITEM_NUM; Count++) {
       if (FormSetClass & mDeviceManagerMenuItemTable[Count].Class) {
@@ -266,7 +254,6 @@ CallDeviceManager (
       }
     }
   }
-  FreePool (String);
 
   for (Index = 0; Index < MENU_ITEM_NUM; Index++) {
     //
@@ -327,16 +314,20 @@ CallDeviceManager (
   //
   // Cleanup dynamic created strings in HII database by reinstall the packagelist
   //
-  gHiiDatabase->RemovePackageList (gHiiDatabase, HiiHandle);
-  PackageList = HiiLibPreparePackageList (2, &mDeviceManagerGuid, DeviceManagerVfrBin, BdsDxeStrings);
-  ASSERT (PackageList != NULL);
-  Status = gHiiDatabase->NewPackageList (
-                           gHiiDatabase,
-                           PackageList,
-                           gDeviceManagerPrivate.DriverHandle,
-                           &gDeviceManagerPrivate.HiiHandle
-                           );
-  FreePool (PackageList);
+  HiiRemovePackages (HiiHandle);
+
+  gDeviceManagerPrivate.HiiHandle = HiiAddPackages (
+                                      &mDeviceManagerGuid,
+                                      gDeviceManagerPrivate.DriverHandle,
+                                      DeviceManagerVfrBin,
+                                      BdsDxeStrings,
+                                      NULL
+                                      );
+  if (gDeviceManagerPrivate.HiiHandle == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+  } else {
+    Status = EFI_SUCCESS;
+  }
 
   for (Index = 0; Index < MENU_ITEM_NUM; Index++) {
     FreePool (UpdateData[Index].Data);

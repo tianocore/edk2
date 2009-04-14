@@ -46,6 +46,7 @@
 
 
 [LibraryClasses]
+  BaseLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint

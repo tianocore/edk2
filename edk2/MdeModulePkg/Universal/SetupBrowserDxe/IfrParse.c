@@ -108,17 +108,15 @@ UpdateCheckBoxStringToken (
 {
   CHAR16                  Str[MAXIMUM_VALUE_CHARACTERS];
   EFI_STRING_ID           Id;
-  EFI_STATUS              Status;
 
   ASSERT (Statement != NULL);
   ASSERT (Statement->Operand == EFI_IFR_NUMERIC_OP);
   
   UnicodeValueToString (Str, 0, Statement->VarStoreInfo.VarName, MAXIMUM_VALUE_CHARACTERS - 1);
-  
-  Status = HiiLibNewString (FormSet->HiiHandle, &Id, Str);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
+  Id = HiiSetString (FormSet->HiiHandle, 0, Str, NULL);
+  if (Id == 0) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Statement->VarStoreInfo.VarName = Id;

@@ -41,6 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PcdLib.h>
+#include <Library/DevicePathLib.h>
 
 #include "Colors.h"
 

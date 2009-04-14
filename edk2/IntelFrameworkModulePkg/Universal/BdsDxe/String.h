@@ -52,10 +52,8 @@ GetStringById (
 /**
   Initialize HII global accessor for string support
 
-  @retval  EFI_SUCCESS  String support initialize success.
-
 **/
-EFI_STATUS
+VOID
 InitializeStringSupport (
   VOID
   );

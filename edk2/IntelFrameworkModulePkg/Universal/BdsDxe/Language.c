@@ -24,7 +24,7 @@ EFI_GUID  mFontPackageGuid = {
 
 typedef struct {
   ///
-  /// This 4-bytes total array length is required by HiiLibPreparePackageList()
+  /// This 4-bytes total array length is required by HiiAddPackages()
   ///
   UINT32                 Length;
 
@@ -260,13 +260,14 @@ ExportFonts (
   )
 {
   EFI_HII_HANDLE               HiiHandle;
-  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
 
-  PackageList = HiiLibPreparePackageList (1, &mFontPackageGuid, &mFontBin);
-  ASSERT (PackageList != NULL);
-
-  gHiiDatabase->NewPackageList (gHiiDatabase, PackageList, mBdsImageHandle, &HiiHandle);
-  FreePool (PackageList);
+  HiiHandle = HiiAddPackages (
+                &mFontPackageGuid,
+                mBdsImageHandle,
+                &mFontBin,
+                NULL
+                );
+  ASSERT (HiiHandle != NULL);
 }
 
 /**

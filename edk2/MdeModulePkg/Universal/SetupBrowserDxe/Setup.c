@@ -525,7 +525,6 @@ InitializeSetup (
   )
 {
   EFI_STATUS                  Status;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
 
   //
   // Locate required Hii relative protocols
@@ -554,15 +553,13 @@ InitializeSetup (
   //
   // Publish our HII data
   //
-  PackageList = HiiLibPreparePackageList (1, &gSetupBrowserGuid, SetupBrowserStrings);
-  ASSERT (PackageList != NULL);
-  Status = mHiiDatabase->NewPackageList (
-                           mHiiDatabase,
-                           PackageList,
-                           ImageHandle,
-                           &gHiiHandle
-                           );
-  ASSERT_EFI_ERROR (Status);
+  gHiiHandle = HiiAddPackages (
+                 &gSetupBrowserGuid,
+                 ImageHandle,
+                 SetupBrowserStrings,
+                 NULL
+                 );
+  ASSERT (gHiiHandle != NULL);
 
   //
   // Initialize Driver private data
@@ -603,11 +600,9 @@ NewString (
   )
 {
   EFI_STRING_ID  StringId;
-  EFI_STATUS     Status;
 
-  StringId = 0;
-  Status = HiiLibNewString (HiiHandle, &StringId, String);
-  ASSERT_EFI_ERROR (Status);
+  StringId = HiiSetString (HiiHandle, 0, String, NULL);
+  ASSERT (StringId != 0);
 
   return StringId;
 }
@@ -631,7 +626,8 @@ DeleteString (
   CHAR16  NullChar;
 
   NullChar = CHAR_NULL;
-  return HiiLibSetString (HiiHandle, StringId, &NullChar);
+  HiiSetString (HiiHandle, StringId, &NullChar, NULL);
+  return EFI_SUCCESS;
 }
 
 
@@ -651,29 +647,11 @@ GetToken (
   IN  EFI_HII_HANDLE               HiiHandle
   )
 {
-  EFI_STATUS  Status;
-  CHAR16      *String;
-  UINTN       BufferLength;
+  EFI_STRING  String;
 
-  //
-  // Set default string size assumption at no more than 256 bytes
-  //
-  BufferLength = 0x100;
-  String = AllocateZeroPool (BufferLength);
+  String = HiiGetString (HiiHandle, Token, NULL);
   ASSERT (String != NULL);
-
-  Status = HiiLibGetString (HiiHandle, Token, String, &BufferLength);
-
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    FreePool (String);
-    String = AllocateZeroPool (BufferLength);
-    ASSERT (String != NULL);
-
-    Status = HiiLibGetString (HiiHandle, Token, String, &BufferLength);
-  }
-  ASSERT_EFI_ERROR (Status);
-
-  return String;
+  return (CHAR16 *) String;
 }
 
 

@@ -34,6 +34,7 @@ Revision History
 
 #include <Guid/MdeModuleHii.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -53,7 +54,7 @@ extern UINT8 VfrMyIfrNVDataBlockName[];
 
 //
 // This is the generated IFR binary data for each formset defined in VFR.
-// This data array is ready to be used as input of HiiLibPreparePackageList() to
+// This data array is ready to be used as input of HiiAddPackages() to
 // create a packagelist (which contains Form packages, String packages, etc).
 //
 extern UINT8  VfrBin[];
@@ -61,7 +62,7 @@ extern UINT8  InventoryBin[];
 
 //
 // This is the generated String package data for all .UNI files.
-// This data array is ready to be used as input of HiiLibPreparePackageList() to
+// This data array is ready to be used as input of HiiAddPackages() to
 // create a packagelist (which contains Form packages, String packages, etc).
 //
 extern UINT8  DriverSampleStrings[];

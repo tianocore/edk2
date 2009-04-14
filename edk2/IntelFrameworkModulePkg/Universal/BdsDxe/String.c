@@ -25,34 +25,19 @@ EFI_GUID mBdsStringPackGuid = {
 /**
   Initialize HII global accessor for string support
 
-  @retval  EFI_SUCCESS  String support initialize success.
-
 **/
-EFI_STATUS
+VOID
 InitializeStringSupport (
   VOID
   )
 {
-  EFI_STATUS                   Status;
-  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
-
-  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &gHiiDatabase);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  PackageList = HiiLibPreparePackageList (1, &mBdsStringPackGuid, &BdsDxeStrings);
-  ASSERT (PackageList != NULL);
-
-  Status = gHiiDatabase->NewPackageList (
-                           gHiiDatabase,
-                           PackageList,
-                           mBdsImageHandle,
-                           &gStringPackHandle
-                           );
-
-  FreePool (PackageList);
-  return Status;
+  gStringPackHandle = HiiAddPackages (
+                         &mBdsStringPackGuid,
+                         mBdsImageHandle,
+                         BdsDxeStrings,
+                         NULL
+                         );
+  ASSERT (gStringPackHandle != NULL);
 }
 
 /**
@@ -70,10 +55,5 @@ GetStringById (
   IN  EFI_STRING_ID   Id
   )
 {
-  CHAR16 *String;
-
-  String = NULL;
-  HiiLibGetStringFromHandle (gStringPackHandle, Id, &String);
-
-  return String;
+  return HiiGetString (gStringPackHandle, Id, NULL);
 }
