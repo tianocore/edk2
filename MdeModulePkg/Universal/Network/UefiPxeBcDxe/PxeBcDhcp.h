@@ -1,7 +1,7 @@
 /** @file
   Dhcp and Discover routines for PxeBc.
 
-Copyright (c) 2007, 2009, Intel Corporation.<BR>
+Copyright (c) 2007 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -193,7 +193,10 @@ typedef struct {
   UINT16  Type;
 } PXEBC_DHCP4_OPTION_ARCH;
 
-#define DEFAULT_CLASS_ID_DATA "PXEClient:Arch:?????:????:??????"
+#define DEFAULT_CLASS_ID_DATA "PXEClient:Arch:xxxxx:UNDI:003000"
+#define DEFAULT_UNDI_TYPE     1
+#define DEFAULT_UNDI_MAJOR    3
+#define DEFAULT_UNDI_MINOR    0
 
 typedef struct {
   UINT8 ClassIdentifier[10];

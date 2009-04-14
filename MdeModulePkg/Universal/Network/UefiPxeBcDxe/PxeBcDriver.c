@@ -174,7 +174,7 @@ PxeBcDriverBindingStart (
   }
 
   //
-  // Get the NII interface
+  // Get the NII interface if it exists.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -185,7 +185,7 @@ PxeBcDriverBindingStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
+    Private->Nii = NULL;
   }
 
   Status = NetLibCreateServiceChild (
