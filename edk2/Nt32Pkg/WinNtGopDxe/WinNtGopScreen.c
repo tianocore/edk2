@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -244,10 +244,6 @@ WinNtGopSetMode (
 
   if (ModeNumber >= This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
-  }
-
-  if (ModeNumber == This->Mode->Mode) {
-    return EFI_SUCCESS;
   }
 
   ModeData = &Private->ModeData[ModeNumber];
