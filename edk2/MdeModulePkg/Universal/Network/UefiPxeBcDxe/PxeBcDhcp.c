@@ -1019,9 +1019,15 @@ PxeBcBuildDhcpOptions (
   OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_UNDI;
   OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_UNDI);
   OptEnt.Undi             = (PXEBC_DHCP4_OPTION_UNDI *) OptList[Index]->Data;
-  OptEnt.Undi->Type       = Private->Nii->Type;
-  OptEnt.Undi->MajorVer   = Private->Nii->MajorVer;
-  OptEnt.Undi->MinorVer   = Private->Nii->MinorVer;
+  if (Private->Nii != NULL) {
+    OptEnt.Undi->Type       = Private->Nii->Type;
+    OptEnt.Undi->MajorVer   = Private->Nii->MajorVer;
+    OptEnt.Undi->MinorVer   = Private->Nii->MinorVer;
+  } else {
+    OptEnt.Undi->Type       = DEFAULT_UNDI_TYPE;
+    OptEnt.Undi->MajorVer   = DEFAULT_UNDI_MAJOR;
+    OptEnt.Undi->MinorVer   = DEFAULT_UNDI_MINOR;
+  }
 
   Index++;
   OptList[Index] = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
@@ -1045,9 +1051,16 @@ PxeBcBuildDhcpOptions (
   OptEnt.Clid             = (PXEBC_DHCP4_OPTION_CLID *) OptList[Index]->Data;
   CopyMem (OptEnt.Clid, DEFAULT_CLASS_ID_DATA, sizeof (PXEBC_DHCP4_OPTION_CLID));
   CvtNum (SYS_ARCH, OptEnt.Clid->ArchitectureType, sizeof (OptEnt.Clid->ArchitectureType));
-  CopyMem (OptEnt.Clid->InterfaceName, Private->Nii->StringId, sizeof (OptEnt.Clid->InterfaceName));
-  CvtNum (Private->Nii->MajorVer, OptEnt.Clid->UndiMajor, sizeof (OptEnt.Clid->UndiMajor));
-  CvtNum (Private->Nii->MinorVer, OptEnt.Clid->UndiMinor, sizeof (OptEnt.Clid->UndiMinor));
+
+  if (Private->Nii != NULL) {
+    // 
+    // If NII protocol exists, update DHCP option data
+    //
+    CopyMem (OptEnt.Clid->InterfaceName, Private->Nii->StringId, sizeof (OptEnt.Clid->InterfaceName));
+    CvtNum (Private->Nii->MajorVer, OptEnt.Clid->UndiMajor, sizeof (OptEnt.Clid->UndiMajor));
+    CvtNum (Private->Nii->MinorVer, OptEnt.Clid->UndiMinor, sizeof (OptEnt.Clid->UndiMinor));
+  }
+
   Index++;
 
   return Index;

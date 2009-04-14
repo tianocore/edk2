@@ -1,7 +1,7 @@
 /** @file
   PxeBc MTFTP functions.
   
-Copyright (c) 2007, 2009, Intel Corporation.<BR>
+Copyright (c) 2007 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -158,7 +158,7 @@ PxeBcTftpGetFileSize (
                     );
 
   if (EFI_ERROR (Status)) {
-    if (Packet->OpCode == EFI_MTFTP4_OPCODE_ERROR) {
+    if (Status == EFI_TFTP_ERROR) {
       Private->Mode.TftpErrorReceived = TRUE;
       Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
       AsciiStrnCpy (
