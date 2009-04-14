@@ -674,7 +674,6 @@ CreateIfrDataArray (
   FORMSET_STORAGE                  *BufferStorage;
   EFI_STATUS                        Status;
   UINTN                             Size;
-  UINTN                             StringSize;
   EFI_STRING                        String;
 
   *NvMapAllocated = FALSE;
@@ -691,17 +690,10 @@ CreateIfrDataArray (
       break;
 
     case EFI_IFR_TYPE_STRING:
-      StringSize = 0;
-      Status = HiiLibGetString (ConfigAccess->ThunkContext->UefiHiiHandle, Value->string, String, &StringSize);
-      ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-      String = AllocateZeroPool (StringSize);
+      String = HiiGetString (ConfigAccess->ThunkContext->UefiHiiHandle, Value->string, NULL);
       ASSERT (String != NULL);
 
-      Status = HiiLibGetString (ConfigAccess->ThunkContext->UefiHiiHandle, Value->string, String, &StringSize);
-      ASSERT_EFI_ERROR (Status);
-
-      Size = StringSize;
+      Size = StrSize (String);
       break;
       
     default:

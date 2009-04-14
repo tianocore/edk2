@@ -104,9 +104,8 @@ InstallProcessorDataHub (
   ASSERT (UString != NULL);
   AsciiStrToUnicodeStr (AString, UString);
 
-  Status = HiiLibNewString (gStringHandle, &Token, UString);
-
-  if (EFI_ERROR (Status)) {
+  Token = HiiSetString (gStringHandle, 0, UString, NULL);
+  if (Token == 0) {
     gBS->FreePool (UString);
     return ;
   }
@@ -232,9 +231,8 @@ InstallMiscDataHub (
   CopyMem (UString, FIRMWARE_BIOS_VERSIONE, sizeof(FIRMWARE_BIOS_VERSIONE));
   AsciiStrToUnicodeStr (AString, UString + sizeof(FIRMWARE_BIOS_VERSIONE) / sizeof(CHAR16) - 1);
 
-  Status = HiiLibNewString (gStringHandle, &Token, UString);
-
-  if (EFI_ERROR (Status)) {
+  Token = HiiSetString (gStringHandle, 0, UString, NULL);
+  if (Token == 0) {
     gBS->FreePool (UString);
     return ;
   }
@@ -281,9 +279,8 @@ InstallMiscDataHub (
   CopyMem (UString, FIRMWARE_PRODUCT_NAME, sizeof(FIRMWARE_PRODUCT_NAME));
   AsciiStrToUnicodeStr (AString, UString + sizeof(FIRMWARE_PRODUCT_NAME) / sizeof(CHAR16) - 1);
 
-  Status = HiiLibNewString (gStringHandle, &Token, UString);
-
-  if (EFI_ERROR (Status)) {
+  Token = HiiSetString (gStringHandle, 0, UString, NULL);
+  if (Token == 0) {
     gBS->FreePool (UString);
     return ;
   }
@@ -345,7 +342,13 @@ DataHubGenEntrypoint (
     return Status;
   }
   
-  HiiLibAddPackages (1, &gEfiMiscProducerGuid, NULL, &gStringHandle, DataHubGenDxeStrings);
+  gStringHandle = HiiAddPackages (
+                    &gEfiMiscProducerGuid,
+                    NULL,
+                    DataHubGenDxeStrings,
+                    NULL
+                    );
+  ASSERT (gStringHandle != NULL);
 
   InstallProcessorDataHub (Smbios);
   InstallCacheDataHub     (Smbios);

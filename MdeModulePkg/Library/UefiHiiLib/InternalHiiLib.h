@@ -48,17 +48,23 @@ extern CONST EFI_HII_DATABASE_PROTOCOL         *mHiiDatabaseProt;
 extern CONST EFI_HII_STRING_PROTOCOL           *mHiiStringProt;
 
 /**
-  This function check if the Hii Handle is a valid handle registered
-  in the HII database.
+  Extract Hii package list GUID for given HII handle.
 
-  @param HiiHandle The HII Handle.
+  If HiiHandle could not be found in the HII database, then ASSERT.
+  If Guid is NULL, then ASSERT.
 
-  @retval TRUE If it is a valid HII handle.
-  @retval FALSE If it is a invalid HII handle.
+  @param  Handle              Hii handle
+  @param  Guid                Package list GUID
+
+  @retval EFI_SUCCESS            Successfully extract GUID from Hii database.
+
 **/
-BOOLEAN
-IsHiiHandleRegistered (
-  EFI_HII_HANDLE    HiiHandle
-  );
+EFI_STATUS
+EFIAPI
+InternalHiiExtractGuidFromHiiHandle (
+  IN      EFI_HII_HANDLE      Handle,
+  OUT     EFI_GUID            *Guid
+  )
+;
 
 #endif

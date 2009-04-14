@@ -156,7 +156,7 @@ InitializeHiiDatabase (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Status = HiiLibListPackageLists (EFI_HII_PACKAGE_STRINGS, NULL, &BufferLength, &Buffer);
+  Status = ListPackageLists (EFI_HII_PACKAGE_STRINGS, NULL, &BufferLength, &Buffer);
   if (Status == EFI_SUCCESS) {
     for (Index = 0; Index < BufferLength / sizeof (EFI_HII_HANDLE); Index++) {
       ThunkContext = CreateThunkContextForUefiHiiHandle (Buffer[Index]);
@@ -403,7 +403,7 @@ HiiGetPrimaryLanguages (
     return EFI_INVALID_PARAMETER;
   }
 
-  LangCodes3066 = HiiLibGetSupportedLanguages (UefiHiiHandle);
+  LangCodes3066 = HiiGetSupportedLanguages (UefiHiiHandle);
 
   if (LangCodes3066 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -437,6 +437,61 @@ Done:
   return Status;
 }
 
+/**
+  This function returns the list of supported 2nd languages, in the format specified
+  in UEFI specification Appendix M.
+
+  If HiiHandle is not a valid Handle in the HII database, then ASSERT.
+  If not enough resource to complete the operation, then ASSERT.
+
+  @param  HiiHandle              The HII package list handle.
+  @param  FirstLanguage          Pointer to language name buffer.
+  
+  @return The supported languages.
+
+**/
+CHAR8 *
+EFIAPI
+HiiGetSupportedSecondaryLanguages (
+  IN EFI_HII_HANDLE           HiiHandle,
+  IN CONST CHAR8              *FirstLanguage
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+  CHAR8       *LanguageString;
+
+  ASSERT (HiiHandle != NULL);
+
+  //
+  // Collect current supported 2nd Languages for given HII handle
+  // First try allocate 4K buffer to store the current supported 2nd languages.
+  //
+  BufferSize = 0x1000;
+  LanguageString = AllocateZeroPool (BufferSize);
+  if (LanguageString == NULL) {
+    return NULL;
+  }
+
+  Status = mHiiStringProtocol->GetSecondaryLanguages (mHiiStringProtocol, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
+  ASSERT (Status != EFI_NOT_FOUND);
+  
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    FreePool (LanguageString);
+    LanguageString = AllocateZeroPool (BufferSize);
+    if (LanguageString == NULL) {
+      return NULL;
+    }
+
+    Status = mHiiStringProtocol->GetSecondaryLanguages (mHiiStringProtocol, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
+  }
+
+  if (EFI_ERROR (Status)) {
+    LanguageString = NULL;
+  }
+
+  return LanguageString;
+}
 
 /**
   Allows a program to determine which secondary languages are supported on a given handle for a given primary language
@@ -499,7 +554,7 @@ HiiGetSecondaryLanguages (
   PrimaryLang3066 = ConvertIso639LanguageToRfc3066Language (PrimaryLang639);
   ASSERT_EFI_ERROR (PrimaryLang3066 != NULL);
 
-  SecLangCodes3066 = HiiLibGetSupportedSecondaryLanguages (UefiHiiHandle, PrimaryLang3066);
+  SecLangCodes3066 = HiiGetSupportedSecondaryLanguages (UefiHiiHandle, PrimaryLang3066);
 
   if (SecLangCodes3066 == NULL) {
     Status =  EFI_INVALID_PARAMETER;

@@ -170,21 +170,21 @@ ValidatePassword (
   //
   // Get user input password
   //
-  BufferSize = 21 * sizeof (CHAR16);
-  Password = AllocateZeroPool (BufferSize);
-  ASSERT (Password != NULL);
-
-  Status = HiiLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
-  if (EFI_ERROR (Status)) {
+  Password = HiiGetString (PrivateData->HiiHandle[0], StringId, NULL);
+  if (Password == NULL) {
+    return EFI_NOT_READY;
+  }
+  if (StrLen (Password) > 20) {
     FreePool (Password);
-    return Status;
+    return EFI_NOT_READY;
   }
 
   //
   // Validate old password
   //
-  EncodedPassword = AllocateCopyPool (21 * sizeof (CHAR16), Password);
+  EncodedPassword = AllocateZeroPool (21 * sizeof (CHAR16));
   ASSERT (EncodedPassword != NULL);
+  StrnCpy (EncodedPassword, Password, 21);
   EncodePassword (EncodedPassword, 20 * sizeof (CHAR16));
   if (CompareMem (EncodedPassword, PrivateData->Configuration.WhatIsThePassword2, 20 * sizeof (CHAR16)) != 0) {
     //
@@ -219,6 +219,7 @@ SetPassword (
 {
   EFI_STATUS                      Status;
   CHAR16                          *Password;
+  CHAR16                          *TempPassword;
   UINTN                           PasswordSize;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   UINTN                           BufferSize;
@@ -242,13 +243,19 @@ SetPassword (
   // Get user input password
   //
   Password = &PrivateData->Configuration.WhatIsThePassword2[0];
-  PasswordSize = sizeof (PrivateData->Configuration.WhatIsThePassword2);
-  
+  PasswordSize = sizeof (PrivateData->Configuration.WhatIsThePassword2); 
   ZeroMem (Password, PasswordSize);
-  Status = HiiLibGetString (PrivateData->HiiHandle[0], StringId, Password, &BufferSize);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  
+  TempPassword = HiiGetString (PrivateData->HiiHandle[0], StringId, NULL);
+  if (TempPassword == NULL) {
+    return EFI_NOT_READY;
   }
+  if (StrLen (TempPassword) > PasswordSize / sizeof (CHAR16)) {
+    FreePool (TempPassword);
+    return EFI_NOT_READY;
+  }
+  StrnCpy (Password, TempPassword, PasswordSize / sizeof (CHAR16));
+  FreePool (TempPassword);
 
   //
   // Retrive uncommitted data from Browser
@@ -786,7 +793,6 @@ DriverSampleInit (
 {
   EFI_STATUS                      Status;
   EFI_STATUS                      SavedStatus;
-  EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
   EFI_HII_HANDLE                  HiiHandle[2];
   EFI_SCREEN_DESCRIPTOR           Screen;
   EFI_HII_DATABASE_PROTOCOL       *HiiDatabase;
@@ -878,26 +884,17 @@ DriverSampleInit (
   //
   // Publish our HII data
   //
-  PackageList = HiiLibPreparePackageList (
-                  2,
-                  &mFormSetGuid,
-                  DriverSampleStrings,
-                  VfrBin
-                  );
-  if (PackageList == NULL) {
+  HiiHandle[0] = HiiAddPackages (
+                   &mFormSetGuid,
+                   DriverHandle[0],
+                   DriverSampleStrings,
+                   VfrBin,
+                   NULL
+                   );
+  if (HiiHandle[0] == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = HiiDatabase->NewPackageList (
-                          HiiDatabase,
-                          PackageList,
-                          DriverHandle[0],
-                          &HiiHandle[0]
-                          );
-  FreePool (PackageList);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
   PrivateData->HiiHandle[0] = HiiHandle[0];
 
   //
@@ -913,26 +910,17 @@ DriverSampleInit (
 
   PrivateData->DriverHandle[1] = DriverHandle[1];
 
-  PackageList = HiiLibPreparePackageList (
-                  2,
-                  &mInventoryGuid,
-                  DriverSampleStrings,
-                  InventoryBin
-                  );
-  if (PackageList == NULL) {
+  HiiHandle[1] = HiiAddPackages (
+                   &mInventoryGuid,
+                   DriverHandle[1],
+                   DriverSampleStrings,
+                   InventoryBin,
+                   NULL
+                   );
+  if (HiiHandle[1] == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = HiiDatabase->NewPackageList (
-                          HiiDatabase,
-                          PackageList,
-                          DriverHandle[1],
-                          &HiiHandle[1]
-                          );
-  FreePool (PackageList);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
   PrivateData->HiiHandle[1] = HiiHandle[1];
 
   //
@@ -941,9 +929,8 @@ DriverSampleInit (
   //
   NewString = L"700 Mhz";
 
-  Status = HiiLibSetString (HiiHandle[0], STRING_TOKEN (STR_CPU_STRING2), NewString);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_CPU_STRING2), NewString, NULL) == 0) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   //

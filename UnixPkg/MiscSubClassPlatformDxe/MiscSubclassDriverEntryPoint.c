@@ -181,12 +181,17 @@ Returns:
   //
   // Add our default strings to the HII database. They will be modified later.
   //
-  HiiLibAddPackages (1, &gEfiMiscSubClassGuid, NULL, &HiiHandle, MiscSubclassStrings);
-
-  if (EFI_ERROR (EfiStatus)) {
+  HiiHandle = HiiAddPackages (
+                &gEfiMiscSubClassGuid,
+                NULL,
+                MiscSubclassStrings,
+                NULL
+                );
+  if (HiiHandle == NULL) {
     DEBUG ((EFI_D_ERROR, "Could not log default strings to Hii.  %r\n", EfiStatus));
-    return EfiStatus;
+    return EFI_OUT_OF_RESOURCES;
   }
+
   //
   //
   //

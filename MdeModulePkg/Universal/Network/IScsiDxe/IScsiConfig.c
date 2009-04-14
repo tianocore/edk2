@@ -715,7 +715,7 @@ IScsiFormCallback (
 
       UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
       DeviceFormTitleToken = (EFI_STRING_ID) STR_ISCSI_DEVICE_FORM_TITLE;
-      HiiLibSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString);
+      HiiSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString, NULL);
 
       IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
 
@@ -840,13 +840,13 @@ IScsiConfigUpdateForm (
       // Compose the Port string and create a new EFI_STRING_ID.
       //
       UnicodeSPrint (PortString, 128, L"Port %s", ConfigFormEntry->MacString);
-      HiiLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleToken, PortString);
+      ConfigFormEntry->PortTitleToken = HiiSetString (mCallbackInfo->RegisteredHandle, 0, PortString, NULL);
 
       //
       // Compose the help string of this port and create a new EFI_STRING_ID.
       //
       UnicodeSPrint (PortString, 128, L"Set the iSCSI parameters on port %s", ConfigFormEntry->MacString);
-      HiiLibNewString (mCallbackInfo->RegisteredHandle, &ConfigFormEntry->PortTitleHelpToken, PortString);
+      ConfigFormEntry->PortTitleHelpToken = HiiSetString (mCallbackInfo->RegisteredHandle, 0, PortString, NULL);
 
       InsertTailList (&mIScsiConfigFormList, &ConfigFormEntry->Link);
       mNumberOfIScsiDevices++;
@@ -931,7 +931,6 @@ IScsiConfigFormInit (
 {
   EFI_STATUS                  Status;
   EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
   ISCSI_FORM_CALLBACK_INFO    *CallbackInfo;
 
   Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **)&HiiDatabase);
@@ -974,19 +973,16 @@ IScsiConfigFormInit (
   //
   // Publish our HII data
   //
-  PackageList = HiiLibPreparePackageList (2, &mVendorGuid, IScsiDxeStrings, IScsiConfigDxeBin);
-  ASSERT (PackageList != NULL);
-  
-  Status = HiiDatabase->NewPackageList (
-                           HiiDatabase,
-                           PackageList,
-                           CallbackInfo->DriverHandle,
-                           &CallbackInfo->RegisteredHandle
-                           );
-  FreePool (PackageList);
-  if (EFI_ERROR (Status)) {
+  CallbackInfo->RegisteredHandle = HiiAddPackages (
+                                     &mVendorGuid,
+                                     CallbackInfo->DriverHandle,
+                                     IScsiDxeStrings,
+                                     IScsiConfigDxeBin,
+                                     NULL
+                                     );
+  if (CallbackInfo->RegisteredHandle == NULL) {
     FreePool(CallbackInfo);
-    return Status;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   mCallbackInfo = CallbackInfo;

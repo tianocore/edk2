@@ -401,7 +401,7 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
 
     if (ThunkContext != IfrThunkContext) {
       if (CompareGuid (&IfrThunkContext->TagGuid, &ThunkContext->TagGuid) && (ThunkContext->IfrPackageCount == 0)) {
-        Status = HiiLibExportPackageLists (ThunkContext->UefiHiiHandle, &StringPackageListHeader, &Size);
+        Status = ExportPackageLists (ThunkContext->UefiHiiHandle, &StringPackageListHeader, &Size);
         ASSERT_EFI_ERROR (Status);
 
         IfrThunkContext->StringPackageCount = GetPackageCountByType (StringPackageListHeader, EFI_HII_PACKAGE_STRINGS);
@@ -861,7 +861,7 @@ RemovePackNotify (
   //
   if (ThunkContext != NULL) {
     if (!ThunkContext->ByFrameworkHiiNewPack) {
-      Status = HiiLibExportPackageLists (Handle, &HiiPackageList, &BufferSize);
+      Status = ExportPackageLists (Handle, &HiiPackageList, &BufferSize);
       ASSERT_EFI_ERROR (Status);
 
       if (GetPackageCountByType (HiiPackageList, EFI_HII_PACKAGE_STRINGS) == 1) {

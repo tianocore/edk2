@@ -58,155 +58,81 @@ HiiLibGetNextLanguage (
 
 
 /**
-  This function returns the list of supported languages, in the format specified
-  in UEFI specification Appendix M.
+  Retrieves a pointer to the a Null-terminated ASCII string containing the list 
+  of languages that an HII handle in the HII Database supports.  The returned 
+  string is allocated using AllocatePool().  The caller is responsible for freeing
+  the returned string using FreePool().  The format of the returned string follows
+  the language format assumed the HII Database.
+  
+  If HiiHandle is NULL, then ASSERT().
 
-  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
+  @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
 
-  @param  HiiHandle              The HII package list handle.
-
-  @retval   !NULL  The supported languages.
-  @retval   NULL    If Supported Languages can not be retrived.
+  @retval NULL   HiiHandle is not registered in the HII database
+  @retval NULL   There are not enough resources available to retrieve the suported 
+                 languages.
+  @retval NULL   The list of suported languages could not be retrieved.
+  @retval Other  A pointer to the Null-terminated ASCII string of supported languages.
 
 **/
 CHAR8 *
 EFIAPI
-HiiLibGetSupportedLanguages (
+HiiGetSupportedLanguages (
   IN EFI_HII_HANDLE           HiiHandle
   )
 {
   EFI_STATUS  Status;
-  UINTN       BufferSize;
-  CHAR8       *LanguageString;
-
-  ASSERT (IsHiiHandleRegistered (HiiHandle));
-  //
-  // Collect current supported Languages for given HII handle
-  // First try allocate 4K buffer to store the current supported languages.
-  //
-  BufferSize = 0x1000;
-  LanguageString = AllocateZeroPool (BufferSize);
-  if (LanguageString == NULL) {
-    return NULL;
-  }
-
-  Status = gHiiString->GetLanguages (gHiiString, HiiHandle, LanguageString, &BufferSize);
-  
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    FreePool (LanguageString);
-    LanguageString = AllocateZeroPool (BufferSize);
-    if (LanguageString == NULL) {
-      return NULL;
-    }
-
-    Status = gHiiString->GetLanguages (gHiiString, HiiHandle, LanguageString, &BufferSize);
-  }
-
-  if (EFI_ERROR (Status)) {
-    LanguageString = NULL;
-  }
-
-  return LanguageString;
-}
-
-
-/**
-  This function returns the number of supported languages on HiiHandle.
-
-  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
-  If not enough resource to complete the operation, then ASSERT.
-
-  @param  HiiHandle              The HII package list handle.
-
-  @return The  number of supported languages.
-
-**/
-UINT16
-EFIAPI
-HiiLibGetSupportedLanguageNumber (
-  IN EFI_HII_HANDLE           HiiHandle
-  )
-{
-  CHAR8   *Languages;
-  CHAR8   *LanguageString;
-  UINT16  LangNumber;
-  CHAR8   *Lang;
-
-  Languages = HiiLibGetSupportedLanguages (HiiHandle);
-  if (Languages == NULL) {
-    return 0;
-  }
-
-  LangNumber = 0;
-  Lang = AllocatePool (AsciiStrSize (Languages));
-  if (Lang != NULL) {
-    LanguageString = Languages;
-    while (*LanguageString != 0) {
-      HiiLibGetNextLanguage (&LanguageString, Lang);
-      LangNumber++;
-    }
-
-    FreePool (Lang);
-  }
-  FreePool (Languages);
-
-  return LangNumber;
-}
-
-/**
-  This function returns the list of supported 2nd languages, in the format specified
-  in UEFI specification Appendix M.
-
-  If HiiHandle is not a valid Handle in the default HII database, then ASSERT.
-  If not enough resource to complete the operation, then ASSERT.
-
-  @param  HiiHandle              The HII package list handle.
-  @param  FirstLanguage          Pointer to language name buffer.
-  
-  @return The supported languages.
-
-**/
-CHAR8 *
-EFIAPI
-HiiLibGetSupportedSecondaryLanguages (
-  IN EFI_HII_HANDLE           HiiHandle,
-  IN CONST CHAR8              *FirstLanguage
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       BufferSize;
-  CHAR8       *LanguageString;
+  UINTN       LanguageSize;
+  CHAR8       TempSupportedLanguages;
+  CHAR8       *SupportedLanguages;
 
   ASSERT (HiiHandle != NULL);
-  ASSERT (IsHiiHandleRegistered (HiiHandle));
+
   //
-  // Collect current supported 2nd Languages for given HII handle
-  // First try allocate 4K buffer to store the current supported 2nd languages.
+  // Retrieve the size required for the supported languages buffer.
   //
-  BufferSize = 0x1000;
-  LanguageString = AllocateZeroPool (BufferSize);
-  if (LanguageString == NULL) {
+  LanguageSize = 0;
+  Status = gHiiString->GetLanguages (gHiiString, HiiHandle, &TempSupportedLanguages, &LanguageSize);
+
+  //
+  // If GetLanguages() returns EFI_SUCCESS for a zero size, 
+  // then there are no supported languages registered for HiiHandle.  If GetLanguages() 
+  // returns an error other than EFI_BUFFER_TOO_SMALL, then HiiHandle is not present
+  // in the HII Database
+  //
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    //
+    // Return NULL if the size can not be retrieved, or if HiiHandle is not in the HII Database
+    //
     return NULL;
   }
 
-  Status = gHiiString->GetSecondaryLanguages (gHiiString, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
-  
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    FreePool (LanguageString);
-    LanguageString = AllocateZeroPool (BufferSize);
-    if (LanguageString == NULL) {
-      return NULL;
-    }
-
-    Status = gHiiString->GetSecondaryLanguages (gHiiString, HiiHandle, FirstLanguage, LanguageString, &BufferSize);
+  //
+  // Allocate the supported languages buffer.
+  //
+  SupportedLanguages = AllocateZeroPool (LanguageSize);
+  if (SupportedLanguages == NULL) {
+    //
+    // Return NULL if allocation fails.
+    //
+    return NULL;
   }
 
+  //
+  // Retrieve the supported languages string
+  //
+  Status = gHiiString->GetLanguages (gHiiString, HiiHandle, SupportedLanguages, &LanguageSize);
   if (EFI_ERROR (Status)) {
-    LanguageString = NULL;
+    //
+    // Free the buffer and return NULL if the supported languages can not be retrieved.
+    //
+    FreePool (SupportedLanguages);
+    return NULL;
   }
 
-  return LanguageString;
+  //
+  // Return the Null-terminated ASCII string of supported languages
+  //
+  return SupportedLanguages;
 }
-
-
 

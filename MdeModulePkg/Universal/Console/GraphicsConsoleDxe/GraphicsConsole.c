@@ -1857,7 +1857,6 @@ RegisterFontPackage (
   EFI_STATUS                           Status;
   EFI_HII_SIMPLE_FONT_PACKAGE_HDR      *SimplifiedFont;
   UINT32                               PackageLength;
-  EFI_HII_PACKAGE_LIST_HEADER          *PackageList;
   UINT8                                *Package;
   UINT8                                *Location;
   EFI_HII_DATABASE_PROTOCOL            *HiiDatabase;
@@ -1873,7 +1872,7 @@ RegisterFontPackage (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Add 4 bytes to the header for entire length for HiiLibPreparePackageList use only.
+  // Add 4 bytes to the header for entire length for HiiAddPackages use only.
   //
   //    +--------------------------------+ <-- Package
   //    |                                |
@@ -1905,10 +1904,13 @@ RegisterFontPackage (
   //
   // Add this simplified font package to a package list then install it.
   //
-  PackageList = HiiLibPreparePackageList (1, &mFontPackageListGuid, Package);
-  Status = HiiDatabase->NewPackageList (HiiDatabase, PackageList, NULL, &mHiiHandle);
-  ASSERT_EFI_ERROR (Status);
-  FreePool (PackageList);
+  mHiiHandle = HiiAddPackages (
+                 &mFontPackageListGuid,
+                 NULL,
+                 Package,
+                 NULL
+                 );
+  ASSERT (mHiiHandle != NULL);
   FreePool (Package);
 }
 

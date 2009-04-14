@@ -409,17 +409,19 @@ UpdateDeviceSelectPage (
   // then the 'first refresh' string will be replaced by the 'refresh' string, and the two strings content are same after the replacement
   //
   NewStringToken = STRING_TOKEN (STR_FIRST_REFRESH);
-  HiiLibGetStringFromHandle (Private->RegisteredHandle, STRING_TOKEN (STR_REFRESH), &NewString);
+  NewString = HiiGetString (Private->RegisteredHandle, STRING_TOKEN (STR_REFRESH), NULL);
   ASSERT (NewString != NULL);
-  Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, NewString);
-  ASSERT_EFI_ERROR (Status);
+  if (HiiSetString (Private->RegisteredHandle, NewStringToken, NewString, NULL) == 0) {
+    ASSERT (FALSE);
+  }
   FreePool (NewString);
 
   NewStringToken = STRING_TOKEN (STR_FIRST_REFRESH_HELP);
-  HiiLibGetStringFromHandle (Private->RegisteredHandle, STRING_TOKEN (STR_REFRESH_HELP), &NewString);
+  NewString = HiiGetString (Private->RegisteredHandle, STRING_TOKEN (STR_REFRESH_HELP), NULL);
   ASSERT (NewString != NULL);
-  Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, NewString);
-  ASSERT_EFI_ERROR (Status);
+  if (HiiSetString (Private->RegisteredHandle, NewStringToken, NewString, NULL) == 0) {
+    ASSERT (FALSE);
+  }
   FreePool (NewString);
 
   //
@@ -504,13 +506,8 @@ UpdateDeviceSelectPage (
     }
     StrCat (NewString, ControllerName);
 
-    NewStringToken = mControllerToken[Index];
-    if (NewStringToken == 0) {
-      Status = HiiLibNewString (Private->RegisteredHandle, &NewStringToken, NewString);
-    } else {
-      Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, NewString);
-    }
-    ASSERT_EFI_ERROR (Status);
+    NewStringToken = HiiSetString (Private->RegisteredHandle, mControllerToken[Index], NewString, NULL);
+    ASSERT (NewStringToken != 0);
     FreePool (NewString);
     //
     // Save the device path string toke for next access use
@@ -799,7 +796,7 @@ UpdateBindingDriverSelectPage (
       //
       // give a default name
       //
-      HiiLibGetStringFromHandle (Private->RegisteredHandle, STRING_TOKEN (STR_DRIVER_DEFAULT_NAME), &DriverName);
+      DriverName = HiiGetString (Private->RegisteredHandle, STRING_TOKEN (STR_DRIVER_DEFAULT_NAME), NULL);
       ASSERT (DriverName != NULL);
       FreeDriverName = TRUE;  // the DriverName string need to free pool
     }
@@ -821,14 +818,9 @@ UpdateBindingDriverSelectPage (
       mLastSavedDriverImageNum++;
     }
     StrCat (NewString, DriverName);
-    NewStringToken = mDriverImageToken[Index];
-    if (NewStringToken == 0) {
-      Status = HiiLibNewString (Private->RegisteredHandle, &NewStringToken, NewString);
-    } else {
-      Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, NewString);
-    }
+    NewStringToken = HiiSetString (Private->RegisteredHandle, mDriverImageToken[Index], NewString, NULL);
+    ASSERT (NewStringToken != 0);
     mDriverImageToken[Index] = NewStringToken;
-    ASSERT_EFI_ERROR (Status);
     FreePool (NewString);
     if (FreeDriverName) {
       FreePool (DriverName);
@@ -842,14 +834,9 @@ UpdateBindingDriverSelectPage (
     NewString = AllocateZeroPool (StrSize (DriverName));
     ASSERT (NewString != NULL); 
     StrCat (NewString, DriverName);
-    NewStringHelpToken = mDriverImageFilePathToken[Index];
-    if (NewStringHelpToken == 0) {
-      Status = HiiLibNewString (Private->RegisteredHandle, &NewStringHelpToken, NewString);
-    } else {
-      Status = HiiLibSetString (Private->RegisteredHandle, NewStringHelpToken, NewString);
-    }
+    NewStringHelpToken = HiiSetString (Private->RegisteredHandle, mDriverImageFilePathToken[Index], NewString, NULL);
+    ASSERT (NewStringHelpToken != 0);
     mDriverImageFilePathToken[Index] = NewStringHelpToken;
-    ASSERT_EFI_ERROR (Status);
     FreePool (NewString);
     FreePool (DriverName);
 
@@ -1304,8 +1291,9 @@ PlatOverMngrCallback (
     // Update page title string
     //
     NewStringToken = STRING_TOKEN (STR_TITLE);
-    Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, L"First, Select the controller by device path");
-    ASSERT_EFI_ERROR (Status);
+    if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"First, Select the controller by device path", NULL) == 0) {
+      ASSERT (FALSE);
+    }
   }
 
   if (((KeyValue >= KEY_VALUE_DEVICE_OFFSET) && (KeyValue < KEY_VALUE_DEVICE_MAX)) || (KeyValue == KEY_VALUE_ORDER_GOTO_PREVIOUS)) {
@@ -1317,8 +1305,9 @@ PlatOverMngrCallback (
     // Update page title string
     //
     NewStringToken = STRING_TOKEN (STR_TITLE);
-    Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, L"Second, Select drivers for the previous selected controller");
-    ASSERT_EFI_ERROR (Status);
+    if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"Second, Select drivers for the previous selected controller", NULL) == 0) {
+      ASSERT (FALSE);
+    }
   }
 
   if (KeyValue == KEY_VALUE_DRIVER_GOTO_ORDER) {
@@ -1327,8 +1316,9 @@ PlatOverMngrCallback (
     // Update page title string
     //
     NewStringToken = STRING_TOKEN (STR_TITLE);
-    Status = HiiLibSetString (Private->RegisteredHandle, NewStringToken, L"Finally, Set the priority order for the drivers and save them");
-    ASSERT_EFI_ERROR (Status);
+    if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"Finally, Set the priority order for the drivers and save them", NULL) == 0) {
+      ASSERT (FALSE);
+    }
   }
 
   if (KeyValue == KEY_VALUE_ORDER_SAVE_AND_EXIT) {
@@ -1383,22 +1373,8 @@ PlatOverMngrInit (
   )
 {
   EFI_STATUS                  Status;
-  EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
   EFI_FORM_BROWSER2_PROTOCOL  *FormBrowser2;
   
-  //
-  // There should only be one HII protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiHiiDatabaseProtocolGuid,
-                  NULL,
-                  (VOID **) &HiiDatabase
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   //
   // There should only be one Form Configuration protocol
   //
@@ -1439,23 +1415,15 @@ PlatOverMngrInit (
   //
   // Publish our HII data
   //
-  PackageList = HiiLibPreparePackageList (
-                  2,
-                  &mPlatformOverridesManagerGuid,
-                  VfrBin,
-                  PlatOverMngrStrings
-                  );
-  ASSERT (PackageList != NULL);
-
-  Status = HiiDatabase->NewPackageList (
-                           HiiDatabase,
-                           PackageList,
-                           mCallbackInfo->DriverHandle,
-                           &mCallbackInfo->RegisteredHandle
-                           );
-  FreePool (PackageList);
-
-  if (EFI_ERROR (Status)) {
+  mCallbackInfo->RegisteredHandle = HiiAddPackages (
+                                     &mPlatformOverridesManagerGuid,
+                                     mCallbackInfo->DriverHandle,
+                                     VfrBin,
+                                     PlatOverMngrStrings,
+                                     NULL
+                                     );
+  if (mCallbackInfo->RegisteredHandle == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Finish;
   }
 
@@ -1494,11 +1462,8 @@ PlatOverMngrInit (
                            NULL
                            );
 
-  HiiDatabase->RemovePackageList (HiiDatabase, mCallbackInfo->RegisteredHandle);
-
-  if (EFI_ERROR (Status)) {
-    goto Finish;
-  }
+  HiiRemovePackages (mCallbackInfo->RegisteredHandle);
+  Status = EFI_SUCCESS;
 
 Finish:
   if (mCallbackInfo->DriverHandle != NULL) {

@@ -21,6 +21,220 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 CONST EFI_GUID  gZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 CONST CHAR16 FrameworkReservedVarstoreName[] = FRAMEWORK_RESERVED_VARSTORE_NAME;
 
+/**
+  
+  This function returns a list of the package handles of the   
+  specified type that are currently active in the HII database. The   
+  pseudo-type EFI_HII_PACKAGE_TYPE_ALL will cause all package   
+  handles to be listed.
+
+  If HandleBufferLength is NULL, then ASSERT.
+  If HandleBuffer is NULL, the ASSERT.
+  If PackageType is EFI_HII_PACKAGE_TYPE_GUID and PackageGuid is
+  NULL, then ASSERT.
+  If PackageType is not EFI_HII_PACKAGE_TYPE_GUID and PackageGuid is not
+  NULL, then ASSERT.
+  
+  
+  @param PackageType          Specifies the package type of the packages
+                              to list or EFI_HII_PACKAGE_TYPE_ALL for
+                              all packages to be listed.
+  
+  @param PackageGuid          If PackageType is
+                              EFI_HII_PACKAGE_TYPE_GUID, then this is
+                              the pointer to the GUID which must match
+                              the Guid field of
+                              EFI_HII_PACKAGE_GUID_HEADER. Otherwise, it
+                              must be NULL.
+  
+  @param HandleBufferLength   On output, the length of the handle buffer
+                              that is required for the handles found.
+
+  @param HandleBuffer         On output, an array of EFI_HII_HANDLE  instances returned.
+                              The caller is responcible to free this pointer allocated.
+
+  @retval EFI_SUCCESS           The matching handles are outputed successfully.
+                                HandleBufferLength is updated with the actual length.
+  @retval EFI_OUT_OF_RESOURCES  Not enough resource to complete the operation.
+  @retval EFI_NOT_FOUND         No matching handle could not be found in database.
+**/
+EFI_STATUS
+EFIAPI
+ListPackageLists (
+  IN        UINT8                     PackageType,
+  IN CONST  EFI_GUID                  *PackageGuid,
+  IN OUT    UINTN                     *HandleBufferLength,
+  OUT       EFI_HII_HANDLE            **HandleBuffer
+  )
+{
+  EFI_STATUS          Status;
+  
+  ASSERT (HandleBufferLength != NULL);
+  ASSERT (HandleBuffer != NULL);
+  
+  *HandleBufferLength = 0;
+  *HandleBuffer       = NULL;
+
+  if (PackageType == EFI_HII_PACKAGE_TYPE_GUID) {
+    ASSERT (PackageGuid != NULL);
+  } else {
+    ASSERT (PackageGuid == NULL);
+  }
+
+  Status = mHiiDatabase->ListPackageLists (
+                           mHiiDatabase,
+                           PackageType,
+                           PackageGuid,
+                           HandleBufferLength,
+                           *HandleBuffer
+                           );
+  if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+    //
+    // No packages is registered to UEFI HII Database, just return.
+    // 
+    //
+    return Status;
+  }
+
+  *HandleBuffer = AllocateZeroPool (*HandleBufferLength);
+  
+  if (*HandleBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  return mHiiDatabase->ListPackageLists (
+                         mHiiDatabase,
+                         PackageType,
+                         PackageGuid,
+                         HandleBufferLength,
+                         *HandleBuffer
+                         );
+  
+}
+
+/**
+  Exports the contents of one or all package lists in the HII database into a buffer.
+
+  If Handle is not NULL and not a valid EFI_HII_HANDLE registered in the database, 
+  then ASSERT.
+  If PackageListHeader is NULL, then ASSERT.
+  If PackageListSize is NULL, then ASSERT.
+
+  @param  Handle                 The HII Handle.
+  @param  PackageListHeader      A pointer to a buffer that will contain the results of 
+                                 the export function.
+  @param  PackageListSize        On output, the length of the buffer that is required for the exported data.
+
+  @retval EFI_SUCCESS            Package exported.
+
+  @retval EFI_OUT_OF_RESOURCES   Not enought memory to complete the operations.
+
+**/
+EFI_STATUS 
+EFIAPI
+ExportPackageLists (
+  IN EFI_HII_HANDLE                    Handle,
+  OUT EFI_HII_PACKAGE_LIST_HEADER      **PackageListHeader,
+  OUT UINTN                            *PackageListSize
+  )
+{
+  EFI_STATUS                       Status;
+  UINTN                            Size;
+  EFI_HII_PACKAGE_LIST_HEADER      *PackageListHdr;
+
+  ASSERT (PackageListSize != NULL);
+  ASSERT (PackageListHeader != NULL);
+
+  Size = 0;
+  PackageListHdr = NULL;
+  Status = mHiiDatabase->ExportPackageLists (
+                           mHiiDatabase,
+                           Handle,
+                           &Size,
+                           PackageListHdr
+                           );
+  ASSERT_EFI_ERROR (Status != EFI_BUFFER_TOO_SMALL);
+  
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    PackageListHdr = AllocateZeroPool (Size);
+    
+    if (PackageListHeader == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    } else {
+      Status = mHiiDatabase->ExportPackageLists (
+                               mHiiDatabase,
+                               Handle,
+                               &Size,
+                               PackageListHdr
+                               );
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
+    *PackageListHeader = PackageListHdr;
+    *PackageListSize   = Size;
+  } else {
+    FreePool (PackageListHdr);
+  }
+
+  return Status;
+}
+
+/**
+  Extract Hii package list GUID for given HII handle.
+
+  If HiiHandle could not be found in the HII database, then ASSERT.
+  If Guid is NULL, then ASSERT.
+
+  @param  Handle              Hii handle
+  @param  Guid                Package list GUID
+
+  @retval EFI_SUCCESS            Successfully extract GUID from Hii database.
+
+**/
+EFI_STATUS
+EFIAPI
+ExtractGuidFromHiiHandle (
+  IN      EFI_HII_HANDLE      Handle,
+  OUT     EFI_GUID            *Guid
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        BufferSize;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+
+  ASSERT (Guid != NULL);
+  ASSERT (Handle != NULL);
+
+  //
+  // Get HII PackageList
+  //
+  BufferSize = 0;
+  HiiPackageList = NULL;
+
+  Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  ASSERT (Status != EFI_NOT_FOUND);
+  
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    HiiPackageList = AllocatePool (BufferSize);
+    ASSERT (HiiPackageList != NULL);
+
+    Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  }
+  if (EFI_ERROR (Status)) {
+    FreePool (HiiPackageList);
+    return Status;
+  }
+
+  //
+  // Extract GUID
+  //
+  CopyGuid (Guid, &HiiPackageList->PackageListGuid);
+
+  FreePool (HiiPackageList);
+
+  return EFI_SUCCESS;
+}
 
 /**
   Find the corressponding UEFI HII Handle from a Framework HII Handle given.
@@ -202,7 +416,7 @@ CreateThunkContextForUefiHiiHandle (
   
   ThunkContext->UefiHiiHandle = UefiHiiHandle;
   
-  Status = HiiLibExtractGuidFromHiiHandle (UefiHiiHandle, &PackageGuid);
+  Status = ExtractGuidFromHiiHandle (UefiHiiHandle, &PackageGuid);
   ASSERT_EFI_ERROR (Status);
   
   CopyGuid(&ThunkContext->TagGuid, &PackageGuid);
