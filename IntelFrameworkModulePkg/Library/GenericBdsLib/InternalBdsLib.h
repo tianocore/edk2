@@ -60,7 +60,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/PcdLib.h>
-#include <Library/IfrSupportLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/GenericBdsLib.h>
 #include <Library/TimerLib.h>
