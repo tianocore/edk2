@@ -1,7 +1,7 @@
 /** @file
   This module provide help function for displaying unicode string.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -392,6 +392,7 @@ CreatePopUp (
   // Allocate a buffer for a single line of the popup with borders and a Null-terminator
   //
   Line = AllocateZeroPool ((MaxLength + 3) * sizeof (CHAR16));
+  ASSERT (Line != NULL);
 
   //
   // Draw top of popup box   
