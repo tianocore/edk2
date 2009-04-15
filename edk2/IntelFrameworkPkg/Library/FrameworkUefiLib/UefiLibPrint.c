@@ -48,7 +48,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_BLT_PIXEL mEfiColors[16] = {
   @param Format   Null-terminated Unicode format string.
   @param Console  The output console.
   @param Marker   VA_LIST marker for the variable argument list.
-  
+
   @return The number of Unicode characters in the produced
           output buffer not including the Null-terminator.
 **/
@@ -241,7 +241,7 @@ AsciiPrint (
   VA_LIST Marker;
   UINTN   Return;
   ASSERT (Format != NULL);
-  
+
   VA_START (Marker, Format);
 
   Return = AsciiInternalPrint( Format, gST->ConOut, Marker);
@@ -280,7 +280,7 @@ AsciiErrorPrint (
   UINTN   Return;
 
   ASSERT (Format != NULL);
-  
+
   VA_START (Marker, Format);
 
   Return = AsciiInternalPrint( Format, gST->StdErr, Marker);
@@ -291,42 +291,42 @@ AsciiErrorPrint (
 }
 
 /**
-  Internal function to print a formatted Unicode string to a graphics console device specified by 
+  Internal function to print a formatted Unicode string to a graphics console device specified by
   ConsoleOutputHandle defined in the EFI_SYSTEM_TABLE at the given (X,Y) coordinates.
 
-  This function prints a formatted Unicode string to the graphics console device 
-  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
-  Unicode characters printed. The EFI_HII_FONT_PROTOCOL is used to convert the 
-  string to a bitmap using the glyphs registered with the 
+  This function prints a formatted Unicode string to the graphics console device
+  specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of
+  Unicode characters printed. The EFI_HII_FONT_PROTOCOL is used to convert the
+  string to a bitmap using the glyphs registered with the
   HII database.  No wrapping is performed, so any portions of the string the fall
   outside the active display region will not be displayed.
 
-  If a graphics console device is not associated with the ConsoleOutputHandle 
+  If a graphics console device is not associated with the ConsoleOutputHandle
   defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
-  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no 
+  If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no
   string is printed, and 0 is returned.
 
-  @param  X            X coordinate to print the string.
-  @param  Y            Y coordinate to print the string.
-  @param  Foreground   The forground color of the string being printed.  This is
+  @param  PointX       X coordinate to print the string.
+  @param  PointY       Y coordinate to print the string.
+  @param  Foreground   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
   @param  Background   The background color of the string being printed.  This is
-                       an optional parameter that may be NULL.  If it is NULL, 
+                       an optional parameter that may be NULL.  If it is NULL,
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
   @param  Buffer       Null-terminated Unicode formatted string.
   @param  PrintNum     The number of Unicode formatted string to be printed.
 
-  @return  Number of Unicode Characters printed. Zero means no any character 
+  @return  Number of Unicode Characters printed. Zero means no any character
            displayed successfully.
 
 **/
 UINTN
 InternalPrintGraphic (
-  IN UINTN                            X,
-  IN UINTN                            Y,
+  IN UINTN                            PointX,
+  IN UINTN                            PointY,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Foreground,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *Background,
   IN CHAR16                           *Buffer,
@@ -393,7 +393,7 @@ InternalPrintGraphic (
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
     VerticalResolution = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport) && UgaDraw != NULL) {
+  } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
   } else {
     Status = EFI_UNSUPPORTED;
@@ -452,21 +452,22 @@ InternalPrintGraphic (
 
   if (GraphicsOutput != NULL) {
     Blt->Image.Screen = GraphicsOutput;
-    
+
     Status = HiiFont->StringToImage (
                          HiiFont,
                          EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN,
                          Buffer,
                          &FontInfo,
                          &Blt,
-                         X,
-                         Y,
+                         PointX,
+                         PointY,
                          NULL,
                          NULL,
                          NULL
                          );
 
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport) && UgaDraw != NULL) {
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+    ASSERT (UgaDraw!= NULL);
 
     Blt->Image.Bitmap = AllocateZeroPool (Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     ASSERT (Blt->Image.Bitmap != NULL);
@@ -482,8 +483,8 @@ InternalPrintGraphic (
                          Buffer,
                          &FontInfo,
                          &Blt,
-                         X,
-                         Y,
+                         PointX,
+                         PointY,
                          &RowInfoArray,
                          &RowInfoArraySize,
                          NULL
@@ -501,10 +502,10 @@ InternalPrintGraphic (
                           UgaDraw,
                           (EFI_UGA_PIXEL *) Blt->Image.Bitmap,
                           EfiUgaBltBufferToVideo,
-                          X,
-                          Y,
-                          X,
-                          Y,
+                          PointX,
+                          PointY,
+                          PointX,
+                          PointY,
                           RowInfoArray[0].LineWidth,
                           RowInfoArray[0].LineHeight,
                           Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
@@ -548,9 +549,9 @@ Error:
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  X            X coordinate to print the string.
-  @param  Y            Y coordinate to print the string.
-  @param  ForeGround   The forground color of the string being printed.  This is
+  @param  PointX       X coordinate to print the string.
+  @param  PointY       Y coordinate to print the string.
+  @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
@@ -569,8 +570,8 @@ Error:
 UINTN
 EFIAPI
 PrintXY (
-  IN UINTN                            X,
-  IN UINTN                            Y,
+  IN UINTN                            PointX,
+  IN UINTN                            PointY,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
   IN CONST CHAR16                     *Format,
@@ -592,10 +593,10 @@ PrintXY (
 
   Buffer = (CHAR16 *) AllocatePool (BufferSize);
   ASSERT (Buffer != NULL);
-    
+
   PrintNum = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
-  ReturnNum = InternalPrintGraphic (X, Y, ForeGround, BackGround, Buffer, PrintNum);
+  ReturnNum = InternalPrintGraphic (PointX, PointY, ForeGround, BackGround, Buffer, PrintNum);
 
   FreePool (Buffer);
 
@@ -621,9 +622,9 @@ PrintXY (
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
 
-  @param  X            X coordinate to print the string.
-  @param  Y            Y coordinate to print the string.
-  @param  ForeGround   The forground color of the string being printed.  This is
+  @param  PointX       X coordinate to print the string.
+  @param  PointY       Y coordinate to print the string.
+  @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
@@ -642,8 +643,8 @@ PrintXY (
 UINTN
 EFIAPI
 AsciiPrintXY (
-  IN UINTN                            X,
-  IN UINTN                            Y,
+  IN UINTN                            PointX,
+  IN UINTN                            PointY,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
   IN CONST CHAR8                      *Format,
@@ -664,13 +665,13 @@ AsciiPrintXY (
 
   Buffer = (CHAR16 *) AllocatePool (BufferSize);
   ASSERT (Buffer != NULL);
-    
+
   PrintNum = UnicodeSPrintAsciiFormat (Buffer, BufferSize, Format, Marker);
 
-  ReturnNum = InternalPrintGraphic (X, Y, ForeGround, BackGround, Buffer, PrintNum);
+  ReturnNum = InternalPrintGraphic (PointX, PointY, ForeGround, BackGround, Buffer, PrintNum);
 
   FreePool (Buffer);
- 
+
   return ReturnNum;
 }
 
