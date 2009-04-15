@@ -21,6 +21,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Guid/EventGroup.h>
-extern EFI_RUNTIME_SERVICES   *mRT;
+extern EFI_RUNTIME_SERVICES   *gInternalRT;
 
 #endif 

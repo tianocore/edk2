@@ -539,7 +539,7 @@ ScsiRequestSenseCommand (
   Executes the SCSI Read Capacity command on the SCSI target specified by ScsiIo.
   If Timeout is zero, then this function waits indefinitely for the command to complete.
   If Timeout is greater than zero, then the command is executed and will timeout after
-  Timeout 100 ns units.  The PMI parameter is used to construct the CDB for this SCSI command.
+  Timeout 100 ns units.  The Pmi parameter is used to construct the CDB for this SCSI command.
   If ScsiIo is NULL, then ASSERT().
   If SenseDataLength is NULL, then ASSERT().
   If HostAdapterStatus is NULL, then ASSERT().
@@ -554,7 +554,7 @@ ScsiRequestSenseCommand (
   @param[out]     TargetStatus         The status of the target.
   @param[in, out] DataBuffer           A pointer to a data buffer.
   @param[in, out] DataLength           The length of data buffer.
-  @param[in]      PMI                  Partial medium indicator.
+  @param[in]      Pmi                  Partial medium indicator.
 
   @retval  EFI_SUCCESS           Command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE   The SCSI Request Packet was executed, but the entire
@@ -579,7 +579,7 @@ ScsiReadCapacityCommand (
      OUT UINT8                 *TargetStatus,
   IN OUT VOID                  *DataBuffer,   OPTIONAL
   IN OUT UINT32                *DataLength,
-  IN     BOOLEAN               PMI
+  IN     BOOLEAN               Pmi
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
@@ -611,9 +611,9 @@ ScsiReadCapacityCommand (
 
   Cdb[0]  = EFI_SCSI_OP_READ_CAPACITY;
   Cdb[1]  = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
-  if (!PMI) {
+  if (!Pmi) {
     //
-    // Partial medium indicator,if PMI is FALSE, the Cdb.2 ~ Cdb.5 MUST BE ZERO.
+    // Partial medium indicator,if Pmi is FALSE, the Cdb.2 ~ Cdb.5 MUST BE ZERO.
     //
     ZeroMem ((Cdb + 2), 4);
   } else {
@@ -646,7 +646,7 @@ ScsiReadCapacityCommand (
   @param  TargetStatus      The status of the target.
   @param  DataBuffer        A pointer to a data buffer.
   @param  DataLength        The length of data buffer.
-  @param  PMI               Partial medium indicator.
+  @param  Pmi               Partial medium indicator.
 
   @retval  EFI_SUCCESS            The status of the unit is tested successfully.
   @retval  EFI_BAD_BUFFER_SIZE    The SCSI Request Packet was executed, 
@@ -666,7 +666,6 @@ ScsiReadCapacityCommand (
                                   Request Packet to execute.
 
 **/
-
 EFI_STATUS
 EFIAPI
 ScsiReadCapacity16Command (
@@ -678,7 +677,7 @@ ScsiReadCapacity16Command (
   OUT UINT8                 *TargetStatus,
   OUT VOID                  *DataBuffer,
   IN OUT UINT32             *DataLength,
-  IN  BOOLEAN               PMI
+  IN  BOOLEAN               Pmi
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
@@ -704,9 +703,9 @@ ScsiReadCapacity16Command (
 
   Cdb[0]  = EFI_SCSI_OP_READ_CAPACITY16;
   Cdb[1]  = 0x10;
-  if (!PMI) {
+  if (!Pmi) {
     //
-    // Partial medium indicator,if PMI is FALSE, the Cdb.2 ~ Cdb.9 MUST BE ZERO.
+    // Partial medium indicator,if Pmi is FALSE, the Cdb.2 ~ Cdb.9 MUST BE ZERO.
     //
     ZeroMem ((Cdb + 2), 8);
   } else {

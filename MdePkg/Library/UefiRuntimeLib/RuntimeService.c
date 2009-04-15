@@ -58,7 +58,7 @@ EfiResetSystem (
   IN VOID                         *ResetData OPTIONAL
   )
 {
-  mRT->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
+  gInternalRT->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
 }
 
 
@@ -90,7 +90,7 @@ EfiGetTime (
   OUT EFI_TIME_CAPABILITIES       *Capabilities  OPTIONAL
   )
 {
-  return mRT->GetTime (Time, Capabilities);
+  return gInternalRT->GetTime (Time, Capabilities);
 }
 
 
@@ -122,7 +122,7 @@ EfiSetTime (
   IN EFI_TIME                   *Time
   )
 {
-  return mRT->SetTime (Time);
+  return gInternalRT->SetTime (Time);
 }
 
 
@@ -155,7 +155,7 @@ EfiGetWakeupTime (
   OUT EFI_TIME                    *Time
   )
 {
-  return mRT->GetWakeupTime (Enabled, Pending, Time);
+  return gInternalRT->GetWakeupTime (Enabled, Pending, Time);
 }
 
 
@@ -189,7 +189,7 @@ EfiSetWakeupTime (
   IN EFI_TIME                     *Time   OPTIONAL
   )
 {
-  return mRT->SetWakeupTime (Enable, Time);
+  return gInternalRT->SetWakeupTime (Enable, Time);
 }
 
 
@@ -233,7 +233,7 @@ EfiGetVariable (
   OUT     VOID                     *Data
   )
 {
-  return mRT->GetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
+  return gInternalRT->GetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
 }
 
 
@@ -275,7 +275,7 @@ EfiGetNextVariableName (
   IN OUT EFI_GUID                 *VendorGuid
   )
 {
-  return mRT->GetNextVariableName (VariableNameSize, VariableName, VendorGuid);
+  return gInternalRT->GetNextVariableName (VariableNameSize, VariableName, VendorGuid);
 }
 
 
@@ -318,7 +318,7 @@ EfiSetVariable (
   IN VOID                         *Data
   )
 {
-  return mRT->SetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
+  return gInternalRT->SetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
 }
 
 
@@ -344,7 +344,7 @@ EfiGetNextHighMonotonicCount (
   OUT UINT32                      *HighCount
   )
 {
-  return mRT->GetNextHighMonotonicCount (HighCount);
+  return gInternalRT->GetNextHighMonotonicCount (HighCount);
 }
 
 
@@ -499,7 +499,7 @@ EfiSetVirtualAddressMap (
   IN CONST EFI_MEMORY_DESCRIPTOR    *VirtualMap
   )
 {
-  return mRT->SetVirtualAddressMap (
+  return gInternalRT->SetVirtualAddressMap (
                 MemoryMapSize,
                 DescriptorSize,
                 DescriptorVersion,
@@ -550,7 +550,7 @@ EfiUpdateCapsule (
   IN EFI_PHYSICAL_ADDRESS     ScatterGatherList OPTIONAL
   )
 {
-  return mRT->UpdateCapsule (
+  return gInternalRT->UpdateCapsule (
                 CapsuleHeaderArray,
                 CapsuleCount,
                 ScatterGatherList
@@ -601,7 +601,7 @@ EfiQueryCapsuleCapabilities (
   OUT EFI_RESET_TYPE           *ResetType
   )
 {
-  return mRT->QueryCapsuleCapabilities (
+  return gInternalRT->QueryCapsuleCapabilities (
           CapsuleHeaderArray,
           CapsuleCount,
           MaximumCapsuleSize,
@@ -653,7 +653,7 @@ EfiQueryVariableInfo (
   OUT UINT64  *MaximumVariableSize
   )
 {
-  return mRT->QueryVariableInfo (
+  return gInternalRT->QueryVariableInfo (
           Attributes,
           MaximumVariableStorageSize,
           RemainingVariableStorageSize,

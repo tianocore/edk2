@@ -1067,6 +1067,7 @@ AsciiErrorPrint (
   ...
   );
 
+
 /**
   Prints a formatted Unicode string to a graphics console device specified by 
   ConsoleOutputHandle defined in the EFI_SYSTEM_TABLE at the given (X,Y) coordinates.
@@ -1087,8 +1088,8 @@ AsciiErrorPrint (
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  X            X coordinate to print the string.
-  @param  Y            Y coordinate to print the string.
+  @param  PointX       X coordinate to print the string.
+  @param  PointY       Y coordinate to print the string.
   @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
@@ -1108,8 +1109,8 @@ AsciiErrorPrint (
 UINTN
 EFIAPI
 PrintXY (
-  IN UINTN                            X,
-  IN UINTN                            Y,
+  IN UINTN                            PointX,
+  IN UINTN                            PointY,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
   IN CONST CHAR16                     *Format,
@@ -1135,8 +1136,8 @@ PrintXY (
   string is printed, and 0 is returned.
   If Format is NULL, then ASSERT().
 
-  @param  X            X coordinate to print the string.
-  @param  Y            Y coordinate to print the string.
+  @param  PointX       X coordinate to print the string.
+  @param  PointY       Y coordinate to print the string.
   @param  ForeGround   The foreground color of the string being printed.  This is
                        an optional parameter that may be NULL.  If it is NULL,
                        then the foreground color of the current ConOut device
@@ -1156,8 +1157,8 @@ PrintXY (
 UINTN
 EFIAPI
 AsciiPrintXY (
-  IN UINTN                            X,
-  IN UINTN                            Y,
+  IN UINTN                            PointX,
+  IN UINTN                            PointY,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
   IN CONST CHAR8                      *Format,

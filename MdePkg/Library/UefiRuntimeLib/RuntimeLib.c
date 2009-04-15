@@ -22,7 +22,7 @@ EFI_EVENT              mEfiVirtualNotifyEvent;
 EFI_EVENT              mEfiExitBootServicesEvent;
 BOOLEAN                mEfiGoneVirtual         = FALSE;
 BOOLEAN                mEfiAtRuntime           = FALSE;
-EFI_RUNTIME_SERVICES   *mRT;
+EFI_RUNTIME_SERVICES   *gInternalRT;
 
 /**
   Set AtRuntime flag as TRUE after ExitBootServices.
@@ -63,7 +63,7 @@ RuntimeLibVirtualNotifyEvent (
   //
   // Update global for Runtime Services Table and IO
   //
-  EfiConvertPointer (0, (VOID **) &mRT);
+  EfiConvertPointer (0, (VOID **) &gInternalRT);
 
   mEfiGoneVirtual = TRUE;
 }
@@ -90,7 +90,7 @@ RuntimeDriverLibConstruct (
   ASSERT (gRT != NULL);
   ASSERT (gBS != NULL);
 
-  mRT = gRT;
+  gInternalRT = gRT;
   //
   // Register SetVirtualAddressMap () notify function
   //
