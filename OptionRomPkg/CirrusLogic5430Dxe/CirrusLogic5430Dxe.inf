@@ -9,7 +9,7 @@
 #  requires both the UGA Draw and the UGA I/O Protocol. Please refer to Microsoft's
 #  documentation on UGA for details on how to write a UGA driver that is able
 #  to function both in the EFI pre-boot environment and from the OS runtime.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -49,6 +49,8 @@
   CirrusLogic5430.c
   CirrusLogic5430.h
   Edid.c
+  CirrusLogic5430I2c.h
+  CirrusLogic5430I2c.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -62,7 +64,7 @@
   DebugLib
   BaseMemoryLib
   DevicePathLib
-  DxeI2cLib
+  TimerLib
 
 [Protocols]
   gEfiDriverSupportedEfiVersionProtocolGuid     # PROTOCOL ALWAYS_PRODUCED
