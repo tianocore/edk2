@@ -13,6 +13,7 @@
 **/
 
 #include "CirrusLogic5430.h"
+#include "CirrusLogic5430I2c.h"
 
 //
 // EDID block

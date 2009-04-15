@@ -38,7 +38,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/DxeI2cLib.h>
+#include <Library/TimerLib.h>
 
 #include <IndustryStandard/Pci22.h>
 //
