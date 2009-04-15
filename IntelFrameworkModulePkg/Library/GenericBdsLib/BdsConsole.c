@@ -587,7 +587,7 @@ ConvertBmpToGopBlt (
   BMP_COLOR_MAP                 *BmpColorMap;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *Blt;
-  UINTN                         BltBufferSize;
+  UINT64                        BltBufferSize;
   UINTN                         Index;
   UINTN                         Height;
   UINTN                         Width;
@@ -623,12 +623,19 @@ ConvertBmpToGopBlt (
   // Calculate the BltBuffer needed size.
   //
   BltBufferSize = BmpHeader->PixelWidth * BmpHeader->PixelHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+  if (BltBufferSize >= SIZE_4GB) {
+    //
+    // If the BMP resolution is too large
+    //
+    return EFI_UNSUPPORTED;
+  }
+  
   IsAllocated   = FALSE;
   if (*GopBlt == NULL) {
     //
     // GopBlt is not allocated by caller.
     //
-    *GopBltSize = BltBufferSize;
+    *GopBltSize = (UINTN) BltBufferSize;
     *GopBlt     = AllocatePool (*GopBltSize);
     IsAllocated = TRUE;
     if (*GopBlt == NULL) {
@@ -639,7 +646,7 @@ ConvertBmpToGopBlt (
     // GopBlt has been allocated by caller.
     //
     if (*GopBltSize < BltBufferSize) {
-      *GopBltSize = BltBufferSize;
+      *GopBltSize = (UINTN) BltBufferSize;
       return EFI_BUFFER_TOO_SMALL;
     }
   }
