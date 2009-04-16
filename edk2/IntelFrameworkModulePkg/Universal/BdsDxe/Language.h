@@ -18,6 +18,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "String.h"
 
 /**
+  Convert language code from RFC3066 to ISO639-2.
+
+  @param  LanguageRfc3066        RFC3066 language code.
+  @param  LanguageIso639         ISO639-2 language code.
+
+  @retval EFI_SUCCESS            Language code converted.
+  @retval EFI_NOT_FOUND          Language code not found.
+
+**/
+EFI_STATUS
+EFIAPI
+ConvertRfc3066LanguageToIso639Language (
+  IN  CHAR8   *LanguageRfc3066,
+  OUT CHAR8   *LanguageIso639
+  );
+
+/**
   Determine the current language that will be used
   based on language related EFI Variables.
 

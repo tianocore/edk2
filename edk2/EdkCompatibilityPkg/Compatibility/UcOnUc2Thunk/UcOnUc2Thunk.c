@@ -30,6 +30,7 @@ Module Name:
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HiiLib.h>
+#include <Library/BaseMemoryLib.h>
 
 
 ///
@@ -37,6 +38,183 @@ Module Name:
 ///
 #define ISO_639_2_ENTRY_SIZE            3
 
+//
+// Lookup table of ISO639-2 3 character language codes to ISO 639-1 2 character language codes
+// Each entry is 5 CHAR8 values long.  The first 3 CHAR8 values are the ISO 639-2 code.
+// The last 2 CHAR8 values are the ISO 639-1 code.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 Iso639ToRfc3066ConversionTable[] =
+"\
+aaraa\
+abkab\
+afraf\
+amham\
+araar\
+asmas\
+aymay\
+azeaz\
+bakba\
+belbe\
+benbn\
+bihbh\
+bisbi\
+bodbo\
+brebr\
+bulbg\
+catca\
+cescs\
+corkw\
+cosco\
+cymcy\
+danda\
+deude\
+dzodz\
+ellel\
+engen\
+epoeo\
+estet\
+euseu\
+faofo\
+fasfa\
+fijfj\
+finfi\
+frafr\
+fryfy\
+gaiga\
+gdhgd\
+glggl\
+grngn\
+gujgu\
+hauha\
+hebhe\
+hinhi\
+hrvhr\
+hunhu\
+hyehy\
+ikuiu\
+ileie\
+inaia\
+indid\
+ipkik\
+islis\
+itait\
+jawjw\
+jpnja\
+kalkl\
+kankn\
+kasks\
+katka\
+kazkk\
+khmkm\
+kinrw\
+kirky\
+korko\
+kurku\
+laolo\
+latla\
+lavlv\
+linln\
+litlt\
+ltzlb\
+malml\
+marmr\
+mkdmk\
+mlgmg\
+mltmt\
+molmo\
+monmn\
+mrimi\
+msams\
+myamy\
+nauna\
+nepne\
+nldnl\
+norno\
+ocioc\
+ormom\
+panpa\
+polpl\
+porpt\
+pusps\
+quequ\
+rohrm\
+ronro\
+runrn\
+rusru\
+sagsg\
+sansa\
+sinsi\
+slksk\
+slvsl\
+smise\
+smosm\
+snasn\
+sndsd\
+somso\
+sotst\
+spaes\
+sqisq\
+srpsr\
+sswss\
+sunsu\
+swasw\
+swesv\
+tamta\
+tattt\
+telte\
+tgktg\
+tgltl\
+thath\
+tsnts\
+tuktk\
+twitw\
+uigug\
+ukruk\
+urdur\
+uzbuz\
+vievi\
+volvo\
+wolwo\
+xhoxh\
+yidyi\
+zhaza\
+zhozh\
+zulzu\
+";
+
+/**
+  Convert language code from RFC3066 to ISO639-2.
+
+  @param  LanguageRfc3066        RFC3066 language code.
+  @param  LanguageIso639         ISO639-2 language code.
+
+  @retval EFI_SUCCESS            Language code converted.
+  @retval EFI_NOT_FOUND          Language code not found.
+
+**/
+EFI_STATUS
+EFIAPI
+ConvertRfc3066LanguageToIso639Language (
+  IN  CHAR8   *LanguageRfc3066,
+  OUT CHAR8   *LanguageIso639
+  )
+{
+  UINTN  Index;
+
+  if ((LanguageRfc3066[2] != '-') && (LanguageRfc3066[2] != 0)) {
+    CopyMem (LanguageIso639, LanguageRfc3066, 3);
+    return EFI_SUCCESS;
+  }
+
+  for (Index = 0; Iso639ToRfc3066ConversionTable[Index] != 0; Index += 5) {
+    if (CompareMem (LanguageRfc3066, &Iso639ToRfc3066ConversionTable[Index + 3], 2) == 0) {
+      CopyMem (LanguageIso639, &Iso639ToRfc3066ConversionTable[Index], 3);
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
 
 /**
   Performs a case-insensitive comparison of two Null-terminated Unicode 

@@ -53,6 +53,7 @@
   UefiLib
   MemoryAllocationLib
   HiiLib
+  BaseMemoryLib
 
 [Protocols]
   gEfiUnicodeCollation2ProtocolGuid

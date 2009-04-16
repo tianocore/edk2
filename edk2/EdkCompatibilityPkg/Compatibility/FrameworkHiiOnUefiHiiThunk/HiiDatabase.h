@@ -480,6 +480,55 @@ InitSetBrowserStrings (
   )
 ;
 
+/**
+  Convert language code from RFC3066 to ISO639-2.
+
+  LanguageRfc3066 contain a single RFC 3066 code such as
+  "en-US" or "fr-FR".
+
+  The LanguageRfc3066 must be a buffer large enough
+  for ISO_639_2_ENTRY_SIZE characters.
+
+  If LanguageRfc3066 is NULL, then ASSERT.
+  If LanguageIso639 is NULL, then ASSERT.
+
+  @param  LanguageRfc3066        RFC3066 language code.
+  @param  LanguageIso639         ISO639-2 language code.
+
+  @retval EFI_SUCCESS            Language code converted.
+  @retval EFI_NOT_FOUND          Language code not found.
+
+**/
+EFI_STATUS
+EFIAPI
+ConvertRfc3066LanguageToIso639Language (
+  IN  CHAR8   *LanguageRfc3066,
+  OUT CHAR8   *LanguageIso639
+  )
+;
+
+/**
+  Convert language code from ISO639-2 to RFC3066 and return the converted language.
+  Caller is responsible for freeing the allocated buffer.
+
+  LanguageIso639 contain a single ISO639-2 code such as
+  "eng" or "fra".
+
+  If LanguageIso639 is NULL, then ASSERT.
+  If LanguageRfc3066 is NULL, then ASSERT.
+
+  @param  LanguageIso639         ISO639-2 language code.
+
+  @return the allocated buffer or NULL, if the language is not found.
+
+**/
+CHAR8*
+EFIAPI
+ConvertIso639LanguageToRfc3066Language (
+  IN  CONST CHAR8   *LanguageIso639
+  )
+;
+
 #include "Utility.h"
 #include "ConfigAccess.h"
 
