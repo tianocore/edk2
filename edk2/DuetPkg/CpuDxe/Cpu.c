@@ -343,7 +343,7 @@ DumpExceptionDataDebugOut (
 
   ErrorCodeFlag = 0x00027d00;
 
-#ifdef EFI32
+#ifdef MDE_CPU_IA32
   DEBUG ((
     EFI_D_ERROR,
     "!!!! IA32 Exception Type - %08x !!!!\n",
@@ -563,7 +563,7 @@ DumpExceptionDataVgaOut (
   VideoBufferBase = (CHAR16 *) (UINTN) 0xb8000;
   VideoBuffer     = (CHAR16 *) (UINTN) 0xb8000;
 
-#ifdef EFI32
+#ifdef MDE_CPU_IA32
   UnicodeSPrintAsciiFormat (
     VideoBuffer,
     COLUMN_MAX * sizeof (CHAR16),
