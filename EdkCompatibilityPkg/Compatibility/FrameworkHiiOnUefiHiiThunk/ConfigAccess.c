@@ -690,10 +690,14 @@ CreateIfrDataArray (
       break;
 
     case EFI_IFR_TYPE_STRING:
-      String = HiiGetString (ConfigAccess->ThunkContext->UefiHiiHandle, Value->string, NULL);
-      ASSERT (String != NULL);
+      if (Value->string == 0) {
+        Size = 0;
+      } else {
+        String = HiiGetString (ConfigAccess->ThunkContext->UefiHiiHandle, Value->string, NULL);
+        ASSERT (String != NULL);
 
-      Size = StrSize (String);
+        Size = StrSize (String);
+      }
       break;
       
     default:
@@ -741,9 +745,11 @@ CreateIfrDataArray (
         break;
 
       case EFI_IFR_TYPE_STRING:
-        ASSERT (String != NULL);
-        StrCpy ((CHAR16 *) &IfrDataEntry->Data, String);
-        FreePool (String);
+        if (Size != 0) {
+          ASSERT (String != NULL);
+          StrCpy ((CHAR16 *) &IfrDataEntry->Data, String);
+          FreePool (String);
+        }
         break;
       default:
         ASSERT (FALSE);
