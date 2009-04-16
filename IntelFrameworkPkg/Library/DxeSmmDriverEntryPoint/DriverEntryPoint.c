@@ -175,16 +175,6 @@ _ModuleEntryPoint (
   gBS = SystemTable->BootServices;
 
   //
-  // Retrieve the Loaded Image Protocol
-  //
-  Status = gBS->HandleProtocol (
-                  ImageHandle,
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID*)&LoadedImage
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Retrieve SMM Base Protocol
   //
   Status = gBS->LocateProtocol (
@@ -204,6 +194,15 @@ _ModuleEntryPoint (
   //
   if (!InSmm) {
     //
+    // Retrieve the Loaded Image Protocol
+    //
+    Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID*)&LoadedImage
+                  );
+    ASSERT_EFI_ERROR (Status);
+    //
     // Retrieve the Device Path Protocol from the DeviceHandle from which this driver was loaded
     //
     Status = gBS->HandleProtocol (
@@ -222,8 +221,21 @@ _ModuleEntryPoint (
     // Load the image in memory to SMRAM; it will automatically generate the
     // SMI.
     //
-    Status = SmmBase->Register (SmmBase, CompleteFilePath, NULL, 0, &Handle, FALSE);
+    Status = SmmBase->Register (SmmBase, CompleteFilePath, LoadedImage->ImageBase, 0, &Handle, FALSE);
     ASSERT_EFI_ERROR (Status);
+    //
+    // Optionally install the unload handler
+    //
+    if (_gDriverUnloadImageCount > 0) {
+      Status = gBS->HandleProtocol (
+                      ImageHandle,
+                      &gEfiLoadedImageProtocolGuid,
+                      (VOID **)&LoadedImage
+                      );
+      ASSERT_EFI_ERROR (Status);
+      LoadedImage->Unload = _DriverUnloadHandler;
+    }
+
     return Status;
   }
 
@@ -231,19 +243,6 @@ _ModuleEntryPoint (
   // Call constructor for all libraries
   //
   ProcessLibraryConstructorList (ImageHandle, SystemTable);
-
-  //
-  // Optionally install the unload handler
-  //
-  if (_gDriverUnloadImageCount > 0) {
-    Status = gBS->HandleProtocol (
-                    ImageHandle,
-                    &gEfiLoadedImageProtocolGuid,
-                    (VOID **)&LoadedImage
-                    );
-    ASSERT_EFI_ERROR (Status);
-    LoadedImage->Unload = _DriverUnloadHandler;
-  }
 
   //
   // Call the list of driver entry points
