@@ -7,7 +7,7 @@
   Common Object File Format Specification, Revision 8.0 - May 16, 2006. 
   This file also includes some definitions in PI Specification, Revision 1.0.
 
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -27,8 +27,6 @@
 #define EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION         10
 #define EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER 11
 #define EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER      12
-#define EFI_IMAGE_SUBSYSTEM_EFI_EFI_ROM             13
-
 #define EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER      13 ///< defined PI Specification, 1.0
 
 
