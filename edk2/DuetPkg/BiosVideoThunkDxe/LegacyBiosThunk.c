@@ -30,26 +30,25 @@ InitializeBiosIntCaller (
   UINT32                RealModeBufferSize;
   UINT32                ExtraStackSize;
   EFI_PHYSICAL_ADDRESS  LegacyRegionBase;
-  
+  UINT32                LegacyRegionSize;
   //
   // Get LegacyRegion
   //
   AsmGetThunk16Properties (&RealModeBufferSize, &ExtraStackSize);
-
+  LegacyRegionSize = (((RealModeBufferSize + ExtraStackSize) / EFI_PAGE_SIZE) + 1) * EFI_PAGE_SIZE;
   LegacyRegionBase = 0x100000;
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
                   EfiACPIMemoryNVS,
-                  EFI_SIZE_TO_PAGES(RealModeBufferSize + ExtraStackSize + 200),
+                  EFI_SIZE_TO_PAGES(LegacyRegionSize),
                   &LegacyRegionBase
                   );
   ASSERT_EFI_ERROR (Status);
   
   ThunkContext->RealModeBuffer     = (VOID*)(UINTN)LegacyRegionBase;
-  ThunkContext->RealModeBufferSize = EFI_PAGES_TO_SIZE (RealModeBufferSize);
-  ThunkContext->ThunkAttributes    = 3;
+  ThunkContext->RealModeBufferSize = LegacyRegionSize;
+  ThunkContext->ThunkAttributes    = THUNK_ATTRIBUTE_BIG_REAL_MODE|THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15;
   AsmPrepareThunk16(ThunkContext);
-  
 }
 
 /**
