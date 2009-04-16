@@ -618,19 +618,19 @@ EfiLdrPeCoffCheckImageMachineType (
 
   Status = EFI_UNSUPPORTED;
 
-#ifdef EFI32
+#ifdef MDE_CPU_IA32
   if (MachineType == EFI_IMAGE_MACHINE_IA32) {
     Status = EFI_SUCCESS;
   }
 #endif
 
-#ifdef EFIX64
+#ifdef MDE_CPU_X64
   if (MachineType == EFI_IMAGE_MACHINE_X64) {
     Status = EFI_SUCCESS;
   }
 #endif
 
-#ifdef EFI64
+#ifdef MDE_CPU_IPF
   if (MachineType == EFI_IMAGE_MACHINE_IA64) {
     Status = EFI_SUCCESS;
   }
