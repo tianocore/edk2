@@ -30,12 +30,194 @@ Module Name:
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HiiLib.h>
+#include <Library/BaseMemoryLib.h>
 
 
 ///
 /// The size of a 3 character ISO639 language code.
 ///
 #define ISO_639_2_ENTRY_SIZE            3
+
+//
+// Lookup table of ISO639-2 3 character language codes to ISO 639-1 2 character language codes
+// Each entry is 5 CHAR8 values long.  The first 3 CHAR8 values are the ISO 639-2 code.
+// The last 2 CHAR8 values are the ISO 639-1 code.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 Iso639ToRfc3066ConversionTable[] =
+"\
+aaraa\
+abkab\
+afraf\
+amham\
+araar\
+asmas\
+aymay\
+azeaz\
+bakba\
+belbe\
+benbn\
+bihbh\
+bisbi\
+bodbo\
+brebr\
+bulbg\
+catca\
+cescs\
+corkw\
+cosco\
+cymcy\
+danda\
+deude\
+dzodz\
+ellel\
+engen\
+epoeo\
+estet\
+euseu\
+faofo\
+fasfa\
+fijfj\
+finfi\
+frafr\
+fryfy\
+gaiga\
+gdhgd\
+glggl\
+grngn\
+gujgu\
+hauha\
+hebhe\
+hinhi\
+hrvhr\
+hunhu\
+hyehy\
+ikuiu\
+ileie\
+inaia\
+indid\
+ipkik\
+islis\
+itait\
+jawjw\
+jpnja\
+kalkl\
+kankn\
+kasks\
+katka\
+kazkk\
+khmkm\
+kinrw\
+kirky\
+korko\
+kurku\
+laolo\
+latla\
+lavlv\
+linln\
+litlt\
+ltzlb\
+malml\
+marmr\
+mkdmk\
+mlgmg\
+mltmt\
+molmo\
+monmn\
+mrimi\
+msams\
+myamy\
+nauna\
+nepne\
+nldnl\
+norno\
+ocioc\
+ormom\
+panpa\
+polpl\
+porpt\
+pusps\
+quequ\
+rohrm\
+ronro\
+runrn\
+rusru\
+sagsg\
+sansa\
+sinsi\
+slksk\
+slvsl\
+smise\
+smosm\
+snasn\
+sndsd\
+somso\
+sotst\
+spaes\
+sqisq\
+srpsr\
+sswss\
+sunsu\
+swasw\
+swesv\
+tamta\
+tattt\
+telte\
+tgktg\
+tgltl\
+thath\
+tsnts\
+tuktk\
+twitw\
+uigug\
+ukruk\
+urdur\
+uzbuz\
+vievi\
+volvo\
+wolwo\
+xhoxh\
+yidyi\
+zhaza\
+zhozh\
+zulzu\
+";
+
+/**
+  Convert language code from ISO639-2 to RFC3066 and return the converted language.
+  Caller is responsible for freeing the allocated buffer.
+
+  LanguageIso639 contain a single ISO639-2 code such as
+  "eng" or "fra".
+
+  If LanguageIso639 is NULL, then ASSERT.
+  If LanguageRfc3066 is NULL, then ASSERT.
+
+  @param  LanguageIso639         ISO639-2 language code.
+
+  @return the allocated buffer or NULL, if the language is not found.
+
+**/
+CHAR8*
+EFIAPI
+ConvertIso639LanguageToRfc3066Language (
+  IN  CONST CHAR8   *LanguageIso639
+  )
+{
+  UINTN Index;
+  CHAR8 *Rfc3066Language;
+  
+  for (Index = 0; Iso639ToRfc3066ConversionTable[Index] != 0; Index += 5) {
+    if (CompareMem (LanguageIso639, &Iso639ToRfc3066ConversionTable[Index], 3) == 0) {
+      Rfc3066Language = AllocateZeroPool (3);
+      if (Rfc3066Language != NULL) {
+        Rfc3066Language = CopyMem (Rfc3066Language, &Iso639ToRfc3066ConversionTable[Index + 3], 2);
+      }
+      return Rfc3066Language;
+    }
+  }
+
+  return NULL;
+}
 
 /**
   Performs a case-insensitive comparison of two Null-terminated Unicode 
