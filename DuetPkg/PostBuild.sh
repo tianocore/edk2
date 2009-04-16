@@ -29,6 +29,7 @@ case "$1" in
      ;;
    *)
      echo Invalid Architecture string, should be only IA32 or X64
+     return 1
 esac
 
 #
@@ -77,4 +78,5 @@ then
 	
 	echo Done!
 fi
+
 
