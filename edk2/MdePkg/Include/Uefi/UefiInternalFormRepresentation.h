@@ -800,6 +800,8 @@ typedef struct _EFI_IFR_FORM_SET {
   EFI_GUID                 Guid;
   EFI_STRING_ID            FormSetTitle;
   EFI_STRING_ID            Help;
+  UINT8                    Flags;
+  // EFI_GUID              ClassGuid[];
 } EFI_IFR_FORM_SET;
 
 typedef struct _EFI_IFR_END {
