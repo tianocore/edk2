@@ -15,14 +15,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeMain.h"
 #include "Image.h"
 
-#define EFI_LOAD_PE_IMAGE_ATTRIBUTE_NONE                                 0x00
-#define EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION                 0x01
-#define EFI_LOAD_PE_IMAGE_ATTRIBUTE_DEBUG_IMAGE_INFO_TABLE_REGISTRATION  0x02
-
 //
 // Module Globals
 //
 LOADED_IMAGE_PRIVATE_DATA  *mCurrentImage = NULL;
+
+LOAD_PE32_IMAGE_PRIVATE_DATA  mLoadPe32PrivateData = {
+  LOAD_PE32_IMAGE_PRIVATE_DATA_SIGNATURE,
+  NULL,
+  {
+    CoreLoadImageEx,
+    CoreUnloadImageEx
+  }
+};
 
 
 //
@@ -142,7 +147,12 @@ CoreInitializeImageServices (
   //
   // Export DXE Core PE Loader functionality
   //
-  return EFI_SUCCESS;
+  return CoreInstallProtocolInterface (
+           &mLoadPe32PrivateData.Handle,
+           &gEfiLoadPeImageProtocolGuid,
+           EFI_NATIVE_INTERFACE,
+           &mLoadPe32PrivateData.Pe32Image
+           );
 }
 
 
@@ -990,6 +1000,66 @@ CoreLoadImage (
 }
 
 
+
+/**
+  Loads an EFI image into memory and returns a handle to the image with extended parameters.
+
+  @param  This                    Calling context
+  @param  ParentImageHandle       The caller's image handle.
+  @param  FilePath                The specific file path from which the image is
+                                  loaded.
+  @param  SourceBuffer            If not NULL, a pointer to the memory location
+                                  containing a copy of the image to be loaded.
+  @param  SourceSize              The size in bytes of SourceBuffer.
+  @param  DstBuffer               The buffer to store the image.
+  @param  NumberOfPages           For input, specifies the space size of the
+                                  image by caller if not NULL. For output,
+                                  specifies the actual space size needed.
+  @param  ImageHandle             Image handle for output.
+  @param  EntryPoint              Image entry point for output.
+  @param  Attribute               The bit mask of attributes to set for the load
+                                  PE image.
+
+  @retval EFI_SUCCESS             The image was loaded into memory.
+  @retval EFI_NOT_FOUND           The FilePath was not found.
+  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.
+  @retval EFI_UNSUPPORTED         The image type is not supported, or the device
+                                  path cannot be parsed to locate the proper
+                                  protocol for loading the file.
+  @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient
+                                  resources.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreLoadImageEx (
+  IN  EFI_PE32_IMAGE_PROTOCOL          *This,
+  IN  EFI_HANDLE                       ParentImageHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL         *FilePath,
+  IN  VOID                             *SourceBuffer       OPTIONAL,
+  IN  UINTN                            SourceSize,
+  IN  EFI_PHYSICAL_ADDRESS             DstBuffer           OPTIONAL,
+  OUT UINTN                            *NumberOfPages      OPTIONAL,
+  OUT EFI_HANDLE                       *ImageHandle,
+  OUT EFI_PHYSICAL_ADDRESS             *EntryPoint         OPTIONAL,
+  IN  UINT32                           Attribute
+  )
+{
+  return CoreLoadImageCommon (
+           TRUE,
+           ParentImageHandle,
+           FilePath,
+           SourceBuffer,
+           SourceSize,
+           DstBuffer,
+           NumberOfPages,
+           ImageHandle,
+           EntryPoint,
+           Attribute
+           );
+}
+
+
 /**
   Transfer control to a loaded image's entry point.
 
@@ -1310,3 +1380,25 @@ Done:
   return Status;
 }
 
+
+
+/**
+  Unload the specified image.
+
+  @param  This                    Indicates the calling context.
+  @param  ImageHandle             The specified image handle.
+
+  @retval EFI_INVALID_PARAMETER   Image handle is NULL.
+  @retval EFI_UNSUPPORTED         Attempt to unload an unsupported image.
+  @retval EFI_SUCCESS             Image successfully unloaded.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreUnloadImageEx (
+  IN EFI_PE32_IMAGE_PROTOCOL  *This,
+  IN EFI_HANDLE                         ImageHandle
+  )
+{
+  return CoreUnloadImage (ImageHandle);
+}
