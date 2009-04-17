@@ -334,7 +334,7 @@ LangCodes3066To639 (
   Index = 0;
   AsciiLangCodes = LangCodes3066;
   while (AsciiStrLen (AsciiLangCodes) != 0) {
-    HiiLibGetNextLanguage (&AsciiLangCodes, Lang);
+    GetNextLanguage (&AsciiLangCodes, Lang);
     Index++;
   }
 
@@ -352,7 +352,7 @@ LangCodes3066To639 (
   AsciiLangCodes = LangCodes3066;
 
   for (Index = 0; Index < Count; Index++) {
-    HiiLibGetNextLanguage (&AsciiLangCodes, Lang);
+    GetNextLanguage (&AsciiLangCodes, Lang);
     Status = ConvertRfc3066LanguageToIso639Language (Lang, *LangCodes639 + Index * ISO_639_2_ENTRY_SIZE);
     ASSERT_EFI_ERROR (Status);
   }

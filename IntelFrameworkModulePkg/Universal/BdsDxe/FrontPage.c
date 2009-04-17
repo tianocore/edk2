@@ -195,7 +195,7 @@ FrontPageCallback (
     Index = 0;
     LangCode = LanguageString;
     while (*LangCode != 0) {
-      HiiLibGetNextLanguage (&LangCode, Lang);
+      GetNextLanguage (&LangCode, Lang);
 
       if (Index == Value->u8) {
         break;
@@ -419,7 +419,7 @@ InitializeFrontPage (
   OptionCount = 0;
   LangCode = LanguageString;
   while (*LangCode != 0) {
-    HiiLibGetNextLanguage (&LangCode, Lang);
+    GetNextLanguage (&LangCode, Lang);
 
     if (gFrontPagePrivate.LanguageToken == NULL) {
       //
