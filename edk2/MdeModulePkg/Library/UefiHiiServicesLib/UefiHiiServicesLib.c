@@ -79,30 +79,35 @@ UefiHiiServicesLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  //
-  // Retrieve the pointer to the UEFI HII Font Protocol 
-  //
-  gBS->LocateProtocol (&gEfiHiiFontProtocolGuid, NULL, (VOID **) &gHiiFont);
+  EFI_STATUS Status;
 
   //
   // Retrieve the pointer to the UEFI HII String Protocol 
   //
-  gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &gHiiString);
-
-  //
-  // Retrieve the pointer to the UEFI HII Image Protocol 
-  //
-  gBS->LocateProtocol (&gEfiHiiImageProtocolGuid, NULL, (VOID **) &gHiiImage);
+  Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &gHiiString);
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Retrieve the pointer to the UEFI HII Database Protocol 
   //
-  gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &gHiiDatabase);
+  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &gHiiDatabase);
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Retrieve the pointer to the UEFI HII Config Routing Protocol 
   //
-  gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &gHiiConfigRouting);
+  Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &gHiiConfigRouting);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Retrieve the pointer to the optional UEFI HII Font Protocol 
+  //
+  gBS->LocateProtocol (&gEfiHiiFontProtocolGuid, NULL, (VOID **) &gHiiFont);
+
+  //
+  // Retrieve the pointer to the optional UEFI HII Image Protocol 
+  //
+  gBS->LocateProtocol (&gEfiHiiImageProtocolGuid, NULL, (VOID **) &gHiiImage);
 
   return EFI_SUCCESS;
 }
