@@ -737,7 +737,7 @@ Returns:
   //
   // Align buffer on section boundry
   //
-  ImageContext.ImageAddress += ImageContext.SectionAlignment;
+  ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
   ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
 
   Status = PeCoffLoaderLoadImage (&ImageContext);
