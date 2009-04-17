@@ -439,7 +439,7 @@ InitializeFrontPage (
   
   if (gFrontPagePrivate.LanguageToken == NULL) {
     while (*LangCode != 0) {
-      HiiLibGetNextLanguage (&LangCode, Lang);
+      GetNextLanguage (&LangCode, Lang);
       OptionCount ++;
     }
     gFrontPagePrivate.LanguageToken = AllocatePool (OptionCount * sizeof (EFI_STRING_ID));
