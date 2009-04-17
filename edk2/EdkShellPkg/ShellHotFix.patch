@@ -528,7 +528,7 @@ Index: shellenv/Connect.c
    EFI_GUID    *ConsoleGuid,
    EFI_HANDLE  *ConsoleHandle,
    VOID        **ConsoleInterface
-@@ -1018,9 +1027,8 @@
+@@ -1018,27 +1027,36 @@
    EFI_HANDLE                *AllHandleBuffer;
    VOID                      *Interface;
  
@@ -538,9 +538,14 @@ Index: shellenv/Connect.c
 +  AllHandleBuffer   = NULL;
  
    DevicePath        = LibGetVariable (VariableName, &gEfiGlobalVariableGuid);
-   if (DevicePath != NULL) {
-@@ -1028,17 +1036,19 @@
-     FreePool (DevicePath);
+-  if (DevicePath != NULL) {
+-    SEnvConnectDevicePath (DevicePath);
+-    FreePool (DevicePath);
++  if (DevicePath == NULL) {
++    //
++    // If no any device defined in EFI variable, do nothing
++    //
++    return;
    }
  
 -  AllHandleBuffer = NULL;
@@ -554,6 +559,12 @@ Index: shellenv/Connect.c
 -  if (!EFI_ERROR (Status) && AllHandleCount > 0) {
 -    *ConsoleHandle = AllHandleBuffer[0];
 -  } else if (*ConsoleHandle == NULL) {
++  //
++  // Connect all console devices
++  //
++  SEnvConnectDevicePath (DevicePath);
++  FreePool (DevicePath);
++
 +  Status = EFI_NOT_FOUND;
 +  //
 +  // Check ConsoleHandle validation whatever it was updated or not.
@@ -564,13 +575,13 @@ Index: shellenv/Connect.c
 +                  ConsoleGuid,
 +                  &Interface
 +                  );
-+  }
++  } 
 +
 +  if (EFI_ERROR (Status)) {
      AllHandleBuffer = NULL;
      Status = BS->LocateHandleBuffer (
                    ByProtocol,
-@@ -1063,16 +1073,16 @@
+@@ -1063,16 +1081,16 @@
                        &gEfiDevicePathProtocolGuid,
                        &Interface
                        );
@@ -590,7 +601,7 @@ Index: shellenv/Connect.c
    if (*ConsoleHandle != NULL) {
      BS->HandleProtocol (
            *ConsoleHandle,
-@@ -1081,7 +1091,7 @@
+@@ -1081,7 +1099,7 @@
            );
    }
  
@@ -599,7 +610,7 @@ Index: shellenv/Connect.c
      FreePool (AllHandleBuffer);
    }
  }
-@@ -1189,8 +1199,7 @@
+@@ -1189,8 +1207,7 @@
    EFI_STATUS  Status;
  
    //
@@ -609,7 +620,7 @@ Index: shellenv/Connect.c
    //
    Status = SEnvCheckConsoleProxy (
              ST->ConsoleInHandle,
-@@ -1203,23 +1212,21 @@
+@@ -1203,23 +1220,21 @@
    // Indicate the Console is replaced by redirection operation
    // It is not safe to connect Console here
    //
@@ -644,7 +655,7 @@ Index: shellenv/Connect.c
      &gEfiSimpleTextOutProtocolGuid,
      &ST->StandardErrorHandle,
      (VOID **) &ST->StdErr
-@@ -1227,7 +1234,6 @@
+@@ -1227,7 +1242,6 @@
  
    SEnvConnectConsole (
      VarConsoleOut,
@@ -652,7 +663,7 @@ Index: shellenv/Connect.c
      &gEfiSimpleTextOutProtocolGuid,
      &ST->ConsoleOutHandle,
      (VOID **) &ST->ConOut
-@@ -1235,7 +1241,6 @@
+@@ -1235,7 +1249,6 @@
  
    SEnvConnectConsole (
      VarConsoleIn,
@@ -660,7 +671,7 @@ Index: shellenv/Connect.c
      &gEfiSimpleTextInProtocolGuid,
      &ST->ConsoleInHandle,
      (VOID **) &ST->ConIn
-@@ -1254,6 +1259,8 @@
+@@ -1254,6 +1267,8 @@
    SetCrc (&ST->Hdr);
  }
  
