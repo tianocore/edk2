@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,7 @@
 #   Real mode thunk
 #
 #------------------------------------------------------------------------------
+
 #include <EdkIIGlueBase.h>
 
 .globl ASM_PFX(m16Start)
@@ -51,7 +52,7 @@
 
 ASM_PFX(m16Size):         .word      ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
 ASM_PFX(mThunk16Attr):    .word      _ThunkAttr - ASM_PFX(m16Start)
-ASM_PFX(m16Gdt):          .word      _NullSeg - ASM_PFX(m16Start)
+ASM_PFX(m16Gdt):          .word      ASM_PFX(NullSeg) - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase):     .word      _16GdtrBase - ASM_PFX(m16Start)
 ASM_PFX(mTransition):     .word      _EntryPoint - ASM_PFX(m16Start)
 
@@ -78,8 +79,8 @@ ASM_PFX(BackFromUserCode):
     .byte 0x16                          # push ss
     .byte 0xe                           # push cs
     .byte 0x66
-    call    @Base                       # push eip
-@Base: 
+    call    L_Base                       # push eip
+L_Base: 
     .byte 0x66
     pushq   $0                          # reserved high order 32 bits of EFlags
     .byte 0x66, 0x9c                    # pushfd actually
@@ -92,17 +93,17 @@ ASM_PFX(BackFromUserCode):
     .byte 0x66,0xba                     # mov edx, imm32
 _ThunkAttr:  .space  4
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15, %dl
-    jz      @1
+    jz      L_1
     movl    $0x15cd2401,%eax            # mov ax, 2401h & int 15h
     cli                                 # disable interrupts
-    jnc     @2
-@1: 
+    jnc     L_2
+L_1: 
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL, %dl
-    jz      @2
+    jz      L_2
     inb     $0x92,%al
     orb     $2,%al
     outb    %al, $0x92                   # deactivate A20M#
-@2: 
+L_2: 
     movl    %ss,%eax
     lea     IA32_REGS_SIZE(%esp), %bp
     #
@@ -115,9 +116,9 @@ _ThunkAttr:  .space  4
     addw    %ax,%bp                     # add ebp, eax
     movw    %cs,%ax
     shlw    $4,%ax
-    lea     (@64BitCode - @Base)(%ebx, %eax), %ax
-    .byte 0x66,0x2e,0x89,0x87           # mov cs:[bx + (@64Eip - @Base)], eax
-    .word   @64Eip - @Base
+    lea     (L_64BitCode - L_Base)(%ebx, %eax), %ax
+    .byte 0x66,0x2e,0x89,0x87           # mov cs:[bx + (L_64Eip - L_Base)], eax
+    .word   L_64Eip - L_Base
     .byte 0x66,0xb8                     # mov eax, imm32
 SavedCr4:   .space  4
     movq    %rax, %cr4
@@ -125,7 +126,7 @@ SavedCr4:   .space  4
     # rdi in the instruction below is indeed bx in 16-bit code
     #
     .byte 0x66,0x2e                     # 2eh is "cs:" segment override
-    lgdt    (SavedGdt - @Base)(%rdi)
+    lgdt    (SavedGdt - L_Base)(%rdi)
     .byte 0x66
     movl    $0xc0000080,%ecx
     rdmsr
@@ -134,17 +135,20 @@ SavedCr4:   .space  4
     .byte 0x66,0xb8                     # mov eax, imm32
 SavedCr0:    .space      4
     movq    %rax, %cr0
-    .byte 0x66,0xea                     # jmp far cs:@64Bit
-@64Eip:      .space      4
+    .byte 0x66,0xea                     # jmp far cs:L_64Bit
+L_64Eip:     .space      4
 SavedCs:     .space      2
-@64BitCode: 
-    movq     %r8, %rsp
+L_64BitCode: 
+    .byte   0x90
+    .byte   0x67,0xbc                  # mov esp, imm32
+SavedSp:    .space 4                   # restore stack
+    nop
     ret
 
 _EntryPoint: .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
              .word      CODE16
 _16Gdtr:     .word      GDT_SIZE - 1
-_16GdtrBase: .quad      _NullSeg
+_16GdtrBase: .quad      ASM_PFX(NullSeg)
 _16Idtr:     .word      0x3ff
              .long      0
 
@@ -169,16 +173,16 @@ ASM_PFX(ToUserCode):
     movl    %esi,%ss                    # set up 16-bit stack segment
     movw    %bx,%sp                     # set up 16-bit stack pointer
     .byte 0x66                          # make the following call 32-bit
-    call    @Base1                       # push eip
-@Base1: 
-    popw    %bp                         # ebp <- address of @Base1
+    call    L_Base1                       # push eip
+L_Base1: 
+    popw    %bp                         # ebp <- address of L_Base1
     pushq   (IA32_REGS_SIZE + 2)(%esp)
     lea     0x0c(%rsi), %eax
     pushq   %rax
     lret                                # execution begins at next instruction
-@RealMode: 
+L_RealMode: 
     .byte 0x66,0x2e                     # CS and operand size override
-    lidt    (_16Idtr - @Base1)(%rsi)
+    lidt    (_16Idtr - L_Base1)(%rsi)
     .byte 0x66,0x61                     # popad
     .byte 0x1f                          # pop ds
     .byte 0x7                           # pop es
@@ -189,26 +193,26 @@ ASM_PFX(ToUserCode):
     .byte 0x66                          # make the following retf 32-bit
     lret                                # transfer control to user code
 
-.equ  CODE16,  ASM_PFX(16Code) - .
-.equ  DATA16,  ASM_PFX(16Data) - .
-.equ  DATA32,  ASM_PFX(32Data) - .
+.equ  CODE16,  ASM_PFX(_16Code) - .
+.equ  DATA16,  ASM_PFX(_16Data) - .
+.equ  DATA32,  ASM_PFX(_32Data) - .
 
-_NullSeg:   .quad      0
-ASM_PFX(16Code):
+ASM_PFX(NullSeg):   .quad      0
+ASM_PFX(_16Code):
             .word -1
             .word 0
             .byte 0
             .byte 0x9b
             .byte 0x8f                  # 16-bit segment, 4GB limit
             .byte 0
-ASM_PFX(16Data):
+ASM_PFX(_16Data):
             .word -1
             .word 0
             .byte 0
             .byte 0x93
             .byte 0x8f                  # 16-bit segment, 4GB limit
             .byte 0
-ASM_PFX(32Data):
+ASM_PFX(_32Data):
             .word -1
             .word 0
             .byte 0
@@ -226,7 +230,6 @@ ASM_PFX(32Data):
 #   IN OUT  VOID                      *Transition
 #   );
 #------------------------------------------------------------------------------
-# MISMATCH: "InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi"
 
 .globl ASM_PFX(InternalAsmThunk16)
 ASM_PFX(InternalAsmThunk16):
@@ -235,9 +238,13 @@ ASM_PFX(InternalAsmThunk16):
     pushq   %rsi
     pushq   %rdi
     
-    movl    %ds, %r10d                  # r9 ~ r11 are not accessible in 16-bit
-    movl    %es, %r11d                  # so use them for saving seg registers
-    movl    %ss, %r9d
+    movq    %ds, %rbx
+    pushq   %rbx      # Save ds segment register on the stack
+    movq    %es, %rbx
+    pushq   %rbx      # Save es segment register on the stack
+    movq    %ss, %rbx
+    pushq   %rbx      # Save ss segment register on the stack
+
     .byte   0x0f, 0xa0                  #push   fs
     .byte   0x0f, 0xa8                  #push   gs
     movq    %rcx, %rsi
@@ -258,7 +265,7 @@ ASM_PFX(InternalAsmThunk16):
     lea     (_BackFromUserCode - ASM_PFX(m16Start))(%rdx), %ax
     stosl                               # [edi] <- return address of user code
     sgdt    (SavedGdt - SavedCr4)(%rcx) 
-    sidt    0x38(%rsp)
+    sidt    0x50(%rsp)
     movq    %cr0, %rax
     movl    %eax, (SavedCr0 - SavedCr4)(%rcx)
     andl    $0x7ffffffe,%eax            # clear PE, PG bits
@@ -272,22 +279,26 @@ ASM_PFX(InternalAsmThunk16):
     movl    %edx,%ss
     pushfq
     lea     -8(%rdx), %edx
-    lea     @RetFromRealMode, %r8
+    lea     L_RetFromRealMode, %r8
     pushq   %r8
     movl    %cs, %r8d
     movw    %r8w, (SavedCs - SavedCr4)(%rcx)
-    movq     %rsp, %r8
+    movl    %esp, (SavedSp - SavedCr4)(%rcx)
     .byte   0xff, 0x69                  #  jmp (_EntryPoint - SavedCr4)(%rcx)
     .byte   _EntryPoint - SavedCr4
-@RetFromRealMode: 
+L_RetFromRealMode: 
     popfq
-    lidt    0x38(%rsp)
+    lidt    0x50(%rsp)
     lea     -IA32_REGS_SIZE(%rbp), %eax
     .byte 0x0f, 0xa9                    # pop gs
     .byte 0x0f, 0xa1                    # pop fs
-    movl    %r9d, %ss
-    movl    %r11d, %es
-    movl    %r10d, %ds
+    
+    popq     %rbx
+    movq     %rbx, %ss
+    popq     %rbx
+    movq     %rbx, %es
+    popq     %rbx
+    movq     %rbx, %ds
     
     popq    %rdi
     popq    %rsi
