@@ -63,7 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_GUID mBootMaintGuid;
 extern EFI_GUID mFileExplorerGuid;
-
+extern CHAR16   mFileExplorerStorageName[];
 //
 // These are the VFR compiler generated data representing our VFR data.
 //
@@ -1565,7 +1565,6 @@ extern COM_ATTR                   DataBitsList[4];
 extern COM_ATTR                   ParityList[5];
 extern COM_ATTR                   StopBitsList[3];
 extern EFI_GUID                   TerminalTypeGuid[4];
-extern EFI_HII_UPDATE_DATA        gUpdateData;
 extern STRING_DEPOSITORY          *FileOptionStrDepository;
 extern STRING_DEPOSITORY          *ConsoleOptionStrDepository;
 extern STRING_DEPOSITORY          *BootOptionStrDepository;
@@ -1575,5 +1574,13 @@ extern STRING_DEPOSITORY          *DriverOptionHelpStrDepository;
 extern STRING_DEPOSITORY          *TerminalStrDepository;
 extern EFI_DEVICE_PATH_PROTOCOL   EndDevicePath[];
 extern EFI_GUID                   EfiLegacyDevOrderGuid;
+
+//
+// Shared IFR form update data
+//
+extern VOID                        *mStartOpCodeHandle;
+extern VOID                        *mEndOpCodeHandle;
+extern EFI_IFR_GUID_LABEL          *mStartLabel;
+extern EFI_IFR_GUID_LABEL          *mEndLabel;
 
 #endif

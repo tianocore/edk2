@@ -29,6 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define BOOT_MANAGER_FORM_ID     0x1000
 
 #define LABEL_BOOT_OPTION        0x00
+#define LABEL_BOOT_OPTION_END    0x01
 
 //
 // These are the VFR compiler generated data representing our VFR data.

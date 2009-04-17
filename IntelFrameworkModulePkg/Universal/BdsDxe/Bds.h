@@ -51,8 +51,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <Library/IfrSupportLib.h>
-#include <Library/ExtendedIfrSupportLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/HobLib.h>
 #include <Library/BaseLib.h>

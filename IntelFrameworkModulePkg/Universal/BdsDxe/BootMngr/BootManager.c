@@ -186,7 +186,6 @@ CallBootManager (
   EFI_STATUS                  Status;
   BDS_COMMON_OPTION           *Option;
   LIST_ENTRY                  *Link;
-  EFI_HII_UPDATE_DATA         UpdateData;
   CHAR16                      *ExitData;
   UINTN                       ExitDataSize;
   EFI_STRING_ID               Token;
@@ -198,6 +197,10 @@ CallBootManager (
   EFI_HII_HANDLE              HiiHandle;
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
   UINTN                       TempSize;
+  VOID                        *StartOpCodeHandle;
+  VOID                        *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL          *StartLabel;
+  EFI_IFR_GUID_LABEL          *EndLabel;
 
   gOption = NULL;
   InitializeListHead (&BdsBootOptionList);
@@ -223,10 +226,25 @@ CallBootManager (
   //
   // Allocate space for creation of UpdateData Buffer
   //
-  UpdateData.BufferSize = 0x1000;
-  UpdateData.Offset = 0;
-  UpdateData.Data = AllocateZeroPool (0x1000);
-  ASSERT (UpdateData.Data != NULL);
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
+
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number       = LABEL_BOOT_OPTION;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = LABEL_BOOT_OPTION_END;
 
   mKeyInput = 0;
 
@@ -256,32 +274,33 @@ CallBootManager (
 
     HelpToken = HiiSetString (HiiHandle, 0, HelpString, NULL);
 
-    CreateActionOpCode (
+    HiiCreateActionOpCode (
+      StartOpCodeHandle,
       mKeyInput,
       Token,
       HelpToken,
       EFI_IFR_FLAG_CALLBACK,
-      0,
-      &UpdateData
+      0
       );
   }
 
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     HiiHandle,
     &mBootManagerGuid,
     BOOT_MANAGER_FORM_ID,
-    LABEL_BOOT_OPTION,
-    FALSE,
-    &UpdateData
+    StartOpCodeHandle,
+    EndOpCodeHandle
     );
-  FreePool (UpdateData.Data);
+
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
 
   ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
   Status = gFormBrowser2->SendForm (
                            gFormBrowser2,
                            &HiiHandle,
                            1,
-                           NULL,
+                           &mBootManagerGuid,
                            0,
                            NULL,
                            &ActionRequest

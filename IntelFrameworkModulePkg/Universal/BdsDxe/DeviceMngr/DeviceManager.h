@@ -26,6 +26,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   0x3ebfa8e6, 0x511d, 0x4b5b, {0xa9, 0x5f, 0xfb, 0x38, 0x26, 0xf, 0x1c, 0x27} \
   }
 
+#define LABEL_DEVICES_LIST                   0x0080
+#define LABEL_END                            0xffff
+
 #define LABEL_VBIOS                          0x0040
 
 #define DEVICE_MANAGER_FORM_ID               0x1000

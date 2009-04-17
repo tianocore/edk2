@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "DeviceManager.h"
+#include <Guid/HiiPlatformSetupFormset.h>
 
 DEVICE_MANAGER_CALLBACK_DATA  gDeviceManagerPrivate = {
   DEVICE_MANAGER_CALLBACK_DATA_SIGNATURE,
@@ -60,9 +61,6 @@ HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
     }
   }
 };
-
-#define MENU_ITEM_NUM  \
-  (sizeof (mDeviceManagerMenuItemTable) / sizeof (DEVICE_MANAGER_MENU_ITEM))
 
 /**
   This function is invoked if user selected a iteractive opcode from Device Manager's
@@ -155,6 +153,124 @@ InitializeDeviceManager (
 }
 
 /**
+  Extract the displayed formset for given HII handle and class guid.
+
+  @param Handle          The HII handle.
+  @param SetupClassGuid  The class guid specifies which form set will be displayed.
+  @param FormSetTitle    Formset title string.
+  @param FormSetHelp     Formset help string.
+
+  @retval  TRUE          The formset for given HII handle will be displayed.
+  @return  FALSE         The formset for given HII handle will not be displayed.
+
+**/
+BOOLEAN
+ExtractDisplayedHiiFormFromHiiHandle (
+  IN      EFI_HII_HANDLE      Handle,
+  IN      EFI_GUID            *SetupClassGuid,
+  OUT     EFI_STRING_ID       *FormSetTitle,
+  OUT     EFI_STRING_ID       *FormSetHelp
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        BufferSize;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+  UINT8                        *Package;
+  UINT8                        *OpCodeData;
+  UINT32                       Offset;
+  UINT32                       Offset2;
+  UINT32                       PackageListLength;
+  EFI_HII_PACKAGE_HEADER       PackageHeader;
+  EFI_GUID                     *ClassGuid;
+  UINT8                        ClassGuidNum;
+
+  ASSERT (Handle != NULL);
+  ASSERT (SetupClassGuid != NULL);  
+  ASSERT (FormSetTitle != NULL);
+  ASSERT (FormSetHelp != NULL);
+
+  *FormSetTitle = 0;
+  *FormSetHelp  = 0;
+  ClassGuidNum  = 0;
+  ClassGuid     = NULL;
+
+  //
+  // Get HII PackageList
+  //
+  BufferSize = 0;
+  HiiPackageList = NULL;
+  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  //
+  // Handle is a invalid handle. Check if Handle is corrupted.
+  //
+  ASSERT (Status != EFI_NOT_FOUND);
+  //
+  // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
+  //
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  
+  HiiPackageList = AllocatePool (BufferSize);
+  ASSERT (HiiPackageList != NULL);
+
+  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  //
+  // Get Form package from this HII package List
+  //
+  Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+  Offset2 = 0;
+  PackageListLength = ReadUnaligned32 (&HiiPackageList->PackageLength);
+
+  while (Offset < PackageListLength) {
+    Package = ((UINT8 *) HiiPackageList) + Offset;
+    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
+
+    if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
+      //
+      // Search FormSet Opcode in this Form Package
+      //
+      Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
+      while (Offset2 < PackageHeader.Length) {
+        OpCodeData = Package + Offset2;
+
+        if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
+          //
+          // Find FormSet OpCode
+          //
+          ClassGuidNum = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags;
+          ClassGuid = (EFI_GUID *) (VOID *)(OpCodeData + sizeof (EFI_IFR_FORM_SET));
+          while (ClassGuidNum-- > 0) {
+            if (CompareGuid (SetupClassGuid, ClassGuid)) {
+              CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
+              CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
+              FreePool (HiiPackageList);
+              return TRUE;
+            }
+          }
+        }
+        
+        //
+        // Go to next opcode
+        //
+        Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
+      }
+    }
+    
+    //
+    // Go to next package
+    //
+    Offset += PackageHeader.Length;
+  }
+
+  FreePool (HiiPackageList);
+
+  return FALSE;
+}
+
+/**
   Call the browser and display the device manager to allow user
   to configure the platform.
 
@@ -172,21 +288,21 @@ CallDeviceManager (
   )
 {
   EFI_STATUS                  Status;
-  UINTN                       Count;
   UINTN                       Index;
   EFI_STRING                  String;
-  EFI_HII_UPDATE_DATA         UpdateData[MENU_ITEM_NUM];
   EFI_STRING_ID               Token;
   EFI_STRING_ID               TokenHelp;
   EFI_HII_HANDLE              *HiiHandles;
   EFI_HII_HANDLE              HiiHandle;
-  UINT16                      FormSetClass;
   EFI_STRING_ID               FormSetTitle;
   EFI_STRING_ID               FormSetHelp;
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
+  VOID                        *StartOpCodeHandle;
+  VOID                        *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL          *StartLabel;
+  EFI_IFR_GUID_LABEL          *EndLabel;
 
-  HiiHandles          = NULL;
-
+  HiiHandles    = NULL;
   Status        = EFI_SUCCESS;
   gCallbackKey  = 0;
 
@@ -201,17 +317,30 @@ CallDeviceManager (
   //
   // Create Subtitle OpCodes
   //
-  for (Index = 0; Index < MENU_ITEM_NUM; Index++) {
-    //
-    // Allocate space for creation of UpdateData Buffer
-    //
-    UpdateData[Index].BufferSize = 0x1000;
-    UpdateData[Index].Offset = 0;
-    UpdateData[Index].Data = AllocatePool (0x1000);
-    ASSERT (UpdateData[Index].Data != NULL);
+  //
+  // Allocate space for creation of UpdateData Buffer
+  //
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
 
-    CreateSubTitleOpCode (mDeviceManagerMenuItemTable[Index].StringId, 0, 0, 1,  &UpdateData[Index]);
-  }
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number       = LABEL_DEVICES_LIST;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = LABEL_END;
+
+  HiiCreateSubTitleOpCode (StartOpCodeHandle, STRING_TOKEN (STR_DEVICES_LIST), 0, 0, 1);
 
   //
   // Get all the Hii handles
@@ -225,9 +354,7 @@ CallDeviceManager (
   // Search for formset of each class type
   //
   for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    IfrLibExtractClassFromHiiHandle (HiiHandles[Index], &FormSetClass, &FormSetTitle, &FormSetHelp);
-
-    if (FormSetClass == EFI_NON_DEVICE_CLASS) {
+    if (!ExtractDisplayedHiiFormFromHiiHandle (HiiHandles[Index], &gEfiHiiPlatformSetupFormsetGuid, &FormSetTitle, &FormSetHelp)) {
       continue;
     }
 
@@ -241,42 +368,35 @@ CallDeviceManager (
     TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
     FreePool (String);
 
-    for (Count = 0; Count < MENU_ITEM_NUM; Count++) {
-      if (FormSetClass & mDeviceManagerMenuItemTable[Count].Class) {
-        CreateActionOpCode (
-          (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET),
-          Token,
-          TokenHelp,
-          EFI_IFR_FLAG_CALLBACK,
-          0,
-          &UpdateData[Count]
-          );
-      }
-    }
-  }
-
-  for (Index = 0; Index < MENU_ITEM_NUM; Index++) {
-    //
-    // Add End Opcode for Subtitle
-    //
-    CreateEndOpCode (&UpdateData[Index]);
-
-    IfrLibUpdateForm (
-      HiiHandle,
-      &mDeviceManagerGuid,
-      DEVICE_MANAGER_FORM_ID,
-      mDeviceManagerMenuItemTable[Index].Class,
-      FALSE,
-      &UpdateData[Index]
+    HiiCreateActionOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET),
+      Token,
+      TokenHelp,
+      EFI_IFR_FLAG_CALLBACK,
+      0
       );
   }
+
+  //
+  // Add End Opcode for Subtitle
+  //
+  HiiCreateEndOpCode (StartOpCodeHandle);
+
+  HiiUpdateForm (
+    HiiHandle,
+    &mDeviceManagerGuid,
+    DEVICE_MANAGER_FORM_ID,
+    StartOpCodeHandle,
+    EndOpCodeHandle
+    );
 
   ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
   Status = gFormBrowser2->SendForm (
                            gFormBrowser2,
                            &HiiHandle,
                            1,
-                           NULL,
+                           &mDeviceManagerGuid,
                            0,
                            NULL,
                            &ActionRequest
@@ -329,9 +449,8 @@ CallDeviceManager (
     Status = EFI_SUCCESS;
   }
 
-  for (Index = 0; Index < MENU_ITEM_NUM; Index++) {
-    FreePool (UpdateData[Index].Data);
-  }
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
   FreePool (HiiHandles);
 
   return Status;

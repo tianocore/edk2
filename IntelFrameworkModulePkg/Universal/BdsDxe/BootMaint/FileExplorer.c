@@ -37,6 +37,7 @@ UpdateFileExplorePage (
   FormId          = 0;
 
   RefreshUpdateData ();
+  mStartLabel->Number = FORM_FILE_EXPLORER_ID;
 
   for (Index = 0; Index < MenuOption->MenuNumber; Index++) {
     NewMenuEntry    = BOpt_GetMenuEntry (MenuOption, Index);
@@ -50,13 +51,13 @@ UpdateFileExplorePage (
       //
       // Create Text opcode for directory, also create Text opcode for file in BOOT_FROM_FILE_STATE.
       //
-      CreateActionOpCode (
+      HiiCreateActionOpCode (
+        mStartOpCodeHandle,
         (UINT16) (FILE_OPTION_OFFSET + Index),
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
         EFI_IFR_FLAG_CALLBACK,
-        0,
-        &gUpdateData
+        0
         );
     } else {
       //
@@ -68,24 +69,23 @@ UpdateFileExplorePage (
         FormId = FORM_DRIVER_ADD_FILE_DESCRIPTION_ID;
       }
 
-      CreateGotoOpCode (
+      HiiCreateGotoOpCode (
+        mStartOpCodeHandle,
         FormId,
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
         EFI_IFR_FLAG_CALLBACK,
-        (UINT16) (FILE_OPTION_OFFSET + Index),
-        &gUpdateData
+        (UINT16) (FILE_OPTION_OFFSET + Index)
         );
     }
   }
 
-  IfrLibUpdateForm (
+  HiiUpdateForm (
     CallbackData->FeHiiHandle,
     &mFileExplorerGuid,
     FORM_FILE_EXPLORER_ID,
-    FORM_FILE_EXPLORER_ID,
-    FALSE,
-    &gUpdateData
+    mStartOpCodeHandle, // Label FORM_FILE_EXPLORER_ID
+    mEndOpCodeHandle    // LABEL_END
     );
 }
 
@@ -179,22 +179,22 @@ UpdateFileExplorer (
         // Create Subtitle op-code for the display string of the option.
         //
         RefreshUpdateData ();
+        mStartLabel->Number = FormId;
 
-        CreateSubTitleOpCode (
+        HiiCreateSubTitleOpCode (
+          mStartOpCodeHandle,
           NewMenuEntry->DisplayStringToken,
           0,
           0,
-          0,
-          &gUpdateData
+          0
           );
 
-        IfrLibUpdateForm (
+        HiiUpdateForm (
           CallbackData->FeHiiHandle,
           &mFileExplorerGuid,
           FormId,
-          FormId,
-          FALSE,
-          &gUpdateData
+          mStartOpCodeHandle, // Label FormId
+          mEndOpCodeHandle    // LABEL_END
           );
         break;
 
@@ -248,7 +248,6 @@ FileExplorerCallback (
   BMM_CALLBACK_DATA     *Private;
   FILE_EXPLORER_NV_DATA *NvRamMap;
   EFI_STATUS            Status;
-  UINTN                 BufferSize;
 
   if ((Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -261,12 +260,13 @@ FileExplorerCallback (
   //
   // Retrieve uncommitted data from Form Browser
   //
-  NvRamMap = &Private->FeFakeNvData;
-  BufferSize = sizeof (FILE_EXPLORER_NV_DATA);
-  Status = GetBrowserData (NULL, NULL, &BufferSize, (UINT8 *) NvRamMap);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  NvRamMap = (FILE_EXPLORER_NV_DATA *) HiiGetBrowserData (&mFileExplorerGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA));
+  if (NvRamMap == NULL) {
+    return EFI_NOT_FOUND;
   }
+  CopyMem (&Private->FeFakeNvData, NvRamMap, sizeof (FILE_EXPLORER_NV_DATA));
+  FreePool (NvRamMap);
+  NvRamMap = &Private->FeFakeNvData;
 
   if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
     //
