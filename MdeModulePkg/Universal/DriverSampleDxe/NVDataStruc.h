@@ -25,6 +25,8 @@ Revision History:
 #ifndef _NVDATASTRUC_H_
 #define _NVDATASTRUC_H_
 
+#include <Guid/HiiPlatformSetupFormset.h>
+
 #define FORMSET_GUID \
   { \
     0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D} \
