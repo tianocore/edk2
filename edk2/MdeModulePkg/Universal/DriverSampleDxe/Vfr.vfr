@@ -51,11 +51,10 @@
 #define LABEL_UPDATE_BBS            0x2222
 
 formset
-  guid     = FORMSET_GUID,
-  title    = STRING_TOKEN(STR_FORM_SET_TITLE),
-  help     = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
-  class    = EFI_ON_BOARD_DEVICE_CLASS,
-  subclass = EFI_SETUP_APPLICATION_SUBCLASS,
+  guid      = FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
   
   //
   // Notes: VfrCompiler will insert a Standard Default Storage declaration 

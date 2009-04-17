@@ -2191,8 +2191,7 @@ InternalHiiUpdateFormPackageData (
   BOOLEAN                   GetFormSet;
   BOOLEAN                   GetForm;
   BOOLEAN                   Updated;
-  EFI_IFR_OP_HEADER         *AddOpCode;
-  UINT32                    UpdatePackageLength;
+  UINTN                     UpdatePackageLength;
 
   CopyMem (TempPackage, Package, sizeof (EFI_HII_PACKAGE_HEADER));
   UpdatePackageLength = sizeof (EFI_HII_PACKAGE_HEADER);
@@ -2230,7 +2229,7 @@ InternalHiiUpdateFormPackageData (
     //
     // The matched Form is found, and Update data in this form
     //
-    if (GetFormSet && GetForm && !Updated) {
+    if (GetFormSet && GetForm) {
       UpdateIfrOpHdr = (EFI_IFR_OP_HEADER *) OpCodeBufferStart->Buffer;
       if ((UpdateIfrOpHdr->Length == IfrOpHdr->Length) && \
           (CompareMem (IfrOpHdr, UpdateIfrOpHdr, UpdateIfrOpHdr->Length) == 0)) {
@@ -2263,22 +2262,14 @@ InternalHiiUpdateFormPackageData (
             return EFI_NOT_FOUND;
           }
         }
+
         //
         // Insert the updated data
         //
-        UpdateIfrOpHdr = (EFI_IFR_OP_HEADER *) OpCodeBufferStart->Buffer;
-        AddSize        = UpdateIfrOpHdr->Length;
-        AddOpCode      = (EFI_IFR_OP_HEADER *) (OpCodeBufferStart->Buffer + AddSize);
-        while (AddSize < OpCodeBufferStart->Position) {
-          CopyMem (BufferPos, AddOpCode, AddOpCode->Length);
-          BufferPos           += AddOpCode->Length;
-          UpdatePackageLength += AddOpCode->Length;
-          
-          AddSize   += AddOpCode->Length;
-          AddOpCode  = (EFI_IFR_OP_HEADER *) (OpCodeBufferStart->Buffer + AddSize);
-        }
-
-        ASSERT (AddSize == OpCodeBufferStart->Position);
+        AddSize = ((EFI_IFR_OP_HEADER *) OpCodeBufferStart->Buffer)->Length;
+        CopyMem (BufferPos, OpCodeBufferStart->Buffer + AddSize, OpCodeBufferStart->Position - AddSize);
+        BufferPos           += OpCodeBufferStart->Position - AddSize;
+        UpdatePackageLength += OpCodeBufferStart->Position - AddSize;
 
         if (OpCodeBufferEnd != NULL) {
           //
@@ -2288,10 +2279,19 @@ InternalHiiUpdateFormPackageData (
           BufferPos           += IfrOpHdr->Length;
           UpdatePackageLength += IfrOpHdr->Length;
         }
+
+        //
+        // Copy the left package data.
+        //
+        Offset += IfrOpHdr->Length;
+        CopyMem (BufferPos, (UINT8 *) Package + Offset, PackageHeader.Length - Offset);
+        UpdatePackageLength += PackageHeader.Length - Offset;
+
         //
         // Set update flag
         //
         Updated = TRUE;
+        break;
       }
     }
 
@@ -2311,7 +2311,7 @@ InternalHiiUpdateFormPackageData (
   //
   // Update the package length.
   //
-  PackageHeader.Length = UpdatePackageLength;
+  PackageHeader.Length = (UINT32) UpdatePackageLength;
   CopyMem (TempPackage, &PackageHeader, sizeof (EFI_HII_PACKAGE_HEADER));
 
   return EFI_SUCCESS;
