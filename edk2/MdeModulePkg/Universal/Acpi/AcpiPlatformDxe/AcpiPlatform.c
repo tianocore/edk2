@@ -94,7 +94,7 @@ LocateFvInstanceWithTables (
     //
     Status = FvInstance->ReadFile (
                            FvInstance,
-                           FixedPcdGetPtr (PcdAcpiTableStorageFile),
+                           (EFI_GUID*)FixedPcdGetPtr (PcdAcpiTableStorageFile),
                            NULL,
                            &Size,
                            &FileType,
@@ -208,7 +208,7 @@ AcpiPlatformEntryPoint (
 
     Status = FwVol->ReadSection (
                       FwVol,
-                      FixedPcdGetPtr (PcdAcpiTableStorageFile),
+                      (EFI_GUID*)FixedPcdGetPtr (PcdAcpiTableStorageFile),
                       EFI_SECTION_RAW,
                       Instance,
                       (VOID**) &CurrentTable,
