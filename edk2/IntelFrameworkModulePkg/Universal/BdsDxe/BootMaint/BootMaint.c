@@ -82,7 +82,7 @@ EFI_GUID EfiLegacyDevOrderGuid  = EFI_LEGACY_DEV_ORDER_VARIABLE_GUID;
 EFI_GUID mBootMaintGuid         = BOOT_MAINT_FORMSET_GUID;
 EFI_GUID mFileExplorerGuid      = FILE_EXPLORE_FORMSET_GUID;
 
-CHAR16  mBootMaintStorageName[]     = L"BmData";
+CHAR16  mBootMaintStorageName[]     = L"BmmData";
 CHAR16  mFileExplorerStorageName[]  = L"FeData";
 
 /**
@@ -251,8 +251,7 @@ BootMaintCallback (
   UINT8             *NewLegacyDev;
   UINT8             *DisMap;
   EFI_FORM_ID       FormId;
-  UINTN             BufferSize;
-
+  
   if ((Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -272,11 +271,9 @@ BootMaintCallback (
   //
   // Retrive uncommitted data from Form Browser
   //
-  CurrentFakeNVMap = &Private->BmmFakeNvData;
-  BufferSize = sizeof (BMM_FAKE_NV_DATA);
-  Status = GetBrowserData (NULL, NULL, &BufferSize, (UINT8 *) CurrentFakeNVMap);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  CurrentFakeNVMap = (BMM_FAKE_NV_DATA *) HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA));
+  if (CurrentFakeNVMap == NULL) {
+    CurrentFakeNVMap = &Private->BmmFakeNvData;
   }
 
   //
@@ -588,8 +585,15 @@ BootMaintCallback (
   //
   // Pass changed uncommitted data back to Form Browser
   //
-  BufferSize = sizeof (BMM_FAKE_NV_DATA);
-  Status = SetBrowserData (NULL, NULL, BufferSize, (UINT8 *) CurrentFakeNVMap, NULL);
+  Status = HiiSetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
+
+  //
+  // Update local settting.
+  //
+  if ((UINTN) CurrentFakeNVMap != (UINTN) &Private->BmmFakeNvData) {
+    CopyMem (&Private->BmmFakeNvData, CurrentFakeNVMap, sizeof (BMM_FAKE_NV_DATA));
+    FreePool (CurrentFakeNVMap);
+  }
 
   return Status;
 }
@@ -954,14 +958,32 @@ InitializeBM (
   ASSERT (BmmCallbackInfo->FeHiiHandle != NULL);
 
   //
-  // Allocate space for creation of Buffer
+  // Init OpCode Handle and Allocate space for creation of Buffer
   //
-  gUpdateData.BufferSize = UPDATE_DATA_SIZE;
-  gUpdateData.Data = AllocateZeroPool (UPDATE_DATA_SIZE);
-  if (gUpdateData.Data == NULL) {
+  mStartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  if (mStartOpCodeHandle == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
+
+  mEndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  if (mEndOpCodeHandle == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  mStartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (mStartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  mStartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  mEndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (mEndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  mEndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  mEndLabel->Number       = LABEL_END;
 
   InitializeStringDepository ();
 
@@ -986,63 +1008,63 @@ InitializeBM (
   Status = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID **) &LegacyBios);
   if (!EFI_ERROR (Status)) {
     RefreshUpdateData ();
+    mStartLabel->Number = FORM_BOOT_LEGACY_DEVICE_ID;
 
     //
     // If LegacyBios Protocol is installed, add 3 tags about legacy boot option
     // in BootOption form: legacy FD/HD/CD/NET/BEV
     //
-    CreateGotoOpCode (
+    HiiCreateGotoOpCode (
+      mStartOpCodeHandle,
       FORM_SET_FD_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_FD_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_FD_ORDER_TITLE),
       EFI_IFR_FLAG_CALLBACK,
-      FORM_SET_FD_ORDER_ID,
-      &gUpdateData
+      FORM_SET_FD_ORDER_ID
       );
 
-    CreateGotoOpCode (
+    HiiCreateGotoOpCode (
+      mStartOpCodeHandle,
       FORM_SET_HD_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_HD_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_HD_ORDER_TITLE),
       EFI_IFR_FLAG_CALLBACK,
-      FORM_SET_HD_ORDER_ID,
-      &gUpdateData
+      FORM_SET_HD_ORDER_ID
       );
 
-    CreateGotoOpCode (
+    HiiCreateGotoOpCode (
+      mStartOpCodeHandle,
       FORM_SET_CD_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_CD_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_CD_ORDER_TITLE),
       EFI_IFR_FLAG_CALLBACK,
-      FORM_SET_CD_ORDER_ID,
-      &gUpdateData
+      FORM_SET_CD_ORDER_ID
       );
 
-    CreateGotoOpCode (
+    HiiCreateGotoOpCode (
+      mStartOpCodeHandle,
       FORM_SET_NET_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_NET_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_NET_ORDER_TITLE),
       EFI_IFR_FLAG_CALLBACK,
-      FORM_SET_NET_ORDER_ID,
-      &gUpdateData
+      FORM_SET_NET_ORDER_ID
       );
 
-    CreateGotoOpCode (
+    HiiCreateGotoOpCode (
+      mStartOpCodeHandle,
       FORM_SET_BEV_ORDER_ID,
       STRING_TOKEN (STR_FORM_SET_BEV_ORDER_TITLE),
       STRING_TOKEN (STR_FORM_SET_BEV_ORDER_TITLE),
       EFI_IFR_FLAG_CALLBACK,
-      FORM_SET_BEV_ORDER_ID,
-      &gUpdateData
+      FORM_SET_BEV_ORDER_ID
       );
-
-    IfrLibUpdateForm (
+    
+    HiiUpdateForm (
       BmmCallbackInfo->BmmHiiHandle,
       &mBootMaintGuid,
       FORM_BOOT_SETUP_ID,
-      FORM_BOOT_LEGACY_DEVICE_ID,
-      FALSE,
-      &gUpdateData
+      mStartOpCodeHandle, // Label FORM_BOOT_LEGACY_DEVICE_ID
+      mEndOpCodeHandle    // LABEL_END
       );
   }
 
@@ -1061,10 +1083,15 @@ InitializeBM (
 
   FreeAllMenu ();
 
-  FreePool (gUpdateData.Data);
-  gUpdateData.Data = NULL;
-
 Exit:
+  if (mStartOpCodeHandle != NULL) {
+    HiiFreeOpCodeHandle (mStartOpCodeHandle);
+  }
+
+  if (mEndOpCodeHandle != NULL) {
+    HiiFreeOpCodeHandle (mEndOpCodeHandle);
+  }
+
   if (BmmCallbackInfo->FeDriverHandle != NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
            BmmCallbackInfo->FeDriverHandle,
@@ -1324,7 +1351,7 @@ FormSetDispatcher (
                              gFormBrowser2,
                              &CallbackData->BmmHiiHandle,
                              1,
-                             NULL,
+                             &mBootMaintGuid,
                              0,
                              NULL,
                              &ActionRequest
@@ -1346,7 +1373,7 @@ FormSetDispatcher (
                                gFormBrowser2,
                                &CallbackData->FeHiiHandle,
                                1,
-                               NULL,
+                               &mFileExplorerGuid,
                                0,
                                NULL,
                                &ActionRequest

@@ -24,11 +24,12 @@
 #define BOOT_MANAGER_SUBCLASS    0x00
 
 formset
-  guid     = FORMSET_GUID,
-  title    = STRING_TOKEN(STR_BM_BANNER),
-  help     = STRING_TOKEN(STR_LAST_STRING),
-  class    = BOOT_MANAGER_CLASS,
-  subclass = BOOT_MANAGER_SUBCLASS,
+  guid      = FORMSET_GUID,
+  title     = STRING_TOKEN(STR_BM_BANNER),
+  help      = STRING_TOKEN(STR_LAST_STRING),
+  classguid = FORMSET_GUID,
+  class     = BOOT_MANAGER_CLASS,
+  subclass  = BOOT_MANAGER_SUBCLASS,
 
   form formid = BOOT_MANAGER_FORM_ID,
        title  = STRING_TOKEN(STR_BM_BANNER);

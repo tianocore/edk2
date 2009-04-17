@@ -23,6 +23,7 @@
 #define EFI_OTHER_DEVICE_CLASS             0x0020
 #define LABEL_VBIOS                        0x0040
 
+#define LABEL_DEVICES_LIST                 0x0080
 #define LABEL_END                          0xffff
 
 #define DEVICE_MANAGER_CLASS               0x0000
@@ -31,11 +32,12 @@
 #define DEVICE_MANAGER_FORM_ID             0x1000
 
 formset
-  guid     = FORMSET_GUID,
-  title    = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE),
-  help     = STRING_TOKEN(STR_EMPTY_STRING),
-  class    = DEVICE_MANAGER_CLASS,
-  subclass = FRONT_PAGE_SUBCLASS,
+  guid      = FORMSET_GUID,
+  title     = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE),
+  help      = STRING_TOKEN(STR_EMPTY_STRING),
+  classguid = FORMSET_GUID,
+  class     = DEVICE_MANAGER_CLASS,
+  subclass  = FRONT_PAGE_SUBCLASS,
 
   form formid = DEVICE_MANAGER_FORM_ID,
        title  = STRING_TOKEN(STR_DEVICE_MANAGER_TITLE);
@@ -58,7 +60,9 @@ formset
     label EFI_ON_BOARD_DEVICE_CLASS;
 //    label LABEL_END;
 
-    label EFI_OTHER_DEVICE_CLASS;
+//    label EFI_OTHER_DEVICE_CLASS;
+
+    label LABEL_DEVICES_LIST;
     label LABEL_END;
 
     subtitle text = STRING_TOKEN(STR_EMPTY_STRING);

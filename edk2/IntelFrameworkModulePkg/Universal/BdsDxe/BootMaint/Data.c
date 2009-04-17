@@ -14,7 +14,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
-EFI_HII_UPDATE_DATA gUpdateData;
+VOID                *mStartOpCodeHandle = NULL;
+VOID                *mEndOpCodeHandle = NULL;
+EFI_IFR_GUID_LABEL  *mStartLabel = NULL;
+EFI_IFR_GUID_LABEL  *mEndLabel = NULL;
+
 STRING_DEPOSITORY   *FileOptionStrDepository;
 STRING_DEPOSITORY   *ConsoleOptionStrDepository;
 STRING_DEPOSITORY   *BootOptionStrDepository;

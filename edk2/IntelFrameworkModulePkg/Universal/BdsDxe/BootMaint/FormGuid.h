@@ -82,6 +82,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define VARSTORE_ID_BOOT_MAINT               0x1000
 #define VARSTORE_ID_FILE_EXPLORER            0x1001
 
+//
+// End Label
+//
+#define LABEL_END   0xffff
+
 ///
 /// This is the structure that will be used to store the
 /// question's current value. Use it at initialize time to
