@@ -107,6 +107,7 @@
   gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiCapsuleArchProtocolGuid                   ## CONSUMES
   gEfiDecompressProtocolGuid                    ## CONSUMES
+  gEfiLoadPeImageProtocolGuid                   ## PRODUCES
   gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
   gEfiLoadFileProtocolGuid                      ## CONSUMES
   gEfiLoadFile2ProtocolGuid                     ## CONSUMES

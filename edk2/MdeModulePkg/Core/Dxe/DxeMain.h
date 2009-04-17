@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/MonotonicCounter.h>
 #include <Protocol/StatusCode.h>
 #include <Protocol/Decompress.h>
+#include <Protocol/LoadPe32Image.h>
 #include <Protocol/Security.h>
 #include <Protocol/Ebc.h>
 #include <Protocol/Reset.h>
