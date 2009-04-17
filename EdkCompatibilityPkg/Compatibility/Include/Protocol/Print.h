@@ -68,7 +68,11 @@ UINTN
   IN  VA_LIST       Marker
   );
 
-
+/**
+   The EFI_PRINT_PROTOCOL provides one service to produce a Null-terminated Unicode string
+   based on a Null-terminated Unicode format string and a VA_LIST argument list and fill into 
+   the buffer as output
+**/
 struct _EFI_PRINT_PROTOCOL {
   UNI_VSPRINT               VSPrint;
 };
