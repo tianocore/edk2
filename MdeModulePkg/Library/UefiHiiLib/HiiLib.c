@@ -1158,10 +1158,10 @@ HiiIsConfigHdrMatch (
   buffer.  The returned buffer is allocated using AllocatePool().  The caller
   is responsible for freeing the returned buffer using FreePool().
 
-  @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
-                            is an optional parameter that may be NULL.
   @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
                             parameter that may be NULL.
+  @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
+                            is an optional parameter that may be NULL.
   @param[in]  BufferSize    Length in bytes of buffer to hold retrived data. 
 
   @retval NULL   The uncommitted data could not be retrieved.
@@ -2267,16 +2267,18 @@ InternalHiiUpdateFormPackageData (
         // Insert the updated data
         //
         UpdateIfrOpHdr = (EFI_IFR_OP_HEADER *) OpCodeBufferStart->Buffer;
-        AddOpCode      = (EFI_IFR_OP_HEADER *) (OpCodeBufferStart->Buffer + UpdateIfrOpHdr->Length);
         AddSize        = UpdateIfrOpHdr->Length;
+        AddOpCode      = (EFI_IFR_OP_HEADER *) (OpCodeBufferStart->Buffer + AddSize);
         while (AddSize < OpCodeBufferStart->Position) {
           CopyMem (BufferPos, AddOpCode, AddOpCode->Length);
           BufferPos           += AddOpCode->Length;
           UpdatePackageLength += AddOpCode->Length;
-
-          AddOpCode = (EFI_IFR_OP_HEADER *) ((UINT8 *) (AddOpCode) + AddOpCode->Length);
-          AddSize += AddOpCode->Length;          
+          
+          AddSize   += AddOpCode->Length;
+          AddOpCode  = (EFI_IFR_OP_HEADER *) (OpCodeBufferStart->Buffer + AddSize);
         }
+
+        ASSERT (AddSize == OpCodeBufferStart->Position);
 
         if (OpCodeBufferEnd != NULL) {
           //
