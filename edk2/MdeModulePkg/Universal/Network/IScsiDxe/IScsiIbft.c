@@ -1,7 +1,7 @@
 /** @file
   Implementation for iSCSI Boot Firmware Table publication.
 
-Copyright (c) 2004 - 2008, Intel Corporation.<BR>
+Copyright (c) 2004 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "IScsiImpl.h"
+
+BOOLEAN mIbftInstalled = FALSE;
+UINTN   mTableKey;
 
 /**
   Initialize the header of the iSCSI Boot Firmware Table.
@@ -440,56 +443,28 @@ IScsiPublishIbft (
   )
 {
   EFI_STATUS                                Status;
-  UINTN                                     TableHandle;
-  EFI_ACPI_SUPPORT_PROTOCOL                 *AcpiSupport;
+  EFI_ACPI_TABLE_PROTOCOL                   *AcpiTableProtocol;
   EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER *Table;
   UINTN                                     HandleCount;
   EFI_HANDLE                                *HandleBuffer;
   UINT8                                     *Heap;
-  INTN                                      Index;
-  EFI_ACPI_TABLE_VERSION                    Version;
-  UINT32                                    Signature;
 
-  Status = gBS->LocateProtocol (&gEfiAcpiSupportProtocolGuid, NULL, (VOID **)&AcpiSupport);
+  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **)&AcpiTableProtocol);
   if (EFI_ERROR (Status)) {
     return ;
   }
-  //
-  // Try to remove the old iSCSI Boot Firmware Table.
-  //
-  for (Index = 0;; Index++) {
-    Status = AcpiSupport->GetAcpiTable (
-                            AcpiSupport,
-                            Index,
-                            (VOID **)&Table,
-                            &Version,
-                            &TableHandle
-                            );
+
+  if (mIbftInstalled) {
+    Status = AcpiTableProtocol->UninstallAcpiTable (
+                                  AcpiTableProtocol,
+                                  mTableKey
+                                  );
     if (EFI_ERROR (Status)) {
-      break;
+      return ;
     }
-
-    Signature = Table->Signature;
-    gBS->FreePool (Table);
-
-    if (Signature == EFI_ACPI_3_0_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE) {
-      //
-      // Remove the table.
-      //
-      Status = AcpiSupport->SetAcpiTable (
-                              AcpiSupport,
-                              NULL,
-                              FALSE,
-                              Version,
-                              &TableHandle
-                              );
-      if (EFI_ERROR (Status)) {
-        return ;
-      }
-
-      break;
-    }
+    mIbftInstalled = FALSE;
   }
+
   //
   // Get all iSCSI private protocols.
   //
@@ -521,23 +496,21 @@ IScsiPublishIbft (
   IScsiFillInitiatorSection (Table, &Heap, HandleBuffer[0]);
   IScsiFillNICAndTargetSections (Table, &Heap, HandleCount, HandleBuffer);
 
-  gBS->FreePool (HandleBuffer);
-
-  TableHandle = 0;
+  FreePool (HandleBuffer);
 
   //
   // Install or update the iBFT table.
   //
-  Status = AcpiSupport->SetAcpiTable (
-                          AcpiSupport,
-                          Table,
-                          TRUE,
-                          EFI_ACPI_TABLE_VERSION_3_0,
-                          &TableHandle
-                          );
-  if (!EFI_ERROR (Status)) {
-    AcpiSupport->PublishTables (AcpiSupport, EFI_ACPI_TABLE_VERSION_3_0);
+  Status = AcpiTableProtocol->InstallAcpiTable (
+                                AcpiTableProtocol,
+                                Table,
+                                Table->Length,
+                                &mTableKey
+                                );
+  if (EFI_ERROR(Status)) {
+    return;
   }
 
-  gBS->FreePool (Table);
+  mIbftInstalled = TRUE;
+  FreePool (Table);
 }
