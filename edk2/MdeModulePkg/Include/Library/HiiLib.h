@@ -224,26 +224,6 @@ HiiGetHiiHandles (
 ;
 
 /**
-  Get next language from language code list (with separator ';').
-
-  If LangCode is NULL, then ASSERT.
-  If Lang is NULL, then ASSERT.
-
-  @param  LangCode    On input: point to first language in the list. On
-                                 output: point to next language in the list, or
-                                 NULL if no more language in the list.
-  @param  Lang           The first language in the list.
-
-**/
-VOID
-EFIAPI
-HiiLibGetNextLanguage (
-  IN OUT CHAR8      **LangCode,
-  OUT CHAR8         *Lang
-  )
-;
-
-/**
   Retrieves a pointer to the a Null-terminated ASCII string containing the list 
   of languages that an HII handle in the HII Database supports.  The returned 
   string is allocated using AllocatePool().  The caller is responsible for freeing
