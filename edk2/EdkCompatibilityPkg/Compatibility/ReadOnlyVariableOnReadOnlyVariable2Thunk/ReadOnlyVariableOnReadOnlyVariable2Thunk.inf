@@ -56,7 +56,6 @@
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
   gEfiPeiReadOnlyVariablePpiGuid                # PPI ALWAYS_PRODUCED
-  gPeiReadonlyVariableThunkPresentPpiGuid
 
 [Depex]
   gEfiPeiReadOnlyVariable2PpiGuid

@@ -22,7 +22,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _ECP_PEI_PCI_CFG_PPI ECP_PEI_PCI_CFG_PPI;
 
+/**
+  PCI read and write operation.
+  
+  Write to/read from a given location in the PCI configuration space.
 
+  @param  PeiServices                   An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This                              Pointer to local data for the interface.
+  @param  Width                            The width of the access. Enumerated in bytes.
+                                                    See EFI_PEI_PCI_CFG_PPI_WIDTH above.
+  @param  Address                         The physical address of the access. The format of
+                                                    the address is described by EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS.
+  @param  Buffer                            A pointer to the buffer of data..
+  @retval EFI_SUCCESS                   The function completed successfully.
+  @retval EFI_DEVICE_ERROR          There was a problem with the transaction.
+  @retval EFI_DEVICE_NOT_READY  The device is not capable of supporting the operation at this
+                                                 time.
+**/
 typedef
 EFI_STATUS
 (EFIAPI *ECP_PEI_PCI_CFG_PPI_IO) (
@@ -32,6 +48,16 @@ EFI_STATUS
   IN UINT64                   Address,
   IN OUT VOID                 *Buffer
   );
+
+/**
+  The ECP_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI 
+  controllers behind a PCI root bridge controller.
+  @param Read
+  PCI read services.  See the Read() function description.
+  @param Write
+  PCI write services.  See the Write() function description.
+
+**/
 
 struct _ECP_PEI_PCI_CFG_PPI {
   ECP_PEI_PCI_CFG_PPI_IO  Read;

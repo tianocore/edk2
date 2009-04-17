@@ -25,7 +25,6 @@ Module Name:
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable.h>
 #include <Ppi/ReadOnlyVariable2.h>
-#include <Ppi/ReadOnlyVariableThunkPresent.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
 
@@ -66,11 +65,6 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
   &mVariablePpi
 };
 
-EFI_PEI_PPI_DESCRIPTOR     mReadOnlyVariableThunkPresent = {
-    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-    &gPeiReadonlyVariableThunkPresentPpiGuid,
-    NULL
-};
 
 
 /**
@@ -89,19 +83,10 @@ PeimInitializeReadOnlyVariable (
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  VOID        *Interface;
-  EFI_STATUS  Status;
-
   //
-  // Make sure ReadOnlyVariableToReadOnlyVariable2 module is not present. If so, the call chain will form a
+  //Developer should make sure ReadOnlyVariableToReadOnlyVariable2 module is not present. If so, the call chain will form a
   // infinite loop: ReadOnlyVariable -> ReadOnlyVariable2 -> ReadOnlyVariable -> ....
   //
-  Status = PeiServicesLocatePpi (&gPeiReadonlyVariableThunkPresentPpiGuid, 0, NULL, &Interface);
-  ASSERT (Status == EFI_NOT_FOUND);
-
-  Status = PeiServicesInstallPpi (&mReadOnlyVariableThunkPresent);
-  ASSERT_EFI_ERROR (Status);
-
   //
   // Publish the variable capability to other modules
   //

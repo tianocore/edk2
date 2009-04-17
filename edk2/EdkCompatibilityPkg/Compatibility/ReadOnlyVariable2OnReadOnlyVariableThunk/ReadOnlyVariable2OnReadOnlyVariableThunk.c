@@ -26,7 +26,6 @@ Module Name:
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/ReadOnlyVariable.h>
-#include <Ppi/ReadOnlyVariableThunkPresent.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
@@ -69,12 +68,6 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
 };
 
 
-EFI_PEI_PPI_DESCRIPTOR     mReadOnlyVariableThunkPresent = {
-    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-    &gPeiReadonlyVariableThunkPresentPpiGuid,
-    NULL
-};
-
 /**
   User entry for this PEIM driver.
   
@@ -92,8 +85,6 @@ PeimInitializeReadOnlyVariable2 (
   IN CONST EFI_PEI_SERVICES    **PeiServices
   )
 {
-  VOID        *Interface;
-  EFI_STATUS  Status;
   //
   // This thunk module can only be used together with a PI PEI core, as we 
   // assume PeiServices Pointer Table can be located in a standard way defined
@@ -102,15 +93,9 @@ PeimInitializeReadOnlyVariable2 (
   ASSERT ((*PeiServices)->Hdr.Revision >= 0x00010000);
 
   //
-  // Make sure ReadOnlyVariable2ToReadOnlyVariable module is not present. If so, the call chain will form a
-  // infinite loop: ReadOnlyVariable2 -> ReadOnlyVariable -> ReadOnlyVariable2 -> ....
+  // Developer should make sure ReadOnlyVariable2ToReadOnlyVariable module is not present. or else, the call chain will form a
+  // infinite loop: ReadOnlyVariable2 -> ReadOnlyVariable -> ReadOnlyVariable2 -> .....
   //
-  Status = PeiServicesLocatePpi (&gPeiReadonlyVariableThunkPresentPpiGuid, 0, NULL, &Interface);
-  ASSERT (Status == EFI_NOT_FOUND);
-  
-  Status = PeiServicesInstallPpi (&mReadOnlyVariableThunkPresent);
-  ASSERT_EFI_ERROR (Status);
-  
   //
   // Publish the variable capability to other modules
   //
