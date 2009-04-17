@@ -140,7 +140,10 @@ SavedCr0    DD      ?
 @64Eip      DD      ?
 SavedCs     DW      ?
 @64BitCode:
-    mov     rsp, r8                     ; restore stack
+    db      090h 
+    db      067h, 0bch                 ; mov esp, imm32
+SavedSp     DD   ?                     ; restore stack
+    nop
     ret
 _BackFromUserCode   ENDP
 
@@ -230,9 +233,13 @@ GDT_SIZE = $ - _NullSeg
 ;   );
 ;------------------------------------------------------------------------------
 InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
-    mov     r10d, ds                    ; r9 ~ r11 are not accessible in 16-bit
-    mov     r11d, es                    ; so use them for saving seg registers
-    mov     r9d, ss
+    mov     rbx, ds
+    push    rbx          ; Save ds segment register on the stack
+    mov     rbx, es
+    push    rbx          ; Save es segment register on the stack
+    mov     rbx, ss
+    push    rbx          ; Save ss segment register on the stack
+    
     push    fs
     push    gs
     mov     rsi, rcx
@@ -252,7 +259,7 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     lea     ax, [rdx + (_BackFromUserCode - m16Start)]  ; offset address
     stosd                               ; [edi] <- return address of user code
     sgdt    fword ptr [rcx + (SavedGdt - SavedCr4)]
-    sidt    fword ptr [rsp + 38h]       ; save IDT stack in argument space
+    sidt    fword ptr [rsp + 50h]       ; save IDT stack in argument space
     mov     rax, cr0
     mov     [rcx + (SavedCr0 - SavedCr4)], eax
     and     eax, 7ffffffeh              ; clear PE, PG bits
@@ -270,17 +277,20 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     push    r8
     mov     r8d, cs
     mov     [rcx + (SavedCs - SavedCr4)], r8w
-    mov     r8, rsp
+    mov     [rcx + (SavedSp - SavedCr4)], esp
     jmp     fword ptr [rcx + (_EntryPoint - SavedCr4)]
 @RetFromRealMode:
     popfq
-    lidt    fword ptr [rsp + 38h]       ; restore protected mode IDTR
+    lidt    fword ptr [rsp + 50h]       ; restore protected mode IDTR
     lea     eax, [rbp - sizeof (IA32_REGS)]
     pop     gs
     pop     fs
-    mov     ss, r9d
-    mov     es, r11d
-    mov     ds, r10d
+    pop     rbx
+    mov     ss, rbx
+    pop     rbx
+    mov     es, rbx
+    pop     rbx
+    mov     ds, rbx
     ret
 InternalAsmThunk16  ENDP
 

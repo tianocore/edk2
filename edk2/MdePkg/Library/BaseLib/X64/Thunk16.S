@@ -136,10 +136,13 @@ SavedCr4:   .space  4
 SavedCr0:    .space      4
     movq    %rax, %cr0
     .byte 0x66,0xea                     # jmp far cs:L_64Bit
-L_64Eip:      .space      4
+L_64Eip:     .space      4
 SavedCs:     .space      2
 L_64BitCode: 
-    movq     %r8, %rsp
+    .byte   0x90
+    .byte   0x67,0xbc                  # mov esp, imm32
+SavedSp:    .space 4                   # restore stack
+    nop
     ret
 
 _EntryPoint: .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
@@ -227,7 +230,6 @@ ASM_PFX(_32Data):
 #   IN OUT  VOID                      *Transition
 #   );
 #------------------------------------------------------------------------------
-# MISMATCH: "InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi"
 
 .globl ASM_PFX(InternalAsmThunk16)
 ASM_PFX(InternalAsmThunk16):
@@ -236,9 +238,13 @@ ASM_PFX(InternalAsmThunk16):
     pushq   %rsi
     pushq   %rdi
     
-    movl    %ds, %r10d                  # r9 ~ r11 are not accessible in 16-bit
-    movl    %es, %r11d                  # so use them for saving seg registers
-    movl    %ss, %r9d
+    movq    %ds, %rbx
+    pushq   %rbx      # Save ds segment register on the stack
+    movq    %es, %rbx
+    pushq   %rbx      # Save es segment register on the stack
+    movq    %ss, %rbx
+    pushq   %rbx      # Save ss segment register on the stack
+
     .byte   0x0f, 0xa0                  #push   fs
     .byte   0x0f, 0xa8                  #push   gs
     movq    %rcx, %rsi
@@ -259,7 +265,7 @@ ASM_PFX(InternalAsmThunk16):
     lea     (_BackFromUserCode - ASM_PFX(m16Start))(%rdx), %ax
     stosl                               # [edi] <- return address of user code
     sgdt    (SavedGdt - SavedCr4)(%rcx) 
-    sidt    0x38(%rsp)
+    sidt    0x50(%rsp)
     movq    %cr0, %rax
     movl    %eax, (SavedCr0 - SavedCr4)(%rcx)
     andl    $0x7ffffffe,%eax            # clear PE, PG bits
@@ -277,18 +283,22 @@ ASM_PFX(InternalAsmThunk16):
     pushq   %r8
     movl    %cs, %r8d
     movw    %r8w, (SavedCs - SavedCr4)(%rcx)
-    movq     %rsp, %r8
+    movl    %esp, (SavedSp - SavedCr4)(%rcx)
     .byte   0xff, 0x69                  #  jmp (_EntryPoint - SavedCr4)(%rcx)
     .byte   _EntryPoint - SavedCr4
 L_RetFromRealMode: 
     popfq
-    lidt    0x38(%rsp)
+    lidt    0x50(%rsp)
     lea     -IA32_REGS_SIZE(%rbp), %eax
     .byte 0x0f, 0xa9                    # pop gs
     .byte 0x0f, 0xa1                    # pop fs
-    movl    %r9d, %ss
-    movl    %r11d, %es
-    movl    %r10d, %ds
+    
+    popq     %rbx
+    movq     %rbx, %ss
+    popq     %rbx
+    movq     %rbx, %es
+    popq     %rbx
+    movq     %rbx, %ds
     
     popq    %rdi
     popq    %rsi
