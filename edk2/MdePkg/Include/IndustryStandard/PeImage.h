@@ -499,10 +499,10 @@ typedef struct {
 ///
 typedef struct {
   union {
-    UINT32  SymbolTableIndex; // Symbol table index of function name if Linenumber is 0.
-    UINT32  VirtualAddress;   // Virtual address of line number.
+    UINT32  SymbolTableIndex; ///< Symbol table index of function name if Linenumber is 0.
+    UINT32  VirtualAddress;   ///< Virtual address of line number.
   } Type;
-  UINT16  Linenumber;         // Line number.
+  UINT16  Linenumber;         ///< Line number.
 } EFI_IMAGE_LINENUMBER;
 
 ///

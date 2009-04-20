@@ -55,7 +55,7 @@ typedef UINT8 SMBIOS_TABLE_STRING;
 /// Defines which functions the BIOS supports. PCI, PCMCIA, Flash, etc. 
 ///
 typedef struct {
-  UINT32  Reserved                          :2;  //Bits 0-1
+  UINT32  Reserved                          :2;  ///< Bits 0-1
   UINT32  Unknown                           :1; 
   UINT32  BiosCharacteristicsNotSupported   :1; 
   UINT32  IsaIsSupported                    :1;  
@@ -86,8 +86,8 @@ typedef struct {
   UINT32  PrinterIsSupported                :1;
   UINT32  CgaMonoIsSupported                :1;
   UINT32  NecPc98                           :1;
-  UINT32  ReservedForVendor                 :32; // Bits 32-63. Bits 32-47 reserved for BIOS vendor 
-                                                 // and bits 48-63 reserved for System Vendor. 
+  UINT32  ReservedForVendor                 :32; ///< Bits 32-63. Bits 32-47 reserved for BIOS vendor 
+                                                 ///< and bits 48-63 reserved for System Vendor. 
 } MISC_BIOS_CHARACTERISTICS;
 
 ///
@@ -115,7 +115,7 @@ typedef struct {
   UINT8  BiosBootSpecIsSupported              :1;
   UINT8  FunctionKeyNetworkBootIsSupported    :1; 
   UINT8  TargetContentDistributionEnabled     :1; 
-  UINT8  ExtensionByte2Reserved               :1; //Bits 3-7
+  UINT8  ExtensionByte2Reserved               :1;
 } MBCE_SYSTEM_RESERVED;
 
 ///
@@ -446,7 +446,7 @@ typedef enum {
   ProcessorFamilyIntelCeleronD          = 0xBA,
   ProcessorFamilyIntelPentiumD          = 0xBB,
   ProcessorFamilyIntelPentiumEx         = 0xBC,
-  ProcessorFamilyIntelCoreSolo          = 0xBD,  // SMBIOS spec 2.6 correct this value
+  ProcessorFamilyIntelCoreSolo          = 0xBD,  ///< SMBIOS spec 2.6 correct this value
   ProcessorFamilyReserved               = 0xBE,
   ProcessorFamilyIntelCore2             = 0xBF,
   ProcessorFamilyIBM390                 = 0xC8,
@@ -468,12 +468,12 @@ typedef enum {
 /// Processor Information - Voltage 
 ///
 typedef struct {
-  UINT8  ProcessorVoltageCapability5V        :1;  // Bit 0
-  UINT8  ProcessorVoltageCapability3_3V      :1;  // Bit 1
-  UINT8  ProcessorVoltageCapability2_9V      :1;  // Bit 2
-  UINT8  ProcessorVoltageCapabilityReserved  :1;  // Bit 3 ,must be zero.
-  UINT8  ProcessorVoltageReserved            :3;  // Bits 4-6, must be zero.
-  UINT8  ProcessorVoltageIndicateLegacy      :1;  // Bit 7.
+  UINT8  ProcessorVoltageCapability5V        :1; 
+  UINT8  ProcessorVoltageCapability3_3V      :1;  
+  UINT8  ProcessorVoltageCapability2_9V      :1;  
+  UINT8  ProcessorVoltageCapabilityReserved  :1; ///< Bit 3, must be zero.
+  UINT8  ProcessorVoltageReserved            :3; ///< Bits 4-6, must be zero.
+  UINT8  ProcessorVoltageIndicateLegacy      :1;
 } PROCESSOR_VOLTAGE;
 
 ///
@@ -484,7 +484,7 @@ typedef enum {
   ProcessorUpgradeUnknown       = 0x02,
   ProcessorUpgradeDaughterBoard = 0x03,
   ProcessorUpgradeZIFSocket     = 0x04,
-  ProcessorUpgradePiggyBack     = 0x05, // Replaceable
+  ProcessorUpgradePiggyBack     = 0x05, ///< Replaceable
   ProcessorUpgradeNone          = 0x06,
   ProcessorUpgradeLIFSocket     = 0x07,
   ProcessorUpgradeSlot1         = 0x08,
@@ -493,7 +493,7 @@ typedef enum {
   ProcessorUpgradeSlotA         = 0x0B,
   ProcessorUpgradeSlotM         = 0x0C,
   ProcessorUpgradeSocket423     = 0x0D,
-  ProcessorUpgradeSocketA       = 0x0E, // Socket 462
+  ProcessorUpgradeSocketA       = 0x0E, ///< Socket 462
   ProcessorUpgradeSocket478     = 0x0F,
   ProcessorUpgradeSocket754     = 0x10,
   ProcessorUpgradeSocket940     = 0x11,
@@ -566,7 +566,7 @@ typedef struct {
   PROCESSOR_MISC_INFO     MiscInfo;
   UINT32                  Reserved;
   PROCESSOR_FEATURE_FLAGS FeatureFlags;
-} PROCESSOR_ID_DATA;  // 4*4 bytes 
+} PROCESSOR_ID_DATA;
 
 ///
 /// Processor Information (Type 4)
@@ -710,7 +710,7 @@ typedef struct {
 /// Memory Module Information - Memory Size
 ///
 typedef struct {
-  UINT8   InstalledOrEnabledSize  :7;// Size (n), where 2**n is the size in MB.
+  UINT8   InstalledOrEnabledSize  :7; ///< Size (n), where 2**n is the size in MB.
   UINT8   SingleOrDoubleBank      :1;
 } MEMORY_INSTALLED_ENABLED_SIZE;
 
@@ -758,8 +758,8 @@ typedef enum {
   CacheErrorUnknown   = 0x02,
   CacheErrorNone      = 0x03,
   CacheErrorParity    = 0x04,
-  CacheErrorSingleBit = 0x05, // ECC
-  CacheErrorMultiBit  = 0x06  // ECC
+  CacheErrorSingleBit = 0x05, ///< ECC
+  CacheErrorMultiBit  = 0x06  ///< ECC
 } CACHE_ERROR_TYPE_DATA;
 
 ///
@@ -960,13 +960,13 @@ typedef enum {
   SlotDataBusWidth32Bit      = 0x05,
   SlotDataBusWidth64Bit      = 0x06,
   SlotDataBusWidth128Bit     = 0x07,
-  SlotDataBusWidth1X         = 0x08, // Or X1
-  SlotDataBusWidth2X         = 0x09, // Or X2
-  SlotDataBusWidth4X         = 0x0A, // Or X4
-  SlotDataBusWidth8X         = 0x0B, // Or X8
-  SlotDataBusWidth12X        = 0x0C, // Or X12
-  SlotDataBusWidth16X        = 0x0D, // Or X16
-  SlotDataBusWidth32X        = 0x0E  // Or X32
+  SlotDataBusWidth1X         = 0x08, ///< Or X1
+  SlotDataBusWidth2X         = 0x09, ///< Or X2
+  SlotDataBusWidth4X         = 0x0A, ///< Or X4
+  SlotDataBusWidth8X         = 0x0B, ///< Or X8
+  SlotDataBusWidth12X        = 0x0C, ///< Or X12
+  SlotDataBusWidth16X        = 0x0D, ///< Or X16
+  SlotDataBusWidth32X        = 0x0E  ///< Or X32
 } MISC_SLOT_DATA_BUS_WIDTH;
 
 ///
@@ -1009,7 +1009,7 @@ typedef struct {
   UINT8  PmeSignalSupported      :1;
   UINT8  HotPlugDevicesSupported :1;
   UINT8  SmbusSignalSupported    :1;
-  UINT8  Reserved                :5;  //Set to 0.
+  UINT8  Reserved                :5;  ///< Set to 0.
 } MISC_SLOT_CHARACTERISTICS2;
 
 ///
@@ -1134,8 +1134,8 @@ typedef enum {
   EventLogTypeUncorrectCPUErr  = 0x15,
   EventLogTypeAreaResetAndClr  = 0x16,
   EventLogTypeSystemBoot       = 0x17,
-  EventLogTypeUnused           = 0x18, // 0x18 - 0x7F
-  EventLogTypeAvailForSys      = 0x80, // 0x80 - 0xFE
+  EventLogTypeUnused           = 0x18, ///< 0x18 - 0x7F
+  EventLogTypeAvailForSys      = 0x80, ///< 0x80 - 0xFE
   EventLogTypeEndOfLog         = 0xFF
 } EVENT_LOG_TYPE_DATA;
 
@@ -1761,9 +1761,9 @@ typedef struct {
 ///    
 typedef struct {
   SMBIOS_STRUCTURE          Hdr;
-  MEMORY_ERROR_TYPE         ErrorType;          // Same as Type 18
-  MEMORY_ERROR_GRANULARITY  ErrorGranularity;   // Same as Type 18
-  MEMORY_ERROR_OPERATION    ErrorOperation;     // Same as Type 18
+  MEMORY_ERROR_TYPE         ErrorType;          ///< Same as Type 18
+  MEMORY_ERROR_GRANULARITY  ErrorGranularity;   ///< Same as Type 18
+  MEMORY_ERROR_OPERATION    ErrorOperation;     ///< Same as Type 18
   UINT32                    VendorSyndrome;
   UINT64                    MemoryArrayErrorAddress;
   UINT64                    DeviceErrorAddress;
@@ -1883,9 +1883,9 @@ typedef struct {
 ///
 typedef enum {
   IPMIDeviceInfoInterfaceTypeUnknown       = 0x00,
-  IPMIDeviceInfoInterfaceTypeKCS           = 0x01, // Keyboard Controller Style
-  IPMIDeviceInfoInterfaceTypeSMIC          = 0x02, // Server Management Interface Chip
-  IPMIDeviceInfoInterfaceTypeBT            = 0x03, // Block Transfer
+  IPMIDeviceInfoInterfaceTypeKCS           = 0x01, ///< Keyboard Controller Style
+  IPMIDeviceInfoInterfaceTypeSMIC          = 0x02, ///< Server Management Interface Chip
+  IPMIDeviceInfoInterfaceTypeBT            = 0x03, ///< Block Transfer
   IPMIDeviceInfoInterfaceTypeReserved      = 0x04
 } BMC_INTERFACE_TYPE;
 
