@@ -46,9 +46,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/HiiLib.h>
 #include <Library/UefiLib.h>
-
-#include <Library/IfrSupportLib.h>
-#include <Library/ExtendedIfrSupportLib.h>
 #include <Library/PcdLib.h>
 
 #include <Guid/MdeModuleHii.h>
@@ -72,8 +69,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// The size of a 3 character ISO639 language code.
 ///
 #define ISO_639_2_ENTRY_SIZE            3
-
-
 
 #pragma pack (1)
 typedef struct {
@@ -421,12 +416,12 @@ ThunkSendForm (
 EFI_STATUS
 EFIAPI 
 ThunkCreatePopUp (
-  IN  UINTN                           NumberOfLines,
+  IN  UINTN                           LinesNumber,
   IN  BOOLEAN                         HotKey,
   IN  UINTN                           MaximumStringSize,
   OUT CHAR16                          *StringBuffer,
-  OUT EFI_INPUT_KEY                   *KeyValue,
-  IN  CHAR16                          *String,
+  OUT EFI_INPUT_KEY                   *Key,
+  IN  CHAR16                          *FirstString,
   ...
   );
 
@@ -451,11 +446,11 @@ NewOrAddPackNotify (
   );
 
 /**
-  Create a EFI_HII_UPDATE_DATA structure used to call IfrLibUpdateForm.
+  Create a Hii Update data Handle used to call IfrLibUpdateForm.
 
-  @param ThunkContext   The HII Thunk Context.
-  @param FwUpdateData   The Framework Update Data.
-  @param UefiUpdateData The UEFI Update Data.
+  @param ThunkContext         The HII Thunk Context.
+  @param FwUpdateData         The Framework Update Data.
+  @param UefiOpCodeHandle     The UEFI Update Data.
 
   @retval EFI_SUCCESS       The UEFI Update Data is created successfully.
   @retval EFI_UNSUPPORTED   There is unsupported opcode in FwUpdateData.
@@ -465,7 +460,7 @@ EFI_STATUS
 FwUpdateDataToUefiUpdateData (
   IN       HII_THUNK_CONTEXT                *ThunkContext,
   IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *FwUpdateData,
-  OUT      EFI_HII_UPDATE_DATA              **UefiUpdateData
+  IN       VOID                             *UefiOpCodeHandle
   )
 ;
 

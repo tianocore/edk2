@@ -487,14 +487,13 @@ ThunkSendForm (
   Rountine used to display a generic dialog interface and return 
   the Key or Input from user input.
 
-  @param NumberOfLines The number of lines for the dialog box.
+  @param LinesNumber   The number of lines for the dialog box.
   @param HotKey        Defines if a single character is parsed (TRUE) and returned in KeyValue
                        or if a string is returned in StringBuffer.
   @param MaximumStringSize The maximum size in bytes of a typed-in string.
-  @param StringBuffer  On return contains the typed-in string if HotKey
-         is FALSE.
-  @param KeyValue      The EFI_INPUT_KEY value returned if HotKey is TRUE.
-  @param String        The pointer to the first string in the list of strings
+  @param StringBuffer  On return contains the typed-in string if HotKey is FALSE.
+  @param Key           The EFI_INPUT_KEY value returned if HotKey is TRUE.
+  @param FirstString   The pointer to the first string in the list of strings
                        that comprise the dialog box.
   @param ...           A series of NumberOfLines text strings that will be used
                        to construct the dialog box.
@@ -505,29 +504,182 @@ ThunkSendForm (
 EFI_STATUS
 EFIAPI 
 ThunkCreatePopUp (
-  IN  UINTN                           NumberOfLines,
+  IN  UINTN                           LinesNumber,
   IN  BOOLEAN                         HotKey,
   IN  UINTN                           MaximumStringSize,
   OUT CHAR16                          *StringBuffer,
-  OUT EFI_INPUT_KEY                   *KeyValue,
-  IN  CHAR16                          *String,
+  OUT EFI_INPUT_KEY                   *Key,
+  IN  CHAR16                          *FirstString,
   ...
   )
 {
-  EFI_STATUS                        Status;
-  VA_LIST                           Marker;
+  VA_LIST                          Args;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *ConOut;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE      SavedConsoleMode;
+  UINTN                            Columns;
+  UINTN                            Rows;
+  UINTN                            Column;
+  UINTN                            Row;
+  UINTN                            NumberOfLines;
+  UINTN                            MaxLength;
+  CHAR16                           *String;
+  UINTN                            Length;
+  CHAR16                           *Line;
+  UINTN                            EventIndex;
 
-  if (HotKey != TRUE) {
+  if (!HotKey) {
     return EFI_UNSUPPORTED;
   }
-
-  VA_START (Marker, String);
   
-  Status = IfrLibCreatePopUp2 (NumberOfLines, KeyValue, String, Marker);
+  if (MaximumStringSize == 0) {
+    //
+    // Blank strint to output
+    //
+    return EFI_INVALID_PARAMETER;
+  }
 
-  VA_END (Marker);
+  //
+  // Determine the length of the longest line in the popup and the the total 
+  // number of lines in the popup
+  //
+  MaxLength = StrLen (FirstString);
+  NumberOfLines = 1;
+  VA_START (Args, FirstString);
+  while ((String = VA_ARG (Args, CHAR16 *)) != NULL) {
+    MaxLength = MAX (MaxLength, StrLen (String));
+    NumberOfLines++;
+  }
+  VA_END (Args);
+
+  //
+  // If the total number of lines in the popup is not same to the input NumberOfLines
+  // the parameter is not valid. Not check.
+  //
+  //  if (NumberOfLines != LinesNumber) {
+  //    return EFI_INVALID_PARAMETER;
+  //  }
+
+  //
+  // If the maximum length of all the strings is not same to the input MaximumStringSize
+  // the parameter is not valid. Not check.
+  //
+  // if (MaxLength != MaximumStringSize) {
+  //   return EFI_INVALID_PARAMETER;
+  // }
+
+  //
+  // Cache a pointer to the Simple Text Output Protocol in the EFI System Table
+  //
+  ConOut = gST->ConOut;
   
-  return Status;
+  //
+  // Save the current console cursor position and attributes
+  //
+  CopyMem (&SavedConsoleMode, ConOut->Mode, sizeof (SavedConsoleMode));
+
+  //
+  // Retrieve the number of columns and rows in the current console mode
+  //
+  ConOut->QueryMode (ConOut, SavedConsoleMode.Mode, &Columns, &Rows);
+
+  //
+  // Disable cursor and set the foreground and background colors specified by Attribute
+  //
+  ConOut->EnableCursor (ConOut, FALSE);
+  ConOut->SetAttribute (ConOut, EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE);
+
+  //
+  // Limit NumberOfLines to height of the screen minus 3 rows for the box itself
+  //
+  NumberOfLines = MIN (NumberOfLines, Rows - 3);
+
+  //
+  // Limit MaxLength to width of the screen minus 2 columns for the box itself
+  //
+  MaxLength = MIN (MaxLength, Columns - 2);
+
+  //
+  // Compute the starting row and starting column for the popup
+  //
+  Row    = (Rows - (NumberOfLines + 3)) / 2;
+  Column = (Columns - (MaxLength + 2)) / 2;
+
+  //
+  // Allocate a buffer for a single line of the popup with borders and a Null-terminator
+  //
+  Line = AllocateZeroPool ((MaxLength + 3) * sizeof (CHAR16));
+  ASSERT (Line != NULL);
+
+  //
+  // Draw top of popup box   
+  //
+  SetMem16 (Line, (MaxLength + 2) * 2, BOXDRAW_HORIZONTAL);
+  Line[0]             = BOXDRAW_DOWN_RIGHT;
+  Line[MaxLength + 1] = BOXDRAW_DOWN_LEFT;
+  Line[MaxLength + 2] = L'\0';
+  ConOut->SetCursorPosition (ConOut, Column, Row++);
+  ConOut->OutputString (ConOut, Line);
+
+  //
+  // Draw middle of the popup with strings
+  //
+  VA_START (Args, FirstString);
+  String = FirstString;
+  while ((String != NULL) && (NumberOfLines > 0)) {
+    Length = StrLen (String);
+    SetMem16 (Line, (MaxLength + 2) * 2, L' ');
+    if (Length <= MaxLength) {
+      //
+      // Length <= MaxLength
+      //
+      CopyMem (Line + 1 + (MaxLength - Length) / 2, String , Length * sizeof (CHAR16));
+    } else {
+      //
+      // Length > MaxLength
+      //
+      CopyMem (Line + 1, String + (Length - MaxLength) / 2 , MaxLength * sizeof (CHAR16));
+    }
+    Line[0]             = BOXDRAW_VERTICAL;
+    Line[MaxLength + 1] = BOXDRAW_VERTICAL;
+    Line[MaxLength + 2] = L'\0';
+    ConOut->SetCursorPosition (ConOut, Column, Row++);
+    ConOut->OutputString (ConOut, Line);
+    String = VA_ARG (Args, CHAR16 *);
+    NumberOfLines--;
+  }
+  VA_END (Args);
+
+  //
+  // Draw bottom of popup box
+  //
+  SetMem16 (Line, (MaxLength + 2) * 2, BOXDRAW_HORIZONTAL);
+  Line[0]             = BOXDRAW_UP_RIGHT;
+  Line[MaxLength + 1] = BOXDRAW_UP_LEFT;
+  Line[MaxLength + 2] = L'\0';
+  ConOut->SetCursorPosition (ConOut, Column, Row++);
+  ConOut->OutputString (ConOut, Line);
+
+  //
+  // Free the allocated line buffer
+  //
+  FreePool (Line);
+
+  //
+  // Restore the cursor visibility, position, and attributes
+  //
+  ConOut->EnableCursor      (ConOut, SavedConsoleMode.CursorVisible);
+  ConOut->SetCursorPosition (ConOut, SavedConsoleMode.CursorColumn, SavedConsoleMode.CursorRow);
+  ConOut->SetAttribute      (ConOut, SavedConsoleMode.Attribute);
+
+  //
+  // Wait for a keystroke
+  //
+  if (Key != NULL) {
+    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+    gST->ConIn->ReadKeyStroke (gST->ConIn, Key);
+  }
+  
+  return EFI_SUCCESS;
 }
 
 /** 

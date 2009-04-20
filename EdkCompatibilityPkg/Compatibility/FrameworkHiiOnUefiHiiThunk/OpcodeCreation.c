@@ -16,17 +16,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "HiiDatabase.h"
 #include "UefiIfrDefault.h"
 
-EFI_GUID  mTianoExtendedOpcodeGuid = EFI_IFR_TIANO_GUID;
-
-
-EFI_IFR_GUID_OPTIONKEY mOptionKeyTemplate = {
-   {EFI_IFR_GUID_OP, sizeof (EFI_IFR_GUID_OPTIONKEY), 0},
-   EFI_IFR_FRAMEWORK_GUID,
-   EFI_IFR_EXTEND_OP_OPTIONKEY,
-   0,
-   {0},
-   0
-};
+typedef struct {
+  UINT8  *Buffer;
+  UINTN  BufferSize;
+  UINTN  Position;
+} HII_LIB_OPCODE_BUFFER;
 
 /**
   The dynamic creation of these opcodes is supported in Framework HII modules.
@@ -155,44 +149,53 @@ FwQIdToUefiQId (
 
 
 
-#define LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL   0x1000
+#define HII_LIB_OPCODE_ALLOCATION_SIZE   0x200
+
 /**
-  Append the newly created OpCode buffer to EFI_HII_UPDATE_DATA buffer.
-  Increase the Data buffer in EFI_HII_UPDATE_DATA if the EFI_HII_UPDATE_DATA 
-  buffer's Data Buffer does not have space left for the newly created
-  OpCode.
+  Append raw opcodes to an OpCodeHandle.
 
-  @param OpCodeBuf      The newly created OpCode Buffer to be appended to 
-                        EFI_HII_UPDATE_DATA buffer.
-  @param OpCodeBufSize  The size of OpCodeBuf.
-  @param UefiUpdateData The EFI_HII_UPDATE_DATA to be appended.
+  If OpCodeHandle is NULL, then ASSERT().
+  If RawBuffer is NULL, then ASSERT();
 
-  @retval EFI_SUCCESS   The OpCode buffer is appended to EFI_HII_UPDATE_DATA successfull.
-  @retval EFI_OUT_OF_RESOURCES There is not enough memory.
+  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
+  @param[in]  RawBuffer      Buffer of opcodes to append.
+  @param[in]  RawBufferSize  The size, in bytes, of Buffer.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the appended opcodes.
+
 **/
-EFI_STATUS
-AppendToUpdateBuffer (
-  IN CONST  UINT8                *OpCodeBuf,
-  IN        UINTN                OpCodeBufSize,
-  IN OUT    EFI_HII_UPDATE_DATA  *UefiUpdateData
+UINT8 *
+EFIAPI
+HiiThunkCreateRawOpCodes (
+  IN VOID   *OpCodeHandle,
+  IN UINT8  *RawBuffer,
+  IN UINTN  RawBufferSize
   )
 {
-  UINT8 * NewBuff;
-  
-  if (UefiUpdateData->Offset + OpCodeBufSize > UefiUpdateData->BufferSize) {
-    NewBuff = AllocateCopyPool (UefiUpdateData->BufferSize + LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL, UefiUpdateData->Data);
-    if (NewBuff == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    UefiUpdateData->BufferSize += LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL;
-    FreePool (UefiUpdateData->Data);
-    UefiUpdateData->Data = NewBuff;
-  }
-  
-  CopyMem (UefiUpdateData->Data + UefiUpdateData->Offset, OpCodeBuf, OpCodeBufSize);
-  UefiUpdateData->Offset += (UINT32) OpCodeBufSize;
+  UINT8                  *Buffer;
+  HII_LIB_OPCODE_BUFFER  *OpCodeBuffer;
 
-  return EFI_SUCCESS;
+  ASSERT (RawBuffer != NULL);
+  ASSERT (OpCodeHandle != NULL);
+
+  OpCodeBuffer = (HII_LIB_OPCODE_BUFFER *)OpCodeHandle;
+  if (OpCodeBuffer->Position + RawBufferSize > OpCodeBuffer->BufferSize) {
+    Buffer = ReallocatePool (
+              OpCodeBuffer->BufferSize, 
+              OpCodeBuffer->BufferSize + (RawBufferSize + HII_LIB_OPCODE_ALLOCATION_SIZE),
+              OpCodeBuffer->Buffer
+              );
+    if (Buffer == NULL) {
+      return NULL;
+    }
+    OpCodeBuffer->Buffer = Buffer;
+    OpCodeBuffer->BufferSize += (RawBufferSize + HII_LIB_OPCODE_ALLOCATION_SIZE);
+  }
+  Buffer = OpCodeBuffer->Buffer + OpCodeBuffer->Position;
+  OpCodeBuffer->Position += RawBufferSize;
+  
+  return (UINT8 *)CopyMem (Buffer, RawBuffer, RawBufferSize);
 }
 
 /**
@@ -221,75 +224,22 @@ AssignQuestionId (
 }
 
 /**
-  Create UEFI HII "End Of" Opcode and append it to UefiUpdateData buffer.
-
-  @param UefiUpdateData     The newly created UEFI HII opcode is appended to UefiUpdateData.
-
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
-  
-**/
-EFI_STATUS
-UCreateEndOfOpcode (
-  IN OUT      EFI_HII_UPDATE_DATA         *UefiUpdateData
-  )
-{
-  EFI_IFR_END UOpcode;
-
-  ZeroMem (&UOpcode, sizeof (UOpcode));
-
-  UOpcode.Header.OpCode = EFI_IFR_END_OP;
-  UOpcode.Header.Length = sizeof (UOpcode);
-
-  return AppendToUpdateBuffer ((UINT8 *)&UOpcode, sizeof(UOpcode), UefiUpdateData);
-}
-
-/**
-  Create UEFI HII Subtitle Opcode from a Framework HII Subtitle Opcode.
-
-  @param FwOpcode         The input Framework Opcode.
-  @param UefiUpdateData   The newly created UEFI HII opcode is appended to UefiUpdateData.
-
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
-  
-**/
-EFI_STATUS
-F2UCreateSubtitleOpCode (
-  IN CONST FRAMEWORK_EFI_IFR_SUBTITLE  *FwOpcode,
-  IN OUT   EFI_HII_UPDATE_DATA         *UefiUpdateData
-  )
-{
-  EFI_IFR_SUBTITLE UOpcode;
-
-  ZeroMem (&UOpcode, sizeof(UOpcode));
-
-  UOpcode.Header.OpCode = EFI_IFR_SUBTITLE_OP;
-  UOpcode.Header.Length = sizeof (EFI_IFR_SUBTITLE);
-
-  UOpcode.Statement.Prompt = FwOpcode->SubTitle;
-
-  return AppendToUpdateBuffer ((UINT8 *)&UOpcode, sizeof(UOpcode), UefiUpdateData);
-}
-
-/**
   Create UEFI HII Text Opcode from a Framework HII Text Opcode.
 
-  @param FwOpcode        The input Framework Opcode.
-  @param UefiUpdateData  The newly created UEFI HII opcode is appended to UefiUpdateData.
+  @param FwOpcode              The input Framework Opcode.
+  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateTextOpCode (
-  IN CONST FRAMEWORK_EFI_IFR_TEXT      *FwOpcode,
-  IN OUT   EFI_HII_UPDATE_DATA         *UefiUpdateData
+  IN OUT   VOID                        *UefiUpdateDataHandle,
+  IN CONST FRAMEWORK_EFI_IFR_TEXT      *FwOpcode
   )
 {
   EFI_IFR_TEXT      UTextOpCode;
-  EFI_IFR_ACTION    UActionOpCode;
 
   if ((FwOpcode->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) == 0) {
     ZeroMem (&UTextOpCode, sizeof(UTextOpCode));
@@ -302,41 +252,29 @@ F2UCreateTextOpCode (
     UTextOpCode.Statement.Prompt = FwOpcode->Text;
     UTextOpCode.TextTwo          = FwOpcode->TextTwo;
     
-    return AppendToUpdateBuffer ((UINT8 *) &UTextOpCode, sizeof(UTextOpCode), UefiUpdateData);
+    return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UTextOpCode, sizeof(UTextOpCode));
   } else {
     //
     // Iteractive Text Opcode is EFI_IFR_ACTION
     //
-
-    ZeroMem (&UActionOpCode, sizeof (UActionOpCode));
-
-    UActionOpCode.Header.OpCode = EFI_IFR_ACTION_OP;
-    UActionOpCode.Header.Length = sizeof (EFI_IFR_ACTION);
-
-    UActionOpCode.Question.Header.Prompt = FwOpcode->Text;
-    UActionOpCode.Question.Header.Help  = FwOpcode->Help;
-    UActionOpCode.Question.Flags      = EFI_IFR_FLAG_CALLBACK;
-    UActionOpCode.Question.QuestionId = FwOpcode->Key;
-
-    return AppendToUpdateBuffer ((UINT8 *) &UActionOpCode, sizeof(UActionOpCode), UefiUpdateData);
-    
+    return HiiCreateActionOpCode (UefiUpdateDataHandle, FwOpcode->Key, FwOpcode->Text, FwOpcode->Help, EFI_IFR_FLAG_CALLBACK, 0);
   }
 }
 
 /**
   Create UEFI HII Reference Opcode from a Framework HII Reference Opcode.
 
-  @param FwOpcode           The input Framework Opcode.
-  @param UefiUpdateData     The newly created UEFI HII opcode is appended to UefiUpdateData.
+  @param FwOpcode              The input Framework Opcode.
+  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateReferenceOpCode (
-  IN CONST FRAMEWORK_EFI_IFR_REF       *FwOpcode,
-  IN OUT    EFI_HII_UPDATE_DATA        *UefiUpdateData
+  IN OUT   VOID                        *UefiUpdateDataHandle,
+  IN CONST FRAMEWORK_EFI_IFR_REF       *FwOpcode
   )
 {
   EFI_IFR_REF UOpcode;
@@ -358,27 +296,25 @@ F2UCreateReferenceOpCode (
   //
   UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
   
-
-  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
+  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
-
 
 /**
   Create UEFI HII "One Of Option" Opcode from a Framework HII "One Of Option" Opcode.
 
-  @param FwOpcode        The input Framework Opcode.
-  @param Width           The size of the One Of Option. 1 bytes or 2 bytes.
-  @param UefiUpdateData  The newly created UEFI HII opcode is appended to UefiUpdateData.
+  @param FwOpcode              The input Framework Opcode.
+  @param Width                 The size of the One Of Option. 1 bytes or 2 bytes.
+  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateOneOfOptionOpCode (
+  IN OUT   VOID                               *UefiUpdateDataHandle,
   IN CONST FRAMEWORK_EFI_IFR_ONE_OF_OPTION    *FwOpcode,
-  IN       UINTN                              Width,
-  IN OUT   EFI_HII_UPDATE_DATA                *UefiUpdateData
+  IN       UINTN                              Width
   )
 {
   EFI_IFR_ONE_OF_OPTION UOpcode;
@@ -410,64 +346,69 @@ F2UCreateOneOfOptionOpCode (
       
     default:
       ASSERT (FALSE);
-      return EFI_UNSUPPORTED;
+      return NULL;
   }
 
-  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
+  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
 
 /**
   Create a GUID Opcode EFI_IFR_GUID_OPTIONKEY to map the Framework One Of Option callback key
   to a UEFI Question ID. This information is used to invoke the Framework HII Browser Callback
-  function. The opcode is appened to UefiUpdateData.
+  function. The opcode is appened to UefiUpdateDataHandle.
 
-  @param    QuestionId      The UEFI Question ID.
-  @param    OptionValue     The value of the "One Of Option".
-  @param    KeyValue        The Framework "One Of Option" callback key.
-  @param    UefiDat         The UEFI Update Data buffer.
+  @param    QuestionId            The UEFI Question ID.
+  @param    OptionValue           The value of the "One Of Option".
+  @param    KeyValue              The Framework "One Of Option" callback key.
+  @param    UefiUpdateDataHandle  The UEFI Update Data buffer.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
 **/
-
-EFI_STATUS
+UINT8 *
 CreateGuidOptionKeyOpCode (
+  IN OUT   VOID                        *UefiUpdateDataHandle,
   IN EFI_QUESTION_ID                   QuestionId,
   IN UINT16                            OptionValue,
-  IN EFI_QUESTION_ID                   KeyValue,
-  IN OUT    EFI_HII_UPDATE_DATA        *UefiUpdateData
+  IN EFI_QUESTION_ID                   KeyValue
   )
 {
-  EFI_IFR_GUID_OPTIONKEY              UOpcode;
-
-  CopyMem (&UOpcode, &mOptionKeyTemplate, sizeof (EFI_IFR_GUID_OPTIONKEY));
-
-  UOpcode.QuestionId  = QuestionId;
-  CopyMem (&UOpcode.OptionValue, &OptionValue, sizeof (OptionValue)); 
-  UOpcode.KeyValue = KeyValue;
+  EFI_IFR_GUID_OPTIONKEY              *UOpcode;
   
-  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
+  UOpcode = (EFI_IFR_GUID_OPTIONKEY *) HiiCreateGuidOpCode (
+                                         UefiUpdateDataHandle, 
+                                         &gEfiIfrFrameworkGuid, 
+                                         NULL,
+                                         sizeof (EFI_IFR_GUID_OPTIONKEY)
+                                         );
+
+  UOpcode->ExtendOpCode = EFI_IFR_EXTEND_OP_OPTIONKEY;
+  UOpcode->QuestionId  = QuestionId;
+  CopyMem (&UOpcode->OptionValue, &OptionValue, sizeof (OptionValue)); 
+  UOpcode->KeyValue = KeyValue;
+
+  return (UINT8 *) UOpcode;
 }
 
 /**
   Create UEFI HII "One Of" Opcode from a Framework HII "One Of" Opcode.
 
-  @param ThunkContext The HII Thunk Context.
-  @param FwOpcode     The input Framework Opcode.
-  @param UefiUpdateData     The newly created UEFI HII opcode is appended to UefiUpdateData.
-  @param NextFwOpcode Returns the position of the next Framework Opcode after FRAMEWORK_EFI_IFR_END_ONE_OF_OP of
-                      the "One Of Option".
-  @param OpcodeCount  The number of Opcode for the complete Framework "One Of" Opcode.
+  @param ThunkContext             The HII Thunk Context.
+  @param FwOpcode                 The input Framework Opcode.
+  @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
+  @param NextFwOpcode             Returns the position of the next Framework Opcode after FRAMEWORK_EFI_IFR_END_ONE_OF_OP of
+                                  the "One Of Option".
+  @param OpcodeCount              The number of Opcode for the complete Framework "One Of" Opcode.
                       
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateOneOfOpCode (
+  IN OUT   VOID                        *UefiUpdateDataHandle,
   IN       HII_THUNK_CONTEXT           *ThunkContext,
   IN CONST FRAMEWORK_EFI_IFR_ONE_OF    *FwOpcode,
-  IN OUT   EFI_HII_UPDATE_DATA         *UefiUpdateData,
   OUT      FRAMEWORK_EFI_IFR_OP_HEADER **NextFwOpcode,
   OUT      UINTN                       *OpcodeCount
   )
@@ -476,6 +417,8 @@ F2UCreateOneOfOpCode (
   EFI_IFR_ONE_OF                      UOpcode;
   FRAMEWORK_EFI_IFR_OP_HEADER         *FwOpHeader;
   FRAMEWORK_EFI_IFR_ONE_OF_OPTION     *FwOneOfOp;
+  UINT8                               *OpCodeBuffer;
+  UINT8                               *OneOfOpCodeBuffer;
 
   ASSERT (NextFwOpcode != NULL);
   ASSERT (OpcodeCount != NULL);
@@ -530,9 +473,9 @@ F2UCreateOneOfOpCode (
     }
   }
   
-  Status = AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof (UOpcode), UefiUpdateData);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  OneOfOpCodeBuffer = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof (UOpcode));
+  if (OneOfOpCodeBuffer == NULL) {
+    return NULL;
   }
   *OpcodeCount += 1;
 
@@ -544,47 +487,48 @@ F2UCreateOneOfOpCode (
 
     FwOneOfOp = (FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader;
       
-    Status = F2UCreateOneOfOptionOpCode ((FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader, FwOpcode->Width, UefiUpdateData);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    OpCodeBuffer = F2UCreateOneOfOptionOpCode (UefiUpdateDataHandle, (FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader, FwOpcode->Width);
+    if (OpCodeBuffer == NULL) {
+      return NULL;
     }
 
-    Status = CreateGuidOptionKeyOpCode (UOpcode.Question.QuestionId, FwOneOfOp->Value, FwOneOfOp->Key, UefiUpdateData);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    OpCodeBuffer = CreateGuidOptionKeyOpCode (UefiUpdateDataHandle, UOpcode.Question.QuestionId, FwOneOfOp->Value, FwOneOfOp->Key);
+    if (OpCodeBuffer == NULL) {
+      return NULL;
     }
+
     FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpHeader + FwOpHeader->Length);
     *OpcodeCount += 1;
   }
 
-  Status = UCreateEndOfOpcode (UefiUpdateData);
-  if (!EFI_ERROR (Status)) {
+  OpCodeBuffer = HiiCreateEndOpCode (UefiUpdateDataHandle);
+  if (OpCodeBuffer != NULL) {
     *NextFwOpcode = (FRAMEWORK_EFI_IFR_OP_HEADER *)((UINT8 *) FwOpHeader + FwOpHeader->Length);
     *OpcodeCount += 1;
   }
 
-  return Status;
+  return OneOfOpCodeBuffer;
 }
 
 /**
   Create UEFI HII "Ordered List" Opcode from a Framework HII "Ordered List" Opcode.
 
-  @param ThunkContext The HII Thunk Context.
-  @param FwOpcode     The input Framework Opcode.
-  @param UefiUpdateData The newly created UEFI HII opcode is appended to UefiUpdateData.
-  @param NextFwOpcode Returns the position of the next Framework Opcode after FRAMEWORK_EFI_IFR_END_ONE_OF_OP of
-                      the "Ordered List".
-  @param OpcodeCount  The number of Opcode for the complete Framework "Ordered List" Opcode.
+  @param ThunkContext         The HII Thunk Context.
+  @param FwOpcode             The input Framework Opcode.
+  @param UefiUpdateDataHandle The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
+  @param NextFwOpcode         Returns the position of the next Framework Opcode after FRAMEWORK_EFI_IFR_END_ONE_OF_OP of
+                              the "Ordered List".
+  @param OpcodeCount          The number of Opcode for the complete Framework "Ordered List" Opcode.
                       
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateOrderedListOpCode (
+  IN OUT    VOID                          *UefiUpdateDataHandle,
   IN       HII_THUNK_CONTEXT              *ThunkContext,
   IN CONST FRAMEWORK_EFI_IFR_ORDERED_LIST *FwOpcode,
-  IN OUT    EFI_HII_UPDATE_DATA           *UefiUpdateData,
   OUT      FRAMEWORK_EFI_IFR_OP_HEADER    **NextFwOpcode,
   OUT      UINTN                          *OpcodeCount
   )
@@ -592,7 +536,9 @@ F2UCreateOrderedListOpCode (
   EFI_IFR_ORDERED_LIST              UOpcode;
   EFI_STATUS                        Status;
   FRAMEWORK_EFI_IFR_OP_HEADER       *FwOpHeader;
-  FRAMEWORK_EFI_IFR_ONE_OF_OPTION     *FwOneOfOp;
+  FRAMEWORK_EFI_IFR_ONE_OF_OPTION   *FwOneOfOp;
+  UINT8                             *OpcodeBuffer;   
+  UINT8                             *OrderListOpCode;
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
   *OpcodeCount = 0;
@@ -642,9 +588,9 @@ F2UCreateOrderedListOpCode (
     }
   }
  
-  Status = AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  OrderListOpCode = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  if (OrderListOpCode == NULL) {
+    return NULL;
   }
   *OpcodeCount += 1;
 
@@ -653,39 +599,39 @@ F2UCreateOrderedListOpCode (
     //
     // Each entry of Order List in Framework HII is always 1 byte in size
     //
-    Status = F2UCreateOneOfOptionOpCode ((CONST FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader, 1, UefiUpdateData);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    OpcodeBuffer = F2UCreateOneOfOptionOpCode (UefiUpdateDataHandle, (CONST FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader, 1);
+    if (OpcodeBuffer == NULL) {
+      return NULL;
     }
     FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpHeader + FwOpHeader->Length);
     *OpcodeCount += 1;
   }
 
-  Status = UCreateEndOfOpcode (UefiUpdateData);
-  if (!EFI_ERROR (Status)) {
+  OpcodeBuffer = HiiCreateEndOpCode (UefiUpdateDataHandle);
+  if (OpcodeBuffer != NULL) {
     *NextFwOpcode = (FRAMEWORK_EFI_IFR_OP_HEADER *)((UINT8 *) FwOpHeader + FwOpHeader->Length);
     *OpcodeCount += 1;
   }
 
-  return Status;
+  return OrderListOpCode;
 }
 
 /**
   Create UEFI HII CheckBox Opcode from a Framework HII Checkbox Opcode.
 
-  @param ThunkContext    The HII Thunk Context.
-  @param FwOpcode        The input Framework Opcode.
-  @param UefiUpdateData  The newly created UEFI HII opcode is appended to UefiUpdateData.
+  @param ThunkContext          The HII Thunk Context.
+  @param FwOpcode              The input Framework Opcode.
+  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateCheckBoxOpCode (
+  IN OUT   VOID                        *UefiUpdateDataHandle,
   IN       HII_THUNK_CONTEXT           *ThunkContext,
-  IN CONST FRAMEWORK_EFI_IFR_CHECKBOX  *FwOpcode,
-  IN OUT   EFI_HII_UPDATE_DATA         *UefiUpdateData
+  IN CONST FRAMEWORK_EFI_IFR_CHECKBOX  *FwOpcode
   )
 {
   EFI_STATUS       Status;
@@ -731,31 +677,33 @@ F2UCreateCheckBoxOpCode (
   //
   UOpcode.Flags           = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING));
 
-  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
+  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
 
 
 /**
   Create UEFI HII Numeric Opcode from a Framework HII Numeric Opcode.
 
-  @param ThunkContext The HII Thunk Context.
-  @param FwOpcode     The input Framework Opcode.
-  @param UefiUpdateData     The newly created UEFI HII opcode is appended to UefiUpdateData.
+  @param ThunkContext            The HII Thunk Context.
+  @param FwOpcode                The input Framework Opcode.
+  @param UefiUpdateDataHandle    The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateNumericOpCode (
+  IN OUT   VOID                        *UefiUpdateDataHandle,
   IN       HII_THUNK_CONTEXT           *ThunkContext,
-  IN CONST FRAMEWORK_EFI_IFR_NUMERIC   *FwOpcode,
-  IN OUT    EFI_HII_UPDATE_DATA        *UefiUpdateData
+  IN CONST FRAMEWORK_EFI_IFR_NUMERIC   *FwOpcode
   )
 {
   EFI_STATUS      Status;
   EFI_IFR_NUMERIC UOpcode;
   EFI_IFR_DEFAULT UOpcodeDefault;
+  UINT8           *NumbericOpCode;
+  UINT8           *OpcodeBuffer;
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
 
@@ -808,13 +756,13 @@ F2UCreateNumericOpCode (
     default: 
     {
       ASSERT (FALSE);
-      return EFI_INVALID_PARAMETER;
+      return NULL;
     }
   }
   
-  Status = AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  NumbericOpCode = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  if (NumbericOpCode == NULL) {
+    return NULL;
   }
 
   //
@@ -841,40 +789,51 @@ F2UCreateNumericOpCode (
 
   CopyMem (&UOpcodeDefault.Value.u8, &FwOpcode->Default, FwOpcode->Width);
 
-  Status = AppendToUpdateBuffer ((UINT8 *) &UOpcodeDefault, sizeof(UOpcodeDefault), UefiUpdateData);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  OpcodeBuffer = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcodeDefault, sizeof(UOpcodeDefault));
+  if (OpcodeBuffer == NULL) {
+    return NULL;
   }
-  Status = UCreateEndOfOpcode (UefiUpdateData);
 
-  return Status;
+  OpcodeBuffer = HiiCreateEndOpCode (UefiUpdateDataHandle);
+  if (OpcodeBuffer == NULL) {
+    return NULL;
+  }
+
+  return NumbericOpCode;
 }
 
 
 /**
   Create UEFI HII String Opcode from a Framework HII String Opcode.
 
-  @param ThunkContext The HII Thunk Context.
-  @param FwOpcode     The input Framework Opcode.
-  @param UefiUpdateData     The newly created UEFI HII opcode is appended to UefiUpdateData.
+  @param ThunkContext             The HII Thunk Context.
+  @param FwOpcode                 The input Framework Opcode.
+  @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateStringOpCode (
+  IN OUT   VOID                        *UefiUpdateDataHandle,
   IN       HII_THUNK_CONTEXT           *ThunkContext,
-  IN CONST FRAMEWORK_EFI_IFR_STRING    *FwOpcode,
-  IN OUT    EFI_HII_UPDATE_DATA        *UefiUpdateData
+  IN CONST FRAMEWORK_EFI_IFR_STRING    *FwOpcode
   )
 {
   EFI_IFR_STRING UOpcode;
+  EFI_STATUS     Status;
 
   ZeroMem (&UOpcode, sizeof(UOpcode));
 
   if (FwOpcode->Key == 0) {
-    FwQIdToUefiQId (ThunkContext->FormSet, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+    Status = FwQIdToUefiQId (ThunkContext->FormSet, FwOpcode->Header.OpCode, FwOpcode->QuestionId, &UOpcode.Question.QuestionId);
+    if (EFI_ERROR (Status)) {
+      //
+      // Add a new opcode and it will not trigger call back. So we just reuse the FW QuestionId.
+      //
+      UOpcode.Question.QuestionId = AssignQuestionId (FwOpcode->QuestionId, ThunkContext->FormSet);
+    }
   } else {
     UOpcode.Question.QuestionId    = FwOpcode->Key;
   }
@@ -885,7 +844,6 @@ F2UCreateStringOpCode (
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;
   UOpcode.Question.Header.Help = FwOpcode->Help;
 
-  UOpcode.Question.QuestionId    = FwOpcode->Key;
   UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
 
   UOpcode.Question.VarStoreId    = ThunkContext->FormSet->DefaultVarStoreId;
@@ -895,101 +853,88 @@ F2UCreateStringOpCode (
   UOpcode.MaxSize = FwOpcode->MaxSize;
   UOpcode.Flags   = EFI_IFR_STRING_MULTI_LINE;
 
-  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
+  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
 
 /**
   Create UEFI HII Banner Opcode from a Framework HII Banner Opcode.
 
-  @param FwOpcode     The input Framework Opcode.
-  @param UefiUpdateData     The newly created UEFI HII opcode is appended to UefiUpdateData.
+  @param FwOpcode                 The input Framework Opcode.
+  @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
-  @retval EFI_SUCCESS           The UEFI HII opcode is created successfully and appended to UefiUpdateData.
-  @retval EFI_OUT_OF_RESOURCE   There is not enough resource.
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
   
 **/
-EFI_STATUS
+UINT8 *
 F2UCreateBannerOpCode (
-  IN CONST FRAMEWORK_EFI_IFR_BANNER    *FwOpcode,
-  IN OUT    EFI_HII_UPDATE_DATA        *UefiUpdateData
+  IN OUT   VOID                        *UefiUpdateDataHandle,
+  IN CONST FRAMEWORK_EFI_IFR_BANNER    *FwOpcode
   )
 {
-  EFI_IFR_GUID_BANNER UOpcode;
+  EFI_IFR_GUID_BANNER *UOpcode;
 
-  ZeroMem (&UOpcode, sizeof(UOpcode));
+  UOpcode = (EFI_IFR_GUID_BANNER *) HiiCreateGuidOpCode (
+                                      UefiUpdateDataHandle, 
+                                      &gEfiIfrTianoGuid, 
+                                      NULL,
+                                      sizeof (EFI_IFR_GUID_BANNER)
+                                      );  
 
-  UOpcode.Header.Length = sizeof(UOpcode);
-  UOpcode.Header.OpCode = EFI_IFR_GUID_OP;
+  UOpcode->ExtendOpCode = EFI_IFR_EXTEND_OP_BANNER;
+  UOpcode->Title          = FwOpcode->Title;
+  UOpcode->LineNumber     = FwOpcode->LineNumber;
+  UOpcode->Alignment      = FwOpcode->Alignment;
 
-  CopyMem (&UOpcode.Guid, &mTianoExtendedOpcodeGuid, sizeof (EFI_GUID));
-  UOpcode.ExtendOpCode = EFI_IFR_EXTEND_OP_BANNER;
-  UOpcode.Title          = FwOpcode->Title;
-  UOpcode.LineNumber     = FwOpcode->LineNumber;
-  UOpcode.Alignment      = FwOpcode->Alignment;
-
-  return AppendToUpdateBuffer ((UINT8 *) &UOpcode, sizeof(UOpcode), UefiUpdateData);
+  return (UINT8 *) UOpcode;
 }
 
 /**
-  Create a EFI_HII_UPDATE_DATA structure used to call IfrLibUpdateForm.
+  Create a Hii Update data Handle used to call IfrLibUpdateForm.
 
-  @param ThunkContext   The HII Thunk Context.
-  @param FwUpdateData   The Framework Update Data.
-  @param UefiUpdateData The UEFI Update Data.
+  @param ThunkContext         The HII Thunk Context.
+  @param FwUpdateData         The Framework Update Data.
+  @param UefiUpdateData       The UEFI Update Data.
 
   @retval EFI_SUCCESS       The UEFI Update Data is created successfully.
   @retval EFI_UNSUPPORTED   There is unsupported opcode in FwUpdateData.
   @retval EFI_OUT_OF_RESOURCES There is not enough resource.
 **/
-EFI_STATUS
+EFI_STATUS 
 FwUpdateDataToUefiUpdateData (
   IN       HII_THUNK_CONTEXT                *ThunkContext,
   IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *FwUpdateData,
-  OUT      EFI_HII_UPDATE_DATA              **UefiUpdateData
+  IN       VOID                             *UefiOpCodeHandle
   )
 {
   FRAMEWORK_EFI_IFR_OP_HEADER          *FwOpCode;
   FRAMEWORK_EFI_IFR_OP_HEADER          *NextFwOpCode;
-  EFI_HII_UPDATE_DATA                  *UefiOpCode;
   UINTN                                Index;
-  EFI_STATUS                           Status;
   UINTN                                DataCount;
-
-  UefiOpCode = AllocateZeroPool (sizeof (EFI_HII_UPDATE_DATA));
-  if (UefiOpCode == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  
-  UefiOpCode->Data = AllocateZeroPool (LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL);
-  if (UefiOpCode->Data == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  UefiOpCode->BufferSize = LOCAL_UPDATE_DATA_BUFFER_INCREMENTAL;
-  UefiOpCode->Offset = 0;
+  UINT8                                *OpCodeBuffer;
 
   FwOpCode = (FRAMEWORK_EFI_IFR_OP_HEADER *) &FwUpdateData->Data;
 
   for (Index = 0; Index < FwUpdateData->DataCount; Index += DataCount) {
     switch (FwOpCode->OpCode) {
       case FRAMEWORK_EFI_IFR_SUBTITLE_OP:
-        Status = F2UCreateSubtitleOpCode ((FRAMEWORK_EFI_IFR_SUBTITLE  *) FwOpCode, UefiOpCode);
+        OpCodeBuffer = HiiCreateSubTitleOpCode (UefiOpCodeHandle, ((FRAMEWORK_EFI_IFR_SUBTITLE  *) FwOpCode)->SubTitle, 0, 0, 0);
         DataCount = 1;
         break;
         
       case FRAMEWORK_EFI_IFR_TEXT_OP:
-        Status = F2UCreateTextOpCode ((FRAMEWORK_EFI_IFR_TEXT  *) FwOpCode, UefiOpCode);  
+        OpCodeBuffer = F2UCreateTextOpCode (UefiOpCodeHandle, (FRAMEWORK_EFI_IFR_TEXT  *) FwOpCode);  
         DataCount = 1;
         break;
 
       case FRAMEWORK_EFI_IFR_REF_OP:
-        Status = F2UCreateReferenceOpCode ((FRAMEWORK_EFI_IFR_REF *) FwOpCode, UefiOpCode);  
+        OpCodeBuffer = F2UCreateReferenceOpCode (UefiOpCodeHandle, (FRAMEWORK_EFI_IFR_REF *) FwOpCode);  
         DataCount = 1;
         break;
         
       case FRAMEWORK_EFI_IFR_ONE_OF_OP:
-        Status = F2UCreateOneOfOpCode (ThunkContext, (FRAMEWORK_EFI_IFR_ONE_OF *) FwOpCode, UefiOpCode, &NextFwOpCode, &DataCount);
-        if (!EFI_ERROR (Status)) {
+        OpCodeBuffer = F2UCreateOneOfOpCode (UefiOpCodeHandle, ThunkContext, (FRAMEWORK_EFI_IFR_ONE_OF *) FwOpCode, &NextFwOpCode, &DataCount);
+        if (OpCodeBuffer != NULL) {
           FwOpCode = NextFwOpCode;
           //
           // FwOpCode is already updated to point to the next opcode.
@@ -999,8 +944,8 @@ FwUpdateDataToUefiUpdateData (
         break;
 
       case FRAMEWORK_EFI_IFR_ORDERED_LIST_OP:
-        Status = F2UCreateOrderedListOpCode (ThunkContext, (FRAMEWORK_EFI_IFR_ORDERED_LIST *) FwOpCode, UefiOpCode, &NextFwOpCode, &DataCount);
-        if (!EFI_ERROR (Status)) {
+        OpCodeBuffer = F2UCreateOrderedListOpCode (UefiOpCodeHandle, ThunkContext, (FRAMEWORK_EFI_IFR_ORDERED_LIST *) FwOpCode, &NextFwOpCode, &DataCount);
+        if (OpCodeBuffer != NULL) {
           FwOpCode = NextFwOpCode;
           //
           // FwOpCode is already updated to point to the next opcode.
@@ -1010,27 +955,27 @@ FwUpdateDataToUefiUpdateData (
         break;
         
       case FRAMEWORK_EFI_IFR_CHECKBOX_OP:
-        Status = F2UCreateCheckBoxOpCode (ThunkContext, (FRAMEWORK_EFI_IFR_CHECKBOX *) FwOpCode, UefiOpCode);  
+        OpCodeBuffer = F2UCreateCheckBoxOpCode (UefiOpCodeHandle, ThunkContext, (FRAMEWORK_EFI_IFR_CHECKBOX *) FwOpCode);  
         DataCount = 1;
         break;
 
       case FRAMEWORK_EFI_IFR_STRING_OP:
-        Status = F2UCreateStringOpCode (ThunkContext, (FRAMEWORK_EFI_IFR_STRING *) FwOpCode, UefiOpCode);  
+        OpCodeBuffer = F2UCreateStringOpCode (UefiOpCodeHandle, ThunkContext, (FRAMEWORK_EFI_IFR_STRING *) FwOpCode);  
         DataCount = 1;
         break;
 
       case FRAMEWORK_EFI_IFR_BANNER_OP:
-        Status = F2UCreateBannerOpCode ((FRAMEWORK_EFI_IFR_BANNER *) FwOpCode, UefiOpCode);  
+        OpCodeBuffer = F2UCreateBannerOpCode (UefiOpCodeHandle, (FRAMEWORK_EFI_IFR_BANNER *) FwOpCode);  
         DataCount = 1;
         break;
 
       case FRAMEWORK_EFI_IFR_END_ONE_OF_OP:
-        Status = UCreateEndOfOpcode (UefiOpCode);
+        OpCodeBuffer = HiiCreateEndOpCode (UefiOpCodeHandle);
         DataCount = 1;
         break;
 
       case FRAMEWORK_EFI_IFR_NUMERIC_OP:
-        Status = F2UCreateNumericOpCode (ThunkContext, (FRAMEWORK_EFI_IFR_NUMERIC *) FwOpCode, UefiOpCode);
+        OpCodeBuffer = F2UCreateNumericOpCode (UefiOpCodeHandle, ThunkContext, (FRAMEWORK_EFI_IFR_NUMERIC *) FwOpCode);
         DataCount = 1;
         break;
 
@@ -1039,17 +984,13 @@ FwUpdateDataToUefiUpdateData (
         return EFI_UNSUPPORTED;
     }
 
-    if (EFI_ERROR (Status)) {
-      FreePool (UefiOpCode->Data);
-      FreePool (UefiOpCode);
-      return Status;
+    if (OpCodeBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
 
     FwOpCode = (FRAMEWORK_EFI_IFR_OP_HEADER *)((UINT8 *) FwOpCode + FwOpCode->Length);
   }
 
-  *UefiUpdateData = UefiOpCode;
-  
   return EFI_SUCCESS;
 }
 

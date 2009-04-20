@@ -76,11 +76,13 @@
   DebugLib
   BaseLib
   HiiLib
-  IfrSupportLib
-  ExtendedIfrSupportLib
   PrintLib
   UefiLib
   PcdLib
+
+[Guids]
+  gEfiIfrTianoGuid
+  gEfiIfrFrameworkGuid
 
 [Protocols]
   gEfiHiiImageProtocolGuid
