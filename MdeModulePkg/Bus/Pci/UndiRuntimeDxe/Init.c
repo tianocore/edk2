@@ -65,7 +65,7 @@ UndiNotifyVirtual (
     // UNDI32DeviceList is an array of pointers
     //
     for (Index = 0; Index < pxe_31->IFcnt; Index++) {
-      UNDI32DeviceList[Index]->NIIProtocol_31.ID = (UINT64) (UINTN) Pxe31Pointer;
+      UNDI32DeviceList[Index]->NIIProtocol_31.Id = (UINT64) (UINTN) Pxe31Pointer;
       EfiConvertPointer (
         EFI_OPTIONAL_PTR,
         (VOID **) &(UNDI32DeviceList[Index])
@@ -346,7 +346,7 @@ UndiDriverStart (
     PxeStructInit (pxe_31);
   }
 
-  UNDI32Device->NIIProtocol_31.ID = (UINT64) (UINTN) (pxe_31);
+  UNDI32Device->NIIProtocol_31.Id = (UINT64) (UINTN) (pxe_31);
 
   Status = PciIoFncs->Attributes (
                         PciIoFncs,

@@ -178,13 +178,13 @@ SimpleNetworkDriverSupported (
   //
   // Check to see if !PXE structure is valid. Paragraph alignment of !PXE structure is required.
   //
-  if (NiiProtocol->ID & 0x0F) {
+  if (NiiProtocol->Id & 0x0F) {
     DEBUG ((EFI_D_NET, "\n!PXE structure is not paragraph aligned.\n"));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
 
-  Pxe = (PXE_UNDI *) (UINTN) (NiiProtocol->ID);
+  Pxe = (PXE_UNDI *) (UINTN) (NiiProtocol->Id);
 
   //
   //  Verify !PXE revisions.
@@ -341,7 +341,7 @@ SimpleNetworkDriverStart (
 
   DEBUG ((EFI_D_INFO, "Start(): UNDI3.1 found\n"));
 
-  Pxe = (PXE_UNDI *) (UINTN) (Nii->ID);
+  Pxe = (PXE_UNDI *) (UINTN) (Nii->Id);
 
   if (Calc8BitCksum (Pxe, Pxe->hw.Len) != 0) {
     DEBUG ((EFI_D_NET, "\n!PXE checksum is not correct.\n"));
