@@ -93,7 +93,9 @@ B. Build DUET image on Linux Platform
   2). run "./PostBuild.sh IA32" for IA32 architecture platform or 
           "./PostBuild.sh X64" for X64 architecture platform.
 
-
+ NOTE: After post build action, you should check the size of EfiLdr at $WORKSPACE/Build/DuetPkg/DEBUG_UNIXGCC directory, it must less than 470k.
+       If not, you should manually remove some unnecessary drivers at DuetPkg.fdf file.
+ 
 3. Create bootable disk
    The following steps are same for IA32 architecture platform or X64 architecture platform.
    Now only support floopy.
