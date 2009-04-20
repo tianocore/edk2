@@ -1,7 +1,7 @@
 /** @file
   EFI Network Interface Identifier Protocol
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -45,7 +45,7 @@ typedef EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL   EFI_NETWORK_INTERFACE_IDENTI
 ///
 struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
   UINT64    Revision;   ///< The revision of the EFI_NETWORK_INTERFACE_IDENTIFIER protocol.
-  UINT64    ID;         ///< Address of the first byte of the identifying structure for this network 
+  UINT64    Id;         ///< Address of the first byte of the identifying structure for this network 
                         ///< interface. This is only valid when the network interface is started 
                         ///< (see Start()). When the network interface is not started, this field is set to zero.
   UINT64    ImageAddr;  ///< Address of the first byte of the identifying structure for this
@@ -76,4 +76,4 @@ typedef enum {
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid;
 extern EFI_GUID gEfiNetworkInterfaceIdentifierProtocolGuid_31;
 
-#endif // _EFI_NII_H
+#endif

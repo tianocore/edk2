@@ -2,7 +2,7 @@
   The definition for iSCSI Boot Firmware Table, it's defined in Microsoft's
   iSCSI Boot Firmware Table(iBFT) as Defined in ACPI 3.0b Specification. 
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -24,14 +24,12 @@
 ///
 /// Structure Type/ID
 ///
-typedef enum {
-  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_RESERVED_STRUCTURE_ID = 0,
-  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_ID,
-  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_ID,
-  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_ID,
-  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_ID,
-  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_EXTERNSIONS_STRUCTURE_ID
-} EFI_ACPI_ISCSI_ID_DEFINITIONS;
+#define  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_RESERVED_STRUCTURE_ID         0
+#define  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_CONTROL_STRUCTURE_ID          1
+#define  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE_ID        2
+#define  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE_ID              3
+#define  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_ID           4
+#define  EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_EXTERNSIONS_STRUCTURE_ID      5
 
 ///
 /// from the definition of IP_PREFIX_ORIGIN Enumeration in MSDN,
