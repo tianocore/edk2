@@ -181,7 +181,7 @@ typedef struct {
 } SMBIOS_TABLE_TYPE1;
 
 ///
-///  Base Board ¡ª Feature Flags 
+///  Base Board - Feature Flags 
 ///
 typedef struct {
   UINT8  Motherboard           :1;
@@ -193,7 +193,7 @@ typedef struct {
 } BASE_BOARD_FEATURE_FLAGS;
 
 ///
-///  Base Board ¡ª Board Type
+///  Base Board - Board Type
 ///
 typedef enum {  
   BaseBoardTypeUnknown                  = 0x1,
@@ -214,7 +214,7 @@ typedef enum {
 ///
 /// Base Board (or Module) Information (Type 2)
 ///
-/// The information in this structure defines attributes of a system baseboard ¡ª 
+/// The information in this structure defines attributes of a system baseboard - 
 /// for example a motherboard, planar, or server blade or other standard system module.
 ///
 typedef struct {
@@ -465,7 +465,7 @@ typedef enum {
 } PROCESSOR_FAMILY_DATA;
 
 ///
-/// Processor Information ¨C Voltage 
+/// Processor Information - Voltage 
 ///
 typedef struct {
   UINT8  ProcessorVoltageCapability5V        :1;  // Bit 0
@@ -901,7 +901,7 @@ typedef enum {
 /// Port Connector Information (Type 8)
 ///
 /// The information in this structure defines the attributes of a system port connector, 
-/// e.g. parallel, serial, keyboard, or mouse ports.  The port¡¯s type and connector information 
+/// e.g. parallel, serial, keyboard, or mouse ports.  The port's type and connector information 
 /// are provided. One structure is present for each port provided by the system.
 ///
 typedef struct {
@@ -1490,7 +1490,7 @@ typedef enum {
 /// Built-in Pointing Device (Type 21)
 ///
 /// This structure describes the attributes of the built-in pointing device for the 
-/// system ¡ª the presence of this structure does not imply that the built-in
+/// system - the presence of this structure does not imply that the built-in
 /// pointing device is active for the system's use! 
 ///
 typedef struct {
@@ -1519,7 +1519,7 @@ typedef enum {
 ///
 /// This structure describes the attributes of the portable battery(s) for the system.  
 /// The structure contains the static attributes for the group.  Each structure describes 
-/// a single battery pack¡¯s attributes.
+/// a single battery pack's attributes.
 ///
 typedef struct {
   SMBIOS_STRUCTURE                  Hdr;
@@ -1743,7 +1743,7 @@ typedef enum {
 /// client's Pre-boot Execution Environment (PXE) boot image or OS-present management 
 /// application via this structure. When used in the PXE environment, for example, 
 /// this code identifies the reason the PXE was initiated and can be used by boot-image 
-/// software to further automate an enterprise¡¯s PXE sessions.  For example, an enterprise  
+/// software to further automate an enterprise's PXE sessions.  For example, an enterprise  
 /// could choose to automatically download a hardware-diagnostic image to a client whose 
 /// reason code indicated either a firmware- or operating system-detected hardware failure.
 ///
