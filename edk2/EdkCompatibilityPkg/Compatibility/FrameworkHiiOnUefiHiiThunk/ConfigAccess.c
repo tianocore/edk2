@@ -189,7 +189,7 @@ GetStorageFromConfigString (
       Name = Storage->Name;
     }
     
-    if (IsConfigHdrMatch (ConfigString, &Storage->Guid, Name)) {
+    if (HiiIsConfigHdrMatch (ConfigString, &Storage->Guid, Name)) {
       return Storage;
     }
 
@@ -671,10 +671,10 @@ CreateIfrDataArray (
   FRAMEWORK_EFI_IFR_DATA_ARRAY      *IfrDataArray;
   FRAMEWORK_EFI_IFR_DATA_ENTRY      *IfrDataEntry;
   UINTN                             BrowserDataSize;
-  FORMSET_STORAGE                  *BufferStorage;
-  EFI_STATUS                        Status;
+  FORMSET_STORAGE                   *BufferStorage;
   UINTN                             Size;
   EFI_STRING                        String;
+  UINT8                             *TempBuffer;
 
   *NvMapAllocated = FALSE;
 
@@ -730,8 +730,10 @@ CreateIfrDataArray (
       IfrDataArray->NvRamMap = ConfigAccess->ThunkContext->NvMapOverride;
     }
     
-    Status = GetBrowserData (&BufferStorage->Guid, BufferStorage->Name, &BrowserDataSize, IfrDataArray->NvRamMap);
-    ASSERT_EFI_ERROR (Status);
+    TempBuffer = (UINT8 *) HiiGetBrowserData (&BufferStorage->Guid, BufferStorage->Name, BrowserDataSize);
+    ASSERT (TempBuffer == NULL);
+    CopyMem (IfrDataArray->NvRamMap, TempBuffer, BrowserDataSize);
+    FreePool (TempBuffer);
 
     IfrDataEntry = (FRAMEWORK_EFI_IFR_DATA_ENTRY *) (IfrDataArray + 1);
 
@@ -789,9 +791,9 @@ SyncBrowserDataForNvMapOverride (
   IN          EFI_QUESTION_ID               QuestionId
   )
 {
-  FORMSET_STORAGE                  *BufferStorage;
-  EFI_STATUS                        Status;
-  UINTN                             BrowserDataSize;
+  FORMSET_STORAGE   *BufferStorage;
+  BOOLEAN           CheckFlag;
+  UINTN             BrowserDataSize;
 
   if (ConfigAccess->ThunkContext->NvMapOverride != NULL) {
 
@@ -813,8 +815,8 @@ SyncBrowserDataForNvMapOverride (
     
     BrowserDataSize = BufferStorage->Size;
 
-    Status = SetBrowserData (&BufferStorage->Guid, BufferStorage->Name, BrowserDataSize, ConfigAccess->ThunkContext->NvMapOverride, NULL);
-    ASSERT_EFI_ERROR (Status);
+    CheckFlag = HiiSetBrowserData (&BufferStorage->Guid, BufferStorage->Name, BrowserDataSize, ConfigAccess->ThunkContext->NvMapOverride, NULL);
+    ASSERT (CheckFlag);
   }
 
 }
@@ -1061,7 +1063,7 @@ ThunkCallback (
   if (EFI_ERROR (Status)) {
     if (Packet != NULL) {
       do {
-        IfrLibCreatePopUp (1, &Key, Packet->String);
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, Packet->String, NULL);
       } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
     }
     //

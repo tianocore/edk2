@@ -488,24 +488,25 @@ HiiThunkUpdateForm (
   IN FRAMEWORK_EFI_HII_HANDLE          Handle,
   IN EFI_FORM_LABEL                    Label,
   IN BOOLEAN                           AddData,
-  IN FRAMEWORK_EFI_HII_UPDATE_DATA    *Data
+  IN FRAMEWORK_EFI_HII_UPDATE_DATA     *Data
   )
 {
   EFI_STATUS                                Status;
   HII_THUNK_PRIVATE_DATA                    *Private;
-  HII_THUNK_CONTEXT                          *ThunkContext;
-  EFI_HII_UPDATE_DATA                       *UefiHiiUpdateData;
+  HII_THUNK_CONTEXT                         *ThunkContext;
   EFI_HII_HANDLE                            UefiHiiHandle;
   EFI_GUID                                  FormsetGuid;
   EFI_FORM_ID                               FormId;
   EFI_TPL                                   OldTpl;
+  VOID                                      *StartOpCodeHandle;
+  VOID                                      *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL                        *StartLabel;
+  EFI_IFR_GUID_LABEL                        *EndLabel;
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   
   mInFrameworkUpdatePakcage = TRUE;
   Status = EFI_SUCCESS;
-  UefiHiiUpdateData = NULL;
-
 
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
@@ -539,34 +540,51 @@ HiiThunkUpdateForm (
     goto Done;
   }
 
+  //
+  // Init OpCode Handle
+  //
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
+
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartLabel->Number       = Label;
+
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndLabel->Number       = 0xffff;
+
   if (AddData) {
     if (Data->DataCount != 0) {
 
       ThunkContext = UefiHiiHandleToThunkContext (Private, UefiHiiHandle);
-      Status = FwUpdateDataToUefiUpdateData (ThunkContext, Data, &UefiHiiUpdateData);
+      Status = FwUpdateDataToUefiUpdateData (ThunkContext, Data, StartOpCodeHandle);
       ASSERT_EFI_ERROR (Status);
 
-      Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, TRUE, UefiHiiUpdateData);
+      Status = HiiUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, StartOpCodeHandle, NULL);
       ASSERT_EFI_ERROR (Status);
-      
-    } 
+    }
   } else {
     //
     // Delete Opcode starting from Labe in FormId found
     //
-    UefiHiiUpdateData = AllocateZeroPool (sizeof (*UefiHiiUpdateData));
-	
-    Status = IfrLibUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, Label, FALSE, UefiHiiUpdateData);
+    Status = HiiUpdateForm (UefiHiiHandle, &FormsetGuid, FormId, StartOpCodeHandle, EndOpCodeHandle);
     ASSERT_EFI_ERROR (Status);
   }
 
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
+
 Done:
-  if (UefiHiiUpdateData != NULL) {
-    if (UefiHiiUpdateData->Data != NULL) {
-      FreePool (UefiHiiUpdateData->Data);
-    }
-    FreePool (UefiHiiUpdateData);
-  }
 
   mInFrameworkUpdatePakcage = FALSE; 
 
