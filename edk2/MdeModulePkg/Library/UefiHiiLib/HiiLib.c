@@ -564,6 +564,15 @@ InternalHiiBrowserCallback (
                               VariableGuid,
                               VariableName
                               );
+    
+    if (!EFI_ERROR (Status)) {
+      //
+      // No Resluts Data, only allocate one char for '\0'
+      //
+      ResultsData = AllocateZeroPool (sizeof (CHAR16));
+      return ResultsData;
+    }
+
     if (Status != EFI_BUFFER_TOO_SMALL) {
       return NULL;
     }
