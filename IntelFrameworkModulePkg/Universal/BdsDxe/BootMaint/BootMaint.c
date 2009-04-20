@@ -273,7 +273,7 @@ BootMaintCallback (
   //
   CurrentFakeNVMap = (BMM_FAKE_NV_DATA *) HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA));
   if (CurrentFakeNVMap == NULL) {
-    CurrentFakeNVMap = &Private->BmmFakeNvData;
+    return EFI_NOT_FOUND;
   }
 
   //
@@ -590,7 +590,7 @@ BootMaintCallback (
   //
   // Update local settting.
   //
-  if ((UINTN) CurrentFakeNVMap != (UINTN) &Private->BmmFakeNvData) {
+  if (CurrentFakeNVMap != NULL) {
     CopyMem (&Private->BmmFakeNvData, CurrentFakeNVMap, sizeof (BMM_FAKE_NV_DATA));
     FreePool (CurrentFakeNVMap);
   }
