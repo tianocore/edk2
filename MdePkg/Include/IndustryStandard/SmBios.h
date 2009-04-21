@@ -1152,7 +1152,7 @@ typedef enum {
   EventLogVariableMutliEventSysManagmentType  = 0x06,                               
   EventLogVariableUnused                      = 0x07,
   EventLogVariableOEMAssigned                 = 0x80
-} EVENT_LOG_TYPE_DATA;
+} EVENT_LOG_VARIABLE_DATA;
 
 ///
 /// Group Item Entry
