@@ -373,6 +373,10 @@ ReassignIdeResources (
   UINT16                  CommandBlockBaseAddr;
   UINT16                  ControlBlockBaseAddr;
 
+  if (IdeDev->Channel >= IdeMaxChannel) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   //
   // Requery IDE IO port registers' base addresses in case of the switch of
   // native and legacy modes

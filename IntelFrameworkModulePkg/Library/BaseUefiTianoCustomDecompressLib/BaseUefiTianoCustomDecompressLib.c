@@ -127,14 +127,15 @@ MakeTable (
   UINT16  WordOfStart;
   UINT16  WordOfCount;
 
-  for (Index = 1; Index <= 16; Index++) {
+  for (Index = 0; Index <= 16; Index++) {
     Count[Index] = 0;
   }
 
   for (Index = 0; Index < NumOfChar; Index++) {
     Count[BitLen[Index]]++;
   }
-
+  
+  Start[0] = 0;
   Start[1] = 0;
 
   for (Index = 1; Index <= 16; Index++) {
@@ -149,7 +150,8 @@ MakeTable (
   }
 
   JuBits = (UINT16) (16 - TableBits);
-
+  
+  Weight[0] = 0;
   for (Index = 1; Index <= TableBits; Index++) {
     Start[Index] >>= JuBits;
     Weight[Index] = (UINT16) (1U << (TableBits - Index));
@@ -157,15 +159,15 @@ MakeTable (
 
   while (Index <= 16) {
     Weight[Index] = (UINT16) (1U << (16 - Index));
-    Index++;
+    Index++;    
   }
 
   Index = (UINT16) (Start[TableBits + 1] >> JuBits);
 
   if (Index != 0) {
     Index3 = (UINT16) (1U << TableBits);
-    while (Index != Index3) {
-      Table[Index++] = 0;
+    if (Index < Index3) {
+      SetMem16 (Table + Index, (Index3 - Index) * sizeof (*Table), 0);
     }
   }
 
@@ -175,7 +177,7 @@ MakeTable (
   for (Char = 0; Char < NumOfChar; Char++) {
 
     Len = BitLen[Char];
-    if (Len == 0) {
+    if (Len == 0 || Len >= 17) {
       continue;
     }
 
@@ -194,15 +196,17 @@ MakeTable (
       Index   = (UINT16) (Len - TableBits);
 
       while (Index != 0) {
-        if (*Pointer == 0) {
-          Sd->mRight[Avail]                     = Sd->mLeft[Avail] = 0;
+        if (*Pointer == 0 && Avail < (2 * NC - 1)) {
+          Sd->mRight[Avail] = Sd->mLeft[Avail] = 0;
           *Pointer = Avail++;
         }
-
-        if (Index3 & Mask) {
-          Pointer = &Sd->mRight[*Pointer];
-        } else {
-          Pointer = &Sd->mLeft[*Pointer];
+        
+        if (*Pointer < (2 * NC - 1)) {
+          if ((Index3 & Mask) != 0) {
+            Pointer = &Sd->mRight[*Pointer];
+          } else {
+            Pointer = &Sd->mLeft[*Pointer];
+          }
         }
 
         Index3 <<= 1;
@@ -294,28 +298,37 @@ ReadPTLen (
   volatile UINT16  Index;
   UINT32  Mask;
 
+  //
+  // Read Extra Set Code Length Array size 
+  //
   Number = (UINT16) GetBits (Sd, nbit);
 
   if (Number == 0) {
+    //
+    // This represents only Huffman code used
+    //
     CharC = (UINT16) GetBits (Sd, nbit);
 
     for (Index = 0; Index < 256; Index++) {
       Sd->mPTTable[Index] = CharC;
     }
 
-    for (Index = 0; Index < nn; Index++) {
-      Sd->mPTLen[Index] = 0;
-    }
+    SetMem (Sd->mPTLen, nn, 0);
 
     return 0;
   }
 
   Index = 0;
 
-  while (Index < Number) {
+  while (Index < Number && Index < NPT) {
 
     CharC = (UINT16) (Sd->mBitBuf >> (BITBUFSIZ - 3));
 
+    //
+    // If a code length is less than 7, then it is encoded as a 3-bit
+    // value. Or it is encoded as a series of "1"s followed by a 
+    // terminating "0". The number of "1"s = Code length - 4.
+    //
     if (CharC == 7) {
       Mask = 1U << (BITBUFSIZ - 1 - 3);
       while (Mask & Sd->mBitBuf) {
@@ -323,23 +336,29 @@ ReadPTLen (
         CharC += 1;
       }
     }
-
+    
     FillBuf (Sd, (UINT16) ((CharC < 7) ? 3 : CharC - 3));
 
     Sd->mPTLen[Index++] = (UINT8) CharC;
-
+ 
+    //
+    // For Code&Len Set, 
+    // After the third length of the code length concatenation,
+    // a 2-bit value is used to indicated the number of consecutive 
+    // zero lengths after the third length.
+    //
     if (Index == Special) {
       CharC = (UINT16) GetBits (Sd, 2);
-      while ((INT16) (--CharC) >= 0) {
+      while ((INT16) (--CharC) >= 0 && Index < NPT) {
         Sd->mPTLen[Index++] = 0;
       }
     }
   }
 
-  while (Index < nn) {
+  while (Index < nn && Index < NPT) {
     Sd->mPTLen[Index++] = 0;
   }
-
+  
   return MakeTable (Sd, nn, Sd->mPTLen, 8, Sd->mPTTable);
 }
 
@@ -365,11 +384,12 @@ ReadCLen (
   Number = (UINT16) GetBits (Sd, CBIT);
 
   if (Number == 0) {
+    //
+    // This represents only Huffman code used
+    //
     CharC = (UINT16) GetBits (Sd, CBIT);
 
-    for (Index = 0; Index < NC; Index++) {
-      Sd->mCLen[Index] = 0;
-    }
+    SetMem (Sd->mCLen, NC, 0);
 
     for (Index = 0; Index < 4096; Index++) {
       Sd->mCTable[Index] = CharC;
@@ -379,8 +399,7 @@ ReadCLen (
   }
 
   Index = 0;
-  while (Index < Number) {
-
+  while (Index < Number && Index < NC) {
     CharC = Sd->mPTTable[Sd->mBitBuf >> (BITBUFSIZ - 8)];
     if (CharC >= NT) {
       Mask = 1U << (BITBUFSIZ - 1 - 8);
@@ -412,7 +431,7 @@ ReadCLen (
         CharC = (UINT16) (GetBits (Sd, CBIT) + 20);
       }
 
-      while ((INT16) (--CharC) >= 0) {
+      while ((INT16) (--CharC) >= 0 && Index < NC) {
         Sd->mCLen[Index++] = 0;
       }
 
@@ -423,9 +442,7 @@ ReadCLen (
     }
   }
 
-  while (Index < NC) {
-    Sd->mCLen[Index++] = 0;
-  }
+  SetMem (Sd->mCLen + Index, NC - Index, 0);
 
   MakeTable (Sd, NC, Sd->mCLen, 12, Sd->mCTable);
 

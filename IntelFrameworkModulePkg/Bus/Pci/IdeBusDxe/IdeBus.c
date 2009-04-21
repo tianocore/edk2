@@ -360,6 +360,14 @@ IDEBusDriverBindingStart (
     EndIdeChannel       = BeginningIdeChannel;
     BeginningIdeDevice  = Node->Atapi.SlaveMaster;
     EndIdeDevice        = BeginningIdeDevice;
+    if (BeginningIdeChannel >= IdeMaxChannel || EndIdeChannel >= IdeMaxChannel) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ErrorExit;
+    }
+    if (BeginningIdeDevice >= IdeMaxDevice|| EndIdeDevice >= IdeMaxDevice) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ErrorExit;
+    }
   }
 
   //
@@ -1030,8 +1038,9 @@ DeRegisterIdeDevice (
   // Release allocated resources
   //
   Index = IdeBlkIoDevice->Channel * 2 + IdeBlkIoDevice->Device;
-  IdeBlkIoDevice->IdeBusDriverPrivateData->HaveScannedDevice[Index] = FALSE;
-
+  if (Index < MAX_IDE_DEVICE) {
+    IdeBlkIoDevice->IdeBusDriverPrivateData->HaveScannedDevice[Index] = FALSE;
+  }
   ReleaseIdeResources (IdeBlkIoDevice);
 
   return EFI_SUCCESS;

@@ -1202,7 +1202,11 @@ GetHpcPciAddressFromRootBridge (
     return EFI_NOT_FOUND;
   }
 
-  *PciAddress = EFI_PCI_ADDRESS (Temp->BusNumber, Temp->DeviceNumber, Temp->FunctionNumber, 0);
+  if (Temp != NULL) {
+    *PciAddress = EFI_PCI_ADDRESS (Temp->BusNumber, Temp->DeviceNumber, Temp->FunctionNumber, 0);
+  } else {
+    return EFI_NOT_FOUND;
+  }
 
   return EFI_SUCCESS;
 
