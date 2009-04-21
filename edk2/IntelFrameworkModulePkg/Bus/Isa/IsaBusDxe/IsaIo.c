@@ -1065,6 +1065,11 @@ IsaIoMap_FullSupport (
   if (Operation < 0 || Operation >= EfiIsaIoOperationMaximum) {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (ChannelNumber >= 8) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   // See if this is a Slave DMA Operation
   //
