@@ -573,7 +573,7 @@ CallFrontPage (
                             gFormBrowser2,
                             &gFrontPagePrivate.HiiHandle,
                             1,
-                            NULL,
+                            &mFrontPageGuid,
                             0,
                             NULL,
                             &ActionRequest
