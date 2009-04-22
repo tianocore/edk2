@@ -49,6 +49,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Capsule.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/TcgService.h>
+#include <Protocol/HiiPackageList.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/HobList.h>
