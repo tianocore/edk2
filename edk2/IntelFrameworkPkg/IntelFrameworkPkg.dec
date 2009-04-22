@@ -24,7 +24,6 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
-  FrameworkIfrSupportLib|Include/Library/FrameworkIfrSupportLib.h
   SmmLib|Include/Library/SmmLib.h
 
 [Guids.common]
