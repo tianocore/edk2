@@ -21,8 +21,10 @@ UINT16           mExpressionOpCodeIndex;
 BOOLEAN          mInScopeSubtitle;
 BOOLEAN          mInScopeSuppress;
 BOOLEAN          mInScopeGrayOut;
+BOOLEAN          mInScopeDisable;
 FORM_EXPRESSION  *mSuppressExpression;
 FORM_EXPRESSION  *mGrayOutExpression;
+FORM_EXPRESSION  *mDisableExpression;
 
 /**
   Initialize Statement header members.
@@ -73,6 +75,11 @@ CreateStatement (
 
   if (mInScopeGrayOut) {
     Statement->GrayOutExpression = mGrayOutExpression;
+  }
+
+
+  if (mInScopeDisable) {
+    Statement->DisableExpression = mDisableExpression;
   }
 
   Statement->InSubtitle = mInScopeSubtitle;
@@ -810,7 +817,6 @@ ParseOpCodes (
   BOOLEAN                 SuppressForOption;
   BOOLEAN                 InScopeOptionSuppress;
   FORM_EXPRESSION         *OptionSuppressExpression;
-  BOOLEAN                 InScopeDisable;
   UINT16                  DepthOfDisable;
   BOOLEAN                 OpCodeDisabled;
   BOOLEAN                 SingleOpCodeExpression;
@@ -822,7 +828,7 @@ ParseOpCodes (
   mInScopeSuppress         = FALSE;
   InScopeOptionSuppress    = FALSE;
   mInScopeGrayOut          = FALSE;
-  InScopeDisable           = FALSE;
+  mInScopeDisable          = FALSE;
   DepthOfDisable           = 0;
   OpCodeDisabled           = FALSE;
   SingleOpCodeExpression   = FALSE;
@@ -890,7 +896,7 @@ ParseOpCodes (
 
         if (ScopeOpCode == EFI_IFR_DISABLE_IF_OP) {
           if (DepthOfDisable == 0) {
-            InScopeDisable = FALSE;
+            mInScopeDisable = FALSE;
             OpCodeDisabled = FALSE;
           } else {
             DepthOfDisable--;
@@ -1035,9 +1041,9 @@ ParseOpCodes (
         //
         SingleOpCodeExpression = FALSE;
 
-        if (InScopeDisable) {
+        if (mInScopeDisable && CurrentForm == NULL) {
           //
-          // Evaluate DisableIf expression
+          // This is DisableIf expression for Form, it should be a constant expression
           //
           Status = EvaluateExpression (FormSet, CurrentForm, CurrentExpression);
           if (EFI_ERROR (Status)) {
@@ -1073,6 +1079,12 @@ ParseOpCodes (
 
       CopyMem (&FormSet->FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
       CopyMem (&FormSet->Help,         &((EFI_IFR_FORM_SET *) OpCodeData)->Help,         sizeof (EFI_STRING_ID));
+
+      //
+      // The formset OpCode contains ClassGuid
+      //
+      FormSet->NumberOfClassGuid = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3;
+      CopyMem (FormSet->ClassGuid, OpCodeData + sizeof (EFI_IFR_FORM_SET), FormSet->NumberOfClassGuid * sizeof (EFI_GUID));
       break;
 
     case EFI_IFR_FORM_OP:
@@ -1208,8 +1220,10 @@ ParseOpCodes (
       break;
 
     case EFI_IFR_RESET_BUTTON_OP:
-      CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      //
+      // Create Statement todo
+      //
+      CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
       CopyMem (&CurrentStatement->DefaultId, &((EFI_IFR_RESET_BUTTON *) OpCodeData)->DefaultId, sizeof (EFI_DEFAULT_ID));
       break;
 
@@ -1504,8 +1518,16 @@ ParseOpCodes (
       CurrentExpression->Type = EFI_HII_EXPRESSION_DISABLE_IF;
       InitializeListHead (&CurrentExpression->OpCodeListHead);
 
-      InScopeDisable = TRUE;
-      OpCodeDisabled = FALSE;
+      if (CurrentForm != NULL) {
+        //
+        // This is DisableIf for Question, enqueue it to Form expression list
+        //
+        InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
+      }
+
+      mDisableExpression = CurrentExpression;
+      mInScopeDisable    = TRUE;
+      OpCodeDisabled     = FALSE;
 
       //
       // Take a look at next OpCode to see whether current expression consists
@@ -1614,9 +1636,12 @@ ParseOpCodes (
           break;
 
         case EFI_IFR_EXTEND_OP_BANNER:
+          //
+          // By SubClass or By ClassGuid to get Banner Data?
+          //
           if (FormSet->SubClass == EFI_FRONT_PAGE_SUBCLASS) {
             CopyMem (
-              &BannerData->Banner[((EFI_IFR_GUID_BANNER *) OpCodeData)->LineNumber][
+              &gBannerData->Banner[((EFI_IFR_GUID_BANNER *) OpCodeData)->LineNumber][
               ((EFI_IFR_GUID_BANNER *) OpCodeData)->Alignment],
               &((EFI_IFR_GUID_BANNER *) OpCodeData)->Title,
               sizeof (EFI_STRING_ID)
@@ -1696,7 +1721,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_DISABLE_IF_OP:
-        InScopeDisable = FALSE;
+        mInScopeDisable = FALSE;
         OpCodeDisabled = FALSE;
         break;
 
@@ -1711,9 +1736,9 @@ ParseOpCodes (
 
       default:
         if (IsExpressionOpCode (ScopeOpCode)) {
-          if (InScopeDisable) {
+          if (mInScopeDisable && CurrentForm == NULL) {
             //
-            // Evaluate DisableIf expression
+            // This is DisableIf expression for Form, it should be a constant expression
             //
             Status = EvaluateExpression (FormSet, CurrentForm, CurrentExpression);
             if (EFI_ERROR (Status)) {

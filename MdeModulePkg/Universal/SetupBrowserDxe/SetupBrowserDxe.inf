@@ -64,6 +64,7 @@
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES  ## GUID
   gEfiIfrFrameworkGuid                          ## CONSUMES  ## GUID
+  gEfiHiiPlatformSetupFormsetGuid
 
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
