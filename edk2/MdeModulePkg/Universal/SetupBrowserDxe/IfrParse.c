@@ -1221,7 +1221,7 @@ ParseOpCodes (
 
     case EFI_IFR_RESET_BUTTON_OP:
       //
-      // Create Statement todo
+      // Create Statement
       //
       CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
       CopyMem (&CurrentStatement->DefaultId, &((EFI_IFR_RESET_BUTTON *) OpCodeData)->DefaultId, sizeof (EFI_DEFAULT_ID));
@@ -1637,7 +1637,7 @@ ParseOpCodes (
 
         case EFI_IFR_EXTEND_OP_BANNER:
           //
-          // By SubClass or By ClassGuid to get Banner Data?
+          // By SubClass to get Banner Data from Front Page
           //
           if (FormSet->SubClass == EFI_FRONT_PAGE_SUBCLASS) {
             CopyMem (
