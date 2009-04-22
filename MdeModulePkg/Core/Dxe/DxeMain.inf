@@ -130,6 +130,7 @@
   gEfiCpuArchProtocolGuid                       ## CONSUMES
   gEfiDevicePathProtocolGuid                    ## CONSUMES
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
+  gEfiHiiPackageListProtocolGuid                ## SOMETIMES_PRODUCES
   gEfiEbcProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid         ## PRODUCES
 
