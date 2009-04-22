@@ -29,8 +29,8 @@ EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 EFI_HII_STRING_PROTOCOL           *mHiiString;
 EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
 
-BANNER_DATA           *BannerData;
-EFI_HII_HANDLE        FrontPageHandle;
+BANNER_DATA           *gBannerData;
+EFI_HII_HANDLE        gFrontPageHandle;
 UINTN                 gClassOfVfr;
 UINTN                 gFunctionKeySetting;
 BOOLEAN               gResetRequired;
@@ -268,7 +268,7 @@ SendForm (
   InitializeBrowserStrings ();
 
   gFunctionKeySetting = DEFAULT_FUNCTION_KEY_SETTING;
-  gClassOfVfr         = EFI_SETUP_APPLICATION_SUBCLASS;
+  gClassOfVfr         = FORMSET_CLASS_PLATFORM_SETUP;
 
   //
   // Ensure we are in Text mode
@@ -564,8 +564,8 @@ InitializeSetup (
   //
   // Initialize Driver private data
   //
-  BannerData = AllocateZeroPool (sizeof (BANNER_DATA));
-  ASSERT (BannerData != NULL);
+  gBannerData = AllocateZeroPool (sizeof (BANNER_DATA));
+  ASSERT (gBannerData != NULL);
 
   //
   // Install FormBrowser2 protocol
@@ -1874,21 +1874,16 @@ GetQuestionDefault (
   // For Questions without default
   //
   switch (Question->Operand) {
-  case EFI_IFR_NUMERIC_OP:
-    //
-    // Take minimal value as numeric's default value
-    //
-    HiiValue->Value.u64 = Question->Minimum;
-    break;
-
   case EFI_IFR_ONE_OF_OP:
     //
     // Take first oneof option as oneof's default value
     //
-    Link = GetFirstNode (&Question->OptionListHead);
-    if (!IsNull (&Question->OptionListHead, Link)) {
-      Option = QUESTION_OPTION_FROM_LINK (Link);
-      CopyMem (HiiValue, &Option->Value, sizeof (EFI_HII_VALUE));
+    if (ValueToOption (Question, HiiValue) == NULL) {    
+      Link = GetFirstNode (&Question->OptionListHead);
+      if (!IsNull (&Question->OptionListHead, Link)) {
+        Option = QUESTION_OPTION_FROM_LINK (Link);
+        CopyMem (HiiValue, &Option->Value, sizeof (EFI_HII_VALUE));
+      }
     }
     break;
 
@@ -1948,11 +1943,11 @@ ExtractFormDefault (
     Link = GetNextNode (&Form->StatementListHead, Link);
 
     //
-    // If Question is suppressed, don't reset it to default
+    // If Question is disabled, don't reset it to default
     //
-    if (Question->SuppressExpression != NULL) {
-      Status = EvaluateExpression (FormSet, Form, Question->SuppressExpression);
-      if (!EFI_ERROR (Status) && Question->SuppressExpression->Result.Value.b) {
+    if (Question->DisableExpression != NULL) {
+      Status = EvaluateExpression (FormSet, Form, Question->DisableExpression);
+      if (!EFI_ERROR (Status) && Question->DisableExpression->Result.Value.b) {
         continue;
       }
     }
@@ -2167,6 +2162,10 @@ GetIfrBinaryData (
   BOOLEAN                      ReturnDefault;
   UINT32                       PackageListLength;
   EFI_HII_PACKAGE_HEADER       PackageHeader;
+  UINT8                        Index;
+  UINT8                        NumberOfClassGuid;
+  BOOLEAN                      IsSetupClassGuid;
+  EFI_GUID                     *ClassGuid;
 
   OpCodeData = NULL;
   Package = NULL;
@@ -2222,7 +2221,21 @@ GetIfrBinaryData (
           // Check whether return default FormSet
           //
           if (ReturnDefault) {
-            break;
+            //
+            // Check ClassGuid of formset OpCode
+            //
+            IsSetupClassGuid  = FALSE;
+            NumberOfClassGuid = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3;
+            ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
+            for (Index = 0; Index < NumberOfClassGuid; Index++) {
+              if (CompareGuid (ClassGuid + Index, &gEfiHiiPlatformSetupFormsetGuid)) {
+                IsSetupClassGuid = TRUE;
+                break;
+              }
+            }
+            if (IsSetupClassGuid) {
+              break;
+            }
           }
 
           //
@@ -2341,9 +2354,10 @@ InitializeFormSet (
     return Status;
   }
 
-  gClassOfVfr = FormSet->SubClass;
-  if (gClassOfVfr == EFI_FRONT_PAGE_SUBCLASS) {
-    FrontPageHandle = FormSet->HiiHandle;
+  gClassOfVfr = FORMSET_CLASS_PLATFORM_SETUP;
+  if (FormSet->SubClass == EFI_FRONT_PAGE_SUBCLASS) {
+    gClassOfVfr = FORMSET_CLASS_FRONT_PAGE;
+    gFrontPageHandle = FormSet->HiiHandle;
   }
 
   //

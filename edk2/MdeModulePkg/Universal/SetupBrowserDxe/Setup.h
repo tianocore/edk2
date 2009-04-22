@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiString.h>
 
 #include <Guid/MdeModuleHii.h>
+#include <Guid/HiiPlatformSetupFormset.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
@@ -192,6 +193,9 @@ typedef struct {
 
 #define FORM_INCONSISTENT_VALIDATION         0
 #define FORM_NO_SUBMIT_VALIDATION            1
+
+#define FORMSET_CLASS_PLATFORM_SETUP         0
+#define FORMSET_CLASS_FRONT_PAGE             1
 
 typedef struct {
   UINT8               Type;
@@ -379,6 +383,7 @@ typedef struct {
   LIST_ENTRY            NoSubmitListHead;    // nested nosubmit expression list (FORM_EXPRESSION)
   FORM_EXPRESSION       *GrayOutExpression;  // nesting inside of GrayOutIf
   FORM_EXPRESSION       *SuppressExpression; // nesting inside of SuppressIf
+  FORM_EXPRESSION       *DisableExpression;  // nesting inside of DisableIf
 
 } FORM_BROWSER_STATEMENT;
 
@@ -425,8 +430,10 @@ typedef struct {
   EFI_GUID                        Guid;
   EFI_STRING_ID                   FormSetTitle;
   EFI_STRING_ID                   Help;
-  UINT16                          Class;
-  UINT16                          SubClass;
+  UINT8                           NumberOfClassGuid;
+  EFI_GUID                        ClassGuid[3];         // Up to three ClassGuid
+  UINT16                          Class;                // Tiano extended Class code
+  UINT16                          SubClass;             // Tiano extended Subclass code
   EFI_IMAGE_ID                    ImageId;
 
   FORM_BROWSER_STATEMENT          *StatementBuffer;     // Buffer for all Statements and Questions
@@ -442,8 +449,8 @@ extern EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 extern EFI_HII_STRING_PROTOCOL           *mHiiString;
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
 
-extern BANNER_DATA           *BannerData;
-extern EFI_HII_HANDLE        FrontPageHandle;
+extern BANNER_DATA           *gBannerData;
+extern EFI_HII_HANDLE        gFrontPageHandle;
 extern UINTN                 gClassOfVfr;
 extern UINTN                 gFunctionKeySetting;
 extern BOOLEAN               gResetRequired;

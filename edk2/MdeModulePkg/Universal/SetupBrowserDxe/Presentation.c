@@ -209,7 +209,7 @@ DisplayPageFrame (
     Buffer[Index] = Character;
   }
 
-  if (gClassOfVfr == EFI_FRONT_PAGE_SUBCLASS) {
+  if (gClassOfVfr == FORMSET_CLASS_FRONT_PAGE) {
     //
     //    ClearLines(0, LocalScreen.RightColumn, 0, BANNER_HEIGHT-1, BANNER_TEXT | BANNER_BACKGROUND);
     //
@@ -237,10 +237,10 @@ DisplayPageFrame (
         ASSERT (RowIdx < BANNER_HEIGHT);
         ASSERT (ColumnIdx < BANNER_COLUMNS);
         
-        if (BannerData->Banner[RowIdx][ColumnIdx] != 0x0000) {
+        if (gBannerData->Banner[RowIdx][ColumnIdx] != 0x0000) {
           StrFrontPageBanner = GetToken (
-                                BannerData->Banner[RowIdx][ColumnIdx],
-                                FrontPageHandle
+                                gBannerData->Banner[RowIdx][ColumnIdx],
+                                gFrontPageHandle
                                 );
         } else {
           continue;
@@ -290,7 +290,7 @@ DisplayPageFrame (
     KEYHELP_TEXT | KEYHELP_BACKGROUND
     );
 
-  if (gClassOfVfr != EFI_FRONT_PAGE_SUBCLASS) {
+  if (gClassOfVfr != FORMSET_CLASS_FRONT_PAGE) {
     ClearLines (
       LocalScreen.LeftColumn,
       LocalScreen.RightColumn,
@@ -325,7 +325,7 @@ DisplayPageFrame (
     Character = BOXDRAW_UP_LEFT;
     PrintChar (Character);
 
-    if (gClassOfVfr == EFI_SETUP_APPLICATION_SUBCLASS) {
+    if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
       //
       // Print Bottom border line
       // +------------------------------------------------------------------------------+
@@ -472,7 +472,7 @@ DisplayForm (
 
   StringPtr = GetToken (Selection->Form->FormTitle, Handle);
 
-  if (gClassOfVfr != EFI_FRONT_PAGE_SUBCLASS) {
+  if (gClassOfVfr != FORMSET_CLASS_FRONT_PAGE) {
     gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | TITLE_BACKGROUND);
     PrintStringAt (
       (LocalScreen.RightColumn + LocalScreen.LeftColumn - GetStringWidth (StringPtr) / 2) / 2,
@@ -481,7 +481,7 @@ DisplayForm (
       );
   }
 
-  if (gClassOfVfr == EFI_SETUP_APPLICATION_SUBCLASS) {
+  if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
     gST->ConOut->SetAttribute (gST->ConOut, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     //
@@ -512,6 +512,10 @@ DisplayForm (
       Suppress = Statement->SuppressExpression->Result.Value.b;
     } else {
       Suppress = FALSE;
+    }
+
+    if (Statement->DisableExpression != NULL) {
+      Suppress = Suppress || Statement->DisableExpression->Result.Value.b;
     }
 
     if (!Suppress) {
@@ -671,10 +675,6 @@ UpdateKeyHelp (
   TopRowOfHelp      = LocalScreen.BottomRow - 4;
   BottomRowOfHelp   = LocalScreen.BottomRow - 3;
 
-  if (gClassOfVfr == EFI_GENERAL_APPLICATION_SUBCLASS) {
-    return ;
-  }
-
   gST->ConOut->SetAttribute (gST->ConOut, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
   Statement = MenuOption->ThisTag;
@@ -687,7 +687,7 @@ UpdateKeyHelp (
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
-      if (gClassOfVfr == EFI_SETUP_APPLICATION_SUBCLASS) {
+      if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
         PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gFunctionOneString);
         PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
         PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
@@ -743,7 +743,7 @@ UpdateKeyHelp (
   case EFI_IFR_CHECKBOX_OP:
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
-    if (gClassOfVfr == EFI_SETUP_APPLICATION_SUBCLASS) {
+    if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
       PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gFunctionOneString);
       PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
       PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
@@ -763,7 +763,7 @@ UpdateKeyHelp (
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
-      if (gClassOfVfr == EFI_SETUP_APPLICATION_SUBCLASS) {
+      if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
         PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gFunctionOneString);
         PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
         PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
@@ -901,6 +901,13 @@ SetupBrowser (
       Selection->FormId = Selection->Form->FormId;
     } else {
       Selection->Form = IdToForm (Selection->FormSet, Selection->FormId);
+    }
+
+    if (Selection->Form == NULL) {
+      //
+      // No Form to display
+      //
+      return EFI_NOT_FOUND;
     }
 
     //
