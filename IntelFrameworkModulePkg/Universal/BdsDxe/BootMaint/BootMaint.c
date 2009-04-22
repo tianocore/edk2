@@ -272,8 +272,16 @@ BootMaintCallback (
   // Retrive uncommitted data from Form Browser
   //
   CurrentFakeNVMap = (BMM_FAKE_NV_DATA *) HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA));
-  if (CurrentFakeNVMap == NULL) {
-    return EFI_NOT_FOUND;
+  DisMap = (UINT8 *) CurrentFakeNVMap;
+  for (Index = 0; Index < sizeof (BMM_FAKE_NV_DATA); Index ++) {
+    if (DisMap [Index] != 0) {
+      break;
+    }
+  }
+  
+  if (Index == sizeof (BMM_FAKE_NV_DATA)) {
+    FreePool (CurrentFakeNVMap);
+    CurrentFakeNVMap = &Private->BmmFakeNvData;
   }
 
   //
@@ -590,7 +598,7 @@ BootMaintCallback (
   //
   // Update local settting.
   //
-  if (CurrentFakeNVMap != NULL) {
+  if (CurrentFakeNVMap != &Private->BmmFakeNvData) {
     CopyMem (&Private->BmmFakeNvData, CurrentFakeNVMap, sizeof (BMM_FAKE_NV_DATA));
     FreePool (CurrentFakeNVMap);
   }
