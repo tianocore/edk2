@@ -117,7 +117,7 @@ MakeTable (
   UINT16  Start[18];
   UINT16  *Pointer;
   UINT16  Index3;
-  volatile UINT16  Index;
+  UINT16  Index;
   UINT16  Len;
   UINT16  Char;
   UINT16  JuBits;
@@ -295,7 +295,7 @@ ReadPTLen (
 {
   UINT16  Number;
   UINT16  CharC;
-  volatile UINT16  Index;
+  UINT16  Index;
   UINT32  Mask;
 
   //
@@ -378,7 +378,7 @@ ReadCLen (
 {
   UINT16  Number;
   UINT16  CharC;
-  volatile UINT16  Index;
+  UINT16  Index;
   UINT32  Mask;
 
   Number = (UINT16) GetBits (Sd, CBIT);
@@ -632,7 +632,7 @@ UefiTianoDecompress (
   IN UINT32      Version
   )
 {
-  volatile UINT32  Index;
+  UINT32           Index;
   UINT32           CompSize;
   UINT32           OrigSize;
   SCRATCH_DATA     *Sd;
