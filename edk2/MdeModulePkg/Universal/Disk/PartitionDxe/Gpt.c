@@ -217,13 +217,13 @@ PartitionInstallGptChildHandles (
   //
   // Read the Protective MBR from LBA #0
   //
-  Status = BlockIo->ReadBlocks (
-                      BlockIo,
-                      BlockIo->Media->MediaId,
-                      0,
-                      BlockIo->Media->BlockSize,
-                      ProtectiveMbr
-                      );
+  Status = DiskIo->ReadDisk (
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     0,
+                     BlockIo->Media->BlockSize,
+                     ProtectiveMbr
+                     );
   if (EFI_ERROR (Status)) {
     GptValidStatus = Status;
     goto Done;
@@ -304,7 +304,7 @@ PartitionInstallGptChildHandles (
                     );
   if (EFI_ERROR (Status)) {
     GptValidStatus = Status;
-    DEBUG ((EFI_D_ERROR, " Partition Entry ReadBlocks error\n"));
+    DEBUG ((EFI_D_ERROR, " Partition Entry ReadDisk error\n"));
     goto Done;
   }
 
@@ -433,13 +433,13 @@ PartitionValidGptTable (
   //
   // Read the EFI Partition Table Header
   //
-  Status = BlockIo->ReadBlocks (
-                      BlockIo,
-                      BlockIo->Media->MediaId,
-                      Lba,
-                      BlockSize,
-                      PartHdr
-                      );
+  Status = DiskIo->ReadDisk (
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     Lba,
+                     BlockSize,
+                     PartHdr
+                     );
   if (EFI_ERROR (Status)) {
     FreePool (PartHdr);
     return FALSE;

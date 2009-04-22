@@ -97,13 +97,13 @@ PartitionInstallElToritoChildHandles (
       break;
     }
 
-    Status = BlockIo->ReadBlocks (
-                        BlockIo,
-                        Media->MediaId,
-                        VolDescriptorLba,
-                        Media->BlockSize,
-                        VolDescriptor
-                        );
+    Status = DiskIo->ReadDisk (
+                       DiskIo,
+                       Media->MediaId,
+                       VolDescriptorLba,
+                       Media->BlockSize,
+                       VolDescriptor
+                       );
     if (EFI_ERROR (Status)) {
       Found = Status;
       break;
@@ -140,13 +140,13 @@ PartitionInstallElToritoChildHandles (
       continue;
     }
 
-    Status = BlockIo->ReadBlocks (
-                        BlockIo,
-                        Media->MediaId,
-                        Lba,
-                        Media->BlockSize,
-                        Catalog
-                        );
+    Status = DiskIo->ReadDisk (
+                       DiskIo,
+                       Media->MediaId,
+                       Lba,
+                       Media->BlockSize,
+                       Catalog
+                       );
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "EltCheckDevice: error reading catalog %r\n", Status));
       continue;

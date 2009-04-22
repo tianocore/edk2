@@ -132,7 +132,6 @@ PartitionInstallMbrChildHandles (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL  *LastDevicePathNode;
 
-  Mbr             = NULL;
   Found           = EFI_NOT_FOUND;
 
   Mbr             = AllocatePool (BlockIo->Media->BlockSize);
@@ -140,13 +139,13 @@ PartitionInstallMbrChildHandles (
     goto Done;
   }
 
-  Status = BlockIo->ReadBlocks (
-                      BlockIo,
-                      BlockIo->Media->MediaId,
-                      0,
-                      BlockIo->Media->BlockSize,
-                      Mbr
-                      );
+  Status = DiskIo->ReadDisk (
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     0,
+                     BlockIo->Media->BlockSize,
+                     Mbr
+                     );
   if (EFI_ERROR (Status)) {
     Found = Status;
     goto Done;
@@ -240,13 +239,13 @@ PartitionInstallMbrChildHandles (
 
     do {
 
-      Status = BlockIo->ReadBlocks (
-                          BlockIo,
-                          BlockIo->Media->MediaId,
-                          ExtMbrStartingLba,
-                          BlockIo->Media->BlockSize,
-                          Mbr
-                          );
+      Status = DiskIo->ReadDisk (
+                         DiskIo,
+                         BlockIo->Media->MediaId,
+                         ExtMbrStartingLba,
+                         BlockIo->Media->BlockSize,
+                         Mbr
+                         );
       if (EFI_ERROR (Status)) {
         Found = Status;
         goto Done;
