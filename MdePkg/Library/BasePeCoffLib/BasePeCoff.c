@@ -92,8 +92,8 @@ PeCoffLoaderGetPeHeader (
 
   //
   // Read the PE/COFF Header. For PE32 (32-bit) this will read in too much
-  // data, but that should not hurt anythine. Hdr.Pe32->OptionalHeader.Magic
-  // determins if this is a PE32 or PE32+ image. The magic is in the same
+  // data, but that should not hurt anything. Hdr.Pe32->OptionalHeader.Magic
+  // determines if this is a PE32 or PE32+ image. The magic is in the same
   // location in both images.
   //
   Size = sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION);
@@ -158,7 +158,7 @@ PeCoffLoaderGetPeHeader (
   if (!PeCoffLoaderImageFormatSupported (ImageContext->Machine)) {
     //
     // If the PE/COFF loader does not support the image type return
-    // unsupported. This library can suport lots of types of images
+    // unsupported. This library can support lots of types of images
     // this does not mean the user of this library can call the entry
     // point of the image.
     //
@@ -411,7 +411,7 @@ PeCoffLoaderGetImageInfo (
       // In Te image header there is not a field to describe the ImageSize.
       // Actually, the ImageSize equals the RVA plus the VirtualSize of
       // the last section mapped into memory (Must be rounded up to
-      // a mulitple of Section Alignment). Per the PE/COFF specification, the
+      // a multiple of Section Alignment). Per the PE/COFF specification, the
       // section headers in the Section Table must appear in order of the RVA
       // values for the corresponding sections. So the ImageSize can be determined
       // by the RVA and the VirtualSize of the last section header in the
@@ -540,9 +540,9 @@ PeCoffLoaderRelocateImage (
   // If there are no relocation entries, then we are done
   //
   if (ImageContext->RelocationsStripped) {
-  	// Applies additional environment specific actions to relocate fixups 
-  	// to a PE/COFF image if needed
-  	PeCoffLoaderRelocateImageExtraAction (ImageContext); 	
+    // Applies additional environment specific actions to relocate fixups 
+    // to a PE/COFF image if needed
+    PeCoffLoaderRelocateImageExtraAction (ImageContext); 	
     return RETURN_SUCCESS;
   }
 
@@ -710,8 +710,8 @@ PeCoffLoaderRelocateImage (
       default:
         //
         // The common code does not handle some of the stranger IPF relocations
-        // PeCoffLoaderRelocateImageEx () addes support for these complex fixups
-        // on IPF and is a No-Op on other archtiectures.
+        // PeCoffLoaderRelocateImageEx () adds support for these complex fixups
+        // on IPF and is a No-Op on other architectures.
         //
         Status = PeCoffLoaderRelocateImageEx (Reloc, Fixup, &FixupData, Adjust);
         if (RETURN_ERROR (Status)) {
@@ -753,7 +753,7 @@ PeCoffLoaderRelocateImage (
   Loads the PE/COFF image accessed through the ImageRead service of ImageContext into the buffer
   specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
   the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
-  The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
+  The EntryPoint, FixupDataSize, CodeView, PdbPointer and HiiResourceData fields of ImageContext are computed.
   The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage,  Machine, ImageType, ImageAddress, ImageSize, 
   DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva 
   fields of the ImageContext structure must be valid prior to invoking this service.
@@ -796,6 +796,11 @@ PeCoffLoaderLoadImage (
   UINT32                                TempDebugEntryRva;
   UINT32                                NumberOfRvaAndSizes;
   UINT16                                Magic;
+  EFI_IMAGE_RESOURCE_DIRECTORY          *ResourceDirectory;
+  EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY    *ResourceDirectoryEntry;
+  EFI_IMAGE_RESOURCE_DIRECTORY_STRING   *ResourceDirectoryString;
+  EFI_IMAGE_RESOURCE_DATA_ENTRY         *ResourceDataEntry;
+
 
   ASSERT (ImageContext != NULL);
 
@@ -968,7 +973,7 @@ PeCoffLoaderLoadImage (
     }
 
     //
-    // If raw size is less then virt size, zero fill the remaining
+    // If raw size is less then virtual size, zero fill the remaining
     //
 
     if (Size < Section->Misc.VirtualSize) {
@@ -1145,6 +1150,72 @@ PeCoffLoaderLoadImage (
     }
   }
 
+  //
+  // Get Image's HII resource section
+  //
+  ImageContext->HiiResourceData = 0;
+  if (!(ImageContext->IsTeImage)) {
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset
+      //
+      DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE];
+    } else {
+      //
+      // Use PE32+ offset
+      //
+      DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE];
+    }
+
+    if (DirectoryEntry->Size != 0) {
+      Base = PeCoffLoaderImageAddress (ImageContext, DirectoryEntry->VirtualAddress);
+
+      ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) Base;
+      ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+
+      for (Index = 0; Index < ResourceDirectory->NumberOfNamedEntries; Index++) {
+        if (ResourceDirectoryEntry->u1.s.NameIsString) {
+          ResourceDirectoryString = (EFI_IMAGE_RESOURCE_DIRECTORY_STRING *) (Base + ResourceDirectoryEntry->u1.s.NameOffset);
+
+          if (ResourceDirectoryString->Length == 3 &&
+              ResourceDirectoryString->String[0] == L'H' &&
+              ResourceDirectoryString->String[1] == L'I' &&
+              ResourceDirectoryString->String[2] == L'I') {
+            //
+            // Resource Type "HII" found
+            //
+            if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+              //
+              // Move to next level - resource Name
+              //
+              ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
+              ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+
+              if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+                //
+                // Move to next level - resource Language
+                //
+                ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
+                ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+              }
+            }
+
+            //
+            // Now it ought to be resource Data
+            //
+            if (!ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+              ResourceDataEntry = (EFI_IMAGE_RESOURCE_DATA_ENTRY *) (Base + ResourceDirectoryEntry->u2.OffsetToData);
+              ImageContext->HiiResourceData = (PHYSICAL_ADDRESS) (UINTN) PeCoffLoaderImageAddress (ImageContext, ResourceDataEntry->OffsetToData);
+              break;
+            }
+          }
+        }
+
+        ResourceDirectoryEntry++;
+      }
+    }
+  }
+ 
   return Status;
 }
 
@@ -1419,8 +1490,10 @@ PeCoffLoaderUnloadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+  //
   // Applies additional environment specific actions to unload a 
   // PE/COFF image if needed
+  //
   PeCoffLoaderUnloadImageExtraAction (ImageContext);
   return RETURN_SUCCESS;
 }
