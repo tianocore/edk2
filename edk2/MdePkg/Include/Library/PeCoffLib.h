@@ -185,6 +185,12 @@ typedef struct {
   /// Initialization Core Interface Specification.
   ///
   BOOLEAN                           IsTeImage;
+  ///
+  /// Set by PeCoffLoaderLoadImage() to the HII resource offset
+  /// if the image contains a custom PE/COFF resource with the type 'HII';
+  /// otherwise, the entry remains to be 0.
+  ///
+  PHYSICAL_ADDRESS                  HiiResourceData;
 } PE_COFF_LOADER_IMAGE_CONTEXT;
 
 /**
@@ -254,7 +260,7 @@ PeCoffLoaderRelocateImage (
   Loads the PE/COFF image accessed through the ImageRead service of ImageContext into the buffer
   specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
   the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
-  The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
+  The EntryPoint, FixupDataSize, CodeView, PdbPointer and HiiResourceData fields of ImageContext are computed.
   The ImageRead, Handle, PeCoffHeaderOffset,  IsTeImage,  Machine, ImageType, ImageAddress, ImageSize, 
   DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva 
   fields of the ImageContext structure must be valid prior to invoking this service.
