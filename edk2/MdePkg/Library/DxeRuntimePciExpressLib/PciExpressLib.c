@@ -222,7 +222,7 @@ GetPciExpressAddress (
   }
 
   //
-  // Search the entire table for a phyical address match
+  // Search the entire table for a physical address match
   //
   for (Index = 0; Index < mDxeRuntimePciExpressLibNumberOfRuntimeRanges; Index++) {
     if (mDxeRuntimePciExpressLibRegistrationTable[Index].PhysicalAddress == (Address & 0x0ffff000)) {
@@ -1471,6 +1471,10 @@ PciExpressReadBuffer (
 {
   UINTN   ReturnValue;
 
+  //
+  // Make sure Address is valid
+  //
+  ASSERT (((StartAddress) & ~0xfffffff) == 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
 
   if (Size == 0) {
@@ -1570,6 +1574,10 @@ PciExpressWriteBuffer (
 {
   UINTN                             ReturnValue;
 
+  //
+  // Make sure Address is valid
+  //
+  ASSERT (((StartAddress) & ~0xfffffff) == 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
 
   if (Size == 0) {
