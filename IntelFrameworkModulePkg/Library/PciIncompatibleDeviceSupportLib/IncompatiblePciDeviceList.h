@@ -15,9 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H
 #define _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H
 
-
-#include <PiDxe.h>
-
 #include <Library/PciIncompatibleDeviceSupportLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>

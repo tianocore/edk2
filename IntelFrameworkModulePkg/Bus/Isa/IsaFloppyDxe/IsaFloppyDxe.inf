@@ -11,7 +11,7 @@
 # 
 #  Conforming to EFI driver model
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2009, Intel Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -29,9 +29,7 @@
   FILE_GUID                      = 0abd8284-6da3-4616-971a-83a5148067ba
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
   EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = InitializeIsaFloppy
 
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
