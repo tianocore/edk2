@@ -632,7 +632,6 @@ UefiTianoDecompress (
   IN UINT32      Version
   )
 {
-  UINT32           Index;
   UINT32           CompSize;
   UINT32           OrigSize;
   SCRATCH_DATA     *Sd;
@@ -660,9 +659,8 @@ UefiTianoDecompress (
 
   Src = Src + 8;
 
-  for (Index = 0; Index < sizeof (SCRATCH_DATA); Index++) {
-    ((UINT8 *) Sd)[Index] = 0;
-  }
+  SetMem (Sd, sizeof (SCRATCH_DATA), 0);
+
   //
   // The length of the field 'Position Set Code Length Array Size' in Block Header.
   // For UEFI 2.0 de/compression algorithm(Version 1), mPBit = 4
