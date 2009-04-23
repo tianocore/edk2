@@ -2225,7 +2225,7 @@ GetIfrBinaryData (
             // Check ClassGuid of formset OpCode
             //
             IsSetupClassGuid  = FALSE;
-            NumberOfClassGuid = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3;
+            NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
             ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
             for (Index = 0; Index < NumberOfClassGuid; Index++) {
               if (CompareGuid (ClassGuid + Index, &gEfiHiiPlatformSetupFormsetGuid)) {
