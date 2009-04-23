@@ -645,7 +645,7 @@ ConvertBmpToGopBlt (
     //
     // GopBlt has been allocated by caller.
     //
-    if (*GopBltSize < BltBufferSize) {
+    if (*GopBltSize < (UINTN) BltBufferSize) {
       *GopBltSize = (UINTN) BltBufferSize;
       return EFI_BUFFER_TOO_SMALL;
     }
