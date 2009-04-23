@@ -1083,7 +1083,7 @@ ParseOpCodes (
       //
       // The formset OpCode contains ClassGuid
       //
-      FormSet->NumberOfClassGuid = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3;
+      FormSet->NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
       CopyMem (FormSet->ClassGuid, OpCodeData + sizeof (EFI_IFR_FORM_SET), FormSet->NumberOfClassGuid * sizeof (EFI_GUID));
       break;
 

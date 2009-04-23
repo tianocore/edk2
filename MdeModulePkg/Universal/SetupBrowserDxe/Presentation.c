@@ -515,7 +515,7 @@ DisplayForm (
     }
 
     if (Statement->DisableExpression != NULL) {
-      Suppress = Suppress || Statement->DisableExpression->Result.Value.b;
+      Suppress = (BOOLEAN) (Suppress || Statement->DisableExpression->Result.Value.b);
     }
 
     if (!Suppress) {
