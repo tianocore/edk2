@@ -67,7 +67,7 @@ PeCoffLoaderGetPeHeader (
   UINT16                Magic;
 
   //
-  // Read the DOS image header to check for it's existance
+  // Read the DOS image header to check for its existence
   //
   Size = sizeof (EFI_IMAGE_DOS_HEADER);
   Status = ImageContext->ImageRead (
@@ -1169,49 +1169,49 @@ PeCoffLoaderLoadImage (
 
     if (DirectoryEntry->Size != 0) {
       Base = PeCoffLoaderImageAddress (ImageContext, DirectoryEntry->VirtualAddress);
+      if (Base != NULL) {
+        ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) Base;
+        ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
 
-      ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) Base;
-      ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+        for (Index = 0; Index < ResourceDirectory->NumberOfNamedEntries; Index++) {
+          if (ResourceDirectoryEntry->u1.s.NameIsString) {
+            ResourceDirectoryString = (EFI_IMAGE_RESOURCE_DIRECTORY_STRING *) (Base + ResourceDirectoryEntry->u1.s.NameOffset);
 
-      for (Index = 0; Index < ResourceDirectory->NumberOfNamedEntries; Index++) {
-        if (ResourceDirectoryEntry->u1.s.NameIsString) {
-          ResourceDirectoryString = (EFI_IMAGE_RESOURCE_DIRECTORY_STRING *) (Base + ResourceDirectoryEntry->u1.s.NameOffset);
-
-          if (ResourceDirectoryString->Length == 3 &&
-              ResourceDirectoryString->String[0] == L'H' &&
-              ResourceDirectoryString->String[1] == L'I' &&
-              ResourceDirectoryString->String[2] == L'I') {
-            //
-            // Resource Type "HII" found
-            //
-            if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+            if (ResourceDirectoryString->Length == 3 &&
+                ResourceDirectoryString->String[0] == L'H' &&
+                ResourceDirectoryString->String[1] == L'I' &&
+                ResourceDirectoryString->String[2] == L'I') {
               //
-              // Move to next level - resource Name
+              // Resource Type "HII" found
               //
-              ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
-              ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
-
               if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
                 //
-                // Move to next level - resource Language
+                // Move to next level - resource Name
                 //
                 ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
                 ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+
+                if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+                  //
+                  // Move to next level - resource Language
+                  //
+                  ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
+                  ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
+                }
+              }
+
+              //
+              // Now it ought to be resource Data
+              //
+              if (!ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+                ResourceDataEntry = (EFI_IMAGE_RESOURCE_DATA_ENTRY *) (Base + ResourceDirectoryEntry->u2.OffsetToData);
+                ImageContext->HiiResourceData = (PHYSICAL_ADDRESS) (UINTN) PeCoffLoaderImageAddress (ImageContext, ResourceDataEntry->OffsetToData);
+                break;
               }
             }
-
-            //
-            // Now it ought to be resource Data
-            //
-            if (!ResourceDirectoryEntry->u2.s.DataIsDirectory) {
-              ResourceDataEntry = (EFI_IMAGE_RESOURCE_DATA_ENTRY *) (Base + ResourceDirectoryEntry->u2.OffsetToData);
-              ImageContext->HiiResourceData = (PHYSICAL_ADDRESS) (UINTN) PeCoffLoaderImageAddress (ImageContext, ResourceDataEntry->OffsetToData);
-              break;
-            }
           }
+          ResourceDirectoryEntry++;
         }
-
-        ResourceDirectoryEntry++;
       }
     }
   }
