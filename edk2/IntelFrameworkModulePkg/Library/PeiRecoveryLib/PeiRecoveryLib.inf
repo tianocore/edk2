@@ -1,7 +1,7 @@
 #/** @file
-# Recovery Library for PEIM
+#  Recovery Library for PEIM
 #
-# Copyright (c) 2006 - 2007, Intel Corporation.
+#  Copyright (c) 2006 - 2009, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,9 +20,6 @@
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = RecoveryLib|PEIM
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
 
 #
 # The following information is for reference only and not required by the build tools.
