@@ -56,15 +56,7 @@
 
   ##  @libraryclass  Provides HII related functions.
   HiiLib|Include/Library/HiiLib.h
-
-  ##  @libraryclass  Provides a set of interfaces to do IFR opcode creation and interact with a UEFI Form Browser.
-  IfrSupportLib|Include/Library/IfrSupportLib.h
-  
-  ##  @libraryclass  Defines APIs that is related to IFR operations but specific to EDK II
-  #                  implementation.
-  ##
-  ExtendedIfrSupportLib|Include/Library/ExtendedIfrSupportLib.h
-  
+    
   ##  @libraryclass  Defines a set of interfaces on how to process capusle image update.
   CapsuleLib|Include/Library/CapsuleLib.h
   
