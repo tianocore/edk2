@@ -129,7 +129,7 @@ DEFINE ICC_WIN_ASLDLINK_FLAGS  = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYS
 #   VS2003                 - win32 - Microsoft Visual Studio .NET 2003, Intel EBC, Intel ASL
 #   VS2005                 - win32 - Microsoft Visual Studio 2005 Team Suite Edition, Intel EBC, Intel ASL (also compatible with VS 2005 Express, Standard, and Pro)
 #   DDK3790                - win32 - Microsoft Windows DDK 3790.1830, Intel EBC, Intel ASL
-#   UINIXGCC               - UNIX GCC, No EBC, Intel ASL
+#   UNIXGCC                - UNIX GCC, No EBC, Intel ASL
 #   ELFGCC                 - Linux ELF GCC, No EBC, Intel ASL
 #   CYGGCC                 - win32 - CygWin GCC, Intel EBC, Intel ASL
 #   ICC                    - win32 - Intel C Compiler V9.1, Intel EBC, Intel ASL
