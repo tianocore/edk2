@@ -1,7 +1,7 @@
-/**@file
-  This driver produces a VGA console.
+/** @file
+  VGA Class Driver that managers VGA devices and produces Simple Text Output Protocol.
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -26,52 +26,10 @@ EFI_DRIVER_BINDING_PROTOCOL gVgaClassDriverBinding = {
   NULL
 };
 
-/**
-  The user Entry Point for module VgaClass. The user code starts with this function.
-
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
-  @param[in] SystemTable    A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs when executing this entry point.
-
-**/
-EFI_STATUS
-EFIAPI
-InitializeVgaClass(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  )
-{
-  EFI_STATUS              Status;
-
-  //
-  // Install driver model protocol(s).
-  //
-  Status = EfiLibInstallDriverBindingComponentName2 (
-             ImageHandle,
-             SystemTable,
-             &gVgaClassDriverBinding,
-             ImageHandle,
-             &gVgaClassComponentName,
-             &gVgaClassComponentName2
-             );
-  ASSERT_EFI_ERROR (Status);
-
-
-  return Status;
-}
-
 //
 // Local variables
 //
 CHAR16               CrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
-
-typedef struct {
-  CHAR16  Unicode;
-  CHAR8   PcAnsi;
-  CHAR8   Ascii;
-} UNICODE_TO_CHAR;
 
 //
 // This list is used to define the valid extend chars.
@@ -344,53 +302,220 @@ UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   }
 };
 
-//
-// Private worker functions
-//
+/**
+  Entrypoint of this VGA Class Driver.
+
+  This function is the entrypoint of this VGA Class Driver. It installs Driver Binding
+  Protocols together with Component Name Protocols.
+
+  @param  ImageHandle       The firmware allocated handle for the EFI image.
+  @param  SystemTable       A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeVgaClass(
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS              Status;
+
+  //
+  // Install driver model protocol(s).
+  //
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gVgaClassDriverBinding,
+             ImageHandle,
+             &gVgaClassComponentName,
+             &gVgaClassComponentName2
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Internal worker function to program CRTC register via PCI I/O Protocol.
+  
+  @param VgaClassDev  device instance object
+  @param Address      Address of register to write
+  @param Data         Data to write to register.
+
+**/
+VOID
+WriteCrtc (
+  IN  VGA_CLASS_DEV  *VgaClassDev,
+  IN  UINT16         Address,
+  IN  UINT8          Data
+  )
+{
+  VgaClassDev->PciIo->Io.Write (
+                           VgaClassDev->PciIo,
+                           EfiPciIoWidthUint8,
+                           VgaClassDev->VgaMiniPort->CrtcAddressRegisterBar,
+                           VgaClassDev->VgaMiniPort->CrtcAddressRegisterOffset,
+                           1,
+                           &Address
+                           );
+
+  VgaClassDev->PciIo->Io.Write (
+                           VgaClassDev->PciIo,
+                           EfiPciIoWidthUint8,
+                           VgaClassDev->VgaMiniPort->CrtcDataRegisterBar,
+                           VgaClassDev->VgaMiniPort->CrtcDataRegisterOffset,
+                           1,
+                           &Data
+                           );
+}
+
+/**
+  Internal worker function to set cursor's position to VgaClass device
+  
+  @param  VgaClassDev   Private data structure for device instance.
+  @param  Column        Colomn of position to set cursor to.
+  @param  Row           Row of position to set cursor to.
+  @param  MaxColumn     Max value of column.
+  
+**/
 VOID
 SetVideoCursorPosition (
   IN  VGA_CLASS_DEV  *VgaClassDev,
   IN  UINTN          Column,
   IN  UINTN          Row,
   IN  UINTN          MaxColumn
-  );
+  )
+{
+  Column    = Column & 0xff;
+  Row       = Row & 0xff;
+  MaxColumn = MaxColumn & 0xff;
 
-VOID
-WriteCrtc (
-  IN  VGA_CLASS_DEV  *VgaClassDev,
-  IN  UINT16         Address,
-  IN  UINT8          Data
-  );
+  WriteCrtc (
+    VgaClassDev,
+    CRTC_CURSOR_LOCATION_HIGH,
+    (UINT8) ((Row * MaxColumn + Column) >> 8)
+    );
+  WriteCrtc (
+    VgaClassDev,
+    CRTC_CURSOR_LOCATION_LOW,
+    (UINT8) ((Row * MaxColumn + Column) & 0xff)
+    );
+}
 
+/**
+  Internal worker function to detect if a Unicode char is for Box Drawing text graphics.
+
+  @param  Graphic  Unicode char to test.
+  @param  PcAnsi   Pointer to PCANSI equivalent of Graphic for output.
+                   If NULL, then PCANSI value is not returned.
+  @param  Ascii    Pointer to ASCII equivalent of Graphic for output.
+                   If NULL, then ASCII value is not returned.
+
+  @retval TRUE     Gpaphic is a supported Unicode Box Drawing character.
+  @retval FALSE    Gpaphic is not a supported Unicode Box Drawing character.
+
+**/
 BOOLEAN
 LibIsValidTextGraphics (
   IN  CHAR16  Graphic,
   OUT CHAR8   *PcAnsi, OPTIONAL
   OUT CHAR8   *Ascii OPTIONAL
-  );
+  )
+{
+  UNICODE_TO_CHAR *Table;
 
-BOOLEAN
-IsValidAscii (
-  IN  CHAR16  Ascii
-  );
+  //
+  // Unicode drawing code charts are all in the 0x25xx range, arrows are 0x21xx.
+  // So first filter out values not in these 2 ranges.
+  //
+  if ((((Graphic & 0xff00) != 0x2500) && ((Graphic & 0xff00) != 0x2100))) {
+    return FALSE;
+  }
 
-BOOLEAN
-IsValidEfiCntlChar (
-  IN  CHAR16  c
-  );
+  //
+  // Search UnicodeToPcAnsiOrAscii table for matching entry.
+  //
+  for (Table = UnicodeToPcAnsiOrAscii; Table->Unicode != 0x0000; Table++) {
+    if (Graphic == Table->Unicode) {
+      if (PcAnsi != NULL) {
+        *PcAnsi = Table->PcAnsi;
+      }
+
+      if (Ascii != NULL) {
+        *Ascii = Table->Ascii;
+      }
+
+      return TRUE;
+    }
+  }
+
+  //
+  // If value is not found in UnicodeToPcAnsiOrAscii table, then return FALSE.
+  //
+  return FALSE;
+}
 
 /**
-  Test to see if this driver supports ControllerHandle. Any ControllerHandle
-  than contains a VgaMiniPort and PciIo protocol can be supported.
+  Internal worker function to check whether input value is an ASCII char.
+  
+  @param  Char     Character to check.
 
-  @param  This                Protocol instance pointer.
+  @retval TRUE     Input value is an ASCII char.
+  @retval FALSE    Input value is not an ASCII char.
+
+**/
+BOOLEAN
+IsValidAscii (
+  IN  CHAR16  Char
+  )
+{
+  if ((Char >= 0x20) && (Char <= 0x7f)) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  Internal worker function to check whether input value is a unicode control char.
+  
+  @param  Char    Character to check.
+
+  @retval TRUE     Input value is a unicode control char.
+  @retval FALSE    Input value is not a unicode control char.
+
+**/
+BOOLEAN
+IsValidEfiCntlChar (
+  IN  CHAR16  Char
+  )
+{
+  if (Char == CHAR_NULL || Char == CHAR_BACKSPACE || Char == CHAR_LINEFEED || Char == CHAR_CARRIAGE_RETURN) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  Tests to see if this driver supports a given controller.
+
+  This function implments EFI_DRIVER_BINDING_PROTOCOL.Supported().
+  It Checks if this driver supports the controller specified. Any Controller
+  with VgaMiniPort Protocol and Pci I/O protocol can be supported.
+
+  @param  This                A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param  ControllerHandle    Handle of device to test
   @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval EFI_ALREADY_STARTED This driver is already running on this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval EFI_ALREADY_STARTED This driver is already running on this device.
+  @retval EFI_UNSUPPORTED     This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -398,19 +523,18 @@ EFIAPI
 VgaClassDriverBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS                  Status;
-  EFI_VGA_MINI_PORT_PROTOCOL  *VgaMiniPort;
 
   //
-  // Open the IO Abstraction(s) needed to perform the supported test
+  // Checks if Abstraction(s) needed to perform the supported test
   //
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiVgaMiniPortProtocolGuid,
-                  (VOID **) &VgaMiniPort,
+                  NULL,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
@@ -437,18 +561,19 @@ VgaClassDriverBindingSupported (
 }
 
 /**
-  Start this driver on ControllerHandle by opening a PciIo and VgaMiniPort
-  protocol, creating VGA_CLASS_DEV device and install gEfiSimpleTextOutProtocolGuid
-  finnally.
+  Starts the device controller.
 
-  @param  This                 Protocol instance pointer.
+  This function implments EFI_DRIVER_BINDING_PROTOCOL.Start().
+  It starts the device specified by Controller with the driver based on PCI I/O Protocol
+  and VgaMiniPort Protocol. It creates context for device instance and install EFI_SIMPLE_TEXT_OUT_PROTOCOL.
+
+  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param  ControllerHandle     Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval other                This driver does not support this device
+  @retval EFI_SUCCESS          The device was started.
+  @retval other                Fail to start the device.
 
 **/
 EFI_STATUS
@@ -456,7 +581,7 @@ EFIAPI
 VgaClassDriverBindingStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS                  Status;
@@ -483,7 +608,7 @@ VgaClassDriverBindingStart (
     );
 
   //
-  // Open the IO Abstraction(s) needed
+  // Open the PCI I/O Protocol
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -496,7 +621,9 @@ VgaClassDriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
+  //
+  // Open the VGA Mini Port Protocol
+  //
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiVgaMiniPortProtocolGuid,
@@ -511,49 +638,37 @@ VgaClassDriverBindingStart (
   //
   // Allocate the private device structure
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (VGA_CLASS_DEV),
-                  (VOID **) &VgaClassPrivate
-                  );
-  if (EFI_ERROR (Status)) {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiVgaMiniPortProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  ZeroMem (VgaClassPrivate, sizeof (VGA_CLASS_DEV));
+  VgaClassPrivate = AllocateZeroPool (sizeof (VGA_CLASS_DEV));
+  ASSERT (VgaClassPrivate != NULL);
 
   //
   // Initialize the private device structure
   //
-  VgaClassPrivate->Signature                        = VGA_CLASS_DEV_SIGNATURE;
-  VgaClassPrivate->Handle = Controller;
+  VgaClassPrivate->Signature   = VGA_CLASS_DEV_SIGNATURE;
+  VgaClassPrivate->Handle      = Controller;
   VgaClassPrivate->VgaMiniPort = VgaMiniPort;
-  VgaClassPrivate->PciIo = PciIo;
+  VgaClassPrivate->PciIo       = PciIo;
 
-  VgaClassPrivate->SimpleTextOut.Reset = VgaClassReset;
-  VgaClassPrivate->SimpleTextOut.OutputString = VgaClassOutputString;
-  VgaClassPrivate->SimpleTextOut.TestString = VgaClassTestString;
-  VgaClassPrivate->SimpleTextOut.ClearScreen = VgaClassClearScreen;
-  VgaClassPrivate->SimpleTextOut.SetAttribute = VgaClassSetAttribute;
+  VgaClassPrivate->SimpleTextOut.Reset             = VgaClassReset;
+  VgaClassPrivate->SimpleTextOut.OutputString      = VgaClassOutputString;
+  VgaClassPrivate->SimpleTextOut.TestString        = VgaClassTestString;
+  VgaClassPrivate->SimpleTextOut.ClearScreen       = VgaClassClearScreen;
+  VgaClassPrivate->SimpleTextOut.SetAttribute      = VgaClassSetAttribute;
   VgaClassPrivate->SimpleTextOut.SetCursorPosition = VgaClassSetCursorPosition;
-  VgaClassPrivate->SimpleTextOut.EnableCursor = VgaClassEnableCursor;
-  VgaClassPrivate->SimpleTextOut.QueryMode = VgaClassQueryMode;
-  VgaClassPrivate->SimpleTextOut.SetMode = VgaClassSetMode;
+  VgaClassPrivate->SimpleTextOut.EnableCursor      = VgaClassEnableCursor;
+  VgaClassPrivate->SimpleTextOut.QueryMode         = VgaClassQueryMode;
+  VgaClassPrivate->SimpleTextOut.SetMode           = VgaClassSetMode;
 
-  VgaClassPrivate->SimpleTextOut.Mode = &VgaClassPrivate->SimpleTextOutputMode;
-  VgaClassPrivate->SimpleTextOutputMode.MaxMode = VgaMiniPort->MaxMode;
-  VgaClassPrivate->DevicePath = DevicePath;
+  VgaClassPrivate->SimpleTextOut.Mode              = &VgaClassPrivate->SimpleTextOutputMode;
+  VgaClassPrivate->SimpleTextOutputMode.MaxMode    = VgaMiniPort->MaxMode;
+  VgaClassPrivate->DevicePath                      = DevicePath;
 
+  //
+  // Initialize the VGA device.
+  //
   Status = VgaClassPrivate->SimpleTextOut.SetAttribute (
                                             &VgaClassPrivate->SimpleTextOut,
-                                            EFI_TEXT_ATTR (EFI_WHITE,
-    EFI_BLACK)
+                                            EFI_TEXT_ATTR (EFI_WHITE, EFI_BLACK)
                                             );
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
@@ -596,14 +711,16 @@ ErrorExit:
 }
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Starts the device controller.
+  
+  This function implments EFI_DRIVER_BINDING_PROTOCOL.Stop().
+  It stops this driver on Controller. Support stoping any child handles
   created by this driver.
 
-  @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
-  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
-                            children is zero stop the entire bus driver.
-  @param  ChildHandleBuffer List of Child Handles to Stop.
+  @param  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  ControllerHandle  A handle to the device being stopped.
+  @param  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
+  @param  ChildHandleBuffer An array of child handles to be freed.
 
   @retval EFI_SUCCESS       This driver is removed ControllerHandle
   @retval other             This driver was not removed from this device
@@ -615,7 +732,7 @@ VgaClassDriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
   IN  EFI_HANDLE                      Controller,
   IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_HANDLE                      *ChildHandleBuffer OPTIONAL
   )
 {
   EFI_STATUS                    Status;
@@ -657,34 +774,43 @@ VgaClassDriverBindingStop (
   // Release PCI I/O and VGA Mini Port Protocols on the controller handle.
   //
   gBS->CloseProtocol (
-        Controller,
-        &gEfiPciIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   gBS->CloseProtocol (
-        Controller,
-        &gEfiVgaMiniPortProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiVgaMiniPortProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
-  gBS->FreePool (VgaClassPrivate);
+  FreePool (VgaClassPrivate);
 
   return EFI_SUCCESS;
 }
 
 /**
-  Reset VgaClass device and clear output.
+  Resets the text output device hardware.
+
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.Reset().
+  It resets the text output device hardware. The cursor position is set to (0, 0),
+  and the screen is cleared to the default background color for the output device.
   
-  @param This                 Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.
-  @param ExtendedVerification Whether need additional judgement
+  @param  This                 Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  ExtendedVerification Indicates that the driver may perform a more exhaustive
+                               verification operation of the device during reset.
+
+  @retval EFI_SUCCESS          The text output device was reset.
+  @retval EFI_DEVICE_ERROR     The text output device is not functioning correctly and could not be reset.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassReset (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     *This,
   IN  BOOLEAN                             ExtendedVerification
   )
 {
@@ -710,16 +836,27 @@ VgaClassReset (
 }
 
 /**
-  Output a string to VgaClass device.
+  Writes a Unicode string to the output device.
   
-  @param This                 Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.
-  @param WString              wide chars.
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.OutputString().
+  It writes a Unicode string to the output device. This is the most basic output mechanism
+  on an output device.
+
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  String                 The Null-terminated Unicode string to be displayed on the output device(s).
+
+  @retval EFI_SUCCESS            The string was output to the device.
+  @retval EFI_DEVICE_ERROR       The device reported an error while attempting to output the text.
+  @retval EFI_UNSUPPORTED        The output device’s mode is not currently in a defined text mode.
+  @retval EFI_WARN_UNKNOWN_GLYPH This warning code indicates that some of the characters in
+                                 the Unicode string could not be rendered and were skipped.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassOutputString (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
-  IN  CHAR16                          *WString
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
+  IN  CHAR16                          *String
   )
 {
   EFI_STATUS                  Status;
@@ -731,22 +868,24 @@ VgaClassOutputString (
   CHAR8                       GraphicChar;
 
   VgaClassDev = VGA_CLASS_DEV_FROM_THIS (This);
-
   Mode        = This->Mode;
 
   Status = This->QueryMode (
-                  This,
-                  Mode->Mode,
-                  &MaxColumn,
-                  &MaxRow
-                  );
+                   This,
+                   Mode->Mode,
+                   &MaxColumn,
+                   &MaxRow
+                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  for (; *WString != CHAR_NULL; WString++) {
+  //
+  // Parse each character of the string to output
+  //
+  for (; *String != CHAR_NULL; String++) {
 
-    switch (*WString) {
+    switch (*String) {
     case CHAR_BACKSPACE:
       if (Mode->CursorColumn > 0) {
         Mode->CursorColumn--;
@@ -794,14 +933,14 @@ VgaClassOutputString (
       break;
 
     default:
-      if (!LibIsValidTextGraphics (*WString, &GraphicChar, NULL)) {
+      if (!LibIsValidTextGraphics (*String, &GraphicChar, NULL)) {
         //
-        // Just convert to ASCII
+        // If this character is not ,Box Drawing text graphics, then convert it to ASCII.
         //
-        GraphicChar = (CHAR8) *WString;
+        GraphicChar = (CHAR8) *String;
         if (!IsValidAscii (GraphicChar)) {
           //
-          // Keep the API from supporting PCANSI Graphics chars
+          // If not valid ASCII char, convert it to "?"
           //
           GraphicChar = '?';
         }
@@ -837,38 +976,50 @@ VgaClassOutputString (
 }
 
 /**
-  Detects if a Unicode char is for Box Drawing text graphics.
+  Verifies that all characters in a Unicode string can be output to the target device.
   
-  @param This     Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
-  @param WString  Unicode chars
-  
-  @return if a Unicode char is for Box Drawing text graphics.
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.TestString().
+  It verifies that all characters in a Unicode string can be output to the target device.
+
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  String                 The Null-terminated Unicode string to be examined for the output device(s).
+
+  @retval EFI_SUCCESS            The device(s) are capable of rendering the output string.
+  @retval EFI_UNSUPPORTED        Some of the characters in the Unicode string cannot be rendered by
+                                 one or more of the output devices mapped by the EFI handle.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassTestString (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
-  IN  CHAR16                          *WString
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
+  IN  CHAR16                          *String
   )
 {
-  while (*WString != 0x0000) {
-    if (!(IsValidAscii (*WString) || IsValidEfiCntlChar (*WString) || LibIsValidTextGraphics (*WString, NULL, NULL))) {
+  while (*String != CHAR_NULL) {
+    if (!(IsValidAscii (*String) || IsValidEfiCntlChar (*String) || LibIsValidTextGraphics (*String, NULL, NULL))) {
       return EFI_UNSUPPORTED;
     }
 
-    WString++;
+    String++;
   }
 
   return EFI_SUCCESS;
 }
 
 /**
-  Clear Screen via VgaClass device
+  Clears the output device(s) display to the currently selected background color.
   
-  @param This     Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.ClearScreen().
+  The ClearScreen() function clears the output device(s) display to the currently
+  selected background color. The cursor position is set to (0, 0).
+
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
   
-  @retval EFI_SUCESS Success to clear screen
-  @retval Others     Wrong displaying mode.
+  @retval EFI_SUCESS             The operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
+  @retval EFI_UNSUPPORTED        The output device is not in a valid text mode.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -885,11 +1036,11 @@ VgaClassClearScreen (
   VgaClassDev = VGA_CLASS_DEV_FROM_THIS (This);
 
   Status = This->QueryMode (
-                  This,
-                  This->Mode->Mode,
-                  &MaxColumn,
-                  &MaxRow
-                  );
+                   This,
+                   This->Mode->Mode,
+                   &MaxColumn,
+                   &MaxRow
+                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -911,18 +1062,27 @@ VgaClassClearScreen (
 }
 
 /**
-  Set displaying mode's attribute
+  Sets the background and foreground colors for theOutputString() and ClearScreen() functions.
   
-  @param This      Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
-  @param Attribute Mode's attribute
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetAttribute().
+  It sets the background and foreground colors for the OutputString() and ClearScreen() functions.
+  The color mask can be set even when the device is in an invalid text mode.
+  Devices supporting a different number of text colors are required to emulate the above colors
+  to the best of the device’s capabilities.
+
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  Attribute              The attribute to set.
+                                 Bits 0..3 are the foreground color,
+                                 and bits 4..6 are the background color.
   
-  @param EFI_SUCCESS      Success to set attribute
-  @param EFI_UNSUPPORTED  Wrong mode's attribute wanted to be set
+  @retval EFI_SUCCESS            The requested attributes were set.
+  @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassSetAttribute (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  UINTN                           Attribute
   )
 {
@@ -935,19 +1095,26 @@ VgaClassSetAttribute (
 }
 
 /**
-  Set cursor position.
+  Sets the current coordinates of the cursor position.
   
-  @param This      Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
-  @param Column    Column of new cursor position.
-  @param Row       Row of new cursor position.
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetCursorPosition().
+  It sets the current coordinates of the cursor position.
+  The upper left corner of the screen is defined as coordinate (0, 0).
   
-  @retval EFI_SUCCESS Sucess to set cursor's position.
-  @retval Others      Wrong current displaying mode.
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  Column                 Column of position to set the cursor to.
+  @param  Row                    Row of position to set the cursor to.
+  
+  @retval EFI_SUCCESS            The operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
+  @retval EFI_UNSUPPORTED        The output device is not in a valid text mode, or the cursor
+                                 position is invalid for the current mode.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassSetCursorPosition (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  UINTN                           Column,
   IN  UINTN                           Row
   )
@@ -960,11 +1127,11 @@ VgaClassSetCursorPosition (
   VgaClassDev = VGA_CLASS_DEV_FROM_THIS (This);
 
   Status = This->QueryMode (
-                  This,
-                  This->Mode->Mode,
-                  &MaxColumn,
-                  &MaxRow
-                  );
+                   This,
+                   This->Mode->Mode,
+                   &MaxColumn,
+                   &MaxRow
+                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -982,17 +1149,25 @@ VgaClassSetCursorPosition (
 }
 
 /**
-  Enable cursor to display or not.
+  Makes the cursor visible or invisible.
   
-  @param This      Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 
-  @param Visible   Display cursor or not.
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.EnableCursor().
+  It makes the cursor visible or invisible.
+
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  Visible                If TRUE, the cursor is set to be visible.
+                                 If FALSE, the cursor is set to be invisible.
   
-  @retval EFI_SUCESS Success to display the cursor or not.
+  @retval EFI_SUCESS             The operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request or the
+                                 device does not support changing the cursor mode.
+  @retval EFI_UNSUPPORTED        The output device does not support visibility control of the cursor.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassEnableCursor (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  BOOLEAN                         Visible
   )
 {
@@ -1000,16 +1175,18 @@ VgaClassEnableCursor (
 
   VgaClassDev = VGA_CLASS_DEV_FROM_THIS (This);
   if (Visible) {
-    switch (This->Mode->Mode) {
-    case 1:
+    if (This->Mode->Mode == 1) {
+      //
+      // 80 * 50
+      //
       WriteCrtc (VgaClassDev, CRTC_CURSOR_START, 0x06);
       WriteCrtc (VgaClassDev, CRTC_CURSOR_END, 0x07);
-      break;
-
-    default:
+    } else {
+      //
+      // 80 * 25
+      //
       WriteCrtc (VgaClassDev, CRTC_CURSOR_START, 0x0e);
       WriteCrtc (VgaClassDev, CRTC_CURSOR_END, 0x0f);
-      break;
     }
   } else {
     WriteCrtc (VgaClassDev, CRTC_CURSOR_START, 0x20);
@@ -1020,23 +1197,27 @@ VgaClassEnableCursor (
 }
 
 /**
-  Query colum and row according displaying mode number
-  The mode:
-  0: 80 * 25
-  1: 80 * 50
+  Returns information for an available text mode that the output device(s) supports.
+
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.QueryMode().
+  It returns information for an available text mode that the output device(s) supports.
+  It is required that all output devices support at least 80x25 text mode. This mode is defined to be mode 0.
+  If the output devices support 80x50, that is defined to be mode 1.
+
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  ModeNumber             The mode number to return information on.
+  @param  Columns                Columen in current mode number
+  @param  Rows                   Row in current mode number.
   
-  @param This       Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
-  @param ModeNumber Mode number
-  @param Columns    return the columen in current mode number
-  @param Rows       return the row in current mode number.
-  
-  @return EFI_SUCCESS     Sucess to get columns and rows according to mode number
-  @return EFI_UNSUPPORTED Unsupported mode number
+  @retval EFI_SUCCESS            The requested mode information was returned.
+  @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
+  @retval EFI_UNSUPPORTED        The mode number was not valid.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassQueryMode (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  UINTN                           ModeNumber,
   OUT UINTN                           *Columns,
   OUT UINTN                           *Rows
@@ -1069,22 +1250,28 @@ VgaClassQueryMode (
 }
 
 /**
-  Set displaying mode number
+  Sets the output device(s) to a specified mode.
   
-  @param This       Pointer of EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
-  @param ModeNumber mode number
+  This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.QueryMode().
+  It sets the output device(s) to the requested mode.
+  On success the device is in the geometry for the requested mode,
+  and the device has been cleared to the current background color with the cursor at (0,0).
+
+  @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
+  @param  ModeNumber             The text mode to set.
   
-  @retval EFI_UNSUPPORTED Unsupported mode number in parameter
-  @retval EFI_SUCCESS     Success to set the mode number.
+  @retval EFI_SUCCESS            The requested text mode was set.
+  @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
+  @retval EFI_UNSUPPORTED        The mode number was not valid.
+
 **/
 EFI_STATUS
 EFIAPI
 VgaClassSetMode (
-  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  UINTN                           ModeNumber
   )
 {
-  EFI_STATUS    Status;
   VGA_CLASS_DEV *VgaClassDev;
 
   VgaClassDev = VGA_CLASS_DEV_FROM_THIS (This);
@@ -1097,153 +1284,5 @@ VgaClassSetMode (
 
   This->Mode->Mode  = (INT32) ModeNumber;
 
-  Status            = VgaClassDev->VgaMiniPort->SetMode (VgaClassDev->VgaMiniPort, ModeNumber);
-
-  return Status;
+  return VgaClassDev->VgaMiniPort->SetMode (VgaClassDev->VgaMiniPort, ModeNumber);
 }
-
-/**
-  Set logic cursor's position to VgaClass device
-  
-  @param VgaClassDev device instance object
-  @param Column      cursor logic position.
-  @param Row         cursor logic position.
-  @param MaxColumn   max logic column
-  
-**/
-VOID
-SetVideoCursorPosition (
-  IN  VGA_CLASS_DEV  *VgaClassDev,
-  IN  UINTN          Column,
-  IN  UINTN          Row,
-  IN  UINTN          MaxColumn
-  )
-{
-  Column    = Column & 0xff;
-  Row       = Row & 0xff;
-  MaxColumn = MaxColumn & 0xff;
-  WriteCrtc (
-    VgaClassDev,
-    CRTC_CURSOR_LOCATION_HIGH,
-    (UINT8) ((Row * MaxColumn + Column) >> 8)
-    );
-  WriteCrtc (
-    VgaClassDev,
-    CRTC_CURSOR_LOCATION_LOW,
-    (UINT8) ((Row * MaxColumn + Column) & 0xff)
-    );
-}
-
-/**
-  Program CRTC register via PCI IO.
-  
-  @param VgaClassDev  device instance object
-  @param Address      address
-  @param Data         data
-**/
-VOID
-WriteCrtc (
-  IN  VGA_CLASS_DEV  *VgaClassDev,
-  IN  UINT16         Address,
-  IN  UINT8          Data
-  )
-{
-  VgaClassDev->PciIo->Io.Write (
-                          VgaClassDev->PciIo,
-                          EfiPciIoWidthUint8,
-                          VgaClassDev->VgaMiniPort->CrtcAddressRegisterBar,
-                          VgaClassDev->VgaMiniPort->CrtcAddressRegisterOffset,
-                          1,
-                          &Address
-                          );
-
-  VgaClassDev->PciIo->Io.Write (
-                          VgaClassDev->PciIo,
-                          EfiPciIoWidthUint8,
-                          VgaClassDev->VgaMiniPort->CrtcDataRegisterBar,
-                          VgaClassDev->VgaMiniPort->CrtcDataRegisterOffset,
-                          1,
-                          &Data
-                          );
-}
-
-/**
-  Detects if a Unicode char is for Box Drawing text graphics.
-
-  @param Grphic   Unicode char to test.
-  @param PcAnsi   Optional pointer to return PCANSI equivalent of Graphic.
-  @param Asci     Optional pointer to return Ascii equivalent of Graphic.
-
-  @return TRUE if Gpaphic is a supported Unicode Box Drawing character.
-
-**/
-BOOLEAN
-LibIsValidTextGraphics (
-  IN  CHAR16  Graphic,
-  OUT CHAR8   *PcAnsi, OPTIONAL
-  OUT CHAR8   *Ascii OPTIONAL
-  )
-{
-  UNICODE_TO_CHAR *Table;
-
-  if ((((Graphic & 0xff00) != 0x2500) && ((Graphic & 0xff00) != 0x2100))) {
-    //
-    // Unicode drawing code charts are all in the 0x25xx range,
-    //  arrows are 0x21xx
-    //
-    return FALSE;
-  }
-
-  for (Table = UnicodeToPcAnsiOrAscii; Table->Unicode != 0x0000; Table++) {
-    if (Graphic == Table->Unicode) {
-      if (PcAnsi) {
-        *PcAnsi = Table->PcAnsi;
-      }
-
-      if (Ascii) {
-        *Ascii = Table->Ascii;
-      }
-
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  Judge whether is an ASCII char.
-  
-  @param Ascii character
-  @return whether is an ASCII char.
-**/
-BOOLEAN
-IsValidAscii (
-  IN  CHAR16  Ascii
-  )
-{
-  if ((Ascii >= 0x20) && (Ascii <= 0x7f)) {
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
-/**
-  Judge whether is diplaying control character.
-  
-  @param c character
-  @return whether is diplaying control character.
-**/
-BOOLEAN
-IsValidEfiCntlChar (
-  IN  CHAR16  c
-  )
-{
-  if (c == CHAR_NULL || c == CHAR_BACKSPACE || c == CHAR_LINEFEED || c == CHAR_CARRIAGE_RETURN) {
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
