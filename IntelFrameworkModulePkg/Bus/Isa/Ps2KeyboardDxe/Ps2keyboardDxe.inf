@@ -24,7 +24,12 @@
   EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializePs2Keyboard
 
+#
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  DRIVER_BINDING                = gKeyboardControllerDriver;
+#  COMPONENT_NAME                = gPs2KeyboardComponentName;
+#  COMPONENT_NAME2               = gPs2KeyboardComponentName2;
+#
 
 [Sources.common]
   ComponentName.c
