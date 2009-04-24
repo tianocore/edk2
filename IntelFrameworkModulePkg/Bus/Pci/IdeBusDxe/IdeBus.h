@@ -43,6 +43,13 @@
 #include "IdeData.h"
 
 //
+// Global Variables
+//
+extern EFI_DRIVER_BINDING_PROTOCOL      gIDEBusDriverBinding;
+extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL  gIDEBusDriverDiagnostics;
+extern EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gIDEBusDriverDiagnostics2;
+
+//
 // Extra Definition to porting
 //
 #define MAX_IDE_DEVICE    4
@@ -109,13 +116,6 @@ typedef struct {
 
 #define IDE_BLOCK_IO_DEV_FROM_THIS(a)           CR (a, IDE_BLK_IO_DEV, BlkIo, IDE_BLK_IO_DEV_SIGNATURE)
 #define IDE_BLOCK_IO_DEV_FROM_DISK_INFO_THIS(a) CR (a, IDE_BLK_IO_DEV, DiskInfo, IDE_BLK_IO_DEV_SIGNATURE)
-
-//
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL      gIDEBusDriverBinding;
-extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL  gIDEBusDriverDiagnostics;
-extern EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gIDEBusDriverDiagnostics2;
 
 #include "Ide.h"
 

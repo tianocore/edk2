@@ -41,6 +41,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "ComponentName.h"
 
 //
+// Global Variables
+//
+extern EFI_DRIVER_BINDING_PROTOCOL  gIsaBusControllerDriver;
+
+extern EFI_ISA_IO_PROTOCOL          IsaIoInterface;
+
+//
 // 8237 DMA registers
 //
 #define R_8237_DMA_BASE_CA_CH0                    0x00
@@ -106,9 +113,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define R_8237_DMA_WRMSK_CH0_3                    0x0f
 #define R_8237_DMA_WRMSK_CH4_7                    0xde
 
-
-extern EFI_ISA_IO_PROTOCOL    IsaIoInterface;
-
 typedef enum {
   IsaAccessTypeUnknown,
   IsaAccessTypeIo,
@@ -145,11 +149,6 @@ typedef struct {
 } ISA_IO_DEVICE;
 
 #define ISA_IO_DEVICE_FROM_ISA_IO_THIS(a) CR (a, ISA_IO_DEVICE, IsaIo, ISA_IO_DEVICE_SIGNATURE)
-
-//
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL  gIsaBusControllerDriver;
 
 //
 // Mapping structure for performing ISA DMA to a buffer above 16 MB

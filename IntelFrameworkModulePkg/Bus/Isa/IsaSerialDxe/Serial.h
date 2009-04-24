@@ -114,10 +114,6 @@ typedef struct {
 
 #define SERIAL_DEV_FROM_THIS(a) CR (a, SERIAL_DEV, SerialIo, SERIAL_DEV_SIGNATURE)
 
-//
-// Globale Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL   gSerialControllerDriver;
 
 //
 // Serial Driver Defaults

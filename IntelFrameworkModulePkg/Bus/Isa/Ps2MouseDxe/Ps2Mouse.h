@@ -31,6 +31,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/ReportStatusCodeLib.h>
 
 //
+// Global Variables
+//
+extern EFI_DRIVER_BINDING_PROTOCOL   gPS2MouseDriver;
+extern EFI_COMPONENT_NAME_PROTOCOL   gPs2MouseComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2MouseComponentName2;
+
+//
 // PS/2 mouse sample rate
 //
 typedef enum {
@@ -94,13 +101,6 @@ typedef struct {
 } PS2_MOUSE_DEV;
 
 #define PS2_MOUSE_DEV_FROM_THIS(a)  CR (a, PS2_MOUSE_DEV, SimplePointerProtocol, PS2_MOUSE_DEV_SIGNATURE)
-
-//
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL   gPS2MouseDriver;
-extern EFI_COMPONENT_NAME_PROTOCOL   gPs2MouseComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2MouseComponentName2;
 
 //
 // Function prototypes

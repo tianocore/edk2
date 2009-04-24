@@ -38,6 +38,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Pci22.h>
 
 //
+// Global Variables
+//
+extern EFI_DRIVER_BINDING_PROTOCOL  gPciVgaMiniPortDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL  gPciVgaMiniPortComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL gPciVgaMiniPortComponentName2;
+
+//
 // PCI VGA MiniPort Device Structure
 //
 #define PCI_VGA_MINI_PORT_DEV_SIGNATURE   SIGNATURE_32('P','V','M','P')
@@ -50,13 +57,6 @@ typedef struct {
 } PCI_VGA_MINI_PORT_DEV;
 
 #define PCI_VGA_MINI_PORT_DEV_FROM_THIS(a) CR(a, PCI_VGA_MINI_PORT_DEV, VgaMiniPort, PCI_VGA_MINI_PORT_DEV_SIGNATURE)
-
-//
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL  gPciVgaMiniPortDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gPciVgaMiniPortComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gPciVgaMiniPortComponentName2;
 
 //
 // Driver Binding Protocol functions

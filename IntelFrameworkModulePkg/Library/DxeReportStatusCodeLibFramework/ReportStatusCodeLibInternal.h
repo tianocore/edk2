@@ -32,6 +32,7 @@
 #include <FrameworkModuleBase.h>
 #include <DebugInfo.h>
 
+extern EFI_REPORT_STATUS_CODE  mReportStatusCode;
 
 /**
   Locate he report status code service.
@@ -128,8 +129,6 @@ InternalReportStatusCodeEx (
   IN CONST VOID             *ExtendedData      OPTIONAL,
   IN UINTN                  ExtendedDataSize
   );
-
-extern EFI_REPORT_STATUS_CODE  mReportStatusCode;
 
 #endif // __REPORT_STATUS_CODE_LIB_INTERNAL__H
 
