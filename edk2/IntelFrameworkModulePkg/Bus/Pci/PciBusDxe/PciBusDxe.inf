@@ -32,6 +32,7 @@
 #
 #  DRIVER_BINDING                =  gPciBusDriverBinding
 #  COMPONENT_NAME                =  gPciBusComponentName
+#  COMPONENT_NAME2               =  gPciBusComponentName2
 #
 
 [Sources.common]
