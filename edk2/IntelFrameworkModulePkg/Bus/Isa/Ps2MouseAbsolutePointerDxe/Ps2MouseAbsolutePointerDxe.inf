@@ -24,7 +24,12 @@
   EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializePs2MouseAbsolutePointer
 
+#
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  DRIVER_BINDING                = gPS2MouseAbsolutePointerDriver;
+#  COMPONENT_NAME                = gPs2MouseAbsolutePointerComponentName;
+#  COMPONENT_NAME2               = gPs2MouseAbsolutePointerComponentName2;
+#
 
 [Sources.common]
   ComponentName.c
