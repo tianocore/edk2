@@ -792,7 +792,6 @@ DriverSampleInit (
   )
 {
   EFI_STATUS                      Status;
-  EFI_STATUS                      SavedStatus;
   EFI_HII_HANDLE                  HiiHandle[2];
   EFI_SCREEN_DESCRIPTOR           Screen;
   EFI_HII_DATABASE_PROTOCOL       *HiiDatabase;
@@ -967,8 +966,6 @@ DriverSampleInit (
              );
     }
   }
-  
-  SavedStatus = EFI_SUCCESS;
 
   //
   // Default this driver is built into Flash device image, 
@@ -993,20 +990,13 @@ DriverSampleInit (
                              NULL,
                              NULL
                              );
-    SavedStatus = Status;
   
-    Status = HiiDatabase->RemovePackageList (HiiDatabase, HiiHandle[0]);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    HiiRemovePackages (HiiHandle[0]);
   
-    Status = HiiDatabase->RemovePackageList (HiiDatabase, HiiHandle[1]);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    HiiRemovePackages (HiiHandle[1]);
   }
 
-  return SavedStatus;
+  return Status;
 }
 
 /**
@@ -1040,6 +1030,14 @@ DriverSampleUnload (
             &mHiiVendorDevicePath1,
             NULL
            );
+  }
+
+  if (PrivateData->HiiHandle[0] != NULL) {
+    HiiRemovePackages (PrivateData->HiiHandle[0]);
+  }
+
+  if (PrivateData->HiiHandle[1] != NULL) {
+    HiiRemovePackages (PrivateData->HiiHandle[1]);
   }
 
   if (PrivateData != NULL) {
