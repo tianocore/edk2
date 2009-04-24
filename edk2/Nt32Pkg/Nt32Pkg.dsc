@@ -74,7 +74,6 @@
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  PlatformDriverOverrideLib|MdeModulePkg/Library/DxePlatDriOverLib/DxePlatDriOverLib.inf
   
 [LibraryClasses.common.USER_DEFINED]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -483,7 +482,6 @@
   MdeModulePkg/Application/VariableInfo/VariableInfo.inf
   
   MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
-  MdeModulePkg/Application/PlatOverMngr/PlatOverMngr.inf
 
 [BuildOptions]
   DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /ALIGN:4096 /SUBSYSTEM:CONSOLE

@@ -1,6 +1,6 @@
 /** @file
-  Ihis library is only intended to be used by Platform Driver Override Dxe Driver and Application.
-  It provides basic platform driver override functions.
+  Ihe internal heder file includes the required Protocol/Guid/Library
+  and the shared function APIs.
 
 Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -13,10 +13,40 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PLATFORM_DRIVER_OVERRIDE_LIB_H_
-#define _PLATFORM_DRIVER_OVERRIDE_LIB_H_
+#ifndef _INTERNAL_PLATFORM_DRIVER_OVERRIDE_H_
+#define _INTERNAL_PLATFORM_DRIVER_OVERRIDE_H_
 
+#include <PiDxe.h>
+
+#include <Protocol/HiiConfigAccess.h>
+#include <Protocol/HiiConfigRouting.h>
+#include <Protocol/HiiDatabase.h>
+#include <Protocol/FormBrowser2.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/FirmwareVolume2.h>
+#include <Protocol/PciIo.h>
+#include <Protocol/BusSpecificDriverOverride.h>
+#include <Protocol/ComponentName2.h>
+#include <Protocol/ComponentName.h>
+#include <Protocol/DriverBinding.h>
+#include <Protocol/DevicePathToText.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/PlatformDriverOverride.h>
+#include <Guid/MdeModuleHii.h>
+#include <Guid/VariableFormat.h>
+
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
+#include <Library/PrintLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
+#include <Library/HiiLib.h>
 
 /**
   Free all the mapping database memory resource and initialize the mapping list entry.

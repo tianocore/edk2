@@ -50,10 +50,6 @@
   ##  @libraryclass  Defines a set of methods related recovery mode.
   RecoveryLib|Include/Library/RecoveryLib.h
   
-  ##  @libraryclass  Basic platform driver override functions.
-  #   This library is only intended to be used by Platform Driver Override Dxe Driver and Application.
-  PlatformDriverOverrideLib|Include/Library/PlatformDriverOverrideLib.h
-
   ##  @libraryclass  Provides HII related functions.
   HiiLib|Include/Library/HiiLib.h
     
@@ -120,10 +116,6 @@
   ## Guid acted as variable store header's signature and to specify the variable list entries put in the EFI system table.
   ## Include/Guid/VariableFormat.h
   gEfiVariableGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
-  
-  ## Platform Override Variable guid
-  ## Include/Guid/OverrideVariable.h
-  gEfiOverrideVariableGuid       = { 0x8e3d4ad5, 0xf762, 0x438a, { 0xa1, 0xc1, 0x5b, 0x9f, 0xe6, 0x8c, 0x6b, 0x15 }}
   
   ## Performance protocol guid that also acts as the performance HOB guid and performance variable GUID
   ## Include/Guid/Performance.h
