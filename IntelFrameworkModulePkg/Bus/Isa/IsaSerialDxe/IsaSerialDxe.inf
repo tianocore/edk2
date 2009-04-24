@@ -30,6 +30,7 @@
 #
 #  DRIVER_BINDING                =  gSerialControllerDriver                      
 #  COMPONENT_NAME                =  gIsaSerialComponentName                      
+#  COMPONENT_NAME2               =  gIsaSerialComponentName2
 #
 
 [Sources.common]
