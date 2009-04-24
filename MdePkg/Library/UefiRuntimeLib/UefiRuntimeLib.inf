@@ -34,8 +34,6 @@
 
 
 [Sources.common]
-  RuntimeLibInternal.h
-  RuntimeService.c
   RuntimeLib.c
 
 [Packages]
