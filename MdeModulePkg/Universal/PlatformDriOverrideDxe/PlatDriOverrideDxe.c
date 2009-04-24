@@ -1,18 +1,19 @@
 /** @file
-
-  A UI application to offer a UI interface in device manager to let user configure
+  This file also installs UEFI PLATFORM_DRIVER_OVERRIDE_PROTOCOL.
+  
+  The main code offers a UI interface in device manager to let user configure
   platform override protocol to override the default algorithm for matching
   drivers to controllers.
 
   The main flow:
-  1. The UI application dynamicly locate all controller device path.
-  2. The UI application dynamicly locate all drivers which support binding protocol.
-  3. The UI application export and dynamicly update two menu to let user select the
+  1. It dynamicly locate all controller device path.
+  2. It dynamicly locate all drivers which support binding protocol.
+  3. It export and dynamicly update two menu to let user select the
      mapping between drivers to controllers.
-  4. The UI application save all the mapping info in NV variables which will be consumed
+  4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,35 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiDxe.h>
-
-#include <Protocol/HiiConfigAccess.h>
-#include <Protocol/HiiConfigRouting.h>
-#include <Protocol/HiiDatabase.h>
-#include <Protocol/FormBrowser2.h>
-#include <Protocol/LoadedImage.h>
-#include <Protocol/FirmwareVolume2.h>
-#include <Protocol/PciIo.h>
-#include <Protocol/BusSpecificDriverOverride.h>
-#include <Protocol/ComponentName2.h>
-#include <Protocol/ComponentName.h>
-#include <Protocol/DriverBinding.h>
-#include <Protocol/DevicePathToText.h>
-#include <Protocol/DevicePath.h>
-#include <Guid/MdeModuleHii.h>
-
-#include <Library/DevicePathLib.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/UefiLib.h>
-#include <Library/UefiApplicationEntryPoint.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/PlatformDriverOverrideLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/HiiLib.h>
-
+#include "InternalPlatDriOverrideDxe.h"
 #include "PlatOverMngr.h"
 
 #define EFI_CALLBACK_INFO_SIGNATURE SIGNATURE_32 ('C', 'l', 'b', 'k')
@@ -64,6 +37,7 @@ typedef struct {
   PLAT_OVER_MNGR_DATA             FakeNvData;
   EFI_HII_CONFIG_ROUTING_PROTOCOL *HiiConfigRouting;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
+  EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL PlatformDriverOverride;
 } EFI_CALLBACK_INFO;
 
 #pragma pack(1)
@@ -82,7 +56,7 @@ typedef struct {
 // uni string and Vfr Binary data.
 //
 extern UINT8  VfrBin[];
-extern UINT8  PlatOverMngrStrings[];
+extern UINT8  PlatDriOverrideDxeStrings[];
 
 //
 // module global data
@@ -90,6 +64,8 @@ extern UINT8  PlatOverMngrStrings[];
 EFI_GUID                     mPlatformOverridesManagerGuid = PLAT_OVER_MNGR_GUID;
 CHAR16                       mVariableName[] = L"Data";
 LIST_ENTRY                   mMappingDataBase = INITIALIZE_LIST_HEAD_VARIABLE (mMappingDataBase);
+BOOLEAN                      mEnvironmentVariableRead = FALSE;
+EFI_HANDLE                   mCallerImageHandle = NULL;
 
 EFI_HANDLE                   *mDevicePathHandleBuffer;
 EFI_HANDLE                   *mDriverImageHandleBuffer;
@@ -142,7 +118,33 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
 CHAR16 *
 DevicePathToStr (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
-  );
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
+  CHAR16                           *ToText;
+  
+  if (DevPath == NULL) {
+    return L"";
+  }
+    
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathToTextProtocolGuid,
+                  NULL,
+                  (VOID **) &DevPathToText
+                  );
+  if (!EFI_ERROR (Status)) {
+    ToText = DevPathToText->ConvertDevicePathToText (
+                              DevPath,
+                              FALSE,
+                              TRUE
+                              );
+    ASSERT (ToText != NULL);
+    return ToText;
+  }
+
+  return L"?";
+}
 
 /**
   Worker function to get the driver name by ComponentName or ComponentName2 protocol 
@@ -1355,6 +1357,133 @@ PlatOverMngrCallback (
 }
 
 /**
+  Retrieves the image handle of the platform override driver for a controller in the system.
+
+  @param  This                   A pointer to the
+                                 EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL instance.
+  @param  ControllerHandle       The device handle of the controller to check if a
+                                 driver override exists.
+  @param  DriverImageHandle      On input, a pointer to the previous driver image
+                                 handle returned by GetDriver().  On output, a
+                                 pointer to the next driver image handle. Passing
+                                 in a NULL,  will return the first driver image
+                                 handle for ControllerHandle.
+
+  @retval EFI_SUCCESS            The driver override for ControllerHandle was
+                                 returned in DriverImageHandle.
+  @retval EFI_NOT_FOUND          A driver override for ControllerHandle was not
+                                 found.
+  @retval EFI_INVALID_PARAMETER  The handle specified by ControllerHandle is not a
+                                 valid handle. DriverImageHandle is not a handle
+                                 that was returned on a previous  call to
+                                 GetDriver().
+
+**/
+EFI_STATUS
+EFIAPI
+GetDriver (
+  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
+  IN     EFI_HANDLE                                     ControllerHandle,
+  IN OUT EFI_HANDLE                                     *DriverImageHandle
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // Check that ControllerHandle is a valid handle
+  //
+  if (ControllerHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Read the environment variable(s) that contain the override mappings from Controller Device Path to
+  // a set of Driver Device Paths, and  initialize in memory database of the overrides that map Controller
+  // Device Paths to an ordered set of Driver Device Paths and Driver Handles. This action is only performed
+  // once and finished in first call.
+  //
+  if (!mEnvironmentVariableRead) {
+    mEnvironmentVariableRead = TRUE;
+
+    Status = InitOverridesMapping (&mMappingDataBase);
+    if (EFI_ERROR (Status)){
+      DEBUG ((DEBUG_ERROR, "The status to Get Platform Driver Override Variable is %r\n", Status));
+      InitializeListHead (&mMappingDataBase);
+      return EFI_NOT_FOUND;
+    }
+  }
+
+  //
+  // if the environment variable does not exist, just return not found
+  //
+  if (IsListEmpty (&mMappingDataBase)) {
+    return EFI_NOT_FOUND;
+  }
+
+  return GetDriverFromMapping (
+            ControllerHandle,
+            DriverImageHandle,
+            &mMappingDataBase,
+            mCallerImageHandle
+            );
+}
+
+/**
+  Retrieves the device path of the platform override driver for a controller in the system.
+  This driver doesn't support this API.
+
+  @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_
+                                PROTOCOL instance.                            
+  @param  ControllerHandle      The device handle of the controller to check if a driver override
+                                exists.                                                          
+  @param  DriverImagePath       On input, a pointer to the previous driver device path returned by
+                                GetDriverPath(). On output, a pointer to the next driver
+                                device path. Passing in a pointer to NULL, will return the first
+                                driver device path for ControllerHandle.
+  
+  @retval EFI_UNSUPPORTED
+**/
+EFI_STATUS
+EFIAPI
+GetDriverPath (
+  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL              *This,
+  IN     EFI_HANDLE                                     ControllerHandle,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL                       **DriverImagePath
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+
+/**
+  Used to associate a driver image handle with a device path that was returned on a prior call to the
+  GetDriverPath() service. This driver image handle will then be available through the               
+  GetDriver() service. This driver doesn't support this API.
+
+  @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_
+                                PROTOCOL instance.                            
+  @param  ControllerHandle      The device handle of the controller.                                                             
+  @param  DriverImagePath       A pointer to the driver device path that was returned in a prior
+                                call to GetDriverPath().                                                                        
+  @param  DriverImageHandle     The driver image handle that was returned by LoadImage()
+                                when the driver specified by DriverImagePath was loaded 
+                                into memory. 
+  
+  @retval EFI_UNSUPPORTED
+**/
+EFI_STATUS
+EFIAPI
+DriverLoaded (
+  IN EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL          *This,
+  IN EFI_HANDLE                                     ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL                       *DriverImagePath,
+  IN EFI_HANDLE                                     DriverImageHandle
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+/**
   The driver Entry Point. The funciton will export a disk device class formset and
   its callback function to hii database.
 
@@ -1367,13 +1496,14 @@ PlatOverMngrCallback (
 **/
 EFI_STATUS
 EFIAPI
-PlatOverMngrInit (
+PlatDriOverrideDxeInit (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
   )
 {
   EFI_STATUS                  Status;
   EFI_FORM_BROWSER2_PROTOCOL  *FormBrowser2;
+  VOID                        *Instance;
   
   //
   // There should only be one Form Configuration protocol
@@ -1387,6 +1517,24 @@ PlatOverMngrInit (
     return Status;
   }
 
+  //
+  // According to UEFI spec, there can be at most a single instance
+  // in the system of the EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL.
+  // So here we check the existence.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiPlatformDriverOverrideProtocolGuid,
+                  NULL,
+                  &Instance
+                  );
+  //
+  // If there was no error, assume there is an installation and return error
+  //
+  if (!EFI_ERROR (Status)) {
+    return EFI_ALREADY_STARTED;
+  }
+  
+  mCallerImageHandle = ImageHandle;
   mCallbackInfo = AllocateZeroPool (sizeof (EFI_CALLBACK_INFO));
   if (mCallbackInfo == NULL) {
     return EFI_BAD_BUFFER_SIZE;
@@ -1396,9 +1544,12 @@ PlatOverMngrInit (
   mCallbackInfo->ConfigAccess.ExtractConfig = PlatOverMngrExtractConfig;
   mCallbackInfo->ConfigAccess.RouteConfig   = PlatOverMngrRouteConfig;
   mCallbackInfo->ConfigAccess.Callback      = PlatOverMngrCallback;
-
+  mCallbackInfo->PlatformDriverOverride.GetDriver      = GetDriver;
+  mCallbackInfo->PlatformDriverOverride.GetDriverPath  = GetDriverPath;
+  mCallbackInfo->PlatformDriverOverride.DriverLoaded   = DriverLoaded;
   //
   // Install Device Path Protocol and Config Access protocol to driver handle
+  // Install Platform Driver Override Protocol to driver handle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCallbackInfo->DriverHandle,
@@ -1406,6 +1557,8 @@ PlatOverMngrInit (
                   &mHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
                   &mCallbackInfo->ConfigAccess,
+                  &gEfiPlatformDriverOverrideProtocolGuid,
+                  &mCallbackInfo->PlatformDriverOverride,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
@@ -1419,7 +1572,7 @@ PlatOverMngrInit (
                                      &mPlatformOverridesManagerGuid,
                                      mCallbackInfo->DriverHandle,
                                      VfrBin,
-                                     PlatOverMngrStrings,
+                                     PlatDriOverrideDxeStrings,
                                      NULL
                                      );
   if (mCallbackInfo->RegisteredHandle == NULL) {
@@ -1448,22 +1601,8 @@ PlatOverMngrInit (
   ZeroMem (mDriverImageFilePathToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
   ZeroMem (mControllerToken, MAX_CHOICE_NUM * sizeof (EFI_STRING_ID));
   ZeroMem (mDriverImageProtocol, MAX_CHOICE_NUM * sizeof (EFI_LOADED_IMAGE_PROTOCOL *));
-
-  //
-  // Show the page
-  //
-  Status = FormBrowser2->SendForm (
-                           FormBrowser2,
-                           &mCallbackInfo->RegisteredHandle,
-                           1,
-                           NULL,
-                           0,
-                           NULL,
-                           NULL
-                           );
-
-  HiiRemovePackages (mCallbackInfo->RegisteredHandle);
-  Status = EFI_SUCCESS;
+  
+  return EFI_SUCCESS;
 
 Finish:
   if (mCallbackInfo->DriverHandle != NULL) {
@@ -1473,8 +1612,14 @@ Finish:
            &mHiiVendorDevicePath,
            &gEfiHiiConfigAccessProtocolGuid,
            &mCallbackInfo->ConfigAccess,
+           &gEfiPlatformDriverOverrideProtocolGuid,
+           &mCallbackInfo->PlatformDriverOverride,
            NULL
            );
+  }
+  
+  if (mCallbackInfo->RegisteredHandle != NULL) {
+    HiiRemovePackages (mCallbackInfo->RegisteredHandle);
   }
 
   if (mCallbackInfo != NULL) {
@@ -1485,43 +1630,38 @@ Finish:
 }
 
 /**
-  Converting a given device to an unicode string. 
-  
-  This function will dependent on gEfiDevicePathToTextProtocolGuid, if protocol
-  does not installed, then return unknown device path L"?" directly.
-  
-  @param    DevPath     Given device path instance
-  
-  @return   Converted string from given device path.
-  @retval   L"?"  Can not locate gEfiDevicePathToTextProtocolGuid protocol for converting.
+  Unload its installed protocol.
+
+  @param[in]  ImageHandle       Handle that identifies the image to be unloaded.
+
+  @retval EFI_SUCCESS           The image has been unloaded.
 **/
-CHAR16 *
-DevicePathToStr (
-  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
+EFI_STATUS
+EFIAPI
+PlatDriOverrideDxeUnload (
+  IN EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS                       Status;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
-  CHAR16                           *ToText;
-  
-  if (DevPath == NULL) {
-    return L"";
-  }
-    
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &DevPathToText
-                  );
-  if (!EFI_ERROR (Status)) {
-    ToText = DevPathToText->ConvertDevicePathToText (
-                              DevPath,
-                              FALSE,
-                              TRUE
-                              );
-    ASSERT (ToText != NULL);
-    return ToText;
+  if (mCallbackInfo->DriverHandle != NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           mCallbackInfo->DriverHandle,
+           &gEfiDevicePathProtocolGuid,
+           &mHiiVendorDevicePath,
+           &gEfiHiiConfigAccessProtocolGuid,
+           &mCallbackInfo->ConfigAccess,
+           &gEfiPlatformDriverOverrideProtocolGuid,
+           &mCallbackInfo->PlatformDriverOverride,
+           NULL
+           );
   }
 
-  return L"?";
+  if (mCallbackInfo->RegisteredHandle != NULL) {
+    HiiRemovePackages (mCallbackInfo->RegisteredHandle);
+  }
+
+  if (mCallbackInfo != NULL) {
+    FreePool (mCallbackInfo);
+  }
+
+  return EFI_SUCCESS;
 }
