@@ -27,6 +27,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 CONST EFI_GUID gZeroGuid  = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 //
+// Module Global:
+//  Since this driver will only ever produce one instance of the Logging Hub
+//  protocol you are not required to dynamically allocate the PrivateData.
+//
+DATA_HUB_INSTANCE mPrivateData;
+
+//
 // Worker functions private to this file
 //
 DATA_HUB_FILTER_DRIVER  *
@@ -531,12 +538,6 @@ GetNextDataRecord (
 
   return Record;
 }
-//
-// Module Global:
-//  Since this driver will only ever produce one instance of the Logging Hub
-//  protocol you are not required to dynamically allocate the PrivateData.
-//
-DATA_HUB_INSTANCE mPrivateData;
 
 /**
 

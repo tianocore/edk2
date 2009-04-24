@@ -272,5 +272,4 @@ DxeStatusCodeDriverEntry (
 // declaration of DXE status code controller.
 //
 extern DXE_STATUS_CODE_CONTROLLER gDxeStatusCode;
-
 #endif

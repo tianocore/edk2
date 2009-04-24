@@ -18,22 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Internal use only
 //
-/**
-  report a error Status code of PCI bus driver controller.
-  
-  @param PciIoDevice Pci device instance.
-  @param Code        status code.
-**/
-EFI_STATUS
-ReportErrorStatusCode (
-  IN PCI_IO_DEVICE               *PciIoDevice,
-  IN EFI_STATUS_CODE_VALUE       Code
-  );
 
-//
-// PCI I/O Support Function Prototypes
-//
-//
 //
 // Pci Io Protocol Interface
 //
@@ -65,6 +50,23 @@ EFI_PCI_IO_PROTOCOL  PciIoInterface = {
   0,
   NULL
 };
+
+/**
+  report a error Status code of PCI bus driver controller.
+  
+  @param PciIoDevice Pci device instance.
+  @param Code        status code.
+**/
+EFI_STATUS
+ReportErrorStatusCode (
+  IN PCI_IO_DEVICE               *PciIoDevice,
+  IN EFI_STATUS_CODE_VALUE       Code
+  );
+
+//
+// PCI I/O Support Function Prototypes
+//
+//
 
 /**
   report a error Status code of PCI bus driver controller.

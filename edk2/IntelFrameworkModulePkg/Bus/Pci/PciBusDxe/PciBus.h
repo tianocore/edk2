@@ -53,6 +53,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Acpi.h>
 #include "ComponentName.h"
 
+
+//
+// Global Variables
+//
+extern EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL *gEfiIncompatiblePciDeviceSupport;
+extern EFI_DRIVER_BINDING_PROTOCOL                  gPciBusDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL                  gPciBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL                 gPciBusComponentName2;
+
 //
 // Driver Produced Protocol Prototypes
 //
@@ -238,10 +247,6 @@ typedef struct _PCI_IO_DEVICE {
 //
 // Global Variables
 //
-extern EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL *gEfiIncompatiblePciDeviceSupport;
-extern EFI_DRIVER_BINDING_PROTOCOL                  gPciBusDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL                  gPciBusComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL                 gPciBusComponentName2;
 extern LIST_ENTRY                                   gPciDevicePool;
 extern BOOLEAN                                      gFullEnumeration;
 extern UINTN                                        gPciHostBridgeNumber;

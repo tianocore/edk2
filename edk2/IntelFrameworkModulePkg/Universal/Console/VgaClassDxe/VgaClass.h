@@ -34,6 +34,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Pci22.h>
 
 //
+// Global Variables
+//
+extern EFI_DRIVER_BINDING_PROTOCOL   gVgaClassDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gVgaClassComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gVgaClassComponentName2;
+
+
+//
 // Structure for tuple containing mapping among uniocde, PC Ansi and ASCII code.
 //
 typedef struct {
@@ -69,13 +77,6 @@ typedef struct {
 } VGA_CLASS_DEV;
 
 #define VGA_CLASS_DEV_FROM_THIS(a)  CR (a, VGA_CLASS_DEV, SimpleTextOut, VGA_CLASS_DEV_SIGNATURE)
-
-//
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL   gVgaClassDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL   gVgaClassComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL  gVgaClassComponentName2;
 
 //
 // Driver Binding Protocol functions

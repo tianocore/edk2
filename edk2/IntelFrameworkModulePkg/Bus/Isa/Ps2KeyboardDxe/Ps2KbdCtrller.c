@@ -15,64 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Ps2Keyboard.h"
 
-//
-// Function declarations
-//
-UINT8
-KeyReadDataRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  );
-
-VOID
-KeyWriteDataRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-VOID
-KeyWriteCommandRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-VOID
-KeyboardError (
-  IN KEYBOARD_CONSOLE_IN_DEV*ConsoleIn,
-  IN CHAR16                 *ErrMsg // should be a unicode string
-  );
-
-EFI_STATUS
-GetScancodeBufHead (
-  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
-  IN UINT32                Count,
-  OUT UINT8                *Buf
-  );
-
-EFI_STATUS
-PopScancodeBufHead (
-  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
-  IN UINT32                Count,
-  OUT UINT8                *Buf
-  );
-
-EFI_STATUS
-KeyboardWrite (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-EFI_STATUS
-KeyboardCommand (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-EFI_STATUS
-KeyboardWaitForValue (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Value
-  );
-
 struct {
   UINT8  ScanCode;
   UINT16  EfiScanCode;
@@ -624,6 +566,64 @@ ConvertKeyboardScanCodeToEfiKey[] = {
 UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 
 BOOLEAN          mEnableMouseInterface;
+
+//
+// Function declarations
+//
+UINT8
+KeyReadDataRegister (
+  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  );
+
+VOID
+KeyWriteDataRegister (
+  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  IN UINT8                   Data
+  );
+
+VOID
+KeyWriteCommandRegister (
+  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  IN UINT8                   Data
+  );
+
+VOID
+KeyboardError (
+  IN KEYBOARD_CONSOLE_IN_DEV*ConsoleIn,
+  IN CHAR16                 *ErrMsg // should be a unicode string
+  );
+
+EFI_STATUS
+GetScancodeBufHead (
+  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN UINT32                Count,
+  OUT UINT8                *Buf
+  );
+
+EFI_STATUS
+PopScancodeBufHead (
+  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN UINT32                Count,
+  OUT UINT8                *Buf
+  );
+
+EFI_STATUS
+KeyboardWrite (
+  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  IN UINT8                   Data
+  );
+
+EFI_STATUS
+KeyboardCommand (
+  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  IN UINT8                   Data
+  );
+
+EFI_STATUS
+KeyboardWaitForValue (
+  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  IN UINT8                   Value
+  );
 
 /**
   Read data register 

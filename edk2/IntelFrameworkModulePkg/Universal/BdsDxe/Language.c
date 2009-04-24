@@ -15,6 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Language.h"
 #include "FrontPage.h"
 
+EFI_GUID  mFontPackageGuid = {
+  0x78941450, 0x90ab, 0x4fb1, {0xb7, 0x5f, 0x58, 0x92, 0x14, 0xe2, 0x4a, 0xc}
+};
+
 //
 // Lookup table of ISO639-2 3 character language codes to ISO 639-1 2 character language codes
 // Each entry is 5 CHAR8 values long.  The first 3 CHAR8 values are the ISO 639-2 code.
@@ -161,10 +165,6 @@ zulzu\
 
 #define NARROW_GLYPH_NUMBER 8
 #define WIDE_GLYPH_NUMBER   75
-
-EFI_GUID  mFontPackageGuid = {
-  0x78941450, 0x90ab, 0x4fb1, {0xb7, 0x5f, 0x58, 0x92, 0x14, 0xe2, 0x4a, 0xc}
-};
 
 typedef struct {
   ///

@@ -29,6 +29,12 @@
 #include <IndustryStandard/Pci.h>
 
 
+//
+// Global Variables
+//
+extern EFI_PEI_PCI_CFG_PPI    gPciCfgPpi;
+extern EFI_PEI_PPI_DESCRIPTOR gPciCfgPpiList;
+
 /**
    Convert EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS to PCI_LIB_ADDRESS.
 
@@ -227,12 +233,5 @@ PciCfgModify (
   IN UINTN                        SetBits,
   IN UINTN                        ClearBits
   );
-
-//
-// Global Variables
-//
-extern EFI_PEI_PCI_CFG_PPI    gPciCfgPpi;
-extern EFI_PEI_PPI_DESCRIPTOR gPciCfgPpiList;
-
 
 #endif
