@@ -1,9 +1,7 @@
 #/** @file
-#  DXE status code driver.
+#  Status Code Runtime Dxe driver that supports multiple devices and produces
+#  Status Code Runtime Protocol.
 #
-#  Status Code Architectural Protocol implementation as defined in Tiano
-#  Architecture Specification. This driver has limited functionality
-#  at runtime and will not log to Data Hub at runtime.
 #  Copyright (c) 2006 - 2009, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -75,15 +73,16 @@
 
 
 [Guids]
-  gEfiDataHubStatusCodeRecordGuid               # SOMETIMES_CONSUMED
-  gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
-  gEfiStatusCodeDataTypeDebugGuid               # PROTOCOL ALWAYS_CONSUMED
-  gEfiEventExitBootServicesGuid
+  gEfiDataHubStatusCodeRecordGuid               ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
+  gMemoryStatusCodeRecordGuid                   ## CONSUMES ## HOB
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
+
 
 [Protocols]
-  gEfiStatusCodeRuntimeProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+  gEfiStatusCodeRuntimeProtocolGuid             ## PRODUCES
+  gEfiDataHubProtocolGuid                       ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
+  gEfiSerialIoProtocolGuid                      ## SOMETIMES_CONSUMES (Needed if Serial is supported for status code.)
 
 
 [FeaturePcd.common]

@@ -1,7 +1,7 @@
 /** @file
-  Runtime memory status code worker in DXE.
+  Runtime memory status code worker.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -14,10 +14,12 @@
 
 #include "DxeStatusCode.h"
 
+RUNTIME_MEMORY_STATUSCODE_HEADER  *mRtMemoryStatusCodeTable;
+
 /**
-  Initialize runtime memory status code.
+  Initialize runtime memory status code table as initialization for runtime memory status code worker
  
-  @return  The function always return EFI_SUCCESS
+  @retval EFI_SUCCESS  Runtime memory status code table successfully initialized.
 
 **/
 EFI_STATUS
@@ -25,26 +27,21 @@ RtMemoryStatusCodeInitializeWorker (
   VOID
   )
 {
-  RUNTIME_MEMORY_STATUSCODE_HEADER  *RtMemoryStatusCodeTable;
-
   //
   // Allocate runtime memory status code pool.
   //
-  RtMemoryStatusCodeTable = 
-    (RUNTIME_MEMORY_STATUSCODE_HEADER *) AllocateRuntimePool (
-                                           sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) +
-                                           PcdGet16 (PcdStatusCodeRuntimeMemorySize) *
-                                           1024
-                                           );
+  mRtMemoryStatusCodeTable = AllocateRuntimePool (
+                               sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) +
+                               PcdGet16 (PcdStatusCodeRuntimeMemorySize) *
+                               1024
+                               );
+  ASSERT (mRtMemoryStatusCodeTable != NULL);
 
-  ASSERT (NULL != RtMemoryStatusCodeTable);
-
-  RtMemoryStatusCodeTable->RecordIndex                  = 0;
-  RtMemoryStatusCodeTable->NumberOfRecords              = 0;
-  RtMemoryStatusCodeTable->MaxRecordsNumber             = 
+  mRtMemoryStatusCodeTable->RecordIndex      = 0;
+  mRtMemoryStatusCodeTable->NumberOfRecords  = 0;
+  mRtMemoryStatusCodeTable->MaxRecordsNumber = 
     (PcdGet16 (PcdStatusCodeRuntimeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
 
-  gDxeStatusCode.RtMemoryStatusCodeTable[PHYSICAL_MODE] = RtMemoryStatusCodeTable;
   return EFI_SUCCESS;
 }
 
@@ -53,29 +50,21 @@ RtMemoryStatusCodeInitializeWorker (
   Report status code into runtime memory. If the runtime pool is full, roll back to the 
   first record and overwrite it.
  
-  @param  RtMemoryStatusCodeTable      
-                        Point to Runtime memory table header.
-
-  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
+  @param  CodeType                Indicates the type of status code being reported.
+  @param  Value                   Describes the current status of a hardware or software entity.
+                                  This included information about the class and subclass that is used to
+                                  classify the entity as well as an operation.
+  @param  Instance                The enumeration of a hardware or software entity within
+                                  the system. Valid instance numbers start with 1.
+  @param  CallerId                This optional parameter may be used to identify the caller.
+                                  This parameter allows the status code driver to apply different rules to
+                                  different callers.
  
-  @param  Value         Describes the current status of a hardware or software entity.  
-                        This included information about the class and subclass that is used to classify the entity 
-                        as well as an operation.  For progress codes, the operation is the current activity. 
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
-                        Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
- 
-  @param  Instance      The enumeration of a hardware or software entity within the system.  
-                        A system may contain multiple entities that match a class/subclass pairing. 
-                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable, 
-                        not meaningful, or not relevant.  Valid instance numbers start with 1.
- 
-  @return               The function always return EFI_SUCCESS.
+  @retval EFI_SUCCESS             Status code successfully recorded in runtime memory status code table.
 
 **/
 EFI_STATUS
 RtMemoryStatusCodeReportWorker (
-  RUNTIME_MEMORY_STATUSCODE_HEADER      *RtMemoryStatusCodeTable,
   IN EFI_STATUS_CODE_TYPE               CodeType,
   IN EFI_STATUS_CODE_VALUE              Value,
   IN UINT32                             Instance
@@ -83,32 +72,33 @@ RtMemoryStatusCodeReportWorker (
 {
   MEMORY_STATUSCODE_RECORD              *Record;
 
-  ASSERT (NULL != RtMemoryStatusCodeTable);
-
   //
   // Locate current record buffer.
   //
-  Record                  = (MEMORY_STATUSCODE_RECORD *) (RtMemoryStatusCodeTable + 1);
-  Record                  = &Record[RtMemoryStatusCodeTable->RecordIndex++];
+  Record = (MEMORY_STATUSCODE_RECORD *) (mRtMemoryStatusCodeTable + 1);
+  Record = &Record[mRtMemoryStatusCodeTable->RecordIndex++];
 
   //
   // Save status code.
   //
-  Record->CodeType        = CodeType;
-  Record->Value           = Value;
-  Record->Instance        = Instance;
+  Record->CodeType = CodeType;
+  Record->Value    = Value;
+  Record->Instance = Instance;
 
   //
-  // Record total number of records, we compare the number with max records number,
-  // if it is bigger than the max number, then the roll back had happened, the record index points to 
-  // the first record. if it is less then max number, then the zero index is the first record.
+  // If record index equals to max record number, then wrap around record index to zero.
   //
-  RtMemoryStatusCodeTable->NumberOfRecords++;
-  if (RtMemoryStatusCodeTable->RecordIndex == RtMemoryStatusCodeTable->MaxRecordsNumber) {
+  // The reader of status code should compare the number of records with max records number,
+  // If it is equal to or larger than the max number, then the wrap-around had happened,
+  // so the first record is pointed by record index.
+  // If it is less then max number, index of the first record is zero.
+  //
+  mRtMemoryStatusCodeTable->NumberOfRecords++;
+  if (mRtMemoryStatusCodeTable->RecordIndex == mRtMemoryStatusCodeTable->MaxRecordsNumber) {
     //
-    // Roll back record index.
+    // Wrap around record index.
     //
-    RtMemoryStatusCodeTable->RecordIndex = 0;
+    mRtMemoryStatusCodeTable->RecordIndex = 0;
   }
 
   return EFI_SUCCESS;

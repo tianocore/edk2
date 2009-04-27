@@ -14,47 +14,8 @@
 
 #include "DxeStatusCode.h"
 
-//
-// Event for Exit Boot Services Callback
-//
-EFI_EVENT mExitBootServicesEvent = NULL;
-
-/**
-  Report status code to all supported device.
-  Calls into the workers which dispatches the platform specific
-  listeners.
-
-  @param  Type          Indicates the type of status code being reported.
-                        The type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
-  @param  Value         Describes the current status of a hardware or software entity.
-                        This includes information about the class and subclass that is used to classify the entity
-                        as well as an operation.  For progress codes, the operation is the current activity.
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time.
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.
-                        Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
-  @param  Instance      The enumeration of a hardware or software entity within the system.
-                        A system may contain multiple entities that match a class/subclass pairing.
-                        The instance differentiates between them.  An instance of 0 indicates that instance
-                        information is unavailable, not meaningful, or not relevant.  Valid instance numbers start with 1.
-  @param  CallerId      This optional parameter may be used to identify the caller.
-                        This parameter allows the status code driver to apply different rules to different callers.
-  @param  Data          This optional parameter may be used to pass additional data.
-                        Type EFI_STATUS_CODE_DATA is defined in "Related Definitions" below.
-                        The contents of this data type may have additional GUID-specific data.  The standard GUIDs and
-                        their associated data structures are defined in the Intel? Platform Innovation Framework for EFI Status Codes Specification.
-
-  @return               Always return EFI_SUCCESS.
-
-**/
-EFI_STATUS
-EFIAPI
-ReportDispatcher (
-  IN EFI_STATUS_CODE_TYPE     Type,
-  IN EFI_STATUS_CODE_VALUE    Value,
-  IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId  OPTIONAL,
-  IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
-  );
+EFI_EVENT    mVirtualAddressChangeEvent = NULL;
+EFI_HANDLE   mHandle = NULL;
 
 //
 // Declaration of status code protocol.
@@ -64,24 +25,21 @@ EFI_STATUS_CODE_PROTOCOL  mEfiStatusCodeProtocol  = {
 };
 
 //
-// Delaration of DXE status code controller
+// Report operation nest status.
+// If it is set, then the report operation has nested.
 //
-DXE_STATUS_CODE_CONTROLLER gDxeStatusCode = {
-  //
-  // Initialize nest status as non nested.
-  //
-  0,
-  {NULL, NULL}
-};
+UINT32  mStatusCodeNestStatus = 0;
 
 /**
+  Entry point of DXE Status Code Driver.
 
-  Install the ReportStatusCode runtime service.
+  This function is the entry point of this DXE Status Code Driver.
+  It installs Status Code Runtime Protocol, and registers event for EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
 
-  @param ImageHandle     Image handle of the loaded driver
-  @param SystemTable     Pointer to the System Table
-
-  @return                The function always returns success.
+  @param  ImageHandle       The firmware allocated handle for the EFI image.
+  @param  SystemTable       A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/
 EFI_STATUS
@@ -91,7 +49,6 @@ DxeStatusCodeDriverEntry (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_HANDLE  Handle       = NULL;
   EFI_STATUS  Status;
 
   //
@@ -100,11 +57,10 @@ DxeStatusCodeDriverEntry (
   InitializationDispatcherWorker ();
 
   //
-  // Install Status Code Architectural Protocol implementation as defined in Tiano
-  // Architecture Specification.
+  // Install Status Code Runtime Protocol implementation as defined in PI Specification.
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Handle,
+                  &mHandle,
                   &gEfiStatusCodeRuntimeProtocolGuid,
                   &mEfiStatusCodeProtocol,
                   NULL
@@ -116,39 +72,33 @@ DxeStatusCodeDriverEntry (
                   TPL_NOTIFY,
                   VirtualAddressChangeCallBack,
                   NULL,
-                  &gEfiEventExitBootServicesGuid,
-                  &mExitBootServicesEvent
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &mVirtualAddressChangeEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
   Report status code to all supported device.
-  Calls into the workers which dispatches the platform specific
-  listeners.
 
-  @param  CodeType      Indicates the type of status code being reported.
-                        The type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
-  @param  Value         Describes the current status of a hardware or software entity.
-                        This includes information about the class and subclass that is used to classify the entity
-                        as well as an operation.  For progress codes, the operation is the current activity.
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time.
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.
-                        Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
-  @param  Instance      The enumeration of a hardware or software entity within the system.
-                        A system may contain multiple entities that match a class/subclass pairing.
-                        The instance differentiates between them.  An instance of 0 indicates that instance
-                        information is unavailable, not meaningful, or not relevant.  Valid instance numbers start with 1.
-  @param  CallerId      This optional parameter may be used to identify the caller.
-                        This parameter allows the status code driver to apply different rules to different callers.
-  @param  Data          This optional parameter may be used to pass additional data.
-                        Type EFI_STATUS_CODE_DATA is defined in "Related Definitions" below.
-                        The contents of this data type may have additional GUID-specific data.  The standard GUIDs and
-                        their associated data structures are defined in the Intel? Platform Innovation Framework for EFI Status Codes Specification.
+  This function implements EFI_STATUS_CODE_PROTOCOL.ReportStatusCode().
+  It calls into the workers which dispatches the platform specific listeners.
 
-  @return               Always return EFI_SUCCESS.
+  @param  Type             Indicates the type of status code being reported.
+  @param  Value            Describes the current status of a hardware or software entity.
+                           This included information about the class and subclass that is used to
+                           classify the entity as well as an operation.
+  @param  Instance         The enumeration of a hardware or software entity within
+                           the system. Valid instance numbers start with 1.
+  @param  CallerId         This optional parameter may be used to identify the caller.
+                           This parameter allows the status code driver to apply different rules to
+                           different callers.
+  @param  Data             This optional parameter may be used to pass additional data.
+
+  @retval EFI_SUCCESS      The function completed successfully
+  @retval EFI_DEVICE_ERROR The function should not be completed due to a device error.
 
 **/
 EFI_STATUS
@@ -165,7 +115,7 @@ ReportDispatcher (
   // Use atom operation to avoid the reentant of report.
   // If current status is not zero, then the function is reentrancy.
   //
-  if (1 == InterlockedCompareExchange32 (&gDxeStatusCode.StatusCodeNestStatus, 0, 1)) {
+  if (InterlockedCompareExchange32 (&mStatusCodeNestStatus, 0, 1) == 1) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -180,7 +130,6 @@ ReportDispatcher (
   }
   if (FeaturePcdGet (PcdStatusCodeUseRuntimeMemory)) {
     RtMemoryStatusCodeReportWorker (
-      gDxeStatusCode.RtMemoryStatusCodeTable[PHYSICAL_MODE],
       CodeType,
       Value,
       Instance
@@ -196,6 +145,9 @@ ReportDispatcher (
       );
   }
   if (FeaturePcdGet (PcdStatusCodeUseOEM)) {
+    //
+    // Call OEM hook status code library API to report status code to OEM device
+    //
     OemHookStatusCodeReport (
       CodeType,
       Value,
@@ -208,7 +160,7 @@ ReportDispatcher (
   //
   // Restore the nest status of report
   //
-  InterlockedCompareExchange32 (&gDxeStatusCode.StatusCodeNestStatus, 1, 0);
+  InterlockedCompareExchange32 (&mStatusCodeNestStatus, 1, 0);
 
   return EFI_SUCCESS;
 }
@@ -235,7 +187,7 @@ VirtualAddressChangeCallBack (
   //
   EfiConvertPointer (
     0,
-    (VOID **) &gDxeStatusCode.RtMemoryStatusCodeTable[PHYSICAL_MODE]
+    (VOID **) &mRtMemoryStatusCodeTable
     );
 }
 
