@@ -674,7 +674,6 @@ CreateIfrDataArray (
   FORMSET_STORAGE                   *BufferStorage;
   UINTN                             Size;
   EFI_STRING                        String;
-  UINT8                             *TempBuffer;
 
   *NvMapAllocated = FALSE;
 
@@ -730,11 +729,7 @@ CreateIfrDataArray (
       IfrDataArray->NvRamMap = ConfigAccess->ThunkContext->NvMapOverride;
     }
     
-    TempBuffer = (UINT8 *) HiiGetBrowserData (&BufferStorage->Guid, BufferStorage->Name, BrowserDataSize);
-    ASSERT (TempBuffer == NULL);
-    CopyMem (IfrDataArray->NvRamMap, TempBuffer, BrowserDataSize);
-    FreePool (TempBuffer);
-
+    ASSERT (HiiGetBrowserData (&BufferStorage->Guid, BufferStorage->Name, BrowserDataSize, (UINT8 *) IfrDataArray->NvRamMap));
     IfrDataEntry = (FRAMEWORK_EFI_IFR_DATA_ENTRY *) (IfrDataArray + 1);
 
     switch (Type) {
