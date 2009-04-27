@@ -71,7 +71,7 @@ extern RUNTIME_MEMORY_STATUSCODE_HEADER  *mRtMemoryStatusCodeTable;
   This function implements EFI_STATUS_CODE_PROTOCOL.ReportStatusCode().
   It calls into the workers which dispatches the platform specific listeners.
 
-  @param  Type             Indicates the type of status code being reported.
+  @param  CodeType         Indicates the type of status code being reported.
   @param  Value            Describes the current status of a hardware or software entity.
                            This included information about the class and subclass that is used to
                            classify the entity as well as an operation.
@@ -168,9 +168,6 @@ RtMemoryStatusCodeInitializeWorker (
                                   classify the entity as well as an operation.
   @param  Instance                The enumeration of a hardware or software entity within
                                   the system. Valid instance numbers start with 1.
-  @param  CallerId                This optional parameter may be used to identify the caller.
-                                  This parameter allows the status code driver to apply different rules to
-                                  different callers.
  
   @retval EFI_SUCCESS             Status code successfully recorded in runtime memory status code table.
 

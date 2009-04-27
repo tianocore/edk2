@@ -56,9 +56,6 @@ RtMemoryStatusCodeInitializeWorker (
                                   classify the entity as well as an operation.
   @param  Instance                The enumeration of a hardware or software entity within
                                   the system. Valid instance numbers start with 1.
-  @param  CallerId                This optional parameter may be used to identify the caller.
-                                  This parameter allows the status code driver to apply different rules to
-                                  different callers.
  
   @retval EFI_SUCCESS             Status code successfully recorded in runtime memory status code table.
 
