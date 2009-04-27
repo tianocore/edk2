@@ -121,7 +121,7 @@ EFI_STATUS
   driver followed by name / value configuration pairs. The driver
   must apply those pairs to its configurable storage. If the
   driver's configuration is stored in a linear block of data
-  and the driver????s name / value pairs are in <BlockConfig>
+  and the driver's name / value pairs are in <BlockConfig>
   format, it may use the ConfigToBlock helper function (above) to
   simplify the job.
 
