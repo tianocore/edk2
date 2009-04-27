@@ -12,7 +12,7 @@
 
 **/
 
-#include "DxeStatusCode.h"
+#include "StatusCodeRuntimeDxe.h"
 
 //
 // Initialize FIFO to cache records.
