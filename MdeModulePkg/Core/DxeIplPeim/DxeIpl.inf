@@ -91,6 +91,9 @@
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress
+
 [FixedPcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe
 
