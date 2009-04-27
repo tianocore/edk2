@@ -504,7 +504,7 @@ InitializeLanguage (
   EFI_STATUS  Status;
   UINTN       Size;
   CHAR8       *Lang;
-  CHAR8       LangCode[ISO_639_2_ENTRY_SIZE];
+  CHAR8       LangCode[ISO_639_2_ENTRY_SIZE + 1];
   CHAR8       *LangCodes;
   CHAR8       *PlatformLang;
   CHAR8       *PlatformLangCodes;
@@ -523,7 +523,7 @@ InitializeLanguage (
                       L"LangCodes",
                       &gEfiGlobalVariableGuid,
                       EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      AsciiStrLen (LangCodes),
+                      AsciiStrSize (LangCodes),
                       LangCodes
                       );
     }
@@ -547,7 +547,7 @@ InitializeLanguage (
     //
     // Find current LangCode from Lang NV Variable
     //
-    Size = ISO_639_2_ENTRY_SIZE;
+    Size = ISO_639_2_ENTRY_SIZE + 1;
     Status = gRT->GetVariable (
                     L"Lang",
                     &gEfiGlobalVariableGuid,
@@ -576,7 +576,7 @@ InitializeLanguage (
                       L"Lang",
                       &gEfiGlobalVariableGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      ISO_639_2_ENTRY_SIZE,
+                      ISO_639_2_ENTRY_SIZE + 1,
                       Lang
                       );
     }

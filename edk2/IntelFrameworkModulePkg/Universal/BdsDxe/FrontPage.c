@@ -156,7 +156,6 @@ FrontPageCallback (
   CHAR8                         *LanguageString;
   CHAR8                         *LangCode;
   CHAR8                         *Lang;
-  CHAR8                         OldLang[ISO_639_2_ENTRY_SIZE];
   UINTN                         Index;
   EFI_STATUS                    Status;
   CHAR8                         *PlatformSupportedLanguages;
@@ -230,25 +229,11 @@ FrontPageCallback (
                       AsciiStrSize (BestLanguage),
                       Lang
                       );
-
-      if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
-        //
-        // Set UEFI deprecated variable "Lang" for backwards compatibility
-        //
-        Status = ConvertRfc3066LanguageToIso639Language (BestLanguage, OldLang);
-        if (!EFI_ERROR (Status)) {
-          Status = gRT->SetVariable (
-                          L"Lang",
-                          &gEfiGlobalVariableGuid,
-                          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                          ISO_639_2_ENTRY_SIZE,
-                          OldLang
-                          );
-        }
-      }
       FreePool (BestLanguage);
+    } else {
+      ASSERT (FALSE);
     }
-  
+
     FreePool (PlatformSupportedLanguages);
     FreePool (Lang);
     FreePool (LanguageString);
