@@ -896,13 +896,13 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
 
   ## Default current ISO 639-2 language: English & French
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfra"|VOID*|0x0000001c
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfraengfra"|VOID*|0x0000001c
 
   ## Default current ISO 639-2 language: English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
 
   ## Default platform supported RFC 3066 languages: (American) English & French
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US;fr-FR"|VOID*|0x0000001e
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fra;en-US;fr-FR"|VOID*|0x0000001e
 
   ## Defualt current RFC 3066 language: (American) English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
