@@ -12,7 +12,7 @@
 
 **/
 
-#include "DxeStatusCode.h"
+#include "StatusCodeRuntimeDxe.h"
 
 RUNTIME_MEMORY_STATUSCODE_HEADER  *mRtMemoryStatusCodeTable;
 

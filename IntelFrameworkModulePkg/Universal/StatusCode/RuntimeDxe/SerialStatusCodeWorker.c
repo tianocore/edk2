@@ -12,7 +12,7 @@
 
 **/
 
-#include "DxeStatusCode.h"
+#include "StatusCodeRuntimeDxe.h"
 
 EFI_SERIAL_IO_PROTOCOL *mSerialIoProtocol;
 
