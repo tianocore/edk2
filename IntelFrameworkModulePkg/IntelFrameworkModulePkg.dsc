@@ -233,8 +233,8 @@
 
 
 [Components.IA32]
-  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
 
 [Components.X64]
-  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
 

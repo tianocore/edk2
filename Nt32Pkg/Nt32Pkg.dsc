@@ -424,7 +424,7 @@
   IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
   Nt32Pkg/TimerDxe/TimerDxe.inf
-  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
