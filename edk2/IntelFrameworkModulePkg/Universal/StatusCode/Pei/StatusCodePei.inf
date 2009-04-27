@@ -29,10 +29,10 @@
 #
 
 [Sources.common]
-  PeiStatusCode.c
+  StatusCodePei.c
+  StatusCodePei.h
   MemoryStausCodeWorker.c
   SerialStatusCodeWorker.c
-  PeiStatusCode.h
 
 
 [Packages]
@@ -54,11 +54,11 @@
 
 
 [Guids]
-  gMemoryStatusCodeRecordGuid                   # SOMETIMES_CONSUMED
+  gMemoryStatusCodeRecordGuid                   ## SOMETIMES_CONSUMES ## HOB
 
 
 [Ppis]
-  gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_CONSUMED
+  gEfiPeiStatusCodePpiGuid                      ## PRODUCES
 
 
 [FeaturePcd.common]

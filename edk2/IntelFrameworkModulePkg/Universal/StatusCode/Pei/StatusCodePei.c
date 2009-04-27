@@ -12,7 +12,7 @@
 
 **/
 
-#include "PeiStatusCode.h"
+#include "StatusCodePei.h"
 
 EFI_PEI_PROGRESS_CODE_PPI     mStatusCodePpi = {
   ReportDispatcher

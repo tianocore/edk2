@@ -12,7 +12,7 @@
 
 **/
 
-#include "PeiStatusCode.h"
+#include "StatusCodePei.h"
 
 /**
   Worker function to create one memory status code GUID'ed HOB,

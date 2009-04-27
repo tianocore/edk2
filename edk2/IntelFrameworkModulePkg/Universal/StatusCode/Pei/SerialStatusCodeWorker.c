@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
-#include "PeiStatusCode.h"
+#include "StatusCodePei.h"
 
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
