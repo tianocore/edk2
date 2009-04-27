@@ -86,7 +86,7 @@ DxeStatusCodeDriverEntry (
   This function implements EFI_STATUS_CODE_PROTOCOL.ReportStatusCode().
   It calls into the workers which dispatches the platform specific listeners.
 
-  @param  Type             Indicates the type of status code being reported.
+  @param  CodeType         Indicates the type of status code being reported.
   @param  Value            Describes the current status of a hardware or software entity.
                            This included information about the class and subclass that is used to
                            classify the entity as well as an operation.
