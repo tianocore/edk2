@@ -34,12 +34,21 @@
   GenericBdsLib|Include/Library/GenericBdsLib.h
 
 [Guids.common]
+  ## Include/Guid/MemoryStatusCodeRecord.h 	
   gMemoryStatusCodeRecordGuid     = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
+  
+  ## Include/Guid/DataHubStatusCodeRecord.h
   gEfiDataHubStatusCodeRecordGuid = { 0xD083E94C, 0x6560, 0x42E4, { 0xB6, 0xD4, 0x2D, 0xF7, 0x5A, 0xDF, 0x6A, 0x2A }}
+  
+  ## Include/Guid/PciOptionRomTable.h
   gEfiPciOptionRomTableGuid       = { 0x7462660F, 0x1CBD, 0x48DA, { 0xAD, 0x11, 0x91, 0x71, 0x79, 0x13, 0x83, 0x1C }}
+  
+  ## Include/Guid/PciHotplugDevice.h
   gEfiPciHotplugDeviceGuid        = { 0x0B280816, 0x52E7, 0x4E51, { 0xAA, 0x57, 0x11, 0xBD, 0x41, 0xCB, 0xEF, 0xC3 }}
 
   gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
+  
+  ## Include/Guid/CustomDecompress.h
   gTianoCustomDecompressGuid     = { 0xA31280AD, 0x481E, 0x41B6, { 0x95, 0xE8, 0x12, 0x7F, 0x4C, 0x98, 0x47, 0x79 }}
   
   ## Guid specify the default BMP logo file.
@@ -68,10 +77,19 @@
   gEfiDiskInfoAhciInterfaceGuid  = { 0x9e498932, 0x4abc, 0x45af, { 0xa3, 0x4d, 0x02, 0x47, 0x78, 0x7b, 0xe7, 0xc6 }}
 
 [Protocols.common]
+  ## Include/Protocol/PciHotPlugRequest.h
   gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
+
+  ## Include/Protocol/VgaMiniPort.h
   gEfiVgaMiniPortProtocolGuid    = { 0xc7735a2f, 0x88f5, 0x4882, { 0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3 }}
+
+  ## Include/Protocol/IsaIo.h
   gEfiIsaIoProtocolGuid          = { 0x7ee2bd44, 0x3da0, 0x11d4, { 0x9a, 0x38, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }}
+
+  ## Include/Protocol/IsaAcpi.h
   gEfiIsaAcpiProtocolGuid        = { 0x64a892dc, 0x5561, 0x4536, { 0x92, 0xc7, 0x79, 0x9b, 0xfc, 0x18, 0x33, 0x55 }}
+
+  ## Include/Protocol/Ps2Policy.h
   gEfiPs2PolicyProtocolGuid      = { 0x4DF19259, 0xDC71, 0x4D46, { 0xBE, 0xF1, 0x35, 0x7B, 0xB5, 0x78, 0xC4, 0x18 }}
 
   ## Disk Info protocol is used to export Inquiry Data for a drive.
@@ -86,7 +104,15 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
+  
+  ## Timeout value for displaying progressing bar in before boot OS.
+  #  According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
 
+  ## Error level for hardware recorder. If value 0, platform does not support feature of hardware error record.
+  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
+  
 [PcdsFeatureFlag.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
@@ -116,12 +142,4 @@
 [PcdsPatchableInModule.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
-  
-[PcdsDynamic.common]
-  ## Timeout value for displaying progressing bar in before boot OS.
-  #  According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
 
-  ## Error level for hardware recorder. If value 0, platform does not support feature of hardware error record.
-  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
