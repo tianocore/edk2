@@ -387,7 +387,7 @@
    <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   Nt32Pkg/BootModePei/BootModePei.inf
   Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf

@@ -153,7 +153,7 @@ READ_LOCK_STATUS   = TRUE
 ##
 APRIORI PEI {
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+  INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   }
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
@@ -162,7 +162,7 @@ APRIORI DXE {
   }
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
 INF  UnixPkg/BootModePei/BootModePei.inf
 INF  UnixPkg/UnixFlashMapPei/FlashMap.inf
 INF  UnixPkg/UnixAutoScanPei/UnixAutoScan.inf

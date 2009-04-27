@@ -154,7 +154,7 @@ FvNameGuid         = 6D99E806-3D38-42c2-A095-5F4300BFD7DC
   ##
 APRIORI PEI {
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+  INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   }
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
@@ -163,7 +163,7 @@ APRIORI DXE {
 
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/PeiStatusCode.inf
+INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
 INF  Nt32Pkg/BootModePei/BootModePei.inf
 INF  Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
 INF  Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
