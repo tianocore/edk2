@@ -287,7 +287,6 @@
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|TRUE
-  gEfiEdkModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseEfiSerial|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseRuntimeMemory|FALSE
@@ -317,10 +316,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportEfiDecompress|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportTianoDecompress|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportCustomDecompress|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildShareCodeHobs|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled|TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseEfiSerial|FALSE
