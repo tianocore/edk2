@@ -100,7 +100,7 @@ PartitionInstallElToritoChildHandles (
     Status = DiskIo->ReadDisk (
                        DiskIo,
                        Media->MediaId,
-                       VolDescriptorLba,
+                       MultU64x32 (VolDescriptorLba, Media->BlockSize),
                        Media->BlockSize,
                        VolDescriptor
                        );
@@ -143,7 +143,7 @@ PartitionInstallElToritoChildHandles (
     Status = DiskIo->ReadDisk (
                        DiskIo,
                        Media->MediaId,
-                       Lba,
+                       MultU64x32 (Lba, Media->BlockSize),
                        Media->BlockSize,
                        Catalog
                        );

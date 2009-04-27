@@ -296,12 +296,12 @@ PartitionInstallGptChildHandles (
   }
 
   Status = DiskIo->ReadDisk (
-                    DiskIo,
-                    BlockIo->Media->MediaId,
-                    MultU64x32(PrimaryHeader->PartitionEntryLBA, BlockSize),
-                    PrimaryHeader->NumberOfPartitionEntries * (PrimaryHeader->SizeOfPartitionEntry),
-                    PartEntry
-                    );
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     MultU64x32(PrimaryHeader->PartitionEntryLBA, BlockSize),
+                     PrimaryHeader->NumberOfPartitionEntries * (PrimaryHeader->SizeOfPartitionEntry),
+                     PartEntry
+                     );
   if (EFI_ERROR (Status)) {
     GptValidStatus = Status;
     DEBUG ((EFI_D_ERROR, " Partition Entry ReadDisk error\n"));
@@ -436,7 +436,7 @@ PartitionValidGptTable (
   Status = DiskIo->ReadDisk (
                      DiskIo,
                      BlockIo->Media->MediaId,
-                     Lba,
+                     MultU64x32 (Lba, BlockSize),
                      BlockSize,
                      PartHdr
                      );

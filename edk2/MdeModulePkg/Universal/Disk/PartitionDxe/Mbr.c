@@ -242,7 +242,7 @@ PartitionInstallMbrChildHandles (
       Status = DiskIo->ReadDisk (
                          DiskIo,
                          BlockIo->Media->MediaId,
-                         ExtMbrStartingLba,
+                         MultU64x32 (ExtMbrStartingLba, BlockIo->Media->BlockSize),
                          BlockIo->Media->BlockSize,
                          Mbr
                          );
