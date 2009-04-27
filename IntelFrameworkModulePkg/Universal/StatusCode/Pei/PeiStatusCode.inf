@@ -1,7 +1,6 @@
 #/** @file
-#  Generic Status code Pei driver
+#  Status code PEIM which produces Status Code PPI.
 #
-#  Customized output devices based on feature flags.
 #  Copyright (c) 2006 - 2009, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -16,7 +15,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiStatusCode
+  BASE_NAME                      = StatusCodePei
   FILE_GUID                      = 1EC0F53A-FDE0-4576-8F25-7A1A410F58EB
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
@@ -38,7 +37,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
