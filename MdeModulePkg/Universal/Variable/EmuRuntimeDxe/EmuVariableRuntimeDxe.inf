@@ -56,6 +56,7 @@
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
+  gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
   gEfiVariableGuid
 
 [Pcd.common]
@@ -63,6 +64,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
 
 [Depex]
   TRUE

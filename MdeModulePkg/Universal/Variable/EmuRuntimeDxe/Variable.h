@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
 #include <Guid/VariableFormat.h>
+#include <Guid/GlobalVariable.h>
 
 #include <Guid/EventGroup.h>
 
@@ -59,7 +60,12 @@ typedef struct {
   VARIABLE_GLOBAL VariableGlobal[2];
   UINTN           VolatileLastVariableOffset;
   UINTN           NonVolatileLastVariableOffset;
-  UINT32          FvbInstance;
+  UINTN           CommonVariableTotalSize;
+  UINTN           HwErrVariableTotalSize;
+  CHAR8           PlatformLangCodes[256]; //Pre-allocate 256 bytes space to accommodate the PlatformlangCodes.
+  CHAR8           LangCodes[256]; //Pre-allocate 256 bytes space to accommodate the langCodes.
+  CHAR8           PlatformLang[8]; //Pre-allocate 8 bytes space to accommodate the Platformlang variable.
+  CHAR8           Lang[4]; //Pre-allocate 4 bytes space to accommodate the lang variable.
 } ESAL_VARIABLE_GLOBAL;
 
 ///
@@ -138,7 +144,6 @@ VariableClassAddressChangeEvent (
   @param  Data                   On input, the size in bytes of the return Data buffer.  
                                  On output, the size of data returned in Data.
   @param  Global                 Pointer to VARIABLE_GLOBAL structure
-  @param  Instance               Instance of the Firmware Volume.
 
   @retval EFI_SUCCESS            The function completed successfully. 
   @retval EFI_NOT_FOUND          The variable was not found.
@@ -151,12 +156,11 @@ EFI_STATUS
 EFIAPI
 EmuGetVariable (
   IN      CHAR16            *VariableName,
-  IN      EFI_GUID          * VendorGuid,
+  IN      EFI_GUID          *VendorGuid,
   OUT     UINT32            *Attributes OPTIONAL,
   IN OUT  UINTN             *DataSize,
   OUT     VOID              *Data,
-  IN      VARIABLE_GLOBAL   * Global,
-  IN      UINT32            Instance
+  IN      VARIABLE_GLOBAL   *Global
   );
 
 /**
@@ -169,7 +173,6 @@ EmuGetVariable (
   @param  VendorGuid             On input, supplies the last VendorGuid that was returned by GetNextVariableName().
                                  On output, returns the VendorGuid of the current variable.  
   @param  Global                 Pointer to VARIABLE_GLOBAL structure.
-  @param  Instance               Instance of the Firmware Volume.
 
   @retval EFI_SUCCESS            The function completed successfully. 
   @retval EFI_NOT_FOUND          The next variable was not found.
@@ -184,8 +187,7 @@ EmuGetNextVariableName (
   IN OUT  UINTN             *VariableNameSize,
   IN OUT  CHAR16            *VariableName,
   IN OUT  EFI_GUID          *VendorGuid,
-  IN      VARIABLE_GLOBAL   *Global,
-  IN      UINT32            Instance
+  IN      VARIABLE_GLOBAL   *Global
   );
 
 /**
@@ -205,7 +207,6 @@ EmuGetNextVariableName (
   @param  Global                 Pointer to VARIABLE_GLOBAL structure
   @param  VolatileOffset         The offset of last volatile variable
   @param  NonVolatileOffset      The offset of last non-volatile variable
-  @param  Instance               Instance of the Firmware Volume.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as 
                                  defined by the Attributes.
@@ -228,8 +229,7 @@ EmuSetVariable (
   IN VOID                    *Data,
   IN VARIABLE_GLOBAL         *Global,
   IN UINTN                   *VolatileOffset,
-  IN UINTN                   *NonVolatileOffset,
-  IN UINT32                  Instance
+  IN UINTN                   *NonVolatileOffset
   );
 
 /**
@@ -245,7 +245,6 @@ EmuSetVariable (
   @param  MaximumVariableSize          Returns the maximum size of an individual EFI variable 
                                        associated with the attributes specified.
   @param  Global                       Pointer to VARIABLE_GLOBAL structure.
-  @param  Instance                     Instance of the Firmware Volume.
 
   @retval EFI_SUCCESS                  Valid answer returned.
   @retval EFI_INVALID_PARAMETER        An invalid combination of attribute bits was supplied
@@ -261,8 +260,7 @@ EmuQueryVariableInfo (
   OUT UINT64                 *MaximumVariableStorageSize,
   OUT UINT64                 *RemainingVariableStorageSize,
   OUT UINT64                 *MaximumVariableSize,
-  IN  VARIABLE_GLOBAL        *Global,
-  IN  UINT32                 Instance
+  IN  VARIABLE_GLOBAL        *Global
   );
 
 #endif
