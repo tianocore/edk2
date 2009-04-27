@@ -228,7 +228,12 @@
   ##
   #  If TRUE, FULL FTW protocol services (total six APIs) will be produced.
   #  If FASLE, only FTW Write service is available.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable|TRUE|BOOLEAN|0x0001200a
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable|TRUE|BOOLEAN|0x0001200b
+
+  ##
+  #  If TRUE, DXE IPL must support the UEFI decompression algorithm.
+  #  If FALSE, DXE IPL will not support UEFI decompression to save space.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|TRUE|BOOLEAN|0x0001200c
 
 [PcdsFeatureFlag.IA32]
   ## 
