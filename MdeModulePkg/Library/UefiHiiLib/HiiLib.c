@@ -447,63 +447,6 @@ InternalHiiBlockToConfig (
 }
 
 /**
-  Uses the ConfigToBlock() service of the Config Routing Protocol to 
-  convert <ConfigResp> to a block.  The block is allocated using
-  AllocatePool().  The caller is responsible for freeing the block
-  using FreePool().
-
-  If ConfigResp is NULL, then ASSERT().
-
-  @param[in] ConfigResp  Pointer to a Null-terminated Unicode string.
-  @param[in] BufferSize  Length in bytes of buffer to hold retrived data. 
-
-  @retval NULL   The block could not be generated..
-  @retval Other  Pointer to the allocated block.
-
-**/
-UINT8 *
-EFIAPI
-InternalHiiConfigToBlock (
-  IN  EFI_STRING  ConfigResp,
-  IN  UINTN       BlockSize
-  )
-{
-  EFI_STATUS  Status;
-  CHAR16      *Progress;
-  UINT8       *Block;
-
-  ASSERT (ConfigResp != NULL);
-
-  //
-  // Allocate a buffer to hold the <ConfigResp> conversion
-  //
-  Block = AllocateZeroPool (BlockSize);
-  if (Block == NULL) {
-    return NULL;
-  }
-
-  //
-  // Convert <ConfigResp> to a buffer
-  //
-  Status = gHiiConfigRouting->ConfigToBlock (
-                                gHiiConfigRouting,
-                                ConfigResp,
-                                Block,
-                                &BlockSize,
-                                &Progress
-                                );
-  if (EFI_ERROR (Status)) {
-    FreePool (Block);
-    return NULL;
-  }
-
-  //
-  // Return converted buffer
-  //
-  return Block;
-}
-
-/**
   Uses the BrowserCallback() service of the Form Browser Protocol to retrieve 
   or set uncommitted data.  If sata i being retrieved, then the buffer is 
   allocated using AllocatePool().  The caller is then responsible for freeing 
@@ -1164,38 +1107,40 @@ HiiIsConfigHdrMatch (
 
 /**
   Retrieves uncommited data from the Form Browser and converts it to a binary
-  buffer.  The returned buffer is allocated using AllocatePool().  The caller
-  is responsible for freeing the returned buffer using FreePool().
+  buffer.
 
-  @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
-                            parameter that may be NULL.
   @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
                             is an optional parameter that may be NULL.
+  @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
+                            parameter that may be NULL.
   @param[in]  BufferSize    Length in bytes of buffer to hold retrived data. 
+  @param[out] Block         Buffer of data to be updated.
 
-  @retval NULL   The uncommitted data could not be retrieved.
-  @retval Other  A pointer to a buffer containing the uncommitted data.
+  @retval FALSE  The uncommitted data could not be retrieved.
+  @retval TRUE   The uncommitted data was retrieved.
 
 **/
-UINT8 *
+BOOLEAN
 EFIAPI
 HiiGetBrowserData (
   IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
   IN CONST CHAR16    *VariableName,  OPTIONAL
-  IN UINTN           BlockSize
+  IN UINTN           BlockSize,
+  OUT UINT8          *Block
   )
 {
   EFI_STRING  ResultsData;
   UINTN       Size;
   EFI_STRING  ConfigResp;
-  UINT8       *Block;
+  EFI_STATUS  Status;
+  CHAR16      *Progress;
 
   //
   // Retrieve the results data from the Browser Callback
   //
   ResultsData = InternalHiiBrowserCallback (VariableGuid, VariableName, NULL);
   if (ResultsData == NULL) {
-    return NULL;
+    return FALSE;
   }
 
   //
@@ -1211,16 +1156,29 @@ HiiGetBrowserData (
   //
   FreePool (ResultsData);
   if (ConfigResp == NULL) {
-    return NULL;
+    return FALSE;
   }
 
   //
   // Convert <ConfigResp> to a buffer
   //
-  Block = InternalHiiConfigToBlock (ConfigResp, BlockSize);
+  Status = gHiiConfigRouting->ConfigToBlock (
+                                gHiiConfigRouting,
+                                ConfigResp,
+                                Block,
+                                &BlockSize,
+                                &Progress
+                                );
+  //
+  // Free the allocated buffer
+  //
   FreePool (ConfigResp);
 
-  return Block;
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /**

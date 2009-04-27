@@ -260,13 +260,8 @@ FileExplorerCallback (
   //
   // Retrieve uncommitted data from Form Browser
   //
-  NvRamMap = (FILE_EXPLORER_NV_DATA *) HiiGetBrowserData (&mFileExplorerGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA));
-  if (NvRamMap == NULL) {
-    return EFI_NOT_FOUND;
-  }
-  CopyMem (&Private->FeFakeNvData, NvRamMap, sizeof (FILE_EXPLORER_NV_DATA));
-  FreePool (NvRamMap);
   NvRamMap = &Private->FeFakeNvData;
+  HiiGetBrowserData (&mFileExplorerGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA), (UINT8 *) NvRamMap);
 
   if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
     //

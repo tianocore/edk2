@@ -505,8 +505,10 @@ IScsiFormCallback (
   //
   // Retrive uncommitted data from Browser
   //
-  IfrNvData = (ISCSI_CONFIG_IFR_NVDATA *) HiiGetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA));
-  if (IfrNvData == NULL) {
+  IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
+  ASSERT (IfrNvData != NULL);
+  if (!HiiGetBrowserData (&mVendorGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData)) {
+    FreePool (IfrNvData);
     return EFI_NOT_FOUND;
   }
   

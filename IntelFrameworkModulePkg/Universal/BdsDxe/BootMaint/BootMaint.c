@@ -271,18 +271,8 @@ BootMaintCallback (
   //
   // Retrive uncommitted data from Form Browser
   //
-  CurrentFakeNVMap = (BMM_FAKE_NV_DATA *) HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA));
-  DisMap = (UINT8 *) CurrentFakeNVMap;
-  for (Index = 0; Index < sizeof (BMM_FAKE_NV_DATA); Index ++) {
-    if (DisMap [Index] != 0) {
-      break;
-    }
-  }
-  
-  if (Index == sizeof (BMM_FAKE_NV_DATA)) {
-    FreePool (CurrentFakeNVMap);
-    CurrentFakeNVMap = &Private->BmmFakeNvData;
-  }
+  CurrentFakeNVMap = &Private->BmmFakeNvData;
+  HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
 
   //
   // need to be subtituded.
@@ -594,14 +584,6 @@ BootMaintCallback (
   // Pass changed uncommitted data back to Form Browser
   //
   Status = HiiSetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
-
-  //
-  // Update local settting.
-  //
-  if (CurrentFakeNVMap != &Private->BmmFakeNvData) {
-    CopyMem (&Private->BmmFakeNvData, CurrentFakeNVMap, sizeof (BMM_FAKE_NV_DATA));
-    FreePool (CurrentFakeNVMap);
-  }
 
   return Status;
 }
