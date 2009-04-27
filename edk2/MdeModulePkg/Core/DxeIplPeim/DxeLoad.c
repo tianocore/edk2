@@ -586,58 +586,62 @@ Decompress (
   //
   switch (CompressionSection->CompressionType) {
   case EFI_STANDARD_COMPRESSION:
-    //
-    // Load EFI standard compression.
-    // For compressed data, decompress them to destination buffer.
-    //
-    Status = UefiDecompressGetInfo (
-               (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-               (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
-               (UINT32 *) &DstBufferSize,
-               &ScratchBufferSize
-               );
-    if (EFI_ERROR (Status)) {
+    if (FeaturePcdGet(PcdDxeIplSupportUefiDecompress)) {
       //
-      // GetInfo failed
+      // Load EFI standard compression.
+      // For compressed data, decompress them to destination buffer.
       //
-      DEBUG ((DEBUG_ERROR, "Decompress GetInfo Failed - %r\n", Status));
+      Status = UefiDecompressGetInfo (
+                 (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                 (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
+                 (UINT32 *) &DstBufferSize,
+                 &ScratchBufferSize
+                 );
+      if (EFI_ERROR (Status)) {
+        //
+        // GetInfo failed
+        //
+        DEBUG ((DEBUG_ERROR, "Decompress GetInfo Failed - %r\n", Status));
+        return EFI_NOT_FOUND;
+      }
+      //
+      // Allocate scratch buffer
+      //
+      ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
+      if (ScratchBuffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      //
+      // Allocate destination buffer, extra one page for adjustment 
+      //
+      DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
+      if (DstBuffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      //
+      // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
+      // to make section data at page alignment.
+      //
+      DstBuffer = DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
+      //
+      // Call decompress function
+      //
+      Status = UefiDecompress (
+                  (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                  DstBuffer,
+                  ScratchBuffer
+                  );
+      if (EFI_ERROR (Status)) {
+        //
+        // Decompress failed
+        //
+        DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
+        return EFI_NOT_FOUND;
+      }
+      break;
+    } else {
       return EFI_NOT_FOUND;
     }
-    //
-    // Allocate scratch buffer
-    //
-    ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
-    if (ScratchBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    //
-    // Allocate destination buffer, extra one page for adjustment 
-    //
-    DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
-    if (DstBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    //
-    // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
-    // to make section data at page alignment.
-    //
-    DstBuffer = DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
-    //
-    // Call decompress function
-    //
-    Status = UefiDecompress (
-                (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                DstBuffer,
-                ScratchBuffer
-                );
-    if (EFI_ERROR (Status)) {
-      //
-      // Decompress failed
-      //
-      DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
-      return EFI_NOT_FOUND;
-    }
-    break;
 
   case EFI_NOT_COMPRESSED:
     //
