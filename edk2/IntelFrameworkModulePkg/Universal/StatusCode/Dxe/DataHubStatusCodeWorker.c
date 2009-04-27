@@ -1,7 +1,7 @@
 /** @file
-  Data Hub status code worker in DXE.
+  Data Hub status code worker.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,12 +28,14 @@ EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
 
 
 /**
-  Return one DATAHUB_STATUSCODE_RECORD space.
-  The size of free record pool would be extend, if the pool is empty.
+  Retrieve one record of from free record buffer. This record is removed from
+  free record buffer.
 
+  This function retrieves one record from free record buffer.
+  If the pool has been exhausted, then new memory would be allocated for it.
 
-  @retval  NULL   Can not allocate free memeory for record.
-  @retval  !NULL  Point to buffer of record.
+  @return  Pointer to the free record.
+           NULL means failure to allocate new memeory for free record buffer.
 
 **/
 DATA_HUB_STATUS_CODE_DATA_RECORD *
@@ -49,6 +51,9 @@ AcquireRecordBuffer (
   CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   if (!IsListEmpty (&mRecordsBuffer)) {
+    //
+    // Strip one entry from free record buffer.
+    //
     Node = GetFirstNode (&mRecordsBuffer);
     RemoveEntryList (Node);
 
@@ -62,13 +67,20 @@ AcquireRecordBuffer (
       return NULL;
     }
 
+    //
+    // If free record buffer is exhausted, then allocate 16 new records for it.
+    //
     gBS->RestoreTPL (CurrentTpl);
     Record   = (DATAHUB_STATUSCODE_RECORD *) AllocateZeroPool (sizeof (DATAHUB_STATUSCODE_RECORD) * 16);
-    if (NULL == Record) {
+    if (Record == NULL) {
       return NULL;
     }
 
     CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    //
+    // Here we only insert 15 new records to the free record buffer, for the first record
+    // will be returned immediately.
+    //
     for (Index = 1; Index < 16; Index++) {
       InsertTailList (&mRecordsBuffer, &Record[Index].Node);
     }
@@ -84,11 +96,10 @@ AcquireRecordBuffer (
 
 
 /**
-  Retrieve one record from Records FIFO. The record would be removed from FIFO and
-  release to free record buffer.
+  Retrieve one record from Records FIFO. The record would be removed from FIFO.
 
-  @return   !NULL   Point to record, which is ready to be logged.
-  @return   NULL    the FIFO of record is empty.
+  @return   Point to record, which is ready to be logged.
+            NULL means the FIFO of record is empty.
 
 **/
 DATA_HUB_STATUS_CODE_DATA_RECORD *
@@ -96,17 +107,19 @@ RetrieveRecord (
   VOID
   )
 {
-  DATA_HUB_STATUS_CODE_DATA_RECORD  *RecordData = NULL;
+  DATA_HUB_STATUS_CODE_DATA_RECORD  *RecordData;
   DATAHUB_STATUSCODE_RECORD         *Record;
   LIST_ENTRY                        *Node;
   EFI_TPL                           CurrentTpl;
+
+  RecordData = NULL;
 
   CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   if (!IsListEmpty (&mRecordsFifo)) {
     Node = GetFirstNode (&mRecordsFifo);
     Record = CR (Node, DATAHUB_STATUSCODE_RECORD, Node, DATAHUB_STATUS_CODE_SIGNATURE);
-    ASSERT (NULL != Record);
+    ASSERT (Record != NULL);
 
     RemoveEntryList (&Record->Node);
     RecordData = (DATA_HUB_STATUS_CODE_DATA_RECORD *) Record->Data;
@@ -118,10 +131,9 @@ RetrieveRecord (
 }
 
 /**
-  Release Records to FIFO.
+  Release given record and return it to free record buffer.
   
-  @param RecordData  Point to the record buffer allocated
-                     from AcquireRecordBuffer.
+  @param RecordData  Pointer to the record to release.
 
 **/
 VOID
@@ -133,7 +145,7 @@ ReleaseRecord (
   EFI_TPL                           CurrentTpl;
 
   Record = CR (RecordData, DATAHUB_STATUSCODE_RECORD, Data[0], DATAHUB_STATUS_CODE_SIGNATURE);
-  ASSERT (NULL != Record);
+  ASSERT (Record != NULL);
 
   CurrentTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
@@ -143,36 +155,24 @@ ReleaseRecord (
   gBS->RestoreTPL (CurrentTpl);
 }
 
-
-
 /**
   Report status code into DataHub.
 
-  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
+  @param  CodeType             Indicates the type of status code being reported.
+  @param  Value                Describes the current status of a hardware or software entity.
+                               This included information about the class and subclass that is used to
+                               classify the entity as well as an operation.
+  @param  Instance             The enumeration of a hardware or software entity within
+                               the system. Valid instance numbers start with 1.
+  @param  CallerId             This optional parameter may be used to identify the caller.
+                               This parameter allows the status code driver to apply different rules to
+                               different callers.
+  @param  Data                 This optional parameter may be used to pass additional data.
 
-  @param  Value         Describes the current status of a hardware or software entity.
-                        This included information about the class and subclass that is used to classify the entity
-                        as well as an operation.  For progress codes, the operation is the current activity.
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time.
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.
-                        Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
-
-  @param  Instance      The enumeration of a hardware or software entity within the system.
-                        A system may contain multiple entities that match a class/subclass pairing.
-                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable,
-                        not meaningful, or not relevant.  Valid instance numbers start with 1.
-
-
-  @param  CallerId      This optional parameter may be used to identify the caller.
-                        This parameter allows the status code driver to apply different rules to different callers.
-                        Type EFI_GUID is defined in InstallProtocolInterface() in the UEFI 2.0 Specification.
-
-
-  @param  Data          This optional parameter may be used to pass additional data
-
-  @retval EFI_OUT_OF_RESOURCES   Can not acquire record buffer.
-  @retval EFI_DEVICE_ERROR       EFI serial device can not work after ExitBootService() is called .
-  @retval EFI_SUCCESS            Success to cache status code and signal log data event.
+  @retval EFI_SUCCESS          The function completed successfully.
+  @retval EFI_DEVICE_ERROR     Function is reentered.
+  @retval EFI_DEVICE_ERROR     Function is called at runtime.
+  @retval EFI_OUT_OF_RESOURCES Fail to allocate memory for free record buffer.
 
 **/
 EFI_STATUS
@@ -190,12 +190,11 @@ DataHubStatusCodeReportWorker (
   CHAR8                             *Format;
   UINTN                             CharCount;
 
-
   //
   // Use atom operation to avoid the reentant of report.
   // If current status is not zero, then the function is reentrancy.
   //
-  if (1 == InterlockedCompareExchange32 (&mLogDataHubStatus, 0, 0)) {
+  if (InterlockedCompareExchange32 (&mLogDataHubStatus, 0, 0) == 1) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -234,7 +233,7 @@ DataHubStatusCodeReportWorker (
                     Marker
                     );
       //
-      // Change record data type from DebugType to String Type.
+      // Change record data type to DebugType.
       //
       CopyGuid (&Record->Data.Type, &gEfiStatusCodeDataTypeDebugGuid);
       Record->Data.HeaderSize = Data->HeaderSize;
@@ -281,7 +280,7 @@ LogDataHubEventCallBack (
   // Use atom operation to avoid the reentant of report.
   // If current status is not zero, then the function is reentrancy.
   //
-  if (1 == InterlockedCompareExchange32 (&mLogDataHubStatus, 0, 1)) {
+  if (InterlockedCompareExchange32 (&mLogDataHubStatus, 0, 1) == 1) {
     return;
   }
 
@@ -289,7 +288,10 @@ LogDataHubEventCallBack (
   // Log DataRecord in Data Hub.
   // Journal records fifo to find all record entry.
   //
-  while (1) {
+  while (TRUE) {
+    //
+    // Retrieve record from record FIFO until no more record can be retrieved.
+    //
     Record = RetrieveRecord ();
     if (Record == NULL) {
       break;
@@ -318,7 +320,6 @@ LogDataHubEventCallBack (
     //
     // Log DataRecord in Data Hub
     //
-
     mDataHubProtocol->LogData (
                         mDataHubProtocol,
                         &gEfiDataHubStatusCodeRecordGuid,
@@ -339,10 +340,10 @@ LogDataHubEventCallBack (
 
 
 /**
-  Initialize data hubstatus code.
-  Create a data hub listener.
+  Locate Data Hub Protocol and create event for logging data
+  as initialization for data hub status code worker.
 
-  @return  The function always return EFI_SUCCESS
+  @retval EFI_SUCCESS  Initialization is successful.
 
 **/
 EFI_STATUS

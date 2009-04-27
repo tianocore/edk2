@@ -13,7 +13,7 @@
   DXE       -> This driver
   RT        -> This driver
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -27,7 +27,6 @@
 #include "DxeStatusCode.h"
 
 /**
-  
   Dispatch initialization request to sub status code devices based on 
   customized feature flags.
  
@@ -41,7 +40,7 @@ InitializationDispatcherWorker (
   EFI_STATUS                        Status;
   MEMORY_STATUSCODE_PACKET_HEADER   *PacketHeader;
   MEMORY_STATUSCODE_RECORD          *Record;
-  UINTN                             ExpectedPacketIndex = 0;
+  UINTN                             ExpectedPacketIndex;
   UINTN                             Index;
   VOID                              *HobStart;
 
@@ -55,6 +54,9 @@ InitializationDispatcherWorker (
     ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseHardSerial)) {
+    //
+    // Call Serial Port Lib API to initialize serial port.
+    //
     Status = SerialPortInitialize ();
     ASSERT_EFI_ERROR (Status);
   }
@@ -67,18 +69,22 @@ InitializationDispatcherWorker (
     ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseOEM)) {
+    //
+    // Call OEM hook status code library API to initialize OEM device for status code.
+    //
     Status = OemHookStatusCodeInitialize ();
     ASSERT_EFI_ERROR (Status);
   }
 
   //
-  // Replay Status code which saved in GUID'ed HOB to all supported device. 
+  // Replay Status code which saved in GUID'ed HOB to all supported devices. 
   //
 
   // 
   // Journal GUID'ed HOBs to find all record entry, if found, 
   // then output record to support replay device.
   //
+  ExpectedPacketIndex = 0;
   Hob.Raw   = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
   HobStart  = Hob.Raw;
   while (Hob.Raw != NULL) {
@@ -103,7 +109,6 @@ InitializationDispatcherWorker (
         if (FeaturePcdGet (PcdStatusCodeReplayInRuntimeMemory) &&
             FeaturePcdGet (PcdStatusCodeUseRuntimeMemory)) {
           RtMemoryStatusCodeReportWorker (
-            gDxeStatusCode.RtMemoryStatusCodeTable[PHYSICAL_MODE],
             Record[Index].CodeType,
             Record[Index].Value,
             Record[Index].Instance
@@ -121,6 +126,9 @@ InitializationDispatcherWorker (
         }
         if (FeaturePcdGet (PcdStatusCodeReplayInOEM) &&
             FeaturePcdGet (PcdStatusCodeUseOEM)) {
+          //
+          // Call OEM hook status code library API to report status code to OEM device
+          //
           OemHookStatusCodeReport (
             Record[Index].CodeType,
             Record[Index].Value,
@@ -135,7 +143,7 @@ InitializationDispatcherWorker (
       //
       // See whether there is gap of packet or not
       //
-      if (NULL != HobStart) {
+      if (HobStart != NULL) {
         HobStart  = NULL;
         Hob.Raw   = HobStart;
         continue;
