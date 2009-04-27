@@ -157,7 +157,7 @@ APRIORI PEI {
   }
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+  INF  IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
   INF  UnixPkg/MetronomeDxe/Metronome.inf
   }
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
@@ -175,7 +175,7 @@ INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 #  DXE Phase modules
 ##
 INF  MdeModulePkg/Core/Dxe/DxeMain.inf
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Dxe/DxeStatusCode.inf
+INF  IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  UnixPkg/MetronomeDxe/Metronome.inf
 INF  UnixPkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
