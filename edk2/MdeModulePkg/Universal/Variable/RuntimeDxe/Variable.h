@@ -59,6 +59,10 @@ typedef struct {
   UINTN           NonVolatileLastVariableOffset;
   UINTN           CommonVariableTotalSize;
   UINTN           HwErrVariableTotalSize;
+  CHAR8           PlatformLangCodes[256]; //Pre-allocate 256 bytes space to accommodate the PlatformlangCodes.
+  CHAR8           LangCodes[256]; //Pre-allocate 256 bytes space to accommodate the langCodes.
+  CHAR8           PlatformLang[8]; //Pre-allocate 8 bytes space to accommodate the Platformlang variable.
+  CHAR8           Lang[4]; //Pre-allocate 4 bytes space to accommodate the lang variable.
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvbInstance;
 } VARIABLE_MODULE_GLOBAL;
 

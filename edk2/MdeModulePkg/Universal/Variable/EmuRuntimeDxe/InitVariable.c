@@ -51,8 +51,7 @@ RuntimeServiceGetVariable (
           Attributes OPTIONAL,
           DataSize,
           Data,
-          &mVariableModuleGlobal->VariableGlobal[Physical],
-          mVariableModuleGlobal->FvbInstance
+          &mVariableModuleGlobal->VariableGlobal[Physical]
           );
 }
 
@@ -82,8 +81,7 @@ RuntimeServiceGetNextVariableName (
           VariableNameSize,
           VariableName,
           VendorGuid,
-          &mVariableModuleGlobal->VariableGlobal[Physical],
-          mVariableModuleGlobal->FvbInstance
+          &mVariableModuleGlobal->VariableGlobal[Physical]
           );
 }
 
@@ -123,8 +121,7 @@ RuntimeServiceSetVariable (
           Data,
           &mVariableModuleGlobal->VariableGlobal[Physical],
           &mVariableModuleGlobal->VolatileLastVariableOffset,
-          &mVariableModuleGlobal->NonVolatileLastVariableOffset,
-          mVariableModuleGlobal->FvbInstance
+          &mVariableModuleGlobal->NonVolatileLastVariableOffset
           );
 }
 
@@ -160,8 +157,7 @@ RuntimeServiceQueryVariableInfo (
           MaximumVariableStorageSize,
           RemainingVariableStorageSize,
           MaximumVariableSize,
-          &mVariableModuleGlobal->VariableGlobal[Physical],
-          mVariableModuleGlobal->FvbInstance
+          &mVariableModuleGlobal->VariableGlobal[Physical]
           );
 }
 
