@@ -357,25 +357,26 @@ HiiIsConfigHdrMatch (
 
 /**
   Retrieves uncommited data from the Form Browser and converts it to a binary
-  buffer.  The returned buffer is allocated using AllocatePool().  The caller
-  is responsible for freeing the returned buffer using FreePool().
+  buffer.
 
   @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
                             is an optional parameter that may be NULL.
   @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
                             parameter that may be NULL.
   @param[in]  BufferSize    Length in bytes of buffer to hold retrived data. 
+  @param[out] Block         Buffer of data to be updated.
 
-  @retval NULL   The uncommitted data could not be retrieved.
-  @retval Other  A pointer to a buffer containing the uncommitted data.
+  @retval FALSE  The uncommitted data could not be retrieved.
+  @retval TRUE   The uncommitted data was retrieved.
 
 **/
-UINT8 *
+BOOLEAN
 EFIAPI
 HiiGetBrowserData (
   IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
   IN CONST CHAR16    *VariableName,  OPTIONAL
-  IN UINTN           BlockSize
+  IN UINTN           BlockSize,
+  OUT UINT8          *Block
   );
 
 /**

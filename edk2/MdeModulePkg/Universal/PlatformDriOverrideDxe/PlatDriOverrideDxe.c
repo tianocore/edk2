@@ -1211,8 +1211,8 @@ PlatOverMngrRouteConfig (
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
 
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
-  FakeNvData = (PLAT_OVER_MNGR_DATA *) HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA));
-  if (FakeNvData == NULL) {
+  FakeNvData = &Private->FakeNvData;
+  if (HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1231,10 +1231,6 @@ PlatOverMngrRouteConfig (
   if (mCurrentPage == FORM_ID_ORDER) {
     KeyValue = KEY_VALUE_ORDER_SAVE_AND_EXIT;
     CommintChanges (Private, KeyValue, FakeNvData);
-  }
-
-  if (FakeNvData != NULL) {
-    FreePool (FakeNvData);
   }
 
   return EFI_SUCCESS;
@@ -1279,8 +1275,8 @@ PlatOverMngrCallback (
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
   
   Private = EFI_CALLBACK_INFO_FROM_THIS (This);
-  FakeNvData = (PLAT_OVER_MNGR_DATA *) HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA));
-  if (FakeNvData == NULL) {
+  FakeNvData = &Private->FakeNvData;
+  if (HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1344,14 +1340,6 @@ PlatOverMngrCallback (
   // Pass changed uncommitted data back to Form Browser
   //
   HiiSetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
-  
-  //
-  // Update local configuration buffer.
-  //
-  CopyMem (&Private->FakeNvData, FakeNvData, sizeof (PLAT_OVER_MNGR_DATA));
-  if (FakeNvData != NULL) {
-    FreePool (FakeNvData);
-  }
 
   return EFI_SUCCESS;
 }

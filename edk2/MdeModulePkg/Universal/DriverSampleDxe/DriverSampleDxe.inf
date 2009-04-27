@@ -61,7 +61,7 @@
 [Protocols]
   gEfiHiiStringProtocolGuid                     ## CONSUMES
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
   gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
 

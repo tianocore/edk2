@@ -260,8 +260,9 @@ SetPassword (
   //
   // Retrive uncommitted data from Browser
   //
-  Configuration = (DRIVER_SAMPLE_CONFIGURATION *) HiiGetBrowserData (&mFormSetGuid, VariableName, sizeof (DRIVER_SAMPLE_CONFIGURATION));
-  if (Configuration != NULL) {
+  Configuration = AllocateZeroPool (sizeof (DRIVER_SAMPLE_CONFIGURATION));
+  ASSERT (Configuration != NULL);
+  if (HiiGetBrowserData (&mFormSetGuid, VariableName, sizeof (DRIVER_SAMPLE_CONFIGURATION), (UINT8 *) Configuration)) {
     //
     // Update password's clear text in the screen
     //
@@ -277,9 +278,12 @@ SetPassword (
        (UINT8 *) Configuration,
        NULL
        );
-    
-    FreePool (Configuration);
   }
+
+  //
+  // Free Configuration Buffer
+  //
+  FreePool (Configuration);
 
 
   //
