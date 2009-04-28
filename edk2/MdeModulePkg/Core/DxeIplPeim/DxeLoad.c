@@ -640,6 +640,11 @@ Decompress (
       }
       break;
     } else {
+      //
+      // PcdDxeIplSupportUefiDecompress is FALSE
+      // Don't support UEFI decompression algorithm.
+      //
+      ASSERT (FALSE);
       return EFI_NOT_FOUND;
     }
 
