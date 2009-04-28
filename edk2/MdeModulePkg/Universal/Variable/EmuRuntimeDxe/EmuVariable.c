@@ -1111,7 +1111,13 @@ EmuSetVariable (
     if ((DataSize > FixedPcdGet32(PcdMaxHardwareErrorVariableSize)) ||                                                       
         (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > FixedPcdGet32(PcdMaxHardwareErrorVariableSize))) {
       return EFI_INVALID_PARAMETER;
-    }    
+    }
+    //
+    // According to UEFI spec, HARDWARE_ERROR_RECORD variable name convention should be L"HwErrRecXXXX"
+    //
+    if (StrnCmp(VariableName, L"HwErrRec", StrLen(L"HwErrRec")) != 0) {
+      return EFI_INVALID_PARAMETER;
+    }
   } else {
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
@@ -1121,7 +1127,8 @@ EmuSetVariable (
         (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > FixedPcdGet32(PcdMaxVariableSize))) {
       return EFI_INVALID_PARAMETER;
     }  
-  }  
+  }
+
   //
   // Check whether the input variable is already existed
   //
