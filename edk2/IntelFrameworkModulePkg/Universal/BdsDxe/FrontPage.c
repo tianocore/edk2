@@ -229,6 +229,7 @@ FrontPageCallback (
                       AsciiStrSize (BestLanguage),
                       Lang
                       );
+      ASSERT_EFI_ERROR(Status);
       FreePool (BestLanguage);
     } else {
       ASSERT (FALSE);
