@@ -696,13 +696,13 @@ typedef struct {
   UINT16  Unknown     :1;
   UINT16  Standard    :1;
   UINT16  FastPageMode:1;
-  UINT16  EDO         :1;
+  UINT16  Edo         :1;
   UINT16  Parity      :1;
-  UINT16  ECC         :1;
-  UINT16  SIMM        :1;
-  UINT16  DIMM        :1;
+  UINT16  Ecc         :1;
+  UINT16  Simm        :1;
+  UINT16  Dimm        :1;
   UINT16  BurstEdo    :1;
-  UINT16  SDRAM       :1;
+  UINT16  Sdram       :1;
   UINT16  Reserved    :5;
 } MEMORY_CURRENT_TYPE;
 
