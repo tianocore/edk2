@@ -96,6 +96,7 @@ InstallProcessorDataHub (
                        &DataRecord,
                        sizeof (DataRecord.DataRecordHeader) + sizeof (DataRecord.VariableRecord.ProcessorCoreFrequency)
                        );
+  ASSERT_EFI_ERROR (Status);
   //
   // Record Type 3
   //
@@ -122,7 +123,7 @@ InstallProcessorDataHub (
                        &DataRecord,
                        sizeof (DataRecord.DataRecordHeader) + sizeof (DataRecord.VariableRecord.ProcessorVersion)
                        );
-
+  ASSERT_EFI_ERROR (Status);
   return ;
 }
 
@@ -260,6 +261,7 @@ InstallMiscDataHub (
                        &DataRecord,
                        sizeof (DataRecord.Header) + sizeof (DataRecord.Record.MiscBiosVendor)
                        );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // System information (TYPE 1)
@@ -304,6 +306,7 @@ InstallMiscDataHub (
                        &DataRecord,
                        sizeof (DataRecord.Header) + sizeof (DataRecord.Record.MiscSystemManufacturer)
                        );
+  ASSERT_EFI_ERROR (Status);
 
   return ;
 }
