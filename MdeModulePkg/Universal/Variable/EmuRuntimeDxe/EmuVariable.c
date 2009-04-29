@@ -812,13 +812,6 @@ FindVariable (
   UINTN                 Index;
 
   //
-  // We aquire the lock at the entry of FindVariable as GetVariable, GetNextVariableName
-  // SetVariable all call FindVariable at entry point. Please move "Aquire Lock" to
-  // the correct places if this assumption does not hold TRUE anymore.
-  //
-  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
-
-  //
   // 0: Non-Volatile, 1: Volatile
   //
   VariableStoreHeader[0]  = (VARIABLE_STORE_HEADER *) ((UINTN) Global->NonVolatileVariableBase);
@@ -906,6 +899,9 @@ EmuGetVariable (
   if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
+
   //
   // Find existing variable
   //
@@ -978,6 +974,8 @@ EmuGetNextVariableName (
   if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
 
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
@@ -1128,6 +1126,8 @@ EmuSetVariable (
       return EFI_INVALID_PARAMETER;
     }  
   }
+
+  AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
 
   //
   // Check whether the input variable is already existed
