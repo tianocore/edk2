@@ -13,7 +13,7 @@
   Module Name:  FrameworkSmmCis.h
 
   @par Revision Reference:
-  Version 0.9.
+  Version 1.1.
 
 **/
 
