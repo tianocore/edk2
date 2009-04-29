@@ -13,7 +13,7 @@
   Module Name:  FrameworkSmmCis.h
 
   @par Revision Reference:
-  Version 1.1.
+  VOLUME 4: Platform Initialization Specification,System Management Mode Core Interface, Version 1.1.
 
 **/
 
