@@ -39,7 +39,7 @@ Abstract:
 #include <Guid/HobList.h>
 #include <Guid/FlashMapHob.h>
 #include <Guid/VariableFormat.h>
-
+#include <Guid/GlobalVariable.h>
 #include <Protocol/Variable.h>
 #include <Protocol/VariableWrite.h>
 #include <Protocol/SimpleFileSystem.h>
@@ -49,9 +49,13 @@ Abstract:
 #include "EfiFlashMap.h"
 #include "VariableStorage.h"
 
-#define VOLATILE_VARIABLE_STORE_SIZE  (64 * 1024)
-#define VARIABLE_SCRATCH_SIZE         (4 * 1024)
+#define VOLATILE_VARIABLE_STORE_SIZE  FixedPcdGet32(PcdVariableStoreSize)
+#define VARIABLE_SCRATCH_SIZE         MAX(FixedPcdGet32(PcdMaxVariableSize), FixedPcdGet32(PcdMaxHardwareErrorVariableSize))
 #define VARIABLE_RECLAIM_THRESHOLD    (1024)
+///
+/// The size of a 3 character ISO639 language code.
+///
+#define ISO_639_2_ENTRY_SIZE    3
 
 #define GET_VARIABLE_NAME_PTR(a)  (CHAR16 *) ((UINTN) (a) + sizeof (VARIABLE_HEADER))
 
@@ -85,6 +89,12 @@ typedef struct {
   VOID               *VariableBase[MaxType];        // Start address of variable storage
   UINTN              LastVariableOffset[MaxType];   // The position to write new variable to (index from VariableBase)
   VOID               *Scratch;                      // Buffer used during reclaim
+  UINTN              CommonVariableTotalSize;
+  UINTN              HwErrVariableTotalSize;
+  CHAR8              PlatformLangCodes[256]; //Pre-allocate 256 bytes space to accommodate the PlatformlangCodes.
+  CHAR8              LangCodes[256];         //Pre-allocate 256 bytes space to accommodate the langCodes.
+  CHAR8              PlatformLang[8];        //Pre-allocate 8 bytes space to accommodate the Platformlang variable.
+  CHAR8              Lang[4];                //Pre-allocate 4 bytes space to accommodate the lang variable.
 } VARIABLE_GLOBAL;
 
 //
