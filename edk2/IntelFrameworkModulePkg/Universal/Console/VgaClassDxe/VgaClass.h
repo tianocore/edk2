@@ -179,7 +179,7 @@ VgaClassDriverBindingStop (
                                 languages specified in SupportedLanguages. The
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified
-                                in RFC 3066 or ISO 639-2 language code format.
+                                in RFC 4646 or ISO 639-2 language code format.
   @param  DriverName            A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 driver specified by This in the language
@@ -236,7 +236,7 @@ VgaClassComponentNameGetDriverName (
                                 languages specified in SupportedLanguages. The
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified in
-                                RFC 3066 or ISO 639-2 language code format.
+                                RFC 4646 or ISO 639-2 language code format.
   @param  ControllerName        A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 controller specified by ControllerHandle and
