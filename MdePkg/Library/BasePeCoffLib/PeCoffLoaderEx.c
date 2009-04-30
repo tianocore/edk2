@@ -43,6 +43,8 @@ PeCoffLoaderRelocateImageEx (
   does not mean the image can be executed it means the PE/COFF loader supports
   loading and relocating of the image type. It's up to the caller to support
   the entry point.
+  
+  The IA32/X64 version PE/COFF loader/relocater both support IA32, X64 and EBC images.
 
   @param  Machine   Machine type from the PE Header.
 
