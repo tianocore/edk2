@@ -66,7 +66,7 @@ typedef enum {
                            options for the bus controller.  It will not be NULL for a
                            bus driver that wishes to set options for one of its child
                            controllers.
-  @param  Language         A Null-terminated ASCII string that contains one or more RFC 3066
+  @param  Language         A Null-terminated ASCII string that contains one or more RFC 4646
                            language codes. This is the list of language codes that this
                            protocol supports. The number of languages
                            supported by a driver is up to the driver writer.
@@ -179,7 +179,7 @@ struct _EFI_DRIVER_CONFIGURATION2_PROTOCOL {
   EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID   OptionsValid;
   EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS  ForceDefaults;
   ///
-  /// A Null-terminated ASCII string that contains one or more RFC 3066
+  /// A Null-terminated ASCII string that contains one or more RFC 4646
   /// language codes.  This is the list of language codes that this protocol supports.  
   ///
   CHAR8                                     *SupportedLanguages;

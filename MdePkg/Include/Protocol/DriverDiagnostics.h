@@ -114,7 +114,7 @@ EFI_STATUS
 struct _EFI_DRIVER_DIAGNOSTICS_PROTOCOL {
   EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS  RunDiagnostics;
   ///
-  /// A Null-terminated ASCII string that contains one or more RFC 3066
+  /// A Null-terminated ASCII string that contains one or more RFC 4646
   /// language codes.  This is the list of language codes that this protocol supports.  
   ///  
   CHAR8                                   *SupportedLanguages;
