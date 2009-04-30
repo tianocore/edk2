@@ -67,7 +67,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_COLLATION_PROTOCOL  UnicodeEng = {
 };
 
 //
-// EFI Unicode Collation2 Protocol supporting RFC 3066 language code
+// EFI Unicode Collation2 Protocol supporting RFC 4646 language code
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_COLLATION_PROTOCOL  Unicode2Eng = {
   EngStriColl,

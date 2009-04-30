@@ -1052,9 +1052,9 @@ FindVariable (
   Get index from supported language codes according to language string.
 
   This code is used to get corresponding index in supported language codes. It can handle
-  RFC3066 and ISO639 language tags.
+  RFC4646 and ISO639 language tags.
   In ISO639 language tags, take 3-characters as a delimitation to find matched string and calculate the index.
-  In RFC3066 language tags, take semicolon as a delimitation to find matched string and calculate the index.
+  In RFC4646 language tags, take semicolon as a delimitation to find matched string and calculate the index.
 
   For example:
     SupportedLang  = "engfraengfra"
@@ -1069,7 +1069,7 @@ FindVariable (
 
   @param  SupportedLang               Platform supported language codes.
   @param  Lang                        Configured language.
-  @param  Iso639Language              A bool value to signify if the handler is operated on ISO639 or RFC3066.
+  @param  Iso639Language              A bool value to signify if the handler is operated on ISO639 or RFC4646.
 
   @retval the index of language in the language codes.
 
@@ -1103,7 +1103,7 @@ GetIndexFromSupportedLangCodes(
     return 0;
   } else {
     //
-    // Compare RFC3066 language code
+    // Compare RFC4646 language code
     //
     while (*Supported != '\0') {
       //
@@ -1129,9 +1129,9 @@ GetIndexFromSupportedLangCodes(
   Get language string from supported language codes according to index.
 
   This code is used to get corresponding language string in supported language codes. It can handle
-  RFC3066 and ISO639 language tags.
+  RFC4646 and ISO639 language tags.
   In ISO639 language tags, take 3-characters as a delimitation. Find language string according to the index.
-  In RFC3066 language tags, take semicolon as a delimitation. Find language string according to the index.
+  In RFC4646 language tags, take semicolon as a delimitation. Find language string according to the index.
 
   For example:
     SupportedLang  = "engfraengfra"
@@ -1146,7 +1146,7 @@ GetIndexFromSupportedLangCodes(
 
   @param  SupportedLang               Platform supported language codes.
   @param  Index                       the index in supported language codes.
-  @param  Iso639Language              A bool value to signify if the handler is operated on ISO639 or RFC3066.
+  @param  Iso639Language              A bool value to signify if the handler is operated on ISO639 or RFC4646.
 
   @retval the language string in the language codes.
 
@@ -1268,7 +1268,7 @@ AutoUpdateLangVariable(
     Index = GetIndexFromSupportedLangCodes(mVariableModuleGlobal->PlatformLangCodes, BestPlatformLang, FALSE);
 
     //
-    // Get the corresponding ISO639 language tag according to RFC3066 language tag.
+    // Get the corresponding ISO639 language tag according to RFC4646 language tag.
     //
     BestLang = GetLangFromSupportedLangCodes(mVariableModuleGlobal->LangCodes, Index, TRUE);
 
@@ -1298,7 +1298,7 @@ AutoUpdateLangVariable(
     Index = GetIndexFromSupportedLangCodes(mVariableModuleGlobal->LangCodes, BestLang, TRUE);
 
     //
-    // Get the corresponding RFC3066 language tag according to ISO639 language tag.
+    // Get the corresponding RFC4646 language tag according to ISO639 language tag.
     //
     BestPlatformLang = GetLangFromSupportedLangCodes(mVariableModuleGlobal->PlatformLangCodes, Index, FALSE);
 
