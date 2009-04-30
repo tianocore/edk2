@@ -837,7 +837,7 @@ HiiConstructConfigAltResp (
   //
   VA_START (Args, BlockNameArray);
   while (TRUE) {
-    AltCfgId = VA_ARG (Args, UINT16);
+    AltCfgId = VA_ARG (Args, UINTN);
     Buffer   = VA_ARG (Args, UINT8 *);
     if (Buffer == NULL) {
       break;
@@ -891,7 +891,7 @@ HiiConstructConfigAltResp (
   //
   VA_START (Args, BlockNameArray);
   while (TRUE) {
-    AltCfgId = VA_ARG (Args, UINT16);
+    AltCfgId = VA_ARG (Args, UINTN);
     Buffer   = VA_ARG (Args, UINT8 *);
     if (Buffer == NULL) {
       break;
