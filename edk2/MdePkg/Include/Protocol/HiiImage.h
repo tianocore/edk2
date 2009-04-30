@@ -38,7 +38,7 @@ typedef struct _EFI_HII_IMAGE_PROTOCOL EFI_HII_IMAGE_PROTOCOL;
 
   @param Height Image height, in pixels.
 
-  @param Bitmap The actual bitmap, organized left-to-right,
+  @param Bitmap A pointer to the actual bitmap, organized left-to-right,
                 top-to-bottom. The size of the bitmap is
                 Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL).
 

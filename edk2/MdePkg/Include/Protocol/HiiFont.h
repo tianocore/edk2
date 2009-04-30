@@ -439,8 +439,6 @@ EFI_STATUS
   @retval EFI_SUCCESS            Matching font returned successfully.
   
   @retval EFI_NOT_FOUND          No matching font was found.
-  
-  @retval EFI_INVALID_PARAMETER  StringInfoIn->FontInfoMask is an invalid combination.
 
   @retval EFI_OUT_OF_RESOURCES   There were insufficient resources to complete the request.
   

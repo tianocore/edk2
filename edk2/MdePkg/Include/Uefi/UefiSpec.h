@@ -1904,7 +1904,7 @@ typedef struct {
   ///
   EFI_HANDLE                        ConsoleInHandle;
   ///
-  /// A pointer to the SIMPLE_INPUT_PROTOCOL interface that is
+  /// A pointer to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL interface that is
   /// associated with ConsoleInHandle.
   ///
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL    *ConIn;
@@ -1913,7 +1913,7 @@ typedef struct {
   ///
   EFI_HANDLE                        ConsoleOutHandle;
   ///
-  /// A pointer to the SIMPLE_TEXT_OUTPUT_PROTOCOL interface
+  /// A pointer to the EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL interface
   /// that is associated with ConsoleOutHandle.
   ///
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut;
@@ -1922,7 +1922,7 @@ typedef struct {
   ///
   EFI_HANDLE                        StandardErrorHandle;
   ///
-  /// A pointer to the SIMPLE_TEXT_OUTPUT_PROTOCOL interface
+  /// A pointer to the EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL interface
   /// that is associated with StandardErrorHandle.
   ///
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *StdErr;
