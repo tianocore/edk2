@@ -43,7 +43,7 @@ Module Name:
 // Each entry is 5 CHAR8 values long.  The first 3 CHAR8 values are the ISO 639-2 code.
 // The last 2 CHAR8 values are the ISO 639-1 code.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 Iso639ToRfc3066ConversionTable[] =
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 Iso639ToRfc4646ConversionTable[] =
 "\
 aaraa\
 abkab\
@@ -183,14 +183,14 @@ zulzu\
 ";
 
 /**
-  Convert language code from ISO639-2 to RFC3066 and return the converted language.
+  Convert language code from ISO639-2 to RFC4646 and return the converted language.
   Caller is responsible for freeing the allocated buffer.
 
   LanguageIso639 contain a single ISO639-2 code such as
   "eng" or "fra".
 
   If LanguageIso639 is NULL, then ASSERT.
-  If LanguageRfc3066 is NULL, then ASSERT.
+  If LanguageRfc4646 is NULL, then ASSERT.
 
   @param  LanguageIso639         ISO639-2 language code.
 
@@ -199,20 +199,20 @@ zulzu\
 **/
 CHAR8*
 EFIAPI
-ConvertIso639LanguageToRfc3066Language (
+ConvertIso639LanguageToRfc4646Language (
   IN  CONST CHAR8   *LanguageIso639
   )
 {
   UINTN Index;
-  CHAR8 *Rfc3066Language;
+  CHAR8 *Rfc4646Language;
   
-  for (Index = 0; Iso639ToRfc3066ConversionTable[Index] != 0; Index += 5) {
-    if (CompareMem (LanguageIso639, &Iso639ToRfc3066ConversionTable[Index], 3) == 0) {
-      Rfc3066Language = AllocateZeroPool (3);
-      if (Rfc3066Language != NULL) {
-        Rfc3066Language = CopyMem (Rfc3066Language, &Iso639ToRfc3066ConversionTable[Index + 3], 2);
+  for (Index = 0; Iso639ToRfc4646ConversionTable[Index] != 0; Index += 5) {
+    if (CompareMem (LanguageIso639, &Iso639ToRfc4646ConversionTable[Index], 3) == 0) {
+      Rfc4646Language = AllocateZeroPool (3);
+      if (Rfc4646Language != NULL) {
+        Rfc4646Language = CopyMem (Rfc4646Language, &Iso639ToRfc4646ConversionTable[Index + 3], 2);
       }
-      return Rfc3066Language;
+      return Rfc4646Language;
     }
   }
 
@@ -430,7 +430,7 @@ UcNotificationEvent (
     //
     // Fill in rest of private data structure
     //
-    Private->UC2.SupportedLanguages = ConvertIso639LanguageToRfc3066Language (Private->UC->SupportedLanguages);
+    Private->UC2.SupportedLanguages = ConvertIso639LanguageToRfc4646Language (Private->UC->SupportedLanguages);
     if (Private->UC2.SupportedLanguages != NULL) {
 
       //

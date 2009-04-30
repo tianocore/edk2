@@ -43,7 +43,7 @@ Module Name:
 // Each entry is 5 CHAR8 values long.  The first 3 CHAR8 values are the ISO 639-2 code.
 // The last 2 CHAR8 values are the ISO 639-1 code.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 Iso639ToRfc3066ConversionTable[] =
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 Iso639ToRfc4646ConversionTable[] =
 "\
 aaraa\
 abkab\
@@ -183,9 +183,9 @@ zulzu\
 ";
 
 /**
-  Convert language code from RFC3066 to ISO639-2.
+  Convert language code from RFC4646 to ISO639-2.
 
-  @param  LanguageRfc3066        RFC3066 language code.
+  @param  LanguageRfc4646        RFC4646 language code.
   @param  LanguageIso639         ISO639-2 language code.
 
   @retval EFI_SUCCESS            Language code converted.
@@ -194,21 +194,21 @@ zulzu\
 **/
 EFI_STATUS
 EFIAPI
-ConvertRfc3066LanguageToIso639Language (
-  IN  CHAR8   *LanguageRfc3066,
+ConvertRfc4646LanguageToIso639Language (
+  IN  CHAR8   *LanguageRfc4646,
   OUT CHAR8   *LanguageIso639
   )
 {
   UINTN  Index;
 
-  if ((LanguageRfc3066[2] != '-') && (LanguageRfc3066[2] != 0)) {
-    CopyMem (LanguageIso639, LanguageRfc3066, 3);
+  if ((LanguageRfc4646[2] != '-') && (LanguageRfc4646[2] != 0)) {
+    CopyMem (LanguageIso639, LanguageRfc4646, 3);
     return EFI_SUCCESS;
   }
 
-  for (Index = 0; Iso639ToRfc3066ConversionTable[Index] != 0; Index += 5) {
-    if (CompareMem (LanguageRfc3066, &Iso639ToRfc3066ConversionTable[Index + 3], 2) == 0) {
-      CopyMem (LanguageIso639, &Iso639ToRfc3066ConversionTable[Index], 3);
+  for (Index = 0; Iso639ToRfc4646ConversionTable[Index] != 0; Index += 5) {
+    if (CompareMem (LanguageRfc4646, &Iso639ToRfc4646ConversionTable[Index + 3], 2) == 0) {
+      CopyMem (LanguageIso639, &Iso639ToRfc4646ConversionTable[Index], 3);
       return EFI_SUCCESS;
     }
   }
@@ -428,7 +428,7 @@ Uc2NotificationEvent (
     // Fill in rest of private data structure
     //
     Private->UC.SupportedLanguages = AllocateZeroPool (ISO_639_2_ENTRY_SIZE + 1);
-    Status = ConvertRfc3066LanguageToIso639Language (Private->UC2->SupportedLanguages, Private->UC.SupportedLanguages);
+    Status = ConvertRfc4646LanguageToIso639Language (Private->UC2->SupportedLanguages, Private->UC.SupportedLanguages);
 
     if (!EFI_ERROR (Status)) {
 
