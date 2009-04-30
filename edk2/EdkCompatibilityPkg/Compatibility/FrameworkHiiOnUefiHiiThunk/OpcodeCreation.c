@@ -16,12 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "HiiDatabase.h"
 #include "UefiIfrDefault.h"
 
-typedef struct {
-  UINT8  *Buffer;
-  UINTN  BufferSize;
-  UINTN  Position;
-} HII_LIB_OPCODE_BUFFER;
-
 /**
   The dynamic creation of these opcodes is supported in Framework HII modules.
   Therefore, Framework HII Thunk module only map these opcode between Framework
@@ -147,57 +141,6 @@ FwQIdToUefiQId (
   return EFI_NOT_FOUND;
 }
 
-
-
-#define HII_LIB_OPCODE_ALLOCATION_SIZE   0x200
-
-/**
-  Append raw opcodes to an OpCodeHandle.
-
-  If OpCodeHandle is NULL, then ASSERT().
-  If RawBuffer is NULL, then ASSERT();
-
-  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
-  @param[in]  RawBuffer      Buffer of opcodes to append.
-  @param[in]  RawBufferSize  The size, in bytes, of Buffer.
-
-  @retval NULL   There is not enough space left in Buffer to add the opcode.
-  @retval Other  A pointer to the appended opcodes.
-
-**/
-UINT8 *
-EFIAPI
-HiiThunkCreateRawOpCodes (
-  IN VOID   *OpCodeHandle,
-  IN UINT8  *RawBuffer,
-  IN UINTN  RawBufferSize
-  )
-{
-  UINT8                  *Buffer;
-  HII_LIB_OPCODE_BUFFER  *OpCodeBuffer;
-
-  ASSERT (RawBuffer != NULL);
-  ASSERT (OpCodeHandle != NULL);
-
-  OpCodeBuffer = (HII_LIB_OPCODE_BUFFER *)OpCodeHandle;
-  if (OpCodeBuffer->Position + RawBufferSize > OpCodeBuffer->BufferSize) {
-    Buffer = ReallocatePool (
-              OpCodeBuffer->BufferSize, 
-              OpCodeBuffer->BufferSize + (RawBufferSize + HII_LIB_OPCODE_ALLOCATION_SIZE),
-              OpCodeBuffer->Buffer
-              );
-    if (Buffer == NULL) {
-      return NULL;
-    }
-    OpCodeBuffer->Buffer = Buffer;
-    OpCodeBuffer->BufferSize += (RawBufferSize + HII_LIB_OPCODE_ALLOCATION_SIZE);
-  }
-  Buffer = OpCodeBuffer->Buffer + OpCodeBuffer->Position;
-  OpCodeBuffer->Position += RawBufferSize;
-  
-  return (UINT8 *)CopyMem (Buffer, RawBuffer, RawBufferSize);
-}
-
 /**
   Assign a Question ID.
 
@@ -252,7 +195,7 @@ F2UCreateTextOpCode (
     UTextOpCode.Statement.Prompt = FwOpcode->Text;
     UTextOpCode.TextTwo          = FwOpcode->TextTwo;
     
-    return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UTextOpCode, sizeof(UTextOpCode));
+    return HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UTextOpCode, sizeof(UTextOpCode));
   } else {
     //
     // Iteractive Text Opcode is EFI_IFR_ACTION
@@ -296,7 +239,7 @@ F2UCreateReferenceOpCode (
   //
   UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
   
-  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  return HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
 
 /**
@@ -349,7 +292,7 @@ F2UCreateOneOfOptionOpCode (
       return NULL;
   }
 
-  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  return HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
 
 /**
@@ -473,7 +416,7 @@ F2UCreateOneOfOpCode (
     }
   }
   
-  OneOfOpCodeBuffer = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof (UOpcode));
+  OneOfOpCodeBuffer = HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof (UOpcode));
   if (OneOfOpCodeBuffer == NULL) {
     return NULL;
   }
@@ -588,7 +531,7 @@ F2UCreateOrderedListOpCode (
     }
   }
  
-  OrderListOpCode = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  OrderListOpCode = HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
   if (OrderListOpCode == NULL) {
     return NULL;
   }
@@ -677,7 +620,7 @@ F2UCreateCheckBoxOpCode (
   //
   UOpcode.Flags           = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING));
 
-  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  return HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
 
 
@@ -760,7 +703,7 @@ F2UCreateNumericOpCode (
     }
   }
   
-  NumbericOpCode = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  NumbericOpCode = HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
   if (NumbericOpCode == NULL) {
     return NULL;
   }
@@ -789,7 +732,7 @@ F2UCreateNumericOpCode (
 
   CopyMem (&UOpcodeDefault.Value.u8, &FwOpcode->Default, FwOpcode->Width);
 
-  OpcodeBuffer = HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcodeDefault, sizeof(UOpcodeDefault));
+  OpcodeBuffer = HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcodeDefault, sizeof(UOpcodeDefault));
   if (OpcodeBuffer == NULL) {
     return NULL;
   }
@@ -853,7 +796,7 @@ F2UCreateStringOpCode (
   UOpcode.MaxSize = FwOpcode->MaxSize;
   UOpcode.Flags   = EFI_IFR_STRING_MULTI_LINE;
 
-  return HiiThunkCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
+  return HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
 
 /**
