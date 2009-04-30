@@ -901,10 +901,10 @@
   ## Default current ISO 639-2 language: English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
 
-  ## Default platform supported RFC 3066 languages: (American) English & French
+  ## Default platform supported RFC 4646 languages: (American) English & French
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fra;en-US;fr-FR"|VOID*|0x0000001e
 
-  ## Defualt current RFC 3066 language: (American) English
+  ## Defualt current RFC 4646 language: (American) English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
 
   ## Indicates the default baud rate of UART
