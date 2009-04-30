@@ -477,6 +477,28 @@ HiiFreeOpCodeHandle (
   );
 
 /**
+  Append raw opcodes to an OpCodeHandle.
+
+  If OpCodeHandle is NULL, then ASSERT().
+  If RawBuffer is NULL, then ASSERT();
+
+  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
+  @param[in]  RawBuffer      Buffer of opcodes to append.
+  @param[in]  RawBufferSize  The size, in bytes, of Buffer.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the appended opcodes.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateRawOpCodes (
+  IN VOID   *OpCodeHandle,
+  IN UINT8  *RawBuffer,
+  IN UINTN  RawBufferSize
+  );
+
+/**
   Create EFI_IFR_END_OP opcode.
 
   If OpCodeHandle is NULL, then ASSERT().

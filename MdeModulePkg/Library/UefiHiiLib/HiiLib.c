@@ -1446,7 +1446,7 @@ InternalHiiCreateOpCode (
 **/
 UINT8 *
 EFIAPI
-InternalHiiCreateRawOpCodes (
+HiiCreateRawOpCodes (
   IN VOID   *OpCodeHandle,
   IN UINT8  *RawBuffer,
   IN UINTN  RawBufferSize
@@ -1485,7 +1485,7 @@ InternalHiiAppendOpCodes (
   ASSERT (RawOpCodeHandle != NULL);
 
   RawOpCodeBuffer = (HII_LIB_OPCODE_BUFFER *)RawOpCodeHandle;
-  return InternalHiiCreateRawOpCodes (OpCodeHandle, RawOpCodeBuffer->Buffer, RawOpCodeBuffer->Position);
+  return HiiCreateRawOpCodes (OpCodeHandle, RawOpCodeBuffer->Buffer, RawOpCodeBuffer->Position);
 }
 
 /**
