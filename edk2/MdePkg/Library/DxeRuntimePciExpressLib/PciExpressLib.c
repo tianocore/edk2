@@ -5,7 +5,7 @@
   All assertions for I/O operations are handled in MMIO functions in the IoLib
   Library.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -217,7 +217,7 @@ GetPciExpressAddress (
   //
   // See if there is a physical address match at the exact same index as the last address match
   //
-  if (mDxeRuntimePciExpressLibRegistrationTable[mDxeRuntimePciExpressLibLastRuntimeRange].PhysicalAddress == (Address & 0x0ffff000)) {
+  if (mDxeRuntimePciExpressLibRegistrationTable[mDxeRuntimePciExpressLibLastRuntimeRange].PhysicalAddress == (Address & (~0x00000fff))) {
     //
     // Convert the physical address to a virtual address and return the virtual address
     //
@@ -228,7 +228,7 @@ GetPciExpressAddress (
   // Search the entire table for a physical address match
   //
   for (Index = 0; Index < mDxeRuntimePciExpressLibNumberOfRuntimeRanges; Index++) {
-    if (mDxeRuntimePciExpressLibRegistrationTable[Index].PhysicalAddress == (Address & 0x0ffff000)) {
+    if (mDxeRuntimePciExpressLibRegistrationTable[Index].PhysicalAddress == (Address & (~0x00000fff))) {
       //
       // Cache the matching index value
       //
