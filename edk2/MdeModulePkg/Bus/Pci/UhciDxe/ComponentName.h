@@ -36,7 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 languages specified in SupportedLanguages. The
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified
-                                in RFC 3066 or ISO 639-2 language code format.
+                                in RFC 4646 or ISO 639-2 language code format.
 
   @param  DriverName[out]       A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
@@ -101,7 +101,7 @@ UhciComponentNameGetDriverName (
                                 languages specified in SupportedLanguages. The
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified in
-                                RFC 3066 or ISO 639-2 language code format.
+                                RFC 4646 or ISO 639-2 language code format.
 
   @param  ControllerName[out]   A pointer to the Unicode string to return.
                                 This Unicode string is the name of the

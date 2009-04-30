@@ -59,7 +59,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mArpDriverNameTable[] = {
                                 languages specified in SupportedLanguages. The
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified
-                                in RFC 3066 or ISO 639-2 language code format.
+                                in RFC 4646 or ISO 639-2 language code format.
 
   @param[out]  DriverName       A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
@@ -132,7 +132,7 @@ ArpComponentNameGetDriverName (
                                 languages specified in SupportedLanguages. The
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified in
-                                RFC 3066 or ISO 639-2 language code format.
+                                RFC 4646 or ISO 639-2 language code format.
 
   @param[out]  ControllerName   A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
