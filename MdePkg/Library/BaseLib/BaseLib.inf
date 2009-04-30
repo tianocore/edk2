@@ -370,7 +370,6 @@
   X64/Invd.asm
   X64/Wbinvd.asm
   X64/DisablePaging64.asm
-  X64/EnablePaging64.asm
   X64/Mwait.asm
   X64/Monitor.asm
   X64/ReadPmc.asm
@@ -533,7 +532,6 @@
   X64/FxSave.S | GCC 
   X64/FxRestore.S | GCC 
   X64/FlushCacheLine.S | GCC 
-  X64/EnablePaging64.S | GCC 
   X64/EnableInterrupts.S | GCC 
   X64/EnableDisableInterrupts.S | GCC 
   X64/DisablePaging64.S | GCC 
