@@ -1212,7 +1212,7 @@ PlatOverMngrRouteConfig (
 
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
-  if (HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
+  if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1276,7 +1276,7 @@ PlatOverMngrCallback (
   
   Private = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
-  if (HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
+  if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
     return EFI_NOT_FOUND;
   }
 
