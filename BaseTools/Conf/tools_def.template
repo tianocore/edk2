@@ -2037,8 +2037,14 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_*_*_ASL_FLAGS                    =
 
 ##################
-# Tiano Compress tool definitions
+# LzmaCompress tool definitions
 ##################
-*_*_*_TIANO_PATH              = TianoCompress
-*_*_*_TIANO_GUID                   = A31280AD-481E-41B6-95E8-127F4C984779
+*_*_*_LZMA_PATH          = LzmaCompress
+*_*_*_LZMA_GUID          = EE4E5898-3914-4259-9D6E-DC7BD79403CF
+
+##################
+# TianoCompress tool definitions
+##################
+*_*_*_TIANO_PATH         = TianoCompress
+*_*_*_TIANO_GUID         = A31280AD-481E-41B6-95E8-127F4C984779
 
