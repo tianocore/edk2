@@ -2029,6 +2029,12 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_*_*_VFR_FLAGS                     = -l -n
 
 ##################
+# OptionRom tool definitions
+##################
+*_*_*_OPTROM_PATH                   = EfiRom
+*_*_*_OPTROM_FLAGS                  = -e
+
+##################
 # Asl Compiler definitions
 ##################
 *_*_*_ASLCC_FLAGS                  = /GL- /Y- /TC /Dmain=ReferenceAcpiTable

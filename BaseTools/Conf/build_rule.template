@@ -380,3 +380,14 @@
         $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
 
     <Command>
+
+[Efi-Image.UEFI_OPTIONROM]
+    <InputFile>
+        ?.efi, ?.EFI, ?.Efi
+
+    <OutputFile>
+        $(BIN_DIR)(+)$(MODULE_NAME).rom
+
+    <Command>
+        $(OPTROM) -i $(PCI_DEVICE_ID) -f $(PCI_VENDOR_ID) -l $(PCI_CLASS_CODE) -o $dst $(OPTROM_FLAGS) $src
+
