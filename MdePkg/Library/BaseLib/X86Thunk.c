@@ -249,7 +249,9 @@ AsmThunk16 (
   ASSERT ((UINTN)ThunkContext->RealModeBuffer < 0x100000);
   ASSERT (ThunkContext->RealModeBufferSize >= m16Size);
   ASSERT ((UINTN)ThunkContext->RealModeBuffer + m16Size <= 0x100000);
-
+  ASSERT (((ThunkContext->ThunkAttributes & (THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 | THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL)) != \
+           (THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 | THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL)));
+           
   UpdatedRegs = InternalAsmThunk16 (
                   ThunkContext->RealModeState,
                   ThunkContext->RealModeBuffer
