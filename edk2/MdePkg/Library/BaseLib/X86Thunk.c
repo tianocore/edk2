@@ -110,8 +110,8 @@ AsmGetThunk16Properties (
 
   Prepares all structures and code required to use AsmThunk16().
   
-  This interface is limited to be used in physical mode but can not be used in 
-  virtual mode with paging.
+  This interface is limited to be used in either physical mode or virtual modes with paging enabled where the
+  virtual to physical mappings for ThunkContext.RealModeBuffer is mapped 1:1.
 
   If ThunkContext is NULL, then ASSERT().
 
@@ -230,8 +230,8 @@ AsmPrepareThunk16 (
   If both THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 and THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL are set in 
   ThunkAttributes, then ASSERT().
 
-  This interface is limited to be used in physical mode but can not be used in 
-  virtual mode with paging.
+  This interface is limited to be used in either physical mode or virtual modes with paging enabled where the
+  virtual to physical mappings for ThunkContext.RealModeBuffer is mapped 1:1.
   
   @param  ThunkContext  A pointer to the context structure that describes the
                         16-bit real mode code to call.
@@ -271,8 +271,8 @@ AsmThunk16 (
   real mode thunk, then it is more efficient if AsmPrepareThunk16() is called
   once and AsmThunk16() can be called for each 16-bit real mode thunk.
 
-  This interface is limited to be used in physical mode but can not be used in 
-  virtual mode with paging.
+  This interface is limited to be used in either physical mode or virtual modes with paging enabled where the
+  virtual to physical mappings for ThunkContext.RealModeBuffer is mapped 1:1.
   
   See AsmPrepareThunk16() and AsmThunk16() for the detailed description and ASSERT() conditions.
 
