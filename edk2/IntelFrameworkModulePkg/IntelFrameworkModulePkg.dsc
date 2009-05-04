@@ -201,8 +201,7 @@
 
 [Components.common]
   IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
-  IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/Pei/LzmaCustomDecompressLib.inf
-  IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/Dxe/LzmaCustomDecompressLib.inf
+  IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   IntelFrameworkModulePkg/Library/PeiS3Lib/PeiS3Lib.inf
