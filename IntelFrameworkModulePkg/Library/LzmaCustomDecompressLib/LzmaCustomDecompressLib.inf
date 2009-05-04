@@ -16,8 +16,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = LzmaPeiDecompressLib
-  FILE_GUID                      = 6725ae86-6ed1-43bd-aeec-0517c0749d70
+  BASE_NAME                      = LzmaDecompressLib
+  FILE_GUID                      = 35194660-7421-44ad-9636-e44885f092d1
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BASE
@@ -33,11 +33,10 @@
 #
 
 [Sources.common]
-  LzmaPeiMemory.c
-  ../LzmaDecompress.c
-  ../Sdk/C/LzFind.c
-  ../Sdk/C/LzmaDec.c
-  ../GuidedSectionExtraction.c
+  LzmaDecompress.c
+  Sdk/C/LzFind.c
+  Sdk/C/LzmaDec.c
+  GuidedSectionExtraction.c
 
 [Packages]
   MdePkg/MdePkg.dec

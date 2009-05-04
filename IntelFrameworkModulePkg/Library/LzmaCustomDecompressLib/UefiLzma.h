@@ -37,5 +37,7 @@ typedef int ptrdiff_t;
 #define memcpy CopyMem
 #define memmove CopyMem
 
+#define _LZMA_SIZE_OPT
+
 #endif // __UEFILZMA_H__
 

@@ -29,7 +29,43 @@
 #include "Sdk/C/7zVersion.h"
 #include "Sdk/C/LzmaDec.h"
 
-extern ISzAlloc g_Alloc;
+/**
+  Allocation routine used by LZMA decompression.
+
+  @param p                Pointer to the ISzAlloc instance
+  @param size             The size in bytes to be allocated
+
+  @return The allocated pointer address, or NULL on failure
+**/
+STATIC
+VOID *
+SzAlloc (
+  void *p,
+  size_t size
+  )
+{
+  return AllocatePool (size);
+}
+
+/**
+  Free routine used by LZMA decompression.
+
+  @param p                Pointer to the ISzAlloc instance
+  @param address          The address to be freed
+**/
+STATIC
+VOID
+SzFree (
+  void *p,
+  void *address
+  )
+{
+  if (address != NULL) {
+    FreePool (address);
+  }
+}
+
+STATIC ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 #define LZMA_HEADER_SIZE (LZMA_PROPS_SIZE + 8)
 
