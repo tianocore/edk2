@@ -902,7 +902,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang|"eng"|VOID*|0x0000001d
 
   ## Default platform supported RFC 4646 languages: (American) English & French
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fra;en-US;fr-FR"|VOID*|0x0000001e
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en;fr;en-US;fr-FR"|VOID*|0x0000001e
 
   ## Defualt current RFC 4646 language: (American) English
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang|"en-US"|VOID*|0x0000001f
