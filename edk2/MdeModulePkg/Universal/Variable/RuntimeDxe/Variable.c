@@ -1308,7 +1308,7 @@ AutoUpdateLangVariable(
     FindVariable(L"PlatformLang", &gEfiGlobalVariableGuid, &Variable, (VARIABLE_GLOBAL *)mVariableModuleGlobal);
 
     Status = UpdateVariable(L"PlatformLang", &gEfiGlobalVariableGuid, 
-                    BestPlatformLang, AsciiStrLen (BestPlatformLang), Attributes, &Variable);
+                    BestPlatformLang, AsciiStrSize (BestPlatformLang), Attributes, &Variable);
 
     DEBUG((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a\n", BestLang, BestPlatformLang));
     ASSERT_EFI_ERROR(Status);
