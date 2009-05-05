@@ -389,5 +389,5 @@
         $(BIN_DIR)(+)$(MODULE_NAME).rom
 
     <Command>
-        $(OPTROM) -i $(PCI_DEVICE_ID) -f $(PCI_VENDOR_ID) -l $(PCI_CLASS_CODE) -o $dst $(OPTROM_FLAGS) $src
+        $(OPTROM) -i $(PCI_DEVICE_ID) -f $(PCI_VENDOR_ID) -l $(PCI_CLASS_CODE) -r $(PCI_REVISION) -o $dst $(OPTROM_FLAGS) $src
 
