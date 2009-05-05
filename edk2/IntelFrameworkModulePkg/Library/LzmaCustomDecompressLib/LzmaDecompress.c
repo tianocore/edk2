@@ -20,7 +20,6 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiDecompressLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Guid/LzmaDecompress.h>
@@ -28,6 +27,17 @@
 #include "Sdk/C/Types.h"
 #include "Sdk/C/7zVersion.h"
 #include "Sdk/C/LzmaDec.h"
+
+//
+// Global data
+//
+
+STATIC CONST VOID  *mSourceLastUsedWithGetInfo;
+STATIC UINT32      mSizeOfLastSource;
+STATIC UINT32      mDecompressedSizeForLastSource;
+STATIC VOID        *mScratchBuffer;
+STATIC UINTN       mScratchBufferSize;
+#define SCRATCH_BUFFER_REQUEST_SIZE SIZE_64KB
 
 /**
   Allocation routine used by LZMA decompression.
@@ -44,7 +54,17 @@ SzAlloc (
   size_t size
   )
 {
-  return AllocatePool (size);
+  VOID *addr;
+
+  if (mScratchBufferSize >= size) {
+    addr = mScratchBuffer;
+    mScratchBuffer = (VOID*) ((UINT8*)addr + size);
+    mScratchBufferSize -= size;
+    return addr;
+  } else {
+    ASSERT (FALSE);
+    return NULL;
+  }
 }
 
 /**
@@ -60,9 +80,11 @@ SzFree (
   void *address
   )
 {
-  if (address != NULL) {
-    FreePool (address);
-  }
+  //
+  // We use the 'scratch buffer' for allocations, so there is no free
+  // operation required.  The scratch buffer will be freed by the caller
+  // of the decompression code.
+  //
 }
 
 STATIC ISzAlloc g_Alloc = { SzAlloc, SzFree };
@@ -89,10 +111,6 @@ GetDecodedSizeOfBuf(
 //
 // LZMA functions and data as defined in local LzmaDecompress.h
 //
-
-STATIC CONST VOID  *mSourceLastUsedWithGetInfo;
-STATIC UINT32      mSizeOfLastSource;
-STATIC UINT32      mDecompressedSizeForLastSource;
 
 /**
   The internal implementation of *_DECOMPRESS_PROTOCOL.GetInfo().
@@ -124,7 +142,7 @@ LzmaUefiDecompressGetInfo (
   mSizeOfLastSource = SourceSize;
   mDecompressedSizeForLastSource = (UInt32)DecodedSize;
   *DestinationSize = mDecompressedSizeForLastSource;
-  *ScratchSize = 0x10;
+  *ScratchSize = SCRATCH_BUFFER_REQUEST_SIZE;
   return RETURN_SUCCESS;
 }
 
@@ -158,6 +176,9 @@ LzmaUefiDecompress (
 
   decodedBufSize = (SizeT)mDecompressedSizeForLastSource;
   encodedDataSize = (SizeT)(mSizeOfLastSource - LZMA_HEADER_SIZE);
+
+  mScratchBuffer = Scratch;
+  mScratchBufferSize = SCRATCH_BUFFER_REQUEST_SIZE;
 
   lzmaResult = LzmaDecode(
     Destination,
