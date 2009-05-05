@@ -49,6 +49,5 @@
   BaseLib
   DebugLib
   BaseMemoryLib
-  MemoryAllocationLib
   ExtractGuidedSectionLib
 
