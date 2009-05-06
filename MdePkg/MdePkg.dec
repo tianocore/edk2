@@ -781,9 +781,6 @@
   ## The mask is used to control PostCodeLib behavior
   gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
 
-  ## This flag is used to control the printout of DebugLib
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0|UINT32|0x00000006
-
   ## This value is used to set the FSB clock
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
 
