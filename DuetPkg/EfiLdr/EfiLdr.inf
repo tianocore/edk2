@@ -47,8 +47,9 @@
   Debug.c
   PeLoader.c
   Support.c
-  TianoDecompress.c
-  TianoDecompress.h
+  #TianoDecompress.c
+  #TianoDecompress.h
+  LzmaDecompress.h
 
 [Guids.common]
   gTianoCustomDecompressGuid
