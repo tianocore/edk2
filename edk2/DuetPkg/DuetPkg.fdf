@@ -68,7 +68,6 @@ INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDx
 
 INF  DuetPkg/FSVariable/FSVariable.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-#INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
 INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
@@ -78,8 +77,6 @@ INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
-#INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-
 INF  DuetPkg/DataHubGenDxe/DataHubGen.inf
 #INF  DuetPkg/FvbRuntimeService/DUETFwh.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
@@ -100,10 +97,10 @@ INF  IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 #IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
 
   # Usb Support
-#INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-#INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-#INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-#INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   # ISA Support
 INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
@@ -120,9 +117,9 @@ INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
   # Binary INF file to support toggle among different CPU architectures.
 INF  FatBinPkg/EnhancedFatDxe/Fat.inf
 
-#FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
-#    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-#  }
+FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
+  }
 
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
