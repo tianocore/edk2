@@ -22,7 +22,7 @@ Revision History:
 #include "Support.h"
 #include "Debug.h"
 #include "PeLoader.h"
-#include "TianoDecompress.h"
+#include "LzmaDecompress.h"
 
 VOID
 SystemHang(
@@ -40,7 +40,6 @@ EfiLoader (
   )
 {
   BIOS_MEMORY_MAP       *BiosMemoryMap;    
-  //EFILDR_HEADER         *EFILDRHeader;
   EFILDR_IMAGE          *EFILDRImage;
   EFI_MEMORY_DESCRIPTOR EfiMemoryDescriptor[EFI_MAX_MEMORY_DESCRIPTORS];
   EFI_STATUS            Status;
@@ -96,8 +95,7 @@ EfiLoader (
                (UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
                EFILDRImage->Offset);
   PrintString (PrintBuffer);
-
-  Status = TianoGetInfo (
+  Status = LzmaUefiDecompressGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              &DestinationSize, 
@@ -113,15 +111,12 @@ EfiLoader (
   AsciiSPrint (PrintBuffer, 256, "BFV decompress: DestinationSize=0x%X, ScratchSize=0x%X!\n",
                DestinationSize, ScratchSize);
   PrintString (PrintBuffer);
+  Status =  LzmaUefiDecompress (
+    (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
+    (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS, 
+    (VOID *)(UINTN)((EFI_DECOMPRESSED_BUFFER_ADDRESS + DestinationSize + 0x1000) & 0xfffff000)
+    );
   
-  Status = TianoDecompress (
-             (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
-             EFILDRImage->Length,
-             (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS,
-             DestinationSize, 
-             (VOID *)(UINTN)((EFI_DECOMPRESSED_BUFFER_ADDRESS + DestinationSize + 0x1000) & 0xfffff000),
-             ScratchSize
-             );
 
   if (EFI_ERROR (Status)) {
     AsciiSPrint (PrintBuffer, 256, "Fail to decompress BFV!\n");
@@ -153,7 +148,7 @@ EfiLoader (
                EFILDRImage->Offset);
   PrintString (PrintBuffer);
 
-  Status = TianoGetInfo (
+  Status = LzmaUefiDecompressGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              &DestinationSize, 
@@ -165,13 +160,10 @@ EfiLoader (
     SystemHang();
   }
 
-  Status = TianoDecompress (
+  Status = LzmaUefiDecompress (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
-             EFILDRImage->Length,
              (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS,
-             DestinationSize, 
-             (VOID *)(UINTN)((EFI_DECOMPRESSED_BUFFER_ADDRESS + DestinationSize + 0x1000) & 0xfffff000),
-             ScratchSize
+             (VOID *)(UINTN)((EFI_DECOMPRESSED_BUFFER_ADDRESS + DestinationSize + 0x1000) & 0xfffff000)
              );
   if (EFI_ERROR (Status)) {
     AsciiSPrint (PrintBuffer, 256, "Fail to decompress DxeIpl image\n");
@@ -220,7 +212,7 @@ PrintHeader ('C');
                EFILDRImage->Offset);
   PrintString (PrintBuffer);
 
-  Status = TianoGetInfo (
+  Status = LzmaUefiDecompressGetInfo (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
              EFILDRImage->Length,
              &DestinationSize, 
@@ -232,13 +224,10 @@ PrintHeader ('C');
     SystemHang();
   }
 
-  Status = TianoDecompress (
+  Status = LzmaUefiDecompress (
              (VOID *)(UINTN)(EFILDR_HEADER_ADDRESS + EFILDRImage->Offset),
-             EFILDRImage->Length,
              (VOID *)(UINTN)EFI_DECOMPRESSED_BUFFER_ADDRESS,
-             DestinationSize, 
-             (VOID *)(UINTN)((EFI_DECOMPRESSED_BUFFER_ADDRESS + DestinationSize + 0x1000) & 0xfffff000),
-             ScratchSize
+             (VOID *)(UINTN)((EFI_DECOMPRESSED_BUFFER_ADDRESS + DestinationSize + 0x1000) & 0xfffff000)
              );
   if (EFI_ERROR (Status)) {
     SystemHang();
