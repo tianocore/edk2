@@ -254,10 +254,11 @@ PeCoffLoaderGetImageInfo (
   ImageContext->DestinationAddress = 0;
 
   //
-  // Initialize the codeview pointer.
+  // Initialize the debug codeview pointer.
   //
-  ImageContext->CodeView    = NULL;
-  ImageContext->PdbPointer  = NULL;
+  ImageContext->DebugDirectoryEntryRva = 0;
+  ImageContext->CodeView               = NULL;
+  ImageContext->PdbPointer             = NULL;
 
   //
   // Three cases with regards to relocations:
