@@ -190,7 +190,7 @@ UsbGetInterface (
                   EfiUsbDataIn,
                   PcdGet32 (PcdUsbTransferTimeoutValue),
                   AlternateSetting,
-                  2,
+                  1,
                   Status
                   );
 }
@@ -295,7 +295,7 @@ UsbGetConfiguration (
                   EfiUsbDataIn,
                   PcdGet32 (PcdUsbTransferTimeoutValue),
                   ConfigurationValue,
-                  2,
+                  1,
                   Status
                   );
 }
