@@ -750,18 +750,24 @@ EFI_STATUS
 
 
 /**
-  Retrieves the next valid PCD token for a given namespace.
+  Retrieves the next valid token number in a given namespace.  
   
-  If the input token namespace or token number does not exist on the platform, an error is 
-  returned and the value of *TokenNumber is undefined. To retrieve the "first" token, 
-  have the pointer reference a TokenNumber value of 0. 
-  If the input token number is 0 and there is no valid token number for this token namespace,
-  *TokenNumber will be assigned to 0 and the function return EFI_SUCCESS. 
-  If the token number is the last valid token number, *TokenNumber will be assigned to 0 and
-  the function return EFI_SUCCESS.
+  This is useful since the PCD infrastructure contains a sparse list of token numbers, 
+  and one cannot a priori know what token numbers are valid in the database. 
+  
+  If TokenNumber is 0 and Guid is not NULL, then the first token from the token space specified by Guid is returned.  
+  If TokenNumber is not 0 and Guid is not NULL, then the next token in the token space specified by Guid is returned.  
+  If TokenNumber is 0 and Guid is NULL, then the first token in the default token space is returned.  
+  If TokenNumber is not 0 and Guid is NULL, then the next token in the default token space is returned.  
+  The token numbers in the default token space may not be related to token numbers in token spaces that are named by Guid.  
+  If the next token number can be retrieved, then it is returned in TokenNumber, and EFI_SUCCESS is returned.  
+  If TokenNumber represents the last token number in the token space specified by Guid, then EFI_NOT_FOUND is returned.  
+  If TokenNumber is not present in the token space specified by Guid, then EFI_NOT_FOUND is returned.
 
 
-  @param[in]       Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]       Guid        The 128-bit unique value that designates the namespace from which to extract the value.  
+                               This is an optional parameter that may be NULL.  If this parameter is NULL, then a request 
+                               is being made to retrieve tokens from the default token space.
   @param[in, out]  TokenNumber A pointer to the PCD token number to use to find the subsequent token number.
                    
   @retval EFI_SUCCESS   The PCD service has retrieved the next valid token number. 
