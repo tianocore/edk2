@@ -63,14 +63,10 @@
   ##
   MemoryTestLib|Include/Library/MemoryTestLib.h
 
-  ##  @libraryclass  Provides APIs for HII related functions.
-  ##
-  NewHiiLib|MdeModulePkg/Include/Library/NewHiiLib.h
-
   ##  @libraryclass    Provides global variables that are pointers 
   ##  to the UEFI HII related protocols. 
   ##
-  UefiHiiServicesLib|MdeModulePkg/Include/Library/UefiHiiServicesLib.h
+  UefiHiiServicesLib|Include/Library/UefiHiiServicesLib.h
 
 [Guids.common]
   ## MdeModule package token space guid
