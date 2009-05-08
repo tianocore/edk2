@@ -784,6 +784,7 @@ InsertStringPackage (
   EFI_STATUS                  Status;
   EFI_HII_PACKAGE_HEADER      PackageHeader;
   CHAR8                       *Language;
+  CHAR8                       *MatchedLanguage;
   UINT32                      LanguageSize;
   LIST_ENTRY                  *Link;
 
@@ -809,8 +810,10 @@ InsertStringPackage (
   AsciiStrCpy (Language, (CHAR8 *) PackageHdr + HeaderSize - LanguageSize);
   for (Link = PackageList->StringPkgHdr.ForwardLink; Link != &PackageList->StringPkgHdr; Link = Link->ForwardLink) {
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-    if (HiiCompareLanguage (Language, StringPackage->StringPkgHdr->Language)) {
+    MatchedLanguage = GetBestLanguage (StringPackage->StringPkgHdr->Language, FALSE, (CHAR8 *) Language, NULL);
+    if (MatchedLanguage != NULL) {
       FreePool (Language);
+      FreePool (MatchedLanguage);
       return EFI_UNSUPPORTED;
     }
   }
