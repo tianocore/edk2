@@ -968,6 +968,7 @@ HiiNewString (
   EFI_HII_SIBT_EXT2_BLOCK             Ext2;
   HII_FONT_INFO                       *LocalFont;
   HII_GLOBAL_FONT_INFO                *GlobalFont;
+  CHAR8                               *MatchedLanguage;
 
   if (This == NULL || String == NULL || StringId == NULL || Language == NULL || PackageList == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1014,7 +1015,9 @@ HiiNewString (
        Link = Link->ForwardLink
       ) {
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-    if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
+    MatchedLanguage = GetBestLanguage (StringPackage->StringPkgHdr->Language, FALSE, (CHAR8 *) Language, NULL);
+    if (MatchedLanguage != NULL) {
+      FreePool (MatchedLanguage);
       Matched = TRUE;
       break;
     }
@@ -1320,6 +1323,7 @@ HiiGetString (
   HII_DATABASE_RECORD                 *DatabaseRecord;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_STRING_PACKAGE_INSTANCE         *StringPackage;
+  CHAR8                               *MatchedLanguage;
 
   if (This == NULL || Language == NULL || StringId < 1 || StringSize == NULL || PackageList == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1353,7 +1357,9 @@ HiiGetString (
          Link =  Link->ForwardLink
         ) {
         StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-        if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
+        MatchedLanguage = GetBestLanguage (StringPackage->StringPkgHdr->Language, FALSE, (CHAR8 *) Language, NULL);
+        if (MatchedLanguage != NULL) {
+          FreePool (MatchedLanguage);
           Status = GetStringWorker (Private, StringPackage, StringId, String, StringSize, StringFontInfo);
           if (Status != EFI_NOT_FOUND) {
             return Status;
@@ -1421,6 +1427,7 @@ HiiSetString (
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_STRING_PACKAGE_INSTANCE         *StringPackage;
   UINT32                              OldPackageLen;
+  CHAR8                               *MatchedLanguage;
 
   if (This == NULL || Language == NULL || StringId < 1 || String == NULL || PackageList == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1446,7 +1453,9 @@ HiiSetString (
          Link =  Link->ForwardLink
         ) {
       StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-      if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) Language)) {
+      MatchedLanguage = GetBestLanguage (StringPackage->StringPkgHdr->Language, FALSE, (CHAR8 *) Language, NULL);
+      if (MatchedLanguage != NULL) {
+        FreePool (MatchedLanguage);
         OldPackageLen = StringPackage->StringPkgHdr->Header.Length;
         Status = SetStringWorker (
                    Private,
@@ -1603,6 +1612,7 @@ HiiGetSecondaryLanguages (
   HII_STRING_PACKAGE_INSTANCE         *StringPackage;
   CHAR8                               *Languages;
   UINTN                               ResultSize;
+  CHAR8                               *MatchedLanguage;
 
   if (This == NULL || PackageList == NULL || FirstLanguage == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1635,7 +1645,9 @@ HiiGetSecondaryLanguages (
          Link1 = Link1->ForwardLink
         ) {
     StringPackage = CR (Link1, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
-    if (HiiCompareLanguage (StringPackage->StringPkgHdr->Language, (CHAR8 *) FirstLanguage)) {
+    MatchedLanguage = GetBestLanguage (StringPackage->StringPkgHdr->Language, FALSE, (CHAR8 *) FirstLanguage, NULL);
+    if (MatchedLanguage != NULL) {
+      FreePool (MatchedLanguage);
       Languages = StringPackage->StringPkgHdr->Language;
       //
       // Language is a series of ';' terminated strings, first one is primary
@@ -1663,41 +1675,3 @@ HiiGetSecondaryLanguages (
   return EFI_INVALID_LANGUAGE;
 }
 
-/**
-  Compare whether two names of languages are identical.
-
-  @param  Language1              Name of language 1
-  @param  Language2              Name of language 2
-
-  @retval TRUE                   same
-  @retval FALSE                  not same
-
-**/
-BOOLEAN
-HiiCompareLanguage (
-  IN  CHAR8  *Language1,
-  IN  CHAR8  *Language2
-  )
-{
-  //
-  // Porting Guide:
-  // This library interface is simply obsolete.
-  // Include the source code to user code.
-  //
-  UINTN Index;
-
-  for (Index = 0; (Language1[Index] != 0) && (Language2[Index] != 0); Index++) {
-    if (Language1[Index] != Language2[Index]) {
-      return FALSE;
-    }
-  }
-
-  if (((Language1[Index] == 0) && (Language2[Index] == 0))   || 
-  	  ((Language1[Index] == 0) && (Language2[Index] != ';')) ||
-  	  ((Language1[Index] == ';') && (Language2[Index] != 0)) ||
-  	  ((Language1[Index] == ';') && (Language2[Index] != ';'))) {
-    return TRUE;
-  }
-
-  return FALSE;
-}

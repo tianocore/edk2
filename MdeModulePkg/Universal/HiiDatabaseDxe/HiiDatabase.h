@@ -1687,24 +1687,6 @@ HiiGetAltCfg (
   OUT EFI_STRING                               *AltCfgResp
   );
 
-
-/**
-  Compare whether two names of languages are identical.
-
-  @param  Language1              Name of language 1
-  @param  Language2              Name of language 2
-
-  @retval TRUE                   same
-  @retval FALSE                  not same
-
-**/
-BOOLEAN
-HiiCompareLanguage (
-  IN  CHAR8  *Language1,
-  IN  CHAR8  *Language2
-  )
-;
-
 //
 // Global variables
 //
