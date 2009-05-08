@@ -478,29 +478,29 @@ StrStr (
   ASSERT (StrSize (String) != 0);
   ASSERT (StrSize (SearchString) != 0);
 
-  while (*String != '\0') {
+  if (*SearchString == L'\0') {
+    return NULL;
+  }
+
+  while (*String != L'\0') {
     SearchStringTmp = SearchString;
     FirstMatch = String;
     
     while ((*String == *SearchStringTmp) 
-            && (*SearchStringTmp != '\0') 
-            && (*String != '\0')) {
+            && (*String != L'\0')) {
       String++;
       SearchStringTmp++;
     } 
     
-    if (*SearchStringTmp == '\0') {
+    if (*SearchStringTmp == L'\0') {
       return (CHAR16 *) FirstMatch;
     }
 
-    if (SearchStringTmp == SearchString) {
-      //
-      // If no character from SearchString match,
-      // move the pointer to the String under search
-      // by one character.
-      //
-      String++;
+    if (*String == L'\0') {
+      return NULL;
     }
+
+    String = FirstMatch + 1;
   }
 
   return NULL;
@@ -1616,12 +1616,15 @@ AsciiStrStr (
   ASSERT (AsciiStrSize (String) != 0);
   ASSERT (AsciiStrSize (SearchString) != 0);
 
+  if (*SearchString == '\0') {
+    return NULL;
+  }
+
   while (*String != '\0') {
     SearchStringTmp = SearchString;
     FirstMatch = String;
     
     while ((*String == *SearchStringTmp) 
-            && (*SearchStringTmp != '\0') 
             && (*String != '\0')) {
       String++;
       SearchStringTmp++;
@@ -1631,15 +1634,11 @@ AsciiStrStr (
       return (CHAR8 *) FirstMatch;
     }
 
-    if (SearchStringTmp == SearchString) {
-      //
-      // If no character from SearchString match,
-      // move the pointer to the String under search
-      // by one character.
-      //
-      String++;
+    if (*String == '\0') {
+      return NULL;
     }
 
+    String = FirstMatch + 1;
   }
 
   return NULL;
