@@ -535,8 +535,9 @@ Error:
 
   This function prints a formatted Unicode string to the graphics console device 
   specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
-  Unicode characters printed.  If the length of the formatted Unicode string is
-  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  Unicode characters displayed, not including partial characters that may be clipped 
+  by the right edge of the display.  If the length of the formatted Unicode string is
+  greater than PcdUefiLibMaxPrintBufferSize, then at most the first 
   PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
   is used to convert the string to a bitmap using the glyphs registered with the 
   HII database.  No wrapping is performed, so any portions of the string the fall
@@ -609,8 +610,9 @@ PrintXY (
 
   This function prints a formatted ASCII string to the graphics console device 
   specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
-  ASCII characters printed.  If the length of the formatted ASCII string is
-  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  ASCII characters displayed, not including partial characters that may be clipped 
+  by the right edge of the display.  If the length of the formatted ASCII string is
+  greater than PcdUefiLibMaxPrintBufferSize, then at most the first 
   PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
   is used to convert the string to a bitmap using the glyphs registered with the 
   HII database.  No wrapping is performed, so any portions of the string the fall
