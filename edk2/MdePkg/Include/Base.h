@@ -332,7 +332,20 @@ struct _LIST_ENTRY {
 //    return Result
 //  }
 //
+#if defined(__GNUC__)
+//
+//  In GCC compiler, its behavior for statically linked varargs is different with MSFT tool chain.
+//  Should use __builtin_* intrinsic functions provided by GCC compiler to access varargs.
+//
+typedef __builtin_va_list VA_LIST;
 
+#define VA_START(Marker, Parameter)  __builtin_va_start(Marker, Parameter)
+
+#define VA_ARG(Marker, TYPE)         __builtin_va_arg(Marker, TYPE)
+
+#define VA_END(Marker)               __builtin_va_end(Marker)
+
+#else
 /**
   Return the size of argument that has been aligned to sizeof (UINTN).
 
@@ -393,6 +406,8 @@ typedef CHAR8 *VA_LIST;
   
 **/
 #define VA_END(Marker)      (Marker = (VA_LIST) 0)
+
+#endif
 
 /**
   Macro that returns the byte offset of a field in a data structure. 
