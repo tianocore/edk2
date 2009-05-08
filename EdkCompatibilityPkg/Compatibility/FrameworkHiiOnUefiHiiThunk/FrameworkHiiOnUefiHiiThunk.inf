@@ -66,6 +66,7 @@
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  EdkCompatibilityPkg/EdkCompatibilityPkg.dec
   
 [LibraryClasses]
   UefiRuntimeServicesTableLib
@@ -79,6 +80,7 @@
   PrintLib
   UefiLib
   PcdLib
+  LanguageLib
 
 [Guids]
   gEfiIfrTianoGuid

@@ -305,65 +305,6 @@ HiiFindHandles (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-LangCodes4646To639 (
-  IN CHAR8 *LangCodes4646,
-  IN CHAR8 **LangCodes639
-  )
-{
-  CHAR8                      *AsciiLangCodes;
-  CHAR8                      *Lang;
-  UINTN                      Index;
-  UINTN                      Count;
-  EFI_STATUS                 Status;
-
-  ASSERT (LangCodes4646 != NULL);
-  ASSERT (LangCodes639 != NULL);
-  
-  //
-  // Allocate working buffer to contain substring of LangCodes4646.
-  //
-  Lang = AllocatePool (AsciiStrSize (LangCodes4646));
-  if (Lang == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Count the number of RFC 4646 language codes.
-  //
-  Index = 0;
-  AsciiLangCodes = LangCodes4646;
-  while (AsciiStrLen (AsciiLangCodes) != 0) {
-    GetNextLanguage (&AsciiLangCodes, Lang);
-    Index++;
-  }
-
-  Count = Index;
-
-  //
-  // 
-  //
-  *LangCodes639 = AllocateZeroPool (ISO_639_2_ENTRY_SIZE * Count + 1);
-  if (*LangCodes639 == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
-  AsciiLangCodes = LangCodes4646;
-
-  for (Index = 0; Index < Count; Index++) {
-    GetNextLanguage (&AsciiLangCodes, Lang);
-    Status = ConvertRfc4646LanguageToIso639Language (Lang, *LangCodes639 + Index * ISO_639_2_ENTRY_SIZE);
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  Status = EFI_SUCCESS;
-
-Done:
-  FreePool (Lang);
-  return Status;
-}
-
 /**
   Allows a program to determine the primary languages that are supported on a given handle.
 
@@ -409,10 +350,9 @@ HiiGetPrimaryLanguages (
     return EFI_INVALID_PARAMETER;
   }
 
-
-  LangCodes639 = NULL;
-  Status = LangCodes4646To639 (LangCodes4646, &LangCodes639);
-  if (EFI_ERROR (Status)) {
+  LangCodes639 = ConvertLanguagesRfc4646ToIso639 (LangCodes4646);
+  if (LangCodes639 == NULL) {
+    Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
   
@@ -427,6 +367,7 @@ HiiGetPrimaryLanguages (
   //
   AsciiStrToUnicodeStr (LangCodes639, UnicodeLangCodes639);
   *LanguageString = UnicodeLangCodes639;
+  Status = EFI_SUCCESS;
 
 Done:
   FreePool (LangCodes4646);
@@ -551,7 +492,7 @@ HiiGetSecondaryLanguages (
 
   UnicodeStrToAsciiStr (PrimaryLanguage, PrimaryLang639);
 
-  PrimaryLang4646 = ConvertIso639LanguageToRfc4646Language (PrimaryLang639);
+  PrimaryLang4646 = ConvertLanguagesIso639ToRfc4646 (PrimaryLang639);
   ASSERT_EFI_ERROR (PrimaryLang4646 != NULL);
 
   SecLangCodes4646 = HiiGetSupportedSecondaryLanguages (UefiHiiHandle, PrimaryLang4646);
@@ -561,8 +502,9 @@ HiiGetSecondaryLanguages (
     goto Done;
   }
 
-  Status = LangCodes4646To639 (SecLangCodes4646, &SecLangCodes639);
-  if (EFI_ERROR (Status)) {
+  SecLangCodes639 = ConvertLanguagesIso639ToRfc4646 (SecLangCodes4646);
+  if (SecLangCodes639 == NULL) {
+    Status =  EFI_INVALID_PARAMETER;
     goto Done;
   }
 
@@ -576,6 +518,7 @@ HiiGetSecondaryLanguages (
   // The language returned is in RFC 4646 format.
   //
   *LanguageString = AsciiStrToUnicodeStr (SecLangCodes639, UnicodeSecLangCodes639);
+  Status = EFI_SUCCESS;
 
 Done:
   if (PrimaryLang639 != NULL) {

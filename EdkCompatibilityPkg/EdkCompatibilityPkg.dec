@@ -47,6 +47,10 @@
 #
 ################################################################################
 [LibraryClasses.common]
+  ##  @libraryclass  Provides functions for language conversion between
+  #                  ISO 639-2 and RFC 4646 styles.
+  ##
+  LanguageLib|Compatibility/Include/Library/LanguageLib.h
 
 [Ppis.common]
   gEcpPeiPciCfgPpiGuid                    = { 0xb0ee53d4, 0xa049, 0x4a79, { 0xb2, 0xff, 0x19, 0xd9, 0xfa, 0xef, 0xaa, 0x94 }} 
