@@ -44,6 +44,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
+  EdkCompatibilityPkg/EdkCompatibilityPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -54,6 +55,7 @@
   MemoryAllocationLib
   HiiLib
   BaseMemoryLib
+  LanguageLib
 
 [Protocols]
   gEfiUnicodeCollation2ProtocolGuid
