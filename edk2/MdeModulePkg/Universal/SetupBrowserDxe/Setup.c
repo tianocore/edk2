@@ -76,6 +76,8 @@ CHAR16            *gAdjustNumber;
 CHAR16            *gSaveChanges;
 CHAR16            *gOptionMismatch;
 
+CHAR16            *mUnknownString = L"!";
+
 CHAR16            gPromptBlockWidth;
 CHAR16            gOptionBlockWidth;
 CHAR16            gHelpBlockWidth;
@@ -650,7 +652,10 @@ GetToken (
   EFI_STRING  String;
 
   String = HiiGetString (HiiHandle, Token, NULL);
-  ASSERT (String != NULL);
+  if (String == NULL) {
+    String = AllocateCopyPool (sizeof (mUnknownString), mUnknownString);
+    ASSERT (String != NULL);
+  }
   return (CHAR16 *) String;
 }
 

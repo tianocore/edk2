@@ -359,12 +359,18 @@ CallDeviceManager (
     }
 
     String = HiiGetString (HiiHandles[Index], FormSetTitle, NULL);
-    ASSERT (String != NULL);
+    if (String == NULL) {
+      String = HiiGetString (HiiHandle, STR_MISSING_STRING, NULL);
+      ASSERT (String != NULL);
+    }
     Token = HiiSetString (HiiHandle, 0, String, NULL);
     FreePool (String);
 
     String = HiiGetString (HiiHandles[Index], FormSetHelp, NULL);
-    ASSERT (String != NULL);
+    if (String == NULL) {
+      String = HiiGetString (HiiHandle, STR_MISSING_STRING, NULL);
+      ASSERT (String != NULL);
+    }
     TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
     FreePool (String);
 
