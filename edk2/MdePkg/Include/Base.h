@@ -332,10 +332,10 @@ struct _LIST_ENTRY {
 //    return Result
 //  }
 //
+
 #if defined(__GNUC__)
 //
-//  In GCC compiler, its behavior for statically linked varargs is different with MSFT tool chain.
-//  Should use __builtin_* intrinsic functions provided by GCC compiler to access varargs.
+// Use GCC builtin macros for variable argument lists.
 //
 typedef __builtin_va_list VA_LIST;
 
