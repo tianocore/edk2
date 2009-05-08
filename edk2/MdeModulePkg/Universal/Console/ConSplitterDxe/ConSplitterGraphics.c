@@ -107,10 +107,6 @@ ConSpliterGraphicsOutputSetMode (
     return EFI_UNSUPPORTED;
   }
 
-  if (ModeNumber == This->Mode->Mode) {
-    return EFI_SUCCESS;
-  }
-
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
   Mode = &Private->GraphicsOutputModeBuffer[ModeNumber];
 
