@@ -250,15 +250,14 @@ RemoveModeHandle (
 }
 
 /**
-  Applies additional actions to relocate fixups to a PE/COFF image.
+  Performs additional actions after a PE/COFF image has been loaded and relocated.
 
-  Generally this function is called after sucessfully Applying relocation fixups 
-  to a PE/COFF image for some specicial purpose. 
-  As a example, For NT32 emulator, the function should be implemented and called
-  to support source level debug.  
-  
-  @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
-                              image that is being relocated.
+  For NT32, this function load symbols to support source level debugging.
+
+  If ImageContext is NULL, then ASSERT().
+
+  @param  ImageContext  Pointer to the image context structure that describes the
+                        PE/COFF image that has already been loaded and relocated.
 
 **/
 VOID
@@ -271,7 +270,9 @@ PeCoffLoaderRelocateImageExtraAction (
   CHAR16            *DllFileName;
   HMODULE           Library;
   UINTN             Index;
-  
+
+  ASSERT (ImageContext != NULL);
+
 	//
   // If we load our own PE COFF images the Windows debugger can not source
   //  level debug our code. If a valid PDB pointer exists usw it to load
@@ -351,17 +352,15 @@ PeCoffLoaderRelocateImageExtraAction (
 }  
 
 /**
-  Unloads a loaded PE/COFF image from memory and releases its taken resource.
+  Performs additional actions just before a PE/COFF image is unloaded.  Any resources
+  that were allocated by PeCoffLoaderRelocateImageExtraAction() must be freed.
   
-  Releases any environment specific resources that were allocated when the image 
-  specified by ImageContext was loaded using PeCoffLoaderLoadImage(). 
-  For NT32 emulator, the PE/COFF image loaded by system needs to release.
-  For real platform, the PE/COFF image loaded by Core doesn't needs to be unloaded, 
-  
+  For NT32, this function unloads symbols for source level debugging.
+
   If ImageContext is NULL, then ASSERT().
   
-  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
-                                    image to be unloaded.
+  @param  ImageContext  Pointer to the image context structure that describes the
+                        PE/COFF image that is being unloaded.
 
 **/
 VOID
@@ -371,6 +370,8 @@ PeCoffLoaderUnloadImageExtraAction (
   )
 {
 	VOID *ModHandle;
+
+  ASSERT (ImageContext != NULL);
 
   ModHandle = RemoveModeHandle (ImageContext);
   if (ModHandle != NULL) {
