@@ -317,6 +317,7 @@ BuildFv2Hob (
   It can only be invoked during PEI phase;
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
   
+  If the platform does not support Capsule Volume HOBs, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
 
   @param  BaseAddress   The base address of the Capsule Volume.
