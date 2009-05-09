@@ -1,6 +1,7 @@
 /** @file
-  Provides services to perform additional actions to relocate and unload
-  PE/Coff image for some environment specific purpose say for souce level debug.
+  Provides services to perform additional actions when a PE/COFF image is loaded
+  or unloaded.  This is useful for environment where symbols need to be loaded 
+  and unloaded to support source level debugging.
 
   Copyright (c) 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -15,17 +16,16 @@
 
 #ifndef __PE_COFF_EXTRA_ACTION_LIB_H__
 #define __PE_COFF_EXTRA_ACTION_LIB_H__
-#include <Library/PeCoffLib.h>
-/**
-  Applies additional actions to relocate fixups to a PE/COFF image.
 
-  Generally this function is called after sucessfully Applying relocation fixups 
-  to a PE/COFF image for some specicial purpose. 
-  As a example, For NT32 emulator, the function should be implemented and called
-  to support source level debug.  
-  
-  @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
-                              image that is being relocated.
+#include <Library/PeCoffLib.h>
+
+/**
+  Performs additional actions after a PE/COFF image has been loaded and relocated.
+
+  If ImageContext is NULL, then ASSERT().
+
+  @param  ImageContext  Pointer to the image context structure that describes the
+                        PE/COFF image that has already been loaded and relocated.
 
 **/
 VOID
@@ -35,17 +35,13 @@ PeCoffLoaderRelocateImageExtraAction (
   );
 
 /**
-  Unloads a loaded PE/COFF image from memory and releases its taken resource.
-  
-  Releases any environment specific resources that were allocated when the image 
-  specified by ImageContext was loaded using PeCoffLoaderLoadImage(). 
-  For NT32 emulator, the PE/COFF image loaded by system needs to release.
-  For real platform, the PE/COFF image loaded by Core doesn't needs to be unloaded, 
+  Performs additional actions just before a PE/COFF image is unloaded.  Any resources
+  that were allocated by PeCoffLoaderRelocateImageExtraAction() must be freed.
   
   If ImageContext is NULL, then ASSERT().
   
-  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
-                                    image to be unloaded.
+  @param  ImageContext  Pointer to the image context structure that describes the
+                        PE/COFF image that is being unloaded.
 
 **/
 VOID
@@ -53,4 +49,5 @@ EFIAPI
 PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
+
 #endif

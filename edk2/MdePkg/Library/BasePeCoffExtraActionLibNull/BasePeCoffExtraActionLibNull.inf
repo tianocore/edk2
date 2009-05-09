@@ -29,7 +29,10 @@
 [Sources.common]
   PeCoffExtraActionLib.c
 
-
 [Packages]
   MdePkg/MdePkg.dec
+
+[LibraryClasses.common]
+  DebugLib
+
 
