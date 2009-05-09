@@ -238,7 +238,7 @@ InternalLanguageLibToLower (
   )
 {
   for (; Length > 0; Length--, Destination++, Source++) {
-    *Destination = (*Source >= 'A' && *Source <= 'Z') ? *Source + ('a' - 'A') : *Source;
+    *Destination = (*Source >= 'A' && *Source <= 'Z') ? (CHAR8)(*Source + ('a' - 'A')) : *Source;
   }
 }
 
