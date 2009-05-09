@@ -636,34 +636,38 @@ ScsiReadCapacityCommand (
 
 
 /**
-  Function to submit read capacity16 command.
+  Execute Read Capacity SCSI 16 command on a specific SCSI target.
 
-  @param  ScsiIo            A pointer to SCSI IO protocol.
-  @param  Timeout           The length of timeout period.
-  @param  SenseData         A pointer to output sense data.
-  @param  SenseDataLength   The length of output sense data.
-  @param  HostAdapterStatus The status of Host Adapter.
-  @param  TargetStatus      The status of the target.
-  @param  DataBuffer        A pointer to a data buffer.
-  @param  DataLength        The length of data buffer.
-  @param  Pmi               Partial medium indicator.
+  Executes the SCSI Read Capacity 16 command on the SCSI target specified by ScsiIo.
+  If Timeout is zero, then this function waits indefinitely for the command to complete.
+  If Timeout is greater than zero, then the command is executed and will timeout after
+  Timeout 100 ns units.  The Pmi parameter is used to construct the CDB for this SCSI command.
+  If ScsiIo is NULL, then ASSERT().
+  If SenseDataLength is NULL, then ASSERT().
+  If HostAdapterStatus is NULL, then ASSERT().
+  If TargetStatus is NULL, then ASSERT().
+  If DataLength is NULL, then ASSERT().
 
-  @retval  EFI_SUCCESS            The status of the unit is tested successfully.
-  @retval  EFI_BAD_BUFFER_SIZE    The SCSI Request Packet was executed, 
-                                  but the entire DataBuffer could not be transferred.
-                                  The actual number of bytes transferred is returned
-                                  in TransferLength.
-  @retval  EFI_NOT_READY          The SCSI Request Packet could not be sent because 
-                                  there are too many SCSI Command Packets already 
-                                  queued.
-  @retval  EFI_DEVICE_ERROR       A device error occurred while attempting to send 
-                                  the SCSI Request Packet.
-  @retval  EFI_INVALID_PARAMETER  The contents of CommandPacket are invalid.  
-  @retval  EFI_UNSUPPORTED        The command described by the SCSI Request Packet
-                                  is not supported by the SCSI initiator(i.e., SCSI 
-                                  Host Controller).
-  @retval  EFI_TIMEOUT            A timeout occurred while waiting for the SCSI 
-                                  Request Packet to execute.
+  @param[in]      ScsiIo               A pointer to SCSI IO protocol.
+  @param[in]      Timeout              The length of timeout period.
+  @param[in, out] SenseData            A pointer to output sense data.
+  @param[in, out] SenseDataLength      The length of output sense data.
+  @param[out]     HostAdapterStatus    The status of Host Adapter.
+  @param[out]     TargetStatus         The status of the target.
+  @param[in, out] DataBuffer           A pointer to a data buffer.
+  @param[in, out] DataLength           The length of data buffer.
+  @param[in]      Pmi                  Partial medium indicator.
+
+  @retval  EFI_SUCCESS           Command is executed successfully.
+  @retval  EFI_BAD_BUFFER_SIZE   The SCSI Request Packet was executed, but the entire
+                                 DataBuffer could not be transferred. The actual
+                                 number of bytes transferred is returned in DataLength.
+  @retval  EFI_NOT_READY         The SCSI Request Packet could not be sent because
+                                 there are too many SCSI Command Packets already queued.
+  @retval  EFI_DEVICE_ERROR      A device error occurred while attempting to send SCSI Request Packet.
+  @retval  EFI_UNSUPPORTED       The command described by the SCSI Request Packet
+                                 is not supported by the SCSI initiator(i.e., SCSI  Host Controller)
+  @retval  EFI_TIMEOUT           A timeout occurred while waiting for the SCSI Request Packet to execute.
 
 **/
 EFI_STATUS
