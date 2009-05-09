@@ -127,7 +127,8 @@ AllocateReservedPages (
 
   Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
   must have been allocated on a previous call to the page allocation services of the Memory
-  Allocation Library.
+  Allocation Library.  If it is not possible to free allocated pages, then this function will
+  peform no actions.
   
   If Buffer was not allocated with a page allocation function in the Memory Allocation Library,
   then ASSERT().
@@ -323,7 +324,8 @@ AllocateAlignedReservedPages (
 
   Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
   must have been allocated on a previous call to the aligned page allocation services of the Memory
-  Allocation Library.
+  Allocation Library.  If it is not possible to free allocated pages, then this function will 
+  peform no actions.
   
   If Buffer was not allocated with an aligned page allocation function in the Memory Allocation
   Library, then ASSERT().
@@ -792,7 +794,8 @@ ReallocateReservedPool (
   Memory Allocation Library.
 
   Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the
-  pool allocation services of the Memory Allocation Library.
+  pool allocation services of the Memory Allocation Library.  If it is not possible to free pool
+  resources, then this function will peform no actions.
   
   If Buffer was not allocated with a pool allocation function in the Memory Allocation Library,
   then ASSERT().
