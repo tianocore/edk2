@@ -68,13 +68,12 @@ DxeUnixPeCoffLibExtraActionConstructor (
 }
 
 /**
-  Applies additional actions to relocate fixups to a PE/COFF image.
+  Performs additional actions after a PE/COFF image has been loaded and relocated.
 
-  Generally this function is called after sucessfully Applying relocation fixups 
-  to a PE/COFF image for some specicial purpose.  
-  
-  @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
-                              image that is being relocated.
+  If ImageContext is NULL, then ASSERT().
+
+  @param  ImageContext  Pointer to the image context structure that describes the
+                        PE/COFF image that has already been loaded and relocated.
 
 **/
 VOID
@@ -85,6 +84,8 @@ PeCoffLoaderRelocateImageExtraAction (
 {
   VOID * Handle;
   VOID * Entry;
+
+  ASSERT (ImageContext != NULL);
 
   Handle = NULL;
   Entry  = NULL;
@@ -112,15 +113,13 @@ PeCoffLoaderRelocateImageExtraAction (
  }  
 
 /**
-  Unloads a loaded PE/COFF image from memory and releases its taken resource.
-  
-  Releases any environment specific resources that were allocated when the image 
-  specified by ImageContext was loaded using PeCoffLoaderLoadImage(). 
+  Performs additional actions just before a PE/COFF image is unloaded.  Any resources
+  that were allocated by PeCoffLoaderRelocateImageExtraAction() must be freed.
   
   If ImageContext is NULL, then ASSERT().
   
-  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
-                                    image to be unloaded.
+  @param  ImageContext  Pointer to the image context structure that describes the
+                        PE/COFF image that is being unloaded.
 
 **/
 VOID
@@ -129,4 +128,5 @@ PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+  ASSERT (ImageContext != NULL);
 }
