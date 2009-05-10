@@ -13,10 +13,13 @@
 
 **/
 
+#include <Uefi.h>
+
+#include <Library/LanguageLib.h>
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/LanguageLib.h>
 
 //
 // Lookup table of ISO639-2 3 character language codes to ISO 639-1 2 character language codes
@@ -238,7 +241,7 @@ InternalLanguageLibToLower (
   )
 {
   for (; Length > 0; Length--, Destination++, Source++) {
-    *Destination = (*Source >= 'A' && *Source <= 'Z') ? (CHAR8)(*Source + ('a' - 'A')) : *Source;
+    *Destination = (CHAR8)((*Source >= 'A' && *Source <= 'Z') ? *Source + ('a' - 'A') : *Source);
   }
 }
 
@@ -496,4 +499,3 @@ ConvertLanguagesRfc4646ToIso639 (
   Iso639Languages[Iso639Index] = '\0';
   return Iso639Languages;
 }
-
