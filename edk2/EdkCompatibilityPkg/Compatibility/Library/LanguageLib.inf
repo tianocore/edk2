@@ -22,8 +22,7 @@
   FILE_GUID                      = 283cad13-a151-4d55-be2d-96ea57392a82 
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = LanguageLib|DXE_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER
-
+  LIBRARY_CLASS                  = LanguageLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
@@ -37,7 +36,6 @@
   EdkCompatibilityPkg/EdkCompatibilityPkg.dec
 
 [LibraryClasses]
-  MemoryAllocationLib
   BaseLib
   DebugLib
-
+  MemoryAllocationLib
