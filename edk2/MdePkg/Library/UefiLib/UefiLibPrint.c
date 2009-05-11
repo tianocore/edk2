@@ -419,8 +419,7 @@ InternalPrintGraphic (
 
   LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * EFI_GLYPH_HEIGHT;
   if (EFI_GLYPH_WIDTH * EFI_GLYPH_HEIGHT * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * PrintNum > LineBufferLen) {
-     Status = EFI_INVALID_PARAMETER;
-     goto Error;
+    PrintNum = HorizontalResolution / EFI_GLYPH_WIDTH;
   }
 
   Blt = (EFI_IMAGE_OUTPUT *) AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
