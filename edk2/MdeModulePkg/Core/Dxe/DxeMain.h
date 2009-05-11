@@ -1012,8 +1012,8 @@ CoreLocateHandleBuffer (
 
 /**
   Return the first Protocol Interface that matches the Protocol GUID. If
-  Registration is pasased in return a Protocol Instance that was just add
-  to the system. If Retistration is NULL return the first Protocol Interface
+  Registration is passed in, return a Protocol Instance that was just add
+  to the system. If Registration is NULL return the first Protocol Interface
   you find.
 
   @param  Protocol               The protocol to search for
