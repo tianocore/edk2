@@ -495,6 +495,10 @@ PeCoffLoaderImageAddress (
     
   If ImageContext is NULL, then ASSERT().
 
+  Note that if the platform does not maintain coherency between the instruction cache(s) and the data
+  cache(s) in hardware, then the caller is responsible for performing cache maintenance operations
+  prior to transferring control to a PE/COFF image that is loaded using this library.
+
   @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
                               image that is being relocated.
 
@@ -760,6 +764,10 @@ PeCoffLoaderRelocateImage (
   fields of the ImageContext structure must be valid prior to invoking this service.
   
   If ImageContext is NULL, then ASSERT().
+
+  Note that if the platform does not maintain coherency between the instruction cache(s) and the data
+  cache(s) in hardware, then the caller is responsible for performing cache maintenance operations
+  prior to transferring control to a PE/COFF image that is loaded using this library.
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that is being loaded.
@@ -1230,6 +1238,10 @@ PeCoffLoaderLoadImage (
   to the address specified by VirtualImageBase.  RelocationData must be identical 
   to the FiuxupData buffer from the PE_COFF_LOADER_IMAGE_CONTEXT structure 
   after this PE/COFF image was relocated with PeCoffLoaderRelocateImage().
+
+  Note that if the platform does not maintain coherency between the instruction cache(s) and the data
+  cache(s) in hardware, then the caller is responsible for performing cache maintenance operations
+  prior to transferring control to a PE/COFF image that is loaded using this library.
 
   @param  ImageBase          Base address of a PE/COFF image that has been loaded 
                              and relocated into system memory.
