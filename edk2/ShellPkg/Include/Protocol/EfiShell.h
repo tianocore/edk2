@@ -23,13 +23,10 @@
   0x6302d008, 0x7f9b, 0x4f30, { 0x87, 0xac, 0x60, 0xc9, 0xfe, 0xf5, 0xda, 0x4e } \
   }
 
-typedef struct _EFI_LIST_ENTRY {
-  struct _EFI_LIST_ENTRY *Flink;
-  struct _EFI_LIST_ENTRY *Blink;
-} EFI_LIST_ENTRY;
-
+// replaced EFI_LIST_ENTRY with LIST_ENTRY for simplicity.
+// they are identical outside of the name.
 typedef struct {
-  EFI_LIST_ENTRY Link;
+  LIST_ENTRY Link;
   EFI_STATUS Status;
   CONST CHAR16 *FullName;
   CONST CHAR16 *FileName;
@@ -316,6 +313,16 @@ typedef UINT32 EFI_SHELL_DEVICE_NAME_FLAGS;
   This function gets the user-readable name of the device specified by the device
   handle. If no user-readable name could be generated, then *BestDeviceName will be
   NULL and EFI_NOT_FOUND will be returned.
+
+  If EFI_DEVICE_NAME_USE_COMPONENT_NAME is set, then the function will return the
+  device’s name using the EFI_COMPONENT_NAME2_PROTOCOL, if present on
+  DeviceHandle.
+
+  If EFI_DEVICE_NAME_USE_DEVICE_PATH is set, then the function will return the
+  device’s name using the EFI_DEVICE_PATH_PROTOCOL, if present on DeviceHandle.
+  If both EFI_DEVICE_NAME_USE_COMPONENT_NAME and
+  EFI_DEVICE_NAME_USE_DEVICE_PATH are set, then
+  EFI_DEVICE_NAME_USE_COMPONENT_NAME will have higher priority.
 
   @param DeviceHandle           The handle of the device.
   @param Flags                  Determines the possible sources of component names. 
@@ -945,5 +952,10 @@ typedef struct _EFI_SHELL_PROTOCOL {
 } EFI_SHELL_PROTOCOL;
 
 extern EFI_GUID gEfiShellProtocolGuid;
+
+enum ShellVersion {
+  SHELL_MAJOR_VERSION = 2,
+  SHELL_MINOR_VERSION = 0
+};
 
 #endif

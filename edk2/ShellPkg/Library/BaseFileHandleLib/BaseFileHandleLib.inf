@@ -15,21 +15,18 @@
 
 [Defines]
   INF_VERSION                    = 0x00010006
-  BASE_NAME                      = BaseShellLib
-  FILE_GUID                      = 449D0F00-2148-4a43-9836-F10B3980ECF5
+  BASE_NAME                      = BaseFileHandleLib
+  FILE_GUID                      = 9495D344-9D8A-41f3-8D17-E2FD238C4E71
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ShellLib|UEFI_APPLICATION UEFI_DRIVER
-  CONSTRUCTOR                    = ShellLibConstructor
-  DESTRUCTOR                     = ShellLibDestructor
+  LIBRARY_CLASS                  = FileHandleLib|UEFI_APPLICATION UEFI_DRIVER
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources.common]
-  BaseShellLib.c
-  BaseShellLib.h
+  BaseFileHandleLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,22 +39,11 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  FileHandleLib
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              # ALWAYS_CONSUMED
   
-  # shell 2.0 
-  gEfiShellProtocolGuid                         # SOMETIMES_CONSUMED
-  gEfiShellParametersProtocolGuid               # SOMETIMES_CONSUMED
-
-  # 'old' shell
-  gEfiShellEnvironment2Guid                     # SOMETIMES_CONSUMED
-  gEfiShellInterfaceGuid                        # SOMETIMES_CONSUMED
-
 [Guids]
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED
-  gEfiShellEnvironment2ExtGuid                  # ALWAYS_CONSUMED
 
 [Pcd.common]
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize  # ALWAYS_CONSUMED
+

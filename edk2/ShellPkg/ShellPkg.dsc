@@ -1,8 +1,5 @@
 #/** @file
 # Shell Package
-# This is the first release of the Shell package.  Please be aware that there will 
-# probably be higher than usual numbers of changes as the package gets used and issues, 
-# enhancements, and bugs are found and fixed.
 #
 # Copyright (c) 2007 - 2008, Intel Corporation
 #
@@ -19,8 +16,8 @@
 [Defines]
   PLATFORM_NAME                  = Shell
   PLATFORM_GUID                  = E1DC9BF8-7013-4c99-9437-795DAA45F3BD
-  PLATFORM_VERSION               = 0.1
-  DSC_SPECIFICATION              = 0x00010005
+  PLATFORM_VERSION               = 0.2
+  DSC_SPECIFICATION              = 0x00010006
   OUTPUT_DIRECTORY               = Build/Shell
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
@@ -35,14 +32,15 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
-  BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PrintLib|MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  
   ShellLib|ShellPkg/Library/BaseShellLib/BaseShellLib.inf
+  FileHandleLib|ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
 
 [PcdsFixedAtBuild.common]
 
 [Components.common]
-  ShellPkg/Library/BaseShellLib/BaseShellLib.inf
   ShellPkg/Application/ShellExecTestApp/SA.inf
   ShellPkg/Application/ShellLibTestApp/SA3.inf

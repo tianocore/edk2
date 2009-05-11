@@ -20,21 +20,35 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
+#include <Library/FileHandleLib.h>
 #include <Protocol/EfiShellEnvironment2.h>
 #include <Protocol/EfiShellInterface.h>
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/SimpleFileSystem.h>
 
+#include "BaseShellLib.h"
+
 #define MAX_FILE_NAME_LEN 522 // (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
 #define FIND_XXXXX_FILE_BUFFER_SIZE (SIZE_OF_EFI_FILE_INFO + MAX_FILE_NAME_LEN)
 
-EFI_SHELL_ENVIRONMENT2        *mEfiShellEnvironment2;
-EFI_SHELL_INTERFACE           *mEfiShellInterface;
-EFI_SHELL_PROTOCOL            *mEfiShellProtocol;
-EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
-EFI_HANDLE                    mEfiShellEnvironment2Handle;
-EFI_LIST_ENTRY                *mOldStyleFileList;
+//
+// This is not static since it's extern in the .h file
+//
+SHELL_PARAM_ITEM EmptyParamList[] = {
+  {NULL, TypeMax}
+  };
+
+//
+// Static file globals for the shell library
+//
+STATIC EFI_SHELL_ENVIRONMENT2        *mEfiShellEnvironment2;
+STATIC EFI_SHELL_INTERFACE           *mEfiShellInterface;
+STATIC EFI_SHELL_PROTOCOL            *mEfiShellProtocol;
+STATIC EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
+STATIC EFI_HANDLE                    mEfiShellEnvironment2Handle;
+STATIC FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
 
 /**
   helper function to find ShellEnvironment2 for constructor
@@ -112,35 +126,13 @@ ShellFindSE2 (
   return (Status);
 }
 
-/**
-  Constructor for the Shell library.
-
-  Initialize the library and determine if the underlying is a UEFI Shell 2.0 or an EFI shell.
-
-  @param ImageHandle    the image handle of the process
-  @param SystemTable    the EFI System Table pointer
-
-  @retval EFI_SUCCESS   the initialization was complete sucessfully
-  @return others        an error ocurred during initialization
-**/
 EFI_STATUS
 EFIAPI
-ShellLibConstructor (
+ShellLibConstructorWorker (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
+){
   EFI_STATUS Status;
-
-  ASSERT(SystemTable != NULL);
-  ASSERT(gBS != NULL);
-
-  mEfiShellEnvironment2       = NULL;
-  mEfiShellProtocol           = NULL;
-  mEfiShellParametersProtocol = NULL;
-  mEfiShellInterface          = NULL;
-  mEfiShellEnvironment2Handle = NULL;
-  mOldStyleFileList           = NULL;
 
   //
   // UEFI 2.0 shell interfaces (used preferentially)
@@ -192,9 +184,68 @@ ShellLibConstructor (
   //
   if ((mEfiShellEnvironment2 != NULL && mEfiShellInterface          != NULL) || 
       (mEfiShellProtocol     != NULL && mEfiShellParametersProtocol != NULL)    ) {
+    if (mEfiShellProtocol != NULL) {
+      FileFunctionMap.GetFileInfo     = mEfiShellProtocol->GetFileInfo;
+      FileFunctionMap.SetFileInfo     = mEfiShellProtocol->SetFileInfo;
+      FileFunctionMap.ReadFile        = mEfiShellProtocol->ReadFile;
+      FileFunctionMap.WriteFile       = mEfiShellProtocol->WriteFile;
+      FileFunctionMap.CloseFile       = mEfiShellProtocol->CloseFile;
+      FileFunctionMap.DeleteFile      = mEfiShellProtocol->DeleteFile;
+      FileFunctionMap.GetFilePosition = mEfiShellProtocol->GetFilePosition;
+      FileFunctionMap.SetFilePosition = mEfiShellProtocol->SetFilePosition;
+      FileFunctionMap.FlushFile       = mEfiShellProtocol->FlushFile;
+      FileFunctionMap.GetFileSize     = mEfiShellProtocol->GetFileSize;
+    } else {
+      FileFunctionMap.GetFileInfo     = FileHandleGetInfo;
+      FileFunctionMap.SetFileInfo     = FileHandleSetInfo;
+      FileFunctionMap.ReadFile        = FileHandleRead;
+      FileFunctionMap.WriteFile       = FileHandleWrite;
+      FileFunctionMap.CloseFile       = FileHandleClose;
+      FileFunctionMap.DeleteFile      = FileHandleDelete;
+      FileFunctionMap.GetFilePosition = FileHandleGetPosition;
+      FileFunctionMap.SetFilePosition = FileHandleSetPosition;
+      FileFunctionMap.FlushFile       = FileHandleFlush;
+      FileFunctionMap.GetFileSize     = FileHandleGetSize;
+    }
     return (EFI_SUCCESS);
   }
   return (EFI_NOT_FOUND);
+}
+/**
+  Constructor for the Shell library.
+
+  Initialize the library and determine if the underlying is a UEFI Shell 2.0 or an EFI shell.
+
+  @param ImageHandle    the image handle of the process
+  @param SystemTable    the EFI System Table pointer
+
+  @retval EFI_SUCCESS   the initialization was complete sucessfully
+  @return others        an error ocurred during initialization
+**/
+EFI_STATUS
+EFIAPI
+ShellLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+
+
+  mEfiShellEnvironment2       = NULL;
+  mEfiShellProtocol           = NULL;
+  mEfiShellParametersProtocol = NULL;
+  mEfiShellInterface          = NULL;
+  mEfiShellEnvironment2Handle = NULL;
+
+  ///@todo make a worker constructor so initialize function works
+  //
+  // verify that auto initialize is not set false
+  // 
+  if (PcdGetBool(PcdShellLibAutoInitialize) == 0) {
+    return (EFI_SUCCESS);
+  }
+  
+  return (ShellLibConstructorWorker(ImageHandle, SystemTable));
 }
 
 /**
@@ -212,27 +263,68 @@ ShellLibDestructor (
                        &gEfiShellEnvironment2Guid,
                        ImageHandle,
                        NULL);
+    mEfiShellEnvironment2 = NULL;
   }
   if (mEfiShellInterface != NULL) {
     gBS->CloseProtocol(ImageHandle,
                        &gEfiShellInterfaceGuid,
                        ImageHandle,
                        NULL);  
+    mEfiShellInterface = NULL;
   }
   if (mEfiShellProtocol != NULL) {
     gBS->CloseProtocol(ImageHandle,
                        &gEfiShellProtocolGuid,
                        ImageHandle,
-                       NULL);    
+                       NULL);  
+    mEfiShellProtocol = NULL;
   }
   if (mEfiShellParametersProtocol != NULL) {
     gBS->CloseProtocol(ImageHandle,
                        &gEfiShellParametersProtocolGuid,
                        ImageHandle,
                        NULL);    
+    mEfiShellParametersProtocol = NULL;
   }
+  mEfiShellEnvironment2Handle = NULL;
   return (EFI_SUCCESS);
 }
+
+/**
+  This function causes the shell library to initialize itself.  If the shell library
+  is already initialized it will de-initialize all the current protocol poitners and
+  re-populate them again.
+
+  When the library is used with PcdShellLibAutoInitialize set to true this function
+  will return EFI_SUCCESS and perform no actions.
+
+  This function is intended for internal access for shell commands only.
+
+  @retval EFI_SUCCESS   the initialization was complete sucessfully
+
+**/
+EFI_STATUS
+EFIAPI
+ShellInitialize (
+  ) {
+  //
+  // if auto initialize is not false then skip
+  //
+  if (PcdGetBool(PcdShellLibAutoInitialize) != 0) {
+    return (EFI_SUCCESS);
+  }
+
+  //
+  // deinit the current stuff
+  //
+  ASSERT_EFI_ERROR(ShellLibDestructor(gImageHandle, gST));
+
+  //
+  // init the new stuff
+  //
+  return (ShellLibConstructorWorker(gImageHandle, gST));
+}
+
 /**
   This function will retrieve the information about the file for the handle 
   specified and store it in allocated pool memory.
@@ -253,47 +345,7 @@ ShellGetFileInfo (
   IN EFI_FILE_HANDLE            FileHandle
   )
 {
-  EFI_GUID        FileInfoGuid;
-  EFI_FILE_INFO   *pFileInfo;
-  UINTN           FileInfoSize;
-  EFI_STATUS      Status;
-
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-
-  //
-  // Get the required size to allocate
-  //
-  FileInfoGuid = gEfiFileInfoGuid;
-  FileInfoSize = 0;
-  pFileInfo = NULL;
-  Status = FileHandle->GetInfo(FileHandle, 
-                               &FileInfoGuid, 
-                               &FileInfoSize, 
-                               pFileInfo);
-  //
-  // error is expected.  getting size to allocate
-  //
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-  pFileInfo = AllocateZeroPool(FileInfoSize);
-  ASSERT (pFileInfo != NULL);
-  //
-  // now get the information
-  //
-  Status = FileHandle->GetInfo(FileHandle, 
-                               &FileInfoGuid, 
-                               &FileInfoSize, 
-                               pFileInfo);
-  //
-  // if we got an error free the memory and return NULL
-  //
-  if (EFI_ERROR(Status)) {
-    FreePool(pFileInfo);
-    return NULL;
-  }
-  return (pFileInfo);
+  return (FileFunctionMap.GetFileInfo(FileHandle));
 }
 
 /**
@@ -321,22 +373,7 @@ ShellSetFileInfo (
   IN EFI_FILE_INFO              *FileInfo
   )
 {
-  EFI_GUID        FileInfoGuid;
-  
-  //
-  // ASSERT if the FileHandle or FileInfo is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  ASSERT (FileInfo   != NULL);
-
-  FileInfoGuid = gEfiFileInfoGuid;
-  //
-  // Set the info
-  //
-  return (FileHandle->SetInfo(FileHandle, 
-                              &FileInfoGuid,
-                              (UINTN)FileInfo->Size,
-                              FileInfo));
+  return (FileFunctionMap.SetFileInfo(FileHandle, FileInfo));
 }  
   
   /**
@@ -404,89 +441,90 @@ ShellOpenFileByDevicePath(
     Status = ShellOpenFileByName(FileName, FileHandle, OpenMode, Attributes);
     FreePool(FileName);
     return (Status);
-  } else {
+  } 
+
+
+  //
+  // use old shell method.
+  //
+  Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, 
+                                  FilePath, 
+                                  DeviceHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = gBS->OpenProtocol(*DeviceHandle,
+                             &gEfiSimpleFileSystemProtocolGuid,
+                             &EfiSimpleFileSystemProtocol,
+                             gImageHandle,
+                             NULL,
+                             EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = EfiSimpleFileSystemProtocol->OpenVolume(EfiSimpleFileSystemProtocol, FileHandle);
+  if (EFI_ERROR (Status)) {
+    FileHandle = NULL;
+    return Status;
+  }
+
+  //
+  // go down directories one node at a time.
+  //
+  while (!IsDevicePathEnd (*FilePath)) {
     //
-    // use old shell method.
+    // For file system access each node should be a file path component
     //
-    Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, 
-                                    FilePath, 
-                                    DeviceHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    Status = gBS->OpenProtocol(*DeviceHandle,
-                               &gEfiSimpleFileSystemProtocolGuid,
-                               &EfiSimpleFileSystemProtocol,
-                               gImageHandle,
-                               NULL,
-                               EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    Status = EfiSimpleFileSystemProtocol->OpenVolume(EfiSimpleFileSystemProtocol, FileHandle);
-    if (EFI_ERROR (Status)) {
+    if (DevicePathType    (*FilePath) != MEDIA_DEVICE_PATH ||
+        DevicePathSubType (*FilePath) != MEDIA_FILEPATH_DP
+        ) {
       FileHandle = NULL;
-      return Status;
+      return (EFI_INVALID_PARAMETER);
     }
+    //
+    // Open this file path node
+    //
+    LastHandle  = *FileHandle;
+    *FileHandle = NULL;
 
     //
-    // go down directories one node at a time.
+    // Try to test opening an existing file
     //
-    while (!IsDevicePathEnd (*FilePath)) {
-      //
-      // For file system access each node should be a file path component
-      //
-      if (DevicePathType    (*FilePath) != MEDIA_DEVICE_PATH ||
-          DevicePathSubType (*FilePath) != MEDIA_FILEPATH_DP
-          ) {
-        FileHandle = NULL;
-        return (EFI_INVALID_PARAMETER);
-      }
-      //
-      // Open this file path node
-      //
-      LastHandle  = *FileHandle;
-      *FileHandle = NULL;
+    Status = LastHandle->Open (
+                          LastHandle,
+                          FileHandle,
+                          ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName,
+                          OpenMode &~EFI_FILE_MODE_CREATE,
+                          0
+                          );
 
-      //
-      // Try to test opening an existing file
-      //
+    //
+    // see if the error was that it needs to be created
+    //
+    if ((EFI_ERROR (Status)) && (OpenMode != (OpenMode &~EFI_FILE_MODE_CREATE))) {
       Status = LastHandle->Open (
                             LastHandle,
                             FileHandle,
                             ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName,
-                            OpenMode &~EFI_FILE_MODE_CREATE,
-                            0
+                            OpenMode,
+                            Attributes
                             );
-
-      //
-      // see if the error was that it needs to be created
-      //
-      if ((EFI_ERROR (Status)) && (OpenMode != (OpenMode &~EFI_FILE_MODE_CREATE))) {
-        Status = LastHandle->Open (
-                              LastHandle,
-                              FileHandle,
-                              ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName,
-                              OpenMode,
-                              Attributes
-                              );
-      }
-      //
-      // Close the last node
-      //
-      LastHandle->Close (LastHandle);
-
-      if (EFI_ERROR(Status)) {
-        return (Status);
-      }
-
-      //
-      // Get the next node
-      //
-      *FilePath = NextDevicePathNode (*FilePath);
     }
-    return (EFI_SUCCESS);
+    //
+    // Close the last node
+    //
+    LastHandle->Close (LastHandle);
+
+    if (EFI_ERROR(Status)) {
+      return (Status);
+    }
+
+    //
+    // Get the next node
+    //
+    *FilePath = NextDevicePathNode (*FilePath);
   }
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -544,6 +582,8 @@ ShellOpenFileByName(
     return (mEfiShellProtocol->OpenFileByName(FileName,
                                              FileHandle,
                                              OpenMode));
+
+    ///@todo add the attributes
   } 
   //
   // Using EFI Shell version
@@ -643,15 +683,7 @@ ShellReadFile(
   OUT VOID                      *Buffer
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-
-  //
-  // Perform the read based on EFI_FILE_PROTOCOL
-  //
-  return (FileHandle->Read(FileHandle, BufferSize, Buffer));
+  return (FileFunctionMap.ReadFile(FileHandle, BufferSize, Buffer));
 }
 
 
@@ -687,14 +719,7 @@ ShellWriteFile(
   IN VOID                       *Buffer
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  //
-  // Perform the write based on EFI_FILE_PROTOCOL
-  //
-  return (FileHandle->Write(FileHandle, BufferSize, Buffer));
+  return (FileFunctionMap.WriteFile(FileHandle, BufferSize, Buffer));
 }
 
 /** 
@@ -714,18 +739,7 @@ ShellCloseFile (
   IN EFI_FILE_HANDLE            *FileHandle
   )
 {
-  EFI_STATUS Status;
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  ASSERT (*FileHandle != NULL);
-  //
-  // Perform the Close based on EFI_FILE_PROTOCOL
-  //
-  Status = (*FileHandle)->Close(*FileHandle);
-  *FileHandle = NULL;
-  return Status;
+  return (FileFunctionMap.CloseFile(*FileHandle));
 }
 
 /**
@@ -748,18 +762,7 @@ ShellDeleteFile (
   IN EFI_FILE_HANDLE		*FileHandle
   )
 {
-  EFI_STATUS Status;
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  ASSERT (*FileHandle != NULL);
-  //
-  // Perform the Delete based on EFI_FILE_PROTOCOL
-  //
-  Status = (*FileHandle)->Delete(*FileHandle);
-  *FileHandle = NULL;
-  return Status;
+  return (FileFunctionMap.DeleteFile(*FileHandle));
 }
 
 /**
@@ -788,14 +791,7 @@ ShellSetFilePosition (
   IN UINT64           	Position
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  //
-  // Perform the SetPosition based on EFI_FILE_PROTOCOL
-  //
-  return (FileHandle->SetPosition(FileHandle, Position));
+  return (FileFunctionMap.SetFilePosition(FileHandle, Position));
 }
 
 /** 
@@ -820,14 +816,7 @@ ShellGetFilePosition (
   OUT UINT64                    *Position
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  //
-  // Perform the GetPosition based on EFI_FILE_PROTOCOL
-  //
-  return (FileHandle->GetPosition(FileHandle, Position));
+  return (FileFunctionMap.GetFilePosition(FileHandle, Position));
 }
 /**
   Flushes data on a file
@@ -849,69 +838,7 @@ ShellFlushFile (
   IN EFI_FILE_HANDLE            FileHandle
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  //
-  // Perform the Flush based on EFI_FILE_PROTOCOL
-  //
-  return (FileHandle->Flush(FileHandle));
-}
-
-/**
-  function to determine if a given handle is a directory handle
-
-  if DirHandle is NULL then ASSERT()
-
-  open the file information on the DirHandle and verify that the Attribute
-  includes EFI_FILE_DIRECTORY bit set.
-
-  @param DirHandle              Handle to open file
-
-  @retval EFI_SUCCESS           DirHandle is a directory
-  @retval EFI_INVALID_PARAMETER DirHandle did not have EFI_FILE_INFO available
-  @retval EFI_NOT_FOUND         DirHandle is not a directory
-**/
-EFI_STATUS
-EFIAPI
-InternalShellIsDirectory (
-  IN EFI_FILE_HANDLE            DirHandle
-  )
-{
-  EFI_FILE_INFO *DirInfo;
-
-  //
-  // ASSERT if DirHandle is NULL
-  //
-  ASSERT(DirHandle != NULL);
-  
-  //
-  // get the file information for DirHandle
-  //
-  DirInfo     = ShellGetFileInfo (DirHandle);
-  
-  //
-  // Parse DirInfo
-  //
-  if (DirInfo == NULL) {
-    //
-    // We got nothing...
-    //
-    return (EFI_INVALID_PARAMETER);
-  } 
-  if ((DirInfo->Attribute & EFI_FILE_DIRECTORY) == 0) {
-    //
-    // Attributes say this is not a directory
-    //
-    FreePool (DirInfo);
-    return (EFI_NOT_FOUND);
-  }
-  //
-  // all good...
-  //
-  FreePool (DirInfo);
-  return (EFI_SUCCESS);
+  return (FileFunctionMap.FlushFile(FileHandle));
 }
 
 /**
@@ -936,49 +863,13 @@ EFI_STATUS
 EFIAPI
 ShellFindFirstFile (
   IN EFI_FILE_HANDLE            DirHandle,
-  OUT EFI_FILE_INFO             *Buffer
+  OUT EFI_FILE_INFO             **Buffer
   )
 {
-  EFI_STATUS    Status;
-  UINTN         BufferSize;
-
   //
-  // ASSERT if DirHandle is NULL
+  // pass to file handle lib
   //
-  ASSERT (DirHandle != NULL);
-  
-  //
-  // verify that DirHandle is a directory
-  //
-  Status = InternalShellIsDirectory(DirHandle);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  } 
-
-  //
-  // reset to the begining of the directory 
-  //
-  Status = ShellSetFilePosition (DirHandle, 0);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  } 
-
-  //
-  // Allocate a buffer sized to struct size + enough for the string at the end
-  //
-  BufferSize = FIND_XXXXX_FILE_BUFFER_SIZE;
-  Buffer = AllocateZeroPool(BufferSize);
-  ASSERT (Buffer != NULL);
-
-  //
-  // read in the info about the first file
-  //
-  Status = ShellReadFile (DirHandle, &BufferSize, Buffer);
-  ASSERT(Status != EFI_BUFFER_TOO_SMALL);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  }
-  return (EFI_SUCCESS);
+  return (FileHandleFindFirstFile(DirHandle, Buffer));
 }
 /**
   Retrieves the next file in a directory.
@@ -1007,47 +898,10 @@ ShellFindNextFile(
   OUT BOOLEAN                    *NoFile
   )
 {
-  EFI_STATUS    Status;
-  UINTN         BufferSize;
-
   //
-  // ASSERTs for DirHandle or Buffer or NoFile poitners being NULL
+  // pass to file handle lib
   //
-  ASSERT (DirHandle != NULL);
-  ASSERT (Buffer    != NULL);
-  ASSERT (NoFile    != NULL);
-  
-  //
-  // verify that DirHandle is a directory
-  //
-  Status = InternalShellIsDirectory(DirHandle);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  } 
-
-  //
-  // This BufferSize MUST stay equal to the originally allocated one in GetFirstFile
-  //
-  BufferSize = FIND_XXXXX_FILE_BUFFER_SIZE;
-
-  //
-  // read in the info about the next file
-  //
-  Status = ShellReadFile (DirHandle, &BufferSize, Buffer);
-  ASSERT(Status != EFI_BUFFER_TOO_SMALL);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  }
-
-  //
-  // If we read 0 bytes (but did not have erros) we already read in the last file.
-  //
-  if (BufferSize == 0) {
-    FreePool(Buffer);
-    *NoFile = TRUE;
-  }
-
-  return (EFI_SUCCESS);
+  return (FileHandleFindNextFile(DirHandle, Buffer, NoFile));
 }
 /**
   Retrieve the size of a file.
@@ -1071,33 +925,7 @@ ShellGetFileSize (
   OUT UINT64                    *Size
   )
 {
-  EFI_FILE_INFO                 *FileInfo;
-
-  //
-  // ASSERT for FileHandle or Size being NULL
-  //
-  ASSERT (FileHandle != NULL);
-  ASSERT (Size != NULL);
-  
-  //
-  // get the FileInfo structure
-  //
-  FileInfo = ShellGetFileInfo(FileHandle);
-  if (FileInfo == NULL) {
-    return (EFI_DEVICE_ERROR);
-  }
-
-  //
-  // Assign the Size pointer to the correct value
-  //
-  *Size = FileInfo->FileSize;
-  
-  //
-  // free the FileInfo memory
-  //
-  FreePool(FileInfo);
-
-  return (EFI_SUCCESS);
+  return (FileFunctionMap.GetFileSize(FileHandle, Size));
 }
 /**
   Retrieves the status of the break execution flag
@@ -1366,7 +1194,7 @@ ShellSetPageBreakMode (
 /// This allows for the struct to be populated.
 ///
 typedef struct {
-  EFI_LIST_ENTRY Link;
+  LIST_ENTRY Link;
   EFI_STATUS Status;
   CHAR16 *FullName;
   CHAR16 *FileName;
@@ -1390,12 +1218,12 @@ typedef struct {
 LIST_ENTRY*
 EFIAPI
 InternalShellConvertFileListType (
-  EFI_LIST_ENTRY                *FileList
+  LIST_ENTRY                *FileList
   )
 {
   LIST_ENTRY                    *ListHead;
   SHELL_FILE_ARG                *OldInfo;
-  EFI_LIST_ENTRY                *Link;
+  LIST_ENTRY                *Link;
   EFI_SHELL_FILE_INFO_NO_CONST  *NewInfo;
 
   //
@@ -1406,14 +1234,14 @@ InternalShellConvertFileListType (
   //
   // Allocate our list head and initialize the list
   //
-  ListHead = AllocateZeroPool(sizeof(EFI_LIST_ENTRY));
+  ListHead = AllocateZeroPool(sizeof(LIST_ENTRY));
   ASSERT (ListHead != NULL);
   ListHead = InitializeListHead (ListHead);
 
   //
   // enumerate through each member of the old list and copy
   //
-  for (Link = FileList->Flink; Link != FileList; Link = Link->Flink) {
+  for (Link = FileList->ForwardLink; Link != FileList; Link = Link->ForwardLink) {
     OldInfo = CR (Link, SHELL_FILE_ARG, Link, SHELL_FILE_ARG_SIGNATURE);
 
     //
@@ -1434,6 +1262,9 @@ InternalShellConvertFileListType (
     //
     NewInfo->Handle       = OldInfo->Handle;
     NewInfo->Status       = OldInfo->Status;
+
+    // old shell checks for 0 not NULL
+    OldInfo->Handle = 0;
 
     //
     // allocate new space to copy strings and structure
@@ -1497,15 +1328,8 @@ ShellOpenFileMetaArg (
 {
   EFI_STATUS                    Status;
   LIST_ENTRY                    *EmptyNode;
-
-  //
-  // make sure we have no outstanding list
-  //
-  if (mOldStyleFileList != NULL) {
-    *ListHead = NULL;
-    return (EFI_UNSUPPORTED);
-  }
-
+  LIST_ENTRY                    *mOldStyleFileList;
+  
   //
   // ASSERT that Arg and ListHead are not NULL
   //
@@ -1529,7 +1353,7 @@ ShellOpenFileMetaArg (
   //
   // allocate memory for old list head
   //
-  mOldStyleFileList = (EFI_LIST_ENTRY*)AllocatePool(sizeof(EFI_LIST_ENTRY));
+  mOldStyleFileList = (LIST_ENTRY*)AllocatePool(sizeof(LIST_ENTRY));
   ASSERT(mOldStyleFileList != NULL);
 
   //
@@ -1550,6 +1374,13 @@ ShellOpenFileMetaArg (
   // Convert that to equivalent of UEFI Shell 2.0 structure
   //
   EmptyNode = InternalShellConvertFileListType(mOldStyleFileList);
+
+  //
+  // Free the EFI Shell version that was converted.
+  //
+  ASSERT_EFI_ERROR(mEfiShellEnvironment2->FreeFileList(mOldStyleFileList));
+  FreePool(mOldStyleFileList);
+  mOldStyleFileList = NULL;
 
   //
   // remove the empty head of the list
@@ -1588,18 +1419,12 @@ ShellCloseFileMetaArg (
     return (mEfiShellProtocol->FreeFileList(ListHead));
   } else {
     //
-    // Free the EFI Shell version that was converted.
-    //
-    ASSERT_EFI_ERROR(mEfiShellEnvironment2->FreeFileList(mOldStyleFileList));
-    FreePool(mOldStyleFileList);
-    mOldStyleFileList = NULL;
-
-    //
     // Since this is EFI Shell version we need to free our internally made copy 
     // of the list
     //
     for (Node = GetFirstNode((LIST_ENTRY*)*ListHead) ; IsListEmpty((LIST_ENTRY*)*ListHead) == FALSE ; Node = GetFirstNode((LIST_ENTRY*)*ListHead)) {
       RemoveEntryList(Node);
+      ((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->Handle->Close(((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->Handle);
       FreePool(((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->FullName);
       FreePool(((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->FileName);
       FreePool(((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->Info);
@@ -1610,7 +1435,7 @@ ShellCloseFileMetaArg (
 }
 
 typedef struct {
-  EFI_LIST_ENTRY List;
+  LIST_ENTRY List;
   CHAR16         *Name;
   ParamType      Type;
   CHAR16         *Value;
@@ -1634,7 +1459,7 @@ typedef struct {
 **/
 BOOLEAN
 EFIAPI
-IsCheckList (
+InternalIsOnCheckList (
   IN CONST CHAR16               *Name,
   IN CONST SHELL_PARAM_ITEM     *CheckList,
   OUT ParamType                 *Type
@@ -1648,6 +1473,15 @@ IsCheckList (
   ASSERT(CheckList  != NULL);
   ASSERT(Type       != NULL);
   ASSERT(Name       != NULL);
+
+  //
+  // question mark and page break mode are always supported
+  //
+  if ((StrCmp(Name, L"-?") == 0) ||
+      (StrCmp(Name, L"-b") == 0)
+      ) {
+     return (TRUE);
+  }
 
   //
   // Enumerate through the list
@@ -1664,7 +1498,7 @@ IsCheckList (
   return (FALSE);
 }
 /**
-  Checks the string for indicators of "flag" status.  this is a leading '/' or '-'
+  Checks the string for indicators of "flag" status.  this is a leading '/', '-', or '+'
 
   @param Name                   pointer to Name of parameter found
 
@@ -1673,7 +1507,7 @@ IsCheckList (
 **/
 BOOLEAN
 EFIAPI
-IsFlag (
+InternalIsFlag (
   IN CONST CHAR16               *Name
   )
 {
@@ -1685,7 +1519,10 @@ IsFlag (
   //
   // If the Name has a / or - as the first character return TRUE
   //
-  if ((Name[0] == L'/') || (Name[0] == L'-') ) {
+  if ((Name[0] == L'/') || 
+      (Name[0] == L'-') ||
+      (Name[0] == L'+')
+      ) {
       return (TRUE);
   }
   return (FALSE);
@@ -1699,7 +1536,8 @@ IsFlag (
   @param CheckList              pointer to list of parameters to check
   @param CheckPackage           pointer to pointer to list checked values
   @param ProblemParam           optional pointer to pointer to unicode string for 
-                                the paramater that caused failure.
+                                the paramater that caused failure.  If used then the
+                                caller is responsible for freeing the memory.
   @param AutoPageBreak          will automatically set PageBreakEnabled for "b" parameter
   @param Argc                   Count of parameters in Argv
   @param Argv                   pointer to array of parameters
@@ -1774,7 +1612,7 @@ InternalCommandLineParse (
       ASSERT(CurrentItemPackage->Value != NULL);
       StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
       InsertTailList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
-    } else if (IsFlag(Argv[LoopCounter]) == FALSE) {
+    } else if (InternalIsFlag(Argv[LoopCounter]) == FALSE) {
       //
       // add this one as a non-flag
       //
@@ -1787,7 +1625,7 @@ InternalCommandLineParse (
       StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
       CurrentItemPackage->OriginalPosition = Count++;
       InsertTailList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
-    } else if (IsCheckList(Argv[LoopCounter], CheckList, &CurrentItemType) == TRUE) {
+    } else if (InternalIsOnCheckList(Argv[LoopCounter], CheckList, &CurrentItemType) == TRUE) {
       //
       // this is a flag
       //
@@ -1818,7 +1656,9 @@ InternalCommandLineParse (
       //
       // this was a non-recognised flag... error!
       //
-      *ProblemParam = (CHAR16*)Argv[LoopCounter];
+      *ProblemParam = AllocatePool(StrSize(Argv[LoopCounter]));
+      ASSERT(*ProblemParam != NULL);
+      StrCpy(*ProblemParam, Argv[LoopCounter]);
       ShellCommandLineFreeVarList(*CheckPackage);
       *CheckPackage = NULL;
       return (EFI_VOLUME_CORRUPTED);
