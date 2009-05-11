@@ -52,7 +52,7 @@ UefiMain (
   EFI_FILE_INFO       *pFileInfo;
   UINT64              Size;
   BOOLEAN             NoFile;
-  EFI_SHELL_FILE_INFO *pShellFileInfo, *pShellFileInfo2;
+  EFI_SHELL_FILE_INFO *pShellFileInfo;
   LIST_ENTRY          *List;
   
   FileHandle = NULL;
@@ -97,7 +97,6 @@ UefiMain (
   FreePool(pFileInfo);
   pFileInfo = NULL;
   Status = ShellCloseFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   ASSERT_EFI_ERROR(Status);
   Print(L"read, write, create, getinfo - pass\r\n");
 
@@ -125,7 +124,6 @@ UefiMain (
   ASSERT(Size == 0x20);
   ASSERT_EFI_ERROR(Status);
   Status = ShellCloseFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   ASSERT_EFI_ERROR(Status);
   Print(L"setinfo and change size, getsize - pass\r\n");
   
@@ -145,7 +143,6 @@ UefiMain (
   FreePool(pFileInfo);
   pFileInfo = NULL;   
   Status = ShellDeleteFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   ASSERT_EFI_ERROR(Status);
   Print(L"reopen file - pass\r\n");
 
@@ -163,7 +160,6 @@ UefiMain (
   ASSERT((pFileInfo->Attribute&EFI_FILE_DIRECTORY)==0);
   FreePool(pFileInfo);
   Status = ShellDeleteFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   ASSERT_EFI_ERROR(Status);
   Print(L"size of empty - pass\r\n");
 
@@ -183,7 +179,6 @@ UefiMain (
   ASSERT(StrCmp(pFileInfo->FileName, FileName) == 0);
   ASSERT(pFileInfo->Attribute&EFI_FILE_DIRECTORY);
   Status = ShellDeleteFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   ASSERT_EFI_ERROR(Status);
   Print(L"Directory create - pass\r\n");
   
@@ -206,7 +201,7 @@ UefiMain (
                                0
                                );
   ASSERT_EFI_ERROR(Status);
-  Status = ShellFindFirstFile(FileHandle, pFileInfo);
+  Status = ShellFindFirstFile(FileHandle, &pFileInfo);
   ASSERT_EFI_ERROR(Status);
   Status = ShellFindNextFile(FileHandle, pFileInfo, &NoFile);
   ASSERT_EFI_ERROR(Status);
@@ -218,7 +213,6 @@ UefiMain (
   ASSERT_EFI_ERROR(Status);
   /// @todo - why is NoFile never set? limitation of NT32 file system?
   Status = ShellDeleteFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   ASSERT(Status == RETURN_WARN_DELETE_FAILURE);
   Print(L"FindFirst - pass\r\n");
   Print(L"FindNext - Verify with real EFI system.  Cant verify NoFile under NT32\r\n");
@@ -233,10 +227,7 @@ UefiMain (
   ASSERT(pShellFileInfo->Info->FileSize == 0);
   ASSERT(StrCmp(pShellFileInfo->Info->FileName, L"File.txt") == 0);
   ASSERT(pShellFileInfo->Info->Attribute == 0);
-  pShellFileInfo2 = (EFI_SHELL_FILE_INFO*)0x12345678;
-  Status = ShellOpenFileMetaArg(L"testDir\\*.*", EFI_FILE_MODE_READ, &pShellFileInfo2);
-  ASSERT(pShellFileInfo2 == NULL);
-  ASSERT(Status == EFI_UNSUPPORTED);
+
   Status = ShellCloseFileMetaArg(&pShellFileInfo);
   ASSERT_EFI_ERROR(Status);
   Print(L"Open/Close Meta Arg - pass\r\n");
@@ -250,7 +241,6 @@ UefiMain (
                                );
   ASSERT_EFI_ERROR(Status);
   Status = ShellDeleteFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   StrCpy(FileName, L"testDir");
   ASSERT_EFI_ERROR(Status);
   Status = ShellOpenFileByName(FileName, 
@@ -259,7 +249,6 @@ UefiMain (
                                0
                                );
   Status = ShellDeleteFile(&FileHandle);
-  ASSERT(FileHandle == NULL);
   ASSERT_EFI_ERROR(Status);
 
   // get environment variable
@@ -286,7 +275,7 @@ UefiMain (
     ASSERT(ShellCommandLineGetFlag(List, L"/Param5") == FALSE);
     ASSERT(ShellCommandLineGetFlag(List, L"/Param1") != FALSE);
     ASSERT(StrCmp(ShellCommandLineGetValue(List, L"/Param2"), L"Val1")==0);
-    ASSERT(StrCmp(ShellCommandLineGetRawValue(List, 0), L"SimpleApplication")==0);
+    ASSERT(StrCmp(ShellCommandLineGetRawValue(List, 0), L"SimpleApplication.efi")==0);
 
     ShellCommandLineFreeVarList(List);
   } else {

@@ -82,7 +82,7 @@ EFI_STATUS
 **/
 typedef struct {
   UINT32                    Signature;            ///< SHELL_FILE_ARG_SIGNATURE
-  EFI_LIST_ENTRY            Link;                 ///< linked list helper
+  LIST_ENTRY                Link;                 ///< linked list helper
   EFI_STATUS                Status;               ///< File's status
 
   EFI_FILE_HANDLE           Parent;               ///< what is the Parent file of this file
@@ -270,7 +270,7 @@ CHAR16*
   support for wildcard characters ('?' and '*') in the Arg path.  if there are 
   any wildcard characters in the path this function will find any and all files
   that match the wildcards.  the return is a double linked list based on the 
-  EFI_LIST_ENTRY linked list structure.  use this in conjunction with the 
+  LIST_ENTRY linked list structure.  use this in conjunction with the 
   SHELL_FILE_ARG_SIGNATURE to get the SHELL_FILE_ARG structures that are returned.
   The memory allocated by the callee for this list is freed by making a call to 
   SHELLENV_FREE_FILE_LIST.
@@ -288,7 +288,7 @@ CHAR16*
 EFI_STATUS
 (EFIAPI *SHELLENV_FILE_META_ARG) (
   IN CHAR16               *Arg,
-  IN OUT EFI_LIST_ENTRY   *ListHead
+  IN OUT LIST_ENTRY       *ListHead
   );
 
 /**
@@ -301,7 +301,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *SHELLENV_FREE_FILE_LIST) (
-  IN OUT EFI_LIST_ENTRY   *ListHead
+  IN OUT LIST_ENTRY       *ListHead
   );
 
 /**
@@ -618,7 +618,7 @@ typedef struct {
 **/
 typedef struct {
   UINTN                       Signature;   ///< PROTOCOL_INFO_SIGNATURE 
-  EFI_LIST_ENTRY              Link;        ///< standard lined list helper member
+  LIST_ENTRY                  Link;        ///< standard lined list helper member
   //
   // parsing info for the protocol
   //
@@ -845,7 +845,7 @@ EFI_STATUS
   support the wildcard characters ('?' and '*') in the Arg path.  if there are 
   any wildcard characters in the path this function will return 
   EFI_INVALID_PARAMETER.  the return is a double linked list based on the 
-  EFI_LIST_ENTRY linked list structure.  use this in conjunction with the 
+  LIST_ENTRY linked list structure.  use this in conjunction with the 
   SHELL_FILE_ARG_SIGNATURE to get the SHELL_FILE_ARG structures that are returned.
   The memory allocated by the callee for this list is freed by making a call to 
   SHELLENV_FREE_FILE_LIST.
@@ -864,7 +864,7 @@ typedef
 EFI_STATUS
 (EFIAPI *SHELLENV_FILE_META_ARG_NO_WILDCARD) (
   IN CHAR16               *Arg,
-  IN OUT EFI_LIST_ENTRY   *ListHead
+  IN OUT LIST_ENTRY       *ListHead
   );
 
 /**
@@ -885,7 +885,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *SHELLENV_DEL_DUP_FILE) (
-  IN EFI_LIST_ENTRY   * ListHead
+  IN LIST_ENTRY   * ListHead
   );
 
 /**

@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __SHELL_LIB__
 
 #include <Protocol/SimpleFileSystem.h>
-#include <Guid/FileInfo.h>
 #include <Protocol/EfiShell.h>
 
 /**
@@ -363,8 +362,10 @@ ShellFlushFile (
   in the directory's info. Caller can use ShellFindNextFile() to get 
   subsequent files.
 
+  Caller must use FreePool on *Buffer opon completion of all file searching.
+
   @param DirHandle              The file handle of the directory to search
-  @param Buffer                 Pointer to buffer for file's information
+  @param Buffer                 Pointer to pointer to buffer for file's information
 
   @retval EFI_SUCCESS           Found the first file.
   @retval EFI_NOT_FOUND         Cannot find the directory.
@@ -377,7 +378,7 @@ EFI_STATUS
 EFIAPI
 ShellFindFirstFile (
   IN EFI_FILE_HANDLE            DirHandle,
-  OUT EFI_FILE_INFO             *Buffer
+  OUT EFI_FILE_INFO             **Buffer
   );
 
 /**
@@ -613,6 +614,10 @@ typedef struct {
   ParamType   Type;
 } SHELL_PARAM_ITEM;
 
+
+/// Helper structure for no parameters (besides -? and -b)
+extern SHELL_PARAM_ITEM EmptyParamList[];
+
 /**
   Checks the command line arguments passed against the list of valid ones.  
   Optionally removes NULL values first.
@@ -724,6 +729,24 @@ EFIAPI
 ShellCommandLineGetRawValue (
   IN CONST LIST_ENTRY              *CheckPackage,
   IN UINT32                        Position
+  );
+
+/**
+  This function causes the shell library to initialize itself.  If the shell library
+  is already initialized it will de-initialize all the current protocol poitners and
+  re-populate them again.
+
+  When the library is used with PcdShellLibAutoInitialize set to true this function
+  will return EFI_SUCCESS and perform no actions.
+
+  This function is intended for internal access for shell commands only.
+
+  @retval EFI_SUCCESS   the initialization was complete sucessfully
+
+**/
+EFI_STATUS
+EFIAPI
+ShellInitialize (
   );
 
 #endif // __SHELL_LIB__
