@@ -128,7 +128,7 @@ AllocateReservedPages (
   Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
   must have been allocated on a previous call to the page allocation services of the Memory
   Allocation Library.  If it is not possible to free allocated pages, then this function will
-  peform no actions.
+  perform no actions.
   
   If Buffer was not allocated with a page allocation function in the Memory Allocation Library,
   then ASSERT().
@@ -325,7 +325,7 @@ AllocateAlignedReservedPages (
   Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
   must have been allocated on a previous call to the aligned page allocation services of the Memory
   Allocation Library.  If it is not possible to free allocated pages, then this function will 
-  peform no actions.
+  perform no actions.
   
   If Buffer was not allocated with an aligned page allocation function in the Memory Allocation
   Library, then ASSERT().
@@ -442,9 +442,9 @@ AllocateReservedPool (
 }
 
 /**
-  Allocates and zeros a buffer of a certian pool type.
+  Allocates and zeros a buffer of a certain pool type.
 
-  Allocates the number bytes specified by AllocationSize of a certian pool type, clears the buffer
+  Allocates the number bytes specified by AllocationSize of a certain pool type, clears the buffer
   with zeros, and returns a pointer to the allocated buffer.  If AllocationSize is 0, then a valid
   buffer of 0 size is returned.  If there is not enough memory remaining to satisfy the request,
   then NULL is returned.
@@ -537,9 +537,9 @@ AllocateReservedZeroPool (
 }
 
 /**
-  Copies a buffer to an allocated buffer of a certian pool type.
+  Copies a buffer to an allocated buffer of a certain pool type.
 
-  Allocates the number bytes specified by AllocationSize of a certian pool type, copies
+  Allocates the number bytes specified by AllocationSize of a certain pool type, copies
   AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
   allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
   is not enough memory remaining to satisfy the request, then NULL is returned.
@@ -685,6 +685,10 @@ InternalReallocatePool (
 {
   VOID  *NewBuffer;
 
+  //
+  // Check the boundary for OldBuffer even if the allocation failure.
+  //
+  ASSERT (OldBuffer == NULL || MIN (OldSize, NewSize) <= MAX_ADDRESS - (UINTN) OldBuffer + 1);
   NewBuffer = InternalAllocateZeroPool (PoolType, NewSize);
   if (NewBuffer != NULL && OldBuffer != NULL) {
     CopyMem (NewBuffer, OldBuffer, MIN (OldSize, NewSize));
@@ -795,7 +799,7 @@ ReallocateReservedPool (
 
   Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the
   pool allocation services of the Memory Allocation Library.  If it is not possible to free pool
-  resources, then this function will peform no actions.
+  resources, then this function will perform no actions.
   
   If Buffer was not allocated with a pool allocation function in the Memory Allocation Library,
   then ASSERT().
