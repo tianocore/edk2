@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -506,16 +506,12 @@ HiiConfigRoutingExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
-  HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
   EFI_STRING                          ConfigRequest;
   UINTN                               Length;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL            *TempDevicePath;
   EFI_STATUS                          Status;
-  LIST_ENTRY                          *Link;
-  HII_DATABASE_RECORD                 *Database;
-  UINT8                               *DevicePathPkg;
-  UINT8                               *CurrentDevicePath;
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
@@ -531,7 +527,6 @@ HiiConfigRoutingExtractConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  Private   = CONFIG_ROUTING_DATABASE_PRIVATE_DATA_FROM_THIS (This);
   StringPtr = Request;
   *Progress = StringPtr;
 
@@ -585,33 +580,20 @@ HiiConfigRoutingExtractConfig (
     }
 
     //
-    // Find driver which matches the routing data.
+    // Find driver handle by device path
     //
     DriverHandle = NULL;
-    for (Link = Private->DatabaseList.ForwardLink;
-         Link != &Private->DatabaseList;
-         Link = Link->ForwardLink
-        ) {
-      Database = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-   
-      if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
-        CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-        if (CompareMem (
-              DevicePath,
-              CurrentDevicePath,
-              GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)
-              ) == 0) {
-          DriverHandle = Database->DriverHandle;
-          break;
-        }
-      }
-    }
-
+    TempDevicePath = DevicePath;
+    Status = gBS->LocateDevicePath (
+                    &gEfiDevicePathProtocolGuid,
+                    &TempDevicePath,
+                    &DriverHandle
+                    );
     FreePool (DevicePath);
 
-    if (DriverHandle == NULL) {
+    if (EFI_ERROR (Status) || (DriverHandle == NULL)) {
       //
-      // Routing data does not match any known driver.
+      // Cannot find any known driver.
       // Set Progress to the 'G' in "GUID" of the routing header.
       //
       *Progress = StringPtr;
@@ -822,16 +804,12 @@ HiiConfigRoutingRouteConfig (
   OUT EFI_STRING                             *Progress
   )
 {
-  HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
   EFI_STRING                          ConfigResp;
   UINTN                               Length;
   EFI_STATUS                          Status;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-  LIST_ENTRY                          *Link;
-  HII_DATABASE_RECORD                 *Database;
-  UINT8                               *DevicePathPkg;
-  UINT8                               *CurrentDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL            *TempDevicePath;
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
@@ -845,7 +823,6 @@ HiiConfigRoutingRouteConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  Private   = CONFIG_ROUTING_DATABASE_PRIVATE_DATA_FROM_THIS (This);
   StringPtr = Configuration;
   *Progress = StringPtr;
 
@@ -891,33 +868,20 @@ HiiConfigRoutingRouteConfig (
     }
 
     //
-    // Find driver which matches the routing data.
+    // Find driver handle by device path
     //
     DriverHandle = NULL;
-    for (Link = Private->DatabaseList.ForwardLink;
-         Link != &Private->DatabaseList;
-         Link = Link->ForwardLink
-        ) {
-      Database = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-
-      if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
-        CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-        if (CompareMem (
-              DevicePath,
-              CurrentDevicePath,
-              GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)
-              ) == 0) {
-          DriverHandle = Database->DriverHandle;
-          break;
-        }
-      }
-    }
-
+    TempDevicePath = DevicePath;
+    Status = gBS->LocateDevicePath (
+                    &gEfiDevicePathProtocolGuid,
+                    &TempDevicePath,
+                    &DriverHandle
+                    );
     FreePool (DevicePath);
 
-    if (DriverHandle == NULL) {
+    if (EFI_ERROR (Status) || (DriverHandle == NULL)) {
       //
-      // Routing data does not match any known driver.
+      // Cannot find any known driver.
       // Set Progress to the 'G' in "GUID" of the routing header.
       //
       *Progress = StringPtr;
@@ -1018,7 +982,6 @@ HiiBlockToConfig (
   OUT EFI_STRING                             *Progress
   )
 {
-  HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
   UINTN                               Length;
   EFI_STATUS                          Status;
@@ -1041,10 +1004,6 @@ HiiBlockToConfig (
     *Progress = ConfigRequest;
     return EFI_INVALID_PARAMETER;
   }
-
-
-  Private = CONFIG_ROUTING_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-  ASSERT (Private != NULL);
 
   StringPtr     = ConfigRequest;
   ValueStr      = NULL;
