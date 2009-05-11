@@ -673,15 +673,15 @@ ScsiReadCapacityCommand (
 EFI_STATUS
 EFIAPI
 ScsiReadCapacity16Command (
-  IN  EFI_SCSI_IO_PROTOCOL  *ScsiIo,
-  IN  UINT64                Timeout,
-  IN  VOID                  *SenseData,
-  IN OUT UINT8              *SenseDataLength,
-  OUT UINT8                 *HostAdapterStatus,
-  OUT UINT8                 *TargetStatus,
-  OUT VOID                  *DataBuffer,
-  IN OUT UINT32             *DataLength,
-  IN  BOOLEAN               Pmi
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData,  OPTIONAL
+  IN OUT UINT8                 *SenseDataLength,
+     OUT UINT8                 *HostAdapterStatus,
+     OUT UINT8                 *TargetStatus,
+  IN OUT VOID                  *DataBuffer, OPTIONAL
+  IN OUT UINT32                *DataLength,
+  IN     BOOLEAN               Pmi
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
