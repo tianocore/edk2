@@ -648,8 +648,8 @@ AllocateReservedCopyPool (
   If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
   enough memory remaining to satisfy the request, then NULL is returned.
   
-  If the smaller of NewSize and OldSize is greater than (MAX_ADDRESS - OldBuffer + 1),
-  then ASSERT(). 
+  If the allocation of the new buffer is successful and the smaller of NewSize and OldSize
+  is greater than (MAX_ADDRESS - OldBuffer + 1), then ASSERT().
 
   @param  PoolType       The type of pool to allocate.
   @param  OldSize        The size, in bytes, of OldBuffer.
@@ -670,10 +670,6 @@ InternalReallocatePool (
 {
   VOID  *NewBuffer;
 
-  //
-  // Check the boundary for OldBuffer even if the allocation failure.
-  //
-  ASSERT (OldBuffer == NULL || MIN (OldSize, NewSize) <= MAX_ADDRESS - (UINTN) OldBuffer + 1);
   NewBuffer = InternalAllocateZeroPool (PoolType, NewSize);
   if (NewBuffer != NULL && OldBuffer != NULL) {
     CopyMem (NewBuffer, OldBuffer, MIN (OldSize, NewSize));
@@ -692,8 +688,8 @@ InternalReallocatePool (
   If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
   enough memory remaining to satisfy the request, then NULL is returned.
   
-  If the smaller of NewSize and OldSize is greater than (MAX_ADDRESS - OldBuffer + 1),
-  then ASSERT(). 
+  If the allocation of the new buffer is successful and the smaller of NewSize and OldSize
+  is greater than (MAX_ADDRESS - OldBuffer + 1), then ASSERT().
 
   @param  OldSize        The size, in bytes, of OldBuffer.
   @param  NewSize        The size, in bytes, of the buffer to reallocate.
@@ -724,8 +720,8 @@ ReallocatePool (
   If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
   enough memory remaining to satisfy the request, then NULL is returned.
 
-  If the smaller of NewSize and OldSize is greater than (MAX_ADDRESS - OldBuffer + 1),
-  then ASSERT(). 
+  If the allocation of the new buffer is successful and the smaller of NewSize and OldSize
+  is greater than (MAX_ADDRESS - OldBuffer + 1), then ASSERT().
 
   @param  OldSize        The size, in bytes, of OldBuffer.
   @param  NewSize        The size, in bytes, of the buffer to reallocate.
@@ -756,8 +752,8 @@ ReallocateRuntimePool (
   If NewSize is 0, then a valid buffer of 0 size is  returned.  If there is not 
   enough memory remaining to satisfy the request, then NULL is returned.
 
-  If the smaller of NewSize and OldSize is greater than (MAX_ADDRESS - OldBuffer + 1),
-  then ASSERT(). 
+  If the allocation of the new buffer is successful and the smaller of NewSize and OldSize
+  is greater than (MAX_ADDRESS - OldBuffer + 1), then ASSERT().
 
   @param  OldSize        The size, in bytes, of OldBuffer.
   @param  NewSize        The size, in bytes, of the buffer to reallocate.
