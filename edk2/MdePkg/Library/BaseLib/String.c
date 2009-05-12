@@ -479,7 +479,7 @@ StrStr (
   ASSERT (StrSize (SearchString) != 0);
 
   if (*SearchString == L'\0') {
-    return NULL;
+    return (CHAR16 *) String;
   }
 
   while (*String != L'\0') {
@@ -1617,7 +1617,7 @@ AsciiStrStr (
   ASSERT (AsciiStrSize (SearchString) != 0);
 
   if (*SearchString == '\0') {
-    return NULL;
+    return (CHAR8 *) String;
   }
 
   while (*String != '\0') {
