@@ -78,7 +78,7 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
                                   values corresponding to all requested
                                   names.
 
-  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
@@ -138,7 +138,7 @@ EFI_STATUS
                                   values corresponding to all requested
                                   names.
   
-  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
@@ -183,7 +183,7 @@ EFI_STATUS
   @retval EFI_SUCCESS             The results have been distributed or are
                                   awaiting distribution.
   
-  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
@@ -242,7 +242,7 @@ EFI_STATUS
                                   to the null terminator at the end of the
                                   ConfigRequest string.
 
-  @retval EFI_OUT_OF_MEMORY       Not enough memory to allocate
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to allocate
                                   Config. Progress points to the
                                   first character of ConfigRequest.
 

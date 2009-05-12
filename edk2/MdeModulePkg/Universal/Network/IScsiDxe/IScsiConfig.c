@@ -426,7 +426,7 @@ IScsiFormExtractConfig (
 
   @retval EFI_SUCCESS             The results have been distributed or are
                                   awaiting distribution.  
-  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
