@@ -5,7 +5,7 @@
   This protocol is published by drivers providing and requesting 
   configuration data from HII. It may only be invoked by HII.
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -74,7 +74,7 @@ typedef UINTN EFI_BROWSER_ACTION;
                                   values corresponding to all requested
                                   names.
 
-  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
@@ -141,7 +141,7 @@ EFI_STATUS
   @retval EFI_SUCCESS             The results have been distributed or are
                                   awaiting distribution.
   
-  @retval EFI_OUT_OF_MEMORY       Not enough memory to store the
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
