@@ -2,7 +2,7 @@
 # Component name for module Ip4Config
 #
 # FIX ME!
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -40,6 +40,11 @@
   Ip4Config.h
   NicIp4Variable.h
   Ip4Config.c
+  Ip4ConfigDxe.vfr
+  Ip4ConfigDxeStrings.uni
+  Ip4NvData.h
+  Ip4ConfigNv.h
+  Ip4ConfigNv.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,13 +58,20 @@
   UefiRuntimeServicesTableLib
   DebugLib
   NetLib
+  HiiLib
+  PrintLib
 
 
 [Protocols]
   gEfiDhcp4ServiceBindingProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
   gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
-  gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
   gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiDhcp4ProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiNicIp4ConfigVariableGuid                  # PROTOCOL ALWAYS_CONSUMED
-  gEfiNicIp4ConfigProtocolGuid                  # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+
+[Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES ## Guid
+  gEfiNicIp4ConfigVariableGuid                  ## CONSUMES ## Guid
+   

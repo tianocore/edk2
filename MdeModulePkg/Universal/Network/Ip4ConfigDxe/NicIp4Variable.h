@@ -1,7 +1,7 @@
 /** @file
   Routines used to operate the Ip4 configure variable.
 
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
+#include <Guid/NicIp4ConfigNvData.h>
+
 #include <Library/NetLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -24,8 +26,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#include <Protocol/NicIp4Config.h>
-
+///
+/// IP4_CONFIG_VARIABLE is the EFI variable to
+/// save the configuration. IP4_CONFIG_VARIABLE is
+/// of variable length.
+///
+typedef struct {
+  UINT32                    Len;        ///< Total length of the variable
+  UINT16                    CheckSum;   ///< CheckSum, the same as IP4 head checksum
+  UINT32                    Count;      ///< Number of NIC_IP4_CONFIG_INFO follows
+  NIC_IP4_CONFIG_INFO       ConfigInfo;
+} IP4_CONFIG_VARIABLE;
 
 //
 // Return the size of NIC_IP4_CONFIG_INFO and EFI_IP4_IPCONFIG_DATA.
@@ -143,3 +154,4 @@ Ip4ConfigFixRouteTablePointer (
   );
 
 #endif
+

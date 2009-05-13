@@ -1,7 +1,7 @@
 /** @file
   This code implements the IP4Config and NicIp4Config protocols.
 
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -15,45 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ip4Config.h"
 
 IP4_CONFIG_INSTANCE *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
-
-/**
-  Return the name and MAC address for the NIC. The Name, if not NULL,
-  has at least IP4_NIC_NAME_LENGTH bytes.
-
-  @param  This                   The NIC IP4 CONFIG protocol
-  @param  Name                   The buffer to return the name
-  @param  NicAddr                The buffer to return the MAC addr
-
-  @retval EFI_INVALID_PARAMETER  This is NULL
-  @retval EFI_SUCCESS            The name or address of the NIC are returned.
-
-**/
-EFI_STATUS
-EFIAPI
-EfiNicIp4ConfigGetName (
-  IN  EFI_NIC_IP4_CONFIG_PROTOCOL  *This,
-  OUT  UINT16                      *Name          OPTIONAL,
-  OUT  NIC_ADDR                    *NicAddr       OPTIONAL
-  )
-{
-  IP4_CONFIG_INSTANCE       *Instance;
-
-  if (This == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Instance = IP4_CONFIG_INSTANCE_FROM_NIC_IP4CONFIG (This);
-
-  if (Name != NULL) {
-    CopyMem (Name, Instance->NicName, IP4_NIC_NAME_LENGTH);
-  }
-
-  if (NicAddr != NULL) {
-    CopyMem (NicAddr, &Instance->NicAddr, sizeof (*NicAddr));
-  }
-
-  return EFI_SUCCESS;
-}
 
 
 /**
@@ -116,7 +77,7 @@ Ip4ConfigGetNicInfo (
 /**
   Get the configure parameter for this NIC.
 
-  @param  This                   The NIC IP4 CONFIG protocol.
+  @param  Instance               The IP4 CONFIG Instance.
   @param  ConfigLen              The length of the NicConfig buffer.
   @param  NicConfig              The buffer to receive the NIC's configure
                                  parameter.
@@ -133,24 +94,22 @@ Ip4ConfigGetNicInfo (
 EFI_STATUS
 EFIAPI
 EfiNicIp4ConfigGetInfo (
-  IN  EFI_NIC_IP4_CONFIG_PROTOCOL *This,
+  IN  IP4_CONFIG_INSTANCE         *Instance,
   IN OUT  UINTN                   *ConfigLen,
   OUT NIC_IP4_CONFIG_INFO         *NicConfig
   )
 {
-  IP4_CONFIG_INSTANCE *Instance;
   NIC_IP4_CONFIG_INFO *Config;
   EFI_STATUS          Status;
   UINTN               Len;
 
-  if ((This == NULL) || (ConfigLen == NULL)) {
+  if ((Instance == NULL) || (ConfigLen == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Read the Nic's configuration parameter from variable
   //
-  Instance  = IP4_CONFIG_INSTANCE_FROM_NIC_IP4CONFIG (This);
   Config    = Ip4ConfigGetNicInfo (&Instance->NicAddr);
 
   if (Config == NULL) {
@@ -187,7 +146,7 @@ EfiNicIp4ConfigGetInfo (
   the configure has finished or not started yet. If NicConfig, the
   NIC's configure parameter is removed from the variable.
 
-  @param  This                   The NIC IP4 CONFIG protocol
+  @param  Instance               The IP4 CONFIG instance.
   @param  NicConfig              The new NIC IP4 configure parameter
   @param  Reconfig               Inform the IP4 driver to restart the auto
                                  configuration
@@ -203,12 +162,11 @@ EfiNicIp4ConfigGetInfo (
 EFI_STATUS
 EFIAPI
 EfiNicIp4ConfigSetInfo (
-  IN EFI_NIC_IP4_CONFIG_PROTOCOL  *This,
+  IN IP4_CONFIG_INSTANCE          *Instance,
   IN NIC_IP4_CONFIG_INFO          *NicConfig     OPTIONAL,
   IN BOOLEAN                      Reconfig
   )
 {
-  IP4_CONFIG_INSTANCE *Instance;
   IP4_CONFIG_VARIABLE *Variable;
   IP4_CONFIG_VARIABLE *NewVariable;
   EFI_STATUS          Status;
@@ -216,11 +174,9 @@ EfiNicIp4ConfigSetInfo (
   //
   // Validate the parameters
   //
-  if (This == NULL) {
+  if (Instance == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  Instance = IP4_CONFIG_INSTANCE_FROM_NIC_IP4CONFIG (This);
 
   if ((NicConfig != NULL) && (!Ip4ConfigIsValid (NicConfig) ||
       !NIC_ADDR_EQUAL (&NicConfig->NicAddr, &Instance->NicAddr))) {
@@ -372,7 +328,7 @@ Ip4ConfigOnDhcp4Complete (
     // ignore the return status of EfiNicIp4ConfigSetInfo. Network
     // stack can operate even that failed.
     //
-    EfiNicIp4ConfigSetInfo (&Instance->NicIp4Protocol, Instance->NicConfig, FALSE);
+    EfiNicIp4ConfigSetInfo (Instance, Instance->NicConfig, FALSE);
   }
 
 ON_EXIT:
@@ -802,8 +758,3 @@ EFI_IP4_CONFIG_PROTOCOL     mIp4ConfigProtocolTemplate = {
   EfiIp4ConfigGetData
 };
 
-EFI_NIC_IP4_CONFIG_PROTOCOL mNicIp4ConfigProtocolTemplate = {
-  EfiNicIp4ConfigGetName,
-  EfiNicIp4ConfigGetInfo,
-  EfiNicIp4ConfigSetInfo
-};
