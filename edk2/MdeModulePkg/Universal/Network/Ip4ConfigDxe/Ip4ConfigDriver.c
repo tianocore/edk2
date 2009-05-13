@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "Ip4Config.h"
-#include "Ip4ConfigNV.h"
+#include "Ip4ConfigNv.h"
 
 EFI_DRIVER_BINDING_PROTOCOL gIp4ConfigDriverBinding = {
   Ip4ConfigDriverBindingSupported,

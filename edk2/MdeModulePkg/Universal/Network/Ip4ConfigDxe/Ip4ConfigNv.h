@@ -1,5 +1,5 @@
 /** @file
-  The header file of IP4ConfigNV.c
+  The header file of IP4ConfigNv.c
 
 Copyright (c) 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _IP4_CONFIGNV_H_
 
 #include "Ip4Config.h"
-#include "Ip4NVData.h"
+#include "Ip4NvData.h"
 
 extern UINT8  Ip4ConfigDxeBin[];
 extern UINT8  Ip4ConfigDxeStrings[];
