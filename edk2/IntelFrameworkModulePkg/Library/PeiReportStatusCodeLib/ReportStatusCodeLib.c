@@ -1,7 +1,7 @@
 /** @file
-  Report Status Code Library for PEI Phase.
+  Instance of Report Status Code Library for PEI Phase.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -33,13 +33,11 @@
 #define MAX_EXTENDED_DATA_SIZE  0x200
 
 /**
-  Internal worker function that reports a status code through the Status Code Protocol
+  Internal worker function that reports a status code through the PEI Status Code Service or
+  OEM Hook Status Code Library.
 
-  This function checks to see if a Status Code Protocol is present in the handle
-  database.  If a Status Code Protocol is not present, then EFI_UNSUPPORTED is
-  returned.  If a Status Code Protocol is present, then it is cached in gStatusCode,
-  and the ReportStatusCode() service of the Status Code Protocol is called passing in
-  Type, Value, Instance, CallerId, and Data.  The result of this call is returned.
+  This function first tries to report status code via PEI Status Code Service. If the service
+  is not available, it then tries calling OEM Hook Status Code Library.
 
   @param  Type              Status code type.
   @param  Value             Status code value.
@@ -50,9 +48,9 @@
   @param  Data              Pointer to the extended data buffer.  This is an
                             optional parameter that may be NULL.
 
-  @retval  EFI_SUCCESS           The status code was reported.
-  @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to report the status code.
-  @retval  EFI_UNSUPPORTED       Status Code Protocol is not available.
+  @retval EFI_SUCCESS       The status code was reported.
+  @retval EFI_UNSUPPORTED   Status code type is not supported.
+  @retval Others            Failed to report status code.
 
 **/
 EFI_STATUS
@@ -68,10 +66,10 @@ InternalReportStatusCode (
   EFI_STATUS              Status;
 
   if ((ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ||
-    (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) ||
-    (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)) {
+      (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) ||
+      (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)) {
     PeiServices = GetPeiServicesTablePointer ();
-    Status =  (*PeiServices)->ReportStatusCode (
+    Status = (*PeiServices)->ReportStatusCode (
                                PeiServices,
                                Type,
                                Value,
@@ -130,7 +128,7 @@ CodeTypeToPostCode (
   // Convert Value to an 8 bit post code
   //
   if (((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ||
-      ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE)       ) {
+      ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE)) {
     *PostCode  = (UINT8) ((((Value & EFI_STATUS_CODE_CLASS_MASK) >> 24) << 5) |
                           (((Value & EFI_STATUS_CODE_SUBCLASS_MASK) >> 16) & 0x1f));
     return TRUE;
@@ -342,6 +340,9 @@ ReportStatusCodeWithDevicePath (
   )
 {
   ASSERT (DevicePath != NULL);
+  //
+  // EFI_UNSUPPORTED is returned for device path is not supported in PEI phase.
+  //
   return EFI_UNSUPPORTED;
 }
 
@@ -458,7 +459,13 @@ ReportStatusCodeEx (
   EFI_STATUS_CODE_DATA  *StatusCodeData;
   UINT64                Buffer[MAX_EXTENDED_DATA_SIZE / sizeof (UINT64)];
 
+  //
+  // If ExtendedData is NULL and ExtendedDataSize is not zero, then ASSERT().
+  //
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
+  //
+  // If ExtendedData is not NULL and ExtendedDataSize is zero, then ASSERT().
+  //
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
   if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
@@ -499,7 +506,7 @@ ReportProgressCodeEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8 (PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED) != 0);
 }
 
 
@@ -521,7 +528,7 @@ ReportErrorCodeEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8 (PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED) != 0);
 }
 
 
@@ -543,5 +550,5 @@ ReportDebugCodeEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8 (PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
