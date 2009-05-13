@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "Ip4Config.h"
+#include "Ip4ConfigNV.h"
 
 EFI_DRIVER_BINDING_PROTOCOL gIp4ConfigDriverBinding = {
   Ip4ConfigDriverBindingSupported,
@@ -40,6 +41,8 @@ EfiIp4ConfigUnload (
   )
 {
   UINT32      Index;
+
+  Ip4ConfigFormUnload ();
 
   //
   //  Stop all the IP4_CONFIG instances
@@ -78,6 +81,8 @@ Ip4ConfigDriverEntryPoint (
   IN EFI_SYSTEM_TABLE       *SystemTable
   )
 {
+  Ip4ConfigFormInit ();
+
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,
@@ -219,7 +224,6 @@ Ip4ConfigDriverBindingStart (
   Instance->Image             = This->DriverBindingHandle;
 
   CopyMem (&Instance->Ip4ConfigProtocol, &mIp4ConfigProtocolTemplate, sizeof (mIp4ConfigProtocolTemplate));
-  CopyMem (&Instance->NicIp4Protocol, &mNicIp4ConfigProtocolTemplate, sizeof (mNicIp4ConfigProtocolTemplate));
 
   Instance->State             = IP4_CONFIG_STATE_IDLE;
   Instance->Mnp               = Mnp;
@@ -242,7 +246,7 @@ Ip4ConfigDriverBindingStart (
 
   Instance->NicAddr.Type    = (UINT16) SnpMode.IfType;
   Instance->NicAddr.Len     = (UINT8) SnpMode.HwAddressSize;
-  CopyMem (&Instance->NicAddr.MacAddr, &SnpMode.CurrentAddress, sizeof (Instance->NicAddr.MacAddr));
+  CopyMem (&Instance->NicAddr.MacAddr, &SnpMode.CurrentAddress, Instance->NicAddr.Len);
 
   //
   // Add it to the global list, and compose the name
@@ -275,6 +279,14 @@ Ip4ConfigDriverBindingStart (
     goto ON_ERROR;
   }
 
+  Status = Ip4ConfigDeviceInit (Instance);
+  if (!EFI_ERROR (Status)) {
+    //
+    // Try to add a port configuration page for this controller.
+    //
+    Ip4ConfigUpdateForm (Instance, TRUE);
+  }
+
   //
   // Install the IP4_CONFIG and NIC_IP4CONFIG protocols
   //
@@ -282,8 +294,6 @@ Ip4ConfigDriverBindingStart (
                   &ControllerHandle,
                   &gEfiIp4ConfigProtocolGuid,
                   &Instance->Ip4ConfigProtocol,
-                  &gEfiNicIp4ConfigProtocolGuid,
-                  &Instance->NicIp4Protocol,
                   NULL
                   );
 
@@ -464,6 +474,8 @@ Ip4ConfigDriverBindingStop (
 
   Instance = IP4_CONFIG_INSTANCE_FROM_IP4CONFIG (Ip4Config);
 
+  Ip4ConfigDeviceUnload (Instance);
+
   //
   // Unload the protocols first to inform the top drivers
   //
@@ -471,8 +483,6 @@ Ip4ConfigDriverBindingStop (
                   NicHandle,
                   &gEfiIp4ConfigProtocolGuid,
                   &Instance->Ip4ConfigProtocol,
-                  &gEfiNicIp4ConfigProtocolGuid,
-                  &Instance->NicIp4Protocol,
                   NULL
                   );
 

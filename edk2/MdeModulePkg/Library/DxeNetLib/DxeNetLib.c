@@ -15,10 +15,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/SimpleNetwork.h>
-#include <Protocol/NicIp4Config.h>
+#include <Protocol/HiiConfigRouting.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
 #include <Protocol/Dpc.h>
+
+#include <Guid/NicIp4ConfigNvData.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>
@@ -28,10 +30,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/HiiLib.h>
+#include <Library/PrintLib.h>
 
 EFI_DPC_PROTOCOL *mDpc = NULL;
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mNetLibHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+
+#define NIC_ITEM_CONFIG_SIZE   sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * 2
 
 //
 // All the supported IP4 maskes in host byte order.
@@ -1248,43 +1254,98 @@ NetLibDefaultAddressIsStatic (
   IN EFI_HANDLE  Controller
   )
 {
-  EFI_STATUS                   Status;
-  EFI_NIC_IP4_CONFIG_PROTOCOL  *NicIp4;
-  UINTN                        Len;
-  NIC_IP4_CONFIG_INFO          *ConfigInfo;
-  BOOLEAN                      IsStatic;
+  EFI_STATUS                       Status;
+  EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
+  UINTN                            Len;
+  NIC_IP4_CONFIG_INFO              *ConfigInfo;
+  BOOLEAN                          IsStatic;
+  EFI_STRING                       ConfigHdr;
+  EFI_STRING                       ConfigResp;
+  EFI_STRING                       AccessProgress;
+  EFI_STRING                       AccessResults;
+  EFI_STRING                       String;
 
-  Status = gBS->HandleProtocol (
-                  Controller,
-                  &gEfiNicIp4ConfigProtocolGuid,
-                  (VOID **) &NicIp4
-                  );
+  ConfigInfo       = NULL;
+  ConfigHdr        = NULL;
+  ConfigResp       = NULL;
+  AccessProgress   = NULL;
+  AccessResults    = NULL;
+  IsStatic         = TRUE;
+
+  Status = gBS->LocateProtocol (
+                &gEfiHiiConfigRoutingProtocolGuid,
+                NULL,
+                (VOID **) &HiiConfigRouting
+                );
   if (EFI_ERROR (Status)) {
     return TRUE;
   }
 
-  Len = 0;
-  Status = NicIp4->GetInfo (NicIp4, &Len, NULL);
-  if (Status != EFI_BUFFER_TOO_SMALL) {
-    return TRUE;
+  //
+  // Construct config request string header
+  //
+  ConfigHdr = HiiConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Controller);
+  
+  Len = StrLen (ConfigHdr);
+  ConfigResp = AllocateZeroPool (Len + NIC_ITEM_CONFIG_SIZE * 2 + 200);
+  if (ConfigResp == NULL) {
+    goto ON_EXIT;
+  }
+  StrCpy (ConfigResp, ConfigHdr);
+
+  String = ConfigResp + Len;
+  UnicodeSPrint (
+    String, 
+    (8 + 4 + 7 + 4) * sizeof (CHAR16), 
+    L"&OFFSET=%04X&WIDTH=%04X", 
+    OFFSET_OF (NIC_IP4_CONFIG_INFO, Source), 
+    sizeof (UINT32)
+    );
+
+  Status = HiiConfigRouting->ExtractConfig (
+                               HiiConfigRouting,
+                               ConfigResp,
+                               &AccessProgress,
+                               &AccessResults
+                               );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
   }
 
-  ConfigInfo = AllocatePool (Len);
+  ConfigInfo = AllocateZeroPool (sizeof (NIC_IP4_CONFIG_INFO));
   if (ConfigInfo == NULL) {
-    return TRUE;
+    goto ON_EXIT;
   }
 
-  IsStatic = TRUE;
-  Status = NicIp4->GetInfo (NicIp4, &Len, ConfigInfo);
+  ConfigInfo->Source = IP4_CONFIG_SOURCE_STATIC;
+  Len = NIC_ITEM_CONFIG_SIZE;
+  Status = HiiConfigRouting->ConfigToBlock (
+                               HiiConfigRouting,
+                               AccessResults,
+                               (UINT8 *) ConfigInfo,
+                               &Len,
+                               &AccessProgress
+                               );
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
 
   IsStatic = (BOOLEAN) (ConfigInfo->Source == IP4_CONFIG_SOURCE_STATIC);
-
+ 
 ON_EXIT:
 
-  gBS->FreePool (ConfigInfo);
+  if (AccessResults != NULL) {
+    FreePool (AccessResults);
+  }
+  if (ConfigInfo != NULL) {
+    FreePool (ConfigInfo);
+  }
+  if (ConfigResp != NULL) {
+    FreePool (ConfigResp);
+  }
+  if (ConfigHdr != NULL) {
+    FreePool (ConfigHdr);
+  }
 
   return IsStatic;
 }
