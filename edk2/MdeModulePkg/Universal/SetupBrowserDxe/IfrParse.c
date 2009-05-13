@@ -1247,7 +1247,8 @@ ParseOpCodes (
     case EFI_IFR_ONE_OF_OP:
     case EFI_IFR_NUMERIC_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT(CurrentStatement != NULL);
+      
       CurrentStatement->Flags = ((EFI_IFR_ONE_OF *) OpCodeData)->Flags;
       Value = &CurrentStatement->HiiValue;
 
