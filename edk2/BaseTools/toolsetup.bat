@@ -168,6 +168,9 @@ if NOT exist %WORKSPACE%\Conf\FrameworkDatabase.db (
 
 if NOT exist %WORKSPACE%\Conf\target.txt (
   echo copying ... target.template to %WORKSPACE%\Conf\target.txt
+  if NOT exist %EDK_TOOLS_PATH%\Conf\target.template (
+    echo Error: target.template is missing at folder %EDK_TOOLS_PATH%\Conf\
+  )
   copy %EDK_TOOLS_PATH%\Conf\target.template %WORKSPACE%\Conf\target.txt > nul
 ) else (
   if defined RECONFIG echo over-write ... target.template to %WORKSPACE%\Conf\target.txt
@@ -176,6 +179,9 @@ if NOT exist %WORKSPACE%\Conf\target.txt (
 
 if NOT exist %WORKSPACE%\Conf\tools_def.txt (
   echo copying ... tools_def.template to %WORKSPACE%\Conf\tools_def.txt
+  if NOT exist %EDK_TOOLS_PATH%\Conf\tools_def.template (
+    echo Error: tools_def.template is missing at folder %EDK_TOOLS_PATH%\Conf\
+  )
   copy %EDK_TOOLS_PATH%\Conf\tools_def.template %WORKSPACE%\Conf\tools_def.txt > nul
 ) else (
   if defined RECONFIG echo over-write ... tools_def.template to %WORKSPACE%\Conf\tools_def.txt
@@ -184,6 +190,9 @@ if NOT exist %WORKSPACE%\Conf\tools_def.txt (
 
 if NOT exist %WORKSPACE%\Conf\build_rule.txt (
   echo copying ... build_rule.template to %WORKSPACE%\Conf\build_rule.txt
+  if NOT exist %EDK_TOOLS_PATH%\Conf\build_rule.template (
+    echo Error: build_rule.template is missing at folder %EDK_TOOLS_PATH%\Conf\
+  )
   copy %EDK_TOOLS_PATH%\Conf\build_rule.template %WORKSPACE%\Conf\build_rule.txt > nul
 ) else (
   if defined RECONFIG echo over-write ... build_rule.template to %WORKSPACE%\Conf\build_rule.txt
