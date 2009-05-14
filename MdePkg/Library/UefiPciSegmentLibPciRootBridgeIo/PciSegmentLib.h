@@ -1,7 +1,7 @@
 /** @file
   Include file of PciSegmentPciRootBridgeIo Library.
 
-  Copyright (c) 2007 - 2008, Intel Corporation All rights
+  Copyright (c) 2007 - 2009, Intel Corporation All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
@@ -37,14 +37,14 @@ typedef struct {
 
 /**
   Assert the validity of a PCI Segment address.
-  A valid PCI address should not contain 1's in bits 31:28
+  A valid PCI Segment address should not contain 1's in bits 28..31 and 48..63
 
   @param  A The address to validate.
   @param  M Additional bits to assert to be zero.
 
 **/
 #define ASSERT_INVALID_PCI_SEGMENT_ADDRESS(A,M) \
-  ASSERT (((A) & (0xf0000000 | (M))) == 0)
+  ASSERT (((A) & (0xffff0000f0000000ULL | (M))) == 0)
 
 /**
   Translate PCI Lib address into format of PCI Root Bridge I/O Protocol

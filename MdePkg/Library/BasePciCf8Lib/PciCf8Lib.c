@@ -2,7 +2,7 @@
   PCI CF8 Library functions that use I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
   Layers on top of an I/O Library instance.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -68,6 +68,7 @@
   associated with that PCI device may be accessed after SetVirtualAddressMap() is called.
   
   If Address > 0x0FFFFFFF, then ASSERT().
+  If the register specified by Address >= 0x100, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -87,6 +88,7 @@ PciCf8RegisterForRuntimeAccess (
   IN UINTN  Address
   )
 {
+  ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   return RETURN_SUCCESS;
 }
 
