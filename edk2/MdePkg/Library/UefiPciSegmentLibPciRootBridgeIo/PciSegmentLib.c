@@ -1,7 +1,7 @@
 /** @file
   PCI Segment Library implementation using PCI Root Bridge I/O Protocol.
 
-  Copyright (c) 2007 - 2008, Intel Corporation All rights
+  Copyright (c) 2007 - 2009, Intel Corporation All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
@@ -244,7 +244,7 @@ DxePciSegmentLibPciRootBridgeIoWriteWorker (
   Register a PCI device so PCI configuration registers may be accessed after 
   SetVirtualAddressMap().
   
-  If Address > 0x0FFFFFFF, then ASSERT().
+  If any reserved bits in Address are set, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
@@ -264,6 +264,7 @@ PciSegmentRegisterForRuntimeAccess (
   IN UINTN  Address
   )
 {
+  ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 0);
   return RETURN_UNSUPPORTED;
 }
 
@@ -297,7 +298,7 @@ PciSegmentRead8 (
   Writes the 8-bit PCI configuration register specified by Address with the value specified by Value.
   Value is returned.  This function must guarantee that all PCI read and write operations are serialized.
   
-  If Address > 0x0FFFFFFF, then ASSERT().
+  If any reserved bits in Address are set, then ASSERT().
 
   @param  Address     Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  Value       The value to write.
@@ -1287,7 +1288,7 @@ PciSegmentBitFieldAndThenOr32 (
   and 16-bit PCI configuration read cycles may be used at the beginning and the
   end of the range.
 
-  If StartAddress > 0x0FFFFFFF, then ASSERT().
+  If any reserved bits in StartAddress are set, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
@@ -1385,7 +1386,7 @@ PciSegmentReadBuffer (
   8-bit and 16-bit PCI configuration write cycles may be used at the beginning
   and the end of the range.
 
-  If StartAddress > 0x0FFFFFFF, then ASSERT().
+  If any reserved bits in StartAddress are set, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
   If Size > 0 and Buffer is NULL, then ASSERT().
 
