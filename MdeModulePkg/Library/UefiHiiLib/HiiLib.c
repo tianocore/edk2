@@ -1177,6 +1177,11 @@ InternalHiiValidateCurrentSetting (
     }
     Link = Link->ForwardLink;      
   }
+  
+  if (IsListEmpty (&CurrentBlockArray->Entry)) {
+    Status = EFI_SUCCESS;
+    goto Done;
+  }
 
   //
   // 2. Check IFR value is in block data, then Validate Vaule
@@ -1233,7 +1238,7 @@ InternalHiiValidateCurrentSetting (
           // Check the matched VarStoreId is found.
           //
           if (IfrVarStore == NULL) {
-            Status = EFI_NOT_FOUND;
+            Status = EFI_SUCCESS;
             goto Done;
           }
           break;
@@ -1580,7 +1585,7 @@ BOOLEAN
 EFIAPI
 InternalHiiIfrValueAction (
   IN CONST EFI_STRING Request,  OPTIONAL
-  IN UINT16        DefaultId,
+  IN UINT16           DefaultId,
   IN UINT8            ActionType
   )
 {
@@ -1738,6 +1743,7 @@ InternalHiiIfrValueAction (
       // Its default value and validating can't execute by parsing IFR data.
       // Directly jump into the next ConfigAltResp string for another pair Guid, Name, and Path.   
       //
+	  Status = EFI_SUCCESS;
       goto NextConfigAltResp;
     }
     
@@ -1819,7 +1825,8 @@ InternalHiiIfrValueAction (
       // Not found the matched default string ID
       //
       if (EFI_ERROR (Status)) {
-        goto Done;
+        Status = EFI_SUCCESS;
+        goto NextConfigAltResp;
       }
     }
     
@@ -1838,7 +1845,8 @@ InternalHiiIfrValueAction (
                                 );
 
     if (EFI_ERROR (Status)) {
-      goto Done;
+      Status = EFI_SUCCESS;
+      goto NextConfigAltResp;
     }
     
     //
@@ -1861,6 +1869,7 @@ InternalHiiIfrValueAction (
       goto Done;
     }
 
+NextConfigAltResp:
     //
     // Free the allocated pacakge buffer and the got ConfigResp string.
     //
@@ -1868,11 +1877,12 @@ InternalHiiIfrValueAction (
       FreePool (HiiPackageList);
       HiiPackageList = NULL;
     }
+    
+	if (ConfigResp != NULL) {
+	  FreePool (ConfigResp);
+	  ConfigResp = NULL;
+	}
 
-    FreePool (ConfigResp);
-    ConfigResp = NULL;
-
-NextConfigAltResp:
     //
     // Free the allocated buffer.
     //
