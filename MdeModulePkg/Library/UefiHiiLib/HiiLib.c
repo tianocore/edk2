@@ -14,6 +14,23 @@
 
 #include "InternalHiiLib.h"
 
+#define GUID_CONFIG_STRING_TYPE 0x00
+#define NAME_CONFIG_STRING_TYPE 0x01
+#define PATH_CONFIG_STRING_TYPE 0x02
+
+#define ACTION_SET_DEFAUTL_VALUE 0x01
+#define ACTION_VALIDATE_SETTING  0x02
+
+#define HII_LIB_DEFAULT_VARSTORE_SIZE  0x200
+
+typedef struct {
+  LIST_ENTRY          Entry;      // Link to Block array
+  UINT16              Offset;
+  UINT16              Width;
+  UINT8               OpCode;
+  UINT8               Scope;
+} IFR_BLOCK_DATA;
+
 //
 // <ConfigHdr> Template
 //
@@ -28,6 +45,62 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_HII_PACKAGE_HEADER  mEndOfPakageList = {
   sizeof (EFI_HII_PACKAGE_HEADER),
   EFI_HII_PACKAGE_END
 };
+
+/**
+  Extract Hii package list GUID for given HII handle.
+
+  If HiiHandle could not be found in the HII database, then ASSERT.
+  If Guid is NULL, then ASSERT.
+
+  @param  Handle              Hii handle
+  @param  Guid                Package list GUID
+
+  @retval EFI_SUCCESS         Successfully extract GUID from Hii database.
+
+**/
+EFI_STATUS
+EFIAPI
+InternalHiiExtractGuidFromHiiHandle (
+  IN      EFI_HII_HANDLE      Handle,
+  OUT     EFI_GUID            *Guid
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        BufferSize;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+
+  ASSERT (Guid != NULL);
+  ASSERT (Handle != NULL);
+
+  //
+  // Get HII PackageList
+  //
+  BufferSize = 0;
+  HiiPackageList = NULL;
+
+  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  ASSERT (Status != EFI_NOT_FOUND);
+  
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    HiiPackageList = AllocatePool (BufferSize);
+    ASSERT (HiiPackageList != NULL);
+
+    Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
+  }
+  if (EFI_ERROR (Status)) {
+    FreePool (HiiPackageList);
+    return Status;
+  }
+
+  //
+  // Extract GUID
+  //
+  CopyGuid (Guid, &HiiPackageList->PackageListGuid);
+
+  FreePool (HiiPackageList);
+
+  return EFI_SUCCESS;
+}
 
 /**
   Registers a list of packages in the HII Database and returns the HII Handle
@@ -303,62 +376,6 @@ HiiGetHiiHandles (
     FreePool (HiiHandleBuffer);
     return NULL;
   }
-}
-
-/**
-  Extract Hii package list GUID for given HII handle.
-
-  If HiiHandle could not be found in the HII database, then ASSERT.
-  If Guid is NULL, then ASSERT.
-
-  @param  Handle              Hii handle
-  @param  Guid                Package list GUID
-
-  @retval EFI_SUCCESS            Successfully extract GUID from Hii database.
-
-**/
-EFI_STATUS
-EFIAPI
-InternalHiiExtractGuidFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle,
-  OUT     EFI_GUID            *Guid
-  )
-{
-  EFI_STATUS                   Status;
-  UINTN                        BufferSize;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-
-  ASSERT (Guid != NULL);
-  ASSERT (Handle != NULL);
-
-  //
-  // Get HII PackageList
-  //
-  BufferSize = 0;
-  HiiPackageList = NULL;
-
-  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  ASSERT (Status != EFI_NOT_FOUND);
-  
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    HiiPackageList = AllocatePool (BufferSize);
-    ASSERT (HiiPackageList != NULL);
-
-    Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  }
-  if (EFI_ERROR (Status)) {
-    FreePool (HiiPackageList);
-    return Status;
-  }
-
-  //
-  // Extract GUID
-  //
-  CopyGuid (Guid, &HiiPackageList->PackageListGuid);
-
-  FreePool (HiiPackageList);
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -677,6 +694,1335 @@ HiiConstructConfigHdr (
   // Convert all hex digits in range [A-F] in the configuration header to [a-f]
   //
   return InternalHiiLowerConfigString (ReturnString);
+}
+
+/**
+  Convert the hex UNICODE encoding string of UEFI GUID, NAME or device path 
+  to binary buffer from <ConfigHdr>.
+
+  This is a internal function.
+
+  @param  String                 UEFI configuration string.
+  @param  Flag                   Flag specifies what type buffer will be retrieved.
+  @param  Buffer                 Binary of Guid, Name or Device path.
+
+  @retval EFI_INVALID_PARAMETER  Any incoming parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Lake of resources to store neccesary structures.
+  @retval EFI_SUCCESS            The buffer data is retrieved and translated to
+                                 binary format.
+
+**/
+EFI_STATUS
+InternalHiiGetBufferFromString (
+  IN  EFI_STRING                 String,
+  IN  UINT8                      Flag,
+  OUT UINT8                      **Buffer
+  )
+{
+  UINTN      Length;
+  EFI_STRING ConfigHdr;
+  CHAR16     *StringPtr;
+  UINT8      *DataBuffer;
+  CHAR16     TemStr[5];
+  UINTN      Index;
+  UINT8      DigitUint8;
+
+  if (String == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  DataBuffer = NULL;
+  StringPtr  = NULL;
+  ConfigHdr  = String;
+  //
+  // The content between 'GUID', 'NAME', 'PATH' of <ConfigHdr> and '&' of next element
+  // or '\0' (end of configuration string) is the UNICODE %02x bytes encoding string.
+  //
+  for (Length = 0; *String != 0 && *String != L'&'; String++, Length++);
+
+  switch (Flag) {
+  case GUID_CONFIG_STRING_TYPE:
+  case PATH_CONFIG_STRING_TYPE:
+    //
+    // The data in <ConfigHdr> is encoded as hex UNICODE %02x bytes in the same order
+    // as the device path and Guid resides in RAM memory.
+    // Translate the data into binary.
+    //
+    DataBuffer = (UINT8 *) AllocateZeroPool ((Length + 1) / 2);
+    if (DataBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    //
+    // Convert binary byte one by one
+    //
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < Length; Index ++) {
+      TemStr[0] = ConfigHdr[Index];
+      DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+      if ((Index & 1) == 0) {
+        DataBuffer [Index/2] = DigitUint8;
+      } else {
+        DataBuffer [Index/2] = (UINT8) ((DataBuffer [Index/2] << 4) + DigitUint8);
+      }
+    }
+    
+    *Buffer = DataBuffer;
+    break;
+
+  case NAME_CONFIG_STRING_TYPE:
+    //
+    // Convert Config String to Unicode String, e.g. "0041004200430044" => "ABCD"
+    // 
+
+    //
+    // Add the tailling char L'\0'
+    //
+    DataBuffer = (UINT8 *) AllocateZeroPool ((Length/4 + 1) * sizeof (CHAR16));
+    if (DataBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    //
+    // Convert character one by one
+    //
+    StringPtr = (CHAR16 *) DataBuffer;
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < Length; Index += 4) {
+      StrnCpy (TemStr, ConfigHdr + Index, 4);
+      StringPtr[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
+    }
+    //
+    // Add tailing L'\0' character
+    //
+    StringPtr[Index/4] = L'\0';
+
+    *Buffer = DataBuffer;
+    break;
+
+  default:
+    return EFI_INVALID_PARAMETER;
+    break;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This function checks VarOffset and VarWidth is in the block range.
+
+  @param  BlockArray         The block array is to be checked. 
+  @param  VarOffset          Offset of var to the structure
+  @param  VarWidth           Width of var.
+  
+  @retval TRUE   This Var is in the block range.
+  @retval FALSE  This Var is not in the block range.
+**/
+BOOLEAN
+BlockArrayCheck (
+  IN IFR_BLOCK_DATA  *BlockArray,
+  IN UINT16          VarOffset,
+  IN UINT16          VarWidth
+  )
+{
+  LIST_ENTRY          *Link;
+  IFR_BLOCK_DATA      *BlockData;
+  
+  //
+  // No Request Block array, all vars are got.
+  //
+  if (BlockArray == NULL) {
+    return TRUE;
+  }
+  
+  //
+  // Check the input var is in the request block range.
+  //
+  for (Link = BlockArray->Entry.ForwardLink; Link != &BlockArray->Entry; Link = Link->ForwardLink) {
+    BlockData = BASE_CR (Link, IFR_BLOCK_DATA, Entry);
+    if ((VarOffset >= BlockData->Offset) && ((VarOffset + VarWidth) <= (BlockData->Offset + BlockData->Width))) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+  Get the value of <Number> in <BlockConfig> format, i.e. the value of OFFSET
+  or WIDTH or VALUE.
+  <BlockConfig> ::= 'OFFSET='<Number>&'WIDTH='<Number>&'VALUE'=<Number>
+
+  @param  ValueString            String in <BlockConfig> format and points to the
+                                 first character of <Number>.
+  @param  ValueData              The output value. Caller takes the responsibility
+                                 to free memory.
+  @param  ValueLength            Length of the <Number>, in characters.
+
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary
+                                 structures.
+  @retval EFI_SUCCESS            Value of <Number> is outputted in Number
+                                 successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+InternalHiiGetValueOfNumber (
+  IN  EFI_STRING           ValueString,
+  OUT UINT8                **ValueData,
+  OUT UINTN                *ValueLength
+  )
+{
+  EFI_STRING               StringPtr;
+  UINTN                    Length;
+  UINT8                    *Buf;
+  UINT8                    DigitUint8;
+  UINTN                    Index;
+  CHAR16                   TemStr[2];
+
+  ASSERT (ValueString != NULL && ValueData != NULL && ValueLength != NULL);
+  ASSERT (*ValueString != L'\0');
+
+  //
+  // Get the length of value string
+  //
+  StringPtr = ValueString;
+  while (*StringPtr != L'\0' && *StringPtr != L'&') {
+    StringPtr++;
+  }
+  Length = StringPtr - ValueString;
+  
+  //
+  // Allocate buffer to store the value
+  //
+  Buf = (UINT8 *) AllocateZeroPool ((Length + 1) / 2);
+  if (Buf == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  //
+  // Convert character one by one to the value buffer
+  //
+  ZeroMem (TemStr, sizeof (TemStr));
+  for (Index = 0; Index < Length; Index ++) {
+    TemStr[0] = ValueString[Length - Index - 1];
+    DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+    if ((Index & 1) == 0) {
+      Buf [Index/2] = DigitUint8;
+    } else {
+      Buf [Index/2] = (UINT8) ((DigitUint8 << 4) + Buf [Index/2]);
+    }
+  }
+  
+  //
+  // Set the converted value and string length.
+  //
+  *ValueData    = Buf;
+  *ValueLength  = Length;
+  return EFI_SUCCESS;
+}
+
+/**
+  This function shares the same logic to parse ConfigAltResp string 
+  for setting default value and validating current setting.
+
+  @param ConfigResp         
+  @param HiiPackageList     
+  @param PackageListLength  
+  @param VarGuid
+  @param VarName
+  
+  @retval EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+InternalHiiValidateCurrentSetting (
+  IN EFI_STRING                    ConfigResp,
+  IN EFI_HII_PACKAGE_LIST_HEADER   *HiiPackageList,
+  IN UINTN                         PackageListLength,
+  IN EFI_GUID                      *VarGuid,
+  IN CHAR16                        *VarName
+  )
+{ 
+  IFR_BLOCK_DATA               *CurrentBlockArray;
+  IFR_BLOCK_DATA               *BlockData;
+  IFR_BLOCK_DATA               *NewBlockData;
+  IFR_BLOCK_DATA               VarBlockData;
+  EFI_STRING                   StringPtr;
+  UINTN                        Length;
+  UINT8                        *TmpBuffer;
+  UINT16                       Offset;
+  UINT16                       Width;
+  UINT64                       VarValue;
+  LIST_ENTRY                   *Link;
+  UINT8                        *VarBuffer;
+  UINTN                        MaxBufferSize;
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_HEADER       PacakgeHeader;
+  UINT32                       PackageOffset;
+  UINT8                        *PackageData;
+  UINTN                        IfrOffset;
+  EFI_IFR_OP_HEADER            *IfrOpHdr;
+  EFI_IFR_VARSTORE             *IfrVarStore;
+  EFI_IFR_ONE_OF               *IfrOneOf;
+  EFI_IFR_NUMERIC              *IfrNumeric;
+  EFI_IFR_ONE_OF_OPTION        *IfrOneOfOption;
+  EFI_IFR_CHECKBOX             *IfrCheckBox;
+  EFI_IFR_STRING               *IfrString;
+  CHAR8                        *VarStoreName;
+  UINTN                        Index;
+  
+  //
+  // 1. Get the current setting to current block data array and Convert them into VarBuffer
+  //
+
+  //
+  // Skip ConfigHdr string
+  //
+  StringPtr = ConfigResp;
+  StringPtr = StrStr (ConfigResp, L"&OFFSET");
+  if (StringPtr == NULL) {
+    //
+    // No ConfigBlock value is requied to be validated.
+    // EFI_SUCCESS directly return.
+    //
+    return EFI_SUCCESS;
+  }
+   
+  //
+  // Initialize the local variables.
+  //
+  Index         = 0;
+  VarStoreName  = NULL;
+  Status        = EFI_SUCCESS;
+  BlockData     = NULL;
+  NewBlockData  = NULL;
+  TmpBuffer     = NULL;
+  MaxBufferSize = HII_LIB_DEFAULT_VARSTORE_SIZE;
+  VarBuffer     = AllocateZeroPool (MaxBufferSize);
+  if (VarBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Init CurrentBlockArray
+  //
+  CurrentBlockArray = (IFR_BLOCK_DATA *) AllocateZeroPool (sizeof (IFR_BLOCK_DATA));
+  if (CurrentBlockArray == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+  InitializeListHead (&CurrentBlockArray->Entry);
+  
+  //
+  // Parse each <RequestElement> if exists
+  // Only <BlockName> format is supported by this help function.
+  // <BlockName> ::= &'OFFSET='<Number>&'WIDTH='<Number>
+  //
+  while (*StringPtr != 0 && StrnCmp (StringPtr, L"&OFFSET=", StrLen (L"&OFFSET=")) == 0) {
+    //
+    // Skip the &OFFSET= string
+    // 
+    StringPtr += StrLen (L"&OFFSET=");
+
+    //
+    // Get Offset
+    //
+    Status = InternalHiiGetValueOfNumber (StringPtr, &TmpBuffer, &Length);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    Offset = 0;
+    CopyMem (
+      &Offset,
+      TmpBuffer,
+      (((Length + 1) / 2) < sizeof (UINT16)) ? ((Length + 1) / 2) : sizeof (UINT16)
+      );
+    FreePool (TmpBuffer);
+    TmpBuffer = NULL;
+
+    StringPtr += Length;
+    if (StrnCmp (StringPtr, L"&WIDTH=", StrLen (L"&WIDTH=")) != 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"&WIDTH=");
+
+    //
+    // Get Width
+    //
+    Status = InternalHiiGetValueOfNumber (StringPtr, &TmpBuffer, &Length);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    Width = 0;
+    CopyMem (
+      &Width,
+      TmpBuffer,
+      (((Length + 1) / 2) < sizeof (UINT16)) ? ((Length + 1) / 2) : sizeof (UINT16)
+      );
+    FreePool (TmpBuffer);
+    TmpBuffer = NULL;
+
+    StringPtr += Length;
+    if (*StringPtr != 0 && *StringPtr != L'&') {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    if (StrnCmp (StringPtr, L"&VALUE=", StrLen (L"&VALUE=")) != 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"&VALUE=");
+
+    //
+    // Get Value
+    //
+    Status = InternalHiiGetValueOfNumber (StringPtr, &TmpBuffer, &Length);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    StringPtr += Length;
+    if (*StringPtr != 0 && *StringPtr != L'&') {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    //
+    // Check whether VarBuffer is enough
+    //
+    if ((UINTN) (Offset + Width) > MaxBufferSize) {
+      VarBuffer = ReallocatePool (
+                    MaxBufferSize,
+                    Offset + Width + HII_LIB_DEFAULT_VARSTORE_SIZE,
+                    VarBuffer
+                    );
+      if (VarBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      MaxBufferSize = Offset + Width + HII_LIB_DEFAULT_VARSTORE_SIZE;
+    }
+
+    //
+    // Update the Block with configuration info
+    //
+    CopyMem (VarBuffer + Offset, TmpBuffer, Width);
+    FreePool (TmpBuffer);
+    TmpBuffer = NULL;
+
+    //
+    // Set new Block Data
+    //
+    NewBlockData = (IFR_BLOCK_DATA *) AllocateZeroPool (sizeof (IFR_BLOCK_DATA));
+    if (NewBlockData == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+    NewBlockData->Offset = Offset;
+    NewBlockData->Width  = Width;
+
+    //
+    // Insert the new block data into the block data array.
+    //
+    for (Link = CurrentBlockArray->Entry.ForwardLink; Link != &CurrentBlockArray->Entry; Link = Link->ForwardLink) {
+      BlockData = BASE_CR (Link, IFR_BLOCK_DATA, Entry);
+      if (NewBlockData->Offset == BlockData->Offset) {
+        if (NewBlockData->Width > BlockData->Width) {
+          BlockData->Width = NewBlockData->Width;
+        }
+        FreePool (NewBlockData);
+        break;
+      } else if (NewBlockData->Offset < BlockData->Offset) {
+        //
+        // Insert new block data as the previous one of this link.
+        //
+        InsertTailList (Link, &NewBlockData->Entry);
+        break;
+      }
+    }
+
+    //
+    // Insert new block data into the array tail.
+    //
+    if (Link == &CurrentBlockArray->Entry) {
+      InsertTailList (Link, &NewBlockData->Entry);
+    }
+
+    //
+    // If '\0', parsing is finished. 
+    //
+    if (*StringPtr == 0) {
+      break;
+    }
+    //
+    // Go to next ConfigBlock 
+    //
+  }
+
+  //
+  // Merge the aligned block data into the single block data.
+  //
+  Link = CurrentBlockArray->Entry.ForwardLink;
+  while ((Link != &CurrentBlockArray->Entry) && (Link->ForwardLink != &CurrentBlockArray->Entry)) {
+    BlockData = BASE_CR (Link, IFR_BLOCK_DATA, Entry);
+    NewBlockData = BASE_CR (Link->ForwardLink, IFR_BLOCK_DATA, Entry);
+    if ((NewBlockData->Offset >= BlockData->Offset) && (NewBlockData->Offset <= (BlockData->Offset + BlockData->Width))) {
+      if ((NewBlockData->Offset + NewBlockData->Width) > (BlockData->Offset + BlockData->Width)) {
+        BlockData->Width = (UINT16) (NewBlockData->Offset + NewBlockData->Width - BlockData->Offset);
+      }
+      RemoveEntryList (Link->ForwardLink);
+      FreePool (NewBlockData);
+      continue;
+    }
+    Link = Link->ForwardLink;      
+  }
+
+  //
+  // 2. Check IFR value is in block data, then Validate Vaule
+  //
+  ZeroMem (&VarBlockData, sizeof (VarBlockData));
+  VarValue      = 0;
+  IfrVarStore   = NULL;
+  PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+  while (PackageOffset < PackageListLength) {
+    CopyMem (&PacakgeHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PacakgeHeader));
+    
+    //
+    // Parse IFR opcode from the form package.
+    //
+    if (PacakgeHeader.Type == EFI_HII_PACKAGE_FORMS) {
+      IfrOffset   = sizeof (PacakgeHeader);
+      PackageData = (UINT8 *) HiiPackageList + PackageOffset;
+      while (IfrOffset < PacakgeHeader.Length) {
+        IfrOpHdr = (EFI_IFR_OP_HEADER *) (PackageData + IfrOffset);
+        //
+        // Validate current setting to the value built in IFR opcode
+        //
+        switch (IfrOpHdr->OpCode) {
+        case EFI_IFR_VARSTORE_OP:          
+          //
+          // VarStoreId has been found. No further found.
+          //
+          if (IfrVarStore != NULL) {
+            break;
+          }
+          //
+          // Find the matched VarStoreId to the input VarGuid and VarName
+          //            
+          IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpHdr;
+          if (CompareGuid ((EFI_GUID *) (VOID *) &IfrVarStore->Guid, VarGuid)) {
+            VarStoreName = (CHAR8 *) IfrVarStore->Name;
+            for (Index = 0; VarStoreName[Index] != 0; Index ++) {
+              if ((CHAR16) VarStoreName[Index] != VarName[Index]) {
+                break;
+              }
+            }
+            //
+            // The matched VarStore is found.
+            //
+            if ((VarStoreName[Index] != 0) || (VarName[Index] != 0)) {
+              IfrVarStore = NULL;
+            }
+          } else {
+            IfrVarStore = NULL;
+          }
+          break;
+        case EFI_IFR_FORM_OP:
+          //
+          // Check the matched VarStoreId is found.
+          //
+          if (IfrVarStore == NULL) {
+            Status = EFI_NOT_FOUND;
+            goto Done;
+          }
+          break;
+        case EFI_IFR_ONE_OF_OP:
+          //
+          // Check whether current value is the one of option. 
+          //
+
+          //
+          // Check whether this question is for the requested varstore.
+          //
+          IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpHdr;
+          if (IfrOneOf->Question.VarStoreId != IfrVarStore->VarStoreId) {
+            break;
+          }
+          
+          //
+          // Get Offset by Question header and Width by DataType Flags
+          //
+          Offset = IfrOneOf->Question.VarStoreInfo.VarOffset;
+          Width  = (UINT16) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
+          //
+          // Check whether this question is in current block array.
+          //
+          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+            //
+            // This question is not in the current configuration string. Skip it.
+            //
+            break;
+          }
+          //
+          // Check this var question is in the var storage 
+          //
+          if ((Offset + Width) > IfrVarStore->Size) {
+            //
+            // This question exceeds the var store size. 
+            //
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+
+          //
+          // Get the current value for oneof opcode
+          //
+          VarValue = 0;
+          CopyMem (&VarValue, VarBuffer +  Offset, Width);
+          //
+          // Set Block Data, to be checked in the following Oneof option opcode.
+          //
+          VarBlockData.Offset     = Offset;
+          VarBlockData.Width      = Width;
+          VarBlockData.OpCode     = IfrOpHdr->OpCode;
+          VarBlockData.Scope      = IfrOpHdr->Scope;
+          break;
+        case EFI_IFR_NUMERIC_OP:
+          //
+          // Check the current value is in the numeric range.
+          //
+
+          //
+          // Check whether this question is for the requested varstore.
+          //
+          IfrNumeric = (EFI_IFR_NUMERIC *) IfrOpHdr;
+          if (IfrNumeric->Question.VarStoreId != IfrVarStore->VarStoreId) {
+            break;
+          }
+          
+          //
+          // Get Offset by Question header and Width by DataType Flags
+          //
+          Offset = IfrNumeric->Question.VarStoreInfo.VarOffset;
+          Width  = (UINT16) (1 << (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE));
+          //
+          // Check whether this question is in current block array.
+          //
+          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+            //
+            // This question is not in the current configuration string. Skip it.
+            //
+            break;
+          }
+          //
+          // Check this var question is in the var storage 
+          //
+          if ((Offset + Width) > IfrVarStore->Size) {
+            //
+            // This question exceeds the var store size. 
+            //
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+
+          //
+          // Check the current value is in the numeric range.
+          //
+          VarValue = 0;
+          CopyMem (&VarValue, VarBuffer +  Offset, Width);
+          switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
+          case EFI_IFR_NUMERIC_SIZE_1:
+            if ((UINT8) VarValue < IfrNumeric->data.u8.MinValue || (UINT8) VarValue > IfrNumeric->data.u8.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              Status = EFI_INVALID_PARAMETER;
+              goto Done;
+            }
+            break;
+          case EFI_IFR_NUMERIC_SIZE_2:
+            if ((UINT16) VarValue < IfrNumeric->data.u16.MinValue || (UINT16) VarValue > IfrNumeric->data.u16.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              Status = EFI_INVALID_PARAMETER;
+              goto Done;
+            }
+            break;
+          case EFI_IFR_NUMERIC_SIZE_4:
+            if ((UINT32) VarValue < IfrNumeric->data.u32.MinValue || (UINT32) VarValue > IfrNumeric->data.u32.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              Status = EFI_INVALID_PARAMETER;
+              goto Done;
+            }
+            break;
+          case EFI_IFR_NUMERIC_SIZE_8:
+            if ((UINT64) VarValue < IfrNumeric->data.u64.MinValue || (UINT64) VarValue > IfrNumeric->data.u64.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              Status = EFI_INVALID_PARAMETER;
+              goto Done;
+            }
+            break;
+          }
+
+          break;
+        case EFI_IFR_CHECKBOX_OP:
+          //
+          // Check value is BOOLEAN type, only 0 and 1 is valid.
+          //
+
+          //
+          // Check whether this question is for the requested varstore.
+          //
+          IfrCheckBox = (EFI_IFR_CHECKBOX *) IfrOpHdr;
+          if (IfrCheckBox->Question.VarStoreId != IfrVarStore->VarStoreId) {
+            break;
+          }
+          
+          //
+          // Get Offset by Question header
+          //
+          Offset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
+          Width  = sizeof (BOOLEAN);
+          //
+          // Check whether this question is in current block array.
+          //
+          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+            //
+            // This question is not in the current configuration string. Skip it.
+            //
+            break;
+          }
+          //
+          // Check this var question is in the var storage 
+          //
+          if ((Offset + Width) > IfrVarStore->Size) {
+            //
+            // This question exceeds the var store size. 
+            //
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+
+          //
+          // Boolean type, only 1 and 0 is valid.
+          //
+          if (*(VarBuffer + Offset) > 1) {
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;            
+          }
+          
+          break;
+        case EFI_IFR_STRING_OP:
+          //
+          // Check current string length is less than maxsize
+          //
+
+          //
+          // Check whether this question is for the requested varstore.
+          //
+          IfrString = (EFI_IFR_STRING *) IfrOpHdr;
+          if (IfrString->Question.VarStoreId != IfrVarStore->VarStoreId) {
+            break;
+          }
+          
+          //
+          // Get Offset/Width by Question header and OneOf Flags
+          //
+          Offset = IfrString->Question.VarStoreInfo.VarOffset;
+          Width  = (UINT16) (IfrString->MaxSize * sizeof (UINT16));
+          //
+          // Check whether this question is in current block array.
+          //
+          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+            //
+            // This question is not in the current configuration string. Skip it.
+            //
+            break;
+          }
+          //
+          // Check this var question is in the var storage 
+          //
+          if ((Offset + Width) > IfrVarStore->Size) {
+            //
+            // This question exceeds the var store size. 
+            //
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+          
+          //
+          // Check current string length is less than maxsize
+          //
+          if (StrSize ((CHAR16 *) (VarBuffer + Offset)) > Width) {
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;            
+          }
+          break;
+        case EFI_IFR_ONE_OF_OPTION_OP:
+          //
+          // Opcode Scope is zero. This one of option is not to be checked. 
+          //
+          if (VarBlockData.Scope == 0) {
+            break;
+          }
+
+          //
+          // Only check for OneOf and OrderList opcode
+          //
+          IfrOneOfOption = (EFI_IFR_ONE_OF_OPTION *) IfrOpHdr;
+          if (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP) {
+            //
+            // Check current value is the value of one of option.
+            //
+            if (VarValue == IfrOneOfOption->Value.u64) {
+              //
+              // The value is one of option value.
+              // Set OpCode to Zero, don't need check again.
+              //
+              VarBlockData.OpCode = 0;
+            }
+          }
+
+          break;
+        case EFI_IFR_END_OP:
+          //
+          // Decrease opcode scope for the validated opcode
+          //
+          if (VarBlockData.Scope > 0) {
+            VarBlockData.Scope --;
+          }
+
+          //
+          // OneOf value doesn't belong to one of option value. 
+          //
+          if (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP) {
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+          break;
+        default:
+          //
+          // Increase Scope for the validated opcode
+          //
+          if (VarBlockData.Scope > 0) {
+            VarBlockData.Scope = (UINT8) (VarBlockData.Scope + IfrOpHdr->Scope);
+          }
+          break;
+        }
+        //
+        // Go to the next opcode
+        //
+        IfrOffset += IfrOpHdr->Length;
+      }
+      //
+      // Only one form is in a package list.
+      //
+      break;
+    }
+    
+    //
+    // Go to next package.
+    //
+    PackageOffset += PacakgeHeader.Length;      
+  }
+
+Done:
+  if (VarBuffer != NULL) {
+    FreePool (VarBuffer);
+  }
+  
+  if (CurrentBlockArray != NULL) {
+    //
+    // Free Link Array CurrentBlockArray
+    //
+    while (!IsListEmpty (&CurrentBlockArray->Entry)) {
+      BlockData = BASE_CR (CurrentBlockArray->Entry.ForwardLink, IFR_BLOCK_DATA, Entry);
+      RemoveEntryList (&BlockData->Entry);
+      FreePool (BlockData);
+    }
+    FreePool (CurrentBlockArray);    
+  }
+
+  return Status;
+}
+
+/**
+  This function shares the same logic to parse ConfigAltResp string 
+  for setting default value and validating current setting.
+  
+  1. For setting default action, Reset the default value specified by DefaultId 
+  to the driver configuration got by Request string.
+  2. For validating current setting, Validate the current configuration 
+  by parsing HII form IFR opcode.
+
+  NULL request string support depends on the ExportConfig interface of
+  HiiConfigRouting protocol in UEFI specification.
+  
+  @param Request    A null-terminated Unicode string in 
+                    <MultiConfigRequest> format. It can be NULL.
+                    If it is NULL, all current configuration for the
+                    entirety of the current HII database will be validated.
+                    If it is NULL, all configuration for the
+                    entirety of the current HII database will be reset.
+  @param DefaultId  Specifies the type of defaults to retrieve only for setting default action.
+  @param ActionType Action supports setting defaults and validate current setting.
+  
+  @retval TURE    Action runs successfully.
+  @retval FALSE   Action is not valid or Action can't be executed successfully..
+**/
+BOOLEAN
+EFIAPI
+InternalHiiIfrValueAction (
+  IN CONST EFI_STRING Request,  OPTIONAL
+  IN UINT16        DefaultId,
+  IN UINT8            ActionType
+  )
+{
+  EFI_STRING     ConfigAltResp;
+  EFI_STRING     ConfigAltHdr;
+  EFI_STRING     ConfigResp;
+  EFI_STRING     Progress;
+  EFI_STRING     StringPtr;
+  EFI_STRING     StringHdr;
+  EFI_STATUS     Status;
+  EFI_HANDLE     DriverHandle;
+  EFI_HANDLE     TempDriverHandle;
+  EFI_HII_HANDLE *HiiHandleBuffer;
+  EFI_HII_HANDLE HiiHandle;
+  UINT32         Index;
+  EFI_GUID       *VarGuid;
+  EFI_STRING     VarName;
+  EFI_STRING_ID  DefaultName;
+
+  UINT8                        *PackageData;
+  UINTN                        IfrOffset;
+  EFI_IFR_OP_HEADER            *IfrOpHdr;
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+  UINT32                       PackageOffset;  
+  UINTN                        PackageListLength;
+  EFI_HII_PACKAGE_HEADER       PacakgeHeader;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL     *TempDevicePath;
+  
+  ConfigAltResp = NULL;
+  ConfigResp    = NULL;
+  VarGuid       = NULL;
+  VarName       = NULL;
+  DevicePath    = NULL;
+  ConfigAltHdr  = NULL;
+  HiiHandleBuffer  = NULL;
+  Index            = 0;
+  TempDriverHandle = NULL;
+  HiiHandle        = NULL;
+  PackageData      = NULL;
+  HiiPackageList   = NULL;
+  
+  //
+  // Only support set default and validate setting action.
+  //
+  if ((ActionType != ACTION_SET_DEFAUTL_VALUE) && (ActionType != ACTION_VALIDATE_SETTING)) {
+    return FALSE;
+  }
+
+  //
+  // Get the full requested value and deault value string.
+  //
+  if (Request != NULL) {
+    Status = gHiiConfigRouting->ExtractConfig (
+                                  gHiiConfigRouting,
+                                  Request,
+                                  &Progress,
+                                  &ConfigAltResp
+                                );
+  } else {
+    Status = gHiiConfigRouting->ExportConfig (
+                                  gHiiConfigRouting,
+                                  &ConfigAltResp
+                                );
+  }
+  
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  
+  StringPtr = ConfigAltResp;
+  
+  while (StringPtr != L'\0') {
+    //
+    // 1. Find <ConfigHdr> GUID=...&NAME=...&PATH=...
+    //
+    StringHdr = StringPtr;
+
+    //
+    // Get Guid value
+    //
+    if (StrnCmp (StringPtr, L"GUID=", StrLen (L"GUID=")) != 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"GUID=");
+    Status = InternalHiiGetBufferFromString (StringPtr, GUID_CONFIG_STRING_TYPE, (UINT8 **) &VarGuid);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    //
+    // Get Name value VarName
+    //
+    while (*StringPtr != L'\0' && StrnCmp (StringPtr, L"&NAME=", StrLen (L"&NAME=")) != 0) {
+      StringPtr++;
+    }
+    if (*StringPtr == L'\0') {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"&NAME=");
+    Status = InternalHiiGetBufferFromString (StringPtr, NAME_CONFIG_STRING_TYPE, (UINT8 **) &VarName);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    
+    //
+    // Get Path value DevicePath
+    //
+    while (*StringPtr != L'\0' && StrnCmp (StringPtr, L"&PATH=", StrLen (L"&PATH=")) != 0) {
+      StringPtr++;
+    }
+    if (*StringPtr == L'\0') {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"&PATH=");
+    Status = InternalHiiGetBufferFromString (StringPtr, PATH_CONFIG_STRING_TYPE, (UINT8 **) &DevicePath);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    //
+    // Get the Driver handle by the got device path.
+    //
+    TempDevicePath = DevicePath;
+    Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &TempDevicePath, &DriverHandle);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    
+    //
+    // Find the matched Hii Handle for the found Driver handle
+    //
+    HiiHandleBuffer = HiiGetHiiHandles (NULL);
+    if (HiiHandleBuffer == NULL) {
+      Status = EFI_NOT_FOUND;
+      goto Done;
+    }
+
+    for (Index = 0; HiiHandleBuffer[Index] != NULL; Index ++) {
+      gHiiDatabase->GetPackageListHandle (gHiiDatabase, HiiHandleBuffer[Index], &TempDriverHandle);
+      if (TempDriverHandle == DriverHandle) {
+        break;
+      }
+    }
+
+    HiiHandle = HiiHandleBuffer[Index];
+    FreePool (HiiHandleBuffer);
+
+    if (HiiHandle == NULL) {
+      //
+      // This request string has no its Hii package.
+      // Its default value and validating can't execute by parsing IFR data.
+      // Directly jump into the next ConfigAltResp string for another pair Guid, Name, and Path.   
+      //
+      goto NextConfigAltResp;
+    }
+    
+    //
+    // 2. Get DefaultName string ID by parsing the PacakgeList 
+    //
+
+    //
+    // Get HiiPackage by HiiHandle
+    //
+    PackageListLength  = 0;
+    HiiPackageList     = NULL;
+    Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, HiiHandle, &PackageListLength, HiiPackageList);
+  
+    //
+    // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
+    //
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+  
+    HiiPackageList = AllocatePool (PackageListLength);
+    if (HiiPackageList == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+  
+    //
+    // Get PackageList on HiiHandle
+    //
+    Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, HiiHandle, &PackageListLength, HiiPackageList);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    
+    //
+    // Parse the form package and get the default name string ID.
+    //
+    if (ActionType == ACTION_SET_DEFAUTL_VALUE) {
+      PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+      Status = EFI_NOT_FOUND;
+      while (PackageOffset < PackageListLength) {
+        CopyMem (&PacakgeHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PacakgeHeader));
+        
+        //
+        // Parse IFR opcode to get default store opcode
+        //
+        if (PacakgeHeader.Type == EFI_HII_PACKAGE_FORMS) {
+          IfrOffset = sizeof (PacakgeHeader);
+          PackageData = (UINT8 *) HiiPackageList + PackageOffset;
+          while (IfrOffset < PacakgeHeader.Length) {
+            IfrOpHdr = (EFI_IFR_OP_HEADER *) (PackageData + IfrOffset);
+            //
+            // Match DefaultId to find its DefaultName
+            //
+            if (IfrOpHdr->OpCode == EFI_IFR_DEFAULTSTORE_OP) {
+              if (((EFI_IFR_DEFAULTSTORE *) IfrOpHdr)->DefaultId == DefaultId) {
+                DefaultName = ((EFI_IFR_DEFAULTSTORE *) IfrOpHdr)->DefaultName;
+                Status = EFI_SUCCESS;
+                break;
+              }
+            }
+            IfrOffset += IfrOpHdr->Length;
+          }
+          //
+          // Only one form is in a package list.
+          //
+          break;
+        }
+        
+        //
+        // Go to next package.
+        //
+        PackageOffset += PacakgeHeader.Length;      
+      }
+      
+      //
+      // Not found the matched default string ID
+      //
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
+    }
+    
+    //
+    // 3. Call ConfigRouting GetAltCfg(ConfigRoute, <ConfigResponse>, Guid, Name, DevicePath, AltCfgId, AltCfgResp)
+    //    Get the default configuration string according to the found defaultname string ID.
+    //
+    Status = gHiiConfigRouting->GetAltConfig (
+                                  gHiiConfigRouting,
+                                  ConfigAltResp,
+                                  VarGuid,
+                                  VarName,
+                                  DevicePath,
+                                  (ActionType == ACTION_SET_DEFAUTL_VALUE) ? &DefaultName:NULL,  // it can be NULL to get the current setting.
+                                  &ConfigResp
+                                );
+
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    
+    //
+    // 4. Set the default configuration information or Validate current setting by parse IFR code.
+    //    Current Setting is in ConfigResp, will be set into buffer, then check it again.
+    //
+    if (ActionType == ACTION_SET_DEFAUTL_VALUE) {
+      //
+      // Set the default configuration information.
+      //
+      Status = gHiiConfigRouting->RouteConfig (gHiiConfigRouting, ConfigResp, &Progress);
+    } else {
+      //
+      // Current Setting is in ConfigResp, will be set into buffer, then check it again.
+      //
+      Status = InternalHiiValidateCurrentSetting (ConfigResp, HiiPackageList, PackageListLength, VarGuid, VarName);
+    }
+
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    //
+    // Free the allocated pacakge buffer and the got ConfigResp string.
+    //
+    if (HiiPackageList != NULL) {
+      FreePool (HiiPackageList);
+      HiiPackageList = NULL;
+    }
+
+    FreePool (ConfigResp);
+    ConfigResp = NULL;
+
+NextConfigAltResp:
+    //
+    // Free the allocated buffer.
+    //
+    FreePool (VarGuid);
+    VarGuid = NULL;
+  
+    FreePool (VarName);
+    VarName = NULL;
+  
+    FreePool (DevicePath);
+    DevicePath = NULL;
+
+    //
+    // 5. Jump to next ConfigAltResp for another Guid, Name, Path.
+    //
+
+    //
+    // Get and Skip ConfigHdr
+    //
+    while (*StringPtr != L'\0' && *StringPtr != L'&') {
+      StringPtr++;
+    }
+    if (*StringPtr == L'\0') {
+      break;
+    }
+        
+    //
+    // Construct ConfigAltHdr string  "&<ConfigHdr>&ALTCFG=\0" 
+    //                               | 1 | StrLen (ConfigHdr) | 8 | 1 |
+    //
+    ConfigAltHdr = AllocateZeroPool ((1 + StringPtr - StringHdr + 8 + 1) * sizeof (CHAR16));
+    if (ConfigAltHdr == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+    StrCpy (ConfigAltHdr, L"&");
+    StrnCat (ConfigAltHdr, StringHdr, StringPtr - StringHdr);
+    StrCat (ConfigAltHdr, L"&ALTCFG=");
+    
+    //
+    // Skip all AltResp (AltConfigHdr ConfigBody) for the same ConfigHdr
+    //
+    while ((StringHdr = StrStr (StringPtr, ConfigAltHdr)) != NULL) {
+      StringPtr = StringHdr + StrLen (ConfigAltHdr);
+      if (*StringPtr == L'\0') {
+        break;
+      }
+    }
+    
+    //
+    // Free the allocated ConfigAltHdr string
+    //
+    FreePool (ConfigAltHdr);
+    if (*StringPtr == L'\0') {
+      break;
+    }
+    
+    //
+    // Find &GUID as the next ConfigHdr
+    //
+    StringPtr = StrStr (StringPtr, L"&GUID");
+    if (StringPtr == NULL) {
+      break;
+    }
+
+    //
+    // Skip char '&'
+    //
+    StringPtr ++;
+  }
+  
+Done:
+  if (VarGuid != NULL) {
+    FreePool (VarGuid);
+  }
+
+  if (VarName != NULL) {
+    FreePool (VarName);
+  }
+
+  if (DevicePath != NULL) {
+    FreePool (DevicePath);
+  }
+
+  if (ConfigResp != NULL) {
+    FreePool (ConfigResp);
+  }
+
+  if (ConfigAltResp != NULL) {
+    FreePool (ConfigAltResp);
+  }
+ 
+  if (HiiPackageList != NULL) {
+    FreePool (HiiPackageList);
+  }
+  
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Validate the current configuration by parsing HII form IFR opcode.
+
+  NULL request string support depends on the ExtractConfig interface of
+  HiiConfigRouting protocol in UEFI specification.
+  
+  @param  Request   A null-terminated Unicode string in 
+                    <MultiConfigRequest> format. It can be NULL.
+                    If it is NULL, all current configuration for the
+                    entirety of the current HII database will be validated.
+  
+  @retval TURE    Current configuration is valid.
+  @retval FALSE   Current configuration is invalid.
+**/
+BOOLEAN
+EFIAPI                               
+HiiValidateSettings (
+  IN CONST EFI_STRING Request  OPTIONAL
+  )
+{
+  return InternalHiiIfrValueAction (Request, 0, ACTION_VALIDATE_SETTING);
+}
+
+/**
+  Reset the default value specified by DefaultId to the driver
+  configuration got by Request string. 
+
+  NULL request string support depends on the ExportConfig interface of
+  HiiConfigRouting protocol in UEFI specification.
+  
+  @param Request    A null-terminated Unicode string in 
+                    <MultiConfigRequest> format. It can be NULL.
+                    If it is NULL, all configuration for the
+                    entirety of the current HII database will be reset.
+  @param DefaultId  Specifies the type of defaults to retrieve.
+  
+  @retval TURE    The default value is set successfully.
+  @retval FALSE   The default value can't be found and set.
+**/
+BOOLEAN
+EFIAPI
+HiiSetToDefaults (
+  IN CONST EFI_STRING Request,  OPTIONAL
+  IN UINT16        DefaultId
+  )
+{
+  return InternalHiiIfrValueAction (Request, DefaultId, ACTION_SET_DEFAUTL_VALUE);
 }
 
 /**

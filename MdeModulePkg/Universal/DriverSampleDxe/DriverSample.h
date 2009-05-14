@@ -42,6 +42,7 @@ Revision History
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HiiLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PrintLib.h>
 
 #include "NVDataStruc.h"
 
