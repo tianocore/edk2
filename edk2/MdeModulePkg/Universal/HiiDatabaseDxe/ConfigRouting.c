@@ -1728,6 +1728,13 @@ GetFullStringFromHiiFormPackages (
 
     PackageOffset += PacakgeHeader.Length;
   }
+  
+  //
+  // No requested varstore in IFR data and directly return
+  //
+  if (VarStorageData->Size == 0) {
+    goto Done;
+  }
 
   //
   // 3. Construct Request Element (Block Name) for 2.1 and 2.2 case.
@@ -2204,6 +2211,13 @@ HiiConfigRoutingExtractConfig (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
+	  //
+	  // Not any request block is found.
+	  //
+	  if (StrStr (ConfigRequest, L"&OFFSET=") == NULL) {
+        AccessResults = AllocateCopyPool (StrSize (ConfigRequest), ConfigRequest);
+		goto NextConfigString;
+	  }
     }
 
     //
@@ -2261,7 +2275,8 @@ HiiConfigRoutingExtractConfig (
       FreePool (DefaultResults);
       DefaultResults = NULL;
     }
-    
+
+NextConfigString:   
     if (!FirstElement) {
       Status = AppendToMultiString (Results, L"&");
       ASSERT_EFI_ERROR (Status);
@@ -2292,6 +2307,7 @@ HiiConfigRoutingExtractConfig (
 Done:
   if (EFI_ERROR (Status)) {
     FreePool (*Results);
+	*Results = NULL;
   }
   
   if (ConfigRequest != NULL) {
@@ -2783,7 +2799,7 @@ HiiBlockToConfig (
     StringPtr++;
   }
   if (*StringPtr == 0) {
-    *Progress = StringPtr;
+    *Progress = StringPtr - 1;
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
   }
@@ -2792,7 +2808,7 @@ HiiBlockToConfig (
     StringPtr++;
   }
   if (*StringPtr == 0) {
-    *Progress = StringPtr;
+    *Progress = StringPtr - 1;
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
   }
@@ -2947,7 +2963,10 @@ HiiBlockToConfig (
   return EFI_SUCCESS;
 
 Exit:
-  FreePool (*Config);
+  if (*Config != NULL) {
+	FreePool (*Config);
+	*Config = NULL;
+  }
   if (ValueStr != NULL) {
     FreePool (ValueStr);
   }
@@ -3401,7 +3420,7 @@ HiiGetAltCfg (
   Status = EFI_NOT_FOUND;
 
 Exit:
-
+  *AltCfgResp = NULL;
   if (!EFI_ERROR (Status) && (Result != NULL)) {
     //
     // Copy the <ConfigHdr> and <ConfigBody>
