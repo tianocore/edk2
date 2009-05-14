@@ -50,11 +50,7 @@
   UefiLib
   UefiHiiServicesLib
   PrintLib
-  PcdLib
 
 [Protocols]
   gEfiFormBrowser2ProtocolGuid ## CONSUMES
   gEfiDevicePathProtocolGuid   ## CONSUMES
-
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang

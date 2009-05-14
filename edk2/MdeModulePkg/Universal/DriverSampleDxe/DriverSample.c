@@ -128,6 +128,7 @@ ValidatePassword (
   EFI_STATUS                      Status;
   UINTN                           Index;
   UINTN                           BufferSize;
+  UINTN                           PasswordMaxSize;
   CHAR16                          *Password;
   CHAR16                          *EncodedPassword;
   BOOLEAN                         OldPassword;
@@ -151,10 +152,11 @@ ValidatePassword (
   }
 
   OldPassword = FALSE;
+  PasswordMaxSize = sizeof (PrivateData->Configuration.WhatIsThePassword2);
   //
   // Check whether we have any old password set
   //
-  for (Index = 0; Index < 20; Index++) {
+  for (Index = 0; Index < PasswordMaxSize / sizeof (UINT16); Index++) {
     if (PrivateData->Configuration.WhatIsThePassword2[Index] != 0) {
       OldPassword = TRUE;
       break;
@@ -174,7 +176,7 @@ ValidatePassword (
   if (Password == NULL) {
     return EFI_NOT_READY;
   }
-  if (StrLen (Password) > 20) {
+  if (StrSize (Password) > PasswordMaxSize) {
     FreePool (Password);
     return EFI_NOT_READY;
   }
@@ -182,11 +184,11 @@ ValidatePassword (
   //
   // Validate old password
   //
-  EncodedPassword = AllocateZeroPool (21 * sizeof (CHAR16));
+  EncodedPassword = AllocateZeroPool (PasswordMaxSize);
   ASSERT (EncodedPassword != NULL);
-  StrnCpy (EncodedPassword, Password, 21);
-  EncodePassword (EncodedPassword, 20 * sizeof (CHAR16));
-  if (CompareMem (EncodedPassword, PrivateData->Configuration.WhatIsThePassword2, 20 * sizeof (CHAR16)) != 0) {
+  StrnCpy (EncodedPassword, Password, StrLen (Password));
+  EncodePassword (EncodedPassword, StrLen (EncodedPassword) * sizeof (CHAR16));
+  if (CompareMem (EncodedPassword, PrivateData->Configuration.WhatIsThePassword2, StrLen (EncodedPassword) * sizeof (CHAR16)) != 0) {
     //
     // Old password mismatch, return EFI_NOT_READY to prompt for error message
     //
@@ -250,11 +252,11 @@ SetPassword (
   if (TempPassword == NULL) {
     return EFI_NOT_READY;
   }
-  if (StrLen (TempPassword) > PasswordSize / sizeof (CHAR16)) {
+  if (StrSize (TempPassword) > PasswordSize) {
     FreePool (TempPassword);
     return EFI_NOT_READY;
   }
-  StrnCpy (Password, TempPassword, PasswordSize / sizeof (CHAR16));
+  StrnCpy (Password, TempPassword, StrLen (TempPassword));
   FreePool (TempPassword);
 
   //
@@ -266,7 +268,7 @@ SetPassword (
     //
     // Update password's clear text in the screen
     //
-    CopyMem (Configuration->PasswordClearText, Password, PasswordSize);
+    CopyMem (Configuration->PasswordClearText, Password, StrSize (Password));
 
     //
     // Update uncommitted data of Browser
@@ -289,7 +291,7 @@ SetPassword (
   //
   // Set password
   //
-  EncodePassword (Password, PasswordSize);
+  EncodePassword (Password, StrLen (Password) * 2);
   Status = gRT->SetVariable(
                   VariableName,
                   &mFormSetGuid,
@@ -340,61 +342,65 @@ ExtractConfig (
   UINTN                            BufferSize;
   DRIVER_SAMPLE_PRIVATE_DATA       *PrivateData;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
+  EFI_STRING                       ConfigRequestHdr;
+  EFI_STRING                       ConfigRequest;
+  UINTN                            Size;
+
+  //
+  // Initialize the local variables.
+  //
+  ConfigRequestHdr = NULL;
+  ConfigRequest    = NULL;
+  Size             = 0;
+  *Progress        = Request;
 
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
   HiiConfigRouting = PrivateData->HiiConfigRouting;
 
   //
-  //
-  // Get Buffer Storage data from EFI variable
+  // Get Buffer Storage data from EFI variable.
+  // Try to get the current setting from variable.
   //
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
-  Status = gRT->GetVariable (
-                  VariableName,
-                  &mFormSetGuid,
-                  NULL,
-                  &BufferSize,
-                  &PrivateData->Configuration
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
+  gRT->GetVariable (
+        VariableName,
+        &mFormSetGuid,
+        NULL,
+        &BufferSize,
+        &PrivateData->Configuration
+        );
+  
   if (Request == NULL) {
     //
-    // Request is set to NULL, return all configurable elements together with ALTCFG
+    // Request is set to NULL, construct full request string.
     //
-    *Results = HiiConstructConfigAltResp (
-                 &mFormSetGuid,
-                 VariableName,
-                 PrivateData->DriverHandle[0],
-                 &PrivateData->Configuration,
-                 BufferSize,
-                 VfrMyIfrNVDataBlockName,
-                 STRING_TOKEN (STR_STANDARD_DEFAULT_PROMPT),
-                 VfrMyIfrNVDataDefault0000,
-                 STRING_TOKEN (STR_MANUFACTURE_DEFAULT_PROMPT),
-                 VfrMyIfrNVDataDefault0001,
-                 0,
-                 NULL
-               );
-    
-    //
-    // No matched storage is found.
-    //
-    if (*Results == NULL) {
-      return EFI_NOT_FOUND;
-    }
 
-    return EFI_SUCCESS;
+    //
+    // First Set ConfigRequestHdr string.
+    //
+    ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
+    ASSERT (ConfigRequestHdr != NULL);
+
+    //
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template 
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+    //
+    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
+  } else {
+    ConfigRequest = Request;
   }
 
   //
   // Check routing data in <ConfigHdr>.
   // Note: if only one Storage is used, then this checking could be skipped.
   //
-  if (!HiiIsConfigHdrMatch (Request, &mFormSetGuid, VariableName)) {
-    *Progress = Request;
+  if (!HiiIsConfigHdrMatch (ConfigRequest, &mFormSetGuid, VariableName)) {
+    if (Request == NULL) {
+      FreePool (ConfigRequest);
+    }
     return EFI_NOT_FOUND;
   }
 
@@ -403,12 +409,17 @@ ExtractConfig (
   //
   Status = HiiConfigRouting->BlockToConfig (
                                 HiiConfigRouting,
-                                Request,
+                                ConfigRequest,
                                 (UINT8 *) &PrivateData->Configuration,
                                 BufferSize,
                                 Results,
                                 Progress
                                 );
+  
+  if (Request == NULL) {
+    FreePool (ConfigRequest);
+  }
+
   return Status;
 }
 
@@ -451,6 +462,7 @@ RouteConfig (
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
   HiiConfigRouting = PrivateData->HiiConfigRouting;
 
+  //
   // Check routing data in <ConfigHdr>.
   // Note: if only one Storage is used, then this checking could be skipped.
   //
@@ -463,16 +475,13 @@ RouteConfig (
   // Get Buffer Storage data from EFI variable
   //
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
-  Status = gRT->GetVariable (
-                  VariableName,
-                  &mFormSetGuid,
-                  NULL,
-                  &BufferSize,
-                  &PrivateData->Configuration
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  gRT->GetVariable (
+        VariableName,
+        &mFormSetGuid,
+        NULL,
+        &BufferSize,
+        &PrivateData->Configuration
+        );
 
   //
   // Convert <ConfigResp> to buffer data by helper function ConfigToBlock()
@@ -549,6 +558,11 @@ DriverCallback (
   if ((Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+  
+  if ((Type == EFI_IFR_TYPE_STRING) && (Value->string == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+   
 
   Status = EFI_SUCCESS;
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
@@ -805,11 +819,13 @@ DriverSampleInit (
   CHAR16                          *NewString;
   UINTN                           BufferSize;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
-  BOOLEAN                         ExtractIfrDefault;
+  BOOLEAN                         ActionFlag;
+  EFI_STRING                      ConfigRequestHdr;  
 
   //
-  // Initialize the library and our protocol.
+  // Initialize the local variables.
   //
+  ConfigRequestHdr = NULL;
 
   //
   // Initialize screen dimensions for SendForm().
@@ -945,34 +961,31 @@ DriverSampleInit (
   //
   // Try to read NV config EFI variable first
   //
-  ExtractIfrDefault = TRUE;
+  ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, DriverHandle[0]);
+  ASSERT (ConfigRequestHdr != NULL);
+
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
   Status = gRT->GetVariable (VariableName, &mFormSetGuid, NULL, &BufferSize, Configuration);
-  if (!EFI_ERROR (Status) && (BufferSize == sizeof (DRIVER_SAMPLE_CONFIGURATION))) {
-    ExtractIfrDefault = FALSE;
-  }
-
-  if (ExtractIfrDefault) {
+  if (EFI_ERROR (Status)) {
     //
     // EFI variable for NV config doesn't exit, we should build this variable
     // based on default values stored in IFR
     //
-    BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
-    Status = HiiIfrLibExtractDefault (Configuration, &BufferSize, 1, VfrMyIfrNVDataDefault0000);
-
-    if (!EFI_ERROR (Status)) {
-      gRT->SetVariable(
-             VariableName,
-             &mFormSetGuid,
-             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-             sizeof (DRIVER_SAMPLE_CONFIGURATION),
-             Configuration
-             );
-    }
+    ActionFlag = HiiSetToDefaults (ConfigRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
+    ASSERT (ActionFlag);
+  } else {
+    //
+    // EFI variable does exist and Validate Current Setting
+    //
+    ActionFlag = HiiValidateSettings (ConfigRequestHdr);
+    ASSERT (ActionFlag);
   }
+  
+  FreePool (ConfigRequestHdr);
+
 
   //
-  // Default this driver is built into Flash device image, 
+  // In default, this driver is built into Flash device image, 
   // the following code doesn't run.
   //
 
@@ -1000,7 +1013,7 @@ DriverSampleInit (
     HiiRemovePackages (HiiHandle[1]);
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**

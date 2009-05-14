@@ -63,6 +63,37 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define BITMAP_LEN_24_BIT(Width, Height) ((Width) * (Height) * 3)
 
 //
+// IFR data structure
+//
+// BASE_CR (a, IFR_DEFAULT_VALUE_DATA, Entry) to get the whole structure.
+
+typedef struct {
+  LIST_ENTRY          Entry;             // Link to VarStorage
+  EFI_GUID            Guid;
+  CHAR16              *Name;
+  EFI_VARSTORE_ID     VarStoreId;
+  UINT16              Size;
+  LIST_ENTRY          BlockEntry;        // Link to its Block array
+} IFR_VARSTORAGE_DATA;
+
+typedef struct {
+  LIST_ENTRY          Entry;             // Link to Block array
+  UINT16              Offset;
+  UINT16              Width;
+  EFI_QUESTION_ID     QuestionId;
+  UINT8               OpCode;
+  UINT8               Scope;
+  LIST_ENTRY          DefaultValueEntry; // Link to its default value array
+} IFR_BLOCK_DATA;
+
+typedef struct {
+  LIST_ENTRY          Entry;
+  EFI_STRING_ID       DefaultName;
+  UINT16              DefaultId;
+  UINT64              Value;
+} IFR_DEFAULT_DATA;
+
+//
 // Storage types
 //
 #define EFI_HII_VARSTORE_BUFFER            0
@@ -82,8 +113,6 @@ typedef struct {
   CHAR16              *Name;
   UINT16              Size;
 } HII_FORMSET_STORAGE;
-
-#define HII_FORMSET_STORAGE_FROM_LINK(a)  CR (a, HII_FORMSET_STORAGE, Link, HII_FORMSET_STORAGE_SIGNATURE)
 
 
 //

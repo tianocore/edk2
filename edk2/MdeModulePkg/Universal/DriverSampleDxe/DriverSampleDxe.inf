@@ -54,6 +54,7 @@
   BaseMemoryLib
   DebugLib
   HiiLib
+  PrintLib
 
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES ## Guid

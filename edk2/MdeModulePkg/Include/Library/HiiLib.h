@@ -286,6 +286,51 @@ HiiConstructConfigHdr (
   );
 
 /**
+  It has the many same logic to HiiValidateSetting API.
+
+  Reset the default value specified by DefaultId to the driver
+  configuration got by Request string. 
+  NULL request string support depends on the ExtractConfig interface of
+  HiiConfigRouting protocol in UEFI specification.
+  
+  @param EFI_STRING  Request    A null-terminated Unicode string in 
+                                <MultiConfigRequest> format. It can be NULL.
+                                If it is NULL, all configuration for the
+                                entirety of the current HII database will be reset.
+  @param UINT16      DefaultId  Specifies the type of defaults to retrieve.
+  
+  @retval TURE    The default value is set successfully.
+  @retval FALSE   The default value can't be found and set.
+**/
+BOOLEAN
+EFIAPI                               
+HiiSetToDefaults (     
+  IN CONST EFI_STRING	Request,  OPTIONAL
+  IN UINT16				    DefaultId
+  );
+
+/**
+  Validate the current configuration by parsing HII form IFR opcode.
+  It can share the most logic with HiiSetToDefaults.
+
+  NULL request string support depends on the ExtractConfig interface of
+  HiiConfigRouting protocol in UEFI specification.
+  
+  @param EFI_STRING  Request    A null-terminated Unicode string in 
+                                <MultiConfigRequest> format. It can be NULL.
+                                If it is NULL, all current configuration for the
+                                entirety of the current HII database will be validated.
+  
+  @retval TURE    Current configuration is valid.
+  @retval FALSE   Current configuration is invalid.
+**/
+BOOLEAN
+EFIAPI                               
+HiiValidateSettings (
+  IN CONST EFI_STRING	Request  OPTIONAL
+  );
+
+/**
   Allocates and returns a Null-terminated Unicode <ConfigAltResp> string.
 
   If Guid is NULL, then ASSERT().
