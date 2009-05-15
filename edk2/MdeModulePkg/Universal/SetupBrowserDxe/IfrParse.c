@@ -1224,12 +1224,13 @@ ParseOpCodes (
       // Create Statement
       //
       CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
+      ASSERT (CurrentStatement != NULL);
       CopyMem (&CurrentStatement->DefaultId, &((EFI_IFR_RESET_BUTTON *) OpCodeData)->DefaultId, sizeof (EFI_DEFAULT_ID));
       break;
 
     case EFI_IFR_REF_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT (CurrentStatement != NULL);
       CopyMem (&CurrentStatement->RefFormId, &((EFI_IFR_REF *) OpCodeData)->FormId, sizeof (EFI_FORM_ID));
       if (OpCodeLength >= sizeof (EFI_IFR_REF2)) {
         CopyMem (&CurrentStatement->RefQuestionId, &((EFI_IFR_REF2 *) OpCodeData)->QuestionId, sizeof (EFI_QUESTION_ID));
@@ -1298,7 +1299,8 @@ ParseOpCodes (
 
     case EFI_IFR_ORDERED_LIST_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT(CurrentStatement != NULL);
+      
       CurrentStatement->Flags = ((EFI_IFR_ORDERED_LIST *) OpCodeData)->Flags;
       CurrentStatement->MaxContainers = ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
       CurrentStatement->StorageWidth = (UINT16)(CurrentStatement->MaxContainers * sizeof (UINT8));
@@ -1319,7 +1321,8 @@ ParseOpCodes (
 
     case EFI_IFR_CHECKBOX_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT(CurrentStatement != NULL);
+      
       CurrentStatement->Flags = ((EFI_IFR_CHECKBOX *) OpCodeData)->Flags;
       CurrentStatement->StorageWidth = sizeof (BOOLEAN);
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_BOOLEAN;
@@ -1330,7 +1333,7 @@ ParseOpCodes (
 
     case EFI_IFR_STRING_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT (CurrentStatement != NULL);
       //
       // MinSize is the minimum number of characters that can be accepted for this opcode,
       // MaxSize is the maximum number of characters that can be accepted for this opcode.
@@ -1349,7 +1352,7 @@ ParseOpCodes (
 
     case EFI_IFR_PASSWORD_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT (CurrentStatement != NULL);
       //
       // MinSize is the minimum number of characters that can be accepted for this opcode,
       // MaxSize is the maximum number of characters that can be accepted for this opcode.
@@ -1367,7 +1370,8 @@ ParseOpCodes (
 
     case EFI_IFR_DATE_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT(CurrentStatement != NULL);
+      
       CurrentStatement->Flags = ((EFI_IFR_DATE *) OpCodeData)->Flags;
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_DATE;
 
@@ -1386,7 +1390,8 @@ ParseOpCodes (
 
     case EFI_IFR_TIME_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      ASSERT(CurrentStatement != NULL);
+      
       CurrentStatement->Flags = ((EFI_IFR_TIME *) OpCodeData)->Flags;
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_TIME;
 
