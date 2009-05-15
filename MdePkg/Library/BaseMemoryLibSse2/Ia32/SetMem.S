@@ -34,8 +34,8 @@
 #    IN UINT8  Value
 #    );
 #------------------------------------------------------------------------------
-.globl _InternalMemSetMem
-_InternalMemSetMem:
+.globl ASM_PFX(InternalMemSetMem)
+ASM_PFX(InternalMemSetMem):
     push    %edi
     movl    12(%esp), %edx              # edx <- Count
     movl    8(%esp), %edi               # edi <- Buffer
