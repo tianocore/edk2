@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMemZeroMem
+.globl ASM_PFX(InternalMemZeroMem)
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -31,7 +31,7 @@
 #    IN UINTN  Count
 #    );
 #------------------------------------------------------------------------------
-_InternalMemZeroMem:
+ASM_PFX(InternalMemZeroMem):
     push    %edi
     movl    8(%esp), %edi
     movl    12(%esp), %ecx

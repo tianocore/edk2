@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMemSetMem
+.globl ASM_PFX(InternalMemSetMem)
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -31,7 +31,7 @@
 #    IN UINT8  Value
 #    )
 #------------------------------------------------------------------------------
-_InternalMemSetMem:
+ASM_PFX(InternalMemSetMem):
     push    %edi
     movb    16(%esp), %al
     movb    %al, %ah
