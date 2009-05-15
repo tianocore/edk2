@@ -29,9 +29,9 @@
 #   IN UINT32   PmcIndex
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadPmc;
-.align 16;
-_AsmReadPmc:
+.global ASM_PFX(AsmReadPmc)
+.align 16
+ASM_PFX(AsmReadPmc):
     rdpmc
     shl     $0x20, %rdx
     or      %rdx, %rax

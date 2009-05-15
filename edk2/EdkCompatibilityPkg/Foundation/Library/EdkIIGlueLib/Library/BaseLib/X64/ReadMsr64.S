@@ -29,9 +29,9 @@
 #   IN UINT32  Index
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadMsr64;
-.align 16;
-_AsmReadMsr64:
+.global ASM_PFX(AsmReadMsr64)
+.align 16
+ASM_PFX(AsmReadMsr64):
     rdmsr                               # edx & eax are zero extended
     shl     $0x20, %rdx
     or      %rdx, %rax

@@ -30,8 +30,8 @@
 #   IN      UINT32                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-.global _InternalSyncCompareExchange32;
-_InternalSyncCompareExchange32:
+.global ASM_PFX(InternalSyncCompareExchange32)
+ASM_PFX(InternalSyncCompareExchange32):
     mov     %edx, %eax
     lock    cmpxchg %r8d, (%rcx)
     ret

@@ -34,8 +34,8 @@
 #    )
 #------------------------------------------------------------------------------
 .intel_syntax
-.globl _InternalMemSetMem64
-_InternalMemSetMem64:
+.globl ASM_PFX(InternalMemSetMem64)
+ASM_PFX(InternalMemSetMem64):
     push    rdi
     mov     rdi, rcx
     mov     rax, r8

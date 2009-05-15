@@ -29,8 +29,8 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadTr;
-.align 16;
-_AsmReadTr: 
+.global ASM_PFX(AsmReadTr)
+.align 16
+ASM_PFX(AsmReadTr): 
     str     %eax
     ret

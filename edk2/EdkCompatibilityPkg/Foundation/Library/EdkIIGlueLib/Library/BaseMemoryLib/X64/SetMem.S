@@ -35,8 +35,8 @@
 #    )
 #------------------------------------------------------------------------------
 .intel_syntax
-.globl _InternalMemSetMem
-_InternalMemSetMem:
+.globl ASM_PFX(InternalMemSetMem)
+ASM_PFX(InternalMemSetMem):
     push    rdi
     mov     rax, r8    # rax = Value
     mov     rdi, rcx   # rdi = Buffer

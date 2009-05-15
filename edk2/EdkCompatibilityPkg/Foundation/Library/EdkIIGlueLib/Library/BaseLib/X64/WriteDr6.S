@@ -29,8 +29,8 @@
 #   IN UINTN Value
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteDr6;
-_AsmWriteDr6:
+.global ASM_PFX(AsmWriteDr6)
+ASM_PFX(AsmWriteDr6):
     mov     %rcx, %dr6
     mov     %rcx, %rax
     ret

@@ -29,8 +29,8 @@
 #   OUT IA32_DESCRIPTOR  *Gdtr
 #   );
 #------------------------------------------------------------------------------
-.global _InternalX86ReadGdtr;
-.align 16;
-_InternalX86ReadGdtr:
+.global ASM_PFX(InternalX86ReadGdtr)
+.align 16
+ASM_PFX(InternalX86ReadGdtr):
     sgdt  (%rcx)
     ret

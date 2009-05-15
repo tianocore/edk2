@@ -20,8 +20,8 @@
 #------------------------------------------------------------------------------
 
 .extern InternalAssertJumpBuffer;
-.global _SetJump;
-_SetJump:
+.global ASM_PFX(SetJump)
+ASM_PFX(SetJump):
     push   %rcx
     add    $0xffffffffffffffe0,%rsp
     call   _InternalAssertJumpBuffer

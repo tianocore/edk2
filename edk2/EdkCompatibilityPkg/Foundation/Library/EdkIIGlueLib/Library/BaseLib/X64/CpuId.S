@@ -32,8 +32,8 @@
 #    OUT  UINT32  *RegisterOutEdx  OPTIONAL
 #    )
 #------------------------------------------------------------------------------
-.global _AsmCpuid;
-_AsmCpuid:
+.global ASM_PFX(AsmCpuid)
+ASM_PFX(AsmCpuid):
     push    %rbx
     mov     %ecx, %eax
     push    %rax                         # save Index on stack

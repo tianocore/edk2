@@ -29,8 +29,8 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadGs;
-.align 16;
-_AsmReadGs:
+.global ASM_PFX(AsmReadGs)
+.align 16
+ASM_PFX(AsmReadGs):
     mov     %gs, %eax
     ret

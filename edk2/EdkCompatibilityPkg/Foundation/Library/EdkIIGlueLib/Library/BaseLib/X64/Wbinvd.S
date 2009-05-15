@@ -29,8 +29,8 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWbinvd;
-.align 16;
-_AsmWbinvd:
+.global ASM_PFX(AsmWbinvd)
+.align 16
+ASM_PFX(AsmWbinvd):
     wbinvd
     ret

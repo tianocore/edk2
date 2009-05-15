@@ -24,7 +24,7 @@
     .386:
     .code:
 
-.globl _InternalMemSetMem
+.globl ASM_PFX(InternalMemSetMem)
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -34,7 +34,7 @@
 #    IN UINT8  Value
 #    )
 #------------------------------------------------------------------------------
-_InternalMemSetMem:
+ASM_PFX(InternalMemSetMem):
     push    %edi
     movl    16(%esp),%eax
     movl    8(%esp),%edi
