@@ -33,8 +33,8 @@
 #   IN      UINT64                    NewStack			%r8
 #   );
 #------------------------------------------------------------------------------
-.global _InternalX86EnablePaging64;
-_InternalX86EnablePaging64:
+.global ASM_PFX(InternalX86EnablePaging64)
+ASM_PFX(InternalX86EnablePaging64):
     cli    
     pop    %rax
     callq  Base

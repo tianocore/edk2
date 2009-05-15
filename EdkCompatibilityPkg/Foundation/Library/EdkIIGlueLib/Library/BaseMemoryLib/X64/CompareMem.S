@@ -41,8 +41,8 @@
 #   );
 #------------------------------------------------------------------------------
 .intel_syntax
-.globl _InternalMemCompareMem
-_InternalMemCompareMem:
+.globl ASM_PFX(InternalMemCompareMem)
+ASM_PFX(InternalMemCompareMem):
     push    rsi
     push    rdi
     mov     rsi, rcx

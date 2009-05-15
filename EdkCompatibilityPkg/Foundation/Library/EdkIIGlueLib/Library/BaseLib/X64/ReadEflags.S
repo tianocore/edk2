@@ -29,9 +29,9 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadEflags;
-.align 16;
-_AsmReadEflags:
+.global ASM_PFX(AsmReadEflags)
+.align 16
+ASM_PFX(AsmReadEflags):
     pushfq
     pop     %rax
     ret

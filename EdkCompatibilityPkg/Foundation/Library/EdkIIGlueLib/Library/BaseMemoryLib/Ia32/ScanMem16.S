@@ -27,7 +27,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMemScanMem16
+.globl ASM_PFX(InternalMemScanMem16)
 
 #------------------------------------------------------------------------------
 # CONST VOID *
@@ -38,7 +38,7 @@
 #   IN      UINT16                    Value
 #   );
 #------------------------------------------------------------------------------
-_InternalMemScanMem16:
+ASM_PFX(InternalMemScanMem16):
     push    %edi
     movl    12(%esp), %ecx
     movl    8(%esp), %edi

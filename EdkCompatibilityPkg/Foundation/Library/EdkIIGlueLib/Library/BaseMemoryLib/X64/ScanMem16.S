@@ -41,8 +41,8 @@
 #   );
 #------------------------------------------------------------------------------
 .intel_syntax
-.globl _InternalMemScanMem16
-_InternalMemScanMem16:
+.globl ASM_PFX(InternalMemScanMem16)
+ASM_PFX(InternalMemScanMem16):
     push    rdi
     mov     rdi, rcx
     mov     rax, r8

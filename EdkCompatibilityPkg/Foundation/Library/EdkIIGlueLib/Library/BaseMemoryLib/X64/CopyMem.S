@@ -35,8 +35,8 @@
 #    )
 #------------------------------------------------------------------------------
 .intel_syntax
-.globl _InternalMemCopyMem
-_InternalMemCopyMem:
+.globl ASM_PFX(InternalMemCopyMem)
+ASM_PFX(InternalMemCopyMem)
     push    rsi
     push    rdi
     mov     rsi, rdx                    # rsi <- Source

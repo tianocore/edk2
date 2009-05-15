@@ -29,8 +29,8 @@
 #   IN      UINT32                    *Value
 #   );
 #------------------------------------------------------------------------------
-.global _InternalSyncIncrement;
-_InternalSyncIncrement:
+.global ASM_PFX(InternalSyncIncrement)
+ASM_PFX(InternalSyncIncrement):
     lock    incl  (%rcx)
     mov     (%rcx), %eax
     ret

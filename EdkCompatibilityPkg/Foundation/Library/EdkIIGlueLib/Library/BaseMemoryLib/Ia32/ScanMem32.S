@@ -27,7 +27,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl _InternalMemScanMem32
+.globl ASM_PFX(InternalMemScanMem32)
 
 #------------------------------------------------------------------------------
 # CONST VOID *
@@ -38,7 +38,7 @@
 #   IN      UINT32                    Value
 #   );
 #------------------------------------------------------------------------------
-_InternalMemScanMem32:
+ASM_PFX(InternalMemScanMem32):
     push    %edi
     movl    12(%esp), %ecx
     movl    8(%esp), %edi

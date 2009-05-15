@@ -29,7 +29,7 @@
 #   IN CONST IA32_FX_BUFFER *Buffer
 #   )#
 #------------------------------------------------------------------------------
-.global _InternalX86FxRestore;
-_InternalX86FxRestore:
+.global ASM_PFX(InternalX86FxRestore)
+ASM_PFX(InternalX86FxRestore):
     fxrstor (%rcx)
     ret

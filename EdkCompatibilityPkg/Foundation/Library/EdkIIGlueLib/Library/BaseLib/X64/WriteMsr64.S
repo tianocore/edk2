@@ -31,9 +31,9 @@
 #   );
 # TODO:
 #------------------------------------------------------------------------------
-.global _AsmWriteMsr64;
-.align 16;
-_AsmWriteMsr64:
+.global ASM_PFX(AsmWriteMsr64)
+.align 16
+ASM_PFX(AsmWriteMsr64):
     mov	%rdx, %rax
     shr $0x20, %rdx
     wrmsr
