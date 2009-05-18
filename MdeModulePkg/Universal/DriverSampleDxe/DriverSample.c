@@ -418,7 +418,7 @@ ExtractConfig (
   
   if (Request == NULL) {
     FreePool (ConfigRequest);
-	*Progress = NULL;
+    *Progress = NULL;
   }
 
   return Status;
