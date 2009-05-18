@@ -4,7 +4,7 @@
   This ppi Provides platform or chipset-specific access to 
   the PCI configuration space for a specific PCI segment.
 
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,8 +20,6 @@
 
 #ifndef __PEI_PCI_CFG2_H__
 #define __PEI_PCI_CFG2_H__
-
-#include <Pi/PiPeiCis.h>
 
 #define EFI_PEI_PCI_CFG2_PPI_GUID \
   { 0x57a449a, 0x1fdc, 0x4c06, { 0xbf, 0xc9, 0xf5, 0x3f, 0x6a, 0x99, 0xbb, 0x92 } }

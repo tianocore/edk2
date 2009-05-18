@@ -2,7 +2,7 @@
   This PPI provides a set of memory- and I/O-based services. 
   The perspective of the services is that of the processor, not the bus or system.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,8 +18,6 @@
 
 #ifndef __PEI_CPUIO_PPI_H__
 #define __PEI_CPUIO_PPI_H__
-
-#include <Pi/PiPeiCis.h>
 
 #define EFI_PEI_CPU_IO_PPI_INSTALLED_GUID \
   { 0xe6af1f7b, 0xfc3f, 0x46da, {0xa8, 0x28, 0xa3, 0xb4, 0x57, 0xa4, 0x42, 0x82 } }

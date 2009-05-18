@@ -4,7 +4,7 @@
   This PPI is installed by some platform- or chipset-specific PEIM that 
   abstracts the Reset Service to other agents.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -20,8 +20,6 @@
 
 #ifndef __RESET_PPI_H__
 #define __RESET_PPI_H__
-
-#include <Pi/PiPeiCis.h>
 
 #define EFI_PEI_RESET_PPI_GUID \
   { \

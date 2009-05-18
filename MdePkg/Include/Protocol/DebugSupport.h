@@ -19,7 +19,6 @@
 #ifndef __DEBUG_SUPPORT_H__
 #define __DEBUG_SUPPORT_H__
 
-#include <ProcessorBind.h>
 #include <IndustryStandard/PeImage.h>
 
 typedef struct _EFI_DEBUG_SUPPORT_PROTOCOL EFI_DEBUG_SUPPORT_PROTOCOL;

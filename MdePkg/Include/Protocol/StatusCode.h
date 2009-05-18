@@ -9,7 +9,7 @@
 
   This code abstracts Status Code reporting.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -22,8 +22,6 @@
 
 #ifndef __STATUS_CODE_RUNTIME_PROTOCOL_H__
 #define __STATUS_CODE_RUNTIME_PROTOCOL_H__
-
-#include <Pi/PiMultiPhase.h>
 
 #define EFI_STATUS_CODE_RUNTIME_PROTOCOL_GUID  \
 { 0xd2b2b828, 0x826, 0x48a7,  { 0xb3, 0xdf, 0x98, 0x3c, 0x0, 0x60, 0x24, 0xf0 } }
