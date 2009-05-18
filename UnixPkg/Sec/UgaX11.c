@@ -170,6 +170,7 @@ UgaSize(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height)
   /* Destroy current buffer if created.  */
   if (drv->image != NULL)
     {
+      /* Before destroy buffer, need to make sure the buffer available for access. */
       XDestroyImage(drv->image);
 
       if (drv->use_shm)
