@@ -362,13 +362,16 @@ ExtractConfig (
   // Try to get the current setting from variable.
   //
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
-  gRT->GetVariable (
-        VariableName,
-        &mFormSetGuid,
-        NULL,
-        &BufferSize,
-        &PrivateData->Configuration
-        );
+  Status = gRT->GetVariable (
+            VariableName,
+            &mFormSetGuid,
+            NULL,
+            &BufferSize,
+            &PrivateData->Configuration
+            );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
   
   if (Request == NULL) {
     //
@@ -476,13 +479,16 @@ RouteConfig (
   // Get Buffer Storage data from EFI variable
   //
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
-  gRT->GetVariable (
-        VariableName,
-        &mFormSetGuid,
-        NULL,
-        &BufferSize,
-        &PrivateData->Configuration
-        );
+  Status = gRT->GetVariable (
+            VariableName,
+            &mFormSetGuid,
+            NULL,
+            &BufferSize,
+            &PrivateData->Configuration
+            );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Convert <ConfigResp> to buffer data by helper function ConfigToBlock()
@@ -968,6 +974,17 @@ DriverSampleInit (
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
   Status = gRT->GetVariable (VariableName, &mFormSetGuid, NULL, &BufferSize, Configuration);
   if (EFI_ERROR (Status)) {
+    //
+    // Store zero data Buffer Storage to EFI variable
+    //
+    Status = gRT->SetVariable(
+                    VariableName,
+                    &mFormSetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (DRIVER_SAMPLE_CONFIGURATION),
+                    Configuration
+                    );
+    ASSERT (Status == EFI_SUCCESS);
     //
     // EFI variable for NV config doesn't exit, we should build this variable
     // based on default values stored in IFR
