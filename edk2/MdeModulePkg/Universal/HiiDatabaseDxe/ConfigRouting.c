@@ -873,9 +873,10 @@ ParseIfrData (
       LengthString = StrLen (GuidStr);
       LengthString = LengthString + StrLen (NameStr) + 1;
       TempStr = AllocateZeroPool (LengthString * sizeof (CHAR16));
-      if (TempStr == NULL) {
-        FreePool (GuidStr);
-        FreePool (NameStr);
+      FreePool (GuidStr);
+      FreePool (NameStr);
+    if (TempStr == NULL) {
+        FreePool (VarStoreName);
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
@@ -899,8 +900,6 @@ ParseIfrData (
       // Free alllocated temp string.
       //
       FreePool (TempStr);
-      FreePool (GuidStr);
-      FreePool (NameStr);
       break;
 
     case EFI_IFR_DEFAULTSTORE_OP:
@@ -2211,13 +2210,13 @@ HiiConfigRoutingExtractConfig (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-	  //
-	  // Not any request block is found.
-	  //
-	  if (StrStr (ConfigRequest, L"&OFFSET=") == NULL) {
+      //
+      // Not any request block is found.
+      //
+      if (StrStr (ConfigRequest, L"&OFFSET=") == NULL) {
         AccessResults = AllocateCopyPool (StrSize (ConfigRequest), ConfigRequest);
-		goto NextConfigString;
-	  }
+        goto NextConfigString;
+      }
     }
 
     //
@@ -2307,7 +2306,7 @@ NextConfigString:
 Done:
   if (EFI_ERROR (Status)) {
     FreePool (*Results);
-	*Results = NULL;
+  *Results = NULL;
   }
   
   if (ConfigRequest != NULL) {
@@ -2964,8 +2963,8 @@ HiiBlockToConfig (
 
 Exit:
   if (*Config != NULL) {
-	FreePool (*Config);
-	*Config = NULL;
+  FreePool (*Config);
+  *Config = NULL;
   }
   if (ValueStr != NULL) {
     FreePool (ValueStr);
