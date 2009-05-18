@@ -873,9 +873,9 @@ ParseIfrData (
       LengthString = StrLen (GuidStr);
       LengthString = LengthString + StrLen (NameStr) + 1;
       TempStr = AllocateZeroPool (LengthString * sizeof (CHAR16));
-      FreePool (GuidStr);
-      FreePool (NameStr);
     if (TempStr == NULL) {
+        FreePool (GuidStr);
+        FreePool (NameStr);
         FreePool (VarStoreName);
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
@@ -899,6 +899,8 @@ ParseIfrData (
       //
       // Free alllocated temp string.
       //
+      FreePool (GuidStr);
+      FreePool (NameStr);
       FreePool (TempStr);
       break;
 
