@@ -107,18 +107,18 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
 // Uga Draw Protocol Private Data template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UGA_DRAW_PROTOCOL mUgaDrawProtocolTemplate = {
-  ConSpliterUgaDrawGetMode,
-  ConSpliterUgaDrawSetMode,
-  ConSpliterUgaDrawBlt
+  ConSplitterUgaDrawGetMode,
+  ConSplitterUgaDrawSetMode,
+  ConSplitterUgaDrawBlt
 };
 
 //
 // Graphics Output Protocol Private Data template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_PROTOCOL mGraphicsOutputProtocolTemplate = {
-  ConSpliterGraphicsOutputQueryMode,
-  ConSpliterGraphicsOutputSetMode,
-  ConSpliterGraphicsOutputBlt,
+  ConSplitterGraphicsOutputQueryMode,
+  ConSplitterGraphicsOutputSetMode,
+  ConSplitterGraphicsOutputBlt,
   NULL
 };
 
@@ -671,7 +671,7 @@ ConSplitterTextOutConstructor (
     //
     // Setup the UgaDraw to 800 x 600 x 32 bits per pixel, 60Hz.
     //
-    ConSpliterUgaDrawSetMode (&ConOutPrivate->UgaDraw, 800, 600, 32, 60);
+    ConSplitterUgaDrawSetMode (&ConOutPrivate->UgaDraw, 800, 600, 32, 60);
   }
   if (FeaturePcdGet (PcdConOutGopSupport)) {
     //
@@ -2951,6 +2951,7 @@ ConSplitterTextOutAddDevice (
   TEXT_OUT_AND_GOP_DATA                *TextAndGop;
   UINTN                                SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+  EFI_STATUS                           DeviceStatus;
 
   Status                = EFI_SUCCESS;
   CurrentNumOfConsoles  = Private->CurrentNumberOfConsoles;
@@ -2959,7 +2960,6 @@ ConSplitterTextOutAddDevice (
   // If the Text Out List is full, enlarge it by calling ConSplitterGrowBuffer().
   //
   while (CurrentNumOfConsoles >= Private->TextOutListCount) {
-    CpuBreakpoint ();
     Status = ConSplitterGrowBuffer (
               sizeof (TEXT_OUT_AND_GOP_DATA),
               &Private->TextOutListCount,
@@ -3004,20 +3004,17 @@ ConSplitterTextOutAddDevice (
   MaxMode     = Private->TextOutMode.MaxMode;
   ASSERT (MaxMode >= 1);
 
+  DeviceStatus = EFI_DEVICE_ERROR;
   if (FeaturePcdGet (PcdConOutGopSupport)) {
     //
     // If GOP is produced by Consplitter, this device display mode will be added into Graphics Ouput modes.
     //
     if ((GraphicsOutput != NULL) || (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport))) {
-      ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
+      DeviceStatus = ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
     }
   }
 
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
-    UgaHorizontalResolution = 800;
-    UgaVerticalResolution   = 600;
-    UgaColorDepth           = 32;
-    UgaRefreshRate          = 60;
 
     Status = EFI_DEVICE_ERROR;
     //
@@ -3043,19 +3040,31 @@ ConSplitterTextOutAddDevice (
                     &UgaColorDepth,
                     &UgaRefreshRate
                     );
+      if (!EFI_ERROR (Status) && EFI_ERROR (DeviceStatus)) {
+        //
+        // if GetMode is successfully and UGA device hasn't been set, set it
+        //
+        Status = ConSplitterUgaDrawSetMode (
+                    &Private->UgaDraw, 
+                    UgaHorizontalResolution, 
+                    UgaVerticalResolution, 
+                    UgaColorDepth, 
+                    UgaRefreshRate
+                    );
+      }
+      //
+      // If GetMode/SetMode is failed, set to 800x600 mode
+      //
+      if(EFI_ERROR (Status)) {
+        Status = ConSplitterUgaDrawSetMode (
+                    &Private->UgaDraw, 
+                    800, 
+                    600, 
+                    32, 
+                    60
+                    );
+      }
     }
-
-    //
-    //  Set UGA Draw mode,
-    //  if GetMode is failed, set to 800x600 mode
-    //
-    Status = ConSpliterUgaDrawSetMode (
-                &Private->UgaDraw,
-                UgaHorizontalResolution,
-                UgaVerticalResolution,
-                UgaColorDepth,
-                UgaRefreshRate
-                );
   }
 
   //
