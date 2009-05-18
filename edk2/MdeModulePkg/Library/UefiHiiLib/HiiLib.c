@@ -921,16 +921,17 @@ InternalHiiGetValueOfNumber (
 }
 
 /**
-  This function shares the same logic to parse ConfigAltResp string 
-  for setting default value and validating current setting.
+  This internal function parses IFR data to validate current setting.
 
-  @param ConfigResp         
-  @param HiiPackageList     
-  @param PackageListLength  
-  @param VarGuid
-  @param VarName
+  @param ConfigResp         ConfigResp string contains the current setting.
+  @param HiiPackageList     Point to Hii package list.
+  @param PackageListLength  The length of the pacakge.
+  @param VarGuid            Guid of the buffer storage.
+  @param VarName            Name of the buffer storage.
   
-  @retval EFI_SUCCESS
+  @retval EFI_SUCCESS            The current setting is valid.
+  @retval EFI_OUT_OF_RESOURCES   The memory is not enough.
+  @retval EFI_INVALID_PARAMETER  The config string or the Hii package is invalid.
 **/
 EFI_STATUS
 EFIAPI
@@ -1214,7 +1215,7 @@ InternalHiiValidateCurrentSetting (
           }
           //
           // Find the matched VarStoreId to the input VarGuid and VarName
-          //            
+          //
           IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpHdr;
           if (CompareGuid ((EFI_GUID *) (VOID *) &IfrVarStore->Guid, VarGuid)) {
             VarStoreName = (CHAR8 *) IfrVarStore->Name;
@@ -1244,10 +1245,17 @@ InternalHiiValidateCurrentSetting (
           break;
         case EFI_IFR_ONE_OF_OP:
           //
-          // Check whether current value is the one of option. 
+          // Check whether current value is the one of option.
           //
 
           //
+          // OneOf question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (IfrVarStore == NULL) {
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+          // 
           // Check whether this question is for the requested varstore.
           //
           IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpHdr;
@@ -1298,6 +1306,13 @@ InternalHiiValidateCurrentSetting (
           // Check the current value is in the numeric range.
           //
 
+          //
+          // Numeric question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (IfrVarStore == NULL) {
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
           //
           // Check whether this question is for the requested varstore.
           //
@@ -1382,6 +1397,14 @@ InternalHiiValidateCurrentSetting (
           //
 
           //
+          // CheckBox question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (IfrVarStore == NULL) {
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+
+          //
           // Check whether this question is for the requested varstore.
           //
           IfrCheckBox = (EFI_IFR_CHECKBOX *) IfrOpHdr;
@@ -1427,6 +1450,14 @@ InternalHiiValidateCurrentSetting (
           //
           // Check current string length is less than maxsize
           //
+
+          //
+          // CheckBox question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (IfrVarStore == NULL) {
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
 
           //
           // Check whether this question is for the requested varstore.
@@ -1558,9 +1589,9 @@ Done:
 }
 
 /**
-  This function shares the same logic to parse ConfigAltResp string 
-  for setting default value and validating current setting.
-  
+  This function parses the input ConfigRequest string and its matched IFR code
+  string for setting default value and validating current setting.
+
   1. For setting default action, Reset the default value specified by DefaultId 
   to the driver configuration got by Request string.
   2. For validating current setting, Validate the current configuration 
