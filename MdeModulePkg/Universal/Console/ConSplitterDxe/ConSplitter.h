@@ -1773,7 +1773,7 @@ ConSplitterGrowBuffer (
 **/
 EFI_STATUS
 EFIAPI
-ConSpliterGraphicsOutputQueryMode (
+ConSplitterGraphicsOutputQueryMode (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL          *This,
   IN  UINT32                                ModeNumber,
   OUT UINTN                                 *SizeOfInfo,
@@ -1795,7 +1795,7 @@ ConSpliterGraphicsOutputQueryMode (
 **/
 EFI_STATUS
 EFIAPI
-ConSpliterGraphicsOutputSetMode (
+ConSplitterGraphicsOutputSetMode (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
   IN  UINT32                       ModeNumber
   );
@@ -1848,7 +1848,7 @@ ConSpliterGraphicsOutputSetMode (
 **/
 EFI_STATUS
 EFIAPI
-ConSpliterGraphicsOutputBlt (
+ConSplitterGraphicsOutputBlt (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL                  *This,
   IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *BltBuffer, OPTIONAL
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION             BltOperation,
@@ -1878,7 +1878,7 @@ ConSpliterGraphicsOutputBlt (
 **/
 EFI_STATUS
 EFIAPI
-ConSpliterUgaDrawGetMode (
+ConSplitterUgaDrawGetMode (
   IN  EFI_UGA_DRAW_PROTOCOL           *This,
   OUT UINT32                          *HorizontalResolution,
   OUT UINT32                          *VerticalResolution,
@@ -1902,7 +1902,7 @@ ConSpliterUgaDrawGetMode (
 **/
 EFI_STATUS
 EFIAPI
-ConSpliterUgaDrawSetMode (
+ConSplitterUgaDrawSetMode (
   IN  EFI_UGA_DRAW_PROTOCOL           *This,
   IN UINT32                           HorizontalResolution,
   IN UINT32                           VerticalResolution,
@@ -1961,7 +1961,7 @@ ConSpliterUgaDrawSetMode (
 **/
 EFI_STATUS
 EFIAPI
-ConSpliterUgaDrawBlt (
+ConSplitterUgaDrawBlt (
   IN  EFI_UGA_DRAW_PROTOCOL                         *This,
   IN  EFI_UGA_PIXEL                                 *BltBuffer, OPTIONAL
   IN  EFI_UGA_BLT_OPERATION                         BltOperation,
