@@ -484,6 +484,34 @@ FindGlyphBlock (
   OUT UINTN                          *GlyphBufferLen OPTIONAL
   );
 
+/**
+  This function exports Form packages to a buffer.
+  This is a internal function.
+
+  @param  Private                Hii database private structure.
+  @param  Handle                 Identification of a package list.
+  @param  PackageList            Pointer to a package list which will be exported.
+  @param  UsedSize               The length of buffer be used.
+  @param  BufferSize             Length of the Buffer.
+  @param  Buffer                 Allocated space for storing exported data.
+  @param  ResultSize             The size of the already exported content of  this
+                                 package list.
+
+  @retval EFI_SUCCESS            Form Packages are exported successfully.
+  @retval EFI_INVALID_PARAMETER  Any input parameter is invalid.
+
+**/
+EFI_STATUS
+ExportFormPackages (
+  IN HII_DATABASE_PRIVATE_DATA          *Private,
+  IN EFI_HII_HANDLE                     Handle,
+  IN HII_DATABASE_PACKAGE_LIST_INSTANCE *PackageList,
+  IN UINTN                              UsedSize,
+  IN UINTN                              BufferSize,
+  IN OUT VOID                           *Buffer,
+  IN OUT UINTN                          *ResultSize
+  );
+
 //
 // EFI_HII_FONT_PROTOCOL protocol interfaces
 //

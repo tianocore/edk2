@@ -577,6 +577,10 @@ MergeDefaultString (
                                      SizeAltCfgResp + StrSize (StringPtrDefault),
                                      (VOID *) (*AltCfgResp)
                                      );
+        if (*AltCfgResp == NULL) {
+          FreePool (AltConfigHdr);
+          return EFI_OUT_OF_RESOURCES;
+        }
         StrCat (*AltCfgResp, StringPtrDefault);
         break;
       } else {
@@ -594,11 +598,12 @@ MergeDefaultString (
     
     //
     // Find next AltCfg String
-    //    
+    //
     *(AltConfigHdr + HeaderLength) = L'\0';
     StringPtrDefault = StrStr (StringPtrDefault + 1, AltConfigHdr);    
   }
-
+  
+  FreePool (AltConfigHdr);
   return EFI_SUCCESS;  
 }
 
@@ -796,7 +801,7 @@ ParseIfrData (
   IN     EFI_STRING          ConfigHdr,
   IN     IFR_BLOCK_DATA      *RequestBlockArray,
   IN OUT IFR_VARSTORAGE_DATA *VarStorageData,
-  OUT    IFR_DEFAULT_DATA    **PIfrDefaultIdArray
+  OUT    IFR_DEFAULT_DATA    *DefaultIdArray
   )
 {
   EFI_STATUS               Status;
@@ -810,7 +815,6 @@ ParseIfrData (
   EFI_IFR_CHECKBOX         *IfrCheckBox;
   EFI_IFR_PASSWORD         *IfrPassword;
   EFI_IFR_STRING           *IfrString;
-  IFR_DEFAULT_DATA         *DefaultIdArray;
   IFR_DEFAULT_DATA         *DefaultData;
   IFR_BLOCK_DATA           *BlockData;
   CHAR16                   *VarStoreName;
@@ -823,9 +827,6 @@ ParseIfrData (
   EFI_STRING               TempStr;
   UINTN                    LengthString;
 
-  //
-  // Initialize DefaultIdArray to store the map between DeaultId and DefaultName
-  //
   LengthString     = 0;
   Status           = EFI_SUCCESS;
   GuidStr          = NULL;
@@ -833,11 +834,6 @@ ParseIfrData (
   TempStr          = NULL;
   BlockData        = NULL;
   DefaultData      = NULL;
-  DefaultIdArray   = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
-  if (DefaultIdArray == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  InitializeListHead (&DefaultIdArray->Entry);
 
   //
   // Go through the form package to parse OpCode one by one.
@@ -936,6 +932,13 @@ ParseIfrData (
       //
 
       //
+      // Numeric and OneOf question is not in IFR Form. This IFR form is not valid. 
+      //
+      if (VarStorageData->Size == 0) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+      //
       // Check whether this question is for the requested varstore.
       //
       IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpHdr;
@@ -992,7 +995,14 @@ ParseIfrData (
       // width by EFI_IFR_ORDERED_LIST MaxContainers * OneofOption Type
       // no default value and default id, how to define its default value?
       //
-      
+
+      //
+      // OrderedList question is not in IFR Form. This IFR form is not valid. 
+      //
+      if (VarStorageData->Size == 0) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
       //
       // Check whether this question is for the requested varstore.
       //
@@ -1056,6 +1066,13 @@ ParseIfrData (
       // default id by DeaultOption DefaultId can override CheckBox Flags and Default value.
       // 
 
+      //
+      // CheckBox question is not in IFR Form. This IFR form is not valid. 
+      //
+      if (VarStorageData->Size == 0) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
       //
       // Check whether this question is for the requested varstore.
       //
@@ -1171,6 +1188,13 @@ ParseIfrData (
       //
 
       //
+      // String question is not in IFR Form. This IFR form is not valid. 
+      //
+      if (VarStorageData->Size == 0) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+      //
       // Check whether this question is for the requested varstore.
       //
       IfrString = (EFI_IFR_STRING *) IfrOpHdr;
@@ -1234,6 +1258,13 @@ ParseIfrData (
       // no default value, only block array
       //
 
+      //
+      // Password question is not in IFR Form. This IFR form is not valid. 
+      //
+      if (VarStorageData->Size == 0) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
       //
       // Check whether this question is for the requested varstore.
       //
@@ -1424,7 +1455,7 @@ ParseIfrData (
       break;
     case EFI_IFR_END_OP:
       //
-      // End Opcode is for Var.
+      // End Opcode is for Var question.
       //
       if (BlockData != NULL && BlockData->Scope > 0) {
         BlockData->Scope--;
@@ -1441,11 +1472,6 @@ ParseIfrData (
   }
 
 Done:
-  //
-  // Set the defualt ID array.
-  //
-  *PIfrDefaultIdArray = DefaultIdArray;
-
   return Status;  
 }
 
@@ -1456,7 +1482,7 @@ Done:
   When Request points to NULL string, the request string and default value string 
   for each varstore in form package will return. 
 
-  @param  HiiHandle              Hii Handle which Hii Packages are registered.
+  @param  DataBaseRecord         The DataBaseRecord instance contains the found Hii handle and package.
   @param  DevicePath             Device Path which Hii Config Access Protocol is registered.
   @param  Request                Pointer to a null-terminated Unicode string in
                                  <ConfigRequest> format. When it doesn't contain
@@ -1486,24 +1512,22 @@ Done:
 EFI_STATUS
 EFIAPI
 GetFullStringFromHiiFormPackages (
-  IN     EFI_HII_HANDLE             HiiHandle,
+  IN     HII_DATABASE_RECORD        *DataBaseRecord,
   IN     EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   IN OUT EFI_STRING                 *Request,
   IN OUT EFI_STRING                 *AltCfgResp
   )
 {
   EFI_STATUS                   Status;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINT32                       PackageListLength;  
-  UINTN                        BufferSize;
+  UINT8                        *HiiFormPackage;
+  UINTN                        PackageSize;
+  UINTN                        ResultSize;
   IFR_BLOCK_DATA               *RequestBlockArray;
   IFR_BLOCK_DATA               *BlockData;
   IFR_BLOCK_DATA               *NextBlockData;
   IFR_DEFAULT_DATA             *DefaultValueData;
   IFR_DEFAULT_DATA             *DefaultId;
   IFR_DEFAULT_DATA             *DefaultIdArray;
-  EFI_HII_PACKAGE_HEADER       PacakgeHeader;
-  UINT32                       PackageOffset;
   IFR_VARSTORAGE_DATA          *VarStorageData;
   EFI_STRING                   DefaultAltCfgResp;
   EFI_STRING                   FullConfigRequest;
@@ -1524,63 +1548,60 @@ GetFullStringFromHiiFormPackages (
   // Initialize the local variables.
   //
   RequestBlockArray = NULL;
+  DefaultIdArray    = NULL;
   VarStorageData    = NULL;
   DefaultAltCfgResp = NULL;
   FullConfigRequest = NULL;
   ConfigHdr         = NULL;
-  DefaultIdArray    = NULL;
   GuidStr           = NULL;
   NameStr           = NULL;
   PathStr           = NULL;
-
+  HiiFormPackage    = NULL;
+  ResultSize        = 0;
+  PackageSize       = 0;
+  
   //
-  // 1. Get HiiPackage by HiiHandle
+  // 0. Get Hii Form Package by HiiHandle
   //
-  BufferSize      = 0;
-  HiiPackageList  = NULL;
-  Status = HiiExportPackageLists (&mPrivate.HiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
-
-  //
-  // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
-  //
-  if (Status != EFI_BUFFER_TOO_SMALL) {
+  Status = ExportFormPackages (
+             &mPrivate, 
+             DataBaseRecord->Handle, 
+             DataBaseRecord->PackageList, 
+             0, 
+             PackageSize, 
+             HiiFormPackage,
+             &ResultSize
+           );
+  if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  HiiPackageList = AllocatePool (BufferSize);
-  if (HiiPackageList == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+ 
+  HiiFormPackage = AllocatePool (ResultSize);
+  if (HiiFormPackage == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
   }
 
   //
-  // Get PackageList on HiiHandle
+  // Get HiiFormPackage by HiiHandle
   //
-  Status = HiiExportPackageLists (&mPrivate.HiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
+  PackageSize   = ResultSize;
+  ResultSize    = 0;
+  Status = ExportFormPackages (
+             &mPrivate, 
+             DataBaseRecord->Handle, 
+             DataBaseRecord->PackageList, 
+             0,
+             PackageSize, 
+             HiiFormPackage,
+             &ResultSize
+           );
   if (EFI_ERROR (Status)) {
     goto Done;
   }
 
   //
-  // 2. Parse FormPackage to get BlockArray and DefaultId Array for the request BlockArray.
-  //    1) Request is NULL.
-  //    2) Request is not NULL. And it doesn't contain any BlockArray.
-  //    3) Request is not NULL. And it containts BlockArray.
-  //
-
-  //
-  // Initialize VarStorageData to store the var store Block and Default value information.
-  //
-  VarStorageData = (IFR_VARSTORAGE_DATA *) AllocateZeroPool (sizeof (IFR_VARSTORAGE_DATA));
-  if (VarStorageData == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
-  InitializeListHead (&VarStorageData->Entry);
-  InitializeListHead (&VarStorageData->BlockEntry);
-
-  //
-  // Gte the request block array by Request String 
+  // 1. Get the request block array by Request String when Request string containts the block array.
   //
   StringPtr = NULL;
   if (*Request != NULL) {
@@ -1695,39 +1716,36 @@ GetFullStringFromHiiFormPackages (
   }
   
   //
-  // Get the form package
+  // 2. Parse FormPackage to get BlockArray and DefaultId Array for the request BlockArray.
   //
-  PackageOffset     = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  PackageListLength = ReadUnaligned32 (&HiiPackageList->PackageLength);
-  while (PackageOffset < PackageListLength) {
-    CopyMem (&PacakgeHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PacakgeHeader));
 
-    if (PacakgeHeader.Type == EFI_HII_PACKAGE_FORMS) {
-      //
-      // Reset VarStorageData
-      //
-      VarStorageData->Size = 0;
-      VarStorageData->VarStoreId = 0;
-      if (VarStorageData->Name != NULL) {
-        FreePool (VarStorageData->Name);
-        VarStorageData->Name = NULL;
-      }
+  //
+  // Initialize DefaultIdArray to store the map between DeaultId and DefaultName
+  //
+  DefaultIdArray   = (IFR_DEFAULT_DATA *) AllocateZeroPool (sizeof (IFR_DEFAULT_DATA));
+  if (DefaultIdArray == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+  InitializeListHead (&DefaultIdArray->Entry);
 
-      //
-      // Parse the opcode in form package 
-      //
-      Status = ParseIfrData ((UINT8 *) HiiPackageList + PackageOffset, PacakgeHeader.Length, *Request, RequestBlockArray, VarStorageData, &DefaultIdArray);
-      if (EFI_ERROR (Status)) {
-        goto Done;
-      }
+  //
+  // Initialize VarStorageData to store the var store Block and Default value information.
+  //
+  VarStorageData = (IFR_VARSTORAGE_DATA *) AllocateZeroPool (sizeof (IFR_VARSTORAGE_DATA));
+  if (VarStorageData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+  InitializeListHead (&VarStorageData->Entry);
+  InitializeListHead (&VarStorageData->BlockEntry);
 
-      //
-      // Only one form is in a pacakge list.
-      //
-      break;
-    }
-
-    PackageOffset += PacakgeHeader.Length;
+  //
+  // Parse the opcode in form pacakge to get the default setting.
+  //
+  Status = ParseIfrData (HiiFormPackage, (UINT32) PackageSize, *Request, RequestBlockArray, VarStorageData, DefaultIdArray);
+  if (EFI_ERROR (Status)) {
+    goto Done;
   }
   
   //
@@ -2011,8 +2029,8 @@ Done:
   //
   // Free Pacakge data
   //
-  if (HiiPackageList != NULL) {
-    FreePool (HiiPackageList);
+  if (HiiFormPackage != NULL) {
+    FreePool (HiiFormPackage);
   }
 
   return Status;
@@ -2158,6 +2176,7 @@ HiiConfigRoutingExtractConfig (
     //
     DriverHandle     = NULL;
     HiiHandle        = NULL;
+    Database         = NULL;
     DevicePathLength = GetDevicePathSize (DevicePath);
     for (Link = Private->DatabaseList.ForwardLink;
          Link != &Private->DatabaseList;
@@ -2208,7 +2227,7 @@ HiiConfigRoutingExtractConfig (
       //
       // Get the full request string from IFR when HiiPackage is registered to HiiHandle 
       //
-      Status = GetFullStringFromHiiFormPackages (HiiHandle, DevicePath, &ConfigRequest, &DefaultResults);
+      Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults);
       if (EFI_ERROR (Status)) {
         goto Done;
       }
@@ -2257,7 +2276,7 @@ HiiConfigRoutingExtractConfig (
     //
     if (HiiHandle != NULL) {
       if (DefaultResults == NULL) {
-        Status = GetFullStringFromHiiFormPackages (HiiHandle, DevicePath, &ConfigRequest, &AccessResults);
+        Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &AccessResults);
       } else {
         Status = MergeDefaultString (&AccessResults, DefaultResults);
       }
@@ -2425,6 +2444,7 @@ HiiConfigRoutingExportConfig (
     HiiHandle        = NULL;
     ConfigRequest    = NULL;
     DefaultResults   = NULL;
+    Database         = NULL;
     DevicePath       = DevicePathFromHandle (ConfigAccessHandles[Index]);
     DevicePathLength = GetDevicePathSize (DevicePath);
     if (DevicePath != NULL) {
@@ -2452,7 +2472,7 @@ HiiConfigRoutingExportConfig (
     // Update AccessResults by getting default setting from IFR when HiiPackage is registered to HiiHandle 
     //
     if (HiiHandle != NULL && DevicePath != NULL) {
-      Status = GetFullStringFromHiiFormPackages (HiiHandle, DevicePath, &ConfigRequest, &DefaultResults);
+      Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults);
     }
     //
     // Can't parse IFR data to get the request string and default string.
@@ -2473,8 +2493,10 @@ HiiConfigRoutingExportConfig (
       // Merge the default sting from IFR code into the got setting from driver.
       //
       if (DefaultResults != NULL) {
-        MergeDefaultString (&AccessResults, DefaultResults);
+        Status = MergeDefaultString (&AccessResults, DefaultResults);
+        ASSERT_EFI_ERROR (Status);
         FreePool (DefaultResults);
+        DefaultResults = NULL;
       }
       
       //
