@@ -1,7 +1,7 @@
 /** @file
   This includes some definitions introduced in UEFI that will be used in both PEI and DXE phases.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -14,8 +14,6 @@
 
 #ifndef __UEFI_MULTIPHASE_H__
 #define __UEFI_MULTIPHASE_H__
-
-#include <ProcessorBind.h>
 
 ///
 /// Enumeration of memory types introduced in UEFI.

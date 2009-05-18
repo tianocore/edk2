@@ -4,7 +4,7 @@
   Abstraction of a very simple input device like a keyboard or serial
   terminal.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -17,8 +17,6 @@
 
 #ifndef __SIMPLE_TEXT_IN_PROTOCOL_H__
 #define __SIMPLE_TEXT_IN_PROTOCOL_H__
-
-#include <ProcessorBind.h>
 
 #define EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID \
   { \

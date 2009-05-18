@@ -4,7 +4,7 @@
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL supports the same languages as
   the corresponding
 
-  Copyright (c) 2006 - 2008, Intel Corporation 
+  Copyright (c) 2006 - 2009, Intel Corporation 
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -17,9 +17,6 @@
 
 #ifndef __SIMPLE_TEXT_IN_EX_H__
 #define __SIMPLE_TEXT_IN_EX_H__
-
-#include <ProcessorBind.h>
-#include <Pi/PiMultiPhase.h>
 
 #define EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID \
   {0xdd9e7534, 0x7762, 0x4698, { 0x8c, 0x14, 0xf5, 0x85, 0x17, 0xa6, 0x25, 0xaa } }
