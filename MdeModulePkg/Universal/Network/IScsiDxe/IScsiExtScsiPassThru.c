@@ -282,7 +282,7 @@ IScsiExtScsiPassThruGetTargetLun (
   Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
   ConfigNvData  = &Private->Session.ConfigData.NvData;
 
-  ZeroMem (*Target, TARGET_MAX_BYTES);
+  (*Target)[0] = 0;
 
   if (AsciiStrCmp (ConfigNvData->TargetName, (CHAR8 *) DevicePath + sizeof (ISCSI_DEVICE_PATH)) != 0) {
     return EFI_UNSUPPORTED;
