@@ -94,6 +94,7 @@ FakeExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
+  *Progress = Request;
   return EFI_NOT_FOUND;
 }
 
@@ -121,7 +122,15 @@ FakeRouteConfig (
   OUT EFI_STRING                             *Progress
   )
 {
-  return EFI_SUCCESS;
+  if (Configuration == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
