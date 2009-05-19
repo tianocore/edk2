@@ -18,6 +18,7 @@
 #   Implementation of CpuBreakpoint() on x86_64
 #
 #------------------------------------------------------------------------------
+#include <EdkIIGlueBase.h>
 
 .global ASM_PFX(CpuBreakpoint)
 ASM_PFX(CpuBreakpoint):

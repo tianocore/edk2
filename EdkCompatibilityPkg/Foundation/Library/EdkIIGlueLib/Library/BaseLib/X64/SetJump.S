@@ -18,7 +18,7 @@
 #   Implementation of SetJump() on x86_64
 #
 #------------------------------------------------------------------------------
-
+#include <EdkIIGlueBase.h>
 .extern InternalAssertJumpBuffer;
 .global ASM_PFX(SetJump)
 ASM_PFX(SetJump):
