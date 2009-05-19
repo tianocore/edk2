@@ -65,7 +65,13 @@ IScsiExtScsiPassThruFunction (
   IN EFI_EVENT                                                Event     OPTIONAL
   )
 {
-  if (Target[0] != 0) {
+  ISCSI_DRIVER_DATA           *Private;
+  ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
+
+  Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
+  ConfigNvData  = &Private->Session.ConfigData.NvData;
+
+  if (Target[0] != 0 || (CompareMem (&Lun, ConfigNvData->BootLun, sizeof (UINT64)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
