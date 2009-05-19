@@ -345,6 +345,13 @@ Ip4DeviceExtractConfig (
 
   *Progress = Request;
 
+  //
+  // Check Request data in <ConfigHdr>.
+  //
+  if (!HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    return EFI_NOT_FOUND;
+  }
+
   Private = IP4CONFIG_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
   Ip4ConfigInstance = IP4_CONFIG_INSTANCE_FROM_IP4FORM_CALLBACK_INFO (Private);
 
@@ -372,7 +379,6 @@ Ip4DeviceExtractConfig (
                                Progress
                                );
 
-  *Progress = Request + StrLen (Request);
   FreePool (IfrDeviceNvData);
 
   return Status;
@@ -422,6 +428,7 @@ Ip4DeviceRouteConfig (
   EFI_STATUS                       Status;
   UINTN                            BufferSize;
   NIC_IP4_CONFIG_INFO              *IfrDeviceNvData;
+  NIC_IP4_CONFIG_INFO              *NicInfo;
   IP4_FORM_CALLBACK_INFO           *Private;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
   IP4_CONFIG_INSTANCE              *Ip4ConfigInstance;
@@ -432,6 +439,13 @@ Ip4DeviceRouteConfig (
   }
 
   *Progress = Configuration;
+
+  //
+  // Check Routing data in <ConfigHdr>.
+  //
+  if (!HiiIsConfigHdrMatch (Configuration, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    return EFI_NOT_FOUND;
+  }
 
   Private = IP4CONFIG_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
   Ip4ConfigInstance = IP4_CONFIG_INSTANCE_FROM_IP4FORM_CALLBACK_INFO (Private);
@@ -456,13 +470,14 @@ Ip4DeviceRouteConfig (
   if (!EFI_ERROR (Status)) {
     ZeroMem (&ZeroMac, sizeof (EFI_MAC_ADDRESS));
     if (CompareMem (&IfrDeviceNvData->NicAddr.MacAddr, &ZeroMac, IfrDeviceNvData->NicAddr.Len) != 0) {
-      Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, IfrDeviceNvData, TRUE);
+      BufferSize = sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * IfrDeviceNvData->Ip4Info.RouteTableSize;
+      NicInfo = AllocateCopyPool (BufferSize, IfrDeviceNvData); 
+      Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NicInfo, TRUE);
     } else {
       Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, TRUE);
     }
   }
 
-  *Progress = Configuration + StrLen (Configuration);
   FreePool (IfrDeviceNvData);
   return Status;
 
@@ -539,6 +554,7 @@ Ip4FormExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
+  *Progress = Request;
   return EFI_NOT_FOUND;
 }
 
