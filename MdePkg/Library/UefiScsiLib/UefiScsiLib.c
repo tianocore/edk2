@@ -115,9 +115,6 @@ ScsiTestUnitReadyCommand (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
 
@@ -139,11 +136,7 @@ ScsiTestUnitReadyCommand (
   //
   // Fill Cdb for Test Unit Ready Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_TEST_UNIT_READY;
-  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   CommandPacket.CdbLength       = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
   CommandPacket.SenseDataLength = *SenseDataLength;
 
@@ -250,9 +243,6 @@ ScsiInquiryCommand (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
 
@@ -272,11 +262,7 @@ ScsiInquiryCommand (
   CommandPacket.SenseDataLength = *SenseDataLength;
   CommandPacket.Cdb             = Cdb;
 
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]  = EFI_SCSI_OP_INQUIRY;
-  Cdb[1]  = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   if (EnableVitalProductData) {
     Cdb[1] |= 0x01;
   }
@@ -398,9 +384,6 @@ ScsiModeSense10Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
@@ -421,18 +404,15 @@ ScsiModeSense10Command (
   //
   // Fill Cdb for Mode Sense (10) Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_MODE_SEN10;
   //
   // DBDField is in Cdb[1] bit3 of (bit7..0)
   //
-  Cdb[1]                        = (UINT8) ((Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK) + ((DBDField << 3) & 0x08));
+  Cdb[1]                        = (UINT8) ((DBDField << 3) & 0x08);
   //
   // PageControl is in Cdb[2] bit7..6, PageCode is in Cdb[2] bit5..0
   //
-  Cdb[2]                        = (UINT8) ((PageControl & 0xc0) | (PageCode & 0x3f));
+  Cdb[2]                        = (UINT8) (((PageControl & 0x3) << 6) | (PageCode & 0x3f));
   Cdb[7]                        = (UINT8) (*DataLength >> 8);
   Cdb[8]                        = (UINT8) (*DataLength);
 
@@ -490,9 +470,6 @@ ScsiRequestSenseCommand (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_SIX];
 
@@ -512,11 +489,7 @@ ScsiRequestSenseCommand (
   //
   // Fill Cdb for Request Sense Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_REQUEST_SENSE;
-  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[4]                        = (UINT8) (*SenseDataLength);
 
   CommandPacket.CdbLength       = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
@@ -583,9 +556,6 @@ ScsiReadCapacityCommand (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
@@ -606,11 +576,7 @@ ScsiReadCapacityCommand (
   //
   // Fill Cdb for Read Capacity Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]  = EFI_SCSI_OP_READ_CAPACITY;
-  Cdb[1]  = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   if (!Pmi) {
     //
     // Partial medium indicator,if Pmi is FALSE, the Cdb.2 ~ Cdb.5 MUST BE ZERO.
@@ -685,9 +651,6 @@ ScsiReadCapacity16Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[16];
 
@@ -702,9 +665,6 @@ ScsiReadCapacity16Command (
   //
   // Fill Cdb for Read Capacity Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]  = EFI_SCSI_OP_READ_CAPACITY16;
   Cdb[1]  = 0x10;
   if (!Pmi) {
@@ -785,9 +745,6 @@ ScsiRead10Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
@@ -808,11 +765,7 @@ ScsiRead10Command (
   //
   // Fill Cdb for Read (10) Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_READ10;
-  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[2]                        = (UINT8) (StartLba >> 24);
   Cdb[3]                        = (UINT8) (StartLba >> 16);
   Cdb[4]                        = (UINT8) (StartLba >> 8);
@@ -887,9 +840,6 @@ ScsiWrite10Command (
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
-  UINT64                          Lun;
-  UINT8                           *Target;
-  UINT8                           TargetArray[EFI_SCSI_TARGET_MAX_BYTES];
   EFI_STATUS                      Status;
   UINT8                           Cdb[EFI_SCSI_OP_LENGTH_TEN];
 
@@ -910,11 +860,7 @@ ScsiWrite10Command (
   //
   // Fill Cdb for Write (10) Command
   //
-  Target = &TargetArray[0];
-  ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
-
   Cdb[0]                        = EFI_SCSI_OP_WRITE10;
-  Cdb[1]                        = (UINT8) (Lun & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[2]                        = (UINT8) (StartLba >> 24);
   Cdb[3]                        = (UINT8) (StartLba >> 16);
   Cdb[4]                        = (UINT8) (StartLba >> 8);
