@@ -1272,7 +1272,7 @@ PciReadBuffer (
     //
     // Read a word if StartAddress is word aligned
     //
-    *(volatile UINT16 *)Buffer = PciRead16 (StartAddress);
+    WriteUnaligned16 (Buffer, PciRead16 (StartAddress));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1282,7 +1282,7 @@ PciReadBuffer (
     //
     // Read as many double words as possible
     //
-    *(volatile UINT32 *)Buffer = PciRead32 (StartAddress);
+    WriteUnaligned32 (Buffer, PciRead32 (StartAddress));
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
@@ -1292,7 +1292,7 @@ PciReadBuffer (
     //
     // Read the last remaining word if exist
     //
-    *(volatile UINT16 *)Buffer = PciRead16 (StartAddress);
+    WriteUnaligned16 (Buffer, PciRead16 (StartAddress));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1370,7 +1370,7 @@ PciWriteBuffer (
     //
     // Write a word if StartAddress is word aligned
     //
-    PciWrite16 (StartAddress, *(UINT16*)Buffer);
+    PciWrite16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1380,7 +1380,7 @@ PciWriteBuffer (
     //
     // Write as many double words as possible
     //
-    PciWrite32 (StartAddress, *(UINT32*)Buffer);
+    PciWrite32 (StartAddress, ReadUnaligned32 (Buffer));
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
@@ -1390,7 +1390,7 @@ PciWriteBuffer (
     //
     // Write the last remaining word if exist
     //
-    PciWrite16 (StartAddress, *(UINT16*)Buffer);
+    PciWrite16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
