@@ -591,6 +591,10 @@ MergeDefaultString (
                                      SizeAltCfgResp + StrSize (StringPtrDefault),
                                      (VOID *) (*AltCfgResp)
                                      );
+        if (*AltCfgResp == NULL) {
+          FreePool (AltConfigHdr);
+          return EFI_OUT_OF_RESOURCES;
+        }
         StrCat (*AltCfgResp, StringPtrDefault);
         *StringPtrEnd = TempChar;
       }
@@ -657,10 +661,17 @@ InsertDefaultValue (
   for (Link = BlockData->DefaultValueEntry.ForwardLink; Link != &BlockData->DefaultValueEntry; Link = Link->ForwardLink) {
     DefaultValueArray = BASE_CR (Link, IFR_DEFAULT_DATA, Entry);
     if (DefaultValueArray->DefaultId == DefaultValueData->DefaultId) {
-      //
-      // Update the default value array in BlockData.
-      //
-      DefaultValueArray->Value = DefaultValueData->Value;
+      if (DefaultValueData->OpCode == EFI_IFR_DEFAULT_OP) {
+        //
+        // Update the default value array in BlockData.
+        //
+        DefaultValueArray->Value = DefaultValueData->Value;
+      } else if (DefaultValueArray->OpCode != EFI_IFR_DEFAULT_OP) {
+        //
+        // Update the default value array in BlockData.
+        //
+        DefaultValueArray->Value = DefaultValueData->Value;
+      }
       FreePool (DefaultValueData);
       return;
     } else if (DefaultValueArray->DefaultId > DefaultValueData->DefaultId) {
@@ -1144,6 +1155,7 @@ ParseIfrData (
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
+        DefaultData->OpCode      = IfrOpHdr->OpCode;
         DefaultData->DefaultId   = VarDefaultId;
         DefaultData->DefaultName = VarDefaultName;
         DefaultData->Value       = 1;
@@ -1170,6 +1182,7 @@ ParseIfrData (
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
+        DefaultData->OpCode      = IfrOpHdr->OpCode;
         DefaultData->DefaultId   = VarDefaultId;
         DefaultData->DefaultName = VarDefaultName;
         DefaultData->Value       = 1;
@@ -1375,6 +1388,7 @@ ParseIfrData (
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
+        DefaultData->OpCode      = IfrOpHdr->OpCode;
         DefaultData->DefaultId   = VarDefaultId;
         DefaultData->DefaultName = VarDefaultName;
         DefaultData->Value       = IfrOneOfOption->Value.u64;
@@ -1401,6 +1415,7 @@ ParseIfrData (
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
+        DefaultData->OpCode      = IfrOpHdr->OpCode;
         DefaultData->DefaultId   = VarDefaultId;
         DefaultData->DefaultName = VarDefaultName;
         DefaultData->Value       = IfrOneOfOption->Value.u64;
@@ -1445,6 +1460,7 @@ ParseIfrData (
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
+      DefaultData->OpCode      = IfrOpHdr->OpCode;
       DefaultData->DefaultId   = VarDefaultId;
       DefaultData->DefaultName = VarDefaultName;
       DefaultData->Value       = IfrDefault->Value.u64;
@@ -1543,6 +1559,7 @@ GetFullStringFromHiiFormPackages (
   LIST_ENTRY                   *Link;
   LIST_ENTRY                   *LinkData;
   LIST_ENTRY                   *LinkDefault;
+  BOOLEAN                      DataExist;
 
   //
   // Initialize the local variables.
@@ -1559,7 +1576,8 @@ GetFullStringFromHiiFormPackages (
   HiiFormPackage    = NULL;
   ResultSize        = 0;
   PackageSize       = 0;
-  
+  DataExist         = FALSE;
+ 
   //
   // 0. Get Hii Form Package by HiiHandle
   //
@@ -1687,7 +1705,28 @@ GetFullStringFromHiiFormPackages (
       BlockData->Offset = Offset;
       BlockData->Width  = Width;
       InsertBlockData (&RequestBlockArray->Entry, &BlockData);
+      
+      //
+      // Skip &VALUE string if &VALUE does exists.
+      //
+      if (StrnCmp (StringPtr, L"&VALUE=", StrLen (L"&VALUE=")) == 0) {
+        StringPtr += StrLen (L"&VALUE=");
 
+        //
+        // Get Value
+        //
+        Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
+        if (EFI_ERROR (Status)) {
+          Status = EFI_INVALID_PARAMETER;
+          goto Done;
+        }
+
+        StringPtr += Length;
+        if (*StringPtr != 0 && *StringPtr != L'&') {
+          Status = EFI_INVALID_PARAMETER;
+          goto Done;
+        }
+      }
       //
       // If '\0', parsing is finished. 
       //
@@ -1752,6 +1791,7 @@ GetFullStringFromHiiFormPackages (
   // No requested varstore in IFR data and directly return
   //
   if (VarStorageData->Size == 0) {
+    Status = EFI_SUCCESS;
     goto Done;
   }
 
@@ -1803,6 +1843,7 @@ GetFullStringFromHiiFormPackages (
     // Compute the length of the entire request starting with <ConfigHdr> and a 
     // Null-terminator
     //
+    DataExist         = FALSE;
     Length = StrLen (ConfigHdr) + 1;
 
     for (Link = VarStorageData->BlockEntry.ForwardLink; Link != &VarStorageData->BlockEntry; Link = Link->ForwardLink) {
@@ -1812,14 +1853,24 @@ GetFullStringFromHiiFormPackages (
       // <BlockName> ::= &OFFSET=1234&WIDTH=1234
       //                 |  8   | 4 |   7  | 4 |
       //
+      DataExist = TRUE;
       Length = Length + (8 + 4 + 7 + 4);
     }
     
+    //
+    // No any request block data is found. The request string can't be constructed.
+    //
+    if (!DataExist) {
+      Status = EFI_SUCCESS;
+      goto Done;
+    }
+
     //
     // Allocate buffer for the entire <ConfigRequest>
     //
     FullConfigRequest = AllocateZeroPool (Length * sizeof (CHAR16));
     if (FullConfigRequest == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
     StringPtr = FullConfigRequest;
@@ -1862,7 +1913,7 @@ GetFullStringFromHiiFormPackages (
   // Go through all VarStorageData Entry and get the DefaultId array for each one
   // Then construct them all to : ConfigHdr AltConfigHdr ConfigBody AltConfigHdr ConfigBody
   //
-
+  DataExist = FALSE;
   //
   // Add length for <ConfigHdr> + '\0'
   //
@@ -1885,10 +1936,19 @@ GetFullStringFromHiiFormPackages (
           // Add length for "&OFFSET=XXXX&WIDTH=YYYY&VALUE=zzzzzzzzzzzz"
           //                |    8  | 4 |   7  | 4 |   7  | Width * 2 |
           //
-          Length += (8 + 4 + 7 + 4 + 7 + BlockData->Width * 2);       
+          Length += (8 + 4 + 7 + 4 + 7 + BlockData->Width * 2);
+          DataExist = TRUE;
         }
       }
     }
+  }
+  
+  //
+  // No default value is found. The default string doesn't exist.
+  //
+  if (!DataExist) {
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   //
@@ -1896,6 +1956,7 @@ GetFullStringFromHiiFormPackages (
   //
   DefaultAltCfgResp = AllocateZeroPool (Length * sizeof (CHAR16));
   if (DefaultAltCfgResp == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
   StringPtr = DefaultAltCfgResp;
@@ -1957,11 +2018,11 @@ GetFullStringFromHiiFormPackages (
   //
   // 5. Merge string into the input AltCfgResp if the iput *AltCfgResp is not NULL.
   //
-  if (*AltCfgResp != NULL) {
+  if (*AltCfgResp != NULL && DefaultAltCfgResp != NULL) {
     Status = MergeDefaultString (AltCfgResp, DefaultAltCfgResp);
     FreePool (DefaultAltCfgResp);
-  } else {
-   *AltCfgResp = DefaultAltCfgResp;
+  } else if (*AltCfgResp == NULL) {
+    *AltCfgResp = DefaultAltCfgResp;
   }
 
 Done:
@@ -2102,7 +2163,7 @@ HiiConfigRoutingExtractConfig (
   EFI_STRING                          AccessResults;
   EFI_STRING                          DefaultResults;
   BOOLEAN                             FirstElement;
-  UINTN                               DevicePathLength;
+  BOOLEAN                             IfrDataParsedFlag;
 
   if (This == NULL || Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2121,6 +2182,7 @@ HiiConfigRoutingExtractConfig (
   Status         = EFI_SUCCESS;
   AccessResults  = NULL;
   DevicePath     = NULL;
+  IfrDataParsedFlag = FALSE;
 
   //
   // The first element of <MultiConfigRequest> should be
@@ -2177,7 +2239,6 @@ HiiConfigRoutingExtractConfig (
     DriverHandle     = NULL;
     HiiHandle        = NULL;
     Database         = NULL;
-    DevicePathLength = GetDevicePathSize (DevicePath);
     for (Link = Private->DatabaseList.ForwardLink;
          Link != &Private->DatabaseList;
          Link = Link->ForwardLink
@@ -2186,12 +2247,11 @@ HiiConfigRoutingExtractConfig (
    
       if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
         CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-        if ((DevicePathLength == GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)) && 
-            (CompareMem (
+        if (CompareMem (
               DevicePath,
               CurrentDevicePath,
-              DevicePathLength
-              ) == 0)) {
+              GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)
+              ) == 0) {
           DriverHandle = Database->DriverHandle;
           HiiHandle    = Database->Handle;
           break;
@@ -2223,10 +2283,12 @@ HiiConfigRoutingExtractConfig (
     //
     // Check whether ConfigRequest contains request string OFFSET/WIDTH
     //
+    IfrDataParsedFlag = FALSE;
     if ((HiiHandle != NULL) && (StrStr (ConfigRequest, L"&OFFSET=") == NULL)) {
       //
       // Get the full request string from IFR when HiiPackage is registered to HiiHandle 
       //
+      IfrDataParsedFlag = TRUE;
       Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults);
       if (EFI_ERROR (Status)) {
         goto Done;
@@ -2275,10 +2337,12 @@ HiiConfigRoutingExtractConfig (
     // Update AccessResults by getting default setting from IFR when HiiPackage is registered to HiiHandle 
     //
     if (HiiHandle != NULL) {
-      if (DefaultResults == NULL) {
+      if (!IfrDataParsedFlag) {
         Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &AccessResults);
-      } else {
+      } else if (DefaultResults != NULL) {
         Status = MergeDefaultString (&AccessResults, DefaultResults);
+        FreePool (DefaultResults);
+        DefaultResults = NULL;
       }
     }
     FreePool (DevicePath);
@@ -2286,14 +2350,6 @@ HiiConfigRoutingExtractConfig (
     
     if (EFI_ERROR (Status)) {
       goto Done;
-    }
-
-    //
-    // Free the allocated memory.
-    //
-    if (DefaultResults != NULL) {
-      FreePool (DefaultResults);
-      DefaultResults = NULL;
     }
 
 NextConfigString:   
@@ -2327,7 +2383,7 @@ NextConfigString:
 Done:
   if (EFI_ERROR (Status)) {
     FreePool (*Results);
-  *Results = NULL;
+    *Results = NULL;
   }
   
   if (ConfigRequest != NULL) {
@@ -2383,7 +2439,7 @@ HiiConfigRoutingExportConfig (
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessResults;
   EFI_STRING                          Progress;
-  EFI_STRING                          ConfigRequest;
+  EFI_STRING                          StringPtr;
   UINTN                               Index;
   EFI_HANDLE                          *ConfigAccessHandles;
   UINTN                               NumberConfigAccessHandles;
@@ -2396,7 +2452,6 @@ HiiConfigRoutingExportConfig (
   HII_DATABASE_RECORD                 *Database;
   UINT8                               *DevicePathPkg;
   UINT8                               *CurrentDevicePath;
-  UINTN                               DevicePathLength;
 
   if (This == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2442,11 +2497,9 @@ HiiConfigRoutingExportConfig (
     //
     Progress         = NULL;
     HiiHandle        = NULL;
-    ConfigRequest    = NULL;
     DefaultResults   = NULL;
     Database         = NULL;
     DevicePath       = DevicePathFromHandle (ConfigAccessHandles[Index]);
-    DevicePathLength = GetDevicePathSize (DevicePath);
     if (DevicePath != NULL) {
       for (Link = Private->DatabaseList.ForwardLink;
            Link != &Private->DatabaseList;
@@ -2455,12 +2508,11 @@ HiiConfigRoutingExportConfig (
         Database = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
         if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
           CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-          if ((DevicePathLength == GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)) &&
-              (CompareMem (
+          if (CompareMem (
                 DevicePath,
                 CurrentDevicePath,
-                DevicePathLength
-                ) == 0)) {
+                GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)
+                ) == 0) {
             HiiHandle = Database->Handle;
             break;
           }
@@ -2468,27 +2520,28 @@ HiiConfigRoutingExportConfig (
       }
     }
 
-    //
-    // Update AccessResults by getting default setting from IFR when HiiPackage is registered to HiiHandle 
-    //
-    if (HiiHandle != NULL && DevicePath != NULL) {
-      Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults);
-    }
-    //
-    // Can't parse IFR data to get the request string and default string.
-    //
-    if (EFI_ERROR (Status)) {
-      ConfigRequest  = NULL;
-      DefaultResults = NULL;
-    }
-       
     Status = ConfigAccess->ExtractConfig (
                              ConfigAccess,
-                             ConfigRequest,
+                             NULL,
                              &Progress,
                              &AccessResults
                              );
     if (!EFI_ERROR (Status)) {
+      //
+      // Update AccessResults by getting default setting from IFR when HiiPackage is registered to HiiHandle 
+      //
+      if (HiiHandle != NULL && DevicePath != NULL) {
+        StringPtr = StrStr (AccessResults, L"&GUID=");
+        if (StringPtr != NULL) {
+          *StringPtr = 0;
+        }
+        if (StrStr (AccessResults, L"&OFFSET=") != NULL) {
+          Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &AccessResults, &DefaultResults);
+        }
+        if (StringPtr != NULL) {
+          *StringPtr = L'&';
+        }
+      }
       //
       // Merge the default sting from IFR code into the got setting from driver.
       //
@@ -2570,7 +2623,6 @@ HiiConfigRoutingRouteConfig (
   EFI_HANDLE                          DriverHandle;
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
-  UINTN                               DevicePathLength;
 
   if (This == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2630,7 +2682,6 @@ HiiConfigRoutingRouteConfig (
     // Find driver which matches the routing data.
     //
     DriverHandle     = NULL;
-    DevicePathLength = GetDevicePathSize (DevicePath);
     for (Link = Private->DatabaseList.ForwardLink;
          Link != &Private->DatabaseList;
          Link = Link->ForwardLink
@@ -2639,12 +2690,11 @@ HiiConfigRoutingRouteConfig (
 
       if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
         CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
-        if ((DevicePathLength == GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)) &&
-            (CompareMem (
+        if (CompareMem (
               DevicePath,
               CurrentDevicePath,
-              DevicePathLength
-              ) == 0)) {
+              GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath)
+              ) == 0) {
           DriverHandle = Database->DriverHandle;
           break;
         }
@@ -3216,7 +3266,7 @@ HiiConfigToBlock (
     goto Exit;
   }
 
-  *Progress = StringPtr;
+  *Progress = StringPtr + StrLen (StringPtr);
   return EFI_SUCCESS;
 
 Exit:
