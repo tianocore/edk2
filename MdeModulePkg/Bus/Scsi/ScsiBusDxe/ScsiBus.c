@@ -1123,7 +1123,7 @@ DiscoverScsiDevice (
             &InquiryDataLength,
             FALSE
             );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && Status != EFI_BAD_BUFFER_SIZE) {
     return FALSE;
   }
   //
