@@ -392,6 +392,12 @@ typedef INT64   INTN;
   #define GLOBAL_REMOVE_IF_UNREFERENCED
 #endif
 
+#if defined(__APPLE__)
+  #define ASM_GLOBAL .globl
+#else
+  #define ASM_GLOBAL .global
+#endif 
+
 ///
 /// A pointer to a function in IPF points to a plabel.
 ///
