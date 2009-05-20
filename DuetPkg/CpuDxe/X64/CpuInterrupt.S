@@ -24,11 +24,11 @@
 #EXTERN mTimerVector: DWORD
 
 	.data
-	.globl ASM_PFX(mExceptionCodeSize)
+	ASM_GLOBAL ASM_PFX(mExceptionCodeSize)
 ASM_PFX(mExceptionCodeSize): .long  9
 
 	.text
-	.globl ASM_PFX(InitDescriptor)
+	ASM_GLOBAL ASM_PFX(InitDescriptor)
 
 ASM_PFX(InitDescriptor):
         movq    $GDT_BASE,%rax              # EAX=PHYSICAL address of gdt
@@ -47,7 +47,7 @@ ASM_PFX(InitDescriptor):
 #     UINTN Vector,
 #     VOID  (*Handler)(VOID)
 #     )
-	.globl ASM_PFX(InstallInterruptHandler)
+	ASM_GLOBAL ASM_PFX(InstallInterruptHandler)
 ASM_PFX(InstallInterruptHandler):
 #  Vector:DWORD @ 4(%esp)
 #  Handler:DWORD @ 8(%esp)
@@ -84,7 +84,7 @@ ASM_PFX(InstallInterruptHandler):
 	.endm
 
     .align 2
-	.globl ASM_PFX(SystemExceptionHandler)
+	ASM_GLOBAL ASM_PFX(SystemExceptionHandler)
 ASM_PFX(SystemExceptionHandler):
 INT0:
     push     $0x0      # push error code place holder on the stack
@@ -211,7 +211,7 @@ INTUnknown:
     JmpCommonIdtEntry
 	.endr
 
-	.globl ASM_PFX(SystemTimerHandler)
+	ASM_GLOBAL ASM_PFX(SystemTimerHandler)
 ASM_PFX(SystemTimerHandler):
     push     $0
     push     $ASM_PFX(mTimerVector)
