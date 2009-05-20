@@ -94,6 +94,9 @@ FakeExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
+  if (Request == NULL || Progress == NULL || Results == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   *Progress = Request;
   return EFI_NOT_FOUND;
 }
@@ -122,15 +125,18 @@ FakeRouteConfig (
   OUT EFI_STRING                             *Progress
   )
 {
-  if (Configuration == NULL) {
+  if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Progress == NULL) {
-    return EFI_INVALID_PARAMETER;
+  *Progress = Configuration;
+  if (!HiiIsConfigHdrMatch (Configuration, &mBootMaintGuid, mBootMaintStorageName)
+      && !HiiIsConfigHdrMatch (Configuration, &mFileExplorerGuid, mFileExplorerStorageName)) {
+    return EFI_NOT_FOUND;
   }
 
-  return EFI_NOT_FOUND;
+  *Progress = Configuration + StrLen (Configuration);
+  return EFI_SUCCESS;
 }
 
 /**

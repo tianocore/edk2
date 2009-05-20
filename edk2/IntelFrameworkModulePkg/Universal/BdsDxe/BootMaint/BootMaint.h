@@ -64,6 +64,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_GUID mBootMaintGuid;
 extern EFI_GUID mFileExplorerGuid;
 extern CHAR16   mFileExplorerStorageName[];
+extern CHAR16   mBootMaintStorageName[];
 //
 // These are the VFR compiler generated data representing our VFR data.
 //
