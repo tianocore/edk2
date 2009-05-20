@@ -23,8 +23,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   This function will retrieve the information about the file for the handle 
   specified and store it in allocated pool memory.
 
-  This function allocates a buffer to store the file’s information. It is the 
-  caller’s responsibility to free the buffer
+  This function allocates a buffer to store the file's information. It is the 
+  caller's responsibility to free the buffer
 
   @param  FileHandle  The file handle of the file for which information is 
   being requested.
@@ -68,11 +68,11 @@ FileHandleSetInfo (
   This function reads information from an opened file.
 
   If FileHandle is not a directory, the function reads the requested number of 
-  bytes from the file at the file’s current position and returns them in Buffer. 
+  bytes from the file at the file's current position and returns them in Buffer. 
   If the read goes beyond the end of the file, the read length is truncated to the
-  end of the file. The file’s current position is increased by the number of bytes 
+  end of the file. The file's current position is increased by the number of bytes 
   returned.  If FileHandle is a directory, the function reads the directory entry 
-  at the file’s current position and returns the entry in Buffer. If the Buffer 
+  at the file's current position and returns the entry in Buffer. If the Buffer 
   is not large enough to hold the current directory entry, then 
   EFI_BUFFER_TOO_SMALL is returned and the current file position is not updated. 
   BufferSize is set to be the size of the buffer needed to read the entry. On 
@@ -107,7 +107,7 @@ FileHandleRead(
   This function writes the specified number of bytes to the file at the current 
   file position. The current file position is advanced the actual number of bytes 
   written, which is returned in BufferSize. Partial writes only occur when there 
-  has been a data error during the write attempt (such as “volume space full”). 
+  has been a data error during the write attempt (such as "volume space full"). 
   The file is automatically grown to hold the data if required. Direct writes to 
   opened directories are not supported.
 
@@ -136,7 +136,7 @@ FileHandleWrite(
 /** 
   Close an open file handle.
 
-  This function closes a specified file handle. All “dirty” cached file data is 
+  This function closes a specified file handle. All "dirty" cached file data is 
   flushed to the device, and the file is closed. In all cases the handle is 
   closed.
 
@@ -260,7 +260,7 @@ FileHandleIsDirectory (
 /**
   Retrieves the first file from a directory
 
-  This function opens a directory and gets the first file’s info in the 
+  This function opens a directory and gets the first file's info in the 
   directory. Caller can use FileHandleFindNextFile() to get other files.  When 
   complete the caller is responsible for calling FreePool() on *Buffer.
 
@@ -314,7 +314,7 @@ FileHandleFindNextFile(
   if FileHandle is NULL then ASSERT()
   if Size is NULL then ASSERT()
 
-  This function extracts the file size info from the FileHandle’s EFI_FILE_INFO 
+  This function extracts the file size info from the FileHandle's EFI_FILE_INFO 
   data.
 
   @param FileHandle             file handle from which size is retrieved

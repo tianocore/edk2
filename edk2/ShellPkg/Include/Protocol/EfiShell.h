@@ -315,11 +315,11 @@ typedef UINT32 EFI_SHELL_DEVICE_NAME_FLAGS;
   NULL and EFI_NOT_FOUND will be returned.
 
   If EFI_DEVICE_NAME_USE_COMPONENT_NAME is set, then the function will return the
-  device’s name using the EFI_COMPONENT_NAME2_PROTOCOL, if present on
+  device's name using the EFI_COMPONENT_NAME2_PROTOCOL, if present on
   DeviceHandle.
 
   If EFI_DEVICE_NAME_USE_DEVICE_PATH is set, then the function will return the
-  device’s name using the EFI_DEVICE_PATH_PROTOCOL, if present on DeviceHandle.
+  device's name using the EFI_DEVICE_PATH_PROTOCOL, if present on DeviceHandle.
   If both EFI_DEVICE_NAME_USE_COMPONENT_NAME and
   EFI_DEVICE_NAME_USE_DEVICE_PATH are set, then
   EFI_DEVICE_NAME_USE_COMPONENT_NAME will have higher priority.
