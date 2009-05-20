@@ -29,7 +29,7 @@
 #   OUT IA32_FX_BUFFER *Buffer
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(InternalX86FxSave)
+ASM_GLOBAL ASM_PFX(InternalX86FxSave)
 ASM_PFX(InternalX86FxSave):
     fxsave  (%rcx)
     ret

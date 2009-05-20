@@ -32,7 +32,7 @@
 #    OUT  UINT32  *RegisterOutEdx  OPTIONAL
 #    )
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmCpuid)
+ASM_GLOBAL ASM_PFX(AsmCpuid)
 ASM_PFX(AsmCpuid):
     push    %rbx
     mov     %ecx, %eax

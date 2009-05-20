@@ -29,7 +29,7 @@
 #   UINTN  Cr3
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteCr3)
+ASM_GLOBAL ASM_PFX(AsmWriteCr3)
 ASM_PFX(AsmWriteCr3):
     mov    %rcx,%cr3
     mov    %rcx,%rax

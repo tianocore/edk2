@@ -30,7 +30,7 @@
 #   IN      UINTN                     Ecx
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmMwait)
+ASM_GLOBAL ASM_PFX(AsmMwait)
 .align 16
 ASM_PFX(AsmMwait):
     mov    %ecx,%eax

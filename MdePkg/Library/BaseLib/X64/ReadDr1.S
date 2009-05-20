@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadDr1)
+ASM_GLOBAL ASM_PFX(AsmReadDr1)
 .align 16
 ASM_PFX(AsmReadDr1):
     mov     %dr1, %rax

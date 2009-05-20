@@ -29,7 +29,7 @@
 #   IN      UINT32                    *Value
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(InternalSyncDecrement)
+ASM_GLOBAL ASM_PFX(InternalSyncDecrement)
 ASM_PFX(InternalSyncDecrement):
     lock    decl (%rcx)
     mov     (%rcx), %eax

@@ -29,7 +29,7 @@
 #   UINTN  Value
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteDr2)
+ASM_GLOBAL ASM_PFX(AsmWriteDr2)
 .align 16
 ASM_PFX(AsmWriteDr2):
     mov     %rcx, %dr2

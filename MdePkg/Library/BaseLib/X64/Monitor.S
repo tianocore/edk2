@@ -31,7 +31,7 @@
 #   IN      UINTN                     Edx
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmMonitor)
+ASM_GLOBAL ASM_PFX(AsmMonitor)
 .align 16
 ASM_PFX(AsmMonitor):
     mov    %ecx,%eax

@@ -341,6 +341,11 @@ typedef INT32   INTN;
   #else
     #define ASM_PFX(name) _##name
   #endif 
+  #if defined(__APPLE__)
+    #define ASM_GLOBAL .globl
+  #else
+    #define ASM_GLOBAL .global
+  #endif 
 #endif
 
 /**

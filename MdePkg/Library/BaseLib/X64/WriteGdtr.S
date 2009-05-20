@@ -29,7 +29,7 @@
 #   IN      CONST IA32_DESCRIPTOR     *Idtr
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(InternalX86WriteGdtr)
+ASM_GLOBAL ASM_PFX(InternalX86WriteGdtr)
 ASM_PFX(InternalX86WriteGdtr):
     lgdt    (%rcx)
     ret

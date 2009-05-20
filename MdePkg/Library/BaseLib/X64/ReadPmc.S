@@ -29,7 +29,7 @@
 #   IN UINT32   PmcIndex
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadPmc)
+ASM_GLOBAL ASM_PFX(AsmReadPmc)
 .align 16
 ASM_PFX(AsmReadPmc):
     rdpmc

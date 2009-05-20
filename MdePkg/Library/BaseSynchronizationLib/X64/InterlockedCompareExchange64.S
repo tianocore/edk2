@@ -31,7 +31,7 @@
 #   IN      UINT64                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(InternalSyncCompareExchange64)
+ASM_GLOBAL ASM_PFX(InternalSyncCompareExchange64)
 .align 16
 ASM_PFX(InternalSyncCompareExchange64):
     mov     %rdx, %rax

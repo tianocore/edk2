@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadLdtr)
+ASM_GLOBAL ASM_PFX(AsmReadLdtr)
 .align 16
 ASM_PFX(AsmReadLdtr):
     sldt    %eax
