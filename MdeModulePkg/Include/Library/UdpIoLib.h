@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/Udp4.h>
 
-#include <Library/UdpIoLib.h>
 #include <Library/NetLib.h>
 
 typedef struct _UDP_IO_PORT UDP_IO_PORT;
