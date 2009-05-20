@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _ISCSI_IBFT_H_
 #define _ISCSI_IBFT_H_
 
+#include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/IScsiBootFirmwareTable.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/PciIo.h>
