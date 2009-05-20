@@ -61,6 +61,7 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  BaseLib
   MemoryAllocationLib
   UefiLib
   UefiBootServicesTableLib
