@@ -59,7 +59,7 @@ EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, {0xac, 
 
 CHAR16               mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
-EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mGraphicsEfiColors[16] = {
   //
   // B    G    R   reserved
   //
@@ -1258,7 +1258,7 @@ GraphicsConsoleConOutSetMode (
       //
       Status = GraphicsOutput->Blt (
                           GraphicsOutput,
-                          &mEfiColors[0],
+                          &mGraphicsEfiColors[0],
                           EfiBltVideoFill,
                           0,
                           0,
@@ -1303,7 +1303,7 @@ GraphicsConsoleConOutSetMode (
       //
       Status = UgaDraw->Blt (
                           UgaDraw,
-                          (EFI_UGA_PIXEL *) (UINTN) &mEfiColors[0],
+                          (EFI_UGA_PIXEL *) (UINTN) &mGraphicsEfiColors[0],
                           EfiUgaVideoFill,
                           0,
                           0,
@@ -1575,8 +1575,8 @@ GetTextColors (
 
   Attribute   = This->Mode->Attribute & 0x7F;
 
-  *Foreground = mEfiColors[Attribute & 0x0f];
-  *Background = mEfiColors[Attribute >> 4];
+  *Foreground = mGraphicsEfiColors[Attribute & 0x0f];
+  *Background = mGraphicsEfiColors[Attribute >> 4];
 
   return EFI_SUCCESS;
 }

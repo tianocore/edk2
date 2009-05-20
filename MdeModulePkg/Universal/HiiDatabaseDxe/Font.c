@@ -2,7 +2,7 @@
 Implementation for EFI_HII_FONT_PROTOCOL.
 
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HiiDatabase.h"
 
-EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mEfiColors[16] = {
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL        mHiiEfiColors[16] = {
   //
   // B     G     R
   //
@@ -912,8 +912,8 @@ GetSystemFont (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Info->ForegroundColor    = mEfiColors[Private->Attribute & 0x0f];
-  Info->BackgroundColor    = mEfiColors[Private->Attribute >> 4];
+  Info->ForegroundColor    = mHiiEfiColors[Private->Attribute & 0x0f];
+  Info->BackgroundColor    = mHiiEfiColors[Private->Attribute >> 4];
   Info->FontInfoMask       = EFI_FONT_INFO_SYS_FONT | EFI_FONT_INFO_SYS_SIZE | EFI_FONT_INFO_SYS_STYLE;
   Info->FontInfo.FontStyle = 0;
   Info->FontInfo.FontSize  = EFI_GLYPH_HEIGHT;
