@@ -21,13 +21,13 @@
 
 #include <Library/BaseLib.h>
 
-.globl ASM_PFX(m16Start)
-.globl ASM_PFX(m16Size)
-.globl ASM_PFX(mThunk16Attr)
-.globl ASM_PFX(m16Gdt)
-.globl ASM_PFX(m16GdtrBase)
-.globl ASM_PFX(mTransition)
-.globl ASM_PFX(InternalAsmThunk16)
+ASM_GLOBAL ASM_PFX(m16Start)
+ASM_GLOBAL ASM_PFX(m16Size)
+ASM_GLOBAL ASM_PFX(mThunk16Attr)
+ASM_GLOBAL ASM_PFX(m16Gdt)
+ASM_GLOBAL ASM_PFX(m16GdtrBase)
+ASM_GLOBAL ASM_PFX(mTransition)
+ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 
 # define the structure of IA32_REGS
 .equ  _EDI, 0       #size 4
@@ -66,7 +66,7 @@ SavedGdt:    .space 10
 # _BackFromUserCode() takes control in real mode after 'retf' has been executed
 # by user code. It will be shadowed to somewhere in memory below 1MB.
 #------------------------------------------------------------------------------
-.globl ASM_PFX(BackFromUserCode)
+ASM_GLOBAL ASM_PFX(BackFromUserCode)
 ASM_PFX(BackFromUserCode):
     #
     # The order of saved registers on the stack matches the order they appears
@@ -156,7 +156,7 @@ _16Idtr:     .word      0x3ff
 # _ToUserCode() takes control in real mode before passing control to user code.
 # It will be shadowed to somewhere in memory below 1MB.
 #------------------------------------------------------------------------------
-.globl ASM_PFX(ToUserCode)
+ASM_GLOBAL ASM_PFX(ToUserCode)
 ASM_PFX(ToUserCode):
     movl    %edx,%ss                    # set new segment selectors
     movl    %edx,%ds
@@ -231,7 +231,7 @@ ASM_PFX(_32Data):
 #   );
 #------------------------------------------------------------------------------
 
-.globl ASM_PFX(InternalAsmThunk16)
+ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 ASM_PFX(InternalAsmThunk16):
     pushq   %rbp
     pushq   %rbx

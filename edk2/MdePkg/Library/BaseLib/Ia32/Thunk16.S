@@ -21,8 +21,8 @@
 
 #include <Library/BaseLib.h>
 
-.globl ASM_PFX(m16Start), ASM_PFX(m16Size), ASM_PFX(mThunk16Attr), ASM_PFX(m16Gdt), ASM_PFX(m16GdtrBase), ASM_PFX(mTransition)
-.globl ASM_PFX(InternalAsmThunk16)
+ASM_GLOBAL ASM_PFX(m16Start), ASM_PFX(m16Size), ASM_PFX(mThunk16Attr), ASM_PFX(m16Gdt), ASM_PFX(m16GdtrBase), ASM_PFX(mTransition)
+ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 
 ASM_PFX(m16Start):
 

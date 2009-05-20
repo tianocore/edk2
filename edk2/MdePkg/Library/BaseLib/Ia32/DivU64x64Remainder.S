@@ -20,7 +20,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl ASM_PFX(InternalMathDivRemU64x32), ASM_PFX(InternalMathDivRemU64x64)
+ASM_GLOBAL ASM_PFX(InternalMathDivRemU64x32), ASM_PFX(InternalMathDivRemU64x64)
 
 #------------------------------------------------------------------------------
 # UINT64

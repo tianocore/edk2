@@ -28,7 +28,7 @@
 #   IN UINT64   Value
 #   );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(AsmWriteMm7)
+ASM_GLOBAL ASM_PFX(AsmWriteMm7)
 ASM_PFX(AsmWriteMm7):
     movq    4(%esp), %mm7
     ret

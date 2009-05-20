@@ -29,7 +29,7 @@
 #   IN      UINT64                    Operand
 #   );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(InternalMathSwapBytes64)
+ASM_GLOBAL ASM_PFX(InternalMathSwapBytes64)
 ASM_PFX(InternalMathSwapBytes64):
     movl    8(%esp), %eax               # eax <- upper 32 bits
     movl    4(%esp), %edx               # edx <- lower 32 bits

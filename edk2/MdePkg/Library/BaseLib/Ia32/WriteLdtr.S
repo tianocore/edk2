@@ -28,7 +28,7 @@
 #   IN UINT16 Ldtr
 #   );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(AsmWriteLdtr)
+ASM_GLOBAL ASM_PFX(AsmWriteLdtr)
 ASM_PFX(AsmWriteLdtr):
     movl    4(%esp), %eax
     lldtw   %ax

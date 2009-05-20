@@ -17,7 +17,7 @@
 .auto
 .text
 
-.globl PalCall
+ASM_GLOBAL PalCall
 .type   PalCall, @function
 
 .proc   CpuFlushTlb

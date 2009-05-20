@@ -34,7 +34,7 @@
 #    )
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem64)
+ASM_GLOBAL ASM_PFX(InternalMemSetMem64)
 ASM_PFX(InternalMemSetMem64):
     movq    mm0, r8                     #Value
     mov     rax, rcx                    #rax <- Buffer

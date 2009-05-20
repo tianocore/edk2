@@ -43,7 +43,7 @@
 #   );
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemCompareMem)
+ASM_GLOBAL ASM_PFX(InternalMemCompareMem)
 ASM_PFX(InternalMemCompareMem):
     push    rsi
     push    rdi

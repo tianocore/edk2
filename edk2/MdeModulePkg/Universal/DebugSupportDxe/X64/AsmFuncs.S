@@ -14,11 +14,11 @@
 
 .intel_syntax noprefix
 
-.globl ASM_PFX(OrigVector)
-.globl ASM_PFX(InterruptEntryStub)
-.globl ASM_PFX(StubSize)
-.globl ASM_PFX(CommonIdtEntry)
-.globl ASM_PFX(FxStorSupport)
+ASM_GLOBAL ASM_PFX(OrigVector)
+ASM_GLOBAL ASM_PFX(InterruptEntryStub)
+ASM_GLOBAL ASM_PFX(StubSize)
+ASM_GLOBAL ASM_PFX(CommonIdtEntry)
+ASM_GLOBAL ASM_PFX(FxStorSupport)
      
 .data 
 
@@ -94,7 +94,7 @@ DebugStackBegin : .ascii    "<<<< DbgStkBegin"   # initial debug ESP == DebugSta
 #
 # Abstract: Returns TRUE if FxStor instructions are supported
 #
-.globl ASM_PFX(FxStorSupport)
+ASM_GLOBAL ASM_PFX(FxStorSupport)
 ASM_PFX(FxStorSupport):  
 #
 # cpuid corrupts rbx which must be preserved per the C calling convention
@@ -116,7 +116,7 @@ ASM_PFX(FxStorSupport):
 #
 # Abstract: Encodes an IDT descriptor with the given physical address
 #
-.globl ASM_PFX(Vect2Desc)
+ASM_GLOBAL ASM_PFX(Vect2Desc)
 ASM_PFX(Vect2Desc):
                 mov     rax, rdx
                 mov     word ptr [rcx], ax                  # write bits 15..0 of offset
@@ -136,13 +136,13 @@ ASM_PFX(Vect2Desc):
 # Abstract: This code is not a function, but is a small piece of code that is
 #               copied and fixed up once for each IDT entry that is hooked.
 #
-.globl ASM_PFX(InterruptEntryStub)
+ASM_GLOBAL ASM_PFX(InterruptEntryStub)
 ASM_PFX(InterruptEntryStub):
 
                 push    0                       # push vector number - will be modified before installed
                 jmp     ASM_PFX(CommonIdtEntry)
                 
-.globl ASM_PFX(InterruptEntryStubEnd)
+ASM_GLOBAL ASM_PFX(InterruptEntryStubEnd)
 ASM_PFX(InterruptEntryStubEnd):
 
 #------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ ASM_PFX(InterruptEntryStubEnd):
 # Abstract: This code is not a function, but is the common part for all IDT
 #               vectors.
 #
-.globl ASM_PFX(CommonIdtEntry)
+ASM_GLOBAL ASM_PFX(CommonIdtEntry)
 ##
 ## At this point, the stub has saved the current application stack esp into AppRsp
 ## and switched stacks to the debug stack, where it pushed the vector number

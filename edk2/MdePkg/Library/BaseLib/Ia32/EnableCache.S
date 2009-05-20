@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(AsmEnableCache)
+ASM_GLOBAL ASM_PFX(AsmEnableCache)
 ASM_PFX(AsmEnableCache):
     wbinvd
     movl    %cr0, %eax

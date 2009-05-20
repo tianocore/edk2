@@ -12,11 +12,11 @@
 #
 #**/
 
-.globl ASM_PFX(OrigVector)
-.globl ASM_PFX(InterruptEntryStub)
-.globl ASM_PFX(StubSize)
-.globl ASM_PFX(CommonIdtEntry)
-.globl ASM_PFX(FxStorSupport)
+ASM_GLOBAL ASM_PFX(OrigVector)
+ASM_GLOBAL ASM_PFX(InterruptEntryStub)
+ASM_GLOBAL ASM_PFX(StubSize)
+ASM_GLOBAL ASM_PFX(CommonIdtEntry)
+ASM_GLOBAL ASM_PFX(FxStorSupport)
 
 ASM_PFX(StubSize):       .long   ASM_PFX(InterruptEntryStubEnd) - ASM_PFX(InterruptEntryStub)
 ASM_PFX(AppEsp):         .long   0x11111111 # ?
@@ -34,7 +34,7 @@ ASM_PFX(OrigVector):     .long   0x66666666 # ?
 #
 # Abstract: Returns TRUE if FxStor instructions are supported
 #
-.globl ASM_PFX(FxStorSupport)
+ASM_GLOBAL ASM_PFX(FxStorSupport)
 ASM_PFX(FxStorSupport):
 #
 # cpuid corrupts ebx which must be preserved per the C calling convention
@@ -57,7 +57,7 @@ ASM_PFX(FxStorSupport):
 # Abstract: Encodes an IDT descriptor with the given physical address
 #
 
-.globl ASM_PFX(Vect2Desc)
+ASM_GLOBAL ASM_PFX(Vect2Desc)
 ASM_PFX(Vect2Desc):
         push   %ebp
         mov    %esp,%ebp
@@ -71,13 +71,13 @@ ASM_PFX(Vect2Desc):
         leave
         ret
 
-.globl ASM_PFX(InterruptEntryStub)
+ASM_GLOBAL ASM_PFX(InterruptEntryStub)
 ASM_PFX(InterruptEntryStub):
         mov    %esp,0x0                    # save stack top
         mov    $0x0,%esp                   # switch to debugger stack
         push   $0x0                        # push vector number - will be modified before installed
         jmp    ASM_PFX(CommonIdtEntry)     # jump CommonIdtEntry
-.globl ASM_PFX(InterruptEntryStubEnd)
+ASM_GLOBAL ASM_PFX(InterruptEntryStubEnd)
 ASM_PFX(InterruptEntryStubEnd):
 
 #------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ ASM_PFX(InterruptEntryStubEnd):
 # Abstract: This code is not a function, but is the common part for all IDT
 #               vectors.
 #
-.globl ASM_PFX(CommonIdtEntry)
+ASM_GLOBAL ASM_PFX(CommonIdtEntry)
 ASM_PFX(CommonIdtEntry):
 ##
 ## At this point, the stub has saved the current application stack esp into AppEsp
