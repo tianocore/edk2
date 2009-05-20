@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __USB_DXE_LIB_H__
 
 #include <Protocol/UsbIo.h>
-#include <IndustryStandard/Usb.h>
 
 /**
   Get the descriptor of the specified USB HID interface.
