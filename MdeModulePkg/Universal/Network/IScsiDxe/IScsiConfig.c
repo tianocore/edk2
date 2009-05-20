@@ -359,9 +359,10 @@ IScsiFormExtractConfig (
   ISCSI_FORM_CALLBACK_INFO         *Private;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
 
-  if (Request == NULL) {
+  if (Request == NULL || Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+  *Progress = Request;
 
   if (!mIScsiDeviceListUpdated) {
     //
@@ -444,6 +445,20 @@ IScsiFormRouteConfig (
   OUT EFI_STRING                             *Progress
   )
 {
+  if (Configuration == NULL || Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check routing data in <ConfigHdr>.
+  // Note: if only one Storage is used, then this checking could be skipped.
+  //
+  if (!HiiIsConfigHdrMatch (Configuration, &mVendorGuid, mVendorStorageName)) {
+    *Progress = Configuration;
+    return EFI_NOT_FOUND;
+  }
+
+  *Progress = Configuration + StrLen (Configuration);
   return EFI_SUCCESS;
 }
 
