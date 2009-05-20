@@ -30,7 +30,7 @@
 #    IN UINTN  Count
 #    );
 #------------------------------------------------------------------------------
-ASM_PFX(InternalMemZeroMem)
+ASM_PFX(InternalMemZeroMem):
     push    %edi
     xorl    %eax,%eax
     movl    8(%esp),%edi
