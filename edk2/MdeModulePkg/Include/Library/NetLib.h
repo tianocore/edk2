@@ -16,12 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _NET_LIB_H_
 #define _NET_LIB_H_
 
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Protocol/DriverBinding.h>
-#include <Protocol/ComponentName.h>
-#include <Protocol/DriverConfiguration.h>
-#include <Protocol/DriverDiagnostics.h>
 #include <Protocol/Dpc.h>
 
 typedef UINT32          IP4_ADDR;
