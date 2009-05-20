@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWbinvd)
+ASM_GLOBAL ASM_PFX(AsmWbinvd)
 .align 16
 ASM_PFX(AsmWbinvd):
     wbinvd

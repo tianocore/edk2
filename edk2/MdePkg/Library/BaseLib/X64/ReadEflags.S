@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadEflags)
+ASM_GLOBAL ASM_PFX(AsmReadEflags)
 .align 16
 ASM_PFX(AsmReadEflags):
     pushfq

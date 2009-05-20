@@ -19,8 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-.extern ASM_PFX(InternalAssertJumpBuffer)
-.global ASM_PFX(SetJump)
+ASM_GLOBAL ASM_PFX(SetJump)
 ASM_PFX(SetJump):
     push   %rcx
     add    $0xffffffffffffffe0,%rsp

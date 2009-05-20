@@ -29,7 +29,7 @@
 #   IN UINT16 Ldtr
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteLdtr)
+ASM_GLOBAL ASM_PFX(AsmWriteLdtr)
 .align 16
 ASM_PFX(AsmWriteLdtr):
     lldt    %cx

@@ -27,7 +27,7 @@
 #   IN      UINTN                     Value
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(InternalLongJump)
+ASM_GLOBAL ASM_PFX(InternalLongJump)
 ASM_PFX(InternalLongJump):
     mov     (%rcx), %rbx
     mov     0x8(%rcx), %rsp

@@ -33,10 +33,10 @@
 #
 # Destroys no working registers.
 #****************************************************************************
-.global _CopyMem;
+ASM_GLOBAL _CopyMem;
 
 # VOID EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
-.global ASM_PFX(EbcLLCALLEXNative);
+ASM_GLOBAL ASM_PFX(EbcLLCALLEXNative);
 ASM_PFX(EbcLLCALLEXNative):
       push   %rbp
       push   %rbx
@@ -84,7 +84,7 @@ ASM_PFX(EbcLLCALLEXNative):
 # Returns:
 #     The contents of the register in which the entry point is passed.
 #
-.global ASM_PFX(EbcLLGetEbcEntryPoint);
+ASM_GLOBAL ASM_PFX(EbcLLGetEbcEntryPoint);
 ASM_PFX(EbcLLGetEbcEntryPoint):
     ret
 
@@ -107,7 +107,7 @@ ASM_PFX(EbcLLGetEbcEntryPoint):
 #--*/
 
 # UINTN EbcLLGetStackPointer()
-.global ASM_PFX(EbcLLGetStackPointer);
+ASM_GLOBAL ASM_PFX(EbcLLGetStackPointer);
 ASM_PFX(EbcLLGetStackPointer):
     mov    %rsp, %rax
     # Stack adjusted by this much when we were called,
@@ -115,7 +115,7 @@ ASM_PFX(EbcLLGetStackPointer):
     add   $4, %rax
     ret
 
-.global ASM_PFX(EbcLLGetReturnValue);
+ASM_GLOBAL ASM_PFX(EbcLLGetReturnValue);
 ASM_PFX(EbcLLGetReturnValue):
 # UINT64 EbcLLGetReturnValue(VOID);
 # Routine Description:

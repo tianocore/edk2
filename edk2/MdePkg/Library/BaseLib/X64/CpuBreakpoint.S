@@ -19,7 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-.global ASM_PFX(CpuBreakpoint)
+ASM_GLOBAL ASM_PFX(CpuBreakpoint)
 ASM_PFX(CpuBreakpoint):
   int $0x3
   ret

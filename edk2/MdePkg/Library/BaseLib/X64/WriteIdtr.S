@@ -29,7 +29,7 @@
 #   IN      CONST IA32_DESCRIPTOR     *Idtr
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(InternalX86WriteIdtr)
+ASM_GLOBAL ASM_PFX(InternalX86WriteIdtr)
 .align 16
 ASM_PFX(InternalX86WriteIdtr):
     lidt    (%rcx)

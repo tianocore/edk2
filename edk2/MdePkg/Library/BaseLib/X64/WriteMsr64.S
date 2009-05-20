@@ -30,7 +30,7 @@
 #   IN UINT64  Value
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteMsr64)
+ASM_GLOBAL ASM_PFX(AsmWriteMsr64)
 .align 16
 ASM_PFX(AsmWriteMsr64):
     mov %rdx, %rax            # meanwhile, rax <- return value

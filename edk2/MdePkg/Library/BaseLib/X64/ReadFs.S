@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadFs)
+ASM_GLOBAL ASM_PFX(AsmReadFs)
 .align 16
 ASM_PFX(AsmReadFs):
     mov     %fs, %eax

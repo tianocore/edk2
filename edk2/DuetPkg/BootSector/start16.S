@@ -27,7 +27,7 @@
 .equ                        BLOCK_SHIFT,                9
 
         .org 0x00
-.global _start
+ASM_GLOBAL _start
 _start:
 Ia32Jump: 
   jmp   BootSectorEntryPoint  # JMP inst    - 3 bytes
@@ -452,7 +452,7 @@ gdtr:   .word  GDT_END - GDT_BASE - 1       # GDT limit
 
         .align 0x2
 
-.global GDT_BASE
+ASM_GLOBAL GDT_BASE
 GDT_BASE: 
 # null descriptor
 .equ                NULL_SEL, .-GDT_BASE
@@ -546,7 +546,7 @@ idtr:   .word IDT_END - IDT_BASE - 1  # IDT limit
 #idt_tag db "IDT",0     
         .align 0x2
 
-.global IDT_BASE
+ASM_GLOBAL IDT_BASE
 IDT_BASE: 
 # divide by zero (INT 0)
 .equ                DIV_ZERO_SEL, .-IDT_BASE

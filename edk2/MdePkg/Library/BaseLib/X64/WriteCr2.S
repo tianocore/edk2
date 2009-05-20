@@ -29,7 +29,7 @@
 #   UINTN  Cr2
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteCr2)
+ASM_GLOBAL ASM_PFX(AsmWriteCr2)
 ASM_PFX(AsmWriteCr2):
     mov    %rcx,%cr2
     mov    %rcx,%rax

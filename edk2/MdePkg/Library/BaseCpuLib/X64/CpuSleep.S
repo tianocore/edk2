@@ -28,7 +28,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(CpuSleep)
+ASM_GLOBAL ASM_PFX(CpuSleep)
 ASM_PFX(CpuSleep):
     hlt
     ret

@@ -29,7 +29,7 @@
 #   IN      VOID                      *LinearAddress
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmFlushCacheLine)
+ASM_GLOBAL ASM_PFX(AsmFlushCacheLine)
 ASM_PFX(AsmFlushCacheLine):
     clflush (%rcx)
     mov     %rcx, %rax
