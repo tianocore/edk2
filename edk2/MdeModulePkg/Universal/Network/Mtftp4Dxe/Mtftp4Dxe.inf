@@ -58,6 +58,8 @@
   DebugLib
   NetLib
   UdpIoLib
+  MemoryAllocationLib
+  BaseMemoryLib
 
 
 [Protocols]

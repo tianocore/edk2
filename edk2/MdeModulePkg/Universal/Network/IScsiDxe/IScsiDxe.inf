@@ -72,6 +72,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   BaseLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
   DevicePathLib
   DebugLib
   PrintLib

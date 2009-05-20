@@ -64,6 +64,8 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
   DebugLib
   NetLib
   IpIoLib
