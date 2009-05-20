@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
+#include <Protocol/DriverBinding.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/HiiConfigRouting.h>
