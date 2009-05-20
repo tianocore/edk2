@@ -61,8 +61,9 @@ CalculateConfigStringLen (
   This is a internal function.
 
   @param  String                 UEFI configuration string
-  @param  DevicePath             binary of a UEFI device path.
+  @param  DevicePathData         Binary of a UEFI device path.
 
+  @retval EFI_NOT_FOUND          The device path is not invalid.
   @retval EFI_INVALID_PARAMETER  Any incoming parameter is invalid.
   @retval EFI_OUT_OF_RESOURCES   Lake of resources to store neccesary structures.
   @retval EFI_SUCCESS            The device path is retrieved and translated to
@@ -72,18 +73,19 @@ CalculateConfigStringLen (
 EFI_STATUS
 GetDevicePath (
   IN  EFI_STRING                   String,
-  OUT UINT8                        **DevicePath
+  OUT UINT8                        **DevicePathData
   )
 {
-  UINTN      Length;
-  EFI_STRING PathHdr;
-  EFI_STRING DevicePathString;
-  UINT8      *DevicePathBuffer;
-  CHAR16     TemStr[2];
-  UINTN      Index;
-  UINT8      DigitUint8;
+  UINTN                    Length;
+  EFI_STRING               PathHdr;
+  UINT8                    *DevicePathBuffer;
+  CHAR16                   TemStr[2];
+  UINTN                    Index;
+  UINT8                    DigitUint8;
+  EFI_DEVICE_PATH_PROTOCOL *DevicePath;
 
-  if (String == NULL || DevicePath == NULL) {
+
+  if (String == NULL || DevicePathData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -94,8 +96,13 @@ GetDevicePath (
   if (*String == 0) {
     return EFI_INVALID_PARAMETER;
   }
-
+  //
+  // Check whether path data does exist.
+  //
   String += StrLen (L"PATH=");
+  if (*String == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
   PathHdr = String;
 
   //
@@ -104,13 +111,13 @@ GetDevicePath (
   // of UEFI device path.
   //
   for (Length = 0; *String != 0 && *String != L'&'; String++, Length++);
-  DevicePathString = (EFI_STRING) AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
-  if (DevicePathString == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+  //
+  // Check DevicePath Length
+  //
+  if (((Length + 1) / 2) < sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
+    return EFI_NOT_FOUND;
   }
-  StrnCpy (DevicePathString, PathHdr, Length);
-  *(DevicePathString + Length) = 0;
-
+  
   //
   // The data in <PathHdr> is encoded as hex UNICODE %02x bytes in the same order
   // as the device path resides in RAM memory.
@@ -118,13 +125,15 @@ GetDevicePath (
   //
   DevicePathBuffer = (UINT8 *) AllocateZeroPool ((Length + 1) / 2);
   if (DevicePathBuffer == NULL) {
-    FreePool (DevicePathString);
     return EFI_OUT_OF_RESOURCES;
   }
-
+  
+  //
+  // Convert DevicePath
+  //
   ZeroMem (TemStr, sizeof (TemStr));
-  for (Index = 0; DevicePathString[Index] != L'\0'; Index ++) {
-    TemStr[0] = DevicePathString[Index];
+  for (Index = 0; Index < Length; Index ++) {
+    TemStr[0] = PathHdr[Index];
     DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
     if ((Index & 1) == 0) {
       DevicePathBuffer [Index/2] = DigitUint8;
@@ -132,13 +141,27 @@ GetDevicePath (
       DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
     }
   }
-
-  FreePool (DevicePathString);
   
-  *DevicePath = DevicePathBuffer;
+  //
+  // Validate DevicePath
+  //
+  DevicePath  = (EFI_DEVICE_PATH_PROTOCOL *) DevicePathBuffer;
+  while (!IsDevicePathEnd (DevicePath)) {
+    if ((DevicePath->Type == 0) || (DevicePath->SubType == 0) || (DevicePathNodeLength (DevicePath) > sizeof (EFI_DEV_PATH))) {
+      //
+      // Invalid device path
+      //
+      FreePool (DevicePathBuffer);
+      return EFI_NOT_FOUND;
+    }
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
 
+  //
+  // return the device path
+  //
+  *DevicePathData = DevicePathBuffer;
   return EFI_SUCCESS;
-
 }
 
 /**
@@ -1516,13 +1539,22 @@ Done:
                                  When Request points to NULL, the default value string 
                                  for each varstore in form package will be merged into 
                                  a <MultiConfigAltResp> format string and return.
+  @param  PointerProgress        Optional parameter, it can be be NULL. 
+                                 When it is not NULL, if Request is NULL, it returns NULL. 
+                                 On return, points to a character in the Request
+                                 string. Points to the string's null terminator if
+                                 request was successful. Points to the most recent
+                                 & before the first failing name / value pair (or
+                                 the beginning of the string if the failure is in
+                                 the first name / value pair) if the request was
+                                 not successful.
   @retval EFI_SUCCESS            The Results string is set to the full request string.
                                  And AltCfgResp contains all default value string.
   @retval EFI_OUT_OF_RESOURCES   Not enough memory for the return string.
   @retval EFI_NOT_FOUND          The varstore (Guid and Name) in Request string 
                                  can't be found in Form package.
   @retval EFI_NOT_FOUND          HiiPackage can't be got on the input HiiHandle.
-  @retval EFI_INVALID_PARAMETER  *Request points to NULL.
+  @retval EFI_INVALID_PARAMETER  Request points to NULL.
 
 **/
 EFI_STATUS
@@ -1531,7 +1563,8 @@ GetFullStringFromHiiFormPackages (
   IN     HII_DATABASE_RECORD        *DataBaseRecord,
   IN     EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   IN OUT EFI_STRING                 *Request,
-  IN OUT EFI_STRING                 *AltCfgResp
+  IN OUT EFI_STRING                 *AltCfgResp,
+  OUT    EFI_STRING                 *PointerProgress OPTIONAL
   )
 {
   EFI_STATUS                   Status;
@@ -1552,6 +1585,7 @@ GetFullStringFromHiiFormPackages (
   EFI_STRING                   NameStr;
   EFI_STRING                   PathStr;
   EFI_STRING                   StringPtr;
+  EFI_STRING                   Progress;
   UINTN                        Length;
   UINT8                        *TmpBuffer;
   UINT16                       Offset;
@@ -1560,6 +1594,10 @@ GetFullStringFromHiiFormPackages (
   LIST_ENTRY                   *LinkData;
   LIST_ENTRY                   *LinkDefault;
   BOOLEAN                      DataExist;
+
+  if (DataBaseRecord == NULL || DevicePath == NULL || Request == NULL || AltCfgResp == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Initialize the local variables.
@@ -1577,6 +1615,7 @@ GetFullStringFromHiiFormPackages (
   ResultSize        = 0;
   PackageSize       = 0;
   DataExist         = FALSE;
+  Progress          = *Request;
  
   //
   // 0. Get Hii Form Package by HiiHandle
@@ -1623,7 +1662,47 @@ GetFullStringFromHiiFormPackages (
   //
   StringPtr = NULL;
   if (*Request != NULL) {
-    StringPtr = StrStr (*Request, L"&OFFSET=");
+    StringPtr = *Request;
+    //
+    // Jump <ConfigHdr>
+    //
+    if (StrnCmp (StringPtr, L"GUID=", StrLen (L"GUID=")) != 0) {
+      Status   = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"GUID=");
+    while (*StringPtr != L'\0' && StrnCmp (StringPtr, L"&NAME=", StrLen (L"&NAME=")) != 0) {
+      StringPtr++;
+    }
+    if (*StringPtr == L'\0') {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"&NAME=");
+    while (*StringPtr != L'\0' && StrnCmp (StringPtr, L"&PATH=", StrLen (L"&PATH=")) != 0) {
+      StringPtr++;
+    }
+    if (*StringPtr == L'\0') {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    StringPtr += StrLen (L"&PATH=");
+    while (*StringPtr != L'\0' && *StringPtr != L'&') {
+      StringPtr ++;
+    }
+    //
+    // Check the following string &OFFSET=
+    //
+    if (*StringPtr != L'\0' && StrnCmp (StringPtr, L"&OFFSET=", StrLen (L"&OFFSET=")) != 0) {
+      Progress = StringPtr;
+      Status   = EFI_INVALID_PARAMETER;
+      goto Done;
+    } else if (*StringPtr == L'\0') {
+      //
+      // No request block is found.
+      //
+      StringPtr = NULL;
+    }
   }
   if (StringPtr != NULL) {
     //
@@ -1649,7 +1728,8 @@ GetFullStringFromHiiFormPackages (
     while (*StringPtr != 0 && StrnCmp (StringPtr, L"&OFFSET=", StrLen (L"&OFFSET=")) == 0) {
       //
       // Skip the OFFSET string
-      //  
+      //
+      Progress   = StringPtr;
       StringPtr += StrLen (L"&OFFSET=");
       //
       // Get Offset
@@ -1843,8 +1923,8 @@ GetFullStringFromHiiFormPackages (
     // Compute the length of the entire request starting with <ConfigHdr> and a 
     // Null-terminator
     //
-    DataExist         = FALSE;
-    Length = StrLen (ConfigHdr) + 1;
+    DataExist = FALSE;
+    Length    = StrLen (ConfigHdr) + 1;
 
     for (Link = VarStorageData->BlockEntry.ForwardLink; Link != &VarStorageData->BlockEntry; Link = Link->ForwardLink) {
       //
@@ -2094,6 +2174,16 @@ Done:
     FreePool (HiiFormPackage);
   }
 
+  if (PointerProgress != NULL) {
+    if (*Request == NULL) {
+      *PointerProgress = NULL;
+    } else if (EFI_ERROR (Status)) {
+      *PointerProgress = Progress;
+    } else {
+      *PointerProgress = *Request + StrLen (*Request);
+    }
+  }
+
   return Status;
 }
 
@@ -2244,7 +2334,6 @@ HiiConfigRoutingExtractConfig (
          Link = Link->ForwardLink
         ) {
       Database = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-   
       if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
         CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
         if (CompareMem (
@@ -2289,8 +2378,13 @@ HiiConfigRoutingExtractConfig (
       // Get the full request string from IFR when HiiPackage is registered to HiiHandle 
       //
       IfrDataParsedFlag = TRUE;
-      Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults);
+      Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults, &AccessProgress);
       if (EFI_ERROR (Status)) {
+        //
+        // AccessProgress indicates the parsing progress on <ConfigRequest>.
+        // Map it to the progress on <MultiConfigRequest> then return it.
+        //
+        *Progress = StrStr (StringPtr, AccessProgress);
         goto Done;
       }
       //
@@ -2336,22 +2430,21 @@ HiiConfigRoutingExtractConfig (
     //
     // Update AccessResults by getting default setting from IFR when HiiPackage is registered to HiiHandle 
     //
-    if (HiiHandle != NULL) {
-      if (!IfrDataParsedFlag) {
-        Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &AccessResults);
-      } else if (DefaultResults != NULL) {
-        Status = MergeDefaultString (&AccessResults, DefaultResults);
-        FreePool (DefaultResults);
-        DefaultResults = NULL;
-      }
-    }
-    FreePool (DevicePath);
-    DevicePath = NULL;
-    
-    if (EFI_ERROR (Status)) {
-      goto Done;
+    if (!IfrDataParsedFlag && HiiHandle != NULL) {
+      Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults, NULL);
+      ASSERT_EFI_ERROR (Status);
     }
 
+    FreePool (DevicePath);
+    DevicePath = NULL;
+
+    if (DefaultResults != NULL) {
+      Status = MergeDefaultString (&AccessResults, DefaultResults);
+      ASSERT_EFI_ERROR (Status);
+      FreePool (DefaultResults);
+      DefaultResults = NULL;
+    }
+    
 NextConfigString:   
     if (!FirstElement) {
       Status = AppendToMultiString (Results, L"&");
@@ -2440,6 +2533,7 @@ HiiConfigRoutingExportConfig (
   EFI_STRING                          AccessResults;
   EFI_STRING                          Progress;
   EFI_STRING                          StringPtr;
+  EFI_STRING                          ConfigRequest;
   UINTN                               Index;
   EFI_HANDLE                          *ConfigAccessHandles;
   UINTN                               NumberConfigAccessHandles;
@@ -2452,6 +2546,7 @@ HiiConfigRoutingExportConfig (
   HII_DATABASE_RECORD                 *Database;
   UINT8                               *DevicePathPkg;
   UINT8                               *CurrentDevicePath;
+  BOOLEAN                             IfrDataParsedFlag;
 
   if (This == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2495,10 +2590,12 @@ HiiConfigRoutingExportConfig (
     //
     // Get DevicePath and HiiHandle for this ConfigAccess driver handle
     //
+    IfrDataParsedFlag = FALSE;
     Progress         = NULL;
     HiiHandle        = NULL;
     DefaultResults   = NULL;
     Database         = NULL;
+    ConfigRequest    = NULL;
     DevicePath       = DevicePathFromHandle (ConfigAccessHandles[Index]);
     if (DevicePath != NULL) {
       for (Link = Private->DatabaseList.ForwardLink;
@@ -2526,17 +2623,42 @@ HiiConfigRoutingExportConfig (
                              &Progress,
                              &AccessResults
                              );
-    if (!EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
       //
       // Update AccessResults by getting default setting from IFR when HiiPackage is registered to HiiHandle 
       //
       if (HiiHandle != NULL && DevicePath != NULL) {
+        IfrDataParsedFlag = TRUE;
+        Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &ConfigRequest, &DefaultResults, NULL);
+        //
+        // Get the full request string to get the Current setting again.
+        //
+        if (!EFI_ERROR (Status) && ConfigRequest != NULL) {
+          Status = ConfigAccess->ExtractConfig (
+                                   ConfigAccess,
+                                   ConfigRequest,
+                                   &Progress,
+                                   &AccessResults
+                                   );
+          FreePool (ConfigRequest);
+        } else {
+          Status = EFI_NOT_FOUND;
+        }
+      }
+    }
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // Update AccessResults by getting default setting from IFR when HiiPackage is registered to HiiHandle 
+      //
+      if (!IfrDataParsedFlag && HiiHandle != NULL && DevicePath != NULL) {
         StringPtr = StrStr (AccessResults, L"&GUID=");
         if (StringPtr != NULL) {
           *StringPtr = 0;
         }
         if (StrStr (AccessResults, L"&OFFSET=") != NULL) {
-          Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &AccessResults, &DefaultResults);
+          Status = GetFullStringFromHiiFormPackages (Database, DevicePath, &AccessResults, &DefaultResults, NULL);
+          ASSERT_EFI_ERROR (Status);
         }
         if (StringPtr != NULL) {
           *StringPtr = L'&';

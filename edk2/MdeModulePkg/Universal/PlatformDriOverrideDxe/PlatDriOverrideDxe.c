@@ -1161,12 +1161,12 @@ PlatOverMngrExtractConfig (
   EFI_STATUS                       Status;
   EFI_CALLBACK_INFO                *Private;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
-  
-  if (Request == NULL) {
-    return EFI_NOT_FOUND;
-  }
 
-  Private = EFI_CALLBACK_INFO_FROM_THIS (This);
+  if (Progress == NULL || Results == NULL || Request == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *Progress        = Request;
+  Private          = EFI_CALLBACK_INFO_FROM_THIS (This);
   HiiConfigRouting = Private->HiiConfigRouting;
 
   //
@@ -1210,6 +1210,15 @@ PlatOverMngrRouteConfig (
   UINT16                                    KeyValue;
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
 
+  if (Configuration == NULL || Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *Progress = Configuration;
+
+  if (!HiiIsConfigHdrMatch (Configuration, &mPlatformOverridesManagerGuid, mVariableName)) {
+    return EFI_NOT_FOUND;
+  }
+
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
   if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
@@ -1233,6 +1242,7 @@ PlatOverMngrRouteConfig (
     CommintChanges (Private, KeyValue, FakeNvData);
   }
 
+  *Progress = Configuration + StrLen (Configuration);
   return EFI_SUCCESS;
 }
 

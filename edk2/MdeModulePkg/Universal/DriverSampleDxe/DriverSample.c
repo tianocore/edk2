@@ -345,7 +345,10 @@ ExtractConfig (
   EFI_STRING                       ConfigRequestHdr;
   EFI_STRING                       ConfigRequest;
   UINTN                            Size;
-
+  
+  if (Progress == NULL || Results == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   //
   // Initialize the local variables.
   //
@@ -833,7 +836,6 @@ DriverSampleInit (
   // Initialize the local variables.
   //
   ConfigRequestHdr = NULL;
-
   //
   // Initialize screen dimensions for SendForm().
   // Remove 3 characters from top and bottom

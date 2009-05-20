@@ -554,6 +554,9 @@ Ip4FormExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
+  if (Request == NULL || Progress == NULL || Results == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
   *Progress = Request;
   return EFI_NOT_FOUND;
 }
@@ -599,7 +602,17 @@ Ip4FormRouteConfig (
   OUT EFI_STRING                             *Progress
   )
 {
-  return EFI_NOT_FOUND;
+  if (Configuration == NULL || Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Progress = Configuration;
+  if (!HiiIsConfigHdrMatch (Configuration, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    return EFI_NOT_FOUND;
+  }
+
+  *Progress = Configuration + StrLen (Configuration);
+  return EFI_SUCCESS;
 }
 
 /**
