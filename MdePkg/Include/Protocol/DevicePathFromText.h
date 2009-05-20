@@ -16,8 +16,6 @@
 #ifndef __DEVICE_PATH_FROM_TEXT_PROTOCOL_H__
 #define __DEVICE_PATH_FROM_TEXT_PROTOCOL_H__
 
-#include <Protocol/DevicePath.h>
-
 ///
 /// Device Path From Text protocol
 ///

@@ -18,7 +18,6 @@
 #ifndef _USB2_HOSTCONTROLLER_H_
 #define _USB2_HOSTCONTROLLER_H_
 
-#include <IndustryStandard/Usb.h>
 #include <Protocol/UsbIo.h>
 
 #define EFI_USB2_HC_PROTOCOL_GUID \

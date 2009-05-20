@@ -17,7 +17,6 @@
 #include <Uefi.h>
 
 #include <Protocol/DevicePathUtilities.h>
-#include <Protocol/DevicePath.h>
 
 #include <Library/DevicePathLib.h>
 #include <Library/DebugLib.h>
