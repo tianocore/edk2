@@ -16,9 +16,6 @@
 #ifndef __DEVICE_PATH_UTILITIES_PROTOCOL_H__
 #define __DEVICE_PATH_UTILITIES_PROTOCOL_H__
 
-
-#include <Protocol/DevicePath.h>
-
 ///
 /// Device Path Utilities protocol
 ///

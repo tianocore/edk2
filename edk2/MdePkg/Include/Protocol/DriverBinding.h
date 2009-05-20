@@ -18,7 +18,6 @@
 #ifndef __EFI_DRIVER_BINDING_H__
 #define __EFI_DRIVER_BINDING_H__
 
-#include <Protocol/DevicePath.h>
 ///
 /// Global ID for the ControllerHandle Driver Protocol
 ///

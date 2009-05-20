@@ -15,12 +15,10 @@
 #ifndef __HII_STRING_H__
 #define __HII_STRING_H__
 
-#define EFI_HII_STRING_PROTOCOL_GUID \
-  { 0xfd96974, 0x23aa, 0x4cdc, { 0xb9, 0xcb, 0x98, 0xd1, 0x77, 0x50, 0x32, 0x2a } }
-
-#include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiFont.h>
 
+#define EFI_HII_STRING_PROTOCOL_GUID \
+  { 0xfd96974, 0x23aa, 0x4cdc, { 0xb9, 0xcb, 0x98, 0xd1, 0x77, 0x50, 0x32, 0x2a } }
 
 typedef struct _EFI_HII_STRING_PROTOCOL EFI_HII_STRING_PROTOCOL;
 

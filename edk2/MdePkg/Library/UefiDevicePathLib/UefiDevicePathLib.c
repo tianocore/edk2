@@ -22,8 +22,6 @@
 
 #include <Uefi.h>
 
-#include <Protocol/DevicePath.h>
-
 #include <Library/DevicePathLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
