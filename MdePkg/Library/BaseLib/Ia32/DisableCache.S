@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(AsmDisableCache)
+ASM_GLOBAL ASM_PFX(AsmDisableCache)
 ASM_PFX(AsmDisableCache):
     movl    %cr0, %eax
     btsl    $30, %eax

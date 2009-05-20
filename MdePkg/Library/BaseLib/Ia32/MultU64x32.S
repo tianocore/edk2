@@ -22,7 +22,7 @@
     .386:
     .code:
 
-.globl ASM_PFX(InternalMathMultU64x32)
+ASM_GLOBAL ASM_PFX(InternalMathMultU64x32)
 
 #------------------------------------------------------------------------------
 # UINT64

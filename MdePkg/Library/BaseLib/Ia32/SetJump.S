@@ -19,7 +19,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl ASM_PFX(SetJump), ASM_PFX(InternalAssertJumpBuffer)
+ASM_GLOBAL ASM_PFX(SetJump), ASM_PFX(InternalAssertJumpBuffer)
 
 #------------------------------------------------------------------------------
 # UINTN

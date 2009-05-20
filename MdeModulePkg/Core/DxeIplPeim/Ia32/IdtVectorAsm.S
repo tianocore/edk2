@@ -18,8 +18,8 @@
 
 
     .align  8
-    .globl  ASM_PFX(AsmGetVectorTemplatInfo)
-    .globl 	ASM_PFX(AsmVectorFixup)
+    ASM_GLOBAL  ASM_PFX(AsmGetVectorTemplatInfo)
+    ASM_GLOBAL 	ASM_PFX(AsmVectorFixup)
 /*
 ;
 ;-----------------------------------------------------------------------

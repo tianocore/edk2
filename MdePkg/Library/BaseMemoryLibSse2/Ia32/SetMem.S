@@ -34,7 +34,7 @@
 #    IN UINT8  Value
 #    );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(InternalMemSetMem)
+ASM_GLOBAL ASM_PFX(InternalMemSetMem)
 ASM_PFX(InternalMemSetMem):
     push    %edi
     movl    12(%esp), %edx              # edx <- Count

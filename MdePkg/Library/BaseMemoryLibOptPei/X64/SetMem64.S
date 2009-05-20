@@ -34,7 +34,7 @@
 #    )
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem64)
+ASM_GLOBAL ASM_PFX(InternalMemSetMem64)
 ASM_PFX(InternalMemSetMem64):
     push    rdi
     mov     rdi, rcx

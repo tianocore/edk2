@@ -35,7 +35,7 @@
 #    );
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemSetMem32)
+ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
 ASM_PFX(InternalMemSetMem32):
     push    rdi
     mov     rdi, rcx

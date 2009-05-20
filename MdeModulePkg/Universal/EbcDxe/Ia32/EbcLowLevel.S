@@ -13,9 +13,9 @@
 #  
 #**/
 
-.globl ASM_PFX(CopyMem)
+ASM_GLOBAL ASM_PFX(CopyMem)
 
-.globl ASM_PFX(EbcLLCALLEXNative)
+ASM_GLOBAL ASM_PFX(EbcLLCALLEXNative)
 ASM_PFX(EbcLLCALLEXNative):
          push   %ebp
          push   %ebx
@@ -42,16 +42,16 @@ ASM_PFX(EbcLLCALLEXNative):
          pop    %ebp
          ret
 
-.globl ASM_PFX(EbcLLGetEbcEntryPoint)
+ASM_GLOBAL ASM_PFX(EbcLLGetEbcEntryPoint)
 ASM_PFX(EbcLLGetEbcEntryPoint):
         ret
 
-.globl ASM_PFX(EbcLLGetStackPointer)
+ASM_GLOBAL ASM_PFX(EbcLLGetStackPointer)
 ASM_PFX(EbcLLGetStackPointer):
         mov    %esp,%eax
         add    $0x4,%eax
         ret
 
-.globl ASM_PFX(EbcLLGetReturnValue)
+ASM_GLOBAL ASM_PFX(EbcLLGetReturnValue)
 ASM_PFX(EbcLLGetReturnValue):
         ret

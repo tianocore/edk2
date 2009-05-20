@@ -30,7 +30,7 @@
 
 #include <ProcessorBind.h>
 
-.globl ASM_PFX(SecSwitchStack)
+ASM_GLOBAL ASM_PFX(SecSwitchStack)
 ASM_PFX(SecSwitchStack):
 #
 # Save three register: eax, ebx, ecx

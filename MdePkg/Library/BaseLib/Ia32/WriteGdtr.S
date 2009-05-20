@@ -28,7 +28,7 @@
 #   OUT IA32_DESCRIPTOR  *Gdtr
 #   );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(InternalX86WriteGdtr)
+ASM_GLOBAL ASM_PFX(InternalX86WriteGdtr)
 ASM_PFX(InternalX86WriteGdtr):
     movl    4(%esp), %eax
     lgdt    (%eax)

@@ -21,7 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-.globl ASM_PFX(InternalSyncCompareExchange64)
+ASM_GLOBAL ASM_PFX(InternalSyncCompareExchange64)
 
 #------------------------------------------------------------------------------
 # UINT64

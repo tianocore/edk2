@@ -29,7 +29,7 @@
 #   IN UINT64  Value
 #   );
 #------------------------------------------------------------------------------
-.globl ASM_PFX(AsmWriteMsr64)
+ASM_GLOBAL ASM_PFX(AsmWriteMsr64)
 ASM_PFX(AsmWriteMsr64):
     movl    12(%esp), %edx
     movl    8(%esp), %eax

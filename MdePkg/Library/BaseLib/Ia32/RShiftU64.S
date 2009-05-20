@@ -22,7 +22,7 @@
     .686:
     .code:
 
-.globl ASM_PFX(InternalMathRShiftU64)
+ASM_GLOBAL ASM_PFX(InternalMathRShiftU64)
 
 #------------------------------------------------------------------------------
 # UINT64

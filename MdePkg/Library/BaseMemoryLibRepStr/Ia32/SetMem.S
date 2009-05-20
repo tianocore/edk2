@@ -24,7 +24,7 @@
     .386:
     .code:
 
-.globl ASM_PFX(InternalMemSetMem)
+ASM_GLOBAL ASM_PFX(InternalMemSetMem)
 
 #------------------------------------------------------------------------------
 #  VOID *

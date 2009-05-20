@@ -35,7 +35,7 @@
 #    )
 #------------------------------------------------------------------------------
 .intel_syntax noprefix
-.globl ASM_PFX(InternalMemCopyMem)
+ASM_GLOBAL ASM_PFX(InternalMemCopyMem)
 ASM_PFX(InternalMemCopyMem):
     push    rsi
     push    rdi
