@@ -46,6 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 [LibraryClasses]
+  BaseLib
   UefiLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
