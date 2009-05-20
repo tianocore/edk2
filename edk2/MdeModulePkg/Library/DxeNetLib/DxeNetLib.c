@@ -1,7 +1,7 @@
 /** @file
   Network library.
   
-Copyright (c) 2005 - 2007, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ EFI_DPC_PROTOCOL *mDpc = NULL;
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mNetLibHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
-#define NIC_ITEM_CONFIG_SIZE   sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * 2
+#define NIC_ITEM_CONFIG_SIZE   sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * MAX_IP4_CONFIG_IN_VARIABLE
 
 //
 // All the supported IP4 maskes in host byte order.
@@ -1287,7 +1287,7 @@ NetLibDefaultAddressIsStatic (
   ConfigHdr = HiiConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Controller);
   
   Len = StrLen (ConfigHdr);
-  ConfigResp = AllocateZeroPool (Len + NIC_ITEM_CONFIG_SIZE * 2 + 200);
+  ConfigResp = AllocateZeroPool ((Len + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
   if (ConfigResp == NULL) {
     goto ON_EXIT;
   }
@@ -1296,7 +1296,7 @@ NetLibDefaultAddressIsStatic (
   String = ConfigResp + Len;
   UnicodeSPrint (
     String, 
-    (8 + 4 + 7 + 4) * sizeof (CHAR16), 
+    (8 + 4 + 7 + 4 + 1) * sizeof (CHAR16), 
     L"&OFFSET=%04X&WIDTH=%04X", 
     OFFSET_OF (NIC_IP4_CONFIG_INFO, Source), 
     sizeof (UINT32)
@@ -1312,7 +1312,7 @@ NetLibDefaultAddressIsStatic (
     goto ON_EXIT;
   }
 
-  ConfigInfo = AllocateZeroPool (sizeof (NIC_IP4_CONFIG_INFO));
+  ConfigInfo = AllocateZeroPool (sizeof (NIC_ITEM_CONFIG_SIZE));
   if (ConfigInfo == NULL) {
     goto ON_EXIT;
   }
