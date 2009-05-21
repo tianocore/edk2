@@ -1,8 +1,8 @@
 /** @file
-  Mde UEFI library API implemention.
+  Mde UEFI library API implementation.
   Print to StdErr or ConOut defined in EFI_SYSTEM_TABLE
 
-  Copyright (c) 2007, Intel Corporation<BR>
+  Copyright (c) 2007 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -334,13 +334,10 @@ InternalPrintGraphic (
   )
 {
   EFI_STATUS                          Status;
-  UINTN                               Index;
-  CHAR16                              *UnicodeWeight;
   UINT32                              HorizontalResolution;
   UINT32                              VerticalResolution;
   UINT32                              ColorDepth;
   UINT32                              RefreshRate;
-  UINTN                               LineBufferLen;
   EFI_HII_FONT_PROTOCOL               *HiiFont;
   EFI_IMAGE_OUTPUT                    *Blt;
   EFI_FONT_DISPLAY_INFO               FontInfo;
@@ -354,6 +351,7 @@ InternalPrintGraphic (
   HorizontalResolution  = 0;
   VerticalResolution    = 0;
   Blt                   = NULL;
+  RowInfoArray          = NULL;
 
   ConsoleHandle = gST->ConsoleOutHandle;
 
@@ -377,7 +375,7 @@ InternalPrintGraphic (
                     );
   }
   if (EFI_ERROR (Status)) {
-    return 0;
+    goto Error;
   }
 
   Status = gBS->HandleProtocol (
@@ -387,7 +385,7 @@ InternalPrintGraphic (
                   );
 
   if (EFI_ERROR (Status)) {
-    return 0;
+    goto Error;
   }
 
   if (GraphicsOutput != NULL) {
@@ -396,7 +394,6 @@ InternalPrintGraphic (
   } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
     UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
   } else {
-    Status = EFI_UNSUPPORTED;
     goto Error;
   }
 
@@ -405,22 +402,6 @@ InternalPrintGraphic (
   Status = gBS->LocateProtocol (&gEfiHiiFontProtocolGuid, NULL, (VOID **) &HiiFont);
   if (EFI_ERROR (Status)) {
     goto Error;
-  }
-
-  UnicodeWeight = Buffer;
-
-  for (Index = 0; UnicodeWeight[Index] != 0; Index++) {
-    if (UnicodeWeight[Index] == CHAR_BACKSPACE ||
-        UnicodeWeight[Index] == CHAR_LINEFEED  ||
-        UnicodeWeight[Index] == CHAR_CARRIAGE_RETURN) {
-      UnicodeWeight[Index] = 0;
-    }
-  }
-
-  LineBufferLen = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * HorizontalResolution * EFI_GLYPH_HEIGHT;
-  if (EFI_GLYPH_WIDTH * EFI_GLYPH_HEIGHT * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * PrintNum > LineBufferLen) {
-     Status = EFI_INVALID_PARAMETER;
-     goto Error;
   }
 
   Blt = (EFI_IMAGE_OUTPUT *) AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
@@ -455,16 +436,21 @@ InternalPrintGraphic (
 
     Status = HiiFont->StringToImage (
                          HiiFont,
-                         EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN,
+                         EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_OUT_FLAG_CLIP |
+                         EFI_HII_OUT_FLAG_CLIP_CLEAN_X | EFI_HII_OUT_FLAG_CLIP_CLEAN_Y |
+                         EFI_HII_IGNORE_LINE_BREAK | EFI_HII_DIRECT_TO_SCREEN,
                          Buffer,
                          &FontInfo,
                          &Blt,
                          PointX,
                          PointY,
-                         NULL,
-                         NULL,
+                         &RowInfoArray,
+                         &RowInfoArraySize,
                          NULL
                          );
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
 
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     ASSERT (UgaDraw!= NULL);
@@ -472,7 +458,6 @@ InternalPrintGraphic (
     Blt->Image.Bitmap = AllocateZeroPool (Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     ASSERT (Blt->Image.Bitmap != NULL);
 
-    RowInfoArray = NULL;
     //
     //  StringToImage only support blt'ing image to device using GOP protocol. If GOP is not supported in this platform,
     //  we ask StringToImage to print the string to blt buffer, then blt to device using UgaDraw.
@@ -510,23 +495,27 @@ InternalPrintGraphic (
                           RowInfoArray[0].LineHeight,
                           Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                           );
+    } else {
+      goto Error;
     }
-
-    FreePool (RowInfoArray);
     FreePool (Blt->Image.Bitmap);
-
   } else {
-    Status = EFI_UNSUPPORTED;
+    goto Error;
   }
+  //
+  // Calculate the number of actual printed characters
+  //
+  PrintNum = RowInfoArray[0].EndIndex - RowInfoArray[0].StartIndex + 1;
 
+  FreePool (RowInfoArray);
   FreePool (Blt);
+  return PrintNum;
 
 Error:
-  if (EFI_ERROR (Status)) {
-    return 0;
-  } else {
-    return PrintNum;
+  if (Blt != NULL) {
+    FreePool (Blt);
   }
+  return 0;
 }
 
 /**
@@ -535,8 +524,9 @@ Error:
 
   This function prints a formatted Unicode string to the graphics console device 
   specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
-  Unicode characters printed.  If the length of the formatted Unicode string is
-  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  Unicode characters displayed, not including partial characters that may be clipped 
+  by the right edge of the display.  If the length of the formatted Unicode string is
+  greater than PcdUefiLibMaxPrintBufferSize, then at most the first 
   PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
   is used to convert the string to a bitmap using the glyphs registered with the 
   HII database.  No wrapping is performed, so any portions of the string the fall
@@ -609,8 +599,9 @@ PrintXY (
 
   This function prints a formatted ASCII string to the graphics console device 
   specified by ConsoleOutputHandle in EFI_SYSTEM_TABLE and returns the number of 
-  ASCII characters printed.  If the length of the formatted ASCII string is
-  greater than PcdUefiLibMaxPrintBufferSize, then only the first 
+  ASCII characters displayed, not including partial characters that may be clipped 
+  by the right edge of the display.  If the length of the formatted ASCII string is
+  greater than PcdUefiLibMaxPrintBufferSize, then at most the first 
   PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
   is used to convert the string to a bitmap using the glyphs registered with the 
   HII database.  No wrapping is performed, so any portions of the string the fall
