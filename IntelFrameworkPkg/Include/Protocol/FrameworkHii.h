@@ -311,7 +311,7 @@ typedef struct _EFI_HII_VARIABLE_PACK_LIST {
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Packages              A pointer to an EFI_HII_PACKAGES package instance.
-  @param  Handle                A pointer to the FRAMEWORK_EFI_HII_HANDLE  instance.
+  @param  Handle                A pointer to the FRAMEWORK_EFI_HII_HANDLE instance.
 
   @retval EFI_SUCCESS           Data was extracted from Packages, the database
                                 was updated with the data, and Handle returned successfully.

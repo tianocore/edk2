@@ -178,7 +178,7 @@ EFI_STATUS
 (EFIAPI *EFI_FORM_CALLBACK)(
   IN     EFI_FORM_CALLBACK_PROTOCOL    *This,
   IN     UINT16                        KeyValue,
-  IN     FRAMEWORK_EFI_IFR_DATA_ARRAY            *Data,
+  IN     FRAMEWORK_EFI_IFR_DATA_ARRAY  *Data,
   OUT    EFI_HII_CALLBACK_PACKET       **Packet
   );
 
