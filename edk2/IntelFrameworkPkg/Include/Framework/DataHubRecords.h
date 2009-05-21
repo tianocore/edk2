@@ -137,38 +137,127 @@ typedef union _EFI_MISC_PORT_DEVICE_PATH {
 //
 #define EFI_STRING_TOKEN          UINT16
 
+///
+/// Each data record that is a member of some subclass starts with a standard 
+/// header of type EFI_SUBCLASS_TYPE1_HEADER.
+/// This header is only a guideline and applicable only to a data 
+/// subclass that is producing SMBIOS data records. A subclass can start with a 
+/// different header if needed. 
+///
 typedef struct {
+  ///
+  /// The version of the specification to which a specific subclass data record adheres. 
+  ///
   UINT32                            Version;
+  ///
+  /// The size in bytes of this data class header. 
+  ///
   UINT32                            HeaderSize;
+  ///
+  /// The instance number of the subclass with the same ProducerName. This number is 
+  /// applicable in cases where multiple subclass instances that were produced by the same 
+  /// driver exist in the system. This entry is 1 based; 0 means Reserved and -1 means Not 
+  /// Applicable. All data consumer drivers should be able to handle all the possible values 
+  /// of Instance, including Not Applicable and Reserved. 
+  ///
   UINT16                            Instance;
+  ///
+  /// The instance number of the RecordType for the same Instance. This number is 
+  /// applicable in cases where multiple instances of the RecordType exist for a specific 
+  /// Instance. This entry is 1 based; 0 means Reserved and -1 means Not Applicable. 
+  /// All data consumer drivers should be able to handle all the possible values of 
+  /// SubInstance, including Not Applicable and Reserved. 
+  ///
   UINT16                            SubInstance;
+  ///
+  /// The record number for the data record being specified. The numbering scheme and 
+  /// definition is defined in the specific subclass specification. 
+  ///
   UINT32                            RecordType;
 } EFI_SUBCLASS_TYPE1_HEADER;
 
+///
+/// This structure is used to link data records in the same subclasses. A data record is 
+/// defined as a link to another data record in the same subclass using this structure. 
+///
 typedef struct {
+  ///
+  /// An EFI_GUID that identifies the component that produced this data record. Type 
+  /// EFI_GUID is defined in InstallProtocolInterface() in the EFI 1.10 Specification. 
+  ///
   EFI_GUID                          ProducerName;
+  ///
+  /// The instance number of the subclass with the same ProducerName. This number is 
+  /// applicable in cases where multiple subclass instances that were produced by the same 
+  /// driver exist in the system. This entry is 1 based; 0 means Reserved and -1 means Not 
+  /// Applicable. All data consumer drivers should be able to handle all the possible values 
+  /// of Instance, including Not Applicable and Reserved. 
+  ///
   UINT16                            Instance;
+  /// The instance number of the RecordType for the same Instance. This number is 
+  /// applicable in cases where multiple instances of the RecordType exist for a specific 
+  /// Instance. This entry is 1 based; 0 means Reserved and -1 means Not Applicable. 
+  /// All data consumer drivers should be able to handle all the possible values of 
+  /// SubInstance, including Not Applicable and Reserved.   
   UINT16                            SubInstance;
 } EFI_INTER_LINK_DATA;
 
 //
 // EXP data
 //
-
+///
+/// This macro provides a calculation for base-10 representations. Value and Exponent are each 
+/// INT16. It is signed to cover negative values and is 16 bits wide (15 bits for data and 1 bit
+/// for the sign).  
+///
 typedef struct {
+  ///
+  /// The INT16 number by which to multiply the base-10 representation. 
+  ///
   UINT16                            Value;
+  ///
+  /// The INT16 number by which to raise the base-10 calculation. 
+  ///
   UINT16                            Exponent;
 } EFI_EXP_BASE2_DATA;
 
+///
+/// This macro provides a calculation for base-2 representations. Value and Exponent are each 
+/// INT16. It is 16 bits wide and is unsigned to mean nonnegative values.  
+///
 typedef struct {
+  ///
+  /// The INT16 number by which to multiply the base-2 representation.
+  ///
   UINT16                            Value;
+  ///
+  /// The INT16 number by which to raise the base-2 calculation. 
+  ///
   UINT16                            Exponent;
 } EFI_EXP_BASE10_DATA;
 
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_MAX_CORE_FREQUENCY_DATA;
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_MAX_FSB_FREQUENCY_DATA;
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_CORE_FREQUENCY_DATA;
+
+///
+/// This data record refers to the list of frequencies that the processor core supports. The list of 
+/// supported frequencies is determined by the firmware based on hardware capabilities--for example, 
+/// it could be a common subset of all processors and the chipset. The unit of measurement of this data 
+/// record is in Hertz. For asynchronous processors, the content of this data record is zero.  
+/// The list is terminated by -1 in the Value field of the last element. A Value field of zero means 
+/// that the processor/driver supports automatic frequency selection. 
+///
 typedef EFI_EXP_BASE10_DATA        *EFI_PROCESSOR_CORE_FREQUENCY_LIST_DATA;
+
+///
+/// This data record refers to the list of supported frequencies of the processor external bus. The list of 
+/// supported frequencies is determined by the firmware based on hardware capabilities--for example, 
+/// it could be a common subset of all processors and the chipset. The unit of measurement of this data 
+/// record is in Hertz. For asynchronous processors, the content of this data record is NULL.  
+/// The list is terminated by -1 in the Value field of the last element. A Value field of zero means 
+/// that the processor/driver supports automatic frequency selection. 
+///
 typedef EFI_EXP_BASE10_DATA        *EFI_PROCESSOR_FSB_FREQUENCY_LIST_DATA;
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_FSB_FREQUENCY_DATA;
 typedef STRING_REF                 EFI_PROCESSOR_VERSION_DATA;
@@ -228,13 +317,35 @@ typedef struct {
   UINT32                            ProcessorReserved4: 2;
 } EFI_PROCESSOR_FEATURE_FLAGS;
 
+///
+/// This data record refers to the unique ID that identifies a set of processors. This data record is 16 
+/// bytes in length. The data in this structure is processor specific and reserved values can be defined 
+/// for future use. The consumer of this data should not make any assumption and should use this data 
+/// with respect to the processor family defined in the Family record number.  
+///
 typedef struct {
+  ///
+  /// Identifies the processor.
+  ///
   EFI_PROCESSOR_SIGNATURE           Signature;
+  ///
+  /// Provides additional processor information. 
+  ///
   EFI_PROCESSOR_MISC_INFO           MiscInfo;
+  ///
+  /// Reserved for future use. 
+  ///
   UINT32                            Reserved;
+  ///
+  /// Provides additional processor information. 
+  ///
   EFI_PROCESSOR_FEATURE_FLAGS       FeatureFlags;
 } EFI_PROCESSOR_ID_DATA;
 
+///
+/// This data record refers to the general classification of the processor. This data record is 4 bytes in 
+/// length. 
+///
 typedef enum {
   EfiProcessorOther    = 1,
   EfiProcessorUnknown  = 2,
@@ -244,6 +355,10 @@ typedef enum {
   EfiVideoProcessor    = 6
 } EFI_PROCESSOR_TYPE_DATA;
 
+///
+/// This data record refers to the family of the processor as defined by the DMTF.  
+/// This data record is 4 bytes in length. 
+///
 typedef enum {
   EfiProcessorFamilyOther               = 1,
   EfiProcessorFamilyUnknown             = 2,
@@ -281,9 +396,32 @@ typedef enum {
   EfiProcessorFamilyPowerPC603          = 0x22,
   EfiProcessorFamilyPowerPC603Plus      = 0x23,
   EfiProcessorFamilyPowerPC604          = 0x24,
+  EfiProcessorFamilyPowerPC620          = 0x25, 
+  EfiProcessorFamilyPowerPC704          = 0x26, 
+  EfiProcessorFamilyPowerPC750          = 0x27, 
   EfiProcessorFamilyAlpha2              = 0x30,
+  EfiProcessorFamilyAlpha21064          = 0x31, 
+  EfiProcessorFamilyAlpha21066          = 0x32, 
+  EfiProcessorFamilyAlpha21164          = 0x33, 
+  EfiProcessorFamilyAlpha21164PC        = 0x34, 
+  EfiProcessorFamilyAlpha21164a         = 0x35, 
+  EfiProcessorFamilyAlpha21264          = 0x36, 
+  EfiProcessorFamilyAlpha21364          = 0x37,  
   EfiProcessorFamilyMips                = 0x40,
+  EfiProcessorFamilyMIPSR4000           = 0x41, 
+  EfiProcessorFamilyMIPSR4200           = 0x42, 
+  EfiProcessorFamilyMIPSR4400           = 0x43, 
+  EfiProcessorFamilyMIPSR4600           = 0x44, 
+  EfiProcessorFamilyMIPSR10000          = 0x45,   
   EfiProcessorFamilySparc               = 0x50,
+  EfiProcessorFamilySuperSparc          = 0x51, 
+  EfiProcessorFamilymicroSparcII        = 0x52, 
+  EfiProcessorFamilymicroSparcIIep      = 0x53, 
+  EfiProcessorFamilyUltraSparc          = 0x54, 
+  EfiProcessorFamilyUltraSparcII        = 0x55, 
+  EfiProcessorFamilyUltraSparcIIi       = 0x56, 
+  EfiProcessorFamilyUltraSparcIII       = 0x57, 
+  EfiProcessorFamilyUltraSparcIIIi      = 0x58,   
   EfiProcessorFamily68040               = 0x60,
   EfiProcessorFamily68xxx               = 0x61,
   EfiProcessorFamily68000               = 0x62,
@@ -291,8 +429,19 @@ typedef enum {
   EfiProcessorFamily68020               = 0x64,
   EfiProcessorFamily68030               = 0x65,
   EfiProcessorFamilyHobbit              = 0x70,
+  EfiProcessorFamilyCrusoeTM5000        = 0x78, 
+  EfiProcessorFamilyCrusoeTM3000        = 0x79,
   EfiProcessorFamilyWeitek              = 0x80,
+  EfiProcessorFamilyItanium             = 0x82, 
+  EfiProcessorFamilyAmdAthlon64         = 0x83, 
+  EfiProcessorFamilyAmdOpteron          = 0x84,
   EfiProcessorFamilyPARISC              = 0x90,
+  EfiProcessorFamilyPaRisc8500          = 0x91, 
+  EfiProcessorFamilyPaRisc8000          = 0x92, 
+  EfiProcessorFamilyPaRisc7300LC        = 0x93, 
+  EfiProcessorFamilyPaRisc7200          = 0x94, 
+  EfiProcessorFamilyPaRisc7100LC        = 0x95, 
+  EfiProcessorFamilyPaRisc7100          = 0x96,
   EfiProcessorFamilyV30                 = 0xA0,
   EfiProcessorFamilyPentiumIIIXeon      = 0xB0,
   EfiProcessorFamilyPentiumIIISpeedStep = 0xB1,
@@ -313,9 +462,28 @@ typedef enum {
   EfiProcessorFamilyi960                = 0xFB
 } EFI_PROCESSOR_FAMILY_DATA;
 
+///
+/// This data record refers to the core voltage of the processor being defined. The unit of measurement 
+/// of this data record is in volts.  
+///
 typedef EFI_EXP_BASE10_DATA         EFI_PROCESSOR_VOLTAGE_DATA;
+
+///
+/// This data record refers to the base address of the APIC of the processor being defined. This data 
+/// record is a physical address location. 
+///
 typedef EFI_PHYSICAL_ADDRESS        EFI_PROCESSOR_APIC_BASE_ADDRESS_DATA;
+
+///
+/// This data record refers to the ID of the APIC of the processor being defined. This data record is a 
+/// 4-byte entry.  
+///
 typedef UINT32                      EFI_PROCESSOR_APIC_ID_DATA;
+
+///
+/// This data record refers to the version number of the APIC of the processor being defined. This data 
+/// record is a 4-byte entry. 
+///
 typedef UINT32                      EFI_PROCESSOR_APIC_VERSION_NUMBER_DATA;
 
 typedef enum {
@@ -324,19 +492,32 @@ typedef enum {
   EfiProcessorIpfPalBMicrocode = 3
 } EFI_PROCESSOR_MICROCODE_TYPE;
 
+///
+/// This data record refers to the revision of the processor microcode that is loaded in the processor. 
+/// This data record is a 4-byte entry. 
+///
 typedef struct {
+  ///
+  /// Identifies what type of microcode the data is. 
+  /// 
   EFI_PROCESSOR_MICROCODE_TYPE      ProcessorMicrocodeType;
+  ///
+  /// Indicates the revision number of this microcode. 
+  ///
   UINT32                            ProcessorMicrocodeRevisionNumber;
 } EFI_PROCESSOR_MICROCODE_REVISION_DATA;
 
+///
+/// This data record refers to the status of the processor.
+///
 typedef struct {
-  UINT32                            CpuStatus                 :3;
-  UINT32                            Reserved1                 :3;
-  UINT32                            SocketPopulated           :1;
-  UINT32                            Reserved2                 :1;
-  UINT32                            ApicEnable                :1;
-  UINT32                            BootApplicationProcessor  :1;
-  UINT32                            Reserved3                 :22;
+  UINT32       CpuStatus                 :3; ///> Indicates the status of the processor. 
+  UINT32       Reserved1                 :3; ///> Reserved for future use. Should be set to zero.  
+  UINT32       SocketPopulated           :1; ///> Indicates if the processor is socketed or not. 
+  UINT32       Reserved2                 :1; ///> Reserved for future use. Should be set to zero. 
+  UINT32       ApicEnable                :1; ///> Indicates if the APIC is enabled or not. 
+  UINT32       BootApplicationProcessor  :1; ///> Indicates if this processor is the boot processor. 
+  UINT32       Reserved3                 :22;///> Reserved for future use. Should be set to zero. 
 } EFI_PROCESSOR_STATUS_DATA;
 
 typedef enum {
@@ -376,12 +557,20 @@ typedef enum {
 typedef STRING_REF                  EFI_PROCESSOR_SOCKET_NAME_DATA;
 typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
 
+///
+/// This data record refers to the health status of the processor. 
+///
 typedef enum {
   EfiProcessorHealthy        = 1,
   EfiProcessorPerfRestricted = 2,
-  EfiProcessorFuncRestricted = 3
+  EfiProcessorFuncRestricted = 3 
 } EFI_PROCESSOR_HEALTH_STATUS;
 
+///
+/// This data record refers to the package number of this processor. Multiple logical processors can 
+/// exist in a system and each logical processor can be correlated to the physical processor using this 
+/// record type. 
+///
 typedef UINTN                       EFI_PROCESSOR_PACKAGE_NUMBER_DATA;
 
 typedef enum {
@@ -572,12 +761,41 @@ typedef enum _EFI_MEMORY_REGION_TYPE {
   EfiMemoryRegionNvs                = 0x04
 } EFI_MEMORY_REGION_TYPE;
 
+///
+/// This data record refers to the size of a memory region. The regions that are 
+/// described can refer to physical memory, memory-mapped I/O, or reserved BIOS memory regions. 
+/// The unit of measurement of this data record is in bytes.  
+///
 typedef struct {
+  ///
+  /// A zero-based value that indicates which processor(s) can access the memory region. 
+  /// A value of 0xFFFF indicates the region is accessible by all processors. 
+  ///
   UINT32                            ProcessorNumber;
+  ///
+  /// A zero-based value that indicates the starting bus that can access the memory region.  
+  ///
   UINT16                            StartBusNumber;
+  ///
+  /// A zero-based value that indicates the ending bus that can access the memory region. 
+  /// A value of 0xFF for a PCI system indicates the region is accessible by all buses and 
+  /// is global in scope. An example of the EndBusNumber not being 0xFF is a system 
+  /// with two or more peer-to-host PCI bridges. 
+  ///
   UINT16                            EndBusNumber;
+  ///
+  /// The type of memory region from the operating system’s point of view. 
+  /// MemoryRegionType values are equivalent to the legacy INT 15 AX = E820 BIOS 
+  /// command values. 
+  ///
   EFI_MEMORY_REGION_TYPE            MemoryRegionType;
+  ///
+  /// The size of the memory region in bytes. 
+  ///
   EFI_EXP_BASE2_DATA                MemorySize;
+  ///
+  /// The starting physical address of the memory region. 
+  ///
   EFI_PHYSICAL_ADDRESS              MemoryStartAddress;
 } EFI_MEMORY_SIZE_DATA;
 
@@ -621,11 +839,40 @@ typedef enum _EFI_MEMORY_ERROR_CORRECTION {
   EfiMemoryErrorCorrectionCrc                 = 0x07
 } EFI_MEMORY_ERROR_CORRECTION;
 
+///
+/// This data record refers to the physical memory array. This data record is a structure.  
+/// The type definition structure for EFI_MEMORY_ARRAY_LOCATION_DATA is in SMBIOS 2.3.4: 
+/// - Table 3.3.17.1, Type 16, Offset 0x4 
+/// - Table 3.3.17.2, Type 16, Offset 0x5 
+/// - Table 3.3.17.3, Type 16, with the following offsets: 
+///     -- Offset 0x6 
+///     -- Offset 0x7 
+///     -- Offset 0xB 
+///     -- Offset 0xD 
+/// 
 typedef struct {
+  ///
+  /// The physical location of the memory array. 
+  ///
   EFI_MEMORY_ARRAY_LOCATION         MemoryArrayLocation;
+  ///
+  /// The memory array usage.
+  ///
   EFI_MEMORY_ARRAY_USE              MemoryArrayUse;
+  ///
+  /// The primary error correction or detection supported by this memory array.
+  ///
   EFI_MEMORY_ERROR_CORRECTION       MemoryErrorCorrection;
+  ///
+  /// The maximum memory capacity size in kilobytes. If capacity is unknown, then 
+  /// values of MaximumMemoryCapacity.Value = 0x00 and 
+  /// MaximumMemoryCapacity.Exponent = 0x8000 are used.
+  ///
   EFI_EXP_BASE2_DATA                MaximumMemoryCapacity;
+  ///
+  /// The number of memory slots or sockets that are available for memory devices  
+  /// in this array.    
+  ///
   UINT16                            NumberMemoryDevices;
 } EFI_MEMORY_ARRAY_LOCATION_DATA;
 
@@ -700,46 +947,156 @@ typedef enum {
   EfiMemoryStatePartial      = 6
 } EFI_MEMORY_STATE;
 
+///
+/// This data record describes a memory device. This data record is a structure. 
+/// The type definition structure for EFI_MEMORY_ARRAY_LINK_DATA is in SMBIOS 2.3.4.
+///
 typedef struct {
+  ///
+  /// A string that identifies the physically labeled socket or board position where the 
+  /// memory device is located.
+  ///
   STRING_REF                        MemoryDeviceLocator;
+  ///
+  /// A string denoting the physically labeled bank where the memory device is located. 
+  ///
   STRING_REF                        MemoryBankLocator;
+  ///
+  /// A string denoting the memory manufacturer.  
+  ///  
   STRING_REF                        MemoryManufacturer;
+  ///
+  /// A string denoting the serial number of the memory device.  
+  ///
   STRING_REF                        MemorySerialNumber;
+  ///
+  /// The asset tag of the memory device. 
+  ///
   STRING_REF                        MemoryAssetTag;
+  ///
+  /// A string denoting the part number of the memory device.  
+  ///
   STRING_REF                        MemoryPartNumber;
+  ///
+  /// A link to a memory array structure set. 
+  ///
   EFI_INTER_LINK_DATA               MemoryArrayLink;
+  ///
+  /// A link to a memory array structure set.
+  ///
   EFI_INTER_LINK_DATA               MemorySubArrayLink;
+  ///
+  /// The total width in bits of this memory device. If there are no error correcting bits, 
+  /// then the total width equals the data width. If the width is unknown, then set the field 
+  /// to 0xFFFF. 
+  ///
   UINT16                            MemoryTotalWidth;
+  ///
+  /// The data width in bits of the memory device. A data width of 0x00 and a total width 
+  /// of 0x08 indicate that the device is used solely for error correction. 
+  ///
   UINT16                            MemoryDataWidth;
+  ///
+  /// The size in bytes of the memory device. A value of 0x00 denotes that no device is 
+  /// installed, while a value of all Fs denotes that the size is not known.
+  ///
   EFI_EXP_BASE2_DATA                MemoryDeviceSize;
+  ///
+  /// The form factor of the memory device. 
+  ///
   EFI_MEMORY_FORM_FACTOR            MemoryFormFactor;
+  ///
+  /// A memory device set that must be populated with all devices of the same type and 
+  /// size. A value of 0x00 indicates that the device is not part of any set. A value of 0xFF 
+  /// indicates that the attribute is unknown. Any other value denotes the set number. 
+  ///
   UINT8                             MemoryDeviceSet;
+  ///
+  /// The memory type in the socket. 
+  ///
   EFI_MEMORY_ARRAY_TYPE             MemoryType;
+  ///
+  /// The memory type details. 
+  ///
   EFI_MEMORY_TYPE_DETAIL            MemoryTypeDetail;
+  ///
+  /// The memory speed in megahertz (MHz). A value of 0x00 denotes that 
+  /// the speed is unknown.
+  ///
   EFI_EXP_BASE10_DATA               MemorySpeed;
+  ///
+  /// The memory state. 
+  ///
   EFI_MEMORY_STATE                  MemoryState;
 } EFI_MEMORY_ARRAY_LINK_DATA;
 
 
 #define EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER    0x00000004
 
+///
+/// This data record refers to a specified physical memory array associated with 
+/// a given memory range. 
+/// 
 typedef struct {
+  ///
+  /// The starting physical address in bytes of memory mapped to a specified physical 
+  /// memory array. 
+  ///
   EFI_PHYSICAL_ADDRESS              MemoryArrayStartAddress;
+  ///
+  /// The last physical address in bytes of memory mapped to a specified physical memory 
+  /// array.  
+  ///
   EFI_PHYSICAL_ADDRESS              MemoryArrayEndAddress;
+  ///
+  /// See Physical Memory Array (Type 16) for physical memory array structures.
+  ///
   EFI_INTER_LINK_DATA               PhysicalMemoryArrayLink;
+  ///
+  /// The number of memory devices that form a single row of memory for the address 
+  /// partition.  
+  ///
   UINT16                            MemoryArrayPartitionWidth;
 } EFI_MEMORY_ARRAY_START_ADDRESS_DATA;
 
 
 #define EFI_MEMORY_DEVICE_START_ADDRESS_RECORD_NUMBER    0x00000005
 
+///
+/// This data record refers to a physical memory device that is associated with 
+/// a given memory range.
+/// 
 typedef struct {
+  ///
+  /// The starting physical address that is associated with the device. 
+  ///
   EFI_PHYSICAL_ADDRESS              MemoryDeviceStartAddress;
+  ///
+  /// The ending physical address that is associated with the device. 
+  ///
   EFI_PHYSICAL_ADDRESS              MemoryDeviceEndAddress;
+  ///
+  /// A link to the memory device data structure. 
+  ///
   EFI_INTER_LINK_DATA               PhysicalMemoryDeviceLink;
+  /// 
+  /// A link to the memory array data structure. 
+  ///
   EFI_INTER_LINK_DATA               PhysicalMemoryArrayLink;
+  ///
+  /// The position of the memory device in a row. A value of 0x00 is reserved and a value 
+  /// of 0xFF indicates that the position is unknown. 
+  ///
   UINT8                             MemoryDevicePartitionRowPosition;
+  ///
+  /// The position of the device in an interleave. 
+  ///
   UINT8                             MemoryDeviceInterleavePosition;
+  ///
+  /// The maximum number of consecutive rows from the device that are accessed in a 
+  /// single interleave transfer. A value of 0x00 indicates that the device is not interleaved 
+  /// and a value of 0xFF indicates that the interleave configuration is unknown. 
+  ///
   UINT8                             MemoryDeviceInterleaveDataDepth;
 } EFI_MEMORY_DEVICE_START_ADDRESS_DATA;
 
@@ -757,17 +1114,53 @@ typedef enum _EFI_MEMORY_CHANNEL_TYPE {
   EfiMemoryChannelTypeSyncLink                = 4
 } EFI_MEMORY_CHANNEL_TYPE;
 
+///
+/// This data record refers the type of memory that is associated with the channel. This data record is a 
+/// structure. 
+/// The type definition structure for EFI_MEMORY_CHANNEL_TYPE_DATA is in SMBIOS 2.3.4, 
+/// Table 3.3.38, Type 37, with the following offsets: 
+///   - Offset 0x4 
+///   - Offset 0x5 
+///   - Offset 0x6
+/// 
 typedef struct {
+  ///
+  /// The type of memory that is associated with the channel. 
+  /// 
   EFI_MEMORY_CHANNEL_TYPE           MemoryChannelType;
+  ///
+  /// The maximum load that is supported by the channel.
+  ///
   UINT8                             MemoryChannelMaximumLoad;
+  ///
+  /// The number of memory devices on this channel. 
+  ///
   UINT8                             MemoryChannelDeviceCount;
 } EFI_MEMORY_CHANNEL_TYPE_DATA;
 
 #define EFI_MEMORY_CHANNEL_DEVICE_RECORD_NUMBER    0x00000007
 
+///
+/// This data record refers to the memory device that is associated with the memory channel. This data 
+/// record is a structure. 
+/// The type definition structure for EFI_MEMORY_CHANNEL_DEVICE_DATA is in SMBIOS 2.3.4, 
+/// Table 3.3.38, Type 37, with the following offsets:  
+///   - Offset 0x7 
+///   - Offset 0x8
+///
 typedef struct {
+  ///
+  /// A number between one and MemoryChannelDeviceCount plus an arbitrary base.  
+  /// 
   UINT8                             DeviceId;
+  ///
+  /// The Link of the associated memory device. See Memory Device (Type 17) for 
+  /// memory devices. 
+  ///
   EFI_INTER_LINK_DATA               DeviceLink;
+  ///
+  /// The number of load units that this device consumes. 
+  ///
   UINT8                             MemoryChannelDeviceLoad;
 } EFI_MEMORY_CHANNEL_DEVICE_DATA;
 

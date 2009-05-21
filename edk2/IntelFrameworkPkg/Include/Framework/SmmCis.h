@@ -77,12 +77,22 @@ EFI_STATUS
   );
 
 typedef struct {
-  EFI_SMM_CPU_IO  Read;
-  EFI_SMM_CPU_IO  Write;
+  EFI_SMM_CPU_IO  Read;  ///> This service provides the various modalities of memory and I/O read.
+  EFI_SMM_CPU_IO  Write; ///> This service provides the various modalities of memory and I/O write.
 } EFI_SMM_IO_ACCESS;
 
+///
+/// The EFI_SMM_CPU_IO_INTERFACE service provides the basic memory, I/O, and PCI
+/// interfaces that are used to abstract accesses to devices.
+///
 struct _EFI_SMM_CPU_IO_INTERFACE {
+  ///
+  /// Allows reads and writes to memory-mapped I/O space. 
+  ///
   EFI_SMM_IO_ACCESS Mem;
+  ///
+  /// Allows reads and writes to I/O space. 
+  ///
   EFI_SMM_IO_ACCESS Io;
 };
 
@@ -176,13 +186,42 @@ EFI_STATUS
   IN  OUT VOID                            *ProcArguments OPTIONAL
   );
 
+///
+/// The processor save-state information for IA-32 processors. This information is important in that the
+/// SMM drivers may need to ascertain the state of the processor before invoking the SMI.
+///
 typedef struct {
+  ///
+  /// Reserved for future processors. As such, software should not attempt to interpret or
+  /// write to this region.
+  ///
   UINT8                 Reserved1[248];
+  ///
+  /// The location of the processor SMBASE, which is the location where the processor
+  /// will pass control upon receipt of an SMI.
+  ///
   UINT32                SMBASE;
+  ///
+  /// The revision of the SMM save state. This value is set by the processor.
+  ///
   UINT32                SMMRevId;
+  ///
+  /// The value of the I/O restart field. Allows for restarting an in-process I/O instruction.
+  ///
   UINT16                IORestart;
+  ///
+  /// Describes behavior that should be commenced in response to a halt instruction.
+  ///
   UINT16                AutoHALTRestart;
+  ///
+  /// Reserved for future processors. As such, software should not attempt to interpret or
+  /// write to this region.
+  ///
   UINT8                 Reserved2[164];
+
+  //
+  // Registers in IA-32 processors. 
+  //
   UINT32                ES;
   UINT32                CS;
   UINT32                SS;
@@ -207,6 +246,11 @@ typedef struct {
   UINT32                CR0;
 } EFI_SMI_CPU_SAVE_STATE;
 
+///
+/// The processor save-state information for the Itanium processor family. This information is
+/// important in that the SMM drivers may need to ascertain the state of the processor before invoking
+/// the PMI. This structure is mandatory and must be 512 byte aligned.
+/// 
 typedef struct {
   UINT64   reserved;
   UINT64   r1;
@@ -317,11 +361,26 @@ typedef struct {
 
 } EFI_PMI_SYSTEM_CONTEXT;
 
+///
+/// The processor save-state information for IA-32 and Itanium processors. This information is
+/// important in that the SMM drivers may need to ascertain the state of the processor before invoking
+/// the SMI or PMI.
+///
 typedef union {
+  ///
+  /// The processor save-state information for IA-32 processors. 
+  ///
   EFI_SMI_CPU_SAVE_STATE     Ia32SaveState;
+  ///
+  /// The processor save-state information for Itanium processors.
+  ///
   EFI_PMI_SYSTEM_CONTEXT     ItaniumSaveState;
 } EFI_SMM_CPU_SAVE_STATE;
 
+///
+/// The optional floating point save-state information for IA-32 processors. If the optional floating
+/// point save is indicated for any handler, the following data structure must be preserved.
+///
 typedef struct {
   UINT16                Fcw;
   UINT16                Fsw;
@@ -344,6 +403,10 @@ typedef struct {
   UINT8                 Rsvd11[22*16];
 } EFI_SMI_OPTIONAL_FPSAVE_STATE;
 
+///
+/// The optional floating point save-state information for the Itanium processor family. If the optional
+/// floating point save is indicated for any handler, then this data structure must be preserved. 
+/// 
 typedef struct {
   UINT64   f2[2];
   UINT64   f3[2];
@@ -377,8 +440,18 @@ typedef struct {
   UINT64   f31[2];
 } EFI_PMI_OPTIONAL_FLOATING_POINT_CONTEXT;
 
+///
+/// The processor save-state information for IA-32 and Itanium processors. If the optional floating
+/// point save is indicated for any handler, then this data structure must be preserved.
+///
 typedef union {
+  /// 
+  /// The optional floating point save-state information for IA-32 processors. 
+  ///
   EFI_SMI_OPTIONAL_FPSAVE_STATE             Ia32FpSave;
+  ///
+  /// The optional floating point save-state information for Itanium processors. 
+  ///
   EFI_PMI_OPTIONAL_FLOATING_POINT_CONTEXT   ItaniumFpSave;
 } EFI_SMM_FLOATING_POINT_SAVE_STATE;
 
@@ -436,25 +509,58 @@ EFI_STATUS
 // System Management System Table (SMST)
 //
 struct _EFI_SMM_SYSTEM_TABLE {
+  ///
+  /// The table header for the System Management System Table (SMST). 
+  ///
   EFI_TABLE_HEADER                    Hdr;
 
+  ///
+  /// A pointer to a NULL-terminated Unicode string containing the vendor name. It is
+  /// permissible for this pointer to be NULL.
+  ///
   CHAR16                              *SmmFirmwareVendor;
+  ///
+  /// The particular revision of the firmware.
+  ///
   UINT32                              SmmFirmwareRevision;
 
+  ///
+  /// Adds, updates, or removes a configuration table entry from the SMST. 
+  ///
   EFI_SMM_INSTALL_CONFIGURATION_TABLE SmmInstallConfigurationTable;
 
   //
   // I/O Services
   //
+  ///
+  /// A GUID that designates the particular CPU I/O services. 
+  ///
   EFI_GUID                            EfiSmmCpuIoGuid;
+  ///
+  /// Provides the basic memory and I/O interfaces that are used to abstract accesses to
+  /// devices.
+  ///
   EFI_SMM_CPU_IO_INTERFACE            SmmIo;
 
   //
   // Runtime memory service
   //
+  ///
+  /// Allocates pool memory from SMRAM for IA-32 or runtime memory for the
+  /// Itanium processor family.
+  ///
   EFI_SMMCORE_ALLOCATE_POOL           SmmAllocatePool;
+  ///
+  /// Returns pool memory to the system. 
+  ///
   EFI_SMMCORE_FREE_POOL               SmmFreePool;
+  ///
+  /// Allocates memory pages from the system. 
+  ///
   EFI_SMMCORE_ALLOCATE_PAGES          SmmAllocatePages;
+  ///
+  /// Frees memory pages for the system.
+  ///
   EFI_SMMCORE_FREE_PAGES              SmmFreePages;
 
   //
@@ -465,15 +571,44 @@ struct _EFI_SMM_SYSTEM_TABLE {
   //
   // CPU information records
   //
+  ///
+  /// A 1-relative number between 1 and the NumberOfCpus field. This field designates
+  /// which processor is executing the SMM infrastructure. This number also serves as an
+  /// index into the CpuSaveState and CpuOptionalFloatingPointState
+  /// fields.
+  ///
   UINTN                               CurrentlyExecutingCpu;
+  ///
+  /// The number of EFI Configuration Tables in the buffer
+  /// SmmConfigurationTable.
+  ///
   UINTN                               NumberOfCpus;
+  ///
+  /// A pointer to the EFI Configuration Tables. The number of entries in the table is
+  /// NumberOfTableEntries.
+  ///
   EFI_SMM_CPU_SAVE_STATE              *CpuSaveState;
+  ///
+  /// A pointer to a catenation of the EFI_SMM_FLOATING_POINT_SAVE_STATE.
+  /// The size of this entire table is NumberOfCpus* size of the
+  /// EFI_SMM_FLOATING_POINT_SAVE_STATE. These fields are populated only if
+  /// there is at least one SMM driver that has registered for a callback with the
+  /// FloatingPointSave field in EFI_SMM_BASE_PROTOCOL.RegisterCallback() set to TRUE.
+  ///
   EFI_SMM_FLOATING_POINT_SAVE_STATE   *CpuOptionalFloatingPointState;
 
   //
   // Extensibility table
   //
+  ///
+  /// The number of EFI Configuration Tables in the buffer
+  /// SmmConfigurationTable.
+  ///
   UINTN                               NumberOfTableEntries;
+  ///
+  /// A pointer to the EFI Configuration Tables. The number of entries in the table is
+  /// NumberOfTableEntries.
+  ///
   EFI_CONFIGURATION_TABLE             *SmmConfigurationTable;
 };
 
