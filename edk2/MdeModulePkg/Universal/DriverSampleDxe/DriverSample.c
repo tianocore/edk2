@@ -22,6 +22,10 @@ EFI_GUID   mFormSetGuid = FORMSET_GUID;
 EFI_GUID   mInventoryGuid = INVENTORY_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
+//
+// <ConfigHdr> Template
+//
+CONST CHAR16 mDriverSampleConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=00";
 
 EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
 DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData = NULL;
@@ -342,7 +346,6 @@ ExtractConfig (
   UINTN                            BufferSize;
   DRIVER_SAMPLE_PRIVATE_DATA       *PrivateData;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
-  EFI_STRING                       ConfigRequestHdr;
   EFI_STRING                       ConfigRequest;
   UINTN                            Size;
   
@@ -352,7 +355,6 @@ ExtractConfig (
   //
   // Initialize the local variables.
   //
-  ConfigRequestHdr = NULL;
   ConfigRequest    = NULL;
   Size             = 0;
   *Progress        = Request;
@@ -373,7 +375,7 @@ ExtractConfig (
             &PrivateData->Configuration
             );
   if (EFI_ERROR (Status)) {
-    return Status;
+    return EFI_NOT_FOUND;
   }
   
   if (Request == NULL) {
@@ -382,32 +384,21 @@ ExtractConfig (
     //
 
     //
-    // First Set ConfigRequestHdr string.
-    //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
-    ASSERT (ConfigRequestHdr != NULL);
-
-    //
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template 
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    Size = (StrLen (mDriverSampleConfigHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
-    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
-    FreePool (ConfigRequestHdr);
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", mDriverSampleConfigHdr, (UINT64)BufferSize);
   } else {
-    ConfigRequest = Request;
-  }
-
-  //
-  // Check routing data in <ConfigHdr>.
-  // Note: if only one Storage is used, then this checking could be skipped.
-  //
-  if (!HiiIsConfigHdrMatch (ConfigRequest, &mFormSetGuid, VariableName)) {
-    if (Request == NULL) {
-      FreePool (ConfigRequest);
+    //
+    // Check routing data in <ConfigHdr>.
+    // Note: if only one Storage is used, then this checking could be skipped.
+    //
+    if (!HiiIsConfigHdrMatch (Request, &mFormSetGuid, VariableName)) {
+      return EFI_NOT_FOUND;
     }
-    return EFI_NOT_FOUND;
+    ConfigRequest = Request;
   }
 
   //
