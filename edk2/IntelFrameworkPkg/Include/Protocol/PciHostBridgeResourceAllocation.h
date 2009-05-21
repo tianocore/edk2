@@ -144,6 +144,7 @@ typedef enum {
 
   @retval EFI_SUCCESS           Success
   @retval EFI_OUT_OF_RESOURCES  If SubmitResources ( ) could not allocate resources
+  @retval EFI_INVALID_PARAMETER The Phase is invalid
   @retval EFI_NOT_READY         This phase cannot be entered at this time
   @retval EFI_DEVICE_ERROR      SetResources failed due to HW error.
 
@@ -168,6 +169,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           Success
   @retval EFI_INVALID_PARAMETER RootBridgeHandle is invalid
+  @retval EFI_NOT_FOUND        There are no more PCI root bridge device handles.
 
 **/
 typedef
@@ -265,7 +267,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Configuration is NULL
   @retval EFI_INVALID_PARAMETER Configuration does not point to a valid ACPI resource descriptor
   @retval EFI_INVALID_PARAMETER Configuration includes a resource descriptor of unsupported type
-
+  
 **/
 typedef
 EFI_STATUS

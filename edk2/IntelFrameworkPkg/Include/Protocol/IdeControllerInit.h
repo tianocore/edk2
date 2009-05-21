@@ -355,7 +355,8 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The modes were accepted without any errors.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
-                                Or Device is invalid.
+                                Or Device is invalid, 
+                                Or IdentifyData is NULL.
 
 **/
 typedef

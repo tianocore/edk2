@@ -7,9 +7,7 @@
 	- Ensure that tables are properly aligned and use correct types of memory.
 	- Update checksum values and IDs.
 	- Complete the final installation of the tables.
-
-  This is defined in the ACPI Specification 0.9.
-  
+ 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +16,10 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+  @par Revision Reference:
+  This Protocol is defined in Framework of ACPI Specification.
+  Version 0.9.
 
 **/
 
@@ -119,6 +121,11 @@ EFI_STATUS
   Causes one or more versions of the ACPI tables to be published in
   the EFI system configuration tables.
 
+  The PublishTables() function installs the ACPI tables for the versions that are specified in 
+  Version. No tables are published for Version equal to EFI_ACPI_VERSION_NONE. Once 
+  published, tables will continue to be updated as tables are modified with 
+  EFI_ACPI_SUPPORT_PROTOCOL.SetAcpiTable(). 
+
   @param  This                  A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
   @param  Version               Indicates to which version(s) of ACPI that the table should be published.
 
@@ -137,7 +144,6 @@ EFI_STATUS
 // ACPI Support Protocol
 //
 /**
-  @par Protocol Description:
   This protocol provides some basic services to support publishing ACPI system
   tables. The services handle many of the more mundane tasks that are required
   to publish a set of tables.

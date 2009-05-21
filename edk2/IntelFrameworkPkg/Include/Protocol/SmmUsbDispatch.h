@@ -41,7 +41,18 @@ typedef enum {
 } EFI_USB_SMI_TYPE;
 
 typedef struct {
+  ///
+  /// Describes whether this child handler will be invoked in response to a USB legacy
+  /// emulation event, such as port-trap on the PS/2* keyboard control registers, or to a
+  /// USB wake event, such as resumption from a sleep state. 
+  ///
   EFI_USB_SMI_TYPE          Type;
+  ///
+  /// The device path is part of the context structure and describes the location of the
+  /// particular USB host controller in the system for which this register event will occur.
+  /// This location is important because of the possible integration of several USB host
+  /// controllers in a system. 
+  ///
   EFI_DEVICE_PATH_PROTOCOL  *Device;
 } EFI_SMM_USB_DISPATCH_CONTEXT;
 

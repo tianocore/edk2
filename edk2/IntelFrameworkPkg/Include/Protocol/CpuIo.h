@@ -101,7 +101,6 @@ typedef struct {
 // *******************************************************
 //
 /**
-  @par Protocol Description:
   Provides the basic memory and I/O interfaces that are used to abstract
   accesses to devices in a system.
 
