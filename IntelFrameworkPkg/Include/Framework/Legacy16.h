@@ -16,7 +16,8 @@
   Module Name:  FrameworkLegacy16.h
 
   @par Revision Reference:
-  These definitions are from Compatibility Support Module Spec Version 0.96.
+  These definitions are from Compatibility Support Module Spec 
+  Version 0.97.
 
 **/
 

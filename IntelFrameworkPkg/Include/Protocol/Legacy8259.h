@@ -15,7 +15,7 @@
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
-  Version 0.96
+  Version 0.97.
 
 **/
 

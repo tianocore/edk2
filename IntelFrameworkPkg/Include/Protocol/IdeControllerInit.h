@@ -22,7 +22,7 @@
 
   @par Revision Reference:
   This Protocol is defined in IDE Controller Initialization Protocol Specification
-  Version 0.9
+  Version 0.9.
 
 **/
 

@@ -28,7 +28,7 @@
 
   @par Revision Reference:
   This protocol is defined in Framework of EFI PCI Platform Support Specification.
-  Version0.9
+  Version 0.9.
 
 **/
 

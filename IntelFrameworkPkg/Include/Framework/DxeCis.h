@@ -16,6 +16,11 @@
 
   Module Name:    FrameworkDxeCis.h
 
+  @par Revision Reference:
+  This Protocol is defined in Framework for EFI Driver Execution Environment 
+  Core Interface Specification. 
+  Version 0.9.
+
 **/
 
 #ifndef _FRAMEWORK_DXE_CIS_H_
