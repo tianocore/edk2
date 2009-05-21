@@ -392,11 +392,11 @@ typedef INT64   INTN;
   #define GLOBAL_REMOVE_IF_UNREFERENCED
 #endif
 
-#if defined(__APPLE__)
-  #define ASM_GLOBAL .globl
-#else
-  #define ASM_GLOBAL .global
-#endif 
+///
+/// For GNU assembly code, .global or .globl can declare global symbols.
+/// Define this macro to unify the usage.
+///
+#define ASM_GLOBAL .globl
 
 ///
 /// A pointer to a function in IPF points to a plabel.
