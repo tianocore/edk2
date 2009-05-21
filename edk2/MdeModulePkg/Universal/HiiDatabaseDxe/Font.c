@@ -1344,15 +1344,14 @@ IsFontInfoExisted (
 /**
   Check whether the unicode represents a line break or not.
 
-  This is a internal function.
+  This is a internal function. Please see Section 27.2.6 of the UEFI Specification
+  for a description of the supported string format.
 
   @param  Char                    Unicode character
 
-  @retval 0                       Yes, it is a line break.
-  @retval 1                       Yes, it is a hyphen that desires a line break
-                                  after this character.
-  @retval 2                       Yes, it is a dash that desires a line break
-                                  before and after it.
+  @retval 0                       Yes, it forces a line break.
+  @retval 1                       Yes, it presents a line break opportunity
+  @retval 2                       Yes, it requires a line break happen before and after it.
   @retval -1                      No, it is not a link break.
 
 **/
@@ -1361,61 +1360,63 @@ IsLineBreak (
   IN  CHAR16    Char
   )
 {
-  UINT8         Byte1;
-  UINT8         Byte2;
-
-  //
-  // In little endian, Byte1 is the low byte of Char, Byte2 is the high byte of Char.
-  //
-  Byte1 = *((UINT8 *) (&Char));
-  Byte2 = *(((UINT8 *) (&Char) + 1));
-
-  if (Byte2 == 0x20) {
-    switch (Byte1) {
-    case 0x00:
-    case 0x01:
-    case 0x02:
-    case 0x03:
-    case 0x04:
-    case 0x05:
-    case 0x06:
-    case 0x08:
-    case 0x09:
-    case 0x0A:
-    case 0x0B:
-    case 0x28:
-    case 0x29:
-    case 0x5F:
-      return 0;
-    case 0x10:
-    case 0x12:
-    case 0x13:
-      return 1;
-    case 0x14:
-      //
-      // BUGBUG: Does it really require line break before it and after it?
-      //
-      return 2;
-    }
-  } else if (Byte2 == 0x00) {
-    switch (Byte1) {
-    case 0x20:
-    case 0x0C:
-    case 0x0D:
-      return 0;
-    }
-  }
-
   switch (Char) {
-    case 0x1680:
+    //
+    // Mandatory line break characters, which force a line-break
+    //
+    case 0x000C:
+    case 0x000D:
+    case 0x2028:
+    case 0x2029:
       return 0;
+    //
+    // Space characters, which is taken as a line-break opportunity
+    //
+    case 0x0020:
+    case 0x1680:
+    case 0x2000:
+    case 0x2001:
+    case 0x2002:
+    case 0x2003:
+    case 0x2004:
+    case 0x2005:
+    case 0x2006:
+    case 0x2008:
+    case 0x2009:
+    case 0x200A:
+    case 0x205F:
+    //
+    // In-Word Break Opportunities
+    //
+    case 0x200B:
+      return 1;
+    //
+    // A space which is not a line-break opportunity
+    //
+    case 0x00A0:
+    case 0x202F:
+    //
+    // A hyphen which is not a line-break opportunity
+    //
+    case 0x2011:
+      return -1;
+    //
+    // Hyphen characters which describe line break opportunities after the character
+    //
     case 0x058A:
+    case 0x2010:
+    case 0x2012:
+    case 0x2013:
     case 0x0F0B:
     case 0x1361:
     case 0x17D5:
       return 1;
+    //
+    // A hyphen which describes line break opportunities before and after them, but not between a pair of them
+    //
+    case 0x2014:
+      return 2;
   }
-
   return -1;
 }
 
@@ -1520,6 +1521,7 @@ HiiStringToImage (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL       *BufferPtr;
   UINTN                               RowInfoSize;
   BOOLEAN                             LineBreak;
+  UINTN                               StrLength;
 
   //
   // Check incoming parameters.
@@ -1555,11 +1557,35 @@ HiiStringToImage (
     return EFI_INVALID_PARAMETER;
   }
 
-  GlyphBuf = (UINT8 **) AllocateZeroPool (MAX_STRING_LENGTH * sizeof (UINT8 *));
+  if (*Blt == NULL) {
+    //
+    // Create a new bitmap and draw the string onto this image.
+    //
+    Image = AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
+    if (Image == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    Image->Width  = 800;
+    Image->Height = 600;
+    Image->Image.Bitmap = AllocateZeroPool (Image->Width * Image->Height *sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+    if (Image->Image.Bitmap == NULL) {
+      FreePool (Image);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
+    // Other flags are not permitted when Blt is NULL.
+    //
+    Flags &= EFI_HII_OUT_FLAG_WRAP | EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_IGNORE_LINE_BREAK;
+    *Blt = Image;
+  }
+
+  StrLength = StrLen(String);
+  GlyphBuf = (UINT8 **) AllocateZeroPool (StrLength * sizeof (UINT8 *));
   ASSERT (GlyphBuf != NULL);
-  Cell = (EFI_HII_GLYPH_INFO *) AllocateZeroPool (MAX_STRING_LENGTH * sizeof (EFI_HII_GLYPH_INFO));
+  Cell = (EFI_HII_GLYPH_INFO *) AllocateZeroPool (StrLength * sizeof (EFI_HII_GLYPH_INFO));
   ASSERT (Cell != NULL);
-  Attributes = (UINT8 *) AllocateZeroPool (MAX_STRING_LENGTH * sizeof (UINT8));
+  Attributes = (UINT8 *) AllocateZeroPool (StrLength * sizeof (UINT8));
   ASSERT (Attributes != NULL);
 
   RowInfo       = NULL;
@@ -1649,16 +1675,14 @@ HiiStringToImage (
   }
   Index     = 0;
   StringTmp = StringIn2;
-
-  while (*StringPtr != 0 && Index < MAX_STRING_LENGTH) {
+  StrLength = StrLen(StringPtr);
+  while (*StringPtr != 0 && Index < StrLength) {
     Status = GetGlyphBuffer (Private, *StringPtr, FontInfo, &GlyphBuf[Index], &Cell[Index], &Attributes[Index]);
     if (Status == EFI_NOT_FOUND) {
       if ((Flags & EFI_HII_IGNORE_IF_NO_GLYPH) == EFI_HII_IGNORE_IF_NO_GLYPH) {
-        if (GlyphBuf[Index] != NULL) {
-          FreePool (GlyphBuf[Index]);
-        }
         GlyphBuf[Index] = NULL;
-        StringPtr++;
+        *StringTmp++ = *StringPtr++;
+        Index++;
       } else {
         //
         // Unicode 0xFFFD must exist in current hii database if this flag is not set.
@@ -1694,160 +1718,172 @@ HiiStringToImage (
   // to an existing image (bitmap or screen depending on flags) pointed by "*Blt".
   // Otherwise render this string to a new allocated image and output it.
   //
-  if (*Blt != NULL) {
-    Image     = *Blt;
-    BufferPtr = Image->Image.Bitmap + Image->Width * BltY + BltX;
-    MaxRowNum = (UINT16) (Image->Height / Height);
-    if (Image->Height % Height != 0) {
-      MaxRowNum++;
-    }
+  Image     = *Blt;
+  BufferPtr = Image->Image.Bitmap + Image->Width * BltY + BltX;
+  MaxRowNum = (UINT16) (Image->Height / Height);
+  if (Image->Height % Height != 0) {
+    MaxRowNum++;
+  }
 
-    RowInfo = (EFI_HII_ROW_INFO *) AllocateZeroPool (MaxRowNum * sizeof (EFI_HII_ROW_INFO));
-    if (RowInfo == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
+  RowInfo = (EFI_HII_ROW_INFO *) AllocateZeroPool (MaxRowNum * sizeof (EFI_HII_ROW_INFO));
+  if (RowInfo == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  //
+  // Format the glyph buffer according to flags.
+  //
+
+  Transparent = (BOOLEAN) ((Flags & EFI_HII_OUT_FLAG_TRANSPARENT) == EFI_HII_OUT_FLAG_TRANSPARENT ? TRUE : FALSE);
+  if ((Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) == EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) {
+    //
+    // Don't draw at all if there is only one row and
+    // the row's bottom-most on pixel cannot fit.
+    //
+    if (MaxRowNum == 1 && SysFontFlag) {
+      Status = EFI_SUCCESS;
       goto Exit;
     }
+  }
+
+  for (RowIndex = 0, Index = 0; RowIndex < MaxRowNum && StringPtr[Index] != 0; ) {
+    LineWidth      = 0;
+    LineHeight     = 0;
+    BaseLineOffset = 0;
+    LineBreak      = FALSE;
 
     //
-    // Format the glyph buffer according to flags.
+    // Calculate how many characters there are in a row.
     //
+    RowInfo[RowIndex].StartIndex = Index;
 
-    Transparent = (BOOLEAN) ((Flags & EFI_HII_OUT_FLAG_TRANSPARENT) == EFI_HII_OUT_FLAG_TRANSPARENT ? TRUE : FALSE);
-    if ((Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) == EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) {
+    while (LineWidth + BltX < Image->Width && StringPtr[Index] != 0) {
+      if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0 &&
+          (Flags & EFI_HII_OUT_FLAG_WRAP) == 0 &&
+           IsLineBreak (StringPtr[Index]) == 0) {
+        //
+        // It forces a line break that ends this row.
+        //
+        Index++;
+        break;
+      }
+
       //
-      // Don't draw at all if there is only one row and
-      // the row's bottom-most on pixel cannot fit.
+      // If the glyph of the character is existing, then accumulate the actual printed width
       //
-      if (MaxRowNum == 1 && SysFontFlag) {
+      if (GlyphBuf[Index] != NULL) {
+        LineWidth += (UINTN) Cell[Index].AdvanceX;
+        if (LineHeight < Cell[Index].Height) {
+          LineHeight = (UINTN) Cell[Index].Height;
+        }
+      }
+
+      Index++;
+    }
+
+    //
+    // If this character is the last character of a row, we need not
+    // draw its (AdvanceX - Width) for next character.
+    //
+    Index--;
+    if (!SysFontFlag) {
+      LineWidth -= (UINTN) (Cell[Index].AdvanceX - Cell[Index].Width);
+    }
+
+    //
+    // Clip the right-most character if cannot fit when EFI_HII_OUT_FLAG_CLEAN_X is set.
+    //
+    if (LineWidth + BltX <= Image->Width ||
+      (LineWidth + BltX > Image->Width && (Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_X) == 0)) {
+      //
+      // Record right-most character in RowInfo even if it is partially displayed.
+      //
+      RowInfo[RowIndex].EndIndex       = Index;
+      RowInfo[RowIndex].LineWidth      = LineWidth;
+      RowInfo[RowIndex].LineHeight     = LineHeight;
+      RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
+    } else {
+      //
+      // When EFI_HII_OUT_FLAG_CLEAN_X is set, it will not draw a character
+      // if its right-most on pixel cannot fit.
+      //
+      if (Index > 0) {
+        RowInfo[RowIndex].EndIndex       = Index - 1;
+        RowInfo[RowIndex].LineWidth      = LineWidth - Cell[Index].AdvanceX;
+        RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
+        if (LineHeight > Cell[Index - 1].Height) {
+          LineHeight = Cell[Index - 1].Height;
+        }
+        RowInfo[RowIndex].LineHeight     = LineHeight;
+      } else {
+        //
+        // There is only one column and it can not be drawn so that return directly.
+        //
         Status = EFI_SUCCESS;
         goto Exit;
       }
     }
 
-    for (RowIndex = 0, Index = 0; RowIndex < MaxRowNum && StringPtr[Index] != 0; ) {
-      LineWidth      = 0;
-      LineHeight     = 0;
-      BaseLineOffset = 0;
-      LineBreak      = FALSE;
-
-      //
-      // Calculate how many characters there are in a row.
-      //
-      RowInfo[RowIndex].StartIndex = Index;
-
-      while (LineWidth + BltX < Image->Width && StringPtr[Index] != 0) {
-        LineWidth += (UINTN) Cell[Index].AdvanceX;
-        if (LineHeight < Cell[Index].Height) {
-          LineHeight = (UINTN) Cell[Index].Height;
-        }
-
-        if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0 &&
-            (Flags & EFI_HII_OUT_FLAG_WRAP) == 0 &&
-             IsLineBreak (StringPtr[Index]) > 0) {
-          //
-          // It is a line break that ends this row.
-          //
-          Index++;
-          break;
-        }
-
-        Index++;
-      }
-
-      //
-      // If this character is the last character of a row, we need not
-      // draw its (AdvanceX - Width) for next character.
-      //
-      Index--;
-      if (!SysFontFlag) {
-        LineWidth -= (UINTN) (Cell[Index].AdvanceX - Cell[Index].Width);
-      }
-
-      //
-      // EFI_HII_OUT_FLAG_WRAP will wrap the text at the right-most line-break
-      // opportunity prior to a character whose right-most extent would exceed Width.
-      // Search the right-most line-break opportunity here.
-      //
-      if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP) {
-        if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0) {
-          for (Index1 = RowInfo[RowIndex].EndIndex; Index1 >= RowInfo[RowIndex].StartIndex; Index1--) {
-            if (IsLineBreak (StringPtr[Index1]) > 0) {
-              LineBreak = TRUE;
-              RowInfo[RowIndex].EndIndex = Index1 - 1;
-              break;
-            }
+    //
+    // EFI_HII_OUT_FLAG_WRAP will wrap the text at the right-most line-break
+    // opportunity prior to a character whose right-most extent would exceed Width.
+    // Search the right-most line-break opportunity here.
+    //
+    if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP) {
+      if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0) {
+        for (Index1 = RowInfo[RowIndex].EndIndex; Index1 >= RowInfo[RowIndex].StartIndex; Index1--) {
+          if (IsLineBreak (StringPtr[Index1]) > 0) {
+            LineBreak = TRUE;
+            RowInfo[RowIndex].EndIndex = Index1 - 1;
+            //
+            // relocate to the character after the right-most line break opportunity of this line
+            //
+            Index = Index1 + 1;
+            break;
           }
         }
-        //
-        // If no line-break opportunity can be found, then the text will
-        // behave as if EFI_HII_OUT_FLAG_CLEAN_X is set.
-        //
-        if (!LineBreak) {
-          Flags &= (~ (EFI_HII_OUT_FLAGS) EFI_HII_OUT_FLAG_WRAP);
-          Flags |= EFI_HII_OUT_FLAG_CLIP_CLEAN_X;
-        }
       }
-
       //
-      // Clip the right-most character if cannot fit when EFI_HII_OUT_FLAG_CLEAN_X is set.
+      // If no line-break opportunity can be found, then the text will
+      // behave as if EFI_HII_OUT_FLAG_CLEAN_X is set.
       //
-      if (LineWidth + BltX <= Image->Width ||
-        (LineWidth + BltX > Image->Width && (Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_X) == 0)) {
-        //
-        // Record right-most character in RowInfo even if it is partially displayed.
-        //
-        RowInfo[RowIndex].EndIndex       = Index;
-        RowInfo[RowIndex].LineWidth      = LineWidth;
-        RowInfo[RowIndex].LineHeight     = LineHeight;
-        RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
-      } else {
-        //
-        // When EFI_HII_OUT_FLAG_CLEAN_X is set, it will not draw a character
-        // if its right-most on pixel cannot fit.
-        //
-        if (Index > 0) {
-          RowInfo[RowIndex].EndIndex       = Index - 1;
-          RowInfo[RowIndex].LineWidth      = LineWidth - Cell[Index].AdvanceX;
-          RowInfo[RowIndex].BaselineOffset = BaseLineOffset;
-          if (LineHeight > Cell[Index - 1].Height) {
-            LineHeight = Cell[Index - 1].Height;
-          }
-          RowInfo[RowIndex].LineHeight     = LineHeight;
-        } else {
-          //
-          // There is only one column and it can not be drawn so that return directly.
-          //
-          Status = EFI_SUCCESS;
-          goto Exit;
-        }
+      if (!LineBreak) {
+        Flags &= (~ (EFI_HII_OUT_FLAGS) EFI_HII_OUT_FLAG_WRAP);
+        Flags |= EFI_HII_OUT_FLAG_CLIP_CLEAN_X;
       }
+    }
 
-      //
-      // Clip the final row if the row's bottom-most on pixel cannot fit when
-      // EFI_HII_OUT_FLAG_CLEAN_Y is set.
-      //
-      if (RowIndex == MaxRowNum - 1 && Image->Height < LineHeight) {
-        LineHeight = Image->Height;
-        if ((Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) == EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) {
-          //
-          // Don't draw at all if the row's bottom-most on pixel cannot fit.
-          //
-          break;
-        }
+    //
+    // Clip the final row if the row's bottom-most on pixel cannot fit when
+    // EFI_HII_OUT_FLAG_CLEAN_Y is set.
+    //
+    if (RowIndex == MaxRowNum - 1 && Image->Height < LineHeight) {
+      LineHeight = Image->Height;
+      if ((Flags & EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) == EFI_HII_OUT_FLAG_CLIP_CLEAN_Y) {
+        //
+        // Don't draw at all if the row's bottom-most on pixel cannot fit.
+        //
+        break;
       }
+    }
 
-      //
-      // Draw it to screen or existing bitmap depending on whether
-      // EFI_HII_DIRECT_TO_SCREEN is set.
-      //
-      if ((Flags & EFI_HII_DIRECT_TO_SCREEN) == EFI_HII_DIRECT_TO_SCREEN) {
-        BltBuffer = AllocateZeroPool (RowInfo[RowIndex].LineWidth * RowInfo[RowIndex].LineHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-        if (BltBuffer == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Exit;
-        }
-        BufferPtr = BltBuffer;
-        for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
+    //
+    // Draw it to screen or existing bitmap depending on whether
+    // EFI_HII_DIRECT_TO_SCREEN is set.
+    //
+    if ((Flags & EFI_HII_DIRECT_TO_SCREEN) == EFI_HII_DIRECT_TO_SCREEN) {
+      BltBuffer = AllocateZeroPool (RowInfo[RowIndex].LineWidth * RowInfo[RowIndex].LineHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+      if (BltBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Exit;
+      }
+      BufferPtr = BltBuffer;
+      for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
+        if (GlyphBuf[Index1] != NULL) {
+          //
+          // Only BLT these character which have corrsponding glyph in font basebase.
+          //
           GlyphToImage (
             GlyphBuf[Index1],
             Foreground,
@@ -1858,37 +1894,50 @@ HiiStringToImage (
             &Cell[Index1],
             Attributes[Index1],
             &BufferPtr
-            );
-          if (ColumnInfoArray != NULL) {
-            if (Index1 == RowInfo[RowIndex].StartIndex) {
-              *ColumnInfoArray = 0;
-            } else {
-              *ColumnInfoArray = Cell[Index1 -1].AdvanceX;
-            }
-            ColumnInfoArray++;
+          );
+        }
+        if (ColumnInfoArray != NULL) {
+          if (GlyphBuf[Index1] == NULL) {
+            *ColumnInfoArray = 0;
+          } else {
+            *ColumnInfoArray = Cell[Index1 -1].AdvanceX;
           }
+          ColumnInfoArray++;
         }
-        Status = Image->Image.Screen->Blt (
-                                        Image->Image.Screen,
-                                        BltBuffer,
-                                        EfiBltBufferToVideo,
-                                        0,
-                                        0,
-                                        BltX,
-                                        BltY,
-                                        RowInfo[RowIndex].LineWidth,
-                                        RowInfo[RowIndex].LineHeight,
-                                        0
-                                        );
-        if (EFI_ERROR (Status)) {
-          FreePool (BltBuffer);
-          goto Exit;
-        }
+      }
+      //
+      // Recalculate the start point of X/Y axis to draw multi-lines with the order of top-to-down
+      //
+      if (RowIndex != 0) {
+        BltX = 0;
+        BltY += RowInfo[RowIndex].LineHeight;
+      }
 
+      Status = Image->Image.Screen->Blt (
+                                      Image->Image.Screen,
+                                      BltBuffer,
+                                      EfiBltBufferToVideo,
+                                      0,
+                                      0,
+                                      BltX,
+                                      BltY,
+                                      RowInfo[RowIndex].LineWidth,
+                                      RowInfo[RowIndex].LineHeight,
+                                      0
+                                      );
+      if (EFI_ERROR (Status)) {
         FreePool (BltBuffer);
+        goto Exit;
+      }
 
-      } else {
-        for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
+      FreePool (BltBuffer);
+
+    } else {
+      for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
+        if (GlyphBuf[Index1] != NULL) {
+          //
+          // Only BLT these character which have corrsponding glyph in font basebase.
+          //
           GlyphToImage (
             GlyphBuf[Index1],
             Foreground,
@@ -1899,87 +1948,55 @@ HiiStringToImage (
             &Cell[Index1],
             Attributes[Index1],
             &BufferPtr
-            );
-          if (ColumnInfoArray != NULL) {
-            if (Index1 == RowInfo[RowIndex].StartIndex) {
-              *ColumnInfoArray = 0;
-            } else {
-              *ColumnInfoArray = Cell[Index1 -1].AdvanceX;
-            }
-            ColumnInfoArray++;
-          }
+          );
         }
-        //
-        // Jump to next row
-        //
-        BufferPtr += BltX + Image->Width * (LineHeight - 1);
+        if (ColumnInfoArray != NULL) {
+          if (GlyphBuf[Index1] == NULL) {
+            *ColumnInfoArray = 0;
+          } else {
+            *ColumnInfoArray = Cell[Index1 -1].AdvanceX;
+          }
+          ColumnInfoArray++;
+        }
       }
-
-      Index++;
-      RowIndex++;
-
+      //
+      // Jump to next row
+      //
+      BufferPtr += BltX + Image->Width * (LineHeight - 1);
     }
 
-    //
-    // Write output parameters.
-    //
-    RowInfoSize = RowIndex * sizeof (EFI_HII_ROW_INFO);
-    if (RowInfoArray != NULL) {
-      *RowInfoArray = AllocateZeroPool (RowInfoSize);
-      if (*RowInfoArray == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Exit;
-      }
-      CopyMem (*RowInfoArray, RowInfo, RowInfoSize);
-    }
-    if (RowInfoArraySize != NULL) {
-      *RowInfoArraySize = RowIndex;
-    }
+    Index++;
+    RowIndex++;
 
-  } else {
-    //
-    // Create a new bitmap and draw the string onto this image.
-    //
-    Image = AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
-    if (Image == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+    if (Flags & EFI_HII_IGNORE_LINE_BREAK) {
+      //
+      // If setting IGNORE_LINE_BREAK attribute, only render one line to image
+      //
+      break;
     }
-    Image->Width  = 800;
-    Image->Height = 600;
-    Image->Image.Bitmap = AllocateZeroPool (Image->Width * Image->Height *sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-    if (Image->Image.Bitmap == NULL) {
-      FreePool (Image);
-      return EFI_OUT_OF_RESOURCES;
-    }
+  }
 
-    //
-    // Other flags are not permitted when Blt is NULL.
-    //
-    Flags &= EFI_HII_OUT_FLAG_WRAP | EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_IGNORE_LINE_BREAK;
-    Status = HiiStringToImage (
-               This,
-               Flags,
-               String,
-               StringInfo,
-               &Image,
-               BltX,
-               BltY,
-               RowInfoArray,
-               RowInfoArraySize,
-               ColumnInfoArray
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
+  //
+  // Write output parameters.
+  //
+  RowInfoSize = RowIndex * sizeof (EFI_HII_ROW_INFO);
+  if (RowInfoArray != NULL) {
+    *RowInfoArray = AllocateZeroPool (RowInfoSize);
+    if (*RowInfoArray == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
     }
-
-    *Blt = Image;
+    CopyMem (*RowInfoArray, RowInfo, RowInfoSize);
+  }
+  if (RowInfoArraySize != NULL) {
+    *RowInfoArraySize = RowIndex;
   }
 
   Status = EFI_SUCCESS;
 
 Exit:
 
-  for (Index = 0; Index < MAX_STRING_LENGTH; Index++) {
+  for (Index = 0; Index < StrLength; Index++) {
     if (GlyphBuf[Index] != NULL) {
       FreePool (GlyphBuf[Index]);
     }
