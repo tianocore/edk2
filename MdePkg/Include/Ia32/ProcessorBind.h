@@ -333,7 +333,7 @@ typedef INT32   INTN;
 #endif
 
 //
-// For symbol name in GNU assembly code, an extra "_" is necessary
+// Macros for GNU assembly code
 //
 #if defined(__GNUC__)
   #if defined(linux)
@@ -341,11 +341,11 @@ typedef INT32   INTN;
   #else
     #define ASM_PFX(name) _##name
   #endif 
-  #if defined(__APPLE__)
-    #define ASM_GLOBAL .globl
-  #else
-    #define ASM_GLOBAL .global
-  #endif 
+  ///
+  /// For GNU assembly code, .global or .globl can declare global symbols.
+  /// Define this macro to unify the usage.
+  ///
+  #define ASM_GLOBAL .globl
 #endif
 
 /**
