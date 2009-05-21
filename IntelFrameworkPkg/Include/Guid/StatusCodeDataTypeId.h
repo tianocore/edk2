@@ -96,11 +96,24 @@ typedef struct {
 } EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA;
 
 ///
-/// Voltage Extended Error Data
+/// This structure provides the voltage at the time of error. It also provides 
+/// the threshold value indicating the minimum or maximum voltage that is considered 
+/// an error. If the voltage is less then the threshold, the error indicates that the 
+/// voltage fell below the minimum acceptable value. If the voltage is greater then the threshold, 
+/// the error indicates that the voltage rose above the maximum acceptable value.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data.  
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The voltage value at the time of the error.
+  ///
   EFI_EXP_BASE10_DATA   Voltage;
+  ///
+  /// The voltage threshold.
+  ///
   EFI_EXP_BASE10_DATA   Threshold;
 } EFI_COMPUTING_UNIT_VOLTAGE_ERROR_DATA;
 
@@ -108,37 +121,78 @@ typedef struct {
 /// Microcode Update Extended Error Data
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The version of the microcode update from the header.
+  ///
   UINT32                Version;
 } EFI_COMPUTING_UNIT_MICROCODE_UPDATE_ERROR_DATA;
 
 ///
 /// Asynchronous Timer Extended Error Data
+/// The timer limit provides the timeout value of the timer prior to expiration.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The number of seconds that the computing unit timer was configured to expire.
+  ///
   EFI_EXP_BASE10_DATA   TimerLimit;
 } EFI_COMPUTING_UNIT_TIMER_EXPIRED_ERROR_DATA;
 
 ///
 /// Host Processor Mismatch Extended Error Data
+/// This provides information to indicate which processors mismatch, and how they mismatch. The 
+/// status code contains the instance number of the processor that is in error. This structure's 
+/// Instance indicates the second processor that does not match. This differentiation allows the 
+/// consumer to determine which two processors do not match. The Attributes indicate what 
+/// mismatch is being reported. Because Attributes is a bit field, more than one mismatch can be 
+/// reported with one error code.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The unit number of the computing unit that does not match.
+  ///  
   UINT32                Instance;
+  /// 
+  /// The attributes describing the failure. 
+  ///  
   UINT16                Attributes;
 } EFI_HOST_PROCESSOR_MISMATCH_ERROR_DATA;
 
 ///
 /// Thermal Extended Error Data
+/// This structure provides the temperature at the time of error. It also provides the threshold value 
+/// indicating the minimum temperature that is considered an error.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The thermal value at the time of the error.
+  ///
   EFI_EXP_BASE10_DATA   Temperature;
+  ///
+  /// The thermal threshold.
+  ///
   EFI_EXP_BASE10_DATA   Threshold;
 } EFI_COMPUTING_UNIT_THERMAL_ERROR_DATA;
 
-
+//
+// Valid cache types
+//
 typedef enum {
   EfiInitCacheDataOnly,
   EfiInitCacheInstrOnly,
@@ -157,10 +211,24 @@ typedef struct {
 
 ///
 /// Processor Disabled Extended Error Data
+/// This structure provides details as to why and how the computing unit was disabled. The causes 
+/// should cover the typical reasons a processor would be disabled. How the processor was disabled is 
+/// important because there are distinct differences between hardware and software disabling.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The reason for disabling the processor. 
+  /// 
   UINT32                Cause;
+  ///
+  /// TRUE if the processor is disabled via software means such as not listing it in the ACPI tables. 
+  /// Such a processor will respond to Interprocessor Interrupts (IPIs). FALSE if the processor is hardware 
+  /// disabled, which means it is invisible to software and will not respond to IPIs.
+  ///
   BOOLEAN               SoftwareDisabled;
 } EFI_COMPUTING_UNIT_CPU_DISABLED_ERROR_DATA;
 
@@ -174,45 +242,114 @@ typedef UINT8 EFI_MEMORY_ERROR_OPERATION;
 ///
 typedef UINT8 EFI_MEMORY_ERROR_GRANULARITY;
 
+///
+/// This structure provides specific details about the memory error that was detected. It provides 
+/// enough information so that consumers can identify the exact failure and provides enough 
+/// information to enable corrective action if necessary.
+///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA          DataHeader;
+  ///
+  /// The error granularity type.
+  ///
   EFI_MEMORY_ERROR_GRANULARITY  Granularity;
+  ///
+  /// The operation that resulted in the error being detected. 
+  ///
   EFI_MEMORY_ERROR_OPERATION    Operation;
+  ///
+  /// The error syndrome, vendor-specific ECC syndrome, or CRC data associated with 
+  /// the error.  If unknown, should be initialized to 0.
+  ///
   UINTN                         Syndrome;
+  ///
+  /// The physical address of the error. 
+  ///
   EFI_PHYSICAL_ADDRESS          Address;
+  ///
+  /// The range, in bytes, within which the error address can be determined.
+  ///
   UINTN                         Resolution;
 } EFI_MEMORY_EXTENDED_ERROR_DATA;
 
+///
+/// This extended data provides some context that consumers can use to locate a DIMM within the 
+/// overall memory scheme.  
+///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The memory array number.
+  ///
   UINT16                Array;
+  ///
+  /// The device number within that Array.
+  ///
   UINT16                Device;
 } EFI_STATUS_CODE_DIMM_NUMBER;
 
 ///
 /// Memory Module Mismatch Extended Error Data
-///
+/// 
 typedef struct {
+  ///
+  /// The data header identifying the data.
+  ///
   EFI_STATUS_CODE_DATA        DataHeader;
+  ///
+  /// The instance number of the memory module that does not match. 
+  ///
   EFI_STATUS_CODE_DIMM_NUMBER Instance;
 } EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA;
 
 ///
 /// Memory Range Extended Data
+/// This extended data may be used to convey the specifics of a memory range.  Ranges are specified 
+/// with a start address and a length.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data. 
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The starting address of the memory range. 
+  ///
   EFI_PHYSICAL_ADDRESS  Start;
+  ///
+  /// The length in bytes of the memory range.
+  ///
   EFI_PHYSICAL_ADDRESS  Length;
 } EFI_MEMORY_RANGE_EXTENDED_DATA;
 
 ///
 /// Extended Error Data for Assert
+/// The data indicates the location of the assertion that failed in the source code.  This information 
+/// includes the file name and line number that are necessary to find the failing assertion in source code.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data.
+  /// 
   EFI_STATUS_CODE_DATA        DataHeader;
+  ///
+  /// The line number of the source file where the fault was generated.
+  ///
   UINT32                      LineNumber;
+  ///
+  /// The size in bytes of FileName.
+  ///
   UINT32                      FileNameSize;
+  ///
+  /// A pointer to a NULL-terminated ASCII or Unicode string that represents the file 
+  /// name of the source file where the fault was generated. 
+  ///
   EFI_STATUS_CODE_STRING_DATA *FileName;
 } EFI_DEBUG_ASSERT_DATA;
 
@@ -225,25 +362,71 @@ typedef union {
   EFI_SYSTEM_CONTEXT_IPF  SystemContextIpf;
 } EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT;
 
+///
+/// This extended data allows the processor context that is present at the time of the exception to be 
+/// reported with the exception. The format and contents of the context data varies depending on the 
+/// processor architecture. 
+///
 typedef struct {
+  ///
+  /// The data header identifying the data.  
+  ///
   EFI_STATUS_CODE_DATA                  DataHeader;
+  ///
+  /// The system context. 
+  ///
   EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT  Context;
 } EFI_STATUS_CODE_EXCEP_EXTENDED_DATA;
 
+///
+/// This extended data records information about a Start() function call. Start() is a member of 
+/// the EFI 1.10 Driver Binding Protocol.
+///
 typedef struct {
+  /// 
+  /// The data header identifying the data.  
+  ///
   EFI_STATUS_CODE_DATA           DataHeader;
+  ///
+  /// The controller handle. 
+  ///
   EFI_HANDLE                     ControllerHandle;
+  ///
+  /// The driver binding handle.
+  ///
   EFI_HANDLE                     DriverBindingHandle;
+  /// 
+  /// The size of the RemainingDevicePath. It is zero if the Start() function is 
+  /// called with RemainingDevicePath = NULL. 
+  ///
   UINT16                         DevicePathSize;
+  ///
+  /// Matches the RemainingDevicePath parameter being passed to the Start() 
+  /// function. Note that this parameter is the variable-length device path and not a pointer 
+  /// to the device path.
+  ///  
   UINT8                          *RemainingDevicePath;
 } EFI_STATUS_CODE_START_EXTENDED_DATA;
 
 ///
 /// Legacy Oprom extended data
+/// The device handle and ROM image base can be used by consumers to determine which option 
+/// ROM failed. Due to the black-box nature of legacy option ROMs, the amount of information that 
+/// can be obtained may be limited.
 ///
 typedef struct {
+  ///
+  /// The data header identifying the data.
+  ///
   EFI_STATUS_CODE_DATA  DataHeader;
+  ///
+  /// The handle corresponding to the device that this legacy option ROM is being invoked.
+  ///
   EFI_HANDLE            DeviceHandle;
+  ///
+  /// The base address of the shadowed legacy ROM image.  
+  /// May or may not point to the shadow RAM area. 
+  ///
   EFI_PHYSICAL_ADDRESS  RomImageBase;
 } EFI_LEGACY_OPROM_EXTENDED_DATA;
 
