@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _BDS_MODULE_H_
 
 #include <PiDxe.h>
-
+#include <IndustryStandard/PeImage.h>
 #include <Guid/MdeModuleHii.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Protocol/DevicePath.h>
