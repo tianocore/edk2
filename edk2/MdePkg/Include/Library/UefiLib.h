@@ -1077,10 +1077,12 @@ AsciiErrorPrint (
   Unicode characters displayed, not including partial characters that may be clipped 
   by the right edge of the display.  If the length of the formatted Unicode string is
   greater than PcdUefiLibMaxPrintBufferSize, then at most the first 
-  PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
-  is used to convert the string to a bitmap using the glyphs registered with the 
-  HII database.  No wrapping is performed, so any portions of the string the fall
-  outside the active display region will not be displayed.
+  PcdUefiLibMaxPrintBufferSize characters are printed.The EFI_HII_FONT_PROTOCOL
+  StringToImage() service is used to convert the string to a bitmap using the glyphs 
+  registered with the HII database. No wrapping is performed, so any portions of the 
+  string the fall outside the active display region will not be displayed. Please see 
+  Section 27.2.6 of the UEFI Specification for a description of the supported string
+  format including the set of control codes supported by the StringToImage() service.
 
   If a graphics console device is not associated with the ConsoleOutputHandle 
   defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
@@ -1127,10 +1129,12 @@ PrintXY (
   ASCII characters displayed, not including partial characters that may be clipped 
   by the right edge of the display.  If the length of the formatted ASCII string is
   greater than PcdUefiLibMaxPrintBufferSize, then at most the first 
-  PcdUefiLibMaxPrintBufferSize characters are printed.  The EFI_HII_FONT_PROTOCOL
-  is used to convert the string to a bitmap using the glyphs registered with the 
-  HII database.  No wrapping is performed, so any portions of the string the fall
-  outside the active display region will not be displayed.
+  PcdUefiLibMaxPrintBufferSize characters are printed.The EFI_HII_FONT_PROTOCOL
+  StringToImage() service is used to convert the string to a bitmap using the glyphs 
+  registered with the HII database. No wrapping is performed, so any portions of the 
+  string the fall outside the active display region will not be displayed. Please see 
+  Section 27.2.6 of the UEFI Specification for a description of the supported string
+  format including the set of control codes supported by the StringToImage() service.
 
   If a graphics console device is not associated with the ConsoleOutputHandle 
   defined in the EFI_SYSTEM_TABLE then no string is printed, and 0 is returned.
