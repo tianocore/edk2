@@ -15,10 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _GENERIC_BDS_LIB_H_
 #define _GENERIC_BDS_LIB_H_
 
-#include <Protocol/HiiDatabase.h>
-#include <IndustryStandard/PeImage.h>
-
-
 extern EFI_HANDLE mBdsImageHandle;
 
 //
@@ -770,29 +766,6 @@ VOID
 EFIAPI
 SetupResetReminder (
   VOID
-  );
-
-
-/**
-  Get the headers (dos, image, optional header) from an image
-
-  @param  Device                SimpleFileSystem device handle
-  @param  FileName              File name for the image
-  @param  DosHeader             Pointer to dos header
-  @param  Hdr                   The buffer in which to return the PE32, PE32+, or TE header.
-
-  @retval EFI_SUCCESS           Successfully get the machine type.
-  @retval EFI_NOT_FOUND         The file is not found.
-  @retval EFI_LOAD_ERROR        File is not a valid image file.
-
-**/
-EFI_STATUS
-EFIAPI
-BdsLibGetImageHeader (
-  IN  EFI_HANDLE                  Device,
-  IN  CHAR16                      *FileName,
-  OUT EFI_IMAGE_DOS_HEADER        *DosHeader,
-  OUT EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr
   );
 
 //
