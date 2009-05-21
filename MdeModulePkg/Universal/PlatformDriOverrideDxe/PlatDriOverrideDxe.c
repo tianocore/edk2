@@ -1218,11 +1218,15 @@ PlatOverMngrRouteConfig (
   if (!HiiIsConfigHdrMatch (Configuration, &mPlatformOverridesManagerGuid, mVariableName)) {
     return EFI_NOT_FOUND;
   }
-
+  
+  *Progress = Configuration + StrLen (Configuration);
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
   if (!HiiGetBrowserData (&mPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
-    return EFI_NOT_FOUND;
+    //
+    // FakeNvData can't be got from SetupBrowser, which doesn't need to be set.
+    //
+    return EFI_SUCCESS;
   }
 
   if (mCurrentPage == FORM_ID_DRIVER) {
@@ -1242,7 +1246,6 @@ PlatOverMngrRouteConfig (
     CommintChanges (Private, KeyValue, FakeNvData);
   }
 
-  *Progress = Configuration + StrLen (Configuration);
   return EFI_SUCCESS;
 }
 
