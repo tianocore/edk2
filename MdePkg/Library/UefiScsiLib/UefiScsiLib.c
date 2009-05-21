@@ -14,6 +14,7 @@
 
 
 #include <Uefi.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiScsiLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -143,7 +144,7 @@ ScsiTestUnitReadyCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_TEST_UNIT_READY;
-  Cdb[1]                        = (UINT8) ((Lun << 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   CommandPacket.CdbLength       = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
   CommandPacket.SenseDataLength = *SenseDataLength;
 
@@ -276,7 +277,7 @@ ScsiInquiryCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]  = EFI_SCSI_OP_INQUIRY;
-  Cdb[1]  = (UINT8) ((Lun << 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  Cdb[1]  = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   if (EnableVitalProductData) {
     Cdb[1] |= 0x01;
   }
@@ -428,7 +429,7 @@ ScsiModeSense10Command (
   //
   // DBDField is in Cdb[1] bit3 of (bit7..0)
   //
-  Cdb[1]                        = (UINT8) (((Lun << 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK) + ((DBDField << 3) & 0x08));
+  Cdb[1]                        = (UINT8) ((LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK) + ((DBDField << 3) & 0x08));
   //
   // PageControl is in Cdb[2] bit7..6, PageCode is in Cdb[2] bit5..0
   //
@@ -516,7 +517,7 @@ ScsiRequestSenseCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_REQUEST_SENSE;
-  Cdb[1]                        = (UINT8) ((Lun << 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[4]                        = (UINT8) (*SenseDataLength);
 
   CommandPacket.CdbLength       = (UINT8) EFI_SCSI_OP_LENGTH_SIX;
@@ -610,7 +611,7 @@ ScsiReadCapacityCommand (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]  = EFI_SCSI_OP_READ_CAPACITY;
-  Cdb[1]  = (UINT8) ((Lun << 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  Cdb[1]  = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   if (!Pmi) {
     //
     // Partial medium indicator,if Pmi is FALSE, the Cdb.2 ~ Cdb.5 MUST BE ZERO.
@@ -812,7 +813,7 @@ ScsiRead10Command (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_READ10;
-  Cdb[1]                        = (UINT8) ((Lun << 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[2]                        = (UINT8) (StartLba >> 24);
   Cdb[3]                        = (UINT8) (StartLba >> 16);
   Cdb[4]                        = (UINT8) (StartLba >> 8);
@@ -914,7 +915,7 @@ ScsiWrite10Command (
   ScsiIo->GetDeviceLocation (ScsiIo, &Target, &Lun);
 
   Cdb[0]                        = EFI_SCSI_OP_WRITE10;
-  Cdb[1]                        = (UINT8) ((Lun << 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
+  Cdb[1]                        = (UINT8) (LShiftU64 (Lun, 5) & EFI_SCSI_LOGICAL_UNIT_NUMBER_MASK);
   Cdb[2]                        = (UINT8) (StartLba >> 24);
   Cdb[3]                        = (UINT8) (StartLba >> 16);
   Cdb[4]                        = (UINT8) (StartLba >> 8);
