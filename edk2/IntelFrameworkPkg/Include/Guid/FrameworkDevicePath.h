@@ -1,6 +1,6 @@
 /** @file
   This GUID is used to define a vendor specific device path being owned by the
-  Framework specificaitons.
+  Framework specifications.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

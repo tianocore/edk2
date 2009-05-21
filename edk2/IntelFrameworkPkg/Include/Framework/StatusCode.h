@@ -26,6 +26,7 @@
   Module Name:  StatusCode.h
 
   @par Revision Reference:
+  Intel Platform Innovation Framework for EFI Status Codes Specification
   Version 0.92.
 
 **/
