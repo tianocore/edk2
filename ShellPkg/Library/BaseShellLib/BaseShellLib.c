@@ -1839,7 +1839,7 @@ ShellCommandLineGetFlag (
   //
   // enumerate through the list of parametrs
   //
-  for (Node = GetFirstNode(CheckPackage) ; Node != CheckPackage ; Node = GetNextNode(CheckPackage, Node) ) {
+  for (Node = GetFirstNode(CheckPackage) ; !IsNull (CheckPackage, Node) ; Node = GetNextNode(CheckPackage, Node) ) {
     //
     // If the Name matches, return TRUE (and there may be NULL name)
     //
@@ -1883,7 +1883,7 @@ ShellCommandLineGetValue (
   //
   // enumerate through the list of parametrs
   //
-  for (Node = GetFirstNode(CheckPackage) ; Node != NULL ; Node = GetNextNode(CheckPackage, Node) ) {
+  for (Node = GetFirstNode(CheckPackage) ; !IsNull (CheckPackage, Node) ; Node = GetNextNode(CheckPackage, Node) ) {
     //
     // If the Name matches, return the value (name can be NULL)
     //
@@ -1927,7 +1927,7 @@ ShellCommandLineGetRawValue (
   //
   // enumerate through the list of parametrs
   //
-  for (Node = GetFirstNode(CheckPackage) ; Node != NULL ; Node = GetNextNode(CheckPackage, Node) ) {
+  for (Node = GetFirstNode(CheckPackage) ; !IsNull (CheckPackage, Node) ; Node = GetNextNode(CheckPackage, Node) ) {
     //
     // If the position matches, return the value
     //
