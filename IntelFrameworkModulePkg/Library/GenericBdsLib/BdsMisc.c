@@ -795,7 +795,7 @@ BdsLibOutputStrings (
     // If String is NULL, then it's the end of the list
     //
     String = VA_ARG (Args, CHAR16 *);
-    if (String != NULL) {
+    if (String == NULL) {
       break;
     }
 
