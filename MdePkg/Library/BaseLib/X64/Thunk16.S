@@ -267,7 +267,7 @@ ASM_PFX(InternalAsmThunk16):
     sgdt    0x60(%rsp)                  # save GDT stack in argument space
     movzwq  0x60(%rsp), %r10            # r10 <- GDT limit 
     lea     ((ASM_PFX(InternalAsmThunk16) - SavedCr4) + 0xf)(%rcx), %r11 
-    andl    $0xfffffff0, r11            # r11 <- 16-byte aligned shadowed GDT table in real mode buffer      
+    andq    $0xfffffff0, %r11            # r11 <- 16-byte aligned shadowed GDT table in real mode buffer      
     
     movw    %r10w, (SavedGdt - SavedCr4)(%rcx)       # save the limit of shadowed GDT table
     movq    %r11, (SavedGdt - SavedCr4 + 0x2)(%rcx)  # save the base address of shadowed GDT table
