@@ -464,7 +464,9 @@ InternalPrintGraphic (
     //
     Status = HiiFont->StringToImage (
                          HiiFont,
-                         EFI_HII_IGNORE_IF_NO_GLYPH,
+                         EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_OUT_FLAG_CLIP |
+                         EFI_HII_OUT_FLAG_CLIP_CLEAN_X | EFI_HII_OUT_FLAG_CLIP_CLEAN_Y |
+                         EFI_HII_IGNORE_LINE_BREAK,
                          Buffer,
                          &FontInfo,
                          &Blt,
