@@ -264,7 +264,23 @@ ASM_PFX(InternalAsmThunk16):
     shll    $12,%eax                    # segment address in high order 16 bits
     lea     (_BackFromUserCode - ASM_PFX(m16Start))(%rdx), %ax
     stosl                               # [edi] <- return address of user code
-    sgdt    (SavedGdt - SavedCr4)(%rcx) 
+    sgdt    0x60(%rsp)                  # save GDT stack in argument space
+    movzwq  0x60(%rsp), %r10            # r10 <- GDT limit 
+    lea     ((ASM_PFX(InternalAsmThunk16) - SavedCr4) + 0xf)(%rcx), %r11 
+    andl    $0xfffffff0, r11            # r11 <- 16-byte aligned shadowed GDT table in real mode buffer      
+    
+    movw    %r10w, (SavedGdt - SavedCr4)(%rcx)       # save the limit of shadowed GDT table
+    movq    %r11, (SavedGdt - SavedCr4 + 0x2)(%rcx)  # save the base address of shadowed GDT table
+    
+    movq    0x62(%rsp) ,%rsi            # rsi <- the original GDT base address
+    xchg   %r10, %rcx                   # save rcx to r10 and initialize rcx to be the limit of GDT table 
+    incq   %rcx                         # rcx <- the size of memory to copy
+    xchg   %r11, %rdi                   # save rdi to r11 and initialize rdi to the base address of shadowed GDT table
+    rep
+    movsb                               # perform memory copy to shadow GDT table
+    movq   %r10, %rcx                   # restore the orignal rcx before memory copy
+    movq   %r11, %rdi                   # restore the original rdi before memory copy
+       
     sidt    0x50(%rsp)
     movq    %cr0, %rax
     movl    %eax, (SavedCr0 - SavedCr4)(%rcx)
@@ -288,7 +304,8 @@ ASM_PFX(InternalAsmThunk16):
     .byte   _EntryPoint - SavedCr4
 L_RetFromRealMode: 
     popfq
-    lidt    0x50(%rsp)
+    lgdt    0x60(%rsp)                  # restore protected mode GDTR
+    lidt    0x50(%rsp)                  # restore protected mode IDTR
     lea     -IA32_REGS_SIZE(%rbp), %eax
     .byte 0x0f, 0xa9                    # pop gs
     .byte 0x0f, 0xa1                    # pop fs
