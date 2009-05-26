@@ -258,7 +258,23 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     shl     eax, 12                     ; segment address in high order 16 bits
     lea     ax, [rdx + (_BackFromUserCode - m16Start)]  ; offset address
     stosd                               ; [edi] <- return address of user code
-    sgdt    fword ptr [rcx + (SavedGdt - SavedCr4)]
+  
+    sgdt    fword ptr [rsp + 60h]       ; save GDT stack in argument space
+    movzx   r10, word ptr [rsp + 60h]   ; r10 <- GDT limit 
+    lea     r11, [rcx + (InternalAsmThunk16 - SavedCr4) + 0xf]
+    and     r11, 0xfffffff0             ; r11 <- 16-byte aligned shadowed GDT table in real mode buffer
+    
+    mov     word ptr [rcx + (SavedGdt - SavedCr4)], r10w      ; save the limit of shadowed GDT table
+    mov     qword ptr [rcx + (SavedGdt - SavedCr4) + 2], r11  ; save the base address of shadowed GDT table
+    
+    mov     rsi, qword ptr [rsp + 62h]  ; rsi <- the original GDT base address
+    xchg    rcx, r10                    ; save rcx to r10 and initialize rcx to be the limit of GDT table
+    inc     rcx                         ; rcx <- the size of memory to copy
+    xchg    rdi, r11                    ; save rdi to r11 and initialize rdi to the base address of shadowed GDT table
+    rep     movsb                       ; perform memory copy to shadow GDT table
+    mov     rcx, r10                    ; restore the orignal rcx before memory copy
+    mov     rdi, r11                    ; restore the original rdi before memory copy
+    
     sidt    fword ptr [rsp + 50h]       ; save IDT stack in argument space
     mov     rax, cr0
     mov     [rcx + (SavedCr0 - SavedCr4)], eax
@@ -281,6 +297,7 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     jmp     fword ptr [rcx + (_EntryPoint - SavedCr4)]
 @RetFromRealMode:
     popfq
+    lgdt    fword ptr [rsp + 60h]       ; restore protected mode GDTR
     lidt    fword ptr [rsp + 50h]       ; restore protected mode IDTR
     lea     eax, [rbp - sizeof (IA32_REGS)]
     pop     gs
