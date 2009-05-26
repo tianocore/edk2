@@ -147,7 +147,7 @@ GetDevicePath (
   //
   DevicePath  = (EFI_DEVICE_PATH_PROTOCOL *) DevicePathBuffer;
   while (!IsDevicePathEnd (DevicePath)) {
-    if ((DevicePath->Type == 0) || (DevicePath->SubType == 0) || (DevicePathNodeLength (DevicePath) > sizeof (EFI_DEV_PATH))) {
+    if ((DevicePath->Type == 0) || (DevicePath->SubType == 0) || (DevicePathNodeLength (DevicePath) < sizeof (EFI_DEVICE_PATH_PROTOCOL))) {
       //
       // Invalid device path
       //
