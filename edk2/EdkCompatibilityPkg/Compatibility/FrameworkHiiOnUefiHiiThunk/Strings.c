@@ -307,7 +307,6 @@ HiiThunkGetString (
 
   Private = HII_THUNK_PRIVATE_DATA_FROM_THIS(This);
 
-  Iso639AsciiLanguage = NULL;
   Rfc4646AsciiLanguage = NULL;
 
   if (LanguageString != NULL) {
@@ -322,6 +321,7 @@ HiiThunkGetString (
     // in Iso639. So map it to the Language Identifier defined in RFC4646.
     //
     Rfc4646AsciiLanguage = ConvertLanguagesIso639ToRfc4646 (Iso639AsciiLanguage);
+    FreePool (Iso639AsciiLanguage);
 
     //
     // If Rfc4646AsciiLanguage is NULL, more language mapping must be added to 
@@ -337,67 +337,56 @@ HiiThunkGetString (
     goto Done;
   }
 
-  if (Rfc4646AsciiLanguage == NULL) {
-    //
-    // Get the languages that the package specified by HiiHandle supports
-    //
-    SupportedLanguages = HiiGetSupportedLanguages (UefiHiiHandle);
-    if (SupportedLanguages == NULL) {
-      goto Error2;
-    }
-
-    //
-    // Get the current platform language setting
-    //
-    PlatformLanguage = GetEfiGlobalVariable (L"PlatformLang");
-    if (PlatformLanguage == NULL) {
-      goto Error1;
-    }
-
-    //
-    // Get the best matching language from SupportedLanguages
-    //
-    BestLanguage = GetBestLanguage (
-                     SupportedLanguages, 
-                     FALSE,                // RFC 4646 mode
-                     PlatformLanguage,     // Next highest priority
-                     SupportedLanguages,   // Lowest priority 
-                     NULL
-                     );
-    if (BestLanguage == NULL) {
-      FreePool (PlatformLanguage);
-Error1:
-      FreePool (SupportedLanguages);
-Error2:
-      Status = EFI_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    Status = mHiiStringProtocol->GetString (
-                                 mHiiStringProtocol,
-                                 BestLanguage,
-                                 UefiHiiHandle,
-                                 Token,
-                                 StringBuffer,
-                                 BufferLengthTemp,
-                                 NULL
-                                 );
-    FreePool (BestLanguage);
-  } else {
-    Status = mHiiStringProtocol->GetString (
-                                 mHiiStringProtocol,
-                                 Rfc4646AsciiLanguage,
-                                 UefiHiiHandle,
-                                 Token,
-                                 StringBuffer,
-                                 BufferLengthTemp,
-                                 NULL
-                                 );
+  //
+  // Get the languages that the package specified by HiiHandle supports
+  //
+  SupportedLanguages = HiiGetSupportedLanguages (UefiHiiHandle);
+  if (SupportedLanguages == NULL) {
+    goto Error2;
   }
 
+  //
+  // Get the current platform language setting
+  //
+  PlatformLanguage = GetEfiGlobalVariable (L"PlatformLang");
+  if (PlatformLanguage == NULL) {
+    goto Error1;
+  }
+
+  //
+  // Get the best matching language from SupportedLanguages
+  //
+  BestLanguage = GetBestLanguage (
+                   SupportedLanguages, 
+                   FALSE,                // RFC 4646 mode
+                   (Rfc4646AsciiLanguage != NULL) ? Rfc4646AsciiLanguage : "",
+                   PlatformLanguage,     // Next highest priority
+                   SupportedLanguages,   // Lowest priority 
+                   NULL
+                   );
+  if (BestLanguage == NULL) {
+    FreePool (PlatformLanguage);
+Error1:
+    FreePool (SupportedLanguages);
+Error2:
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  Status = mHiiStringProtocol->GetString (
+                               mHiiStringProtocol,
+                               BestLanguage,
+                               UefiHiiHandle,
+                               Token,
+                               StringBuffer,
+                               BufferLengthTemp,
+                               NULL
+                               );
+  FreePool (BestLanguage);
+
 Done:
-	if (Iso639AsciiLanguage != NULL) {
-    FreePool (Iso639AsciiLanguage);
+	if (Rfc4646AsciiLanguage != NULL) {
+    FreePool (Rfc4646AsciiLanguage);
   }
   
   return Status;
