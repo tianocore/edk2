@@ -480,7 +480,7 @@ InternalPrintGraphic (
     if (!EFI_ERROR (Status)) {
       ASSERT (RowInfoArray != NULL);
       //
-      // Line breaks are handled by caller of DrawUnicodeWeightAtCursorN, so the updated parameter RowInfoArraySize by StringToImage will
+      // Explicit Line break characters are ignored, so the updated parameter RowInfoArraySize by StringToImage will
       // always be 1 or 0 (if there is no valid Unicode Char can be printed). ASSERT here to make sure.
       //
       ASSERT (RowInfoArraySize <= 1);
