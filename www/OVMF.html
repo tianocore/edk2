@@ -1,278 +1,175 @@
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
-<style type="text/css">
-  <!--
-  .main-title, .main-details, .sub-heading {
-    font-size: 11pt;
-  }
-  
-  .main-details {
-    margin-top: 0.19in;
-    margin-bottom: 0.19in
-  }
-  
-  .main-title {
-    font-weight: bold;
-    margin-top: 0in;
-    margin-bottom: 0.08in;
-    border-bottom: thin solid black;
-  }
-
-  .sub-heading {
-    font-weight: bold;
-    text-decoration: underline;
-  }
-
-  .monospace {
-    font-family: "courier new", "courier", "monospace";
-  }
-
-  .q-and-a {
-    font-size: 12pt;
-    margin-left: 0.05in;
-  }
-
-  table.build-step-details td {
-    border-style: hidden;
-  }
-  
-  img.in-text {
-    vertical-align: top;
-  }
-  -->
-</style>
-
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css"> <!-- .main-title, .main-details, .sub-heading { font-size: 14pt; }
+	.main-details { margin-top: 0.19in; margin-bottom: 0.19in }
+	.main-title { font-weight: bold; margin-top: 0in; margin-bottom: 0.08in; border-bottom: thin solid black; }
+	.sub-heading { font-weight: bold; text-decoration: underline; }
+	.monospace { font-family: "courier", "courier new", "monospace"; }
+	.q-and-a { font-size: 12pt; margin-left: 0.05in; }
+	table.build-step-details td { border-style: hidden; }
+	img.in-text { vertical-align: top; }
+	--></style>
 <h2 class="main-title">
-  <b>Open Virtual Machine Firmware</b> (OVMF)
-</h2>
-
-<!--
- #
- # OVMF FAQ / Q&A
- #
--->
+	<b>Open Virtual Machine Firmware</b> (OVMF)
+</h2> <!-- # # OVMF FAQ / Q&A #-->
 <h2 class="sub-heading">
-  OVMF Questions and Answers:
+	OVMF Questions and Answers:
 </h2>
-
 <p class="q-and-a">
-  <b>Q: What is Open Virtual Machine Firmware (OVMF)?</b>
-</p>
-
-<p class="q-and-a">
-  <b>A</b>: OVMF is a project to enable support for UEFI
-  within Virtual Machines.
-  It is built upon the
-  <a href="https://edk2.tianocore.org">EDK II</a>
-  code base.
-</p>
-
-
-<p class="q-and-a">
-  <b>Q: What source code license does OVMF use?</b>
-</p>
-
-<p class="q-and-a">
-  <b>A</b>: OVMF follows the
-  <a href="https://edk2.tianocore.org">EDK II</a>
-  project in using the  open source
-  <a href="http://opensource.org/licenses/bsd-license.php">BSD license</a>.
-</p>
-
-<p class="q-and-a">
-  Note: A binary of the
-  <a href="https://fat-driver2.tianocore.org/">UEFI FAT</a>
-  driver may be included with OVMF builds,
-  and has a slightly modified BSD license.
-</p>
-
-
-<p class="q-and-a">
-  <b>Q: What does OVMF provide?</b>
-</p>
-
-<p class="q-and-a">
-  <b>A</b>:
-    <UL>
-      <LI> Libraries and drivers related to virtual machines
-      <LI> An entire firmware implementation with supports UEFI on open source virtual machines.
-    </UL>
-</p>
-
-<p class="q-and-a">
-  <b>Q: Are OVMF releases fully UEFI compliant?</b>
-</p>
-
-<p class="q-and-a">
-  <b>A</b>: While the goal is to be as fully UEFI compliant as
-  possible, you should not assume that an OVMF release is fully
-  UEFI compliant unless the particular release states full
-  compliance.
-</p>
-
-<p class="q-and-a">
-  For virtual machines, there are some challenging areas in
-  achieving full UEFI compliance.
-  For example, UEFI 'non-volatile'
-  variables may be difficult to fully support in some
-  virtual machine environments if a flash memory device is
-  not emulated.
-</p>
-
-<p class="q-and-a">
-  <b>Q: Does OVMF support legacy booting, legacy option ROMs, CSM?</b>
-</p>
-
-<p class="q-and-a">
-  <b>A</b>: No. While OVMF may have UEFI firmware drivers for some
-  legacy hardware, there is no planned legacy compatibility
-  for OVMF.
-</p>
-
-<p class="q-and-a">
-  One reason for this is that there is currently no open source
-  CSM module which could be used within OVMF.
-  Another reason is that we would like to use OVMF to help drive
-  out some legacy assumptions which might be made by software
-  layers above the system firmware.
-</p>
-
-<p class="q-and-a">
-  <b>Q: What quality level is the OVMF code? (Alpha, Beta, Production?)</b>
-</p>
-
-<p class="q-and-a">
-  <b>A</b>: The quality level of the OvmfPkg within the edk2
-  source code repository may change over time.
-  Therefore, the best way to determine the current quality
-  level of the source repository is to look at the README
-  document under the OvmfPkg source directory or ask the EDK II
-  dev email list.
-
-  Binary releases of OVMF may indicate a code quality level,
-  and should also indicate the versions of the source code
-  repositories used to produce that binary release.
-</p>
-
-<p class="q-and-a">
-  <b>Q: What virtual machines are supported by the OVMF firmware builds?</b>
-</p>
-
-<p class="q-and-a">
-  <b>A</b>: Hopefully this will improve over time, but initially the
-  QEMU virtual machine will be supported while emulating
-  a IA32 (x86) or X64 (x86-64) based system.
-  The README text file included under the OvmfPkg source tree
-  should contain the most up to date list of supported virtual
-  machine environments.
-  The README text file included with binary releases should
-  also document the supported virtual machine environments which
-  are supported for that release.
+	<b>Q: What is Open Virtual Machine Firmware (OVMF)?</b>
 </p>
 <p class="q-and-a">
-  <b>Q: Are only open source virtual machines supported?</b>
+	<b>A</b>: OVMF is a project to enable support for UEFI within Virtual Machines. 
+	It is built upon the <a href="https://edk2.tianocore.org">EDK II</a> code base.
 </p>
-
 <p class="q-and-a">
-  <b>A</b>: Certainly not.
-  We have chosen the BSD license to enable easy incorporation
-  of any of the piece of our code within nearly any type of product.
+	<b>Q: What source code license does OVMF use?</b>
 </p>
-
 <p class="q-and-a">
-  But, it is likely that the firmware images produced by OvmfPkg
-  under edk2 will only support open source virtual machines.
+	<b>A</b>: OVMF follows the <a href="https://edk2.tianocore.org">EDK II</a> project 
+	in using the open source <a href="http://opensource.org/licenses/bsd-license.php">BSD 
+		license</a>.
 </p>
-
 <p class="q-and-a">
-  <b>Q: How can I use OVMF with a VM?</b>
+	Note: A binary of the <a href="https://fat-driver2.tianocore.org/">UEFI FAT</a> 
+	driver may be included with OVMF builds, and has a slightly modified BSD 
+	license.
 </p>
-
 <p class="q-and-a">
-  <b>A</b>: Pre-built binaries of OVMF will be available under
-  the downloads area of the EDK II project.
-  The README file included in the download will explain how
-  to run the OVMF platform.
+	<b>Q: What does OVMF provide?</b>
 </p>
-
 <p class="q-and-a">
-  (Please note that there may be a small delay between the
-  initial announcement of the OVMF project, and the availability
-  of the first pre-built binaries.)
-</p>
-
+	<b>A</b>: OVMF provides the following:
+	<UL>
+		<LI>
+		Libraries and drivers related to virtual machines
+		<LI>
+			An entire firmware implementation with supports UEFI on open source virtual 
+			machines.</LI>
+	</UL>
+<P></P>
 <p class="q-and-a">
-  <b>Q: Where is the source code to OVMF?</b>
+	<b>Q: Are OVMF releases fully UEFI compliant?</b>
 </p>
-
 <p class="q-and-a">
-  <b>A</b>: The source code to OVMF is under the OvmfPkg directory
-  within the EDK II source repository.
+	<b>A</b>: While the goal is to be as fully UEFI compliant as possible, you 
+	should not assume that an OVMF release is fully UEFI compliant unless the 
+	particular release states full compliance.
 </p>
-
 <p class="q-and-a">
-  Changes to other EDK II packages (directories) will be driven
-  by the OVMF project as required.
+	For virtual machines, there are some challenging areas in achieving full UEFI 
+	compliance. For example, UEFI 'non-volatile' variables may be difficult to 
+	fully support in some virtual machine environments if a flash memory device is 
+	not emulated.
 </p>
-
 <p class="q-and-a">
-  <b>Q: Where can I find the current status and roadmap of OVMF?</b>
+	<b>Q: Does OVMF support legacy booting, legacy option ROMs, CSM?</b>
 </p>
-
 <p class="q-and-a">
-  <b>A</b>: Please look in the 'README' file under the OvmfPkg
-  source directory.
+	<b>A</b>: No. While OVMF may have UEFI firmware drivers for some legacy 
+	hardware, there is no planned legacy compatibility for OVMF.
 </p>
-
 <p class="q-and-a">
-  <b>Q: What build environments are supported by OVMF?</b>
+	One reason for this is that there is currently no open source CSM module which 
+	could be used within OVMF. Another reason is that we would like to use OVMF to 
+	help drive out some legacy assumptions which might be made by software layers 
+	above the system firmware.
 </p>
-
 <p class="q-and-a">
-  <b>A</b>: OVMF's goal is to support all the build environments
-  which the main EDK II project supports.
+	<b>Q: What quality level is the OVMF code? (Alpha, Beta, Production?)</b>
 </p>
-
 <p class="q-and-a">
-  This includes support for building under the Linux,
-  Mac OS X and Windows operating systems.
-  Toolchain support includes GCC,
-  Visual Studio (2003 or 2005), WINDDK,
-  ICC (Intel Compiler) and GCC under CYGWIN.
+	<b>A</b>: The quality level of the OvmfPkg within the edk2 source code 
+	repository may change over time. Therefore, the best way to determine the 
+	current quality level of the source repository is to look at the README 
+	document under the OvmfPkg source directory or ask the EDK II dev email list. 
+	Binary releases of OVMF may indicate a code quality level, and should also 
+	indicate the versions of the source code repositories used to produce that 
+	binary release.
 </p>
-
 <p class="q-and-a">
-  If you are new to UEFI development, this
-  <a href="step-by-step-instructions.html">document</a>
-  may help you get a build environment up and running.
+	<b>Q: What virtual machines are supported by the OVMF firmware builds?</b>
 </p>
-
 <p class="q-and-a">
-  OVMF will also require an ASL compiler to be installed on the system.
-  The Intel ASL compiler is compatible with many operating systems,
-  and is available from
-  <a href="http://www.acpica.org">http://www.acpica.org</a>.
+	<b>A</b>: Hopefully this will improve over time, but initially the QEMU virtual 
+	machine will be supported while emulating a IA32 (x86) or X64 (x86-64) based 
+	system. The README text file included under the OvmfPkg source tree should 
+	contain the most up to date list of supported virtual machine environments. The 
+	README text file included with binary releases should also document the 
+	supported virtual machine environments which are supported for that release.
 </p>
-
 <p class="q-and-a">
-  <b>Q: Where can I ask additional questions and discuss OVMF?</b>
+	<b>Q: Are only open source virtual machines supported?</b>
 </p>
-
 <p class="q-and-a">
-  <b>A</b>: Questions and discussion related to OVMF should be
-  directed to the
-  <a href="https://edk2.tianocore.org">EDK II</a>
-  dev email list.
+	<b>A</b>: Certainly not. We have chosen the BSD license to enable easy 
+	incorporation of any of the piece of our code within nearly any type of 
+	product.
 </p>
-
 <p class="q-and-a">
-  <b>Q: How can I contribute to OVMF?</b>
+	But, it is likely that the firmware images produced by OvmfPkg under edk2 will 
+	only support open source virtual machines.
 </p>
-
 <p class="q-and-a">
-  <b>A</b>: Please refer to
-  <a href="https://www.tianocore.org/ContributorsGettingStarted.html"
-  >https://www.tianocore.org/ContributorsGettingStarted.html</a>.
+	<b>Q: How can I use OVMF with a VM?</b>
 </p>
-
-
+<p class="q-and-a">
+	<b>A</b>: Pre-built binaries of OVMF will be available under the downloads area 
+	of the EDK II project. The README file included in the download will explain 
+	how to run the OVMF platform.
+</p>
+<p class="q-and-a">
+	(Please note that there may be a small delay between the initial announcement 
+	of the OVMF project, and the availability of the first pre-built binaries.)
+</p>
+<p class="q-and-a">
+	<b>Q: Where is the source code to OVMF?</b>
+</p>
+<p class="q-and-a">
+	<b>A</b>: The source code to OVMF is under the OvmfPkg directory within the EDK 
+	II source repository.
+</p>
+<p class="q-and-a">
+	Changes to other EDK II packages (directories) will be driven by the OVMF 
+	project as required.
+</p>
+<p class="q-and-a">
+	<b>Q: Where can I find the current status and roadmap of OVMF?</b>
+</p>
+<p class="q-and-a">
+	<b>A</b>: Please look in the 'README' file under the OvmfPkg source directory.
+</p>
+<p class="q-and-a">
+	<b>Q: What build environments are supported by OVMF?</b>
+</p>
+<p class="q-and-a">
+	<b>A</b>: OVMF's goal is to support all the build environments which the main 
+	EDK II project supports.
+</p>
+<p class="q-and-a">
+	This includes support for building under the Linux, Mac OS X and Windows 
+	operating systems. Toolchain support includes GCC, Visual Studio (2003 or 
+	2005), WINDDK, ICC (Intel Compiler) and GCC under CYGWIN.
+</p>
+<p class="q-and-a">
+	If you are new to UEFI development, this <a href="step-by-step-instructions.html">document</a>
+	may help you get a build environment up and running.
+</p>
+<p class="q-and-a">
+	OVMF will also require an ASL compiler to be installed on the system. The Intel 
+	ASL compiler is compatible with many operating systems, and is available from <a href="http://www.acpica.org">
+		http://www.acpica.org</a>.
+</p>
+<p class="q-and-a">
+	<b>Q: Where can I ask additional questions and discuss OVMF?</b>
+</p>
+<p class="q-and-a">
+	<b>A</b>: Questions and discussion related to OVMF should be directed to the <a href="https://edk2.tianocore.org">
+		EDK II</a> dev email list.
+</p>
+<p class="q-and-a">
+	<b>Q: How can I contribute to OVMF?</b>
+</p>
+<p class="q-and-a">
+	<b>A</b>: Please refer to <a href="https://www.tianocore.org/ContributorsGettingStarted.html">
+		https://www.tianocore.org/ContributorsGettingStarted.html</a>.
+</p>
