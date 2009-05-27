@@ -21,4 +21,6 @@
   PACKAGE_GUID                   = 2171df9b-0d39-45aa-ac37-2de190010d23
   PACKAGE_VERSION                = 0.1
 
+[Includes.common]
+  Include
 
