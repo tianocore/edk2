@@ -1,0 +1,34 @@
+#/** @file
+#  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
+#
+#  Copyright (c) 2006 - 2009, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+# 
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_VERSION                    = 0x00010005
+  PACKAGE_NAME                   = OvmfPkg
+  PACKAGE_GUID                   = 2daf5f34-50e5-4b9d-b8e3-5562334d87e5
+  PACKAGE_VERSION                = 0.1
+
+[Guids.common]
+  gUefiOvmfPkgTokenSpaceGuid      = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
+
+[PcdsFixedAtBuild.common]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase|0x0|UINT32|0x0000100e
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoveryBase|0x0|UINT32|0x00001010
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoverySize|0x0|UINT32|0x00001011
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|0x0|UINT32|0x00001012
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize|0|UINT32|0x00001013
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase|0x0|UINT32|0x00001014
+
+
