@@ -40,7 +40,7 @@ GetWorker (
 {
   UINT32              *LocalTokenNumberTable;
   EFI_GUID            *GuidTable;
-  UINT16              *StringTable;
+  UINT8               *StringTable;
   EFI_GUID            *Guid;
   UINT16              *Name;
   VARIABLE_HEAD       *VariableHead;
@@ -108,9 +108,9 @@ GetWorker (
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
                                     
   if (IsPeiDb) {
-    StringTable = (UINT16 *) (&mPcdDatabase->PeiDb.Init.StringTable[0]);
+    StringTable = (UINT8 *) (&mPcdDatabase->PeiDb.Init.StringTable[0]);
   } else {
-    StringTable = (UINT16 *) (&mPcdDatabase->DxeDb.Init.StringTable[0]);
+    StringTable = (UINT8 *) (&mPcdDatabase->DxeDb.Init.StringTable[0]);
   }
                                       
   
@@ -132,7 +132,7 @@ GetWorker (
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
       Guid = GuidTable + VariableHead->GuidTableIndex;
-      Name = StringTable + VariableHead->StringIndex;
+      Name = (UINT16*)(StringTable + VariableHead->StringIndex);
       VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
 
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
@@ -694,7 +694,7 @@ SetWorker (
   BOOLEAN             IsPeiDb;
   UINT32              LocalTokenNumber;
   EFI_GUID            *GuidTable;
-  UINT16              *StringTable;
+  UINT8               *StringTable;
   EFI_GUID            *Guid;
   UINT16              *Name;
   UINTN               VariableOffset;
@@ -770,9 +770,9 @@ SetWorker (
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
 
   if (IsPeiDb) {
-    StringTable = (UINT16 *) (&mPcdDatabase->PeiDb.Init.StringTable[0]);
+    StringTable = (UINT8 *) (&mPcdDatabase->PeiDb.Init.StringTable[0]);
   } else {
-    StringTable = (UINT16 *) (&mPcdDatabase->DxeDb.Init.StringTable[0]);
+    StringTable = (UINT8 *) (&mPcdDatabase->DxeDb.Init.StringTable[0]);
   }
 
   
@@ -786,7 +786,7 @@ SetWorker (
     
     case PCD_TYPE_STRING:
       if (SetPtrTypeSize (TmpTokenNumber, Size)) {
-        CopyMem (StringTable + *((UINT16 *)InternalData), Data, *Size);
+        CopyMem (StringTable + *((UINT8 *)InternalData), Data, *Size);
         Status = EFI_SUCCESS;
       } else {
         Status = EFI_INVALID_PARAMETER;
@@ -810,7 +810,7 @@ SetWorker (
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
       
       Guid = GuidTable + VariableHead->GuidTableIndex;
-      Name = StringTable + VariableHead->StringIndex;
+      Name = (UINT16*) (StringTable + VariableHead->StringIndex);
       VariableOffset = VariableHead->Offset;
 
       Status = SetHiiVariable (Guid, Name, Data, *Size, VariableOffset);
