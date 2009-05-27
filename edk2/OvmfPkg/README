@@ -1,0 +1,25 @@
+
+=== OVMF OVERVIEW ===
+
+The Open Virtual Machine Firmware (OVMF) project aims
+to support firmware for Virtual Machines using the edk2
+code base.  More information can be found at:
+
+  https://edk2.tianocore.org/OVMF.html
+
+=== STATUS ===
+
+Current status: Alpha
+
+Current capabilities:
+* IA32 and X64 architectures
+* QEMU (0.9.1 or later)
+  - Video, keyboard, IDE, CD-ROM, serial
+  - Runs UEFI shell
+* UEFI Linux has booted (but is not stable)
+
+=== FUTURE PLANS ===
+
+* Stabilize UEFI Linux boot
+* Test/Stabilize UEFI Self-Certification Tests (SCT) results
+

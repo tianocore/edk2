@@ -1,0 +1,52 @@
+/** @file
+  Platform PEI module include file.
+
+  Copyright (c) 2006 - 2007, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#ifndef _PLATFORM_PEI_H_INCLUDED_
+#define _PLATFORM_PEI_H_INCLUDED_
+
+VOID
+AddIoMemoryBaseSizeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  UINT64                      MemorySize
+  );
+
+VOID
+AddIoMemoryRangeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  );
+
+VOID
+AddMemoryBaseSizeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  UINT64                      MemorySize
+  );
+
+VOID
+AddMemoryRangeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  );
+
+EFI_STATUS
+MemDetect (
+  VOID
+  );
+
+EFI_STATUS
+PeiFvInitialization (
+  VOID
+  );
+
+#endif // _PLATFORM_PEI_H_INCLUDED_
