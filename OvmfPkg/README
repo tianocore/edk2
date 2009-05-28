@@ -23,3 +23,38 @@ Current capabilities:
 * Stabilize UEFI Linux boot
 * Test/Stabilize UEFI Self-Certification Tests (SCT) results
 
+=== BUILDING OVMF ===
+
+Pre-requisites:
+* Build environment capable of build the edk2 MdeModulePkg.
+* A properly configured ASL compiler
+  * Intel ASL compiler: Available from http://www.acpica.org
+      or
+  * Microsoft ASL compiler: Available from http://www.acpi.info
+
+Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
+                             PEI arch   DXE arch   UEFI interfaces
+* OvmfPkg/OvmfPkgIa32.dsc      IA32       IA32           IA32
+* OvmfPkg/OvmfPkgIa32X64.dsc   IA32       X64            X64
+* OvmfPkg/OvmfPkgX64.dsc       X64        X64            X64
+
+Following the edk2 build process, you will find OVMF.fd at:
+$WORKSPACE/Build/*/*/FV/OVMF.fd
+
+=== RUNNING OVMF on QEMU ===
+
+* QEMU 0.9.1 or later is required.
+* Either copy, rename or symlink OVMF.fd => bios.bin
+* Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
+  (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
+* Use the QEMU -L parameter to specify the directory where bios.bin
+  is located.
+* If QEMU returns an error about not finding a video bios, you can
+  try creating an empty copy of the video bios file, or copy the
+  video bios from QEMU's BIOS directory.
+* Optionally you can use the QEMU -serial command to capture the
+  OVMF debug messages.  For example: -serial file:serial.log
+* The EFI shell is built into OVMF builds at this time, so it should
+  run automatically if a UEFI boot application is not found on the
+  removable media.
+
