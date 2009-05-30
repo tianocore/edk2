@@ -186,7 +186,7 @@ DataHubStatusCodeReportWorker (
 {
   DATA_HUB_STATUS_CODE_DATA_RECORD  *Record;
   UINT32                            ErrorLevel;
-  VA_LIST                           Marker;
+  BASE_LIST                         Marker;
   CHAR8                             *Format;
   UINTN                             CharCount;
 
@@ -226,7 +226,7 @@ DataHubStatusCodeReportWorker (
 
   if (Data != NULL) {
     if (ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
-      CharCount = UnicodeVSPrintAsciiFormat (
+      CharCount = UnicodeBSPrintAsciiFormat (
                     (CHAR16 *) (Record + 1),
                     EFI_STATUS_CODE_DATA_MAX_SIZE,
                     Format,
