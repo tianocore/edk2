@@ -51,7 +51,7 @@ SerialStatusCodeReportWorker (
   UINT32          ErrorLevel;
   UINT32          LineNumber;
   UINTN           CharCount;
-  VA_LIST         Marker;
+  BASE_LIST       Marker;
 
   Buffer[0] = '\0';
 
@@ -73,7 +73,7 @@ SerialStatusCodeReportWorker (
     //
     // Print DEBUG() information into output buffer.
     //
-    CharCount = AsciiVSPrint (
+    CharCount = AsciiBSPrint (
                   Buffer,
                   EFI_STATUS_CODE_DATA_MAX_SIZE,
                   Format,

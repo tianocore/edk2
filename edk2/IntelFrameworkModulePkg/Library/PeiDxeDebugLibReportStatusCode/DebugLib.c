@@ -53,9 +53,11 @@ DebugPrint (
   UINT64          Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
   EFI_DEBUG_INFO  *DebugInfo;
   UINTN           TotalSize;
-  UINTN           Index;
-  VA_LIST         Marker;
-  UINT64          *ArgumentPointer;
+  VA_LIST         VaListMarker;
+  BASE_LIST       BaseListMarker;
+  CHAR8           *FormatString;
+  BOOLEAN         Long;
+  BOOLEAN         Done;
 
   //
   // If Format is NULL, then ASSERT().
@@ -69,27 +71,140 @@ DebugPrint (
     return;
   }
 
+  //
+  // Compute the total size of the record
+  //
   TotalSize = sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrLen (Format) + 1;
+
+  //
+  // If the TotalSize is larger than the maximum record size, then ASSERT()
+  //
+  ASSERT (TotalSize <= EFI_STATUS_CODE_DATA_MAX_SIZE);
+
+  //
+  // If the TotalSize is larger than the maximum record size, then return
+  //
   if (TotalSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
     return;
   }
 
   //
-  // Then EFI_DEBUG_INFO
+  // Fill in EFI_DEBUG_INFO
   //
-  DebugInfo = (EFI_DEBUG_INFO *)Buffer;
+  DebugInfo             = (EFI_DEBUG_INFO *)Buffer;
   DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
+  BaseListMarker        = (BASE_LIST)(DebugInfo + 1);
+  FormatString          = (UINT8 *)((UINT64 *)(DebugInfo + 1) + 12);
+
+  //
+  // Copy the Format string into the record
+  //
+  AsciiStrCpy (FormatString, Format);
 
   //
   // 256 byte mini Var Arg stack. That is followed by the format string.
   //
-  VA_START (Marker, Format);
-  for (Index = 0, ArgumentPointer = (UINT64 *)(DebugInfo + 1); Index < 12; Index++, ArgumentPointer++) {
-    WriteUnaligned64(ArgumentPointer, VA_ARG (Marker, UINT64));
-  }
-  VA_END (Marker);
-  AsciiStrCpy ((CHAR8 *)ArgumentPointer, Format);
+  VA_START (VaListMarker, Format);
+  for (; *Format != '\0'; Format++) {
+    if (*Format != '%') {
+      continue;
+    }
+    Long = FALSE;
+    //
+    // Parse Flags and Width
+    //
+    for (Done = FALSE; !Done; ) {
+      Format++;
+      switch (*Format) {
+      case '.': 
+      case '-': 
+      case '+': 
+      case ' ': 
+      case ',': 
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        break;
+      case 'L':
+      case 'l': 
+        Long = TRUE;
+        break;
+      case '*':
+        BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
+        break;
+      case '\0':
+        //
+        // Make no output if Format string terminates unexpectedly when
+        // looking up for flag, width, precision and type. 
+        //
+        Format--;
+        //
+        // break skipped on purpose.
+        //
+      default:
+        Done = TRUE;
+        break;
+      }
+    } 
+        
+    //
+    // Handle each argument type
+    //
+    switch (*Format) {
+    case 'p':
+      if (sizeof (VOID *) > 4) {
+        Long = TRUE;
+      }
+    case 'X':
+    case 'x':
+    case 'd':
+      if (Long) {
+        BASE_ARG (BaseListMarker, INT64) = VA_ARG (VaListMarker, INT64);
+      } else {
+        BASE_ARG (BaseListMarker, int) = VA_ARG (VaListMarker, int);
+      }
+      break;
+    case 's':
+    case 'S':
+    case 'a':
+    case 'g':
+    case 't':
+      BASE_ARG (BaseListMarker, VOID *) = VA_ARG (VaListMarker, VOID *);
+      break;
+    case 'c':
+      BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
+      break;
+    case 'r':
+      BASE_ARG (BaseListMarker, RETURN_STATUS) = VA_ARG (VaListMarker, RETURN_STATUS);
+      break;
+    }
 
+    //
+    // If the converted BASE_LIST is larger than the 12 * sizeof (UINT64) allocated bytes, then ASSERT()
+    // This indicates that the DEBUG() macro is passing in more argument than can be handled by 
+    // the EFI_DEBUG_INFO record
+    //
+    ASSERT ((UINT8 *)BaseListMarker <= FormatString);
+
+    //
+    // If the converted BASE_LIST is larger than the 12 * sizeof (UINT64) allocated bytes, then return
+    //
+    if ((UINT8 *)BaseListMarker > FormatString) {
+      return;
+    }
+  }
+  VA_END (VaListMarker);
+
+  //
+  // Send the DebugInfo record
+  //
   REPORT_STATUS_CODE_EX (
     EFI_DEBUG_CODE,
     (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_DC_UNSPECIFIED),
@@ -100,7 +215,6 @@ DebugPrint (
     TotalSize
     );
 }
-
 
 /**
 
