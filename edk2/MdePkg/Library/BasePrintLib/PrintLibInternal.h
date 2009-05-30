@@ -59,24 +59,26 @@ typedef struct {
   VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine.
 
-  @param  Buffer      Character buffer to print the results of the parsing
-                      of Format into.
-  @param  BufferSize  Maximum number of characters to put into buffer.
-  @param  Flags       Initial flags value.
-                      Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
-  @param  Format      Null-terminated format string.
-  @param  Marker      Vararg list consumed by processing Format.
+  @param  Buffer          Character buffer to print the results of the parsing
+                          of Format into.
+  @param  BufferSize      Maximum number of characters to put into buffer.
+  @param  Flags           Initial flags value.
+                          Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
+  @param  Format          Null-terminated format string.
+  @param  VaListMarker    VA_LIST style variable argument list consumed by processing Format.
+  @param  BaseListMarker  BASE_LIST style variable argument list consumed by processing Format.
 
   @return Number of characters printed not including the Null-terminator.
 
 **/
 UINTN
-BasePrintLibVSPrint (
+BasePrintLibSPrintMarker (
   OUT CHAR8        *Buffer,
   IN  UINTN        BufferSize,
   IN  UINTN        Flags,
   IN  CONST CHAR8  *Format,
-  IN  VA_LIST      Marker
+  IN  VA_LIST      VaListMarker,   OPTIONAL
+  IN  BASE_LIST    BaseListMarker  OPTIONAL
   );
 
 /**

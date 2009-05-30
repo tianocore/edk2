@@ -275,52 +275,54 @@ BasePrintLibConvertValueToString (
   VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
   this is the main print working routine.
 
-  @param  Buffer      Character buffer to print the results of the parsing
-                      of Format into.
-  @param  BufferSize  Maximum number of characters to put into buffer.
-  @param  Flags       Initial flags value.
-                      Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
-  @param  Format      Null-terminated format string.
-  @param  Marker      Vararg list consumed by processing Format.
+  @param  Buffer          Character buffer to print the results of the parsing
+                          of Format into.
+  @param  BufferSize      Maximum number of characters to put into buffer.
+  @param  Flags           Initial flags value.
+                          Can only have FORMAT_UNICODE and OUTPUT_UNICODE set.
+  @param  Format          Null-terminated format string.
+  @param  VaListMarker    VA_LIST style variable argument list consumed by processing Format.
+  @param  BaseListMarker  BASE_LIST style variable argument list consumed by processing Format.
 
   @return Number of characters printed not including the Null-terminator.
 
 **/
 UINTN
-BasePrintLibVSPrint (
+BasePrintLibSPrintMarker (
   OUT CHAR8        *Buffer,
   IN  UINTN        BufferSize,
   IN  UINTN        Flags,
   IN  CONST CHAR8  *Format,
-  IN  VA_LIST      Marker
+  IN  VA_LIST      VaListMarker,   OPTIONAL
+  IN  BASE_LIST    BaseListMarker  OPTIONAL
   )
 {
-  CHAR8           *OriginalBuffer;
-  CHAR8           *EndBuffer;
-  CHAR8           ValueBuffer[MAXIMUM_VALUE_CHARACTERS];
-  UINTN           BytesPerOutputCharacter;
-  UINTN           BytesPerFormatCharacter;
-  UINTN           FormatMask;
-  UINTN           FormatCharacter;
-  UINTN           Width;
-  UINTN           Precision;
-  INT64           Value;
-  CONST CHAR8     *ArgumentString;
-  UINTN           Character;
-  GUID            *TmpGuid;
-  TIME            *TmpTime;
-  UINTN           Count;
-  UINTN           ArgumentMask;
-  INTN            BytesPerArgumentCharacter;
-  UINTN           ArgumentCharacter;
-  BOOLEAN         Done;
-  UINTN           Index;
-  CHAR8           Prefix;
-  BOOLEAN         ZeroPad;
-  BOOLEAN         Comma;
-  UINTN           Digits;
-  UINTN           Radix;
-  RETURN_STATUS   Status;
+  CHAR8             *OriginalBuffer;
+  CHAR8             *EndBuffer;
+  CHAR8             ValueBuffer[MAXIMUM_VALUE_CHARACTERS];
+  UINTN             BytesPerOutputCharacter;
+  UINTN             BytesPerFormatCharacter;
+  UINTN             FormatMask;
+  UINTN             FormatCharacter;
+  UINTN             Width;
+  UINTN             Precision;
+  INT64             Value;
+  CONST CHAR8       *ArgumentString;
+  UINTN             Character;
+  GUID              *TmpGuid;
+  TIME              *TmpTime;
+  UINTN             Count;
+  UINTN             ArgumentMask;
+  INTN              BytesPerArgumentCharacter;
+  UINTN             ArgumentCharacter;
+  BOOLEAN           Done;
+  UINTN             Index;
+  CHAR8             Prefix;
+  BOOLEAN           ZeroPad;
+  BOOLEAN           Comma;
+  UINTN             Digits;
+  UINTN             Radix;
+  RETURN_STATUS     Status;
 
   if (BufferSize == 0) {
     return 0;
@@ -338,6 +340,7 @@ BasePrintLibVSPrint (
   //
   BufferSize--;
   OriginalBuffer = Buffer;
+
   //
   // Set the tag for the end of the input Buffer.
   //
@@ -417,9 +420,17 @@ BasePrintLibVSPrint (
         case '*':
           if ((Flags & PRECISION) == 0) {
             Flags |= PAD_TO_WIDTH;
-            Width = VA_ARG (Marker, UINTN);
+            if (BaseListMarker == NULL) {
+              Width = VA_ARG (VaListMarker, UINTN);
+            } else {
+              Width = BASE_ARG (BaseListMarker, UINTN);
+            }
           } else {
-            Precision = VA_ARG (Marker, UINTN);
+            if (BaseListMarker == NULL) {
+              Precision = VA_ARG (VaListMarker, UINTN);
+            } else {
+              Precision = BASE_ARG (BaseListMarker, UINTN);
+            }
           }
           break;
         case '0':
@@ -497,9 +508,17 @@ BasePrintLibVSPrint (
           // provides an implementation that is compatible with that largest possible set of CPU 
           // architectures.  This is why the type "int" is used in this one case.
           //
-          Value = (VA_ARG (Marker, int));
+          if (BaseListMarker == NULL) {
+            Value = VA_ARG (VaListMarker, int);
+          } else {
+            Value = BASE_ARG (BaseListMarker, int);
+          }
         } else {
-          Value = VA_ARG (Marker, INT64);
+          if (BaseListMarker == NULL) {
+            Value = VA_ARG (VaListMarker, INT64);
+          } else {
+            Value = BASE_ARG (BaseListMarker, INT64);
+          }
         }
         if ((Flags & PREFIX_BLANK) != 0) {
           Prefix = ' ';
@@ -576,7 +595,11 @@ BasePrintLibVSPrint (
         // break skipped on purpose
         //
       case 'a':
-        ArgumentString = (CHAR8 *)VA_ARG (Marker, CHAR8 *);
+        if (BaseListMarker == NULL) {
+          ArgumentString = VA_ARG (VaListMarker, CHAR8 *);
+        } else {
+          ArgumentString = BASE_ARG (BaseListMarker, CHAR8 *);
+        }
         if (ArgumentString == NULL) {
           Flags &= (~ARGUMENT_UNICODE);
           ArgumentString = "<null string>";
@@ -590,13 +613,21 @@ BasePrintLibVSPrint (
         break;
 
       case 'c':
-        Character = VA_ARG (Marker, UINTN) & 0xffff;
+        if (BaseListMarker == NULL) {
+          Character = VA_ARG (VaListMarker, UINTN) & 0xffff;
+        } else {
+          Character = BASE_ARG (BaseListMarker, UINTN) & 0xffff;
+        }
         ArgumentString = (CHAR8 *)&Character;
         Flags |= ARGUMENT_UNICODE;
         break;
 
       case 'g':
-        TmpGuid = VA_ARG (Marker, GUID *);
+        if (BaseListMarker == NULL) {
+          TmpGuid = VA_ARG (VaListMarker, GUID *);
+        } else {
+          TmpGuid = BASE_ARG (BaseListMarker, GUID *);
+        }
         if (TmpGuid == NULL) {
           ArgumentString = "<null guid>";
         } else {
@@ -622,7 +653,11 @@ BasePrintLibVSPrint (
         break;
 
       case 't':
-        TmpTime = VA_ARG (Marker, TIME *); 
+        if (BaseListMarker == NULL) {
+          TmpTime = VA_ARG (VaListMarker, TIME *); 
+        } else {
+          TmpTime = BASE_ARG (BaseListMarker, TIME *); 
+        }
         if (TmpTime == NULL) {
           ArgumentString = "<null time>";
         } else {
@@ -642,7 +677,11 @@ BasePrintLibVSPrint (
         break;
 
       case 'r':
-        Status = VA_ARG (Marker, RETURN_STATUS);
+        if (BaseListMarker == NULL) {
+          Status = VA_ARG (VaListMarker, RETURN_STATUS);
+        } else {
+          Status = BASE_ARG (BaseListMarker, RETURN_STATUS);
+        }
         ArgumentString = ValueBuffer;
         if (RETURN_ERROR (Status)) {
           //
@@ -833,5 +872,5 @@ BasePrintLibSPrint (
   VA_LIST  Marker;
 
   VA_START (Marker, FormatString);
-  return BasePrintLibVSPrint (StartOfBuffer, BufferSize, Flags, FormatString, Marker);
+  return BasePrintLibSPrintMarker (StartOfBuffer, BufferSize, Flags, FormatString, Marker, NULL);
 }
