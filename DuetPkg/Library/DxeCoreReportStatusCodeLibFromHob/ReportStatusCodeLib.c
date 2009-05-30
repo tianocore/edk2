@@ -229,14 +229,14 @@ EFIAPI
 ReportStatusCodeExtractDebugInfo (
   IN CONST EFI_STATUS_CODE_DATA  *Data,
   OUT UINT32                     *ErrorLevel,
-  OUT VA_LIST                    *Marker,
+  OUT BASE_LIST                  *Marker,
   OUT CHAR8                      **Format
   )
 {
   EFI_DEBUG_INFO  *DebugInfo;
 
-  ASSERT (Data       != NULL);
-  ASSERT (ErrorLevel != NULL);
+  ASSERT (Data          != NULL);
+  ASSERT (ErrorLevel    != NULL);
   ASSERT (Marker     != NULL);
   ASSERT (Format     != NULL);
 
@@ -258,7 +258,7 @@ ReportStatusCodeExtractDebugInfo (
   // The first 12 * UINTN bytes of the string are really an
   // argument stack to support varargs on the Format string.
   //
-  *Marker = (VA_LIST) (DebugInfo + 1);
+  *Marker = (BASE_LIST) (DebugInfo + 1);
   *Format = (CHAR8 *)(((UINT64 *)*Marker) + 12);
 
   return TRUE;
