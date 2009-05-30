@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __PPRINT2_H__
 
 #define EFI_PRINT2_PROTOCOL_GUID  \
-   { 0x5bcc3dbc, 0x8c57, 0x450a, { 0xbb, 0xc, 0xa1, 0xc0, 0xbd, 0xde, 0x48, 0xc } }
+  { 0xf05976ef, 0x83f1, 0x4f3d, { 0x86, 0x19, 0xf7, 0x59, 0x5d, 0x41, 0xe5, 0x38 } }
 
 //
 // Forward reference for pure ANSI compatability
@@ -27,7 +27,7 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on 
-  a Null-terminated Unicode format string and a VA_LIST argument list
+  a Null-terminated Unicode format string and a BASE_LIST argument list
   
   Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
   and BufferSize.  
@@ -53,7 +53,7 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
-  @param  Marker          VA_LIST marker for the variable argument list.
+  @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
@@ -61,11 +61,11 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
 **/
 typedef
 UINTN
-(EFIAPI *UNICODE_VS_PRINT) (
+(EFIAPI *UNICODE_BS_PRINT) (
   OUT CHAR16        *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
-  IN  VA_LIST       Marker
+  IN  BASE_LIST     Marker
   );
 
 /**
@@ -113,7 +113,7 @@ UINTN
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on a Null-terminated
-  ASCII format string and a VA_LIST argument list
+  ASCII format string and a BASE_LIST argument list
   
   Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
   and BufferSize.
@@ -138,7 +138,7 @@ UINTN
                           Unicode string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated ASCII format string.
-  @param  Marker          VA_LIST marker for the variable argument list.
+  @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of Unicode characters in the produced output buffer not including the
           Null-terminator.
@@ -146,11 +146,11 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *UNICODE_VS_PRINT_ASCII_FORMAT) (
+(EFIAPI *UNICODE_BS_PRINT_ASCII_FORMAT) (
   OUT CHAR16       *StartOfBuffer,
   IN  UINTN        BufferSize,
   IN  CONST CHAR8  *FormatString,
-  IN  VA_LIST      Marker
+  IN  BASE_LIST    Marker
   );
 
 /**
@@ -248,7 +248,7 @@ UINTN
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  ASCII format string and a VA_LIST argument list.
+  ASCII format string and a BASE_LIST argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.
@@ -272,7 +272,7 @@ UINTN
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated ASCII format string.
-  @param  Marker          VA_LIST marker for the variable argument list.
+  @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.
@@ -280,11 +280,11 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_VS_PRINT) (
+(EFIAPI *ASCII_BS_PRINT) (
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR8   *FormatString,
-  IN  VA_LIST       Marker
+  IN  BASE_LIST     Marker
   );
 
 /**
@@ -331,7 +331,7 @@ UINTN
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  Unicode format string and a VA_LIST argument list.
+  Unicode format string and a BASE_LIST argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.
@@ -356,7 +356,7 @@ UINTN
                           ASCII string.
   @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
   @param  FormatString    Null-terminated Unicode format string.
-  @param  Marker          VA_LIST marker for the variable argument list.
+  @param  Marker          BASE_LIST marker for the variable argument list.
   
   @return The number of ASCII characters in the produced output buffer not including the
           Null-terminator.
@@ -364,11 +364,11 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_VS_PRINT_UNICODE_FORMAT) (
+(EFIAPI *ASCII_BS_PRINT_UNICODE_FORMAT) (
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
-  IN  VA_LIST       Marker
+  IN  BASE_LIST     Marker
   );
 
 /**
@@ -464,16 +464,16 @@ UINTN
   );
 
 struct _EFI_PRINT2_PROTOCOL {
-  UNICODE_VS_PRINT                 UnicodeVSPrint;
-  UNICODE_S_PRINT                  UnicodeSPrint;
-  UNICODE_VS_PRINT_ASCII_FORMAT    UnicodeVSPrintAsciiFormat;
-  UNICODE_S_PRINT_ASCII_FORMAT     UnicodeSPrintAsciiFormat;
-  UNICODE_VALUE_TO_STRING          UnicodeValueToString;
-  ASCII_VS_PRINT                   AsciiVSPrint;
-  ASCII_S_PRINT                    AsciiSPrint;
-  ASCII_VS_PRINT_UNICODE_FORMAT    AsciiVSPrintUnicodeFormat;
-  ASCII_S_PRINT_UNICODE_FORMAT     AsciiSPrintUnicodeFormat;
-  ASCII_VALUE_TO_STRING            AsciiValueToString;
+  UNICODE_BS_PRINT                     UnicodeBSPrint;
+  UNICODE_S_PRINT                      UnicodeSPrint;
+  UNICODE_BS_PRINT_ASCII_FORMAT        UnicodeBSPrintAsciiFormat;
+  UNICODE_S_PRINT_ASCII_FORMAT         UnicodeSPrintAsciiFormat;
+  UNICODE_VALUE_TO_STRING              UnicodeValueToString;
+  ASCII_BS_PRINT                       AsciiBSPrint;
+  ASCII_S_PRINT                        AsciiSPrint;
+  ASCII_BS_PRINT_UNICODE_FORMAT        AsciiBSPrintUnicodeFormat;
+  ASCII_S_PRINT_UNICODE_FORMAT         AsciiSPrintUnicodeFormat;
+  ASCII_VALUE_TO_STRING                AsciiValueToString;
 };
 
 extern EFI_GUID gEfiPrint2ProtocolGuid;
