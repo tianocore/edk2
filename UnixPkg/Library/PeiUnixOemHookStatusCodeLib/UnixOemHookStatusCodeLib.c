@@ -119,7 +119,7 @@ OemHookStatusCodeReport (
   UINT32          ErrorLevel;
   UINT32          LineNumber;
   UINTN           CharCount;
-  VA_LIST         Marker;
+  BASE_LIST       Marker;
   EFI_DEBUG_INFO  *DebugInfo;
 
   Buffer[0] = '\0';
@@ -154,7 +154,7 @@ OemHookStatusCodeReport (
     //
     // Print DEBUG() information into output buffer.
     //
-    CharCount = AsciiVSPrint (
+    CharCount = AsciiBSPrint (
                   Buffer, 
                   EFI_STATUS_CODE_DATA_MAX_SIZE, 
                   Format, 
@@ -167,10 +167,10 @@ OemHookStatusCodeReport (
     // Print specific data into output buffer.
     //
     DebugInfo = (EFI_DEBUG_INFO *) (Data + 1);
-    Marker    = (VA_LIST) (DebugInfo + 1);
+    Marker    = (BASE_LIST) (DebugInfo + 1);
     Format    = (CHAR8 *) (((UINT64 *) Marker) + 12);
 
-    CharCount = AsciiVSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, Format, Marker);
+    CharCount = AsciiBSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, Format, Marker);
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) {
     //
     // Print ERROR information into output buffer.

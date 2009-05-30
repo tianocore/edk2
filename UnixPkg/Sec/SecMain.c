@@ -448,7 +448,7 @@ Returns:
 // TODO:    Data - add argument and description to function comment
 {
   CHAR8           *Format;
-  VA_LIST         Marker;
+  BASE_LIST       Marker;
   CHAR8           PrintBuffer[BYTES_PER_RECORD * 2];
   CHAR8           *Filename;
   CHAR8           *Description;
@@ -467,7 +467,7 @@ Returns:
     //
     // Process DEBUG () macro 
     //
-    AsciiVSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
+    AsciiBSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
     printf (PrintBuffer);
   }
 
