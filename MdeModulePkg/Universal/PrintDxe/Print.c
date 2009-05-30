@@ -23,18 +23,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_HANDLE  mPrintThunkHandle = NULL;
 
 CONST EFI_PRINT2_PROTOCOL mPrint2Protocol = {
-  UnicodeVSPrint,
+  UnicodeBSPrint,
   UnicodeSPrint,
-  UnicodeVSPrintAsciiFormat,
+  UnicodeBSPrintAsciiFormat,
   UnicodeSPrintAsciiFormat,
   UnicodeValueToString,
-  AsciiVSPrint,
+  AsciiBSPrint,
   AsciiSPrint,
-  AsciiVSPrintUnicodeFormat,
+  AsciiBSPrintUnicodeFormat,
   AsciiSPrintUnicodeFormat,
   AsciiValueToString
 };
-
 
 /**
   The user Entry Point for Print module.
