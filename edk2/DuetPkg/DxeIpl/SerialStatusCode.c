@@ -695,7 +695,7 @@ Returns:
   CHAR8                   *Filename;
   CHAR8                   *Description;
   CHAR8                   *Format;
-  VA_LIST                 Marker;
+  BASE_LIST               Marker;
   UINT32                  ErrorLevel;
   UINTN                   CharCount;
 
@@ -720,7 +720,7 @@ Returns:
     //
     // Process PEI_DEBUG () macro to Serial
     //
-    AsciiVSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, Format, Marker);
+    AsciiBSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, Format, Marker);
 
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) { 
     //
