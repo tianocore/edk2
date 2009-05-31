@@ -94,7 +94,7 @@ DebugPrint (
   DebugInfo             = (EFI_DEBUG_INFO *)Buffer;
   DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
   BaseListMarker        = (BASE_LIST)(DebugInfo + 1);
-  FormatString          = (UINT8 *)((UINT64 *)(DebugInfo + 1) + 12);
+  FormatString          = (CHAR8 *)((UINT64 *)(DebugInfo + 1) + 12);
 
   //
   // Copy the Format string into the record
@@ -191,12 +191,12 @@ DebugPrint (
     // This indicates that the DEBUG() macro is passing in more argument than can be handled by 
     // the EFI_DEBUG_INFO record
     //
-    ASSERT ((UINT8 *)BaseListMarker <= FormatString);
+    ASSERT ((CHAR8 *)BaseListMarker <= FormatString);
 
     //
     // If the converted BASE_LIST is larger than the 12 * sizeof (UINT64) allocated bytes, then return
     //
-    if ((UINT8 *)BaseListMarker > FormatString) {
+    if ((CHAR8 *)BaseListMarker > FormatString) {
       return;
     }
   }
