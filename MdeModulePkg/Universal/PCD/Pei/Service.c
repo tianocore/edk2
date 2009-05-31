@@ -640,7 +640,7 @@ GetWorker (
       return (VOID *) ((UINT8 *)PeiPcdDb + Offset);
 
     case PCD_TYPE_STRING:
-      StringTableIdx = (UINT16) *((UINT8 *) PeiPcdDb + Offset);
+      StringTableIdx = * (UINT16*) ((UINT8 *) PeiPcdDb + Offset);
       return (VOID *) (&StringTable[StringTableIdx]);
 
     default:
