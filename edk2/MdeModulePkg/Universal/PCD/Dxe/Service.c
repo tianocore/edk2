@@ -161,7 +161,7 @@ GetWorker (
       break;
 
     case PCD_TYPE_STRING:
-      StringTableIdx = (UINT16) *((UINT8 *) PcdDb + Offset);
+      StringTableIdx = *(UINT16*)((UINT8 *) PcdDb + Offset);
       RetPtr = (VOID *) (StringTable + StringTableIdx);
       break;
 
