@@ -39,6 +39,7 @@ Abstract:
 
 #include <IndustryStandard/PeImage.h>
 
+#define EFI_STATUS_CODE_DATA_MAX_SIZE 200
 
 #define STACK_SIZE                0x20000      
 
