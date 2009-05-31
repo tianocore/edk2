@@ -137,9 +137,10 @@ ReportStatusCodeExtractDebugInfo (
   OUT CHAR8                      **Format
   )
 {
-  ASSERT (Data          != NULL);
-  ASSERT (ErrorLevel    != NULL);
-  ASSERT (StartOfBuffer != NULL);
+  ASSERT (Data       != NULL);
+  ASSERT (ErrorLevel != NULL);
+  ASSERT (Marker     != NULL);
+  ASSERT (Format     != NULL);
 
   return FALSE;
 }
