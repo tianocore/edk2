@@ -209,8 +209,8 @@ Interrupt8259SetVectorBase (
     IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, Mask);
   }
 
-  IoWrite8 (LEGACY_8259_CONTROL_REGISTER_SLAVE, 0x20);
-  IoWrite8 (LEGACY_8259_CONTROL_REGISTER_MASTER, 0x20);
+  IoWrite8 (LEGACY_8259_CONTROL_REGISTER_SLAVE, LEGACY_8259_EOI);
+  IoWrite8 (LEGACY_8259_CONTROL_REGISTER_MASTER, LEGACY_8259_EOI);
 
   return EFI_SUCCESS;
 }
@@ -351,11 +351,6 @@ Interrupt8259SetMode (
     //
     // Write new legacy mode mask/trigger level
     //
-    Interrupt8259SetVectorBase (This, LEGACY_MODE_BASE_VECTOR_MASTER, LEGACY_MODE_BASE_VECTOR_SLAVE);
-
-    //
-    // Enable Interrupts
-    //
     Interrupt8259WriteMask (mLegacyModeMask, mLegacyModeEdgeLevel);
 
     return EFI_SUCCESS;
@@ -390,11 +385,6 @@ Interrupt8259SetMode (
 
     //
     // Write new protected mode mask/trigger level
-    //
-    Interrupt8259SetVectorBase (This, PROTECTED_MODE_BASE_VECTOR_MASTER, PROTECTED_MODE_BASE_VECTOR_SLAVE);
-
-    //
-    // Enable Interrupts
     //
     Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
 
@@ -519,7 +509,33 @@ Interrupt8259GetInterruptLine (
   OUT UINT8                     *Vector
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT8               InterruptLine;
+  EFI_STATUS          Status;
+
+  Status = gBS->HandleProtocol (
+                  PciHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **) &PciIo
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PciIo->Pci.Read (
+               PciIo,
+               EfiPciIoWidthUint8,
+               PCI_INT_LINE_OFFSET,
+               1,
+               &InterruptLine
+               );
+  //
+  // Interrupt line is same location for standard PCI cards, standard
+  // bridge and CardBus bridge.
+  //
+  *Vector = InterruptLine;
+
+  return EFI_SUCCESS;
 }
 
 /**
