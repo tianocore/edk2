@@ -491,18 +491,6 @@ extern EFI_GUID gEfiStatusCodeSpecificDataGuid;
 ///
 #define EFI_ALL_MEMORY_ARRAY_OPERATION  0xffff
 
-
-
-
-//
-// Debug Assert Data. This is part of Status Code Specification
-//
-#define EFI_STATUS_CODE_DATA_TYPE_ASSERT_GUID \
- { 0xDA571595, 0x4D99, 0x487C, { 0x82, 0x7C, 0x26, 0x22, 0x67, 0x7D, 0x33, 0x07 } }
-
-
-extern EFI_GUID gEfiStatusCodeDataTypeAssertGuid;
-
 //
 // Debug DataType defintions. User Defined Data Types.
 //
