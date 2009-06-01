@@ -504,14 +504,6 @@ extern EFI_GUID gEfiStatusCodeSpecificDataGuid;
 extern EFI_GUID gEfiStatusCodeDataTypeAssertGuid;
 
 //
-// Exception Data type (CPU REGS)
-//
-#define EFI_STATUS_CODE_DATA_TYPE_EXCEPTION_HANDLER_GUID \
-  { 0x3BC2BD12, 0xAD2E, 0x11D5, { 0x87, 0xDD, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 } }
-
-extern EFI_GUID gEfiStatusCodeDataTypeExceptionHandlerGuid;
-
-//
 // Debug DataType defintions. User Defined Data Types.
 //
 #define EFI_STATUS_CODE_DATA_TYPE_DEBUG_GUID \
