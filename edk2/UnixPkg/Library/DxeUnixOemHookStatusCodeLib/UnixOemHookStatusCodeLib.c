@@ -23,7 +23,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <FrameworkModuleBase.h>
-#include <DebugInfo.h>
 
 //
 // Cache of UnixThunk protocol 
