@@ -51,11 +51,6 @@
   PrintLib
   DebugLib
 
-
-[Guids]
-  gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
-
-
 [Ppis]
   gPeiUnixThunkPpiGuid                          # PPI ALWAYS_CONSUMED
 
