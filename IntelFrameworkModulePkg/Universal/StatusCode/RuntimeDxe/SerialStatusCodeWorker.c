@@ -96,7 +96,7 @@ SerialStatusCodeReportWorker (
     //
     CharCount = AsciiSPrint (
                   Buffer,
-                  EFI_STATUS_CODE_DATA_MAX_SIZE,
+                  sizeof (Buffer),
                   "\n\rDXE_ASSERT!: %a (%d): %a\n\r",
                   Filename,
                   LineNumber,
@@ -109,7 +109,7 @@ SerialStatusCodeReportWorker (
     //
     CharCount = AsciiBSPrint (
                   Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  sizeof (Buffer), 
                   Format, 
                   Marker
                   );
@@ -119,7 +119,7 @@ SerialStatusCodeReportWorker (
     //
     CharCount = AsciiSPrint (
                   Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  sizeof (Buffer), 
                   "ERROR: C%x:V%x I%x", 
                   CodeType, 
                   Value, 
@@ -129,7 +129,7 @@ SerialStatusCodeReportWorker (
     if (CallerId != NULL) {
       CharCount += AsciiSPrint (
                      &Buffer[CharCount - 1],
-                     (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof (Buffer[0]) * CharCount)),
+                     (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                      " %g",
                      CallerId
                      );
@@ -138,7 +138,7 @@ SerialStatusCodeReportWorker (
     if (Data != NULL) {
       CharCount += AsciiSPrint (
                      &Buffer[CharCount - 1],
-                     (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof (Buffer[0]) * CharCount)),
+                     (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                      " %x",
                      Data
                      );
@@ -146,7 +146,7 @@ SerialStatusCodeReportWorker (
 
     CharCount += AsciiSPrint (
                    &Buffer[CharCount - 1],
-                   (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof (Buffer[0]) * CharCount)),
+                   (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                    "\n\r"
                    );
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) {
@@ -155,7 +155,7 @@ SerialStatusCodeReportWorker (
     //
     CharCount = AsciiSPrint (
                   Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  sizeof (Buffer), 
                   "PROGRESS CODE: V%x I%x\n\r", 
                   Value, 
                   Instance
@@ -166,7 +166,7 @@ SerialStatusCodeReportWorker (
     //
     CharCount = AsciiSPrint (
                   Buffer, 
-                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  sizeof (Buffer), 
                   "Undefined: C%x:V%x I%x\n\r", 
                   CodeType, 
                   Value, 
