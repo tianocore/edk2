@@ -1,7 +1,7 @@
 /** @file
   Driver implementing the Tiano Legacy 8259 Protocol
 
-Copyright (c) 2005, 2009, Intel Corporation                                                         
+Copyright (c) 2005 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -18,11 +18,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <FrameworkDxe.h>
 
 #include <Protocol/Legacy8259.h>
+#include <Protocol/PciIo.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/BaseLib.h>
 
+#include <IndustryStandard/Pci22.h>
 //
 // 8259 Hardware definitions
 //
