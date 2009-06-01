@@ -60,9 +60,6 @@
   UefiDriverEntryPoint
   DebugLib
 
-[Guids]
-  gEfiStatusCodeSpecificDataGuid                # ALWAYS_CONSUMED
-
 [Protocols]
   gEfiIsaIoProtocolGuid                         # PROTOCOL BY_START
   gEfiIsaAcpiProtocolGuid                       # PROTOCOL TO_START

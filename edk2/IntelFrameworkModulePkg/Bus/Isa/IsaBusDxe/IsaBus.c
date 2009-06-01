@@ -208,19 +208,7 @@ IsaBusControllerDriverStart (
   //
   // Local variables declaration for StatusCode reporting
   //
-  EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA AllocFailExtendedData;
   EFI_DEVICE_PATH_PROTOCOL              *DevicePathData;
-
-  //
-  // Initialize status code structure
-  //
-  AllocFailExtendedData.DataHeader.HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
-  AllocFailExtendedData.DataHeader.Size = sizeof (EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA) - sizeof (EFI_STATUS_CODE_DATA);
-  CopyMem (
-    &AllocFailExtendedData.DataHeader.Type,
-    &gEfiStatusCodeSpecificDataGuid,
-    sizeof (EFI_GUID)
-    );
 
   //
   // Open Device Path Protocol
@@ -358,7 +346,6 @@ IsaBusControllerDriverStart (
                ParentDevicePath,
                ResourceList,
                &DevicePathData
-               //&AllocFailExtendedData.DevicePath
                );
 
     if (EFI_ERROR (Status)) {
@@ -381,9 +368,6 @@ IsaBusControllerDriverStart (
       //
       // It's hard to tell which resource conflicts
       //
-      AllocFailExtendedData.Bar       = 0;
-      AllocFailExtendedData.ReqRes    = NULL;
-      AllocFailExtendedData.AllocRes  = NULL;
       REPORT_STATUS_CODE_WITH_DEVICE_PATH (
          EFI_ERROR_CODE,
          (EFI_IO_BUS_LPC | EFI_IOB_EC_RESOURCE_CONFLICT),
