@@ -18,7 +18,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = LanguageLib
+  BASE_NAME                      = UefiLanguageLib
   FILE_GUID                      = 283cad13-a151-4d55-be2d-96ea57392a82 
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -29,7 +29,7 @@
 #
 
 [Sources.common]
-  LanguageLib.c
+  UefiLanguageLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
