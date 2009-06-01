@@ -21,6 +21,9 @@
 
         .org 0x21000
 
+.global _start
+_start:
+
 .equ                 DEFAULT_HANDLER_SIZE, INT1 - INT0
 
 .macro jmpCommonIdtEntry  
