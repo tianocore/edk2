@@ -708,7 +708,7 @@ Returns:
     //
     AsciiSPrint (
       Buffer,
-      EFI_STATUS_CODE_DATA_MAX_SIZE,
+      sizeof (Buffer),
       "\nPEI_ASSERT!: %a (%d): %a\n",
       Filename,
       LineNumber,
@@ -720,23 +720,23 @@ Returns:
     //
     // Process PEI_DEBUG () macro to Serial
     //
-    AsciiBSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, Format, Marker);
+    AsciiBSPrint (Buffer, sizeof (Buffer), Format, Marker);
 
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) { 
     //
     // Process Errors
     //
-    CharCount = AsciiSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, "ERROR: C%x:V%x I%x", CodeType, Value, Instance);
+    CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "ERROR: C%x:V%x I%x", CodeType, Value, Instance);
     //
     // Make sure we don't try to print values that weren't intended to be printed, especially NULL GUID pointers.
     //
     if (CallerId) {
-      CharCount += AsciiSPrint (&Buffer[CharCount - 1], (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof(Buffer[0]) * CharCount)), " %g", CallerId);
+      CharCount += AsciiSPrint (&Buffer[CharCount - 1], (sizeof (Buffer) - (sizeof(Buffer[0]) * CharCount)), " %g", CallerId);
     }
     if (Data) {
-      CharCount += AsciiSPrint (&Buffer[CharCount - 1], (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof(Buffer[0]) * CharCount)), " %x", Data);
+      CharCount += AsciiSPrint (&Buffer[CharCount - 1], (sizeof (Buffer) - (sizeof(Buffer[0]) * CharCount)), " %x", Data);
     }
-    CharCount += AsciiSPrint (&Buffer[CharCount - 1], (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof(Buffer[0]) * CharCount)), "\n");
+    CharCount += AsciiSPrint (&Buffer[CharCount - 1], (sizeof (Buffer) - (sizeof(Buffer[0]) * CharCount)), "\n");
 
   }
 
@@ -788,7 +788,7 @@ Returns:
         //
         AsciiSPrint (
           Buffer,
-          EFI_STATUS_CODE_DATA_MAX_SIZE,
+          sizeof (Buffer),
           "%a:%a:%a:%d\n",
           SeverityToken,
           SubClassToken,
