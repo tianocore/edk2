@@ -26,10 +26,10 @@
 #include <Library/HobLib.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Protocol/StatusCode.h>
 
 #include <FrameworkModuleBase.h>
-#include <DebugInfo.h>
 
 
 /**
