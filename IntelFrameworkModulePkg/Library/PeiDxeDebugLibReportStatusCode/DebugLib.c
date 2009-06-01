@@ -282,7 +282,7 @@ DebugAssert (
       (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_EC_ILLEGAL_SOFTWARE_STATE),
       0,
       NULL,
-      &gEfiStatusCodeDataTypeAssertGuid,
+      NULL,
       AssertData,
       TotalSize
       );
