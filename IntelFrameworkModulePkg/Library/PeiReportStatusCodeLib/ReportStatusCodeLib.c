@@ -16,6 +16,7 @@
 #include <FrameworkPei.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
@@ -24,8 +25,6 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/OemHookStatusCodeLib.h>
 #include <Library/PcdLib.h>
-
-#include <DebugInfo.h>
 
 //
 // Define the maximum extended data size that is supported in the PEI phase

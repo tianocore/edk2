@@ -27,11 +27,11 @@
 #include <Library/DevicePathLib.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Guid/EventGroup.h>
 #include <Protocol/StatusCode.h>
 
 #include <FrameworkModuleBase.h>
-#include <DebugInfo.h>
 
 extern EFI_REPORT_STATUS_CODE  mReportStatusCode;
 

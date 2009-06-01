@@ -17,14 +17,13 @@
 #include <FrameworkPei.h>
 #include <FrameworkModuleBase.h>
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PcdLib.h>
-
-#include <DebugInfo.h>
 
 /**
 
