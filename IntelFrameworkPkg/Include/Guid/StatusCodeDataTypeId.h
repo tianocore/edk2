@@ -499,21 +499,4 @@ extern EFI_GUID gEfiStatusCodeSpecificDataGuid;
 
 extern EFI_GUID gEfiStatusCodeDataTypeDebugGuid;
 
-//
-// Progress Code. User Defined Data Type Guid.
-//
-#define EFI_STATUS_CODE_DATA_TYPE_ERROR_GUID \
-  { 0xAB359CE3, 0x99B3, 0xAE18, { 0xC8, 0x9D, 0x95, 0xD3, 0xB0, 0x72, 0xE1, 0x9B } }
-
-extern EFI_GUID gEfiStatusCodeDataTypeErrorGuid;
-
-//
-// Progress Code. User Defined Data Type Guid.
-//
-#define EFI_STATUS_CODE_DATA_TYPE_PROGRESS_CODE_GUID \
-  { 0xA356AB39, 0x35C4, 0x35DA, { 0xB3, 0x7A, 0xF8, 0xEA, 0x9E, 0x8B, 0x36, 0xA3 } }
-
-extern EFI_GUID gEfiStatusCodeDataTypeProgressCodeGuid;
-
-
 #endif
