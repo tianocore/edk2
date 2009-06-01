@@ -491,12 +491,4 @@ extern EFI_GUID gEfiStatusCodeSpecificDataGuid;
 ///
 #define EFI_ALL_MEMORY_ARRAY_OPERATION  0xffff
 
-//
-// Debug DataType defintions. User Defined Data Types.
-//
-#define EFI_STATUS_CODE_DATA_TYPE_DEBUG_GUID \
-  { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xb9 } }
-
-extern EFI_GUID gEfiStatusCodeDataTypeDebugGuid;
-
 #endif
