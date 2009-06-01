@@ -27,6 +27,10 @@
 .equ                        BLOCK_SHIFT, 9
 
         .org 0x0
+
+.global _start
+_start:
+
 Ia32Jump: 
   jmp   BootSectorEntryPoint  # JMP inst    - 3 bytes
   nop
