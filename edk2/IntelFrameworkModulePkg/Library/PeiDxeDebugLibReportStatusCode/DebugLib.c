@@ -78,12 +78,12 @@ DebugPrint (
   //
   // If the TotalSize is larger than the maximum record size, then ASSERT()
   //
-  ASSERT (TotalSize <= EFI_STATUS_CODE_DATA_MAX_SIZE);
+  ASSERT (TotalSize <= sizeof (Buffer));
 
   //
   // If the TotalSize is larger than the maximum record size, then return
   //
-  if (TotalSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
+  if (TotalSize > sizeof (Buffer)) {
     return;
   }
 
@@ -259,7 +259,7 @@ DebugAssert (
   FileNameLength    = AsciiStrLen (FileName);
   DescriptionLength = AsciiStrLen (Description);
   TotalSize = sizeof (EFI_DEBUG_ASSERT_DATA) + FileNameLength + 1 + DescriptionLength + 1;
-  if (TotalSize <= EFI_STATUS_CODE_DATA_MAX_SIZE) {
+  if (TotalSize <= sizeof (Buffer)) {
     //
     // Fill in EFI_DEBUG_ASSERT_DATA
     //
