@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/DataHubStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/SimpleTextOut.h>
 

@@ -62,6 +62,10 @@
   ## Include/Guid/ShellFile.h
   gEfiShellFileGuid              = { 0xC57AD6B7, 0x0515, 0x40A8, { 0x9D, 0x21, 0x55, 0x16, 0x52, 0x85, 0x4E, 0x37 }}
 
+  ## GUID used to pass DEBUG() macro information through the Status Code Protocol and Status Code PPI
+  ## Include/Guid/StatusCodeDataTypeDebug.h
+  gEfiStatusCodeDataTypeDebugGuid  = { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 }}
+
 
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Usb interface.
   ## Include/Protocol/DiskInfo.h

@@ -24,6 +24,7 @@
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Protocol/StatusCode.h>
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Guid/EventGroup.h>
 
 #include <Library/BaseLib.h>
