@@ -63,9 +63,9 @@ TOOL_CHAIN_TAG        = MYTOOLS
 #                                                 cores or CPUs. Less than 2 means disable multithread build.
 MAX_CONCURRENT_THREAD_NUMBER = 1
 
-# MULTIPLE_THREAD        BOOLEAN  Optional    If TRUE, multi-thread is enable for bulding.
-#                                             If FALSE, multi-thread is disable for building.
-MULTIPLE_THREAD       = FALSE
+# MULTIPLE_THREAD        BOOLEAN  Optional    If "Enable", multi-thread is enable for bulding.
+#                                             If "Disable", multi-thread is disable for building.
+MULTIPLE_THREAD       = Disable
 
 # Build rules definition
 #
