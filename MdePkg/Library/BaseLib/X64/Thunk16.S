@@ -295,7 +295,7 @@ ASM_PFX(InternalAsmThunk16):
     movl    %edx,%ss
     pushfq
     lea     -8(%rdx), %edx
-    lea     L_RetFromRealMode, %r8
+    lea     L_RetFromRealMode(%rip), %r8
     pushq   %r8
     movl    %cs, %r8d
     movw    %r8w, (SavedCs - SavedCr4)(%rcx)
