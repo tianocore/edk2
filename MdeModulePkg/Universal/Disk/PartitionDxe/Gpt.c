@@ -574,14 +574,20 @@ PartitionRestoreGptTable (
   PartHdr->PartitionEntryLBA  = PEntryLBA;
   PartitionSetCrc ((EFI_TABLE_HEADER *) PartHdr);
 
-  Status = BlockIo->WriteBlocks (BlockIo, BlockIo->Media->MediaId, PartHdr->MyLBA, BlockSize, PartHdr);
+  Status = DiskIo->WriteDisk (
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     MultU64x32 (PartHdr->MyLBA, BlockIo->Media->BlockSize),
+                     BlockSize,
+                     PartHdr
+                     );
   if (EFI_ERROR (Status)) {
     goto Done;
   }
 
   Ptr = AllocatePool (PartHeader->NumberOfPartitionEntries * PartHeader->SizeOfPartitionEntry);
   if (Ptr == NULL) {
-    DEBUG ((EFI_D_ERROR, " Allocate pool effor\n"));
+    DEBUG ((EFI_D_ERROR, " Allocate pool error\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
