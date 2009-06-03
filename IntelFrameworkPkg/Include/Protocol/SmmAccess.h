@@ -72,7 +72,7 @@ EFI_STATUS
   Inhibits access to the SMRAM.
 
   @param  This                  The EFI_SMM_ACCESS_PROTOCOL instance.
-  @param  DescriptorIndex       Indicates that the driver wishes to open
+  @param  DescriptorIndex       Indicates that the driver wishes to close
                                 the memory tagged by this index.
 
   @retval EFI_SUCCESS           The operation was successful.
@@ -90,8 +90,9 @@ EFI_STATUS
 
 /**
   Inhibits access to the SMRAM.
+
   @param  This                  The EFI_SMM_ACCESS_PROTOCOL instance.
-  @param  DescriptorIndex       Indicates that the driver wishes to open
+  @param  DescriptorIndex       Indicates that the driver wishes to lock
                                 the memory tagged by this index.
 
   @retval EFI_SUCCESS           The operation was successful.

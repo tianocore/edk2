@@ -64,10 +64,10 @@ typedef enum {
 
   @param  This                  Protocol instance pointer.
   @param  MasterBase            The base vector for the Master PIC in the 8259 controller
-  @param  Slavebase             The base vector for the Master PIC in the 8259 controller
+  @param  SlaveBase             The base vector for the Slave PIC in the 8259 controller
 
   @retval EFI_SUCCESS           The new bases were programmed
-  @retval EFI_DEVICE_ERROR      A device erro occured programming the vector bases
+  @retval EFI_DEVICE_ERROR      A device error occured programming the vector bases
 
 **/
 typedef
@@ -116,7 +116,7 @@ EFI_STATUS
   @param  ProtectedEdgeLevel    Bit 0 is Irq0 - Bit 15 is Irq15
 
   @retval EFI_SUCCESS           8259 status returned
-  @retval EFI_DEVICE_ERROR      Error reading 8259
+  @retval EFI_DEVICE_ERROR      Error writing 8259
 
 **/
 typedef
@@ -144,7 +144,7 @@ EFI_STATUS
   @param  EdgeLevel             Optional trigger mask for the new mode.
 
   @retval EFI_SUCCESS           8259 programmed
-  @retval EFI_DEVICE_ERROR      Error writting to 8259
+  @retval EFI_DEVICE_ERROR      Error writing to 8259
 
 **/
 typedef
