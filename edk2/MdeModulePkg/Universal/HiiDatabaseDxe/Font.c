@@ -1766,6 +1766,7 @@ HiiStringToImage (
         // It forces a line break that ends this row.
         //
         Index++;
+        LineBreak = TRUE;
         break;
       }
 
@@ -1842,6 +1843,12 @@ HiiStringToImage (
             Index = Index1 + 1;
             break;
           }
+          //
+          // If don't find a line break opportunity from EndIndex to StartIndex,
+          // then jump out.
+          //
+          if (Index1 == RowInfo[RowIndex].StartIndex)
+            break;
         }
       }
       //
@@ -1968,9 +1975,9 @@ HiiStringToImage (
     Index++;
     RowIndex++;
 
-    if (Flags & EFI_HII_IGNORE_LINE_BREAK) {
+    if (!LineBreak) {
       //
-      // If setting IGNORE_LINE_BREAK attribute, only render one line to image
+      // If there is not a mandatory line break or line break opportunity, only render one line to image
       //
       break;
     }
