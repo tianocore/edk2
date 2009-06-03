@@ -265,7 +265,7 @@ UnicodeVSPrint (
   IN  VA_LIST       Marker
   )
 {
-  UINT8  BaseListMarker[256];
+  UINT64  BaseListMarker[256 / sizeof (UINT64)];
 
   DxePrintLibPrint2ProtocolVaListToBaseList (
     FALSE, 
@@ -415,7 +415,7 @@ UnicodeVSPrintAsciiFormat (
   IN  VA_LIST      Marker
   )
 {
-  UINT8  BaseListMarker[256];
+  UINT64  BaseListMarker[256 / sizeof (UINT64)];
 
   DxePrintLibPrint2ProtocolVaListToBaseList (
     TRUE, 
@@ -616,7 +616,7 @@ AsciiVSPrint (
   IN  VA_LIST       Marker
   )
 {
-  UINT8  BaseListMarker[256];
+  UINT64  BaseListMarker[256 / sizeof (UINT64)];
 
   DxePrintLibPrint2ProtocolVaListToBaseList (
     TRUE, 
@@ -763,7 +763,7 @@ AsciiVSPrintUnicodeFormat (
   IN  VA_LIST       Marker
   )
 {
-  UINT8  BaseListMarker[256];
+  UINT64  BaseListMarker[256 / sizeof (UINT64)];
 
   DxePrintLibPrint2ProtocolVaListToBaseList (
     FALSE, 
