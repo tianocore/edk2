@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -95,7 +95,7 @@ PeCoffLoaderRelocateImageExtraAction (
   if (mUnix == NULL) {
     UnixPeCoffGetUnixThunkStucture ();
   }
-  DEBUG ((EFI_D_ERROR, "Loading %s 0x%08lx - entry point 0x%08lx\n",
+  DEBUG ((EFI_D_ERROR, "Loading %a 0x%08lx - entry point 0x%08lx\n",
           ImageContext->PdbPointer,
           (UINTN)ImageContext->ImageAddress,
           (UINTN)ImageContext->EntryPoint));
@@ -105,12 +105,12 @@ PeCoffLoaderRelocateImageExtraAction (
   if (Handle) {
     Entry = mUnix->Dlsym(Handle, "_ModuleEntryPoint");
   } else {
-  	DEBUG ((EFI_D_ERROR, "%s\n", mUnix->Dlerror()));
+  	DEBUG ((EFI_D_ERROR, "%a\n", mUnix->Dlerror()));
   }
   
   if (Entry != NULL) {
     ImageContext->EntryPoint = Entry;
-    DEBUG ((EFI_D_ERROR, "Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, Entry));
+    DEBUG ((EFI_D_ERROR, "Change %a Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, Entry));
   }
 
 
