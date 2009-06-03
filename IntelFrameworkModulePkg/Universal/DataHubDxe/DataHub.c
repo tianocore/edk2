@@ -243,19 +243,22 @@ DataHubGetNextRecord (
       // Use the MTC from the Filter Driver.
       //
       FilterMonotonicCount = FilterDriver->GetNextMonotonicCount;
+       
+      //
+      // The GetNextMonotonicCount field remembers the last value from the previous time.
+      // But we already processed this vaule, so we need to find the next one.
+      //
+      *Record = GetNextDataRecord (&Private->DataListHead, ClassFilter, &FilterMonotonicCount);
       if (FilterMonotonicCount != 0) {
-        //
-        // The GetNextMonotonicCount field remembers the last value from the previous time.
-        // But we already processed this vaule, so we need to find the next one.
-        //
-        *Record         = GetNextDataRecord (&Private->DataListHead, ClassFilter, &FilterMonotonicCount);
         *MonotonicCount = FilterMonotonicCount;
-        if (FilterMonotonicCount == 0) {
-          //
-          // If there is no new record to get exit now.
-          //
-          return EFI_NOT_FOUND;
-        }
+      }
+      
+      if ((FilterDriver->GetNextMonotonicCount != 0) && (FilterMonotonicCount == 0)) {
+        //
+        // If there is no new record to get exit now.
+        //
+        *MonotonicCount = 0;
+        return EFI_NOT_FOUND;
       }
     }
   }
