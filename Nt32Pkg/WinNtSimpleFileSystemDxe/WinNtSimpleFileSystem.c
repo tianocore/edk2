@@ -902,10 +902,11 @@ OpenRoot:
   }
 
   //
-  // If file name does not equal to "." or "..",
+  // If file name does not equal to "." or ".." and not trailed with "\..",
   // then we trim the leading/trailing blanks and trailing dots
   //
-  if (StrCmp (FileName, L".") != 0 && StrCmp (FileName, L"..") != 0) {
+  if (StrCmp (FileName, L".") != 0 && StrCmp (FileName, L"..") != 0 && 
+    ((StrLen (FileName) >= 3) ? (StrCmp (&FileName[StrLen (FileName) - 3], L"\\..") != 0) : TRUE)) {
     //
     // Trim leading blanks
     //
@@ -1255,7 +1256,7 @@ OpenRoot:
     WinNtSimpleFileSystemSetInfo (&NewPrivateFile->EfiFile, &gEfiFileInfoGuid, InfoSize, Info);
   }
 
-Done: ;
+Done:
   FreePool (FileName);
 
   if (EFI_ERROR (Status)) {
