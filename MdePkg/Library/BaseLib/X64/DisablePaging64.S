@@ -28,24 +28,24 @@
 # EFIAPI
 # InternalX86DisablePaging64 (
 #   IN      UINT16                    Cs,
-#   IN      UINT64                    EntryPoint,
-#   IN      UINT64                    Context1,  OPTIONAL
+#   IN      UINT32                    EntryPoint,
+#   IN      UINT32                    Context1,  OPTIONAL
 #   IN      UINT32                    Context2,  OPTIONAL
-#   IN      UINT64                    NewStack
+#   IN      UINT32                    NewStack
 #   );
 #------------------------------------------------------------------------------
 
 ASM_GLOBAL ASM_PFX(InternalX86DisablePaging64)
 ASM_PFX(InternalX86DisablePaging64):
     cli    
-    shl    $0x20,%rcx                     # rcx[32..47] <- Cs
-    lea    L1, %eax
+    lea    L1(%rip), %r10
     mov    %r8d, %esi 
-    or     %rax, %rcx                     # rcx[0..47] <- Cs:@F
     mov    %r9d, %edi 
     mov    0x28(%rsp), %eax               # eax <- New Stack
-    push   %rcx
-    ret                                   # switch to compatibility mode
+    push   %rcx                           # push Cs to stack
+    push   %r10
+    .byte  0x48, 0xcb                     # retq: Use far return to load CS register from stack
+                                          # (Use raw byte code since some GNU assemblers generates incorrect code for "retq")  
 L1:
     mov    %eax,%esp                      # set up new stack
     mov    %cr0,%rax
