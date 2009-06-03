@@ -224,7 +224,7 @@ IScsiCreateConnection (
   //
   // set the default connection-only parameters
   //
-  Conn->MaxRecvDataSegmentLength  = MAX_RECV_DATA_SEG_LEN_IN_FFP;
+  Conn->MaxRecvDataSegmentLength  = DEFAULT_MAX_RECV_DATA_SEG_LEN;
   Conn->HeaderDigest              = ISCSI_DIGEST_NONE;
   Conn->DataDigest                = ISCSI_DIGEST_NONE;
 
@@ -1374,7 +1374,7 @@ IScsiFillOpParams (
   AsciiSPrint (Value, sizeof (Value), "%a", Session->ImmediateData ? "Yes" : "No");
   IScsiAddKeyValuePair (Pdu, ISCSI_KEY_IMMEDIATE_DATA, Value);
 
-  AsciiSPrint (Value, sizeof (Value), "%d", Conn->MaxRecvDataSegmentLength);
+  AsciiSPrint (Value, sizeof (Value), "%d", MAX_RECV_DATA_SEG_LEN_IN_FFP);
   IScsiAddKeyValuePair (Pdu, ISCSI_KEY_MAX_RECV_DATA_SEGMENT_LENGTH, Value);
 
   AsciiSPrint (Value, sizeof (Value), "%d", Session->MaxBurstLength);
