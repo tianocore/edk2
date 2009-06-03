@@ -36,14 +36,14 @@
 ;------------------------------------------------------------------------------
 InternalX86DisablePaging64    PROC
     cli
-    shl     rcx, 32                     ; rcx[32..47] <- Cs
-    lea     eax, @F
+    lea     r10, @F
     mov     esi, r8d
-    or      rcx, rax                    ; rcx[0..47] <- Cs:@F
     mov     edi, r9d
     mov     eax, [rsp + 28h]            ; eax <- New Stack
-    push    rcx
-    retf                                ; switch to compatibility mode
+    push    rcx                         ; push Cs to stack
+    push    r10
+    DB      48h                         ; prefix to composite "retq" with next "retf"
+    retf                                ; Use far return to load CS register from stack
 @@:
     mov     esp, eax                    ; set up new stack
     mov     rax, cr0
