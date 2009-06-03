@@ -49,7 +49,7 @@ DebugPrint (
   ...
   )
 {
-  UINT64          Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
+  UINT64          Buffer[(EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)) + 1];
   EFI_DEBUG_INFO  *DebugInfo;
   UINTN           TotalSize;
   VA_LIST         VaListMarker;
@@ -90,7 +90,7 @@ DebugPrint (
   //
   // Fill in EFI_DEBUG_INFO
   //
-  DebugInfo             = (EFI_DEBUG_INFO *)Buffer;
+  DebugInfo             = (EFI_DEBUG_INFO *)(Buffer) + 1;
   DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
   BaseListMarker        = (BASE_LIST)(DebugInfo + 1);
   FormatString          = (CHAR8 *)((UINT64 *)(DebugInfo + 1) + 12);
