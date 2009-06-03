@@ -177,6 +177,8 @@ UsbGetInterface (
   ASSERT (AlternateSetting != NULL);
   ASSERT (Status != NULL);
 
+  *AlternateSetting = 0;
+
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
   DevReq.RequestType  = USB_DEV_GET_INTERFACE_REQ_TYPE;
@@ -282,6 +284,8 @@ UsbGetConfiguration (
   ASSERT (UsbIo != NULL);
   ASSERT (ConfigurationValue != NULL);
   ASSERT (Status != NULL);
+
+  *ConfigurationValue = 0;
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
