@@ -76,11 +76,6 @@ DebugPrint (
   TotalSize = sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrLen (Format) + 1;
 
   //
-  // If the TotalSize is larger than the maximum record size, then ASSERT()
-  //
-  ASSERT (TotalSize <= sizeof (Buffer));
-
-  //
   // If the TotalSize is larger than the maximum record size, then return
   //
   if (TotalSize > sizeof (Buffer)) {
