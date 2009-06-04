@@ -1,8 +1,9 @@
 /** @file
-  The file defines the protocol to obtain input from the
-  ConsoleIn device. The EFI specification requires that the
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL supports the same languages as
-  the corresponding
+  Simple Text Input Ex protocol from the UEFI 2.0 specification.
+  
+  This protocol defines an extension to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL
+  which exposes much more state and modifier information from the input device,
+  also allows one to register a notification for a particular keystroke.
 
   Copyright (c) 2006 - 2009, Intel Corporation 
   All rights reserved. This program and the accompanying materials                          

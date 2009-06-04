@@ -2,7 +2,7 @@
   The file provides basic SMBus host controller management 
   and basic data transactions over the SMBus.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                          
+  Copyright (c) 2006 - 2009, Intel Corporation                                                          
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -32,7 +32,7 @@ typedef struct _EFI_SMBUS_HC_PROTOCOL EFI_SMBUS_HC_PROTOCOL;
   operation as defined in the System Management Bus (SMBus)
   Specification. The resulting transaction will be either that
   the SMBus slave devices accept this transaction or that this
-  function returns with error. Status Codes Returned
+  function returns with error. 
   
   @param This     A pointer to the EFI_SMBUS_HC_PROTOCOL instance.
                   SlaveAddress The SMBus slave address of the device

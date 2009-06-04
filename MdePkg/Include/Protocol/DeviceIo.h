@@ -4,7 +4,7 @@
   Device IO is used to abstract hardware access to devices. It includes
   memory mapped IO, IO, PCI Config space, and DMA.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -135,6 +135,7 @@ typedef enum {
   @param  Operation             Indicates if the bus master is going to read or write to system memory.
   @param  HostAddress           The system memory address to map to the device.
   @param  NumberOfBytes         On input, the number of bytes to map.
+                                On output the number of bytes that were mapped.
   @param  DeviceAddress         The resulting map address for the bus master device to use to access the
                                 hosts HostAddress.
   @param  Mapping               A resulting value to pass to Unmap().

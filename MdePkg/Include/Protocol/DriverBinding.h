@@ -4,7 +4,7 @@
   This protocol is produced by every driver that follows the UEFI Driver Model, 
   and it is the central component that allows drivers and controllers to be managed.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -113,7 +113,7 @@ EFI_STATUS
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.Not used.
   @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
-                                if NumberOfChildren is 0.Not used.
+                                if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
   @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
