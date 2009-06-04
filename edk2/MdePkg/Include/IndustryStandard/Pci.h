@@ -1,5 +1,5 @@
 /** @file
-  Support for The latest PCI standard.
+  Support for the latest PCI standard.
 
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials                          

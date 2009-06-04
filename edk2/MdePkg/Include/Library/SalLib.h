@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   defined as reserved or some fields defined as reserved must be
   zero filled or the invalid argument return value may be returned
   or undefined result may occur during the execution of the procedure.
-  This function is only available on IPF.
+  This function is only available on Intel Itanium-based platforms.
 
   @param  Index       The SAL procedure Index number
   @param  Arg2        The 2nd parameter for SAL procedure calls

@@ -60,7 +60,7 @@ EfiGoneVirtual (
   information returned by GetTime() are the values that were last set via SetTime().
   The GetTime() function should take approximately the same amount of time to read the time each
   time it is called. All reported device capabilities are to be rounded up.
-  During runtime, if a PC-AT CMOS device is present in the platform the caller must synchronize
+  During runtime, if a PC-AT CMOS device is present in the platform, the caller must synchronize
   access to the device before calling GetTime().
 
   @param  Time         A pointer to storage to receive a snapshot of the current time.
@@ -87,7 +87,7 @@ EfiGetTime (
   to loop based on the current time. For example, if the device does not support a hardware reset
   for the sub-resolution time, the code is not to implement the feature by waiting for the time to
   wrap.
-  During runtime, if a PC-AT CMOS device is present in the platform the caller must synchronize
+  During runtime, if a PC-AT CMOS device is present in the platform, the caller must synchronize
   access to the device before calling SetTime().
 
   @param  Time  A pointer to the current time. Type EFI_TIME is defined in the GetTime()
@@ -169,7 +169,7 @@ EfiSetWakeupTime (
   This service is a wrapper for the UEFI Runtime Service GetVariable().
 
   Each vendor may create and manage its own variables without the risk of name conflicts by
-  using a unique VendorGuid. When a variable is set its Attributes are supplied to indicate
+  using a unique VendorGuid. When a variable is set, its Attributes are supplied to indicate
   how the data variable should be stored and maintained by the system. The attributes affect
   when the variable may be accessed and volatility of the data. Any attempts to access a variable
   that does not have the attribute set for runtime access will yield the EFI_NOT_FOUND error.
@@ -249,7 +249,7 @@ EfiGetNextVariableName (
   Variables are stored by the firmware and may maintain their values across power cycles. Each vendor
   may create and manage its own variables without the risk of name conflicts by using a unique VendorGuid.
 
-  @param  VariableName the name of the vendor's variable, it's a
+  @param  VariableName the name of the vendor's variable, as a
                        Null-Terminated Unicode String
   @param  VendorGuid   Unify identifier for vendor.
   @param  Attributes   Point to memory location to return the attributes of variable. If the point
@@ -443,7 +443,7 @@ EfiSetVirtualAddressMap (
   @param  ListHead           Head of linked list to convert.
 
   @retval  EFI_SUCCESS  Success to execute the function.
-  @retval  !EFI_SUCCESS Failed to e3xecute the function.
+  @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
 EFI_STATUS

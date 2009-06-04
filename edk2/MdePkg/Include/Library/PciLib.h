@@ -167,7 +167,7 @@ PciAnd8 (
 
 /**
   Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit
-  value, followed a  bitwise OR with another 8-bit value.
+  value, followed by a  bitwise OR with another 8-bit value.
 
   Reads the 8-bit PCI configuration register specified by Address, performs a
   bitwise AND between the read result and the value specified by AndData,

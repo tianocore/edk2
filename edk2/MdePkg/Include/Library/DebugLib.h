@@ -216,10 +216,10 @@ DebugClearMemoryEnabled (
 /**  
   Internal worker macro that calls DebugAssert().
 
-  This macro calls DebugAssert() passing in the filename, line number, and 
-  expression that evailated to FALSE.
+  This macro calls DebugAssert(), passing in the filename, line number, and an
+  expression that evaluated to FALSE.
 
-  @param  Expression  Boolean expression that evailated to FALSE
+  @param  Expression  Boolean expression that evaluated to FALSE
 
 **/
 #define _ASSERT(Expression)  DebugAssert (__FILE__, __LINE__, #Expression)
@@ -239,7 +239,7 @@ DebugClearMemoryEnabled (
 
 
 /**  
-  Macro that calls DebugAssert() if a expression evaluates to FALSE.
+  Macro that calls DebugAssert() if an expression evaluates to FALSE.
 
   If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set, 
   then this macro evaluates the Boolean expression specified by Expression.  If 

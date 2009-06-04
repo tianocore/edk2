@@ -1,7 +1,7 @@
 /** @file
   Provides a GUID and a data structure that can be used with EFI_FILE_PROTOCOL.GetInfo()
   or EFI_FILE_PROTOCOL.SetInfo() to get or set the system's volume label.
-  This guid is defined in UEFI specification.
+  This GUID is defined in UEFI specification.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

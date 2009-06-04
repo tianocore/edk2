@@ -964,7 +964,7 @@ typedef enum {
   ///
   EfiResetWarm,
   ///
-  /// Used to induce en entry into power state equivalent to the ACPI G2/S5 or G3
+  /// Used to induce an entry into the power state equivalent to the ACPI G2/S5 or G3
   /// state.  If the system does not support this reset type, then when the system
   /// is rebooted, it should exhibit the EfiResetCold attributes.
   ///

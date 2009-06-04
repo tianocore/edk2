@@ -1,7 +1,7 @@
 /** @file
   GUID used as an FV filename for A Priori file. The A Priori file contains a
   list of FV filenames that the DXE dispatcher will schedule reguardless of
-  the dependency grammer.
+  the dependency grammar.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

@@ -1,5 +1,5 @@
 /** @file
-  Processor or Compiler specific defines and types x64 (Intel(r) EM64T, AMD64).
+  Processor or Compiler specific defines and types x64 (Intel 64, AMD64).
 
   Copyright (c) 2006 - 2009, Intel Corporation<BR>                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -397,19 +397,14 @@ typedef INT64   INTN;
 #endif
 
 //
-// Macros for GNU assembly code
+// For symbol name in GNU assembly code, an extra "_" is necessary
 //
 #if defined(__GNUC__)
   #if defined(linux)
     #define ASM_PFX(name) name
   #else
     #define ASM_PFX(name) _##name
-  #endif 
-  ///
-  /// For GNU assembly code, .global or .globl can declare global symbols.
-  /// Define this macro to unify the usage.
-  ///
-  #define ASM_GLOBAL .globl
+  #endif  
 #endif
 
 /**

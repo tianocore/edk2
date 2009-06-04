@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED  0x00000010
 
 /**
-  Sends an 32-bit value to a POST card.
+  Sends a 32-bit value to a POST card.
 
   Sends the 32-bit value specified by Value to a POST card, and returns Value.  
   Some implementations of this library function may perform I/O operations 
@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   display the 32-bit value on the status reporting device.
   
   PostCode() must actively prevent recursion.  If PostCode() is called while 
-  processing another any other Post Code Library function, then 
+  processing another Post Code Library function, then 
   PostCode() must return Value immediately.
 
   @param  Value  The 32-bit value to write to the POST card.
@@ -44,7 +44,7 @@ PostCode (
 
 
 /**
-  Sends an 32-bit value to a POST and associated ASCII string.
+  Sends a 32-bit value to a POST and associated ASCII string.
 
   Sends the 32-bit value specified by Value to a POST card, and returns Value.
   If Description is not NULL, then the ASCII string specified by Description is 
@@ -114,7 +114,7 @@ PostCodeDescriptionEnabled (
 
 
 /**
-  Sends an 32-bit value to a POST card.
+  Sends a 32-bit value to a POST card.
 
   If POST codes are enabled in PcdPostCodeProperyMask, then call PostCode() 
   passing in Value.  Value is returned.
@@ -127,7 +127,7 @@ PostCodeDescriptionEnabled (
 #define POST_CODE(Value)  PostCodeEnabled() ? PostCode(Value) : Value
 
 /**
-  Sends an 32-bit value to a POST and associated ASCII string.
+  Sends a 32-bit value to a POST and associated ASCII string.
 
   If POST codes and POST code descriptions are enabled in 
   PcdPostCodeProperyMask, then call PostCodeWithDescription() passing in 

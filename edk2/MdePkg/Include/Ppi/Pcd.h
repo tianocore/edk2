@@ -74,7 +74,7 @@ UINT8
 /**
   Retrieves a 16-bit value for a given PCD token.
 
-  Retrieves the current 16-bits value for a PCD token number.  
+  Retrieves the current 16-bit value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
   @param[in]  TokenNumber The PCD token number. 
@@ -93,7 +93,7 @@ UINT16
 /**
   Retrieves a 32-bit value for a given PCD token.
 
-  Retrieves the current 32-bits value for a PCD token number.  
+  Retrieves the current 32-bit value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
   @param[in]  TokenNumber The PCD token number. 
@@ -112,7 +112,7 @@ UINT32
 /**
   Retrieves a 64-bit value for a given PCD token.
 
-  Retrieves the current 64-bits value for a PCD token number.  
+  Retrieves the current 64-bit value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
   @param[in]  TokenNumber The PCD token number. 

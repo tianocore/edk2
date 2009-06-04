@@ -1,6 +1,6 @@
 /** @file
   Provides string functions, linked list functions, math functions, synchronization
-  functions, and CPU architecture specific functions.
+  functions, and CPU architecture-specific functions.
 
 Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
@@ -17,11 +17,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __BASE_LIB__
 
 //
-// Definitions for architecture specific types
+// Definitions for architecture-specific types
 //
 #if   defined (MDE_CPU_IA32)
 ///
-/// IA32 context buffer used by SetJump() and LongJump()
+/// IA-32 architecture context buffer used by SetJump() and LongJump()
 ///
 typedef struct {
   UINT32                            Ebx;
@@ -39,7 +39,7 @@ typedef struct {
 #if defined (MDE_CPU_IPF)
 
 ///
-/// IPF context buffer used by SetJump() and LongJump()
+/// Itanium architecture context buffer used by SetJump() and LongJump()
 ///
 typedef struct {
   UINT64                            F2[2];
@@ -88,7 +88,7 @@ typedef struct {
 
 #if defined (MDE_CPU_X64)
 ///
-/// x64 context buffer used by SetJump() and LongJump()
+/// x64 architecture context buffer used by SetJump() and LongJump()
 ///
 typedef struct {
   UINT64                            Rbx;
@@ -3159,7 +3159,7 @@ MemoryFence (
   calls to LongJump() cause a non-zero value to be returned by SetJump().
 
   If JumpBuffer is NULL, then ASSERT().
-  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
+  For Itanium processors, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
   
   NOTE: The structure BASE_LIBRARY_JUMP_BUFFER is CPU architecture specific.
   The same structure must never be used for more than one CPU architecture context.
@@ -3186,7 +3186,7 @@ SetJump (
   the state of JumpBuffer.
 
   If JumpBuffer is NULL, then ASSERT().
-  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
+  For Itanium processors, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
   If Value is 0, then ASSERT().
 
   @param  JumpBuffer  A pointer to CPU context buffer.
@@ -3311,8 +3311,8 @@ CpuPause (
   by Context1 and Context2.  Context1 and Context2 are optional and may
   be NULL.  The function EntryPoint must never return.  This function
   supports a variable number of arguments following the NewStack parameter.
-  These additional arguments are ignored on IA-32, x64, and EBC.
-  IPF CPUs expect one additional parameter of type VOID * that specifies
+  These additional arguments are ignored on IA-32, x64, and EBC architectures.
+  Itanium processors expect one additional parameter of type VOID * that specifies
   the new backing store pointer.
 
   If EntryPoint is NULL, then ASSERT().
@@ -3325,8 +3325,8 @@ CpuPause (
                       function.
   @param  NewStack    A pointer to the new stack to use for the EntryPoint
                       function.
-  @param  ...         This variable argument list is ignored for IA32, x64, and EBC.  
-                      For IPF, this variable argument list is expected to contain 
+  @param  ...         This variable argument list is ignored for IA-32, x64, and EBC architectures.  
+                      For Itanium processors, this variable argument list is expected to contain 
                       a single parameter of type VOID * that specifies the new backing 
                       store pointer.
 
@@ -3384,7 +3384,7 @@ CpuDeadLoop (
   line containing Address + Length - 1 is flushed.  This function may choose to flush 
   the entire cache if that is more efficient than flushing the specified range.  If 
   Length is 0, the no cache lines are flushed.  Address is returned.   
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 
@@ -3410,7 +3410,7 @@ AsmFlushCacheRange (
   Executes a FC instruction
   Executes a FC instruction on the cache line specified by Address.
   The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
-  An implementation may flush a larger region.  This function is only available on IPF.
+  An implementation may flush a larger region.  This function is only available on Itanium processors.
 
   @param Address    The Address of cache line to be flushed.
 
@@ -3428,7 +3428,7 @@ AsmFc (
   Executes a FC.I instruction.
   Executes a FC.I instruction on the cache line specified by Address.
   The cache line size affected is at least 32-bytes (aligned on a 32-byte boundary).
-  An implementation may flush a larger region.  This function is only available on IPF.
+  An implementation may flush a larger region.  This function is only available on Itanium processors.
 
   @param Address    The Address of cache line to be flushed.
 
@@ -3451,7 +3451,7 @@ AsmFci (
   No parameter checking is performed on Index.  If the Index value is beyond the
   implemented CPUID register range, a Reserved Register/Field fault may occur.  The caller
   must either guarantee that Index is valid, or the caller must set up fault handlers to
-  catch the faults.  This function is only available on IPF.
+  catch the faults.  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Processor Identifier Register index to read.
 
@@ -3467,7 +3467,7 @@ AsmReadCpuid (
 
 /**
   Reads the current value of 64-bit Processor Status Register (PSR).
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of PSR.
 
@@ -3485,7 +3485,7 @@ AsmReadPsr (
   No parameter checking is performed on Value.  All bits of Value corresponding to
   reserved fields of PSR must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
-  fault handlers to catch the faults. This function is only available on IPF.
+  fault handlers to catch the faults. This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to PSR.
 
@@ -3503,7 +3503,7 @@ AsmWritePsr (
   Reads the current value of 64-bit Kernel Register #0 (KR0).
   
   Reads and returns the current value of KR0. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of KR0.
 
@@ -3519,7 +3519,7 @@ AsmReadKr0 (
   Reads the current value of 64-bit Kernel Register #1 (KR1).
 
   Reads and returns the current value of KR1. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of KR1.
 
@@ -3535,7 +3535,7 @@ AsmReadKr1 (
   Reads the current value of 64-bit Kernel Register #2 (KR2).
 
   Reads and returns the current value of KR2. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of KR2.
 
@@ -3551,7 +3551,7 @@ AsmReadKr2 (
   Reads the current value of 64-bit Kernel Register #3 (KR3).
 
   Reads and returns the current value of KR3. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of KR3.
 
@@ -3567,7 +3567,7 @@ AsmReadKr3 (
   Reads the current value of 64-bit Kernel Register #4 (KR4).
 
   Reads and returns the current value of KR4. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
   
   @return The current value of KR4.
 
@@ -3583,7 +3583,7 @@ AsmReadKr4 (
   Reads the current value of 64-bit Kernel Register #5 (KR5).
 
   Reads and returns the current value of KR5. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of KR5.
 
@@ -3599,7 +3599,7 @@ AsmReadKr5 (
   Reads the current value of 64-bit Kernel Register #6 (KR6).
 
   Reads and returns the current value of KR6. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of KR6.
 
@@ -3615,7 +3615,7 @@ AsmReadKr6 (
   Reads the current value of 64-bit Kernel Register #7 (KR7).
 
   Reads and returns the current value of KR7. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of KR7.
 
@@ -3631,7 +3631,7 @@ AsmReadKr7 (
   Write the current value of 64-bit Kernel Register #0 (KR0).
   
   Writes the current value of KR0.  The 64-bit value written to 
-  the KR0 is returned. This function is only available on IPF.
+  the KR0 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR0.
 
@@ -3649,7 +3649,7 @@ AsmWriteKr0 (
   Write the current value of 64-bit Kernel Register #1 (KR1).
 
   Writes the current value of KR1.  The 64-bit value written to 
-  the KR1 is returned. This function is only available on IPF.
+  the KR1 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR1.
 
@@ -3667,7 +3667,7 @@ AsmWriteKr1 (
   Write the current value of 64-bit Kernel Register #2 (KR2).
 
   Writes the current value of KR2.  The 64-bit value written to 
-  the KR2 is returned. This function is only available on IPF.
+  the KR2 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR2.
 
@@ -3685,7 +3685,7 @@ AsmWriteKr2 (
   Write the current value of 64-bit Kernel Register #3 (KR3).
 
   Writes the current value of KR3.  The 64-bit value written to 
-  the KR3 is returned. This function is only available on IPF.
+  the KR3 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR3.
 
@@ -3703,7 +3703,7 @@ AsmWriteKr3 (
   Write the current value of 64-bit Kernel Register #4 (KR4).
 
   Writes the current value of KR4.  The 64-bit value written to 
-  the KR4 is returned. This function is only available on IPF.
+  the KR4 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR4.
 
@@ -3721,7 +3721,7 @@ AsmWriteKr4 (
   Write the current value of 64-bit Kernel Register #5 (KR5).
 
   Writes the current value of KR5.  The 64-bit value written to 
-  the KR5 is returned. This function is only available on IPF.
+  the KR5 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR5.
 
@@ -3739,7 +3739,7 @@ AsmWriteKr5 (
   Write the current value of 64-bit Kernel Register #6 (KR6).
 
   Writes the current value of KR6.  The 64-bit value written to 
-  the KR6 is returned. This function is only available on IPF.
+  the KR6 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR6.
 
@@ -3757,7 +3757,7 @@ AsmWriteKr6 (
   Write the current value of 64-bit Kernel Register #7 (KR7).
 
   Writes the current value of KR7.  The 64-bit value written to 
-  the KR7 is returned. This function is only available on IPF.
+  the KR7 is returned. This function is only available on Itanium processors.
 
   @param  Value   The 64-bit value to write to KR7.
 
@@ -3775,7 +3775,7 @@ AsmWriteKr7 (
   Reads the current value of Interval Timer Counter Register (ITC).
   
   Reads and returns the current value of ITC.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of ITC.
 
@@ -3791,7 +3791,7 @@ AsmReadItc (
   Reads the current value of Interval Timer Vector Register (ITV).
   
   Reads and returns the current value of ITV. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of ITV.
 
@@ -3807,7 +3807,7 @@ AsmReadItv (
   Reads the current value of Interval Timer Match Register (ITM).
   
   Reads and returns the current value of ITM.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of ITM.
 **/
@@ -3822,7 +3822,7 @@ AsmReadItm (
   Writes the current value of 64-bit Interval Timer Counter Register (ITC).
   
   Writes the current value of ITC.  The 64-bit value written to the ITC is returned. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to ITC.
 
@@ -3840,7 +3840,7 @@ AsmWriteItc (
   Writes the current value of 64-bit Interval Timer Match Register (ITM).
   
   Writes the current value of ITM.  The 64-bit value written to the ITM is returned. 
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to ITM.
 
@@ -3862,7 +3862,7 @@ AsmWriteItm (
   reserved fields of ITV must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to ITV.
 
@@ -3879,7 +3879,7 @@ AsmWriteItv (
 /**
   Reads the current value of Default Control Register (DCR).
   
-  Reads and returns the current value of DCR.  This function is only available on IPF.
+  Reads and returns the current value of DCR.  This function is only available on Itanium processors.
 
   @return The current value of DCR.
 
@@ -3894,7 +3894,7 @@ AsmReadDcr (
 /**
   Reads the current value of Interruption Vector Address Register (IVA).
   
-  Reads and returns the current value of IVA.  This function is only available on IPF.
+  Reads and returns the current value of IVA.  This function is only available on Itanium processors.
 
   @return The current value of IVA.
 **/
@@ -3908,7 +3908,7 @@ AsmReadIva (
 /**
   Reads the current value of Page Table Address Register (PTA).
   
-  Reads and returns the current value of PTA.  This function is only available on IPF.
+  Reads and returns the current value of PTA.  This function is only available on Itanium processors.
 
   @return The current value of PTA.
 
@@ -3928,7 +3928,7 @@ AsmReadPta (
   reserved fields of DCR must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to DCR.
 
@@ -3948,7 +3948,7 @@ AsmWriteDcr (
   Writes the current value of IVA.  The 64-bit value written to the IVA is returned.  
   The size of vector table is 32 K bytes and is 32 K bytes aligned
   the low 15 bits of Value is ignored when written.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to IVA.
 
@@ -3970,7 +3970,7 @@ AsmWriteIva (
   reserved fields of DCR must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to PTA.
 
@@ -3986,7 +3986,7 @@ AsmWritePta (
 /**
   Reads the current value of Local Interrupt ID Register (LID).
   
-  Reads and returns the current value of LID.  This function is only available on IPF.
+  Reads and returns the current value of LID.  This function is only available on Itanium processors.
 
   @return The current value of LID.
 
@@ -4001,7 +4001,7 @@ AsmReadLid (
 /**
   Reads the current value of External Interrupt Vector Register (IVR).
   
-  Reads and returns the current value of IVR.  This function is only available on IPF. 
+  Reads and returns the current value of IVR.  This function is only available on Itanium processors. 
 
   @return The current value of IVR.
 
@@ -4016,7 +4016,7 @@ AsmReadIvr (
 /**
   Reads the current value of Task Priority Register (TPR).
   
-  Reads and returns the current value of TPR.  This function is only available on IPF. 
+  Reads and returns the current value of TPR.  This function is only available on Itanium processors. 
 
   @return The current value of TPR.
 
@@ -4031,7 +4031,7 @@ AsmReadTpr (
 /**
   Reads the current value of External Interrupt Request Register #0 (IRR0).
   
-  Reads and returns the current value of IRR0.  This function is only available on IPF.  
+  Reads and returns the current value of IRR0.  This function is only available on Itanium processors.  
 
   @return The current value of IRR0.
 
@@ -4046,7 +4046,7 @@ AsmReadIrr0 (
 /**
   Reads the current value of External Interrupt Request Register #1 (IRR1).
   
-  Reads and returns the current value of IRR1.  This function is only available on IPF. 
+  Reads and returns the current value of IRR1.  This function is only available on Itanium processors. 
 
   @return The current value of IRR1.
 
@@ -4061,7 +4061,7 @@ AsmReadIrr1 (
 /**
   Reads the current value of External Interrupt Request Register #2 (IRR2).
   
-  Reads and returns the current value of IRR2.  This function is only available on IPF.
+  Reads and returns the current value of IRR2.  This function is only available on Itanium processors.
 
   @return The current value of IRR2.
 
@@ -4076,7 +4076,7 @@ AsmReadIrr2 (
 /**
   Reads the current value of External Interrupt Request Register #3 (IRR3).
   
-  Reads and returns the current value of IRR3.  This function is only available on IPF.  
+  Reads and returns the current value of IRR3.  This function is only available on Itanium processors.  
 
   @return The current value of IRR3.
 
@@ -4091,7 +4091,7 @@ AsmReadIrr3 (
 /**
   Reads the current value of Performance Monitor Vector Register (PMV).
   
-  Reads and returns the current value of PMV.  This function is only available on IPF. 
+  Reads and returns the current value of PMV.  This function is only available on Itanium processors. 
 
   @return The current value of PMV.
 
@@ -4106,7 +4106,7 @@ AsmReadPmv (
 /**
   Reads the current value of Corrected Machine Check Vector Register (CMCV).
   
-  Reads and returns the current value of CMCV.  This function is only available on IPF.
+  Reads and returns the current value of CMCV.  This function is only available on Itanium processors.
 
   @return The current value of CMCV.
 
@@ -4121,7 +4121,7 @@ AsmReadCmcv (
 /**
   Reads the current value of Local Redirection Register #0 (LRR0).
   
-  Reads and returns the current value of LRR0.  This function is only available on IPF. 
+  Reads and returns the current value of LRR0.  This function is only available on Itanium processors. 
 
   @return The current value of LRR0.
 
@@ -4136,7 +4136,7 @@ AsmReadLrr0 (
 /**
   Reads the current value of Local Redirection Register #1 (LRR1).
   
-  Reads and returns the current value of LRR1.  This function is only available on IPF.
+  Reads and returns the current value of LRR1.  This function is only available on Itanium processors.
 
   @return The current value of LRR1.
 
@@ -4156,7 +4156,7 @@ AsmReadLrr1 (
   reserved fields of LID must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to LID.
 
@@ -4178,7 +4178,7 @@ AsmWriteLid (
   reserved fields of TPR must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to TPR.
 
@@ -4195,7 +4195,7 @@ AsmWriteTpr (
 /**
   Performs a write operation on End OF External Interrupt Register (EOI).
   
-  Writes a value of 0 to the EOI Register.  This function is only available on IPF.
+  Writes a value of 0 to the EOI Register.  This function is only available on Itanium processors.
 
 **/
 VOID
@@ -4213,7 +4213,7 @@ AsmWriteEoi (
   to reserved fields of PMV must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to PMV.
 
@@ -4235,7 +4235,7 @@ AsmWritePmv (
   to reserved fields of CMCV must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to CMCV.
 
@@ -4257,7 +4257,7 @@ AsmWriteCmcv (
   to reserved fields of LRR0 must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to LRR0.
 
@@ -4279,7 +4279,7 @@ AsmWriteLrr0 (
   to reserved fields of LRR1 must be 0 or a Reserved Register/Field fault may occur.
   The caller must either guarantee that Value is valid, or the caller must
   set up fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value    The 64-bit value to write to LRR1.
 
@@ -4304,7 +4304,7 @@ AsmWriteLrr1 (
   is beyond the implemented IBR register range, a Reserved Register/Field fault may
   occur.  The caller must either guarantee that Index is valid, or the caller must
   set up fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Instruction Breakpoint Register index to read.
 
@@ -4329,7 +4329,7 @@ AsmReadIbr (
   the implemented DBR register range, a Reserved Register/Field fault may occur.
   The caller must either guarantee that Index is valid, or the caller must set up
   fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Data Breakpoint Register index to read.
 
@@ -4354,7 +4354,7 @@ AsmReadDbr (
   register set is implementation dependent.  No parameter checking is performed
   on Index.  If the Index value is beyond the implemented PMC register range,
   zero value will be returned.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Performance Monitor Configuration Register index to read.
 
@@ -4380,7 +4380,7 @@ AsmReadPmc (
   register set is implementation dependent.  No parameter checking is performed
   on Index.  If the Index value is beyond the implemented PMD register range,
   zero value will be returned.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Performance Monitor Data Register index to read.
 
@@ -4406,7 +4406,7 @@ AsmReadPmd (
   is beyond the implemented IBR register range, a Reserved Register/Field fault may
   occur.  The caller must either guarantee that Index is valid, or the caller must
   set up fault handlers to catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Instruction Breakpoint Register index to write.
   @param Value    The 64-bit value to write to IBR.
@@ -4434,7 +4434,7 @@ AsmWriteIbr (
   DBR register range, a Reserved Register/Field fault may occur.  The caller must
   either guarantee that Index is valid, or the caller must set up fault handlers to
   catch the faults.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Data Breakpoint Register index to write.
   @param Value    The 64-bit value to write to DBR.
@@ -4461,7 +4461,7 @@ AsmWriteDbr (
   counters (PMC/PMD pairs).  The remainder of PMC and PMD register set is implementation
   dependent.  No parameter checking is performed on Index.  If the Index value is
   beyond the implemented PMC register range, the write is ignored.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Performance Monitor Configuration Register index to write.
   @param Value    The 64-bit value to write to PMC.
@@ -4488,7 +4488,7 @@ AsmWritePmc (
   performance counters (PMC/PMD pairs).  The remainder of PMC and PMD register set
   is implementation dependent.  No parameter checking is performed on Index.  If the
   Index value is beyond the implemented PMD register range, the write is ignored.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Index    The 8-bit Performance Monitor Data Register index to write.
   @param Value    The 64-bit value to write to PMD.
@@ -4508,7 +4508,7 @@ AsmWritePmd (
   Reads the current value of 64-bit Global Pointer (GP).
 
   Reads and returns the current value of GP.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of GP.
 
@@ -4525,7 +4525,7 @@ AsmReadGp (
 
   Writes the current value of GP. The 64-bit value written to the GP is returned.
   No parameter checking is performed on Value.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @param Value  The 64-bit value to write to GP.
 
@@ -4543,7 +4543,7 @@ AsmWriteGp (
   Reads the current value of 64-bit Stack Pointer (SP).
 
   Reads and returns the current value of SP.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @return The current value of SP.
 
@@ -4590,7 +4590,7 @@ AsmReadSp (
 
   Reads and returns the control register specified by Index. The valid Index valued are defined
   above in "Related Definitions".
-  If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on IPF.
+  If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on Itanium processors.
 
   @param  Index                     The index of the control register to read.
 
@@ -4640,7 +4640,7 @@ AsmReadControlRegister (
 
   Reads and returns the application register specified by Index. The valid Index valued are defined
   above in "Related Definitions".
-  If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on IPF.
+  If Index is invalid then 0xFFFFFFFFFFFFFFFF is returned.  This function is only available on Itanium processors.
 
   @param  Index                     The index of the application register to read.
 
@@ -4661,7 +4661,7 @@ AsmReadApplicationRegister (
   parameter checking is performed on Index, and if the Index value is beyond the implemented MSR
   register range, a Reserved Register/Field fault may occur.  The caller must either guarantee that
   Index is valid, or the caller must set up fault handlers to catch the faults.  This function is
-  only available on IPF.
+  only available on Itanium processors.
 
   @param  Index                     The 8-bit Machine Specific Register index to read.
 
@@ -4682,7 +4682,7 @@ AsmReadMsr (
   parameter checking is performed on Index, and if the Index value is beyond the implemented MSR
   register range, a Reserved Register/Field fault may occur.  The caller must either guarantee that
   Index is valid, or the caller must set up fault handlers to catch the faults.  This function is
-  only available on IPF.
+  only available on Itanium processors.
 
   @param  Index                     The 8-bit Machine Specific Register index to write.
   @param  Value                     The 64-bit value to write to the Machine Specific Register.
@@ -4706,7 +4706,7 @@ AsmWriteMsr (
   If the CPU is in physical mode(PSR.RT=0, PSR.DT=0, PSR.IT=0), then 0 is returned.
   If the CPU is not in physical mode or virtual mode, then it is in mixed mode,
   and -1 is returned.
-  This function is only available on IPF.
+  This function is only available on Itanium processors.
 
   @retval  1  The CPU is in virtual mode.
   @retval  0  The CPU is in physical mode.
@@ -4740,7 +4740,7 @@ AsmCpuVirtual (
   argument return value may be returned or undefined result may occur during the
   execution of the procedure.  If the PalEntryPoint  does not point to a valid
   PAL entry point then the system behavior is undefined.  This function is only
-  available on IPF.
+  available on Itanium processors.
 
   @param PalEntryPoint  The PAL procedure calls entry point.
   @param Index          The PAL procedure Index number.
@@ -4894,7 +4894,7 @@ typedef struct {
 
 #if defined (MDE_CPU_IA32)
 ///
-/// Byte packed structure for an IA32 Interrupt Gate Descriptor
+/// Byte packed structure for an IA-32 Interrupt Gate Descriptor
 ///
 typedef union {
   struct {

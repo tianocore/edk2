@@ -1,6 +1,6 @@
 /** @file
   This file declares Status Code PPI.
-  This ppi provides service that allows PEIMs to report status codes.
+  This ppi provides a service that allows PEIMs to report status codes.
 
   Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -29,7 +29,7 @@
 //
 
 ///
-/// This PPI provides the sevice to report status code.
+/// This PPI provides the service to report status code.
 /// There can be only one instance of this service in the system.
 ///
 typedef struct {

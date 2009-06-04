@@ -1,7 +1,7 @@
 /** @file
   Processor or compiler specific defines and types for EBC.
 
-  We currently only have one EBC complier so there may be some Intel compiler
+  We currently only have one EBC compiler so there may be some Intel compiler
   specific functions in this file.
 
   Copyright (c) 2006 - 2009, Intel Corporation<BR>                                                         

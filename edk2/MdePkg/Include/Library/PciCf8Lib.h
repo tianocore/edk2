@@ -2,7 +2,7 @@
   Provides services to access PCI Configuration Space using the I/O ports 0xCF8 and 0xCFC.
   
   This library is identical to the PCI Library, except the access method for performing PCI 
-  configuration cycles must be though I/O ports 0xCF8 and 0xCFC.  This library only allows 
+  configuration cycles must be through I/O ports 0xCF8 and 0xCFC.  This library only allows 
   access to PCI Segment #0.
 
 Copyright (c) 2006 - 2009, Intel Corporation<BR>
