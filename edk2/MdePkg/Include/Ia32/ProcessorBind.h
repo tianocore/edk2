@@ -341,6 +341,11 @@ typedef INT32   INTN;
   #else
     #define ASM_PFX(name) _##name
   #endif 
+  ///
+  /// For GNU assembly code, .global or .globl can declare global symbols.
+  /// Define this macro to unify the usage.
+  ///
+  #define ASM_GLOBAL .globl
 #endif
 
 /**
