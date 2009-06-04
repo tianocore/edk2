@@ -347,6 +347,9 @@ InternalPrintGraphic (
   EFI_UGA_DRAW_PROTOCOL               *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     *Sto;
   EFI_HANDLE                          ConsoleHandle;
+  UINTN                               Width;
+  UINTN                               Height;
+  UINTN                               Delta;
 
   HorizontalResolution  = 0;
   VerticalResolution    = 0;
@@ -485,6 +488,15 @@ InternalPrintGraphic (
       //
       ASSERT (RowInfoArraySize <= 1);
 
+      if (RowInfoArraySize != 0) {
+        Width  = RowInfoArray[0].LineWidth;
+        Height = RowInfoArray[0].LineHeight;
+        Delta  = Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+      } else {
+        Width  = 0;
+        Height = 0;
+        Delta  = 0;
+      }
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *) Blt->Image.Bitmap,
@@ -493,9 +505,9 @@ InternalPrintGraphic (
                           PointY,
                           PointX,
                           PointY,
-                          RowInfoArray[0].LineWidth,
-                          RowInfoArray[0].LineHeight,
-                          Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                          Width,
+                          Height,
+                          Delta
                           );
     } else {
       goto Error;
@@ -507,7 +519,11 @@ InternalPrintGraphic (
   //
   // Calculate the number of actual printed characters
   //
-  PrintNum = RowInfoArray[0].EndIndex - RowInfoArray[0].StartIndex + 1;
+  if (RowInfoArraySize != 0) {
+    PrintNum = RowInfoArray[0].EndIndex - RowInfoArray[0].StartIndex + 1;
+  } else {
+    PrintNum = 0;
+  }
 
   FreePool (RowInfoArray);
   FreePool (Blt);
