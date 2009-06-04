@@ -37,7 +37,7 @@
 /**
   PAL Procedure - PAL_CACHE_FLUSH.
 
-  Flush the instruction or data caches. It is required by IPF.
+  Flush the instruction or data caches. It is required by Itanium processors.
   The PAL procedure supports the Static Registers calling
   convention. It could be called at virtual mode and physical
   mode.
@@ -127,7 +127,7 @@ typedef struct {
   PAL Procedure - PAL_CACHE_INFO.
 
   Return detailed instruction or data cache information. It is
-  required by IPF. The PAL procedure supports the Static
+  required by Itanium processors. The PAL procedure supports the Static
   Registers calling convention. It could be called at virtual
   mode and physical mode.
 
@@ -184,7 +184,7 @@ typedef struct {
   PAL Procedure - PAL_CACHE_INIT.
 
   Initialize the instruction or data caches. It is required by
-  IPF. The PAL procedure supports the Static Registers calling
+  Itanium processors. The PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode.
 
   @param Index      Index of PAL_CACHE_INIT within the list of PAL
@@ -252,7 +252,7 @@ typedef struct {
   PAL Procedure - PAL_CACHE_PROT_INFO.
 
   Return instruction or data cache protection information. It is
-  required by IPF. The PAL procedure supports the Static
+  required by Itanium processors. The PAL procedure supports the Static
   Registers calling convention. It could be called at physical
   mode and Virtual mode.
 
@@ -359,7 +359,7 @@ typedef struct {
   PAL Procedure - PAL_CACHE_SUMMARY.
 
   Return a summary of the cache hierarchy. It is required by
-  IPF. The PAL procedure supports the Static Registers calling
+  Itanium processors. The PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode and Virtual
   mode.
 
@@ -404,7 +404,7 @@ typedef struct {
   PAL Procedure - PAL_MEM_ATTRIB.
 
   Return a list of supported memory attributes.. It is required
-  by IPF. The PAL procedure supports the Static Registers calling
+  by Itanium processors. The PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode and Virtual
   mode.
 
@@ -428,7 +428,7 @@ typedef struct {
 
   Used in architected sequence to transition pages from a
   cacheable, speculative attribute to an uncacheable attribute.
-  It is required by IPF. The PAL procedure supports the Static
+  It is required by Itanium processors. The PAL procedure supports the Static
   Registers calling convention. It could be called at physical
   mode and Virtual mode.
 
@@ -452,7 +452,7 @@ typedef struct {
   PAL Procedure - PAL_PTCE_INFO.
 
   Return information needed for ptc.e instruction to purge
-  entire TC. It is required by IPF. The PAL procedure supports
+  entire TC. It is required by Itanium processors. The PAL procedure supports
   the Static Registers calling convention. It could be called at
   physical mode and Virtual mode.
 
@@ -507,7 +507,7 @@ typedef struct {
   PAL Procedure - PAL_VM_INFO.
 
   Return detailed information about virtual memory features
-  supported in the processor. It is required by IPF. The PAL
+  supported in the processor. It is required by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and Virtual mode.
 
@@ -542,7 +542,7 @@ typedef struct {
   PAL Procedure - PAL_VM_PAGE_SIZE.
 
   Return virtual memory TC and hardware walker page sizes
-  supported in the processor. It is required by IPF. The PAL
+  supported in the processor. It is required by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and Virtual mode.
 
@@ -613,7 +613,7 @@ typedef struct {
   PAL Procedure - PAL_VM_SUMMARY.
 
   Return summary information about virtual memory features
-  supported in the processor. It is required by IPF. The PAL
+  supported in the processor. It is required by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and Virtual mode.
 
@@ -646,7 +646,7 @@ typedef struct {
   PAL Procedure - PAL_VM_TR_READ.
 
   Read contents of a translation register. It is required by
-  IPF. The PAL procedure supports the Stacked Register calling
+  Itanium processors. The PAL procedure supports the Stacked Register calling
   convention. It could be called at physical mode.
 
   @param Index      Index of PAL_VM_TR_READ within the list
@@ -838,7 +838,7 @@ typedef struct {
   PAL Procedure - PAL_BUS_GET_FEATURES.
 
   Return configurable processor bus interface features and their
-  current settings. It is required by IPF. The PAL procedure
+  current settings. It is required by Itanium processors. The PAL procedure
   supports the Stacked Register calling convention. It could be
   called at physical mode.
 
@@ -862,7 +862,7 @@ typedef struct {
   PAL Procedure - PAL_BUS_SET_FEATURES.
 
   Enable or disable configurable features in processor bus
-  interface. It is required by IPF. It is required by IPF. The PAL procedure
+  interface. It is required by Itanium processors. The PAL procedure
   supports the Static Registers calling convention. It could be
   called at physical mode.
 
@@ -883,7 +883,7 @@ typedef struct {
   PAL Procedure - PAL_DEBUG_INFO.
 
   Return the number of instruction and data breakpoint
-  registers. It is required by IPF. It is required by IPF. The
+  registers. It is required by Itanium processors. The
   PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode and virtual
   mode.
@@ -909,7 +909,7 @@ typedef struct {
   PAL Procedure - PAL_FIXED_ADDR.
 
   Return the fixed component of a processor's directed address.
-  It is required by IPF. It is required by IPF. The PAL
+  It is required by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and virtual mode.
 
@@ -954,7 +954,7 @@ typedef struct {
 
   Return ratio of processor, bus, and interval time counter to
   processor input clock or output clock for platform use, if
-  generated by the processor. It is required by IPF. The PAL
+  generated by the processor. It is required by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and virtual mode.
 
@@ -1081,7 +1081,7 @@ typedef struct {
   PAL Procedure - PAL_PERF_MON_INFO.
 
   Return the number and type of performance monitors. It is
-  required by IPF. The PAL procedure supports the Static
+  required by Itanium processors. The PAL procedure supports the Static
   Registers calling convention. It could be called at physical
   mode and virtual mode.
 
@@ -1107,7 +1107,7 @@ typedef struct {
   PAL Procedure - PAL_PLATFORM_ADDR.
 
   Specify processor interrupt block address and I/O port space
-  address. It is required by IPF. The PAL procedure supports the
+  address. It is required by Itanium processors. The PAL procedure supports the
   Static Registers calling convention. It could be called at
   physical mode and virtual mode.
 
@@ -1448,7 +1448,7 @@ typedef struct {
   PAL Procedure - PAL_PROC_GET_FEATURES.
 
   Return configurable processor features and their current
-  setting. It is required by IPF. The PAL procedure supports the
+  setting. It is required by Itanium processors. The PAL procedure supports the
   Static Registers calling convention. It could be called at
   physical mode and virtual mode.
 
@@ -1482,7 +1482,7 @@ typedef struct {
   PAL Procedure - PAL_PROC_SET_FEATURES.
 
   Enable or disable configurable processor features. It is
-  required by IPF. The PAL procedure supports the Static
+  required by Itanium processors. The PAL procedure supports the Static
   Registers calling convention. It could be called at physical
   mode.
 
@@ -1519,7 +1519,7 @@ typedef struct {
 /**
   PAL Procedure - PAL_REGISTER_INFO.
 
-  Return AR and CR register information. It is required by IPF.
+  Return AR and CR register information. It is required by Itanium processors.
   The PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode and virtual
   mode.
@@ -1546,7 +1546,7 @@ typedef struct {
 /**
   PAL Procedure - PAL_RSE_INFO.
 
-  Return RSE information. It is required by IPF. The PAL
+  Return RSE information. It is required by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and virtual mode.
 
@@ -1587,7 +1587,7 @@ typedef struct {
 /**
   PAL Procedure - PAL_VERSION.
 
-  Return version of PAL code. It is required by IPF. The PAL
+  Return version of PAL code. It is required by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode and virtual mode.
 
@@ -1623,7 +1623,7 @@ typedef struct {
   PAL Procedure - PAL_MC_CLEAR_LOG.
 
   Clear all error information from processor error logging
-  registers. It is required by IPF. The PAL procedure supports
+  registers. It is required by Itanium processors. The PAL procedure supports
   the Static Registers calling convention. It could be called at
   physical mode and virtual mode.
 
@@ -1644,7 +1644,7 @@ typedef struct {
   PAL Procedure - PAL_MC_DRAIN.
 
   Ensure that all operations that could cause an MCA have
-  completed. It is required by IPF. The PAL procedure supports
+  completed. It is required by Itanium processors. The PAL procedure supports
   the Static Registers calling convention. It could be called at
   physical mode and virtual mode.
 
@@ -1916,7 +1916,7 @@ typedef struct {
   PAL Procedure - PAL_MC_ERROR_INFO.
 
   Return Processor Machine Check Information and Processor
-  Static State for logging by SAL. It is required by IPF. The
+  Static State for logging by SAL. It is required by Itanium processors. The
   PAL procedure supports the Static Registers calling
   convention. It could be called at physical and virtual mode.
 
@@ -1955,7 +1955,7 @@ typedef struct {
   PAL Procedure - PAL_MC_EXPECTED.
 
   Set/Reset Expected Machine Check Indicator. It is required by
-  IPF. The PAL procedure supports the Static Registers calling
+  Itanium processors. The PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode.
 
   @param Index      Index of PAL_MC_EXPECTED within the list of PAL
@@ -1979,7 +1979,7 @@ typedef struct {
   PAL Procedure - PAL_MC_REGISTER_MEM.
 
   Register min-state save area with PAL for machine checks and
-  inits. It is required by IPF. The PAL procedure supports the
+  inits. It is required by Itanium processors. The PAL procedure supports the
   Static Registers calling convention. It could be called at
   physical mode.
 
@@ -1999,7 +1999,7 @@ typedef struct {
   PAL Procedure - PAL_MC_RESUME.
 
   Restore minimal architected state and return to interrupted
-  process. It is required by IPF. The PAL procedure supports the
+  process. It is required by Itanium processors. The PAL procedure supports the
   Static Registers calling convention. It could be called at
   physical mode.
 
@@ -2057,7 +2057,7 @@ typedef struct {
   PAL Procedure - PAL_HALT_INFO.
 
   Return the low power capabilities of the processor. It is
-  required by IPF. The PAL procedure supports the
+  required by Itanium processors. The PAL procedure supports the
   Stacked Registers calling convention. It could be called at
   physical and virtual mode.
 
@@ -2078,7 +2078,7 @@ typedef struct {
   PAL Procedure - PAL_HALT_LIGHT.
 
   Enter the low power LIGHT HALT state. It is required by
-  IPF. The PAL procedure supports the Static Registers calling
+  Itanium processors. The PAL procedure supports the Static Registers calling
   convention. It could be called at physical and virtual mode.
 
   @param Index  Index of PAL_HALT_LIGHT within the list of PAL
@@ -2095,7 +2095,7 @@ typedef struct {
   PAL Procedure - PAL_CACHE_LINE_INIT.
 
   Initialize tags and data of a cache line for processor
-  testing. It is required by IPF. The PAL procedure supports the
+  testing. It is required by Itanium processors. The PAL procedure supports the
   Static Registers calling convention. It could be called at
   physical and virtual mode.
 
@@ -2185,7 +2185,7 @@ typedef struct {
   Returns alignment and size requirements needed for the memory
   buffer passed to the PAL_TEST_PROC procedure as well as
   information on self-test control words for the processor self
-  tests. It is required by IPF. The PAL procedure supports the
+  tests. It is required by Itanium processors. The PAL procedure supports the
   Static Registers calling convention. It could be called at
   physical mode.
 
@@ -2347,7 +2347,7 @@ typedef struct {
 /**
   PAL Procedure - PAL_TEST_PROC.
 
-  Perform late processor self test. It is required by IPF. The
+  Perform late processor self test. It is required by Itanium processors. The
   PAL procedure supports the Static Registers calling
   convention. It could be called at physical mode.
 
@@ -2391,7 +2391,7 @@ typedef struct {
   PAL Procedure - PAL_COPY_INFO.
 
   Return information needed to relocate PAL procedures and PAL
-  PMI code to memory. It is required by IPF. The PAL procedure
+  PMI code to memory. It is required by Itanium processors. The PAL procedure
   supports the Static Registers calling convention. It could be
   called at physical mode.
 
@@ -2425,7 +2425,7 @@ typedef struct {
   PAL Procedure - PAL_COPY_PAL.
 
   Relocate PAL procedures and PAL PMI code to memory. It is
-  required by IPF. The PAL procedure supports the Stacked
+  required by Itanium processors. The PAL procedure supports the Stacked
   Registers calling convention. It could be called at physical
   mode.
 
@@ -2524,7 +2524,7 @@ typedef struct {
   PAL Procedure - PAL_PMI_ENTRYPOINT.
 
   Register PMI memory entrypoints with processor. It is required
-  by IPF. The PAL procedure supports the Stacked Registers
+  by Itanium processors. The PAL procedure supports the Stacked Registers
   calling convention. It could be called at physical mode.
 
   @param Index        Index of PAL_PMI_ENTRYPOINT within the list of
@@ -2558,7 +2558,7 @@ typedef struct {
   PAL Procedure - PAL_BRAND_INFO.
 
   Provides processor branding information. It is optional by
-  IPF. The PAL procedure supports the Stacked Registers calling
+  Itanium processors. The PAL procedure supports the Stacked Registers calling
   convention. It could be called at physical and Virtual mode.
 
   @param Index        Index of PAL_BRAND_INFO within the list of PAL
@@ -2586,7 +2586,7 @@ typedef struct {
   PAL Procedure - PAL_GET_HW_POLICY.
 
   Returns the current hardware resource sharing policy of the
-  processor. It is optional by IPF. The PAL procedure supports
+  processor. It is optional by Itanium processors. The PAL procedure supports
   the Static Registers calling convention. It could be called at
   physical and Virtual mode.
 
@@ -2635,7 +2635,7 @@ typedef struct {
   PAL Procedure - PAL_SET_HW_POLICY.
 
   Sets the current hardware resource sharing policy of the
-  processor. It is optional by IPF. The PAL procedure supports
+  processor. It is optional by Itanium processors. The PAL procedure supports
   the Static Registers calling convention. It could be called at
   physical and Virtual mode.
 
@@ -2825,7 +2825,7 @@ typedef struct {
 
   Injects the requested processor error or returns information
   on the supported injection capabilities for this particular
-  processor implementation. It is optional by IPF. The PAL
+  processor implementation. It is optional by Itanium processors. The PAL
   procedure supports the Stacked Registers calling convention.
   It could be called at physical and Virtual mode.
 
@@ -2880,7 +2880,7 @@ typedef struct {
   PAL Procedure - PAL_GET_PSTATE.
 
   Returns the performance index of the processor. It is optional
-  by IPF. The PAL procedure supports the Stacked Registers
+  by Itanium processors. The PAL procedure supports the Stacked Registers
   calling convention. It could be called at physical and Virtual
   mode.
 
@@ -2928,7 +2928,7 @@ typedef struct {
   PAL Procedure - PAL_PSTATE_INFO.
 
   Returns information about the P-states supported by the
-  processor. It is optional by IPF. The PAL procedure supports
+  processor. It is optional by Itanium processors. The PAL procedure supports
   the Static Registers calling convention. It could be called
   at physical and Virtual mode.
 
@@ -2955,7 +2955,7 @@ typedef struct {
   PAL Procedure - PAL_SET_PSTATE.
 
   To request a processor transition to a given P-state. It is
-  optional by IPF. The PAL procedure supports the Stacked
+  optional by Itanium processors. The PAL procedure supports the Stacked
   Registers calling convention. It could be called at physical
   and Virtual mode.
 
@@ -2982,7 +2982,7 @@ typedef struct {
   PAL Procedure - PAL_SHUTDOWN.
 
   Put the logical processor into a low power state which can be
-  exited only by a reset event. It is optional by IPF. The PAL
+  exited only by a reset event. It is optional by Itanium processors. The PAL
   procedure supports the Static Registers calling convention. It
   could be called at physical mode.
 
@@ -3017,7 +3017,7 @@ typedef struct {
   PAL Procedure - PAL_MEMORY_BUFFER.
 
   Provides cacheable memory to PAL for exclusive use during
-  runtime. It is optional by IPF. The PAL procedure supports the
+  runtime. It is optional by Itanium processors. The PAL procedure supports the
   Static Registers calling convention. It could be called at
   physical mode.
 
@@ -3051,7 +3051,7 @@ typedef struct {
   PAL Procedure - PAL_VP_CREATE.
 
   Initializes a new vpd for the operation of a new virtual
-  processor in the virtual environment. It is optional by IPF.
+  processor in the virtual environment. It is optional by Itanium processors.
   The PAL procedure supports the Stacked Registers calling
   convention. It could be called at Virtual mode.
 
@@ -3089,7 +3089,7 @@ typedef struct {
   PAL Procedure - PAL_VP_ENV_INFO.
 
   Returns the parameters needed to enter a virtual environment.
-  It is optional by IPF. The PAL procedure supports the Stacked
+  It is optional by Itanium processors. The PAL procedure supports the Stacked
   Registers calling convention. It could be called at Virtual
   mode.
 
@@ -3123,7 +3123,7 @@ typedef struct {
   PAL Procedure - PAL_VP_EXIT_ENV.
 
   Allows a logical processor to exit a virtual environment.
-  It is optional by IPF. The PAL procedure supports the Stacked
+  It is optional by Itanium processors. The PAL procedure supports the Stacked
   Registers calling convention. It could be called at Virtual
   mode.
 
@@ -3147,7 +3147,7 @@ typedef struct {
   PAL Procedure - PAL_VP_INIT_ENV.
 
   Allows a logical processor to enter a virtual environment. It
-  is optional by IPF. The PAL procedure supports the Stacked
+  is optional by Itanium processors. The PAL procedure supports the Stacked
   Registers calling convention. It could be called at Virtual
   mode.
 
@@ -3195,7 +3195,7 @@ typedef struct {
 
   Register a different host IVT and/or a different optional
   virtualization intercept handler for the virtual processor
-  specified by vpd. It is optional by IPF. The PAL procedure
+  specified by vpd. It is optional by Itanium processors. The PAL procedure
   supports the Stacked Registers calling convention. It could be
   called at Virtual mode.
 
@@ -3223,7 +3223,7 @@ typedef struct {
   PAL Procedure - PAL_VP_RESTORE.
 
   Restores virtual processor state for the specified vpd on the
-  logical processor. It is optional by IPF. The PAL procedure
+  logical processor. It is optional by Itanium processors. The PAL procedure
   supports the Stacked Registers calling convention. It could be
   called at Virtual mode.
 
@@ -3250,7 +3250,7 @@ typedef struct {
   PAL Procedure - PAL_VP_SAVE.
 
   Saves virtual processor state for the specified vpd on the
-  logical processor. It is optional by IPF. The PAL procedure
+  logical processor. It is optional by Itanium processors. The PAL procedure
   supports the Stacked Registers calling convention. It could be
   called at Virtual mode.
 
@@ -3278,7 +3278,7 @@ typedef struct {
   PAL Procedure - PAL_VP_TERMINATE.
 
   Terminates operation for the specified virtual processor. It
-  is optional by IPF. The PAL procedure supports the Stacked
+  is optional by Itanium processors. The PAL procedure supports the Stacked
   Registers calling convention. It could be called at Virtual
   mode.
 

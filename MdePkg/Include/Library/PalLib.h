@@ -2,12 +2,12 @@
   Provides library services to make PAL Calls.
   
   The PAL Library provides a service to make a PAL CALL.  This service is identical
-  in functionality to AsmPalCall() in the Itanium specific functions of the Base Library.
-  The only difference is that the  PAL Entry Point is not passed in.  Implementations
+  in functionality to AsmPalCall() in the functions of the Base Library specific to Intel Itanium architecture.
+  The only difference is that the PAL Entry Point is not passed in.  Implementations
   of this library class must manage PAL Entry Point on their own.  For example, a PEI
   implementation can use a PPI to lookup the PAL Entry Point, and a DXE implementation
   can contain a constructor to look up the PAL Entry Point from a HOB.  This library class 
-  is only available on IPF.
+  is only available on Intel Itanium-based platforms.
   
 Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials                          
@@ -40,7 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   may cause undefined results.  For those parameters defined as reserved or some fields
   defined as reserved must be zero filled or the invalid argument return value may be
   returned or undefined result may occur during the execution of the procedure.
-  This function is only available on IPF.
+  This function is only available on Intel Itanium-based platforms.
 
   @param Index  The PAL procedure Index number.
   @param Arg2   The 2nd parameter for PAL procedure calls.

@@ -2,7 +2,7 @@
   Provides services to access PCI Configuration Space using the MMIO PCI Express window.
   
   This library is identical to the PCI Library, except the access method for performing PCI 
-  configuration cycles must be though the 256 MB PCI Express MMIO window whose base address
+  configuration cycles must be through the 256 MB PCI Express MMIO window whose base address
   is defined by PcdPciExpressBaseAddress.
 
 Copyright (c) 2006 - 2008, Intel Corporation<BR>

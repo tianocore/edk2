@@ -1,5 +1,5 @@
 /** @file
-  Processor or Compiler specific defines and types for Intel Itanium(TM).
+  Processor or Compiler specific defines and types for Intel Itanium(TM) processors.
 
   Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -17,7 +17,7 @@
 
 
 ///
-/// Define the processor type so other code can make processor based choices
+/// Define the processor type so other code can make processor-based choices
 ///
 #define MDE_CPU_IPF
 
@@ -84,7 +84,7 @@
 
 //
 // Can not cast a function pointer to a data pointer. We need to do this on
-// IPF to get access to the PLABEL.
+// Itanium processors to get access to the PLABEL.
 //
 #pragma warning ( disable : 4514 )
 
@@ -108,7 +108,7 @@
 
   #if defined(_MSC_EXTENSIONS)
     //
-    // use Microsoft C complier dependent integer width types
+    // use Microsoft C compiler dependent integer width types
     //
 
     ///
@@ -393,12 +393,6 @@ typedef INT64   INTN;
 #endif
 
 ///
-/// For GNU assembly code, .global or .globl can declare global symbols.
-/// Define this macro to unify the usage.
-///
-#define ASM_GLOBAL .globl
-
-///
 /// A pointer to a function in IPF points to a plabel.
 ///
 typedef struct {
@@ -418,7 +412,7 @@ typedef struct {
 
 /**
   Return the pointer to the first instruction of a function given a function pointer.
-  For Itanium CPUs, all function calls are made through a PLABEL, so a pointer to a function 
+  For Itanium processors, all function calls are made through a PLABEL, so a pointer to a function 
   is actually a pointer to a PLABEL.  The pointer to the first instruction of the function 
   is contained within the PLABEL.  This macro may be used to retrieve a pointer to the first 
   instruction of a function independent of the CPU architecture being used.  This is very 

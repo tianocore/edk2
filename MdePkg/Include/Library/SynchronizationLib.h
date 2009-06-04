@@ -22,7 +22,7 @@ typedef volatile UINTN              SPIN_LOCK;
 
 
 /**
-  Retrieves the architecture specific spin lock alignment requirements for
+  Retrieves the architecture-specific spin lock alignment requirements for
   optimal spin lock performance.
 
   This function retrieves the spin lock alignment requirements for optimal
@@ -34,7 +34,7 @@ typedef volatile UINTN              SPIN_LOCK;
   consumers of the spin lock synchronization functions to obtain optimal spin
   lock performance.
 
-  @return The architecture specific spin lock alignment.
+  @return The architecture-specific spin lock alignment.
 
 **/
 UINTN
@@ -140,7 +140,7 @@ ReleaseSpinLock (
 
 
 /**
-  Performs an atomic increment of an 32-bit unsigned integer.
+  Performs an atomic increment of a 32-bit unsigned integer.
 
   Performs an atomic increment of the 32-bit unsigned integer specified by
   Value and returns the incremented value. The increment operation must be
@@ -162,7 +162,7 @@ InterlockedIncrement (
 
 
 /**
-  Performs an atomic decrement of an 32-bit unsigned integer.
+  Performs an atomic decrement of a 32-bit unsigned integer.
 
   Performs an atomic decrement of the 32-bit unsigned integer specified by
   Value and returns the decremented value. The decrement operation must be

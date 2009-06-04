@@ -1,5 +1,5 @@
 /** @file
-  Processor or Compiler specific defines and types for Ia32 architecture.
+  Processor or Compiler specific defines and types for IA-32 architecture.
 
   Copyright (c) 2006 - 2009, Intel Corporation<BR>                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -333,7 +333,7 @@ typedef INT32   INTN;
 #endif
 
 //
-// Macros for GNU assembly code
+// For symbol name in GNU assembly code, an extra "_" is necessary
 //
 #if defined(__GNUC__)
   #if defined(linux)
@@ -341,16 +341,11 @@ typedef INT32   INTN;
   #else
     #define ASM_PFX(name) _##name
   #endif 
-  ///
-  /// For GNU assembly code, .global or .globl can declare global symbols.
-  /// Define this macro to unify the usage.
-  ///
-  #define ASM_GLOBAL .globl
 #endif
 
 /**
   Return the pointer to the first instruction of a function given a function pointer.
-  On IA32 CPU architectures, these two pointer values are the same, 
+  On IA-32 CPU architectures, these two pointer values are the same, 
   so the implementation of this macro is very simple.
   
   @param  FunctionPointer   A pointer to a function.

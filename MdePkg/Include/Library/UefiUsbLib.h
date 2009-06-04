@@ -1,6 +1,6 @@
 /** @file
-  Provides most usb APIs to support the Hid requests defined in Usb Hid 1.1 spec
-  and the standard requests defined in Usb 1.1 spec.
+  Provides most USB APIs to support the Hid requests defined in USB Hid 1.1 spec
+  and the standard requests defined in USB 1.1 spec.
 
 Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
@@ -18,12 +18,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __USB_DXE_LIB_H__
 
 #include <Protocol/UsbIo.h>
+#include <IndustryStandard/Usb.h>
 
 /**
   Get the descriptor of the specified USB HID interface.
 
-  Submit a USB get HID descriptor request for the USB device specified by UsbIo
-  and Interface and return the HID descriptor in HidDescriptor.
+  Submit a UsbGetHidDescriptor() request for the USB device specified by UsbIo
+  and Interface, and return the HID descriptor in HidDescriptor.
   If UsbIo is NULL, then ASSERT().
   If HidDescriptor is NULL, then ASSERT().
 
@@ -51,7 +52,7 @@ UsbGetHidDescriptor (
   Get the report descriptor of the specified USB HID interface.
 
   Submit a USB get HID report descriptor request for the USB device specified by
-  UsbIo and Interface and return the report descriptor in DescriptorBuffer.
+  UsbIo and Interface, and return the report descriptor in DescriptorBuffer.
   If UsbIo is NULL, then ASSERT().
   If DescriptorBuffer is NULL, then ASSERT().
 
@@ -81,7 +82,7 @@ UsbGetReportDescriptor (
   Get the HID protocol of the specified USB HID interface.
 
   Submit a USB get HID protocol request for the USB device specified by UsbIo
-  and Interface and return the protocol retrieved in Protocol.
+  and Interface, and return the protocol retrieved in Protocol.
   If UsbIo is NULL, then ASSERT().
   If Protocol is NULL, then ASSERT().
 
@@ -106,7 +107,7 @@ UsbGetProtocolRequest (
   Set the HID protocol of the specified USB HID interface.
 
   Submit a USB set HID protocol request for the USB device specified by UsbIo
-  and Interface and set the protocol to the value specified by Protocol.
+  and Interface, and set the protocol to the value specified by Protocol.
   If UsbIo is NULL, then ASSERT().
 
   @param  UsbIo      A pointer to the USB I/O Protocol instance for the specific USB target.
@@ -501,7 +502,7 @@ UsbClearFeature (
   Get the status of the specified device.
 
   Submit a USB device get status request for the USB device specified by UsbIo,
-  Recipient, and Target and place the result in the buffer specified by DeviceStatus.
+  Recipient, and Target, and place the result in the buffer specified by DeviceStatus.
   The status of the transfer is returned in Status.
   If UsbIo is NULL, then ASSERT().
   If DeviceStatus is NULL, then ASSERT().

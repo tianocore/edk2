@@ -1497,7 +1497,7 @@ typedef struct {
 ///
 /// This key is affected by the caps lock so that if a keyboard driver
 /// would need to disambiguate between a key which had a "1" defined
-/// versus a "a" character.  Having this bit turned on would tell
+/// versus an "a" character.  Having this bit turned on would tell
 /// the keyboard driver to use the appropriate shifted state or not.
 ///
 #define EFI_AFFECTED_BY_CAPS_LOCK            0x0002
@@ -1563,7 +1563,7 @@ typedef struct {
 //
 // Keys that have multiple control functions based on modifier
 // settings are handled in the keyboard driver implementation.
-// For instance PRINT_KEY might have a modifier held down and
+// For instance, PRINT_KEY might have a modifier held down and
 // is still a nonprinting character, but might have an alternate
 // control function like SYSREQUEST
 //

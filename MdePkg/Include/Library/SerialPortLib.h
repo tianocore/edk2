@@ -69,7 +69,7 @@ SerialPortWrite (
   @param  Buffer           Pointer to the data buffer to store the data read from the serial device.
   @param  NumberOfBytes    Number of bytes which will be read.
 
-  @retval 0                Read data failed, No data is to be read.
+  @retval 0                Read data failed, no data is to be read.
   @retval >0               Actual number of bytes read from serial device.
 
 **/

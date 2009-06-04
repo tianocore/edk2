@@ -39,7 +39,7 @@ InvalidateInstructionCache (
   aligned on a cache line boundary, then the entire instruction cache line
   containing Address + Length -1 is invalidated. This function may choose to
   invalidate the entire instruction cache if that is more efficient than
-  invalidating the specified range. If Length is 0, the no instruction cache
+  invalidating the specified range. If Length is 0, then no instruction cache
   lines are invalidated. Address is returned.
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
@@ -88,7 +88,7 @@ WriteBackInvalidateDataCache (
   line containing Address + Length -1 is written back and invalidated. This
   function may choose to write back and invalidate the entire data cache if
   that is more efficient than writing back and invalidating the specified
-  range. If Length is 0, the no data cache lines are written back and
+  range. If Length is 0, then no data cache lines are written back and
   invalidated. Address is returned.
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
@@ -136,7 +136,7 @@ WriteBackDataCache (
   cache line boundary, then the entire data cache line containing Address +
   Length -1 is written back. This function may choose to write back the entire
   data cache if that is more efficient than writing back the specified range.
-  If Length is 0, the no data cache lines are written back. This function may
+  If Length is 0, then no data cache lines are written back. This function may
   also invalidate all the data cache lines in the specified range of the cache
   coherency domain of the calling CPU. Address is returned.
 

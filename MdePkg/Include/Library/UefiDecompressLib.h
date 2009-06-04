@@ -45,7 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  SourceSize      The size, in bytes, of the source buffer.
   @param  DestinationSize A pointer to the size, in bytes, of the uncompressed buffer
                           that will be generated when the compressed buffer specified
-                          by Source and SourceSize is decompressed..
+                          by Source and SourceSize is decompressed.
   @param  ScratchSize     A pointer to the size, in bytes, of the scratch buffer that
                           is required to decompress the compressed buffer specified 
                           by Source and SourceSize.

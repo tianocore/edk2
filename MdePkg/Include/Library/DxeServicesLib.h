@@ -13,14 +13,17 @@
 
 **/
 
-#ifndef __DXE_SERVICES_LIB_H__
-#define __DXE_SERVICES_LIB_H__
+#ifndef __PI_LIB_H__
+#define __PI_LIB_H__
+
+#include <Pi/PiFirmwareFile.h>
+
 
 /**
-  Searches all the availables firmware volumes and returns the first matching FFS section. 
+  Searches all the available firmware volumes and returns the first matching FFS section. 
 
   This function searches all the firmware volumes for FFS files with an FFS filename specified by NameGuid.  
-  The order that the firmware volumes is searched is not deterministic. For each FFS file found a search 
+  The order in which the firmware volumes are searched is not deterministic. For each FFS file found, a search 
   is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance instances 
   of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer. 
   Buffer is allocated using AllocatePool(), and the size of the allocated buffer is returned in Size. 
@@ -42,7 +45,7 @@
   @param  SectionType          Indicates the FFS section type to search for within the FFS file specified by NameGuid.
   @param  SectionInstance      Indicates which section instance within the FFS file specified by NameGuid to retrieve.
   @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
-                               Is it the caller's responsibility to free this buffer using FreePool().
+                               It is the caller's responsibility to free this buffer using FreePool().
   @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
   @retval  EFI_SUCCESS          The specified FFS section was returned.
@@ -66,7 +69,7 @@ GetSectionFromAnyFv  (
   Searches the firmware volume that the currently executing module was loaded from and returns the first matching FFS section. 
 
   This function searches the firmware volume that the currently executing module was loaded 
-  from for an FFS file with an FFS filename specified by NameGuid. If the FFS file is found a search 
+  from for an FFS file with an FFS filename specified by NameGuid. If the FFS file is found, a search 
   is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance 
   instances of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer.
   Buffer is allocated using AllocatePool(), and the size of the allocated buffer is returned in Size. 
@@ -88,7 +91,7 @@ GetSectionFromAnyFv  (
   @param  SectionType          Indicates the FFS section type to search for within the FFS file specified by NameGuid.
   @param  SectionInstance      Indicates which section instance within the FFS file specified by NameGuid to retrieve.
   @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
-                               Is it the caller's responsibility to free this buffer using FreePool().
+                               It is the caller's responsibility to free this buffer using FreePool().
   @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
 
@@ -134,7 +137,7 @@ GetSectionFromFv (
   @param  SectionInstance      Indicates which section instance to retrieve within the FFS file 
                                that the currently executing module was loaded from.
   @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.  
-                               Is it the caller's responsibility to free this buffer using FreePool().
+                               It is the caller's responsibility to free this buffer using FreePool().
   @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
 
   @retval  EFI_SUCCESS          The specified FFS section was returned.

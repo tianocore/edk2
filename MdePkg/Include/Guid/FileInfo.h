@@ -1,7 +1,7 @@
 /** @file
   Provides a GUID and a data structure that can be used with EFI_FILE_PROTOCOL.SetInfo()
   and EFI_FILE_PROTOCOL.GetInfo() to set or get generic file information.
-  This guid is defined in UEFI specification.
+  This GUID is defined in UEFI specification.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
