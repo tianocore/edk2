@@ -786,7 +786,7 @@ SetWorker (
     
     case PCD_TYPE_STRING:
       if (SetPtrTypeSize (TmpTokenNumber, Size)) {
-        CopyMem (StringTable + *((UINT8 *)InternalData), Data, *Size);
+        CopyMem (StringTable + *((UINT16 *)InternalData), Data, *Size);
         Status = EFI_SUCCESS;
       } else {
         Status = EFI_INVALID_PARAMETER;
