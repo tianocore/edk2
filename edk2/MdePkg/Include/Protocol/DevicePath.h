@@ -1,8 +1,8 @@
 /** @file
   The device path protocol as defined in UEFI 2.0.
 
-  The device path represents a programatic path to a device. It's the view
-  from a software point of view. It also must persist from boot to boot, so 
+  The device path represents a programmatic path to a device,
+  from a software point of view. The path must persist from boot to boot, so 
   it can not contain things like PCI bus numbers that change from boot to boot.
 
   Copyright (c) 2006 - 2009, Intel Corporation                                                         

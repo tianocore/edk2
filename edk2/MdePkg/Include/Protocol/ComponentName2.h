@@ -27,7 +27,7 @@ typedef struct _EFI_COMPONENT_NAME2_PROTOCOL  EFI_COMPONENT_NAME2_PROTOCOL;
 
 
 /**
-  Retrieves a Unicode string that is the user readable name of
+  Retrieves a Unicode string that is the user-readable name of
   the EFI Driver.
 
   @param  This       A pointer to the
@@ -87,7 +87,7 @@ EFI_STATUS
                            retrieve the name of.  This is an
                            optional parameter that may be NULL.
                            It will be NULL for device drivers.
-                           It will also be NULL for a bus
+                           It will also be NULL for bus
                            drivers that wish to retrieve the
                            name of the bus controller.  It will
                            not be NULL for a bus driver that

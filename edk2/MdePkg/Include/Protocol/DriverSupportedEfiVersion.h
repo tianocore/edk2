@@ -1,7 +1,7 @@
 /** @file
   The protocol provides information about the version of the EFI
   specification that a driver is following. This protocol is
-  required for EFI drivers that are on PCI and other plug in
+  required for EFI drivers that are on PCI and other plug-in
   cards.
 
   Copyright (c) 2006 - 2008, Intel Corporation
@@ -26,13 +26,13 @@
 /// The EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL provides a
 /// mechanism for an EFI driver to publish the version of the EFI   
 /// specification it conforms to. This protocol must be placed on   
-/// the drivers image handle when the driver's entry point is   
+/// the driver's image handle when the driver's entry point is   
 /// called.
 ///
 typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
   ///
   /// The size, in bytes, of the entire structure. Future versions of this 
-  /// specification may grow the size of the structure.
+  /// specification may increase the size of the structure.
   /// 
   UINT32 Length;
   ///

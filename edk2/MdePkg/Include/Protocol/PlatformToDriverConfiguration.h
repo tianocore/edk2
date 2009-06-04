@@ -33,7 +33,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
   the platform about the ControllerHandle that is being started.
   Information returned from Query may lead to the drivers Start()
   function failing.
-  If the UEFI driver is a bus driver and producing a ChildHandle
+  If the UEFI driver is a bus driver and producing a ChildHandle,
   the driver must call Query after the child handle has been created
   and an EFI_DEVICE_PATH_PROTOCOL has been placed on that handle,
   but before any time consuming operation is performed. If information
@@ -57,7 +57,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
   @param ChildHandle          The handle of the child controller to
                               return information on. This is an optional
                               parameter that may be NULL. It will be
-                              NULL for device drivers, and for bus
+                              NULL for device drivers and for bus
                               drivers that attempt to get options for
                               the bus controller. It will not be NULL
                               for a bus driver that attempts to get
@@ -76,7 +76,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
                               should not attempt to free ParameterTypeGuid.
 
   @param ParameterBlock       The platform returns a pointer to the
-                              ParameterBlock structure which
+                              ParameterBlock structure, which
                               contains details about the
                               configuration parameters specific to
                               the ParameterTypeGuid. This structure
@@ -85,7 +85,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
                               protocols. UEFI driver decodes this
                               structure and its contents based on
                               ProtocolGuid. ParameterBlock is
-                              allocated by the platform and the
+                              allocated by the platform. The
                               platform is responsible for freeing
                               the ParameterBlock after Result is
                               called.
@@ -132,9 +132,9 @@ EFI_STATUS
 typedef enum {
   ///
   ///  The controller specified by ControllerHandle is still
-  ///  in a usable state, it's configuration has been updated
+  ///  in a usable state, and its configuration has been updated
   ///  via parsing the ParameterBlock. If required by the
-  ///  parameter block and the module supports an NVRAM store
+  ///  parameter block, and the module supports an NVRAM store,
   ///  the configuration information from PB was successfully
   ///  saved to the NVRAM. No actions are required before
   ///  this controller can be used again with the updated
@@ -144,7 +144,7 @@ typedef enum {
   
   ///
   ///  The driver has detected that the controller specified
-  ///  by ControllerHandle  is not in a usable state, and it
+  ///  by ControllerHandle is not in a usable state and 
   ///  needs to be stopped. The calling agent can use the
   ///  DisconnectControservice to perform this operation, and
   ///  it should be performed as soon as possible.  
@@ -156,8 +156,8 @@ typedef enum {
   ///  be stopped and restarted before it can be used again.
   ///  The calling agent can use the DisconnectController()
   ///  and ConnectController() services to perform this
-  ///  operation. The restart operation can be delayed  until
-  ///  all of the configuratiooptions have been set.  
+  ///  operation. The restart operation can be delayed until
+  ///  all of the configuration options have been set.  
   ///
   EfiPlatformConfigurationActionRestartController = 2,
   
@@ -199,7 +199,7 @@ typedef enum {
   ParameterBlock, and ParameterBlockSize. The UEFI driver may
   update values in ParameterBlock based on rules defined by
   ParameterTypeGuid. The platform is responsible for freeing
-  ParameterBlock and the UEFI driver must not try to free it
+  ParameterBlock and the UEFI driver must not try to free it.
 
   @param This               A pointer to the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL instance.
 
@@ -225,7 +225,7 @@ typedef enum {
 
   @param ParameterBlockSize The ParameterBlock size returned from Query.
 
-  @param Configuration      ActionThe driver tells the platform what
+  @param ConfigurationAction      The driver tells the platform what
                             action is required for ParameterBlock to
                             take effect.
   
@@ -285,15 +285,15 @@ struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL {
   EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL is platform
   firmware and the consumer is the UEFI driver. Note: if future
   versions of the DMTF SM CLP Specification require changes to the
-  parameter block definition, newer ParameterTypeGuid will be
+  parameter block definition, a newer ParameterTypeGuid will be
   used.
 **/
 typedef struct {
   CHAR8   *CLPCommand;        ///<  A pointer to the DMTF SM CLP command line null-terminated string that the 
-                              ///<  driver is required to parse and process when this EFI_SUCCESS The platform 
+                              ///<  driver is required to parse and process. EFI_SUCCESS The platform 
                               ///<  return parameter information for ControllerHandle. EFI_NOT_FOUND Instance 
                               ///<  was not found. EFI_INVALID_PARAMETER ControllerHandle is not a valid 
-                              ///<  EFI_HANDLE. EFI_INVALID_PARAMETER Instance is zero. function is called. 
+                              ///<  EFI_HANDLE. EFI_INVALID_PARAMETER Instance is zero. Function is called. 
                               ///<  See the DMTF SM CLP Specification 1.0 Final Standard for details on the 
                               ///<  format and syntax of the CLP command line string. CLPCommand buffer
                               ///<  is allocated by the producer of the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOOL.

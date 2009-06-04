@@ -134,7 +134,7 @@ typedef enum {
   @param  This                  A pointer to the EFI_DEVICE_IO_INTERFACE instance.
   @param  Operation             Indicates if the bus master is going to read or write to system memory.
   @param  HostAddress           The system memory address to map to the device.
-  @param  NumberOfBytes         On input the number of bytes to map.
+  @param  NumberOfBytes         On input, the number of bytes to map.
   @param  DeviceAddress         The resulting map address for the bus master device to use to access the
                                 hosts HostAddress.
   @param  Mapping               A resulting value to pass to Unmap().

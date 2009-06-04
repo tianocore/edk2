@@ -1,8 +1,8 @@
 /** @file
   EDID Discovered Protocol from the UEFI 2.0 specification.
 
-  This protocol is placed on the video output device child handle and it represents
-  the EDID information being used for output device represented by the child handle.
+  This protocol is placed on the video output device child handle. It represents
+  the EDID information being used for the output device represented by the child handle.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

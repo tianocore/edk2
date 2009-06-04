@@ -140,7 +140,7 @@ typedef struct {
   @param  DeviceType A pointer to the device type information
                      retrieved from the SCSI Controller.
 
-  @retval EFI_SUCCESS           Retrieves the device type information successfully.
+  @retval EFI_SUCCESS           Retrieved the device type information successfully.
   @retval EFI_INVALID_PARAMETER The DeviceType is NULL.
 
 **/
@@ -197,7 +197,7 @@ EFI_STATUS
   @param  This Protocol instance pointer.
 
   @retval EFI_SUCCESS      Reset the SCSI controller successfully.
-  @retval EFI_DEVICE_ERROR Errors are encountered when resetting the
+  @retval EFI_DEVICE_ERROR Errors were encountered when resetting the
                            SCSI Controller.
   @retval EFI_UNSUPPORTED  The SCSI bus does not support a device
                            reset operation.
@@ -218,7 +218,7 @@ EFI_STATUS
   @param  This    Protocol instance pointer.
   @param  Packet  The SCSI request packet to send to the SCSI
                   Controller specified by the device handle.
-  @param  Event   If the SCSI bus where the SCSI device is attached
+  @param  Event   If the SCSI bus to which the SCSI device is attached
                   does not support non-blocking I/O, then Event is
                   ignored, and blocking I/O is performed.
                   If Event is NULL, then blocking I/O is performed.
@@ -229,7 +229,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS               The SCSI Request Packet was sent by the host
                                     successfully, and TransferLength bytes were
-                                    transferred to/from DataBuffer.See
+                                    transferred to/from DataBuffer. See
                                     HostAdapterStatus, TargetStatus,
                                     SenseDataLength, and SenseData in that order
                                     for additional status information.

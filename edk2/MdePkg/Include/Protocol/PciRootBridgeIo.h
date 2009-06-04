@@ -3,7 +3,7 @@
 
   PCI Root Bridge I/O protocol is used by PCI Bus Driver to perform PCI Memory, PCI I/O, 
   and PCI Configuration cycles on a PCI Root Bridge. It also provides services to perform 
-  defferent types of bus mastering DMA
+  defferent types of bus mastering DMA.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -205,7 +205,7 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Provides the PCI controller-Cspecific addresses required to access system memory from a
+  Provides the PCI controller-specific addresses required to access system memory from a
   DMA bus master.                                                                        
             
   @param  This                  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.

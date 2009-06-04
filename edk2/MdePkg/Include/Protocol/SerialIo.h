@@ -104,15 +104,20 @@ EFI_STATUS
   );
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
-  data buts, and stop bits on a serial device.
+  Sets the following attributes for a serial device:
+  * baud rate
+  * receive FIFO depth
+  * transmit/receive time out
+  * parity 
+  * data bits
+  * stop bits
 
   @param  This             Protocol instance pointer.
-  @param  BaudRate         The requested baud rate. A BaudRate value of 0 will use the the
+  @param  BaudRate         The requested baud rate. A BaudRate value of 0 will use the
                            device's default interface speed.
   @param  ReveiveFifoDepth The requested depth of the FIFO on the receive side of the
                            serial interface. A ReceiveFifoDepth value of 0 will use
-                           the device's dfault FIFO depth.
+                           the device's default FIFO depth.
   @param  Timeout          The requested time out for a single character in microseconds.
                            This timeout applies to both the transmit and receive side of the
                            interface. A Timeout value of 0 will use the device's default time
@@ -203,7 +208,7 @@ EFI_STATUS
   @param  This              Protocol instance pointer.
   @param  BufferSize        On input, the size of the Buffer. On output, the amount of
                             data returned in Buffer.
-  @param  Buffer            The buffer to return the data into.
+  @param  Buffer            The buffer to which to return the data.
 
   @retval EFI_SUCCESS       The data was read.
   @retval EFI_DEVICE_ERROR  The device reported an error.
@@ -224,7 +229,7 @@ EFI_STATUS
   that produces the SERIAL_IO_PROTOCOL member functions.
 
   @param ControlMask
-  A mask fo the Control bits that the device supports. The device
+  A mask for the Control bits that the device supports. The device
   must always support the Input Buffer Empty control bit.
   
   @param TimeOut
@@ -272,13 +277,13 @@ typedef struct {
 
 ///
 /// The Serial I/O protocol is used to communicate with UART-style serial devices. 
-/// These can be standard UART serial ports in PC-AT systems, serial ports attached 
-/// to a USB interface, or potentially any character-based I/O device.
+/// These can be standard UART serial ports in PC-AT systems, or serial ports attached 
+/// to a USB interface or any character-based I/O device.
 ///
 struct _EFI_SERIAL_IO_PROTOCOL {
   ///
   /// The revision to which the EFI_SERIAL_IO_PROTOCOL adheres. All future revisions 
-  /// must be backwards compatible. If a future version is not back wards compatible, 
+  /// must be backwards compatible. If a future version is not backwards compatible, 
   /// it is not the same GUID.
   ///
   UINT32                      Revision;

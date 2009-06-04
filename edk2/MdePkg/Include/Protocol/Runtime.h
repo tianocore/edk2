@@ -113,8 +113,8 @@ struct _EFI_RUNTIME_EVENT_ENTRY {
 struct _EFI_RUNTIME_ARCH_PROTOCOL {
   EFI_LIST_ENTRY          ImageHead;    ///< A list of type EFI_RUNTIME_IMAGE_ENTRY.
   EFI_LIST_ENTRY          EventHead;    ///< A list of type EFI_RUNTIME_EVENT_ENTRY.
-  UINTN                   MemoryDescriptorSize;   ///< Size of a memory descriptor that is return by GetMemoryMap().
-  UINT32                  MemoryDesciptorVersion; ///< Version of a memory descriptor that is return by GetMemoryMap().
+  UINTN                   MemoryDescriptorSize;   ///< Size of a memory descriptor that is returned by GetMemoryMap().
+  UINT32                  MemoryDesciptorVersion; ///< Version of a memory descriptor that is returned by GetMemoryMap().
   UINTN                   MemoryMapSize;///< Size of the memory map in bytes contained in MemoryMapPhysical and MemoryMapVirtual. 
   EFI_MEMORY_DESCRIPTOR   *MemoryMapPhysical;     ///< Pointer to a runtime buffer that contains a copy of 
                                                   ///< the memory map returned via GetMemoryMap().

@@ -3,7 +3,7 @@
 
   Abstraction of a very simple text based output device like VGA text mode or
   a serial terminal. The Simple Text Out protocol instance can represent
-  a single hardware device or a virtual device that is an agregation
+  a single hardware device or a virtual device that is an aggregation
   of multiple physical devices.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
@@ -137,11 +137,11 @@ typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 
 //
 // We currently define attributes from 0 - 7F for color manipulations
-// To internally handle the local display characteristics for a particular character, we are defining
-// Bit 7 to signify the local glyph representation for a character.  If turned on, glyphs will be
+// To internally handle the local display characteristics for a particular character, 
+// Bit 7 signifies the local glyph representation for a character.  If turned on, glyphs will be
 // pulled from the wide glyph database and will display locally as a wide character (16 X 19 versus 8 X 19)
 // If bit 7 is off, the narrow glyph database will be used.  This does NOT affect information that is sent to
-// non-local displays (e.g. serial or LAN consoles).
+// non-local displays, such as serial or LAN consoles.
 //
 #define EFI_WIDE_ATTRIBUTE  0x80
 
@@ -263,7 +263,7 @@ EFI_STATUS
                     and must be zero. The valid Attributes are defined in this file.
 
   @retval EFI_SUCCESS     The attribute was set.
-  @retval EFI_DEVICE_     ERROR The device had an error and could not complete the request.
+  @retval EFI_DEVICE_ERROR  The device had an error and could not complete the request.
   @retval EFI_UNSUPPORTED The attribute requested is not defined.
 
 **/

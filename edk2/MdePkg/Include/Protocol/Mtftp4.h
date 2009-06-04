@@ -182,9 +182,9 @@ typedef struct {
 //
 
 /**
-  a callback function that is provided by the caller to intercept               
+  A callback function that is provided by the caller to intercept               
   the EFI_MTFTP4_OPCODE_DATA or EFI_MTFTP4_OPCODE_DATA8 packets processed in the
-  EFI_MTFTP4_PROTOCOL.ReadFile() function, and alternatively to intercept       
+  EFI_MTFTP4_PROTOCOL.ReadFile() function, or alternatively to intercept       
   EFI_MTFTP4_OPCODE_OACK or EFI_MTFTP4_OPCODE_ERROR packets during a call to    
   EFI_MTFTP4_PROTOCOL.ReadFile(), WriteFile() or ReadDirectory().                   
 
@@ -230,7 +230,7 @@ EFI_STATUS
   );
 
 /**
-  a callback function that the caller provides to feed data to the
+  A callback function that the caller provides to feed data to the
   EFI_MTFTP4_PROTOCOL.WriteFile() function.
 
   @param  This   Pointer to the EFI_MTFTP4_PROTOCOL instance.

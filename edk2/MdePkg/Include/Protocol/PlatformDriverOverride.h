@@ -65,7 +65,7 @@ EFI_STATUS
                                 exists.                                                          
   @param  DriverImagePath       On input, a pointer to the previous driver device path returned by
                                 GetDriverPath(). On output, a pointer to the next driver
-                                device path. Passing in a pointer to NULL, will return the first
+                                device path. Passing in a pointer to NULL will return the first
                                 driver device path for ControllerHandle.
                                 
   @retval EFI_SUCCESS           The driver override for ControllerHandle was returned in

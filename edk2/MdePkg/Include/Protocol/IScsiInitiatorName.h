@@ -1,6 +1,6 @@
 /** @file
   EFI_ISCSI_INITIATOR_NAME_PROTOCOL as defined in UEFI 2.0.
-  It rovides the ability to get and set the iSCSI Initiator Name.                                                  
+  It provides the ability to get and set the iSCSI Initiator Name.                                                  
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

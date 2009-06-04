@@ -171,8 +171,8 @@ typedef struct {
 
   @retval EFI_SUCCESS               The SCSI Request Packet was sent by the host, and
                                     TransferLength bytes were transferred to/from
-                                    DataBuffer.See HostAdapterStatus, TargetStatus,
-                                    SenseDataLength,and SenseData in that order
+                                    DataBuffer. See HostAdapterStatus, TargetStatus,
+                                    SenseDataLength, and SenseData in that order
                                     for additional status information.
   @retval EFI_BAD_BUFFER_SIZE       The SCSI Request Packet was executed, but the
                                     entire DataBuffer could not be transferred.
@@ -223,7 +223,7 @@ EFI_STATUS
                  Target ID of the first SCSI device present on
                  a SCSI channel.
   @param  Lun    On input, a pointer to the LUN of a SCSI device
-                 present on the SCSI channel.On output, a pointer
+                 present on the SCSI channel. On output, a pointer
                  to the LUN of the next SCSI device present on a
                  SCSI channel.
 
@@ -360,7 +360,7 @@ EFI_STATUS
 
 ///
 /// The EFI_SCSI_PASS_THRU_PROTOCOL provides information about a SCSI channel and
-/// the ability to send SCI Request Packets to any SCSI device attached to that SCSI channel. The
+/// the ability to send SCSI Request Packets to any SCSI device attached to that SCSI channel. The
 /// information includes the Target ID of the host controller on the SCSI channel, the attributes of
 /// the SCSI channel, the printable name for the SCSI controller, and the printable name of the
 /// SCSI channel.

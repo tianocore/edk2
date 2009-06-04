@@ -90,10 +90,10 @@ typedef struct {
 /**
   Describes font output-related information.
 
-  This structure is used for describing the way in which a string
+  This structure is used for describing the way a string
   should be rendered in a particular font. FontInfo specifies the
-  basic font information and ForegroundColor and BackgroundColor
-  specify the color in which they should be displayed. The flags
+  basic font information, and ForegroundColor and BackgroundColor
+  specify the color in which the characters should be displayed. The flags
   in FontInfoMask describe where the system default should be
   supplied instead of the specified information. The flags also
   describe what options can be used to make a match between the
@@ -194,7 +194,7 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
                           string on the row where it is
                           displayed. Non-printing characters
                           will have the offset ~0. The caller is
-                          responsible to allocate a buffer large
+                          responsible for allocating a buffer large
                           enough so that there is one entry for
                           each character in the string, not
                           including the null-terminator. It is
@@ -231,7 +231,7 @@ EFI_STATUS
 
   This function renders a string as a bitmap or to the screen
   and can clip or wrap the string. The bitmap is either supplied
-  by the caller or else is allocated by the function. The
+  by the caller or allocated by the function. The
   strings are drawn with the font, size and style specified and
   can be drawn transparently or opaquely. The function can also
   return information about each row and each character's

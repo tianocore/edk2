@@ -295,7 +295,7 @@ EFI_STATUS
                                       attempting to access the firmware volume.
 
   @retval EFI_ACCESS_DENIED           The firmware volume is configured to
-                                      isallow reads.
+                                      disallow reads.
 
 **/
 typedef

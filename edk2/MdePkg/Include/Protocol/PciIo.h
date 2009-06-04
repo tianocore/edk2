@@ -59,7 +59,7 @@ typedef enum {
 #define EFI_PCI_IO_ATTRIBUTE_VGA_IO               0x0010  ///< I/O cycles 0x3B0-0x3BB and 0x3C0-0x3DF (10 bit decode)
 #define EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO       0x0020  ///< I/O cycles 0x1F0-0x1F7, 0x3F6, 0x3F7 (10 bit decode)
 #define EFI_PCI_IO_ATTRIBUTE_IDE_SECONDARY_IO     0x0040  ///< I/O cycles 0x170-0x177, 0x376, 0x377 (10 bit decode)
-#define EFI_PCI_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE 0x0080  ///< Map a memory range so write are combined
+#define EFI_PCI_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE 0x0080  ///< Map a memory range so writes are combined
 #define EFI_PCI_IO_ATTRIBUTE_IO                   0x0100  ///< Enable the I/O decode bit in the PCI Config Header
 #define EFI_PCI_IO_ATTRIBUTE_MEMORY               0x0200  ///< Enable the Memory decode bit in the PCI Config Header
 #define EFI_PCI_IO_ATTRIBUTE_BUS_MASTER           0x0400  ///< Enable the DMA bit in the PCI Config Header
@@ -127,7 +127,7 @@ typedef enum {
 } EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION;
 
 /**                                                                 
-  Reads from the memory space of a PCI controller. Returns when either the polling exit criteria is
+  Reads from the memory space of a PCI controller. Returns either when the polling exit criteria is
   satisfied or after a defined duration.                                                           
           
   @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
@@ -283,7 +283,7 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Provides the PCI controller-Cspecific addresses needed to access system memory.
+  Provides the PCI controller-specific addresses needed to access system memory.
             
   @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
   @param  Operation             Indicates if the bus master is going to read or write to system memory.
@@ -515,7 +515,7 @@ EFI_STATUS
 
 ///
 /// The EFI_PCI_IO_PROTOCOL provides the basic Memory, I/O, PCI configuration, 
-/// and DMA interfaces that are used to abstract accesses to PCI controllers. 
+/// and DMA interfaces used to abstract accesses to PCI controllers. 
 /// There is one EFI_PCI_IO_PROTOCOL instance for each PCI controller on a PCI bus. 
 /// A device driver that wishes to manage a PCI controller in a system will have to 
 /// retrieve the EFI_PCI_IO_PROTOCOL instance that is associated with the PCI controller. 

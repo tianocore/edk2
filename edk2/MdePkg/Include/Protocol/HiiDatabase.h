@@ -147,8 +147,7 @@ EFI_STATUS
   EFI_HII_PACKAGE_TYPE_GUID, the Guid field, as defined in
   EFI_HII_PACKAGE_GUID_HEADER. Iterate through the packages within
   the existing package list in the HII database specified by
-  Handle. If a package??s type matches one of the types collected
-  in step 1, then perform the following steps:
+  Handle. If a package's type matches one of the collected types, then perform the following steps:
   - Call any functions registered with the notification type
   REMOVE_PACK.
   - Remove the package from the package list and the HII
@@ -355,7 +354,7 @@ EFI_STATUS
   @retval EFI_SUCCESS   Unregister the notification Successsfully
   
   @retval EFI_NOT_FOUND The incoming notification handle does not exist 
-                        in current hii database.
+                        in the current hii database.
   
 **/
 typedef

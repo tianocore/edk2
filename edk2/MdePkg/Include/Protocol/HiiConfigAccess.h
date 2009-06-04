@@ -95,7 +95,7 @@ typedef UINTN EFI_BROWSER_ACTION;
                                   process the names.
 
   @retval EFI_INVALID_PARAMETER   Illegal syntax. Progress set
-                                  to most recent & before the
+                                  to most recent "&" before the
                                   error or the beginning of the
                                   string.
 
@@ -173,7 +173,7 @@ EFI_STATUS
   @param  QuestionId             A unique value which is sent to the original
                                  exporting driver so that it can identify the type
                                  of data to expect. The format of the data tends to 
-                                 vary based on the opcode that enerated the callback.
+                                 vary based on the opcode that generated the callback.
   @param  Type                   The type of value for the question.
   @param  Value                  A pointer to the data being sent to the original
                                  exporting driver.

@@ -131,9 +131,9 @@ typedef struct {
   @retval EFI_SUCCESS            The new station address was successfully
                                  registered.
   @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
-                                 This is NULL. SwAddressLength is zero when
-                                 ConfigData is not NULL. StationAddress is NULL
-                                 when ConfigData is not NULL.
+                                 * This is NULL. 
+                                 * SwAddressLength is zero when ConfigData is not NULL. 
+                                 * StationAddress is NULL when ConfigData is not NULL.
   @retval EFI_ACCESS_DENIED      The SwAddressType, SwAddressLength, or
                                  StationAddress is different from the one that is
                                  already registered.
@@ -181,11 +181,11 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            The entry has been added or updated.
   @retval EFI_INVALID_PARAMETER  One or more of the following conditions is TRUE:
-                                 This is NULL. DenyFlag is FALSE and
-                                 TargetHwAddress is NULL. DenyFlag is FALSE and
-                                 TargetSwAddress is NULL. TargetHwAddress is NULL
-                                 and TargetSwAddress is NULL. Both TargetSwAddress
-                                 and TargetHwAddress are not NULL when DenyFlag is
+                                 * This is NULL. 
+                                 * DenyFlag is FALSE and TargetHwAddress is NULL. 
+                                 * DenyFlag is FALSE and TargetSwAddress is NULL. 
+                                 * TargetHwAddress is NULL and TargetSwAddress is NULL. 
+                                 * Neither TargetSwAddress nor TargetHwAddress are NULL when DenyFlag is
                                  TRUE.
   @retval EFI_OUT_OF_RESOURCES   The new ARP cache entry could not be allocated.
   @retval EFI_ACCESS_DENIED      The ARP cache entry already exists and Overwrite
@@ -326,7 +326,7 @@ EFI_STATUS
   );  
 
 /**
-  This function aborts the previous ARP request (identified by This,  TargetSwAddress
+  This function aborts the previous ARP request (identified by This, TargetSwAddress
   and ResolvedEvent) that is issued by EFI_ARP_PROTOCOL.Request().
   
   If the request is in the internal ARP request queue, the request is aborted 

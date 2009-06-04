@@ -9,7 +9,7 @@
   EFI_REAL_TIME_CLOCK_ARCH_PROTOCOL_GUID protocol is registered with a NULL 
   pointer.
 
-  No CRC of the EFI system table is required, as it is done in the DXE core.
+  No CRC of the EFI system table is required, since that is done in the DXE core.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

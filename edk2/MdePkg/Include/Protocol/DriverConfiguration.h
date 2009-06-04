@@ -35,7 +35,7 @@ typedef struct _EFI_DRIVER_CONFIGURATION_PROTOCOL  EFI_DRIVER_CONFIGURATION_PROT
   @param  ControllerHandle The handle of the controller to set options on.
   @param  ChildHandle      The handle of the child controller to set options on.  This
                            is an optional parameter that may be NULL.  It will be NULL
-                           for device drivers, and for a bus drivers that wish to set
+                           for device drivers, and for bus drivers that wish to set
                            options for the bus controller.  It will not be NULL for a
                            bus driver that wishes to set options for one of its child
                            controllers.
@@ -88,7 +88,7 @@ EFI_STATUS
   @param  ChildHandle      The handle of the child controller to test if it's current
                            configuration options are valid.  This is an optional
                            parameter that may be NULL.  It will be NULL for device
-                           drivers.  It will also be NULL for a bus drivers that wish
+                           drivers.  It will also be NULL for bus drivers that wish
                            to test the configuration options for the bus controller.
                            It will not be NULL for a bus driver that wishes to test
                            configuration options for one of its child controllers.
@@ -121,9 +121,9 @@ EFI_STATUS
 
   @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to force default configuration options on.
-  @param  ChildHandle      The handle of the child controller to force default configuration options on  This is an optional parameter that may be NULL.  It will be NULL for device drivers.  It will also be NULL for a bus drivers that wish to force default configuration options for the bus controller.  It will not be NULL for a bus driver that wishes to force default configuration options for one of its child controllers.
+  @param  ChildHandle      The handle of the child controller to force default configuration options on  This is an optional parameter that may be NULL.  It will be NULL for device drivers.  It will also be NULL for bus drivers that wish to force default configuration options for the bus controller.  It will not be NULL for a bus driver that wishes to force default configuration options for one of its child controllers.
   @param  DefaultType      The type of default configuration options to force on the controller specified by ControllerHandle and ChildHandle.  See Table 9-1 for legal values.  A DefaultType of 0x00000000 must be supported by this protocol.
-  @param  ActionRequired   A pointer to the action that the calling agent is required to perform when this function returns.  See "Related Definitions" in Section 9.1for a list of the actions that the calling agent is required to perform prior to accessing ControllerHandle again.
+  @param  ActionRequired   A pointer to the action that the calling agent is required to perform when this function returns.  See "Related Definitions" in Section 9.1 for a list of the actions that the calling agent is required to perform prior to accessing ControllerHandle again.
 
   @retval EFI_SUCCESS           The driver specified by This successfully forced the default configuration options on the controller specified by ControllerHandle and ChildHandle.
   @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.

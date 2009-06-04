@@ -1,11 +1,11 @@
 /** @file
   SimpleFileSystem protocol as defined in the UEFI 2.0 specification.
 
-  The SimpleFileSystem protocol is the programatic access to the FAT (12,16,32) 
+  The SimpleFileSystem protocol is the programmatic access to the FAT (12,16,32) 
   file system specified in UEFI 2.0. It can also be used to abstract a file  
   system other than FAT.
 
-  UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem
+  UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -181,11 +181,11 @@ EFI_STATUS
   );
 
 /**
-  Write data from to the file.
+  Write data from or to the file.
 
   @param  This       Protocol instance pointer.
-  @param  BufferSize On input size of buffer, on output amount of data in buffer.
-  @param  Buffer     The buffer in which data to write.
+  @param  BufferSize On input: size of buffer. On output: amount of data in buffer.
+  @param  Buffer     The buffer in which to write data.
 
   @retval EFI_SUCCESS          Data was written.
   @retval EFI_UNSUPPORT        Writes to Open directory are not supported
@@ -209,7 +209,7 @@ EFI_STATUS
   Set a files current position
 
   @param  This            Protocol instance pointer.
-  @param  Position        Byte possition from the start of the file
+  @param  Position        Byte position, from the start of the file
                           
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
@@ -223,10 +223,10 @@ EFI_STATUS
   );
 
 /**
-  Get a files current position
+  Get a file's current position
 
   @param  This            Protocol instance pointer.
-  @param  Position        Byte possition from the start of the file
+  @param  Position        Byte position, from the start of the file
                           
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
@@ -244,7 +244,7 @@ EFI_STATUS
 
   @param  This            Protocol instance pointer.
   @param  InformationType Type of info to return in Buffer
-  @param  BufferSize      On input size of buffer, on output amount of data in buffer.
+  @param  BufferSize      On input: size of buffer. On output: amount of data in buffer.
   @param  Buffer          The buffer to return data.
 
   @retval EFI_SUCCESS          Data was returned.
