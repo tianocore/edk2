@@ -13,11 +13,8 @@
 
 **/
 
-#ifndef __PI_LIB_H__
-#define __PI_LIB_H__
-
-#include <Pi/PiFirmwareFile.h>
-
+#ifndef __DXE_SERVICES_LIB_H__
+#define __DXE_SERVICES_LIB_H__
 
 /**
   Searches all the available firmware volumes and returns the first matching FFS section. 

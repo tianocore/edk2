@@ -333,6 +333,15 @@ struct _LIST_ENTRY {
 //  }
 //
 
+/**
+  Return the size of argument that has been aligned to sizeof (UINTN).
+
+  @param  n    The parameter size is to be aligned.
+
+  @return The aligned size
+**/
+#define _INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
+
 #if defined(__GNUC__)
 //
 // Use GCC built-in macros for variable argument lists.
@@ -346,15 +355,6 @@ typedef __builtin_va_list VA_LIST;
 #define VA_END(Marker)               __builtin_va_end (Marker)
 
 #else
-/**
-  Return the size of argument that has been aligned to sizeof (UINTN).
-
-  @param  n    The parameter size to be aligned.
-
-  @return The aligned size
-**/
-#define _INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
-
 ///
 /// Pointer to the start of a variable argument list. Same as CHAR8 *.
 ///
@@ -408,6 +408,29 @@ typedef CHAR8 *VA_LIST;
 #define VA_END(Marker)      (Marker = (VA_LIST) 0)
 
 #endif
+
+///
+/// Pointer to the start of a variable argument list stored in a memory buffer. Same as UINT8 *.
+///
+typedef UINTN  *BASE_LIST;
+
+/**
+  Returns an argument of a specified type from a variable argument list and updates 
+  the pointer to the variable argument list to point to the next argument. 
+
+  This function returns an argument of the type specified by TYPE from the beginning 
+  of the variable argument list specified by Marker.  Marker is then updated to point 
+  to the next argument in the variable argument list.  The method for computing the 
+  pointer to the next argument in the argument list is CPU specific following the EFIAPI ABI.
+
+  @param   Marker   Pointer to the beginning of a variable argument list.
+  @param   TYPE     The type of argument to retrieve from the beginning 
+                    of the variable argument list.
+  
+  @return  An argument of the type specified by TYPE.
+
+**/
+#define BASE_ARG(Marker, TYPE) (*(TYPE *)((UINT8 *)(Marker = (BASE_LIST)((UINT8 *)Marker + _INT_SIZE_OF (TYPE))) - _INT_SIZE_OF (TYPE)))
 
 /**
   Macro that returns the byte offset of a field in a data structure. 

@@ -393,6 +393,12 @@ typedef INT64   INTN;
 #endif
 
 ///
+/// For GNU assembly code, .global or .globl can declare global symbols.
+/// Define this macro to unify the usage.
+///
+#define ASM_GLOBAL .globl
+
+///
 /// A pointer to a function in IPF points to a plabel.
 ///
 typedef struct {
