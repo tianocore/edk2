@@ -59,6 +59,62 @@ typedef enum {
   EfiPlatformHookAfterRomInit     = 2
 } EFI_GET_PLATFORM_HOOK_MODE;
 
+
+//
+//
+//
+
+#define PCI_UNUSED        0x00
+#define PCI_USED          0xFF
+#define LEGACY_USED       0xFE
+
+#pragma pack(1)
+
+//
+//
+//
+typedef struct {
+  UINT8 Irq;
+  UINT8 Used;
+} EFI_LEGACY_IRQ_PRIORITY_TABLE_ENTRY;
+
+//
+// Define PIR table structures
+//
+#define EFI_LEGACY_PIRQ_TABLE_SIGNATURE SIGNATURE_32 ('$', 'P', 'I', 'R')
+
+typedef struct {
+  UINT32  Signature;
+  UINT8   MinorVersion;
+  UINT8   MajorVersion;
+  UINT16  TableSize;
+  UINT8   Bus;
+  UINT8   DevFun;
+  UINT16  PciOnlyIrq;
+  UINT16  CompatibleVid;
+  UINT16  CompatibleDid;
+  UINT32  Miniport;
+  UINT8   Reserved[11];
+  UINT8   Checksum;
+} EFI_LEGACY_PIRQ_TABLE_HEADER;
+
+
+typedef struct {
+  UINT8   Pirq;
+  UINT16  IrqMask;
+} EFI_LEGACY_PIRQ_ENTRY;
+
+typedef struct {
+  UINT8                 Bus;
+  UINT8                 Device;
+  EFI_LEGACY_PIRQ_ENTRY PirqEntry[4];
+  UINT8                 Slot;
+  UINT8                 Reserved;
+} EFI_LEGACY_IRQ_ROUTING_ENTRY;
+
+#pragma pack()
+
+
 /**
   Finds the binary data or other platform information.
 

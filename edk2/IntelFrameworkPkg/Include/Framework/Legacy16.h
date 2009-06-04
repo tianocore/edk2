@@ -87,6 +87,22 @@ typedef enum {
   Legacy16InstallPciHandler     = 0x0008
 } EFI_COMPATIBILITY_FUNCTIONS;
 
+
+///////////////////////////////////////////////////////////////////////////////
+// EFI_DISPATCH_OPROM_TABLE
+///////////////////////////////////////////////////////////////////////////////
+
+typedef struct {
+  UINT16  PnPInstallationCheckSegment;
+  UINT16  PnPInstallationCheckOffset;
+  UINT16  OpromSegment;
+  UINT8   PciBus;
+  UINT8   PciDeviceFunction;
+  UINT8   NumberBbsEntries;
+  VOID    *BbsTablePointer; /// @bug: variable size on 32/64-bit systems.
+  UINT16  RuntimeSegment;
+} EFI_DISPATCH_OPROM_TABLE;
+
 //
 // EFI_TO_COMPATIBILITY16_INIT_TABLE
 //

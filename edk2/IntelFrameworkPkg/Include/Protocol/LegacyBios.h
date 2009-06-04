@@ -42,6 +42,14 @@
 typedef struct _EFI_LEGACY_BIOS_PROTOCOL EFI_LEGACY_BIOS_PROTOCOL;
 
 //
+// Flags returned by CheckPciRom()
+//
+#define NO_ROM            0x00
+#define ROM_FOUND         0x01
+#define VALID_LEGACY_ROM  0x02
+#define ROM_WITH_CONFIG   0x04     // Not defined in CSM Specification0.96
+
+//
 /// @bug These macros appear in no specifications and are kept for backward
 //        compatibility only.
 // Convert from 32-bit address (_Adr) to Segment:Offset 16-bit form
