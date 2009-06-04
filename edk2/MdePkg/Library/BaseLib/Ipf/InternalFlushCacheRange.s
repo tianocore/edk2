@@ -1,5 +1,5 @@
 //++
-// Copyright (c) 2006 - 2008, Intel Corporation                                                         
+// Copyright (c) 2006 - 2009, Intel Corporation                                                         
 // All rights reserved. This program and the accompanying materials                          
 // are licensed and made available under the terms and conditions of the BSD License         
 // which accompanies this distribution.  The full text of the license may be found at        
@@ -9,7 +9,7 @@
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 // 
 //  Module Name:
-//    FlushCacheRange.s 
+//    InternalFlushCacheRange.s 
 //
 //  Abstract:
 //    Assemble routine to flush cache lines 
@@ -22,20 +22,18 @@
 #include <IpfMacro.i>
 
 //
-//  Invalidates a range of instruction cache lines in the cache coherency domain
-//  of the calling CPU.
+//  Internal worker function to invalidate a range of instruction cache lines
+//  in the cache coherency domain of the calling CPU.
 //
-//  Invalidates the instruction cache lines specified by Address and Length. If
-//  Address is not aligned on a cache line boundary, then entire instruction
-//  cache line containing Address is invalidated. If Address + Length is not
-//  aligned on a cache line boundary, then the entire instruction cache line
-//  containing Address + Length -1 is invalidated. This function may choose to
-//  invalidate the entire instruction cache if that is more efficient than
-//  invalidating the specified range. If Length is 0, the no instruction cache
-//  lines are invalidated. Address is returned.
+//  Internal worker function to invalidate the instruction cache lines specified
+//  by Address and Length. If Address is not aligned on a cache line boundary,
+//  then entire instruction cache line containing Address is invalidated. If
+//  Address + Length is not aligned on a cache line boundary, then the entire
+//  instruction cache line containing Address + Length -1 is invalidated. This
+//  function may choose to invalidate the entire instruction cache if that is more
+//  efficient than invalidating the specified range. If Length is 0, the no instruction
+//  cache lines are invalidated. Address is returned.
 //  This function is only available on IPF.
-//
-//  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 //
 //  @param  Address The base address of the instruction cache lines to
 //                  invalidate. If the CPU is in a physical addressing mode, then
@@ -48,12 +46,12 @@
 //  
 //  VOID *
 //  EFIAPI
-//  AsmFlushCacheRange (
+//  InternalFlushCacheRange (
 //    IN      VOID                      *Address,
 //    IN      UINTN                     Length
 //    );
 //
-PROCEDURE_ENTRY (AsmFlushCacheRange)
+PROCEDURE_ENTRY (InternalFlushCacheRange)
 
       NESTED_SETUP (5,8,0,0)
             
@@ -92,5 +90,5 @@ DoneFlushingC:
       mov          r8   = in0       // return *Address
       NESTED_RETURN
 
-PROCEDURE_EXIT (AsmFlushCacheRange)
+PROCEDURE_EXIT (InternalFlushCacheRange)
 

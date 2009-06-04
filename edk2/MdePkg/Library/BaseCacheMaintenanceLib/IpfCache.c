@@ -1,7 +1,7 @@
 /** @file
   Cache Maintenance Functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -64,7 +64,6 @@ InvalidateInstructionCacheRange (
   IN      UINTN                     Length
   )
 {
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
   return AsmFlushCacheRange (Address, Length);
 }
 
@@ -120,8 +119,6 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-
   return AsmFlushCacheRange (Address, Length);
 }
 
@@ -176,8 +173,6 @@ WriteBackDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-
   return AsmFlushCacheRange (Address, Length);
 }
 
@@ -239,7 +234,6 @@ InvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
   //
   // Invalidation of a data cache range without writing back is not supported on
   // IPF architecture, so write back and invalidate operation is performed.
