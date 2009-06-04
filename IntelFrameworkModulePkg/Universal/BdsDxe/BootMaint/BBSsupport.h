@@ -17,8 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
-#define MAX_BBS_ENTRIES 0x100
-
 /**
   Build Legacy Device Name String according.
 
