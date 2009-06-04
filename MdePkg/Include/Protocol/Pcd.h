@@ -74,9 +74,9 @@ UINT8
 
 
 /**
-  Retrieves an 16-bit value for a given PCD token.
+  Retrieves a 16-bit value for a given PCD token.
 
-  Retrieves the current 16-bits value for a PCD token number.  
+  Retrieves the current 16-bit value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
   @param[in]  TokenNumber The PCD token number. 
@@ -93,9 +93,9 @@ UINT16
 
 
 /**
-  Retrieves an 32-bit value for a given PCD token.
+  Retrieves a 32-bit value for a given PCD token.
 
-  Retrieves the current 32-bits value for a PCD token number.  
+  Retrieves the current 32-bit value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
   @param[in]  TokenNumber The PCD token number. 
@@ -112,9 +112,9 @@ UINT32
 
 
 /**
-  Retrieves an 64-bit value for a given PCD token.
+  Retrieves a 64-bit value for a given PCD token.
 
-  Retrieves the current 64-bits value for a PCD token number.  
+  Retrieves the current 64-bit value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
   @param[in]  TokenNumber The PCD token number. 
@@ -215,7 +215,7 @@ UINT8
 
 
 /**
-  Retrieves an 16-bit value for a given PCD token.
+  Retrieves a 16-bit value for a given PCD token.
 
   Retrieves the 16-bit value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -238,7 +238,7 @@ UINT16
 
 
 /**
-  Retrieves an 32-bit value for a given PCD token.
+  Retrieves a 32-bit value for a given PCD token.
 
   Retrieves the 32-bit value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -294,7 +294,7 @@ UINT64
   @param[in]  Guid        The token space for the token number.
   @param[in]  TokenNumber The PCD token number. 
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
   
 **/
 typedef
@@ -307,7 +307,7 @@ VOID *
 
 
 /**
-  Retrieves an Boolean value for a given PCD token.
+  Retrieves a Boolean value for a given PCD token.
 
   Retrieves the Boolean value of a particular PCD token.  
   If the TokenNumber is invalid or the token space
@@ -377,7 +377,7 @@ EFI_STATUS
 
 
 /**
-  Sets an 16-bit value for a given PCD token.
+  Sets a 16-bit value for a given PCD token.
 
   When the PCD service sets a value, it will check to ensure that the 
   size of the value being set is compatible with the Token's existing definition.  
@@ -403,7 +403,7 @@ EFI_STATUS
 
 
 /**
-  Sets an 32-bit value for a given PCD token.
+  Sets a 32-bit value for a given PCD token.
 
   When the PCD service sets a value, it will check to ensure that the 
   size of the value being set is compatible with the Token's existing definition.  
@@ -429,7 +429,7 @@ EFI_STATUS
 
 
 /**
-  Sets an 64-bit value for a given PCD token.
+  Sets a 64-bit value for a given PCD token.
 
   When the PCD service sets a value, it will check to ensure that the 
   size of the value being set is compatible with the Token's existing definition.  
@@ -486,7 +486,7 @@ EFI_STATUS
 
 
 /**
-  Sets an Boolean value for a given PCD token.
+  Sets a Boolean value for a given PCD token.
 
   When the PCD service sets a value, it will check to ensure that the 
   size of the value being set is compatible with the Token's existing definition.  
@@ -568,7 +568,7 @@ EFI_STATUS
 
 
 /**
-  Sets an 32-bit value for a given PCD token.
+  Sets a 32-bit value for a given PCD token.
 
   When the PCD service sets a value, it will check to ensure that the 
   size of the value being set is compatible with the Token's existing definition.  
@@ -596,7 +596,7 @@ EFI_STATUS
 
 
 /**
-  Sets an 64-bit value for a given PCD token.
+  Sets a 64-bit value for a given PCD token.
 
   When the PCD service sets a value, it will check to ensure that the 
   size of the value being set is compatible with the Token's existing definition.  
@@ -657,7 +657,7 @@ EFI_STATUS
 
 
 /**
-  Sets an Boolean value for a given PCD token.
+  Sets a Boolean value for a given PCD token.
 
   When the PCD service sets a value, it will check to ensure that the 
   size of the value being set is compatible with the Token's existing definition.  
@@ -690,8 +690,8 @@ EFI_STATUS
   This notification function serves two purposes. 
   Firstly, it notifies the module which did the registration that the value 
   of this PCD token has been set. Secondly, it provides a mechanism for the 
-  module which did the registration to intercept the set operation and override 
-  the value been set if necessary. After the invocation of the callback function, 
+  module that did the registration to intercept the set operation and override 
+  the value that has been set, if necessary. After the invocation of the callback function, 
   TokenData will be used by PCD service DXE driver to modify the internal data in 
   PCD database.
 
@@ -775,7 +775,7 @@ EFI_STATUS
 
 
   @param[in]      Guid    The 128-bit unique value that designates the namespace from which to retrieve the next token. 
-                          This is an optional parameter that may be NULL.  If this parameter is NULL, then a request is 
+                          This is an optional parameter that may be NULL. If this parameter is NULL, then a request is 
                           being made to retrieve tokens from the default token space.
   @param[in,out]  TokenNumber 
                           A pointer to the PCD token number to use to find the subsequent token number.  
@@ -798,14 +798,14 @@ EFI_STATUS
 /**
   Retrieves the next valid PCD token namespace for a given namespace.
 
-  @param[in, out]  Guid An indirect pointer to EFI_GUID.  On input it designates 
+  @param[in, out]  Guid An indirect pointer to EFI_GUID. On input it designates 
                         a known token namespace from which the search will start. On output, 
                         it designates the next valid token namespace on the platform. If the input 
                         token namespace does not exist on the platform, an error is returned and 
                         the value of *Guid is undefined. If *Guid is NULL, then the GUID of the 
                         first token space of the current platform is assigned to *Guid the function 
-                        return EFI_SUCCESS. If  *Guid is NULL  and there is no namespace exist in 
-                        the platform other than the default (NULL) tokennamespace, *Guid is unchanged 
+                        return EFI_SUCCESS. If *Guid is NULL  and there is no namespace exist in 
+                        the platform other than the default (NULL) token namespace, *Guid is unchanged 
                         and the function return EFI_SUCCESS. If this input token namespace is the last 
                         namespace on the platform, *Guid will be assigned to NULL and the function return 
                         EFI_SUCCESS. 

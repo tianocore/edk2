@@ -87,8 +87,9 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
                                   for the Request parameter
                                   would result in this type of
                                   error. The Progress parameter
-                                  is set to NULL. EFI_NOT_FOUND
-                                  Routing data doesn't match any
+                                  is set to NULL. 
+  
+  @retval EFI_NOT_FOUND           Routing data doesn't match any
                                   known driver. Progress set to
                                   the "G" in "GUID" of the
                                   routing header that doesn't
@@ -256,8 +257,8 @@ EFI_STATUS
   @retval EFI_NOT_FOUND           Target for the specified routing data
                                   was not found. Progress points to the
                                   'G' in "GUID" of the errant routing
-                                  data. EFI_DEVICE_ERROR Block not large
-                                  enough. Progress undefined.
+                                  data. 
+  @retval EFI_DEVICE_ERROR 				Block not large enough. Progress undefined.
 
   @retval EFI_INVALID_PARAMETER   Encountered non <BlockName>
                                   formatted string. Block is
@@ -324,7 +325,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            The request succeeded. Progress points to the null
                                  terminator at the end of the ConfigResp string.
-  @retval EFI_OUT_OF_RESOURCES   Not enough memory to allocate Config.     Progress
+  @retval EFI_OUT_OF_RESOURCES   Not enough memory to allocate Config. Progress
                                  points to the first character of ConfigResp.
   @retval EFI_INVALID_PARAMETER  Passing in a NULL for the ConfigResp or
                                  Block parameter would result in this type of

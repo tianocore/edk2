@@ -115,7 +115,7 @@ typedef struct {
 #define BIS_GET_SIGINFO_ARRAY(BisDataPtr) ((EFI_BIS_SIGNATURE_INFO *) (BisDataPtr)->Data)
 
 ///
-/// Support old name for backward compatible
+/// Support old name for backward compatibility
 ///
 #define BOOT_OBJECT_AUTHORIZATION_PARMSET_GUIDVALUE \
         BOOT_OBJECT_AUTHORIZATION_PARMSET_GUID
@@ -146,11 +146,11 @@ typedef struct {
                                    TargetAddress.Data was any other value that was not
                                    supported by the implementation.                   
   @retval EFI_OUT_OF_RESOURCES     The function failed due to lack of memory or other resources.                              
-  @retval EFI_DEVICE_ERROR         The function encountered an unexpected internal failure while
-                                   initializing a cryptographic software module, or
-                                   No cryptographic software module with compatible version was
-                                   found, or A resource limitation was encountered while using a
-                                   cryptographic software module.
+  @retval EFI_DEVICE_ERROR         One of the following device errors:
+                                   * The function encountered an unexpected internal failure while initializing a cryptographic software module
+                                   * No cryptographic software module with compatible version was found
+                                   found
+                                   * A resource limitation was encountered while using a cryptographic software module.
   @retval EFI_INVALID_PARAMETER    The This parameter supplied by the caller is NULL or does not
                                    reference a valid EFI_BIS_PROTOCOL object, or
                                    The AppHandle parameter supplied by the caller is NULL or

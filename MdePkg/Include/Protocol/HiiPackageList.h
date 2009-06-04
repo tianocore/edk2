@@ -2,7 +2,7 @@
   EFI_HII_PACKAGE_LIST_PROTOCOL as defined in UEFI 2.1.
   Boot service LoadImage() installs EFI_HII_PACKAGE_LIST_PROTOCOL on the handle
   if the image contains a custom PE/COFF resource with the type 'HII'.
-  The protocol's interface pointer points to the HII package list which is
+  The protocol's interface pointer points to the HII package list, which is
   contained in the resource's data.
   
   Copyright (c) 2009, Intel Corporation

@@ -1,5 +1,5 @@
 /** @file
-  The file provides services that allow information about a
+  The file provides services that allow information about an
   absolute pointer device to be retrieved.
   
   Copyright (c) 2006 - 2008, Intel Corporation
@@ -108,7 +108,7 @@ EFI_STATUS
 **/
 typedef struct {
   ///
-  /// The unsigned position of the activation on the x axis If the AboluteMinX 
+  /// The unsigned position of the activation on the x axis. If the AboluteMinX 
   /// and the AboluteMaxX fields of the EFI_ABSOLUTE_POINTER_MODE structure are 
   /// both 0, then this pointer device does not support an x-axis, and this field
   /// must be ignored.
@@ -116,7 +116,7 @@ typedef struct {
   UINT64 CurrentX;
   
   ///
-  /// The unsigned position of the activation on the x axis If the AboluteMinY 
+  /// The unsigned position of the activation on the x axis. If the AboluteMinY 
   /// and the AboluteMaxY fields of the EFI_ABSOLUTE_POINTER_MODE structure are 
   /// both 0, then this pointer device does not support an y-axis, and this field
   /// must be ignored.  
@@ -180,10 +180,9 @@ EFI_STATUS
 /// The EFI_ABSOLUTE_POINTER_PROTOCOL provides a set of services
 /// for a pointer device that can be used as an input device from an
 /// application written to this specification. The services include
-/// the ability to reset the pointer device, retrieve the state of
+/// the ability to: reset the pointer device, retrieve the state of
 /// the pointer device, and retrieve the capabilities of the pointer
-/// device. In addition certain data items describing the device are
-/// provided.
+/// device. The service also provides certain data items describing the device.
 ///
 struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
   EFI_ABSOLUTE_POINTER_RESET      Reset;

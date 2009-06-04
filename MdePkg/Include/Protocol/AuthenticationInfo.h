@@ -145,14 +145,14 @@ typedef struct {
 } CHAP_LOCAL_AUTH_NODE;
 
 /**
-  Retrieves the Authentication information associated with a particular controller handle.
+  Retrieves the authentication information associated with a particular controller handle.
 
   @param  This                  Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
   @param  ControllerHandle      Handle to the Controller
   @param  Buffer                Pointer to the authentication information.
 
-  @retval EFI_SUCCESS           Successfully retrieved Authentication information for the given ControllerHandle
-  @retval EFI_INVALID_PARAMETER No matching Authentication information found for the given ControllerHandle
+  @retval EFI_SUCCESS           Successfully retrieved authentication information for the given ControllerHandle
+  @retval EFI_INVALID_PARAMETER No matching authentication information found for the given ControllerHandle
   @retval EFI_DEVICE_ERROR      The authentication information could not be retrieved due to a
                                 hardware error.
 
@@ -166,14 +166,14 @@ EFI_STATUS
   );  
 
 /**
-  Set the Authentication information for a given controller handle.
+  Set the authentication information for a given controller handle.
 
   @param  This                 Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
   @param  ControllerHandle     Handle to the Controller
   @param  Buffer               Pointer to the authentication information.
                                 
-  @retval EFI_SUCCESS          Successfully set Authentication information for the given ControllerHandle
-  @retval EFI_UNSUPPORTED      If the platform policies do not allow setting of the Authentication
+  @retval EFI_SUCCESS          Successfully set authentication information for the given ControllerHandle
+  @retval EFI_UNSUPPORTED      If the platform policies do not allow setting of the authentication
                                information.
   @retval EFI_DEVICE_ERROR     The authentication information could not be configured due to a
                                hardware error.

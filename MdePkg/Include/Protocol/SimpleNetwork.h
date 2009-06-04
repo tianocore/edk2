@@ -284,7 +284,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The network interface was initialized.
   @retval EFI_NOT_STARTED       The network interface has not been started
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory for the transmit and
-                                receive buffers.   .
+                                receive buffers.
   @retval EFI_INVALID_PARAMETER One or more of the parameters has an unsupported value.
   @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
   @retval EFI_UNSUPPORTED       This function is not supported by the network interface.

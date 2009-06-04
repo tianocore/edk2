@@ -5,7 +5,7 @@
   EFI_STATUS_CODE_ARCH_PROTOCOL_GUID protocol is registered with a NULL 
   pointer.
 
-  No CRC of the EFI system table is required, as it is done in the DXE core.
+  No CRC of the EFI system table is required, since that is done in the DXE core.
 
   This code abstracts Status Code reporting.
 

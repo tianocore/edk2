@@ -285,7 +285,7 @@ typedef struct {
 typedef struct {
   //
   // The first reserved field is necessary to preserve alignment for the correct
-  // bits in UNAT and to insure F2 is 16 byte aligned..
+  // bits in UNAT and to insure F2 is 16 byte aligned.
   //
   UINT64  Reserved;
   UINT64  R1;

@@ -1,7 +1,7 @@
 /** @file
   EDID Override Protocol from the UEFI 2.0 specification.
 
-  Allow platform to provide EDID information to producer of the Graphics Output
+  Allow platform to provide EDID information to the producer of the Graphics Output
   protocol.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         

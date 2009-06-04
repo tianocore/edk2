@@ -88,7 +88,7 @@ typedef struct {
 
 
 /**
-  Dynamically allocate storage for a child UGA_DEVICE .
+  Dynamically allocate storage for a child UGA_DEVICE.
 
   @param[in]     This            The EFI_UGA_IO_PROTOCOL instance. 
   @param[in]     ParentDevice    ParentDevice specifies a pointer to the parent device of Device.
@@ -116,7 +116,7 @@ EFI_STATUS
 
 
 /**
-  Delete a dynamically allocated child UGA_DEVICE object that was allocated via CreateDevice() .
+  Delete a dynamically allocated child UGA_DEVICE object that was allocated via CreateDevice().
 
   @param[in]     This            The EFI_UGA_IO_PROTOCOL instance. Type EFI_UGA_IO_PROTOCOL is 
                                  defined in Section 10.7.

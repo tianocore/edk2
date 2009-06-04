@@ -1,7 +1,7 @@
 /** @file
   Simple Pointer protocol from the UEFI 2.0 specification.
 
-  Abstraction of a very simple pointer device like a mice or tracekballs.
+  Abstraction of a very simple pointer device like a mouse or trackball.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

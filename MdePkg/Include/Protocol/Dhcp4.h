@@ -720,7 +720,7 @@ EFI_STATUS
   If *OptionCount isn't zero, and there is enough space for all the DHCP options
   in the Packet, each element of PacketOptionList is set to point to somewhere in
   the Packet->Dhcp4.Option where a new DHCP option begins. If RFC3396 is supported,
-  the caller should reassemble the parsed DHCP options to get the finial result.
+  the caller should reassemble the parsed DHCP options to get the final result.
   If *OptionCount is zero or there isn't enough space for all of them, the number
   of DHCP options in the Packet is returned in OptionCount.
 

@@ -32,7 +32,7 @@ typedef struct _EFI_DECOMPRESS_PROTOCOL  EFI_DECOMPRESS_PROTOCOL;
   buffer is returned in DestinationSize, the size of the scratch buffer is 
   returned in ScratchSize, and EFI_SUCCESS is returned.
 
-  The GetInfo() function does not have scratch buffer available to perform 
+  The GetInfo() function does not have a scratch buffer available to perform 
   a thorough checking of the validity of the source data. It just retrieves
   the 'Original Size' field from the beginning bytes of the source data and
   output it as DestinationSize.  And ScratchSize is specific to the decompression

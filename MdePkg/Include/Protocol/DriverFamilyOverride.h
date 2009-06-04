@@ -32,7 +32,7 @@ typedef struct _EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL  EFI_DRIVER_FAMILY_OVERRIDE_
   Retrieves the version of the driver that is used by the EFI Boot Service ConnectController()
   to sort the set of Driver Binding Protocols in order from highest priority to lowest priority.
   For drivers that support the Driver Family Override Protocol, those drivers are sorted so that
-  the drivers with higher values returned by GetVersion() are high priority that drivers that
+  the drivers with higher values returned by GetVersion() are higher priority than drivers that
   return lower values from GetVersion().
 
   @param  This                  A pointer to the EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL instance.                            

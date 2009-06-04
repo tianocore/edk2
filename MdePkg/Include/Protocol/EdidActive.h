@@ -1,7 +1,7 @@
 /** @file
   EDID Active Protocol from the UEFI 2.0 specification.
 
-  Placed on the video output device child handle that are actively displaying output.
+  Placed on the video output device child handle that is actively displaying output.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

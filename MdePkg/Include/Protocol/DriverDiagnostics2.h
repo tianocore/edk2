@@ -31,11 +31,11 @@ typedef struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL  EFI_DRIVER_DIAGNOSTICS2_PROTOC
   @param  ControllerHandle The handle of the controller to run diagnostics on.
   @param  ChildHandle      The handle of the child controller to run diagnostics on
                            This is an optional parameter that may be NULL.  It will
-                           be NULL for device drivers.  It will also be NULL for a
+                           be NULL for device drivers.  It will also be NULL for 
                            bus drivers that wish to run diagnostics on the bus
                            controller.  It will not be NULL for a bus driver that
                            wishes to run diagnostics on one of its child controllers.
-  @param  DiagnosticType   Indicates type of diagnostics to perform on the controller
+  @param  DiagnosticType   Indicates the type of diagnostics to perform on the controller
                            specified by ControllerHandle and ChildHandle.   See
                            "Related Definitions" for the list of supported types.
   @param  Language         A pointer to a Null-terminated ASCII string
