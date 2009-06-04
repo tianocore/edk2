@@ -5,7 +5,7 @@
   information from configuration applications, routing the
   results to the appropriate drivers.
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -108,7 +108,7 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_EXTRACT_CONFIG)(
+(EFIAPI * EFI_HII_EXTRACT_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      Request,
   OUT       EFI_STRING                      *Progress,
@@ -124,7 +124,7 @@ EFI_STATUS
   call has deceptively few inputs but the implementation is likely
   to be somewhat complex. The requirement is to scan all IFR in
   the HII database to determine the list of names and then request
-  the configuration using the corresponding drivers??
+  the configuration using the corresponding drivers.
   EFI_HII_CONFIG_ACCESS_PROTOCOL.ExtractConfig() interfaces below.
   
   @param This     Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
@@ -152,7 +152,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_EXPORT_CONFIG)(
+(EFIAPI * EFI_HII_EXPORT_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   OUT       EFI_STRING                      *Results
 );
@@ -199,7 +199,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_ROUTE_CONFIG)(
+(EFIAPI * EFI_HII_ROUTE_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      Configuration,
   OUT       EFI_STRING                      *Progress
@@ -269,7 +269,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_BLOCK_TO_CONFIG)(
+(EFIAPI * EFI_HII_BLOCK_TO_CONFIG)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      ConfigRequest,
   IN CONST  UINT8                           *Block,
@@ -339,7 +339,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HII_ROUTING_CONFIG_TO_BLOCK)(
+(EFIAPI * EFI_HII_CONFIG_TO_BLOCK)(
   IN CONST  EFI_HII_CONFIG_ROUTING_PROTOCOL *This,
   IN CONST  EFI_STRING                      ConfigResp,
   IN OUT    UINT8                           *Block,
@@ -397,11 +397,11 @@ EFI_STATUS
 /// instance of this protocol in the system.
 ///
 struct _EFI_HII_CONFIG_ROUTING_PROTOCOL {
-  EFI_HII_ROUTING_EXTRACT_CONFIG  ExtractConfig;
-  EFI_HII_ROUTING_EXPORT_CONFIG   ExportConfig;
-  EFI_HII_ROUTING_ROUTE_CONFIG    RouteConfig;
-  EFI_HII_ROUTING_BLOCK_TO_CONFIG BlockToConfig;
-  EFI_HII_ROUTING_CONFIG_TO_BLOCK ConfigToBlock;
+  EFI_HII_EXTRACT_CONFIG  ExtractConfig;
+  EFI_HII_EXPORT_CONFIG   ExportConfig;
+  EFI_HII_ROUTE_CONFIG    RouteConfig;
+  EFI_HII_BLOCK_TO_CONFIG BlockToConfig;
+  EFI_HII_CONFIG_TO_BLOCK ConfigToBlock;
   EFI_HII_GET_ALT_CFG             GetAltConfig;
 };
 

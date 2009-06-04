@@ -1,7 +1,7 @@
 /** @file
   The file provides services to retrieve font information.
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -251,8 +251,7 @@ EFI_STATUS
   EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is set, then it modifies the
   behavior of EFI_HII_OUT_FLAG_CLIP so that if a row's bottom
   most pixel cannot fit, then it will not be drawn at all. This
-  flag requires that EFI_HII_OUT_FLAG_CLIP be set. Draft for
-  Review HII Protocols Version 2.1 November 3, 2006 1285 If
+  flag requires that EFI_HII_OUT_FLAG_CLIP be set. If
   EFI_HII_OUT_FLAG_WRAP is set, then text will be wrapped at the
   right-most line-break opportunity prior to a character whose
   right-most extent would exceed Width. If no line-break

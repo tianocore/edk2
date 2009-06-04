@@ -11,7 +11,7 @@
     may include support for the Internet Group Management
     Protocol (IGMP).
   
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -311,7 +311,10 @@ EFI_STATUS
   @retval EFI_SUCCESS           The driver instance was successfully opened.
   @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
                                 RARP, etc.) is not finished yet.
-  @retval EFI_INVALID_PARAMETER At least one of the parameters was invalid. 
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                This is NULL.
+                                IpConfigData.StationAddress is not a unicast IPv4 address.
+                                IpConfigData.SubnetMask is not a valid IPv4 subnet 
   @retval EFI_UNSUPPORTED       One or more of the following conditions is TRUE:
                                 A configuration protocol (DHCP, BOOTP, RARP, etc.) could
                                 not be located when clients choose to use the default IPv4

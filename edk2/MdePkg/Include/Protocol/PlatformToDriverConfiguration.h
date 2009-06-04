@@ -5,7 +5,7 @@
   by a UEFI Driver in its Start() function. This protocol allows the driver to receive 
   configuration information as part of being started.
 
-  Copyright (c) 2006 - 2008, Intel Corporation 
+  Copyright (c) 2006 - 2009, Intel Corporation 
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -290,10 +290,7 @@ struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL {
 **/
 typedef struct {
   CHAR8   *CLPCommand;        ///<  A pointer to the DMTF SM CLP command line null-terminated string that the 
-                              ///<  driver is required to parse and process. EFI_SUCCESS The platform 
-                              ///<  return parameter information for ControllerHandle. EFI_NOT_FOUND Instance 
-                              ///<  was not found. EFI_INVALID_PARAMETER ControllerHandle is not a valid 
-                              ///<  EFI_HANDLE. EFI_INVALID_PARAMETER Instance is zero. Function is called. 
+                              ///<  driver is required to parse and process when this function is called. 
                               ///<  See the DMTF SM CLP Specification 1.0 Final Standard for details on the 
                               ///<  format and syntax of the CLP command line string. CLPCommand buffer
                               ///<  is allocated by the producer of the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOOL.

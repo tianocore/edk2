@@ -1,7 +1,7 @@
 /** @file
   Platform Configuration Database (PCD) Protocol
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -43,7 +43,6 @@ extern EFI_GUID gPcdProtocolGuid;
   @param[in]  SkuId The SKU value that will be used when the PCD service will retrieve and 
                     set values associated with a PCD token.
 
-  @retval VOID
 
 **/
 typedef 
