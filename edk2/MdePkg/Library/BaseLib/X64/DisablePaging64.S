@@ -39,9 +39,9 @@ ASM_GLOBAL ASM_PFX(InternalX86DisablePaging64)
 ASM_PFX(InternalX86DisablePaging64):
     cli    
     lea    L1(%rip), %rsi                 # rsi <- The start address of transition code
-    mov    0x28(%rsp), %rdi               # rdi <- New stack
-    sub    $64, %rdi                      # rdi <- use 64 byte in stack to hold transition code  
-    mov    %rdi, %r10                     # r10 <- The start address of transicition code below 4G
+    mov    0x28(%rsp), %edi               # rdi <- New stack
+    sub    $64, %edi                      # rdi <- use 64 byte in stack to hold transition code  
+    mov    %edi, %r10d                    # r10 <- The start address of transicition code below 4G
     lea    _mTransitionEnd(%rip), %rax    # rax <- end of transition code
     sub    %rsi, %rax                     # rax <- The size of transition piece code
     push   %rcx                           # save rcx to stack
