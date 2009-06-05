@@ -692,6 +692,12 @@ ScsiReadCapacity16Command (
   EFI_STATUS                      Status;
   UINT8                           Cdb[16];
 
+  ASSERT (SenseDataLength != NULL);
+  ASSERT (HostAdapterStatus != NULL);
+  ASSERT (TargetStatus != NULL);
+  ASSERT (DataLength != NULL);
+  ASSERT (ScsiIo != NULL);
+
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, 16);
 
