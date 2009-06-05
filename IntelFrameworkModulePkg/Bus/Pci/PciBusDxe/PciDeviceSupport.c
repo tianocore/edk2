@@ -378,12 +378,6 @@ RegisterPciDevice (
     return Status;
   }
 
-  //
-  // Install Pccard Hotplug GUID for Pccard device so that
-  // to notify CardBus driver to stop the device when de-register happens
-  //
-  InstallPciHotplugGuid (PciIoDevice);
-
   if (Handle != NULL) {
     *Handle = PciIoDevice->Handle;
   }
@@ -505,10 +499,6 @@ DeRegisterPciDevice (
         CurrentLink = CurrentLink->ForwardLink;
       }
     }
-    //
-    // Uninstall Pccard Hotplug GUID for Pccard device
-    //
-    UninstallPciHotplugGuid (PciIoDevice);
 
     //
     // Close the child handle
