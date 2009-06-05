@@ -36,7 +36,17 @@
 ;------------------------------------------------------------------------------
 InternalX86DisablePaging64    PROC
     cli
-    lea     r10, @F
+    lea     rsi, @F                     ; rsi <- The start address of transition code
+    mov     rdi, [rsp + 28h]            ; rdi <- New stack
+    sub     rdi, 64                     ; rdi <- use 64 byte in stack to hold transition code  
+    mov     r10, rdi                    ; r10 <- The start address of transicition code below 4G
+    lea     rax, mTransitionEnd         ; rax <- end of transition code
+    sub     rax, rsi                    ; rax <- The size of transition piece code 
+    push    rcx                         ; save rcx to stack
+    mov     rcx, rax                    ; rcx <- The size of transition piece code
+    rep     movsb                       ; copy transition code to (new stack - 64byte) below 4G
+    pop     rcx                         ; restore rcx
+    
     mov     esi, r8d
     mov     edi, r9d
     mov     eax, [rsp + 28h]            ; eax <- New Stack
@@ -44,6 +54,8 @@ InternalX86DisablePaging64    PROC
     push    r10
     DB      48h                         ; prefix to composite "retq" with next "retf"
     retf                                ; Use far return to load CS register from stack
+
+; Start of transition code
 @@:
     mov     esp, eax                    ; set up new stack
     mov     rax, cr0
@@ -63,5 +75,7 @@ InternalX86DisablePaging64    PROC
     call    rbx                         ; transfer control to EntryPoint
     hlt                                 ; no one should get here
 InternalX86DisablePaging64    ENDP
+
+mTransitionEnd LABEL    BYTE
 
     END
