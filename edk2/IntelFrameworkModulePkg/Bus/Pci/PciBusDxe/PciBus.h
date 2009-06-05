@@ -29,7 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/PciPlatform.h>
 #include <Protocol/PciHotPlugInit.h>
 #include <Protocol/Decompress.h>
-#include <Guid/PciOptionRomTable.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/UgaIo.h>
 #include <Protocol/IncompatiblePciDeviceSupport.h>
