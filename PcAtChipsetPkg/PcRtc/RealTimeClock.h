@@ -291,27 +291,6 @@ Returns:
 --*/
 ;
 
-UINT8
-BcdToDecimal (
-  IN  UINT8 BcdValue
-  )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  BcdValue  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
-;
-
 EFI_STATUS
 RtcTimeFieldsValid (
   IN EFI_TIME *Time
@@ -371,27 +350,6 @@ Arguments:
   Time      - TODO: add argument description
   RegisterB - TODO: add argument description
   Century   - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
-;
-
-EFI_STATUS
-RtcTestCenturyRegister (
-  VOID
-  )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  None
 
 Returns:
 

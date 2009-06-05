@@ -212,11 +212,7 @@ Returns:
 
   ConvertRtcTimeToEfiTime (&Time, RegisterB);
 
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = BcdToDecimal ((UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f));
-  } else {
-    Century = BcdToDecimal (RtcRead (RTC_ADDRESS_CENTURY));
-  }
+  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
 
   Time.Year = (UINT16) (Century * 100 + Time.Year);
 
@@ -313,11 +309,7 @@ Routine Description:
 
   ConvertRtcTimeToEfiTime (Time, RegisterB);
 
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = BcdToDecimal ((UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f));
-  } else {
-    Century = BcdToDecimal (RtcRead (RTC_ADDRESS_CENTURY));
-  }
+  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
 
   Time->Year = (UINT16) (Century * 100 + Time->Year);
 
@@ -422,10 +414,6 @@ Routine Description:
   RtcWrite (RTC_ADDRESS_DAY_OF_THE_MONTH, RtcTime.Day);
   RtcWrite (RTC_ADDRESS_MONTH, RtcTime.Month);
   RtcWrite (RTC_ADDRESS_YEAR, (UINT8) RtcTime.Year);
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = (UINT8) ((Century & 0x7f) | (RtcRead (RTC_ADDRESS_CENTURY) & 0x80));
-  }
-
   RtcWrite (RTC_ADDRESS_CENTURY, Century);
 
   //
@@ -527,11 +515,7 @@ Returns:
 
   ConvertRtcTimeToEfiTime (Time, RegisterB);
 
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = BcdToDecimal ((UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f));
-  } else {
-    Century = BcdToDecimal (RtcRead (RTC_ADDRESS_CENTURY));
-  }
+  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
 
   Time->Year = (UINT16) (Century * 100 + Time->Year);
 
@@ -660,64 +644,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-UINT8
-BcdToDecimal (
-  IN  UINT8 BcdValue
-  )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-  
-
-Returns: 
---*/
-// TODO:    BcdValue - add argument and description to function comment
-{
-  UINTN High;
-  UINTN Low;
-
-  High  = BcdValue >> 4;
-  Low   = BcdValue - (High << 4);
-
-  return (UINT8) (Low + (High * 10));
-}
-
-EFI_STATUS
-RtcTestCenturyRegister (
-  VOID
-  )
-/*++
-
-Routine Description:
-
-  Arguments:
-
-  
-
-Returns: 
---*/
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-{
-  UINT8 Century;
-  UINT8 Temp;
-
-  Century = RtcRead (RTC_ADDRESS_CENTURY);
-  //
-  //  RtcWrite (RTC_ADDRESS_CENTURY, 0x00);
-  //
-  Temp = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
-  RtcWrite (RTC_ADDRESS_CENTURY, Century);
-  if (Temp == 0x19 || Temp == 0x20) {
-    return EFI_SUCCESS;
-  }
-
-  return EFI_DEVICE_ERROR;
-}
-
 VOID
 ConvertRtcTimeToEfiTime (
   IN EFI_TIME       *Time,
@@ -747,12 +673,12 @@ Returns:
   Time->Hour = (UINT8) (Time->Hour & 0x7f);
 
   if (RegisterB.Bits.DM == 0) {
-    Time->Year    = BcdToDecimal ((UINT8) Time->Year);
-    Time->Month   = BcdToDecimal (Time->Month);
-    Time->Day     = BcdToDecimal (Time->Day);
-    Time->Hour    = BcdToDecimal (Time->Hour);
-    Time->Minute  = BcdToDecimal (Time->Minute);
-    Time->Second  = BcdToDecimal (Time->Second);
+    Time->Year    = BcdToDecimal8 ((UINT8) Time->Year);
+    Time->Month   = BcdToDecimal8 (Time->Month);
+    Time->Day     = BcdToDecimal8 (Time->Day);
+    Time->Hour    = BcdToDecimal8 (Time->Hour);
+    Time->Minute  = BcdToDecimal8 (Time->Minute);
+    Time->Second  = BcdToDecimal8 (Time->Second);
   }
   //
   // If time is in 12 hour format, convert it to 24 hour format
