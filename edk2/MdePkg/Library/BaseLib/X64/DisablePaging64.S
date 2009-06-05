@@ -38,7 +38,18 @@
 ASM_GLOBAL ASM_PFX(InternalX86DisablePaging64)
 ASM_PFX(InternalX86DisablePaging64):
     cli    
-    lea    L1(%rip), %r10
+    lea    L1(%rip), %rsi                 # rsi <- The start address of transition code
+    mov    0x28(%rsp), %rdi               # rdi <- New stack
+    sub    $64, %rdi                      # rdi <- use 64 byte in stack to hold transition code  
+    mov    %rdi, %r10                     # r10 <- The start address of transicition code below 4G
+    lea    _mTransitionEnd(%rip), %rax    # rax <- end of transition code
+    sub    %rsi, %rax                     # rax <- The size of transition piece code
+    push   %rcx                           # save rcx to stack
+    mov    %rax, %rcx                     # rcx <- The size of transition piece code
+    rep
+    movsb                                 # copy transition code to (new stack - 64byte) below 4G
+    pop    %rcx                           # restore rcx
+   
     mov    %r8d, %esi 
     mov    %r9d, %edi 
     mov    0x28(%rsp), %eax               # eax <- New Stack
@@ -64,4 +75,4 @@ L1:
     push   %rsi                           # push Context1
     callq  *%rbx                          # transfer control to EntryPoint
     jmp    .                              # no one should get here
-
+_mTransitionEnd :
