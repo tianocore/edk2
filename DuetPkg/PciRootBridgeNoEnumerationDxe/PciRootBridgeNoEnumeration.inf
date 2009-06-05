@@ -31,7 +31,6 @@
   MdePkg/MdePkg.dec
   DuetPkg/DuetPkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
