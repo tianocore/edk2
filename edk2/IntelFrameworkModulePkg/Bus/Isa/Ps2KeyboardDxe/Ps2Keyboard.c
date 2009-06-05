@@ -216,6 +216,21 @@ KbdControllerDriverStart (
   ConsoleIn->ConInEx.UnregisterKeyNotify = KeyboardUnregisterKeyNotify;  
   
   InitializeListHead (&ConsoleIn->NotifyList);
+
+  //
+  // Fix for random hangs in System waiting for the Key if no KBC is present in BIOS.
+  //
+  KeyboardRead (ConsoleIn, &Data);
+  if ((KeyReadStatusRegister (ConsoleIn) & (KBC_PARE | KBC_TIM)) == (KBC_PARE | KBC_TIM)) {
+    //
+    // If nobody decodes KBC I/O port, it will read back as 0xFF.
+    // Check the Time-Out and Parity bit to see if it has an active KBC in system
+    //
+    Status      = EFI_DEVICE_ERROR;
+    StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
+    goto ErrorExit;
+  }
+  
   //
   // Setup the WaitForKey event
   //
@@ -355,7 +370,7 @@ ErrorExit:
   //
   if (ConsoleIn != NULL) {
     Status1 = EFI_SUCCESS;
-    while (!EFI_ERROR (Status1)) {
+    while (!EFI_ERROR (Status1) && (Status != EFI_DEVICE_ERROR)) {
       Status1 = KeyboardRead (ConsoleIn, &Data);;
     }
   }
