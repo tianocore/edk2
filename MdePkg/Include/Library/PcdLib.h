@@ -250,7 +250,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 8-bit value to set.
   
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PatchPcdSet8(TokenName, Value)      (_gPcd_BinaryPatch_##TokenName = (Value))
@@ -266,7 +266,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 16-bit value to set.
 
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PatchPcdSet16(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = (Value))
@@ -282,7 +282,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 32-bit value to set.
 
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PatchPcdSet32(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = (Value))
@@ -298,7 +298,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 64-bit value to set.
 
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PatchPcdSet64(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = (Value))
@@ -314,7 +314,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The boolean value to set.
 
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PatchPcdSetBool(TokenName, Value)   (_gPcd_BinaryPatch_##TokenName = (Value))
@@ -338,7 +338,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   SizeOfBuffer   A pointer to the size, in bytes, of Buffer.
   @param   Buffer         Pointer to the value to set.
 
-  @return  Value.
+  @return Return the pointer to the Buffer that was set.
 
 **/
 #define PatchPcdSetPtr(TokenName, Size, Buffer) \
@@ -442,7 +442,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the PCD token to retrieve a current value for.
   @param   Value      The 8-bit value to set.
   
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PcdSet8(TokenName, Value)           _PCD_SET_MODE_8_##TokenName     ((Value))
@@ -457,7 +457,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the PCD token to retrieve a current value for.
   @param   Value      The 16-bit value to set.
 
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PcdSet16(TokenName, Value)          _PCD_SET_MODE_16_##TokenName    ((Value))
@@ -472,7 +472,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the PCD token to retrieve a current value for.
   @param   Value      The 32-bit value to set.
 
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PcdSet32(TokenName, Value)          _PCD_SET_MODE_32_##TokenName    ((Value))
@@ -487,7 +487,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName  The name of the PCD token to retrieve a current value for.
   @param   Value      The 64-bit value to set.
 
-  @return  Value.
+  @return Return the Value that was set.
 
 **/
 #define PcdSet64(TokenName, Value)          _PCD_SET_MODE_64_##TokenName    ((Value))
@@ -511,7 +511,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   SizeOfBuffer   A pointer to the size, in bytes, of Buffer.
   @param   Buffer         A pointer to the buffer to set.
 
-  @return  Buffer.
+  @return Return the pointer to the Buffer that was set.
 
 **/
 #define PcdSetPtr(TokenName, SizeOfBuffer, Buffer) \
@@ -526,7 +526,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName      The name of the PCD token to set the current value for.
   @param   Buffer         The Boolean value to set.
 
-  @return  Value. 
+  @return Return the Value that was set.
 
 **/
 #define PcdSetBool(TokenName, Value)        _PCD_SET_MODE_BOOL_##TokenName  ((Value))
@@ -660,7 +660,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName   The name of the PCD token to set the current value for.
   @param   Value       The 8-bit value to set.                   
 
-  @return  Value. 
+  @return Return the Value that was set.
 
 **/
 #define PcdSetEx8(Guid, TokenName, Value)   LibPcdSetEx8   ((Guid), _PCD_TOKEN_##TokenName, (Value))
@@ -680,7 +680,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName   The name of the PCD token to set the current value for.
   @param   Value       The 16-bit value to set.                   
 
-  @return  Value. 
+  @return Return the Value that was set.
 
 **/
 #define PcdSetEx16(Guid, TokenName, Value)  LibPcdSetEx16  ((Guid), _PCD_TOKEN_##TokenName, (Value))
@@ -700,7 +700,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName   The name of the PCD token to set the current value for.
   @param   Value       The 32-bit value to set.                   
 
-  @return  Value. 
+  @return Return the Value that was set.
 
 **/
 #define PcdSetEx32(Guid, TokenName, Value)  LibPcdSetEx32  ((Guid), _PCD_TOKEN_##TokenName, (Value))
@@ -720,7 +720,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName   The name of the PCD token to set the current value for.
   @param   Value       The 64-bit value to set.                   
 
-  @return  Value. 
+  @return Return the Value that was set.
 
 **/
 #define PcdSetEx64(Guid, TokenName, Value)  LibPcdSetEx64  ((Guid), _PCD_TOKEN_##TokenName, (Value))
@@ -746,9 +746,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                           which namespace to retrieve a value from.
   @param   TokenName      The name of the PCD token to set the current value for.
   @param   SizeOfBuffer   A pointer to the size, in bytes, of Buffer.                  
-  @param   Value          Pointer to the buffer to set.
+  @param   Buffer         Pointer to the buffer to set.
     
-  @return  Buffer. 
+  @return Return the pointer to the Buffer that was set.
 
 **/
 #define PcdSetExPtr(Guid, TokenName, SizeOfBuffer, Buffer) \
@@ -769,7 +769,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param   TokenName      The name of the PCD token to set the current value for.              
   @param   Value          The Boolean value to set.
 
-  @return  Value. 
+  @return Return the Value that was set.
 
 **/                                         
 #define PcdSetExBool(Guid, TokenName, Value) \
