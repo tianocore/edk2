@@ -181,6 +181,12 @@ InstallPs2KeyboardDriver (
 #define SCANCODE_MAX_MAKE               0x60
 
 //
+// Keyboard Controller Status
+//
+#define KBC_PARE  0x80  // Parity Error
+#define KBC_TIM   0x40  // General Time Out
+
+//
 // Other functions that are used among .c files
 //
 /**
