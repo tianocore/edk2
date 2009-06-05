@@ -71,8 +71,6 @@
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
-
-
 [LibraryClasses]
   PciIncompatibleDeviceSupportLib
   PcdLib
@@ -86,9 +84,6 @@
   UefiDriverEntryPoint
   DebugLib
   PeCoffLib
-
-[Guids]
-  gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED  System Table
 
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
@@ -109,7 +104,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable
-
 
 [FixedPcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask
