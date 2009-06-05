@@ -89,8 +89,6 @@
 
 [Guids]
   gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED  System Table
-  gEfiPciHotplugDeviceGuid                      # PRIVATE
-  gEfiPciOptionRomTableGuid                     # SOMETIMES_CONSUMED
 
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid             # PROTOCOL ALWAYS_PRODUCED

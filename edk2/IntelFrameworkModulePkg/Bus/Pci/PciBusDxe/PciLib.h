@@ -59,30 +59,6 @@ InstallHotPlugRequestProtocol (
   );
 
 /**
-  Install protocol gEfiPciHotplugDeviceGuid into hotplug device
-  instance.
-  
-  @param PciIoDevice  hotplug device instance.
-  
-**/
-VOID
-InstallPciHotplugGuid (
-  IN  PCI_IO_DEVICE                  *PciIoDevice
-  );
-
-/**
-  UnInstall protocol gEfiPciHotplugDeviceGuid into hotplug device
-  instance.
-  
-  @param PciIoDevice  hotplug device instance.
-  
-**/
-VOID
-UninstallPciHotplugGuid (
-  IN  PCI_IO_DEVICE                  *PciIoDevice
-  );
-
-/**
   Retrieve the BAR information via PciIo interface.
   
   @param PciIoDevice Pci device instance.

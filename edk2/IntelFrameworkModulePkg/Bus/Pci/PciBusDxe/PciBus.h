@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/LoadFile2.h>
-#include <Guid/PciHotplugDevice.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/PciHotPlugRequest.h>
 #include <Protocol/DevicePath.h>
