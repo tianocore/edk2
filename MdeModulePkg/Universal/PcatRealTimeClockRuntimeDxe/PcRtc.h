@@ -296,16 +296,6 @@ ConvertEfiTimeToRtcTime (
   OUT    UINT8           *Century
   );
 
-/**
-  See if centry register of RTC is valid.
-
-  @retval  EFI_SUCCESS       Century register is valid.
-  @retval  EFI_DEVICE_ERROR  Century register is NOT valid.
-**/
-EFI_STATUS
-RtcTestCenturyRegister (
-  VOID
-  );
 
 /**
   Converts time read from RTC to EFI_TIME format defined by UEFI spec.

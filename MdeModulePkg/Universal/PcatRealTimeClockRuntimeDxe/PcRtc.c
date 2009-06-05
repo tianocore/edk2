@@ -158,11 +158,7 @@ PcRtcInit (
   Time.Month  = RtcRead (RTC_ADDRESS_MONTH);
   Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
 
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
-  } else {
-    Century = RtcRead (RTC_ADDRESS_CENTURY);
-  }
+  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
 
   //
   // Set RTC configuration after get original time
@@ -285,11 +281,7 @@ PcRtcGetTime (
   Time->Month   = RtcRead (RTC_ADDRESS_MONTH);
   Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
 
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
-  } else {
-    Century = RtcRead (RTC_ADDRESS_CENTURY);
-  }
+  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
 
   //
   // Release RTC Lock.
@@ -401,10 +393,6 @@ PcRtcSetTime (
   RtcWrite (RTC_ADDRESS_DAY_OF_THE_MONTH, RtcTime.Day);
   RtcWrite (RTC_ADDRESS_MONTH, RtcTime.Month);
   RtcWrite (RTC_ADDRESS_YEAR, (UINT8) RtcTime.Year);
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = (UINT8) ((Century & 0x7f) | (RtcRead (RTC_ADDRESS_CENTURY) & 0x80));
-  }
-
   RtcWrite (RTC_ADDRESS_CENTURY, Century);
 
   //
@@ -520,11 +508,7 @@ PcRtcGetWakeupTime (
     Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
   }
 
-  if (RtcTestCenturyRegister () == EFI_SUCCESS) {
-    Century = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
-  } else {
-    Century = RtcRead (RTC_ADDRESS_CENTURY);
-  }
+  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
 
   //
   // Release RTC Lock.
@@ -663,29 +647,6 @@ PcRtcSetWakeupTime (
   return EFI_SUCCESS;
 }
 
-/**
-  See if century register of RTC is valid.
-
-  @retval  EFI_SUCCESS       Century register is valid.
-  @retval  EFI_DEVICE_ERROR  Century register is NOT valid.
-**/
-EFI_STATUS
-RtcTestCenturyRegister (
-  VOID
-  )
-{
-  UINT8 Century;
-  UINT8 Temp;
-
-  Century = RtcRead (RTC_ADDRESS_CENTURY);
-  Temp = (UINT8) (RtcRead (RTC_ADDRESS_CENTURY) & 0x7f);
-  RtcWrite (RTC_ADDRESS_CENTURY, Century);
-  if (Temp == 0x19 || Temp == 0x20) {
-    return EFI_SUCCESS;
-  }
-
-  return EFI_DEVICE_ERROR;
-}
 
 /**
   Checks an 8-bit BCD value, and converts to an 8-bit value if valid.
