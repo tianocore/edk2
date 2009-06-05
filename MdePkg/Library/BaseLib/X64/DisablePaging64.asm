@@ -37,9 +37,9 @@
 InternalX86DisablePaging64    PROC
     cli
     lea     rsi, @F                     ; rsi <- The start address of transition code
-    mov     rdi, [rsp + 28h]            ; rdi <- New stack
-    sub     rdi, 64                     ; rdi <- use 64 byte in stack to hold transition code  
-    mov     r10, rdi                    ; r10 <- The start address of transicition code below 4G
+    mov     edi, [rsp + 28h]            ; rdi <- New stack
+    sub     edi, 64                     ; rdi <- use 64 byte in stack to hold transition code  
+    mov     r10d, edi                   ; r10 <- The start address of transicition code below 4G
     lea     rax, mTransitionEnd         ; rax <- end of transition code
     sub     rax, rsi                    ; rax <- The size of transition piece code 
     push    rcx                         ; save rcx to stack
