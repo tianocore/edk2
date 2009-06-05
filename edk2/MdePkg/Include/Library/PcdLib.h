@@ -1072,7 +1072,7 @@ LibPcdGetExSize (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 8-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT8
@@ -1092,7 +1092,7 @@ LibPcdSet8 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 16-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT16
@@ -1112,7 +1112,7 @@ LibPcdSet16 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 32-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT32
@@ -1132,7 +1132,7 @@ LibPcdSet32 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 64-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT64
@@ -1162,7 +1162,7 @@ LibPcdSet64 (
   @param[in, out] SizeOfBuffer  The size, in bytes, of Buffer.
   @param[in]      Buffer        A pointer to the buffer to set.
 
-  @return Return the pointer for the buffer that was set.
+  @return Return the pointer for the Buffer that was set.
 
 **/
 VOID *
@@ -1183,7 +1183,7 @@ LibPcdSetPtr (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The boolean value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 BOOLEAN
@@ -1207,7 +1207,7 @@ LibPcdSetBool (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 8-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT8
@@ -1232,7 +1232,7 @@ LibPcdSetEx8 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 16-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT16
@@ -1257,7 +1257,7 @@ LibPcdSetEx16 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 32-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT32
@@ -1281,7 +1281,7 @@ LibPcdSetEx32 (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The 64-bit value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 UINT64
@@ -1312,7 +1312,7 @@ LibPcdSetEx64 (
   @param[in, out] SizeOfBuffer  The size, in bytes, of Buffer.
   @param[in]  Buffer            A pointer to the buffer to set.
 
-  @return Return the pointer to the buffer that was set.
+  @return Return the pointer to the Buffer that was set.
 
 **/
 VOID *
@@ -1338,7 +1338,7 @@ LibPcdSetExPtr (
   @param[in]  TokenNumber   The PCD token number to set a current value for.
   @param[in]  Value         The Boolean value to set.
 
-  @return Return the value that was set.
+  @return Return the Value that was set.
 
 **/
 BOOLEAN
@@ -1491,7 +1491,7 @@ LibPcdGetNextTokenSpace (
   @param[in, out] SizeOfBuffer  A pointer to the size, in bytes, of Buffer.
   @param[in] Buffer             A pointer to the buffer to used to set the target variable.
   
-  @return Return the pointer to the buffer that was set.
+  @return Return the pointer to the Buffer that was set.
 
 **/
 VOID *
