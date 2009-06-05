@@ -24,7 +24,7 @@ Revision History
 #ifndef _EFI_PCI_BUS_H
 #define _EFI_PCI_BUS_H
 
-#include <FrameworkDxe.h>
+#include <PiDxe.h>
 
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
