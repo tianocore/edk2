@@ -23,7 +23,6 @@ Abstract:
 **/
 #include <PiPei.h>
 #include <Ppi/UnixThunk.h>
-#include <FrameworkModuleBase.h>
 
 #include <Library/PeCoffLib.h>
 #include <Library/PeiServicesLib.h>
