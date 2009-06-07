@@ -30,8 +30,6 @@
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <Protocol/StatusCode.h>
 
-#include <FrameworkModuleBase.h>
-
 extern EFI_REPORT_STATUS_CODE  mReportStatusCode;
 
 /**
