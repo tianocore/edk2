@@ -83,20 +83,6 @@ typedef struct {
 // Platform BDS Functions
 //
 VOID
-PlatformBdsInit (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData
-  )
-;
-
-VOID
-PlatformBdsPolicyBehavior (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData,
-  IN LIST_ENTRY                      *DriverOptionList,
-  IN LIST_ENTRY                      *BootOptionList
-  )
-;
-
-VOID
 PlatformBdsGetDriverOption (
   IN LIST_ENTRY               *BdsDriverLists
   )
@@ -112,21 +98,6 @@ BdsMemoryTest (
 VOID
 PlatformBdsConnectSequence (
   VOID
-  )
-;
-
-VOID
-PlatformBdsBootFail (
-  IN  BDS_COMMON_OPTION  *Option,
-  IN  EFI_STATUS         Status,
-  IN  CHAR16             *ExitData,
-  IN  UINTN              ExitDataSize
-  )
-;
-
-VOID
-PlatformBdsBootSuccess (
-  IN  BDS_COMMON_OPTION *Option
   )
 ;
 
