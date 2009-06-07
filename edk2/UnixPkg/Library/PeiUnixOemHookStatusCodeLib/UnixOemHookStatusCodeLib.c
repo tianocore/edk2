@@ -15,8 +15,8 @@
 **/
 #include "PiPei.h"
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Ppi/UnixThunk.h>
-#include <FrameworkModuleBase.h>
 #include <Library/OemHookStatusCodeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>

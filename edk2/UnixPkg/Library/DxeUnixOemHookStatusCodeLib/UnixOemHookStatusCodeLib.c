@@ -15,6 +15,7 @@
 **/
 #include "PiDxe.h"
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include "UnixDxe.h"
 #include <Library/OemHookStatusCodeLib.h>
 #include <Library/DebugLib.h>
@@ -22,7 +23,6 @@
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <FrameworkModuleBase.h>
 
 //
 // Cache of UnixThunk protocol 
