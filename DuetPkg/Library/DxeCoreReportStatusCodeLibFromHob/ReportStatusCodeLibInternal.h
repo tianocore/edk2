@@ -29,9 +29,6 @@
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <Protocol/StatusCode.h>
 
-#include <FrameworkModuleBase.h>
-
-
 /**
   Internal worker function that reports a status code through the Status Code Protocol
 
