@@ -30,14 +30,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// Please refer to the library useage of BdsLibGetBootMode, BdsLibGetTimeout 
 /// and PlatformBdsDiagnostics in BdsPlatform.c
 ///
-EFI_BDS_ARCH_PROTOCOL_INSTANCE  gBdsInstanceTemplate = {
-  EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE,
-  NULL,
-  {BdsEntry},
-  0xFFFF,
-  TRUE,
-  0,
-  EXTENSIVE
+EFI_HANDLE  gBdsHandle = NULL;
+
+EFI_BDS_ARCH_PROTOCOL  gBds = {
+  BdsEntry
 };
 
 UINT16                          *mBootNext = NULL;
@@ -70,11 +66,10 @@ BdsInitialize (
   //
   // Install protocol interface
   //
-  Status = gBS->InstallProtocolInterface (
-                  &gBdsInstanceTemplate.Handle,
-                  &gEfiBdsArchProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &gBdsInstanceTemplate.Bds
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &gBdsHandle,
+                  &gEfiBdsArchProtocolGuid, &gBds,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -280,7 +275,6 @@ BdsEntry (
   IN EFI_BDS_ARCH_PROTOCOL  *This
   )
 {
-  EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData;
   LIST_ENTRY                      DriverOptionList;
   LIST_ENTRY                      BootOptionList;
   UINTN                           BootNextSize;
@@ -303,15 +297,10 @@ BdsEntry (
   InitializeHotkeyService ();
 
   //
-  // Get the BDS private data
-  //
-  PrivateData = EFI_BDS_ARCH_PROTOCOL_INSTANCE_FROM_THIS (This);
-
-  //
   // Do the platform init, can be customized by OEM/IBV
   //
   PERF_START (0, "PlatformBds", "BDS", 0);
-  PlatformBdsInit (PrivateData);
+  PlatformBdsInit ();
 
   InitializeHwErrRecSupport();
   
@@ -344,7 +333,7 @@ BdsEntry (
   //
   // Setup some platform policy here
   //
-  PlatformBdsPolicyBehavior (PrivateData, &DriverOptionList, &BootOptionList);
+  PlatformBdsPolicyBehavior (&DriverOptionList, &BootOptionList);
   PERF_END (0, "PlatformBds", "BDS", 0);
 
   //

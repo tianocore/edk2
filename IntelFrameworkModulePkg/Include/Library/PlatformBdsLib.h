@@ -20,45 +20,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/GenericMemoryTest.h>
 #include <Library/GenericBdsLib.h>
 
-//
-// Bds AP Context data
-//
-#define EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE  SIGNATURE_32 ('B', 'd', 's', 'A')
-typedef struct _EFI_BDS_ARCH_PROTOCOL_INSTANCE EFI_BDS_ARCH_PROTOCOL_INSTANCE;
-
-struct _EFI_BDS_ARCH_PROTOCOL_INSTANCE {
-  UINTN                     Signature;
-  EFI_HANDLE                Handle;
-  EFI_BDS_ARCH_PROTOCOL     Bds;
-  ///
-  /// Save the current boot mode
-  ///
-  EFI_BOOT_MODE             BootMode;
-  ///
-  /// Set true if boot with default settings
-  ///
-  BOOLEAN                   DefaultBoot;
-  ///
-  /// The system default timeout for choose the boot option
-  ///
-  UINT16                    TimeoutDefault;
-  ///
-  /// Memory Test Level
-  ///
-  EXTENDMEM_COVERAGE_LEVEL  MemoryTestLevel;
-};
-
 /**
   Platform Bds init. Include the platform firmware vendor, revision
   and so crc check.
-
-  @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
 
 **/
 VOID
 EFIAPI
 PlatformBdsInit (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData
+  VOID
   );
 
 /**
@@ -66,7 +36,6 @@ PlatformBdsInit (
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 
-  @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
   @param  DriverOptionList        The header of the driver option link list
   @param  BootOptionList          The header of the boot option link list
 
@@ -74,7 +43,6 @@ PlatformBdsInit (
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData,
   IN LIST_ENTRY                      *DriverOptionList,
   IN LIST_ENTRY                      *BootOptionList
   );
