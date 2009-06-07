@@ -64,13 +64,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/GenericBdsLib.h>
 #include <Library/PlatformBdsLib.h>
 
-#define EFI_BDS_ARCH_PROTOCOL_INSTANCE_FROM_THIS(_this) \
-  CR ((_this),                                          \
-      EFI_BDS_ARCH_PROTOCOL_INSTANCE,                   \
-      Bds,                                              \
-      EFI_BDS_ARCH_PROTOCOL_INSTANCE_SIGNATURE          \
-      )
-
 #pragma pack(1)
 
 ///

@@ -21,16 +21,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Platform Bds init. Include the platform firmware vendor, revision
   and so crc check.
 
-  @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
-
 **/
 VOID
 EFIAPI
 PlatformBdsInit (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData
+  VOID
   )
 {
-  return;
 }
 
 /**
@@ -62,7 +59,6 @@ PlatformBdsConnectSequence (
   VOID
   )
 {
-  return;
 }
 
 /**
@@ -77,7 +73,6 @@ PlatformBdsGetDriverOption (
   IN OUT LIST_ENTRY              *BdsDriverLists
   )
 {
-  return;
 }
 
 /**
@@ -94,7 +89,6 @@ PlatformBdsDiagnostics (
   IN BOOLEAN                     QuietBoot
   )
 {
-  return;
 }
 
 /**
@@ -102,7 +96,6 @@ PlatformBdsDiagnostics (
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 
-  @param  PrivateData             The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
   @param  DriverOptionList        The header of the driver option link list
   @param  BootOptionList          The header of the boot option link list
 
@@ -110,12 +103,10 @@ PlatformBdsDiagnostics (
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData,
   IN LIST_ENTRY                      *DriverOptionList,
   IN LIST_ENTRY                      *BootOptionList
   )
 {
-  return ;
 }
 
 /**
@@ -133,7 +124,6 @@ PlatformBdsBootSuccess (
   IN  BDS_COMMON_OPTION *Option
   )
 {
-  return;
 }
 
 /**
@@ -154,7 +144,6 @@ PlatformBdsBootFail (
   IN  UINTN              ExitDataSize
   )
 {
-  return;
 }
 
 /**
