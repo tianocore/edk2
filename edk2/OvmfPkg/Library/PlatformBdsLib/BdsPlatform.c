@@ -21,7 +21,7 @@
 VOID
 EFIAPI
 PlatformBdsInit (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData
+  VOID
   )
 /*++
 
@@ -31,8 +31,6 @@ Routine Description:
   and so crc check.
 
 Arguments:
-
-  PrivateData  - The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
 
 Returns:
 
@@ -764,7 +762,6 @@ Returns:
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
-  IN EFI_BDS_ARCH_PROTOCOL_INSTANCE  *PrivateData,
   IN OUT LIST_ENTRY                  *DriverOptionList,
   IN OUT LIST_ENTRY                  *BootOptionList
   )
@@ -777,8 +774,6 @@ Routine Description:
   policy action.
 
 Arguments:
-
-  PrivateData      - The EFI_BDS_ARCH_PROTOCOL_INSTANCE instance
 
   DriverOptionList - The header of the driver option link list
 
@@ -798,6 +793,7 @@ Returns:
   UINTN                              Index;
   EFI_INPUT_KEY                      Key;
   EFI_TPL                            OldTpl;
+  EFI_BOOT_MODE                      BootMode;
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
 
@@ -814,14 +810,14 @@ Returns:
   //
   // Get current Boot Mode
   //
-  Status = BdsLibGetBootMode (&PrivateData->BootMode);
-  DEBUG ((EFI_D_ERROR, "Boot Mode:%x\n", PrivateData->BootMode));
+  Status = BdsLibGetBootMode (&BootMode);
+  DEBUG ((EFI_D_ERROR, "Boot Mode:%x\n", BootMode));
 
   //
   // Go the different platform policy with different boot mode
   // Notes: this part code can be change with the table policy
   //
-  ASSERT (PrivateData->BootMode == BOOT_WITH_FULL_CONFIGURATION);
+  ASSERT (BootMode == BOOT_WITH_FULL_CONFIGURATION);
   //
   // Connect platform console
   //
