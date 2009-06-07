@@ -119,7 +119,6 @@ SecPrint (
 
   va_start (Marker, Format);
   
-//  vsprintf (Buffer, Format, Marker);
   _vsnprintf (Buffer, sizeof (Buffer), Format, Marker);
 
   CharCount = strlen (Buffer);

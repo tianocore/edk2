@@ -24,8 +24,7 @@ Abstract:
 //
 // The package level header files this module uses
 //
-#include <FrameworkPei.h>
-#include <FrameworkModulePei.h>
+#include <PiPei.h>
 #include <WinNtPeim.h>
 
 //

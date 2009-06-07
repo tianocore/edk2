@@ -17,14 +17,14 @@
 //
 // The package level header files this module uses
 //
-#include <FrameworkPei.h>
-#include <FrameworkModulePei.h>
+#include <PiPei.h>
 #include <WinNtPeim.h>
 
 //
 // The protocols, PPI and GUID defintions for this module
 //
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Ppi/NtThunk.h>
 //
 // The Library classes this module consumes

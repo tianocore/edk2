@@ -18,7 +18,6 @@
 // The package level header files this module uses
 //
 #include <FrameworkDxe.h>
-#include <FrameworkModuleDxe.h>
 #include <WinNtDxe.h>
 
 //
@@ -26,6 +25,7 @@
 //
 #include <Protocol/WinNtThunk.h>
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 //
 // The Library classes this module consumes
 //

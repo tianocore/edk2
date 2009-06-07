@@ -23,6 +23,7 @@ Abstract:
 #include <PiPei.h>
 #include <PiDxe.h>
 #include <WinNtPeim.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Library/BaseLib.h>
 #include <Library/PeCoffLib.h>
 #include <Ppi/NtPeiLoadFile.h>
@@ -38,8 +39,6 @@ Abstract:
 #include <Library/ReportStatusCodeLib.h>
 
 #include <IndustryStandard/PeImage.h>
-
-#define EFI_STATUS_CODE_DATA_MAX_SIZE 200
 
 #define STACK_SIZE                0x20000      
 
