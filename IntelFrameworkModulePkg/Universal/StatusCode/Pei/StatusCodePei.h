@@ -18,9 +18,9 @@
 
 
 #include <FrameworkPei.h>
-#include <FrameworkModulePei.h>
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 #include <Ppi/StatusCode.h>
 
 #include <Library/BaseLib.h>

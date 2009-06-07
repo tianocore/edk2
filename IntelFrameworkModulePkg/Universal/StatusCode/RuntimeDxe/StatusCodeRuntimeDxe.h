@@ -17,7 +17,6 @@
 
 
 #include <FrameworkDxe.h>
-#include <FrameworkModuleDxe.h>
 #include <Guid/DataHubStatusCodeRecord.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/SerialIo.h>

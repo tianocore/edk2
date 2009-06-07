@@ -23,6 +23,8 @@
 #define EFI_STATUS_CODE_DATA_TYPE_DEBUG_GUID \
   { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xb9 } }
 
+#define EFI_STATUS_CODE_DATA_MAX_SIZE 200
+
 typedef struct {
   UINT32  ErrorLevel;
   //
