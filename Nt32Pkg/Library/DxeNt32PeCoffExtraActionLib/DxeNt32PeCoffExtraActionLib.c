@@ -25,7 +25,6 @@ Abstract:
 // The package level header files this module uses
 //
 #include <FrameworkDxe.h>
-#include <FrameworkModuleDxe.h>
 #include <WinNtDxe.h>
 
 //
