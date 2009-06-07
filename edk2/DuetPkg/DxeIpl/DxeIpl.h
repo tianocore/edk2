@@ -1,9 +1,8 @@
-
+  
 #ifndef _DUET_DXEIPL_H_
 #define _DUET_DXEIPL_H_
 
-#include "FrameworkPei.h"
-#include "FrameworkModulePei.h"
+#include <FrameworkPei.h>
 
 #include "EfiLdrHandoff.h"
 #include "EfiFlashMap.h"
@@ -19,6 +18,7 @@
 #include <Guid/FlashMapHob.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
 
 #include <Protocol/Decompress.h>
 #include <Protocol/StatusCode.h>
