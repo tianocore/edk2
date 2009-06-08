@@ -1,7 +1,7 @@
 /** @file
   Interface routines for PxeBc.
   
-Copyright (c) 2007 - 2008, Intel Corporation.<BR>
+Copyright (c) 2007 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PxeBcImpl.h"
 
-EFI_LOAD_FILE_PROTOCOL  mLoadFileProtocolTemplate = { EfiPxeLoadFile };
+UINT32  mPxeDhcpTimeout[4] = { 4, 8, 16, 32 };
 
 /**
   Get and record the arp cache.
@@ -502,6 +502,7 @@ EfiPxeBcStop (
 
   Private->CurrentUdpSrcPort = 0;
   Private->Udp4Write->Configure (Private->Udp4Write, NULL);
+  Private->Udp4Read->Groups (Private->Udp4Read, FALSE, NULL);
   Private->Udp4Read->Configure (Private->Udp4Read, NULL);
 
   Private->Dhcp4->Stop (Private->Dhcp4);
@@ -560,8 +561,6 @@ EfiPxeBcDhcp (
   EFI_DHCP4_MODE_DATA     Dhcp4Mode;
   EFI_DHCP4_PACKET_OPTION *OptList[PXEBC_DHCP4_MAX_OPTION_NUM];
   UINT32                  OptCount;
-  UINT32                  DiscoverTimeout;
-  UINTN                   Index;
   EFI_STATUS              Status;
   EFI_ARP_CONFIG_DATA     ArpConfigData;
 
@@ -589,76 +588,62 @@ EfiPxeBcDhcp (
 
   //
   // Set the DHCP4 config data.
+  // The four discovery timeouts are 4, 8, 16, 32 seconds respectively.
   //
   ZeroMem (&Dhcp4CfgData, sizeof (EFI_DHCP4_CONFIG_DATA));
   Dhcp4CfgData.OptionCount      = OptCount;
   Dhcp4CfgData.OptionList       = OptList;
   Dhcp4CfgData.Dhcp4Callback    = PxeBcDhcpCallBack;
   Dhcp4CfgData.CallbackContext  = Private;
-  Dhcp4CfgData.DiscoverTryCount = 1;
-  Dhcp4CfgData.DiscoverTimeout  = &DiscoverTimeout;
+  Dhcp4CfgData.DiscoverTryCount = 4;
+  Dhcp4CfgData.DiscoverTimeout  = mPxeDhcpTimeout;
 
-  for (Index = 0; Index < PXEBC_DHCP4_DISCOVER_RETRIES; Index++) {
-    //
-    // The four discovery timeouts are 4, 8, 16, 32 seconds respectively.
-    //
-    DiscoverTimeout = (PXEBC_DHCP4_DISCOVER_INIT_TIMEOUT << Index);
+  Status          = Dhcp4->Configure (Dhcp4, &Dhcp4CfgData);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+  
+  //
+  // Zero those arrays to record the varies numbers of DHCP OFFERS.
+  //
+  Private->GotProxyOffer = FALSE;
+  Private->NumOffers     = 0;
+  Private->BootpIndex    = 0;
+  ZeroMem (Private->ServerCount, sizeof (Private->ServerCount));
+  ZeroMem (Private->ProxyIndex, sizeof (Private->ProxyIndex));
 
-    Status          = Dhcp4->Configure (Dhcp4, &Dhcp4CfgData);
-    if (EFI_ERROR (Status)) {
-      break;
+  Status = Dhcp4->Start (Dhcp4, NULL);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_ICMP_ERROR) {
+      Mode->IcmpErrorReceived = TRUE;
     }
-    //
-    // Zero those arrays to record the varies numbers of DHCP OFFERS.
-    //
-    Private->GotProxyOffer = FALSE;
-    Private->NumOffers     = 0;
-    Private->BootpIndex    = 0;
-    ZeroMem (Private->ServerCount, sizeof (Private->ServerCount));
-    ZeroMem (Private->ProxyIndex, sizeof (Private->ProxyIndex));
-
-    Status = Dhcp4->Start (Dhcp4, NULL);
-    if (EFI_ERROR (Status)) {
-      if (Status == EFI_TIMEOUT) {
-        //
-        // If no response is received or all received offers don't match
-        // the PXE boot requirements, EFI_TIMEOUT will be returned.
-        //
-        continue;
-      }
-      if (Status == EFI_ICMP_ERROR) {
-        Mode->IcmpErrorReceived = TRUE;
-      }
-      //
-      // Other error status means the DHCP really fails.
-      //
-      break;
-    }
-
-    Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4Mode);
-    if (EFI_ERROR (Status)) {
-      break;
-    }
-
-    ASSERT (Dhcp4Mode.State == Dhcp4Bound);
-
-    CopyMem (&Private->StationIp, &Dhcp4Mode.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->GatewayIp, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
-
-    CopyMem (&Mode->StationIp, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Mode->SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-
-    //
-    // Check the selected offer to see whether BINL is required, if no or BINL is
-    // finished, set the various Mode members.
-    //
-    Status = PxeBcCheckSelectedOffer (Private);
-    if (!EFI_ERROR (Status)) {
-      break;
-    }
+    goto ON_EXIT;
   }
 
+  Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4Mode);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  ASSERT (Dhcp4Mode.State == Dhcp4Bound);
+
+  CopyMem (&Private->StationIp, &Dhcp4Mode.ClientAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Private->SubnetMask, &Dhcp4Mode.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Private->GatewayIp, &Dhcp4Mode.RouterAddress, sizeof (EFI_IPv4_ADDRESS));
+
+  CopyMem (&Mode->StationIp, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Mode->SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+
+  //
+  // Check the selected offer to see whether BINL is required, if no or BINL is
+  // finished, set the various Mode members.
+  //
+  Status = PxeBcCheckSelectedOffer (Private);
+  if (!EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+ON_EXIT:
   if (EFI_ERROR (Status)) {
     Dhcp4->Stop (Dhcp4);
     Dhcp4->Configure (Dhcp4, NULL);
@@ -2754,4 +2739,6 @@ EfiPxeLoadFile (
 
   return Status;
 }
+
+EFI_LOAD_FILE_PROTOCOL  mLoadFileProtocolTemplate = { EfiPxeLoadFile };
 
