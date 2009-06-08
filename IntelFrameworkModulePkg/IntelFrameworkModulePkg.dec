@@ -24,27 +24,36 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
+  ##  @libraryclass  This libary is used to support the incompatible PCI devices.
   PciIncompatibleDeviceSupportLib|Include/Library/PciIncompatibleDeviceSupportLib.h
+
+  ##  @libraryclass  OEM status code libary is used to report status code to OEM device.
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
 
   ##  @libraryclass  Platform BDS library definition about platform specific behavior.
   PlatformBdsLib|Include/Library/PlatformBdsLib.h
-  
+
   ##  @libraryclass  Generic BDS library definition, include the data structure and function.
   GenericBdsLib|Include/Library/GenericBdsLib.h
 
 [Guids.common]
+  ## IntelFrameworkModule package token space guid
+  ## Include/Guid/IntelFrameworkModulePkgTokenSpace.h
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
+  
+  ## GUID identifies status code records HOB that originate from the PEI status code  
   ## Include/Guid/MemoryStatusCodeRecord.h 	
   gMemoryStatusCodeRecordGuid     = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
   
+  ## GUID identifies Data Hub records logged by Status Code Runtime Protocol.
   ## Include/Guid/DataHubStatusCodeRecord.h
   gEfiDataHubStatusCodeRecordGuid = { 0xD083E94C, 0x6560, 0x42E4, { 0xB6, 0xD4, 0x2D, 0xF7, 0x5A, 0xDF, 0x6A, 0x2A }}
   
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
-  
-  ## Include/Guid/CustomDecompress.h
+  ## GUID indicates the tiano custom compress/decompress algorithm.
+  ## Include/Guid/TianoDecompress.h
   gTianoCustomDecompressGuid     = { 0xA31280AD, 0x481E, 0x41B6, { 0x95, 0xE8, 0x12, 0x7F, 0x4C, 0x98, 0x47, 0x79 }}
   
+  ## GUID indicates the LZMA custom compress/decompress algorithm.
   ## Include/Guid/LzmaDecompress.h
   gLzmaCustomDecompressGuid      = { 0xEE4E5898, 0x3914, 0x4259, { 0x9D, 0x6E, 0xDC, 0x7B, 0xD7, 0x94, 0x03, 0xCF }}
 
@@ -59,7 +68,6 @@
   ## GUID used to pass DEBUG() macro information through the Status Code Protocol and Status Code PPI
   ## Include/Guid/StatusCodeDataTypeDebug.h
   gEfiStatusCodeDataTypeDebugGuid  = { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 }}
-
 
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Usb interface.
   ## Include/Protocol/DiskInfo.h
@@ -78,18 +86,23 @@
   gEfiDiskInfoAhciInterfaceGuid  = { 0x9e498932, 0x4abc, 0x45af, { 0xa3, 0x4d, 0x02, 0x47, 0x78, 0x7b, 0xe7, 0xc6 }}
 
 [Protocols.common]
+  ## This protocol is used to add or remove all PCI child devices on the PCI root bridge.
   ## Include/Protocol/PciHotPlugRequest.h
   gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
 
+  ## Vga Mini port binding for a VGA controller
   ## Include/Protocol/VgaMiniPort.h
   gEfiVgaMiniPortProtocolGuid    = { 0xc7735a2f, 0x88f5, 0x4882, { 0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3 }}
 
+  ## ISA I/O Protocol is used to perform ISA device Io/Mem operations.
   ## Include/Protocol/IsaIo.h
   gEfiIsaIoProtocolGuid          = { 0x7ee2bd44, 0x3da0, 0x11d4, { 0x9a, 0x38, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }}
 
+  ## ISA Acpi Protocol is used to operate and communicate with ISA device.
   ## Include/Protocol/IsaAcpi.h
   gEfiIsaAcpiProtocolGuid        = { 0x64a892dc, 0x5561, 0x4536, { 0x92, 0xc7, 0x79, 0x9b, 0xfc, 0x18, 0x33, 0x55 }}
 
+  ## PS/2 policy protocol abstracts the specific platform initialization and setting.
   ## Include/Protocol/Ps2Policy.h
   gEfiPs2PolicyProtocolGuid      = { 0x4DF19259, 0xDC71, 0x4D46, { 0xBE, 0xF1, 0x35, 0x7B, 0xB5, 0x78, 0xC4, 0x18 }}
 
@@ -101,20 +114,8 @@
   ## Include/Protocol/OEMBadging.h
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
 
-[PcdsDynamic.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
-  
-  ## Timeout value for displaying progressing bar in before boot OS.
-  #  According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
-
-  ## Error level for hardware recorder. If value 0, platform does not support feature of hardware error record.
-  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
-  
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
+  ## if required, only one mask PCD to support all features to reduces PCD number.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|FALSE|BOOLEAN|0x00010024
@@ -126,21 +127,34 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInRuntimeMemory|FALSE|BOOLEAN|0x0001002b
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInDataHub|FALSE|BOOLEAN|0x0001002c
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInOEM|FALSE|BOOLEAN|0x0001002d
+  
+  ## 
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable|FALSE|BOOLEAN|0x00010039
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable|FALSE|BOOLEAN|0x0001003a
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE|BOOLEAN|0x0001003d
+  
+  ## 
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportDma|TRUE|BOOLEAN|0x00010040
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma|FALSE|BOOLEAN|0x00010041
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory|TRUE|BOOLEAN|0x00010042
+  
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable|FALSE|BOOLEAN|0x00010043
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfg2Disable|FALSE|BOOLEAN|0x00010044
 
-[PcdsFixedAtBuild.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
+[PcdsFixedAtBuild]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask|0|UINT8|0x0001003f
 
-[PcdsPatchableInModule.common]
+[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize|128|UINT16|0x0001002e
 
+[PcdsDynamic]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
+  
+  ## Timeout value for displaying progressing bar in before boot OS.
+  #  According to UEFI 2.0 spec, it should treat the Timeout value as 0xffff.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
+
+  ## Error level for hardware recorder. If value 0, platform does not support feature of hardware error record.
+  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002

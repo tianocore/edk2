@@ -1,7 +1,7 @@
 /** @file
-  EFI ISA Acpi Protocol
+  ISA Acpi Protocol is used to operate and communicate with ISA device.
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -56,11 +56,7 @@ typedef struct _EFI_ISA_ACPI_PROTOCOL EFI_ISA_ACPI_PROTOCOL;
 
 //
 // Resource List definition: 
-// at first, the resource was defined as below
-// but in the future, it will be defined again that follow ACPI spec: ACPI resource type
-// so that, in this driver, we can interpret the ACPI table and get the ISA device information. 
 //
- 
 typedef enum {
   EfiIsaAcpiResourceEndOfList,
   EfiIsaAcpiResourceIo,
@@ -86,16 +82,33 @@ typedef struct {
   EFI_ISA_ACPI_RESOURCE       *ResourceItem;
 } EFI_ISA_ACPI_RESOURCE_LIST;
 
-//
-// Prototypes for the ISA ACPI Protocol
-//
+/**
+  Enumerate the ISA devices on the ISA bus.
+
+  @param  This               Pointer to EFI_ISA_ACPI_PROTOCOL.
+  @param  Device             Found next ISA device.
+
+  @retval EFI_NOT_FOUND      No device found.
+  @retval EFI_SUCCESS        Success get the next ISA device.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_DEVICE_ENUMERATE) (
   IN EFI_ISA_ACPI_PROTOCOL           *This,
   OUT EFI_ISA_ACPI_DEVICE_ID         **Device
   );
-  
+
+/**
+  Set ISA device power.
+
+  @param  This               Pointer to EFI_ISA_ACPI_PROTOCOL.
+  @param  Device             ISA device.
+  @param  OnOff              Whether to set power on or off.
+
+  @retval EFI_SUCCESS        Successfully set ISA device.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_SET_DEVICE_POWER) (
@@ -104,6 +117,17 @@ EFI_STATUS
   IN BOOLEAN                         OnOff
   );
   
+/**
+  Get current Resource of the specific ISA device.
+
+  @param  This               Pointer to EFI_ISA_ACPI_PROTOCOL.
+  @param  Device             ISA device.
+  @param  ResourceList       Returned resource list.
+
+  @retval EFI_SUCCESS        Successfully get current resource.
+  @retval EFI_NOT_FOUND      No resource found.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_GET_CUR_RESOURCE) (
@@ -112,6 +136,16 @@ EFI_STATUS
   OUT EFI_ISA_ACPI_RESOURCE_LIST     **ResourceList
   );
 
+/**
+  Get possible resource for the specific ISA device.
+
+  @param  This               Pointer to EFI_ISA_ACPI_PROTOCOL.
+  @param  Device             ISA device.
+  @param  ResourceList       Returned resource list.
+
+  @retval EFI_SUCCESS        Successfully get possible resource.
+  @retval EFI_NOT_FOUND      No resource found.
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_GET_POS_RESOURCE) (
@@ -119,7 +153,17 @@ EFI_STATUS
   IN EFI_ISA_ACPI_DEVICE_ID          *Device,
   OUT EFI_ISA_ACPI_RESOURCE_LIST     **ResourceList
   );
-  
+
+/**
+  Set resources for the specific ISA device.
+
+  @param  This               Pointer to EFI_ISA_ACPI_PROTOCOL.
+  @param  Device             ISA device.
+  @param  ResourceList       Resource list will be set.
+
+  @retval EFI_SUCCESS        Successfully set resource.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_SET_RESOURCE) (
@@ -128,6 +172,16 @@ EFI_STATUS
   IN EFI_ISA_ACPI_RESOURCE_LIST      *ResourceList
   );    
 
+/**
+  Enable or disable ISA device.
+
+  @param  This               Pointer of EFI_ISA_ACPI_PROTOCOL.
+  @param  Device             ISA device.
+  @param  Enable             Enable/Disable.
+
+  @retval EFI_SUCCESS        Successfully perform this action.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_ENABLE_DEVICE) (
@@ -136,6 +190,15 @@ EFI_STATUS
   IN BOOLEAN                         Enable
   );    
 
+/**
+  Init ISA device.
+
+  @param  This               Pointer to EFI_ISA_ACPI_PROTOCOL.
+  @param  Device             ISA device.
+
+  @retval EFI_SUCCESS        Successfully initialize ISA device.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_INIT_DEVICE) (
@@ -143,6 +206,14 @@ EFI_STATUS
   IN EFI_ISA_ACPI_DEVICE_ID          *Device
   );  
 
+/**
+  ISA Interface Init.
+
+  @param  This               Pointer of EFI_ISA_ACPI_PROTOCOL.
+
+  @retval EFI_SUCCESS        Successfully initialize ISA interface.
+
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_INTERFACE_INIT) (

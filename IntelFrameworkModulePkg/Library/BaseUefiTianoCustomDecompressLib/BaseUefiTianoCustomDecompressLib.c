@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "BaseUefiTianoCustomDecompressLibInternals.h"
-#include <Guid/CustomDecompress.h>
 
 /**
   Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
