@@ -1,6 +1,7 @@
 /** @file
+  This protocol is used to add or remove all PCI child devices on the PCI root bridge.
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -24,6 +25,19 @@ typedef enum {
 
 typedef struct _EFI_PCI_HOTPLUG_REQUEST_PROTOCOL  EFI_PCI_HOTPLUG_REQUEST_PROTOCOL;
 
+/**
+  Hot plug request notify.
+  
+  @param This                 A pointer to the hot plug request protocol.
+  @param Operation            The operation.
+  @param Controller           A pointer to the controller.
+  @param RemainingDevicePath  A pointer to the device path.
+  @param NumberOfChildren     A the number of child handle in the ChildHandleBuffer.
+  @param ChildHandleBuffer    A pointer to the array contain the child handle.
+  
+  @retval EFI_NOT_FOUND Can not find bridge according to controller handle.
+  @retval EFI_SUCCESS   Success operating.
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PCI_HOTPLUG_REQUEST_NOTIFY) (
