@@ -6,7 +6,7 @@
   RFC 1534: Interoperation Between DHCP and BOOTP
   RFC 3396: Encoding Long Options in DHCP.
   
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -110,7 +110,7 @@ struct _DHCP_SERVICE {
 
   UDP_IO_PORT                   *UdpIo;       // Udp child receiving all DHCP message
   UDP_IO_PORT                   *LeaseIoPort; // Udp child with lease IP
-  NET_BUF                       *LastPacket;  // The last sent packet for retransmission
+  EFI_DHCP4_PACKET              *LastPacket;  // The last sent packet for retransmission
   EFI_MAC_ADDRESS               Mac;
   UINT8                         HwType;
   UINT8                         HwLen;
@@ -126,6 +126,7 @@ struct _DHCP_SERVICE {
   EFI_EVENT                     Timer;
 
   UINT32                        PacketToLive; // Retransmission timer for our packets
+  UINT32                        LastTimeout;  // Record the init value of PacketToLive every time
   INTN                          CurRetry;
   INTN                          MaxRetries;
   UINT32                        LeaseLife;

@@ -1117,6 +1117,7 @@ PxeBcDiscvBootService (
   UINT8                               VendorOptLen;
   CHAR8                               *SystemSerialNumber;
   EFI_DHCP4_HEADER                    *DhcpHeader;
+  UINT32                              Xid;
 
 
   Mode      = Private->PxeBc.Mode;
@@ -1183,14 +1184,15 @@ PxeBcDiscvBootService (
 
     DhcpHeader->HwAddrLen = sizeof (EFI_GUID);
   }
-
-  Token.Packet->Dhcp4.Header.Xid      = NET_RANDOM (NetRandomInitSeed ());
-  Token.Packet->Dhcp4.Header.Reserved = (UINT16) ((IsBCast) ? 0xf000 : 0x0);
+       
+  Xid                                 = NET_RANDOM (NetRandomInitSeed ());
+  Token.Packet->Dhcp4.Header.Xid      = HTONL(Xid);
+  Token.Packet->Dhcp4.Header.Reserved = HTONS((IsBCast) ? 0x8000 : 0);
   CopyMem (&Token.Packet->Dhcp4.Header.ClientAddr, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
 
   Token.RemotePort = Sport;
 
-  if (DestIp == NULL) {
+  if (IsBCast) {
     SetMem (&Token.RemoteAddress, sizeof (EFI_IPv4_ADDRESS), 0xff);
   } else {
     CopyMem (&Token.RemoteAddress, DestIp, sizeof (EFI_IPv4_ADDRESS));
@@ -1210,7 +1212,8 @@ PxeBcDiscvBootService (
   //
   for (TryIndex = 1; TryIndex <= PXEBC_BOOT_REQUEST_RETRIES; TryIndex++) {
 
-    Token.TimeoutValue  = PXEBC_BOOT_REQUEST_TIMEOUT * TryIndex;
+    Token.TimeoutValue                  = (UINT16) (PXEBC_BOOT_REQUEST_TIMEOUT * TryIndex);
+    Token.Packet->Dhcp4.Header.Seconds  = (UINT16) (PXEBC_BOOT_REQUEST_TIMEOUT * (TryIndex - 1));
 
     Status              = Dhcp4->TransmitReceive (Dhcp4, &Token);
 
