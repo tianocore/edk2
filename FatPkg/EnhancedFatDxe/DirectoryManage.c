@@ -989,7 +989,8 @@ Returns:
   // We will append this entry to the end of directory
   //
   FatGetCurrentFatTime (&DirEnt->Entry.FileCreateTime);
-  FatGetCurrentFatTime (&DirEnt->Entry.FileModificationTime);
+  CopyMem (&DirEnt->Entry.FileModificationTime, &DirEnt->Entry.FileCreateTime, sizeof (FAT_DATE_TIME));
+  CopyMem (&DirEnt->Entry.FileLastAccess, &DirEnt->Entry.FileCreateTime.Date, sizeof (FAT_DATE));
   NewEndPos = ODir->CurrentEndPos + DirEnt->EntryCount;
   if (NewEndPos * sizeof (FAT_DIRECTORY_ENTRY) > OFile->FileSize) {
     if (NewEndPos >= (OFile->IsFixedRootDir ? OFile->Volume->RootEntries : FAT_MAX_DIRENTRY_COUNT)) {
