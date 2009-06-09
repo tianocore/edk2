@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -17,9 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/LoadFile2.h>
 
 /**
-  Initialize a PCI LoadFile2 instance
+  Initialize a PCI LoadFile2 instance.
   
-  @param PciIoDevice - PCI IO Device
+  @param PciIoDevice   PCI IO Device.
 
 **/
 VOID
@@ -38,7 +38,7 @@ InitializePciLoadFile2 (
                      On output with a return code of EFI_BUFFER_TOO_SMALL, 
                      the size of Buffer required to retrieve the requested file. 
   @param Buffer      The memory buffer to transfer the file to. If Buffer is NULL, 
-                    then no the size of the requested file is returned in BufferSize.
+                     then no the size of the requested file is returned in BufferSize.
 
   @retval EFI_SUCCESS           The file was loaded. 
   @retval EFI_UNSUPPORTED       BootPolicy is TRUE.

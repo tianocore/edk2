@@ -362,7 +362,7 @@ GatherDeviceInfo (
   //
   // Start to parse the bars
   //
-  for (Offset = 0x10, BarIndex = 0; Offset <= 0x24; BarIndex++) {
+  for (Offset = 0x10, BarIndex = 0; Offset <= 0x24 && BarIndex < PCI_MAX_BAR; BarIndex++) {
     Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
   }
 
@@ -1147,7 +1147,7 @@ UpdatePciInfo (
     }
   }
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || Configuration == NULL ) {
     return EFI_UNSUPPORTED;
   }
 

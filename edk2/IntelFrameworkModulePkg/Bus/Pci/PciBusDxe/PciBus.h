@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -128,7 +128,9 @@ typedef struct {
 #define EFI_SET_SUPPORTS    0
 #define EFI_SET_ATTRIBUTES  1
 
-typedef struct _PCI_IO_DEVICE {
+typedef struct _PCI_IO_DEVICE              PCI_IO_DEVICE;
+
+struct _PCI_IO_DEVICE {
   UINT32                                    Signature;
   EFI_HANDLE                                Handle;
   EFI_PCI_IO_PROTOCOL                       PciIo;
@@ -159,7 +161,7 @@ typedef struct _PCI_IO_DEVICE {
   //
   // The bridge device this pci device is subject to
   //
-  struct _PCI_IO_DEVICE                     *Parent;
+  PCI_IO_DEVICE                             *Parent;
 
   //
   // A linked list for children Pci Device if it is bridge device
@@ -227,7 +229,7 @@ typedef struct _PCI_IO_DEVICE {
 
   BOOLEAN                                   IsPciExp;
 
-} PCI_IO_DEVICE;
+};
 
 
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \
