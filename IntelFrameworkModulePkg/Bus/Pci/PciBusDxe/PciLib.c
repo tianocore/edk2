@@ -466,7 +466,6 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
                             RootBridgeDev->Handle,
                             &AcpiConfig
                             );
-
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -551,9 +550,7 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
       PMem64Bridge
       );
 
-    if (AcpiConfig != NULL) {
-      FreePool (AcpiConfig);
-    }
+    FreePool (AcpiConfig);
   }
 
   //
@@ -1044,9 +1041,7 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
       PMem64Bridge
       );
 
-    if (AcpiConfig != NULL) {
-      gBS->FreePool (AcpiConfig);
-    }
+    FreePool (AcpiConfig);
   }
 
   //

@@ -231,7 +231,7 @@ PciHostBridgeAdjustAllocation (
   @param PMem32Node       Pointer to instance of 32-bit Pmemory resource node.
   @param Mem64Node        Pointer to instance of 64-bit memory resource node.
   @param PMem64Node       Pointer to instance of 64-bit Pmemory resource node.
-  @param pConfig          outof buffer holding new constructed APCI resource requestor.
+  @param Config           Output buffer holding new constructed APCI resource requestor.
 **/
 EFI_STATUS
 ConstructAcpiResourceRequestor (
@@ -241,24 +241,25 @@ ConstructAcpiResourceRequestor (
   IN PCI_RESOURCE_NODE  *PMem32Node,
   IN PCI_RESOURCE_NODE  *Mem64Node,
   IN PCI_RESOURCE_NODE  *PMem64Node,
-  OUT VOID              **pConfig
+  OUT VOID              **Config
   );
 
 /**
-  Get resource base from a acpi configuration descriptor.
+  Get resource base from an acpi configuration descriptor.
   
-  @param pConfig      an acpi configuration descriptor.
+  @param Config       an acpi configuration descriptor.
   @param IoBase       output of I/O resource base address.
   @param Mem32Base    output of 32-bit memory base address.
   @param PMem32Base   output of 32-bit pmemory base address.
   @param Mem64Base    output of 64-bit memory base address.
   @param PMem64Base   output of 64-bit pmemory base address.
   
-  @return EFI_SUCCESS  Success operation.
+  @return EFI_SUCCESS    Get resource base address successfully.
+
 **/
 EFI_STATUS
 GetResourceBase (
-  IN VOID     *pConfig,
+  IN VOID     *Config,
   OUT UINT64  *IoBase,
   OUT UINT64  *Mem32Base,
   OUT UINT64  *PMem32Base,

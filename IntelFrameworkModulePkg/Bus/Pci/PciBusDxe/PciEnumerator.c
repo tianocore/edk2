@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1005,7 +1005,7 @@ PciHostBridgeAdjustAllocation (
   @param PMem32Node       Pointer to instance of 32-bit Pmemory resource node
   @param Mem64Node        Pointer to instance of 64-bit memory resource node
   @param PMem64Node       Pointer to instance of 64-bit Pmemory resource node
-  @param pConfig          outof buffer holding new constructed APCI resource requestor
+  @param Config           Output buffer holding new constructed APCI resource requestor
 **/
 EFI_STATUS
 ConstructAcpiResourceRequestor (
@@ -1015,7 +1015,7 @@ ConstructAcpiResourceRequestor (
   IN PCI_RESOURCE_NODE  *PMem32Node,
   IN PCI_RESOURCE_NODE  *Mem64Node,
   IN PCI_RESOURCE_NODE  *PMem64Node,
-  OUT VOID              **pConfig
+  OUT VOID              **Config
   )
 {
   UINT8                             NumConfig;
@@ -1027,7 +1027,7 @@ ConstructAcpiResourceRequestor (
   NumConfig = 0;
   Aperture  = 0;
 
-  *pConfig  = NULL;
+  *Config  = NULL;
 
   //
   // if there is io request, add to the io aperture
@@ -1228,26 +1228,27 @@ ConstructAcpiResourceRequestor (
     PtrEnd->Checksum  = 0;
   }
 
-  *pConfig = Configuration;
+  *Config = Configuration;
 
   return EFI_SUCCESS;
 }
 
 /**
-  Get resource base from a acpi configuration descriptor.
+  Get resource base from an acpi configuration descriptor.
   
-  @param pConfig      an acpi configuration descriptor.
+  @param Config       an acpi configuration descriptor.
   @param IoBase       output of I/O resource base address.
   @param Mem32Base    output of 32-bit memory base address.
   @param PMem32Base   output of 32-bit pmemory base address.
   @param Mem64Base    output of 64-bit memory base address.
   @param PMem64Base   output of 64-bit pmemory base address.
   
-  @return EFI_SUCCESS  Success operation.
+  @return EFI_SUCCESS    Get resource base address successfully.
+
 **/
 EFI_STATUS
 GetResourceBase (
-  IN VOID     *pConfig,
+  IN VOID     *Config,
   OUT UINT64  *IoBase,
   OUT UINT64  *Mem32Base,
   OUT UINT64  *PMem32Base,
@@ -1259,13 +1260,15 @@ GetResourceBase (
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Ptr;
   UINT64                            ResStatus;
 
+  ASSERT (Config != NULL);
+
   *IoBase     = 0xFFFFFFFFFFFFFFFFULL;
   *Mem32Base  = 0xFFFFFFFFFFFFFFFFULL;
   *PMem32Base = 0xFFFFFFFFFFFFFFFFULL;
   *Mem64Base  = 0xFFFFFFFFFFFFFFFFULL;
   *PMem64Base = 0xFFFFFFFFFFFFFFFFULL;
 
-  Temp        = (UINT8 *) pConfig;
+  Temp        = (UINT8 *) Config;
 
   while (*Temp == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
 

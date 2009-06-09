@@ -97,8 +97,7 @@
   gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL TO_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiIncompatiblePciDeviceSupportProtocolGuid  # PROTOCOL TO_START
-  gEfiUgaIoProtocolGuid                         # ALWAYS_CONSUMED     System Table
-  gEfiLoadFile2ProtocolGuid						# SOMETIMES_CONSUMED
+  gEfiLoadFile2ProtocolGuid						          # SOMETIMES_CONSUMED
 
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable
