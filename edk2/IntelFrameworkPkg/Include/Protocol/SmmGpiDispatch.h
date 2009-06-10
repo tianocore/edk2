@@ -113,7 +113,7 @@ EFI_STATUS
                                 unregistered and the SMI source has been disabled
                                 if there are no other registered child dispatch
                                 functions for this SMI source.
-  @retval EFI_INVALID_PARAMETER Handle is invalid.
+  @retval EFI_INVALID_PARAMETER DispatchHandle is invalid.
 
 **/
 typedef
