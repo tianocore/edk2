@@ -1,10 +1,12 @@
 /** @file
-  This file declares Firmware Volume protocol.
-  The Firmware Volume Protocol provides file-level access to the firmware volume.E ach firmware
-  volume driver must produce an instance of the Firmware Volume Protocol if the firmware volume
-  is to be visible to the system.T he Firmware Volume Protocol also provides mechanisms for
-  determining and modifying some attributes of the firmware volume.
+  This file declares the Firmware Volume Protocol.
   
+  The Firmware Volume Protocol provides file-level access to the firmware volume.
+  Each firmware volume driver must produce an instance of the Firmware Volume
+  Protocol if the firmware volume is to be visible to the system. The Firmware
+  Volume Protocol also provides mechanisms for determining and modifying some
+  attributes of the firmware volume.
+
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -85,12 +87,10 @@ typedef UINT64  FRAMEWORK_EFI_FV_ATTRIBUTES;
   Retrieves attributes, insures positive polarity of attribute bits, returns
   resulting attributes in output parameter
 
-  @param  This                  Calling context
+  @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
   @param  Attributes            output buffer which contains attributes
 
-  @retval EFI_INVALID_PARAMETER
-  @retval EFI_SUCCESS
-
+  @retval EFI_SUCCESS           The firmware volume attributes were returned.
 **/
 typedef
 EFI_STATUS
@@ -102,26 +102,34 @@ EFI_STATUS
 /**
   Sets volume attributes
 
-  @param  This                  Calling context
-  @param  Attributes            Buffer which contains attributes
+  @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
+  @param  Attributes            On input, Attributes is a pointer to an 
+                                EFI_FV_ATTRIBUTES containing the desired firmware 
+                                volume settings.O n successful return, it contains 
+                                the new settings of the firmware volume. On 
+                                unsuccessful return, Attributes is not modified 
+                                and the firmware volume settings are not changed.
 
-  @retval EFI_INVALID_PARAMETER
-  @retval EFI_DEVICE_ERROR
-  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER A bit in Attributes was invalid
+  @retval EFI_SUCCESS           The requested firmware volume attributes were set 
+                                and the resulting EFI_FV_ATTRIBUTES is returned in
+                                Attributes.
+  @retval EFI_ACCESS_DENIED     the Device is locked and does not permit modification. 
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *FRAMEWORK_EFI_FV_SET_ATTRIBUTES)(
-  IN EFI_FIRMWARE_VOLUME_PROTOCOL   *This,
-  IN OUT FRAMEWORK_EFI_FV_ATTRIBUTES          *Attributes
+  IN EFI_FIRMWARE_VOLUME_PROTOCOL       *This,
+  IN OUT FRAMEWORK_EFI_FV_ATTRIBUTES    *Attributes
   );
 
 /**
-  Read the requested file (NameGuid) and returns data in Buffer.
+  Read the requested file (NameGuid) or file information from the firmware volume 
+  and returns data in Buffer.
 
-  @param  This                  Calling context
-  @param  NameGuid              Filename identifying which file to read
+  @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
+  @param  NameGuid              pointer to EFI_GUID which is the filename identifying which file to read
   @param  Buffer                Pointer to pointer to buffer in which contents of file are returned.
                                 <br>
                                 If Buffer is NULL, only type, attributes, and size are returned as
@@ -134,15 +142,17 @@ EFI_STATUS
                                 allocated by the caller and is being passed in.
   @param  BufferSize            Indicates the buffer size passed in, and on output the size
                                 required to complete the read
-  @param  FoundType             Indicates the type of the file who's data is returned
-  @param  FileAttributes        Indicates the attributes of the file who's data is resturned
-  @param  AuthenticationStatus  Indicates the authentication status of the data
+  @param  FoundType             pointer to type of the file who's data is returned
+  @param  FileAttributes        pointer to attributes of the file who's data is resturned
+  @param  AuthenticationStatus  pointer to authentication status of the data
 
-  @retval EFI_SUCCESS
-  @retval EFI_WARN_BUFFER_TOO_SMALL
-  @retval EFI_NOT_FOUND
-  @retval EFI_DEVICE_ERROR
-  @retval EFI_ACCESS_DENIED
+  @retval EFI_SUCCESS               The call completed successfully
+  @retval EFI_WARN_BUFFER_TOO_SMALL The buffer is too small to contain the requested output.
+                                    The buffer is filled and the output is truncated.
+  @retval EFI_NOT_FOUND             NameGuid was not found int he firmware volume.
+  @retval EFI_DEVICE_ERROR          A hardware error occurred when attempting to access the firmware volume.
+  @retval EFI_ACCESS_DENIED         The firmware volumen is configured to disallow reads.
+  @retval EFI_OUT_OF_RESOURCES      An allocation failure occurred.
 
 **/
 typedef
@@ -160,7 +170,7 @@ EFI_STATUS
 /**
   Read the requested section from the specified file and returns data in Buffer.
 
-  @param  This                  Calling context
+  @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
   @param  NameGuid              Filename identifying the file from which to read
   @param  SectionType           Indicates what section type to retrieve
   @param  SectionInstance       Indicates which instance of SectionType to retrieve
@@ -174,9 +184,9 @@ EFI_STATUS
                                 <br>
                                 If Buffer != NULL and *Buffer != NULL, the output buffer has been
                                 allocated by the caller and is being passed in.
-  @param  BufferSize            Indicates the buffer size passed in, and on output the size
+  @param  BufferSize            pointer to the buffer size passed in, and on output the size
                                 required to complete the read
-  @param  AuthenticationStatus  Indicates the authentication status of the data
+  @param  AuthenticationStatus  pointer to the authentication status of the data
 
   @retval EFI_SUCCESS
   @retval EFI_WARN_BUFFER_TOO_SMALL
@@ -214,7 +224,7 @@ typedef struct {
 /**
   Write the supplied file (NameGuid) to the FV.
 
-  @param  This                  Calling context
+  @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
   @param  NumberOfFiles         Indicates the number of file records pointed to by FileData
   @param  WritePolicy           Indicates the level of reliability of the write with respect to
                                 things like power failure events.
@@ -242,14 +252,14 @@ EFI_STATUS
 /**
   Given the input key, search for the next matching file in the volume.
 
-  @param  This                  Calling context
+  @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
   @param  Key                   Pointer to a caller allocated buffer that contains an implementation
                                 specific key that is used to track where to begin searching on
                                 successive calls.
-  @param  FileType              Indicates the file type to filter for
-  @param  NameGuid              Guid filename of the file found
-  @param  Attributes            Attributes of the file found
-  @param  Size                  Size in bytes of the file found
+  @param  FileType              pointer to the file type to filter for
+  @param  NameGuid              pointer to Guid filename of the file found
+  @param  Attributes            pointer to Attributes of the file found
+  @param  Size                  pointer to Size in bytes of the file found
 
   @retval EFI_SUCCESS
   @retval EFI_NOT_FOUND
@@ -268,48 +278,42 @@ EFI_STATUS
   OUT UINTN                         *Size
   );
 
-/**
-  @par Protocol Description:
-  The Firmware Volume Protocol provides file-level access to the firmware volume.
-  Each firmware volume driver must produce an instance of the Firmware Volume
-  Protocol if the firmware volume is to be visible to the system. The Firmware
-  Volume Protocol also provides mechanisms for determining and modifying some
-  attributes of the firmware volume.
-
-  @param GetVolumeAttributes
-  Retrieves volume capabilities and current settings.
-
-  @param SetVolumeAttributes
-  Modifies the current settings of the firmware volume.
-
-  @param ReadFile
-  Reads an entire file from the firmware volume.
-
-  @param ReadSection
-  Reads a single section from a file into a buffer.
-
-  @param WriteFile
-  Writes an entire file into the firmware volume.
-
-  @param GetNextFile
-  Provides service to allow searching the firmware volume.
-
-  @param KeySize
-  Data field that indicates the size in bytes of the Key input buffer for
-  the GetNextFile() API.
-
-  @param ParentHandle
-  Handle of the parent firmware volume.
-
-**/
+//
+// Protocol interface structure
+//
 struct _EFI_FIRMWARE_VOLUME_PROTOCOL {
+///
+/// Retrieves volume capabilities and current settings.
+///
   FRAMEWORK_EFI_FV_GET_ATTRIBUTES GetVolumeAttributes;
+///
+/// Modifies the current settings of the firmware volume.
+///
   FRAMEWORK_EFI_FV_SET_ATTRIBUTES SetVolumeAttributes;
+///
+/// Reads an entire file from the firmware volume.
+///
   FRAMEWORK_EFI_FV_READ_FILE      ReadFile;
+///
+/// Reads a single section from a file into a buffer.
+///
   FRAMEWORK_EFI_FV_READ_SECTION   ReadSection;
+///
+/// Writes an entire file into the firmware volume.
+///
   FRAMEWORK_EFI_FV_WRITE_FILE     WriteFile;
+///
+/// Provides service to allow searching the firmware volume.
+///
   FRAMEWORK_EFI_FV_GET_NEXT_FILE  GetNextFile;
-  UINT32                KeySize;
+///
+///  Data field that indicates the size in bytes of the Key input buffer for
+///  the GetNextFile() API.
+///
+UINT32                KeySize;
+///
+///  Handle of the parent firmware volume.
+///
   EFI_HANDLE            ParentHandle;
 };
 
