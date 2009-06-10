@@ -13,7 +13,7 @@
   Module Name:  SmmSwDispatch.h
 
   @par Revision Reference:
-  This Protocol is defined in Framework of EFI SMM Core Interface Spec
+  This Protocol is defined in Framework for EFI SMM Core Interface Spec
   Version 0.9.
 
 **/
@@ -125,22 +125,21 @@ EFI_STATUS
 /**
   @par Protocol Description:
   Provides the parent dispatch service for a given SMI source generator.
-
-  @param Register
-  Installs a child service to be dispatched by this protocol.
-
-  @param UnRegister
-  Removes a child service dispatched by this protocol.
-
-  @param MaximumSwiValue
-  A read-only field that describes the maximum value that can be used
-  in the EFI_SMM_SW_DISPATCH_PROTOCOL.Register() service.
-
 **/
 struct _EFI_SMM_SW_DISPATCH_PROTOCOL {
+///
+/// Installs a child service to be dispatched by this protocol.
+///
   EFI_SMM_SW_REGISTER   Register;
+///
+/// Removes a child service dispatched by this protocol.
+///
   EFI_SMM_SW_UNREGISTER UnRegister;
-  UINTN                 MaximumSwiValue;
+///
+/// A read-only field that describes the maximum value that can be used
+/// in the EFI_SMM_SW_DISPATCH_PROTOCOL.Register() service.
+///
+UINTN                 MaximumSwiValue;
 };
 
 extern EFI_GUID gEfiSmmSwDispatchProtocolGuid;
