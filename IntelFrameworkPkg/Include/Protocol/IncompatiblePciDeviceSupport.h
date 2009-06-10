@@ -74,18 +74,12 @@ EFI_STATUS
 //
 // Interface structure for the Incompatible PCI Device Support Protocol
 //
-/**
-  @par Protocol Description:
-  This protocol can find some incompatible PCI devices and report their
-  special resource requirements to the PCI bus driver.
-
-  @param CheckDevice
-  Returns a list of ACPI resource descriptors that detail any special
-  resource configuration requirements if the specified device is a recognized
-  incompatible PCI device.
-
-**/
 struct _EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL {
+///
+///  Returns a list of ACPI resource descriptors that detail any special
+///  resource configuration requirements if the specified device is a recognized
+///  incompatible PCI device.
+///
   EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_CHECK_DEVICE      CheckDevice;
 };
 
