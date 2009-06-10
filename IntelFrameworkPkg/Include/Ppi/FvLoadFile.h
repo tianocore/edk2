@@ -58,12 +58,11 @@ EFI_STATUS
   published by a PEIM.The PEI Foundation will use this service to
   launch the known non-XIP PE/COFF PEIM images.  This service may
   depend upon the presence of the EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI.
-
-  @param FvLoadFile
-  Loads a PEIM into memory for subsequent execution
-
 **/
 struct _EFI_PEI_FV_FILE_LOADER_PPI {
+///
+/// Loads a PEIM into memory for subsequent execution
+///
   EFI_PEI_FV_LOAD_FILE  FvLoadFile;
 };
 
