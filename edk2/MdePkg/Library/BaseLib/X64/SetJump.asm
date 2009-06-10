@@ -47,6 +47,18 @@ SetJump     PROC
     mov     [rcx + 38h], r14
     mov     [rcx + 40h], r15
     mov     [rcx + 48h], rdx
+    ; save non-volatile fp registers
+    stmxcsr [rcx + 50h]
+    movdqu  [rcx + 58h], xmm6
+    movdqu  [rcx + 68h], xmm7
+    movdqu  [rcx + 78h], xmm8
+    movdqu  [rcx + 88h], xmm9
+    movdqu  [rcx + 98h], xmm10
+    movdqu  [rcx + 0A8h], xmm11
+    movdqu  [rcx + 0B8h], xmm12
+    movdqu  [rcx + 0C8h], xmm13
+    movdqu  [rcx + 0D8h], xmm14
+    movdqu  [rcx + 0E8h], xmm15
     xor     rax, rax
     jmp     rdx
 SetJump     ENDP

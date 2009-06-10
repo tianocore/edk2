@@ -39,7 +39,19 @@ InternalLongJump    PROC
     mov     r13, [rcx + 30h]
     mov     r14, [rcx + 38h]
     mov     r15, [rcx + 40h]
-    mov     rax, rdx                    ; set return value
+    ; load non-volatile fp registers
+    ldmxcsr [rcx + 50h]
+    movdqu  xmm6,  [rcx + 58h]
+    movdqu  xmm7,  [rcx + 68h]
+    movdqu  xmm8,  [rcx + 78h]
+    movdqu  xmm9,  [rcx + 88h]
+    movdqu  xmm10, [rcx + 98h]
+    movdqu  xmm11, [rcx + 0A8h]
+    movdqu  xmm12, [rcx + 0B8h]
+    movdqu  xmm13, [rcx + 0C8h]
+    movdqu  xmm14, [rcx + 0D8h]
+    movdqu  xmm15, [rcx + 0E8h]
+    mov     rax, rdx               ; set return value
     jmp     qword ptr [rcx + 48h]
 InternalLongJump    ENDP
 

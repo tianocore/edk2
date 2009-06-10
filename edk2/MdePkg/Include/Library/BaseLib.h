@@ -101,6 +101,8 @@ typedef struct {
   UINT64                            R14;
   UINT64                            R15;
   UINT64                            Rip;
+  UINT64                            MxCsr;
+  UINT8                             XmmBuffer[160]; ///< XMM6-XMM15
 } BASE_LIBRARY_JUMP_BUFFER;
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
