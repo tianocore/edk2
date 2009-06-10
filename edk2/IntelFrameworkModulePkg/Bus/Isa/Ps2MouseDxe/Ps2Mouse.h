@@ -1,5 +1,5 @@
-/**@file
-  PS/2 Mouse driver header file
+/** @file
+  PS/2 Mouse driver header file.
   
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PS2MOUSE_H
-#define _PS2MOUSE_H
+#ifndef _PS2MOUSE_H_
+#define _PS2MOUSE_H_
 
 #include <PiDxe.h>
 #include <Framework/StatusCode.h>
@@ -105,6 +105,20 @@ typedef struct {
 //
 // Function prototypes
 //
+/**
+  Test to see if this driver supports ControllerHandle. Any ControllerHandle
+  than contains a IsaIo protocol can be supported.
+
+  @param  This                Protocol instance pointer.
+  @param  ControllerHandle    Handle of device to test
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
+                              device to start.
+
+  @retval EFI_SUCCESS         This driver supports this device
+  @retval EFI_ALREADY_STARTED This driver is already running on this device
+  @retval other               This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PS2MouseDriverSupported (
@@ -113,6 +127,21 @@ PS2MouseDriverSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Start this driver on ControllerHandle by opening a IsaIo
+  protocol, creating PS2_MOUSE_ABSOLUTE_POINTER_DEV device and install gEfiAbsolutePointerProtocolGuid
+  finnally.
+
+  @param  This                 Protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+
+**/
 EFI_STATUS
 EFIAPI
 PS2MouseDriverStart (
@@ -121,6 +150,20 @@ PS2MouseDriverStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 PS2MouseDriverStop (
@@ -259,7 +302,17 @@ Ps2MouseComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
+/**
+  Reset the Mouse and do BAT test for it, if ExtendedVerification isTRUE and there is a mouse device connectted to system
 
+  @param This                 - Pointer of simple pointer Protocol.
+  @param ExtendedVerification - Whether configure mouse parameters. True: do; FALSE: skip.
+
+
+  @retval EFI_SUCCESS         - The command byte is written successfully.
+  @retval EFI_DEVICE_ERROR    - Errors occurred during reseting keyboard.
+
+**/
 EFI_STATUS
 EFIAPI
 MouseReset (
@@ -267,6 +320,16 @@ MouseReset (
   IN BOOLEAN                        ExtendedVerification
   );
 
+/**
+  Get and Clear mouse status.
+  
+  @param This                 - Pointer of simple pointer Protocol.
+  @param State                - Output buffer holding status.
+
+  @retval EFI_INVALID_PARAMETER Output buffer is invalid.
+  @retval EFI_NOT_READY         Mouse is not changed status yet.
+  @retval EFI_SUCCESS           Mouse status is changed and get successful.
+**/
 EFI_STATUS
 EFIAPI
 MouseGetState (
@@ -274,6 +337,15 @@ MouseGetState (
   IN OUT EFI_SIMPLE_POINTER_STATE   *State
   );
 
+/**
+
+  Event notification function for SIMPLE_POINTER.WaitForInput event.
+  Signal the event if there is input from mouse.
+
+  @param Event    event object
+  @param Context  event context
+
+**/
 VOID
 EFIAPI
 MouseWaitForInput (
@@ -281,6 +353,14 @@ MouseWaitForInput (
   IN  VOID                    *Context
   );
 
+/**
+  Event notification function for TimerEvent event
+  If mouse device is connected to system, try to get the mouse packet data
+
+  @param Event      -  TimerEvent in PS2_MOUSE_DEV
+  @param Context    -  Pointer to PS2_MOUSE_DEV structure
+
+**/
 VOID
 EFIAPI
 PollMouse (
@@ -288,11 +368,30 @@ PollMouse (
   IN VOID       *Context
   );
 
+/**
+  I/O work flow of in 8042 data.
+  
+  @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
+  @param Data    Data value
+  
+  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_TIMEOUT Keyboard controller time out.
+**/
 EFI_STATUS
 In8042Data (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN OUT UINT8                            *Data
   );
+
+/**
+  Check whether there is Ps/2 mouse device in system
+
+  @param MouseDev   - Mouse Private Data Structure
+
+  @retval TRUE      - Keyboard in System.
+  @retval FALSE     - Keyboard not in System.
+
+**/
 BOOLEAN
 CheckMouseConnect (
   IN  PS2_MOUSE_DEV     *MouseDev

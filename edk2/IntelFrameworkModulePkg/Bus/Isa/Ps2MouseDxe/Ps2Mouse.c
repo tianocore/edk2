@@ -1,4 +1,4 @@
-/**@file
+/** @file
   PS/2 Mouse driver. Routines that interacts with callers,
   conforming to EFI driver model
   
@@ -618,10 +618,10 @@ Exit:
 /**
   Check whether there is Ps/2 mouse device in system
 
-  @param PS2_MOUSE_DEV - Mouse Private Data Structure
+  @param MouseDev   - Mouse Private Data Structure
 
-  @retval TRUE                - Keyboard in System.
-  @retval FALSE               - Keyboard not in System.
+  @retval TRUE      - Keyboard in System.
+  @retval FALSE     - Keyboard not in System.
 
 **/
 BOOLEAN
@@ -687,22 +687,19 @@ MouseGetState (
 
 /**
 
-  Event notification function for SIMPLE_POINTER.WaitForInput event
-  Signal the event if there is input from mouse
+  Event notification function for SIMPLE_POINTER.WaitForInput event.
+  Signal the event if there is input from mouse.
 
   @param Event    event object
   @param Context  event context
 
 **/
-
 VOID
 EFIAPI
 MouseWaitForInput (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
   )
-// GC_TODO:    Event - add argument and description to function comment
-// GC_TODO:    Context - add argument and description to function comment
 {
   PS2_MOUSE_DEV *MouseDev;
 

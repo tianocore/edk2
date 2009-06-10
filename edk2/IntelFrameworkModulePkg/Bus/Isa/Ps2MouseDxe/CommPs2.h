@@ -1,7 +1,6 @@
-/**@file
+/** @file
   PS2 Mouse Communication Interface 
 
-  
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -360,7 +359,7 @@ In8042AuxData (
   I/O work flow of outing 8042 Aux data.
   
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
-  @param Command Aux I/O command
+  @param Data    Buffer holding return value
   
   @retval EFI_SUCCESS Success to excute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
@@ -372,7 +371,7 @@ Out8042AuxData (
   );
 
 /**
-  Check keyboard controller status, if it is output buffer full and for auxiliary device
+  Check keyboard controller status, if it is output buffer full and for auxiliary device.
   
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   
