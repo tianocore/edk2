@@ -203,8 +203,9 @@ bash$ <b>export ftp_proxy=$http_proxy</b>
 
 <font size="2">
   <ul>
-    <li><a href="#RHEL4">Red Hat Enterprise Linux 4 Desktop</a></li>
+    <li><a href="#Fedora11">Fedora 11</a></li>
     <li><a href="#MacOSX10.5">Mac OS X 10.5</a> (Leopard)</li>
+    <li><a href="#RHEL4">Red Hat Enterprise Linux 4 Desktop</a></li>
     <li><a href="#SLED10">SuSE Linux Enterprise 10 Desktop</a></li>
     <li><a href="#Ubuntu8.04">Ubuntu 8.04</a></li>
   </ul>
@@ -223,6 +224,84 @@ bash$ <b>export ftp_proxy=$http_proxy</b>
 <h3 class="build-step-title">
   Coming soon...
 </h3>
+
+<!--
+ #
+ # Fedora 11
+ #
+-->
+<h2 class="main-title">
+  <a name="Fedora11"></a>
+  Fedora 11
+</h2>
+
+<h3 class="build-step-title">
+  Please note
+</h3>
+
+<p class="build-step-details">
+  <ul>
+    <li class="build-step-details">
+      Fedora 11 is not officially supported or tested by the
+      <a href="index.html">edk2</a>
+      project at this time.
+    </li>
+    <li class="build-step-details">
+      These instructions assume that the <i>Software Development</i>
+      option was enabled during the Fedora installation.
+    </li>
+  </ul>
+</p>
+
+<h3 class="build-step-title">
+  Open the <a href="http://www.gnome.org">GNOME</a> Terminal program
+</h3>
+
+<p class="build-step-details">
+  These instructions will utilize Fedora's built in
+  command shell (bash) via the <i>GNOME Terminal</i> application.&nbsp;
+  To open the <i>Terminal</i> application, locate it under the
+  <i>Applications</i> menu and the <i>System Tools</i> sub-menu.
+</p>
+
+<h3 class="build-step-title">
+  Install MPFR library
+</h3>
+
+<p class="build-step-details">
+  The MPFR library must be installed to allow the gcc
+  cross compiler to be built.
+</p>
+
+<pre class="build-step-code">
+bash$ <b>mkdir ~/src</b>
+bash$ <b>cd ~/src</b>
+bash$ <b>wget http://www.mpfr.org/mpfr-current/mpfr-2.4.1.tar.bz2</b>
+bash$ <b>tar -jxf mpfr-2.4.1.tar.bz2</b>
+bash$ <b>cd mpfr-2.4.1</b>
+bash$ <b>./configure --prefix=/usr</b>
+bash$ <b>make</b>
+</pre>
+
+<p class="build-step-details">
+To install the library, you must be root.&nbsp; Therefore we
+use 'su' to become the root user, for the 'make install' command.
+</p>
+
+<pre class="build-step-code">
+bash$ <b>su</b>
+bash$ <b>make install</b>
+bash$ <b>exit</b>
+</pre>
+
+<h3 class="build-step-title">
+  Continue with common instructions
+</h3>
+
+<p class="build-step-details">
+  The remaining instructions are
+  <a href="#UnixCommon">common for most UNIX-like systems</a>.
+</p>
 
 <!--
  #
@@ -316,7 +395,6 @@ bash$ <b>tar -jxf mpfr-2.4.1.tar.bz2</b>
 bash$ <b>cd mpfr-2.4.1</b>
 bash$ <b>./configure --prefix=/usr</b>
 bash$ <b>make</b>
-bash$ <b>make check</b>
 bash$ <b>sudo make install</b>
 </pre>
 
