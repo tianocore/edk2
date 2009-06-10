@@ -37,5 +37,17 @@ ASM_PFX(SetJump):
     mov    %r14,0x38(%rcx)
     mov    %r15,0x40(%rcx)
     mov    %rdx,0x48(%rcx)
+    # save non-volatile fp registers
+    stmxcsr 0x50(%rcx)
+    movdqa  %xmm6, 0x58(%rcx) 
+    movdqa  %xmm7, 0x68(%rcx)
+    movdqa  %xmm8, 0x78(%rcx)
+    movdqa  %xmm9, 0x88(%rcx)
+    movdqa  %xmm10, 0x98(%rcx)
+    movdqa  %xmm11, 0xA8(%rcx)
+    movdqa  %xmm12, 0xB8(%rcx)
+    movdqa  %xmm13, 0xC8(%rcx)
+    movdqa  %xmm14, 0xD8(%rcx)
+    movdqa  %xmm15, 0xE8(%rcx)     
     xor    %rax,%rax
     jmpq   *%rdx
