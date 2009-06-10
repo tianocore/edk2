@@ -340,36 +340,37 @@ EFI_STATUS
 /**
   @par Data Structure Description:
   Mode Structure pointed to by Simple Text Out protocol.
-
-  @param MaxMode
-  The number of modes supported by QueryMode () and SetMode ().
-  
-  @param Mode
-  The text mode of the output device(s).
-  
-  @param Attribute
-  The current character output attribute
-  
-  @param CursorColumn
-  The cursor's column.
-  
-  @param CursorRow
-  The cursor's row.
-  
-  @param CursorVisible
-  The cursor is currently visbile or not.
-
 **/
 typedef struct {
+///
+/// The number of modes supported by QueryMode () and SetMode ().
+///
   INT32   MaxMode;
 
   //
   // current settings
   //
+
+///
+/// The text mode of the output device(s).
+///
   INT32   Mode;
+
+///
+/// The current character output attribute
+///
   INT32   Attribute;
+///
+/// The cursor's column.
+///
   INT32   CursorColumn;
+///
+/// The cursor's row.
+///
   INT32   CursorRow;
+///
+/// The cursor is currently visbile or not.
+///
   BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
 
