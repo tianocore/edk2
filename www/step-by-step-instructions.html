@@ -593,29 +593,19 @@ bash$ <b>. edksetup.sh BaseTools</b>
 </p>
 
 <p class="build-step-details">
-  For the <i>Conf/tools_def.txt</i> file, find the following lines:
+  For the <i>Conf/tools_def.txt</i> file, search for all instances of:
 </p>
 
 <pre class="build-step-code">
-*_UNIXGCC_X64_CC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_SLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ar
-*_UNIXGCC_X64_DLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ld
-*_UNIXGCC_X64_ASM_PATH              = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_PP_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
+DEF(UNIXGCC_X64_PETOOLS_PREFIX)/
 </pre>
 
 <p class="build-step-details">
-  And change the cooresponding lines to match these:
+  And replace it with:
 </p>
 
 <pre class="build-step-code">
-*_UNIXGCC_X64_CC_PATH               = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
-*_UNIXGCC_X64_SLINK_PATH            = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-ar
-*_UNIXGCC_X64_DLINK_PATH            = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-ld
-*_UNIXGCC_X64_ASM_PATH              = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
-*_UNIXGCC_X64_PP_PATH               = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
-*_UNIXGCC_X64_VFRPP_PATH            = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-gcc
+ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-
 </pre>
 
 <p class="build-step-details">
