@@ -1,7 +1,7 @@
 /**@file
   The implementation for EFI_ISA_IO_PROTOCOL. 
   
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,9 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalIsaIo.h"
 
 //
-// Driver Support Global Variables
+// Module Variables
 //
-EFI_ISA_IO_PROTOCOL IsaIoInterface = {
+EFI_ISA_IO_PROTOCOL mIsaIoInterface = {
   {    
     IsaIoMemRead,
     IsaIoMemWrite
@@ -37,7 +37,7 @@ EFI_ISA_IO_PROTOCOL IsaIoInterface = {
   NULL
 };
 
-EFI_ISA_DMA_REGISTERS  DmaRegisters[8] = {
+EFI_ISA_DMA_REGISTERS  mDmaRegisters[8] = {
   {
     0x00,
     0x87,
@@ -81,82 +81,72 @@ EFI_ISA_DMA_REGISTERS  DmaRegisters[8] = {
 };
 
 /**
-  report a error Status code of PCI bus driver controller
+  report a error Status code
 
-  @param Code         - The error status code.
+  @param Code          The error status code.
   
-  @return EFI_SUCCESS  - Success to report status code.
+  @return EFI_SUCCESS  Success to report status code.
 **/
 EFI_STATUS
 ReportErrorStatusCode (
   EFI_STATUS_CODE_VALUE Code
   )
-
 {
   return REPORT_STATUS_CODE (
-                EFI_ERROR_CODE | EFI_ERROR_MINOR,
-                Code
-                );
+           EFI_ERROR_CODE | EFI_ERROR_MINOR,
+           Code
+           );
 }
 
-//
-// Driver Support Functions
-//
 /**
-
   Initializes an ISA I/O Instance
 
-  @param IsaIoDevice            - The iso device to be initialized.
-  @param IsaDeviceResourceList  - The resource list.
+  @param[in] IsaIoDevice            The iso device to be initialized.
+  @param[in] IsaDeviceResourceList  The resource list.
   
-  @retval EFI_SUCCESS            - Initial success.
-  
+  @retval None
 **/
-EFI_STATUS
+VOID
 InitializeIsaIoInstance (
   IN ISA_IO_DEVICE               *IsaIoDevice,
   IN EFI_ISA_ACPI_RESOURCE_LIST  *IsaDeviceResourceList
   )
 {
   //
-  // Initializes an ISA I/O Instance
+  // Use the ISA IO Protocol structure template to initialize the ISA IO instance
   //
   CopyMem (
     &IsaIoDevice->IsaIo,
-    &IsaIoInterface,
+    &mIsaIoInterface,
     sizeof (EFI_ISA_IO_PROTOCOL)
     );
 
   IsaIoDevice->IsaIo.ResourceList = IsaDeviceResourceList;
-  
-  return EFI_SUCCESS;
 }
 
 /**
   Performs an ISA I/O Read Cycle
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Width                 - Signifies the width of the I/O operation.
-  @param Offset                - The offset in ISA I/O space to start the I/O operation.  
-  @param Count                 - The number of I/O operations to perform. 
-  @param Buffer                - The destination buffer to store the results
+  @param[in]  This              A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in]  Width             Specifies the width of the I/O operation.
+  @param[in]  Offset            The offset in ISA I/O space to start the I/O operation.  
+  @param[in]  Count             The number of I/O operations to perform. 
+  @param[out] Buffer            The destination buffer to store the results
 
-  @retval EFI_SUCCESS           - The data was read from the device sucessfully.
-  @retval EFI_UNSUPPORTED       - The Offset is not valid for this device.
-  @retval EFI_INVALID_PARAMETER - Width or Count, or both, were invalid.
-  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
-
+  @retval EFI_SUCCESS           The data was read from the device sucessfully.
+  @retval EFI_UNSUPPORTED       The Offset is not valid for this device.
+  @retval EFI_INVALID_PARAMETER Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoIoRead (
-  IN     EFI_ISA_IO_PROTOCOL                        *This,
-  IN     EFI_ISA_IO_PROTOCOL_WIDTH                  Width,
-  IN     UINT32                                     Offset,
-  IN     UINTN                                      Count,
-  IN OUT VOID                                       *Buffer
+  IN  EFI_ISA_IO_PROTOCOL        *This,
+  IN  EFI_ISA_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT32                     Offset,
+  IN  UINTN                      Count,
+  OUT VOID                       *Buffer
   )
-
 {
   EFI_STATUS    Status;
   ISA_IO_DEVICE *IsaIoDevice;
@@ -171,14 +161,12 @@ IsaIoIoRead (
              IsaAccessTypeIo,
              Width,
              Count,
-             &Offset
+             Offset
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Call PciIo->Io.Read
-  //
+
   Status = IsaIoDevice->PciIo->Io.Read (
                                     IsaIoDevice->PciIo,
                                     (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
@@ -198,26 +186,25 @@ IsaIoIoRead (
 /**
   Performs an ISA I/O Write Cycle
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Width                 - Signifies the width of the I/O operation.
-  @param Offset                - The offset in ISA I/O space to start the I/O operation.  
-  @param Count                 - The number of I/O operations to perform. 
-  @param Buffer                - The source buffer to write data from
+  @param[in] This                A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in] Width               Specifies the width of the I/O operation.
+  @param[in] Offset              The offset in ISA I/O space to start the I/O operation.  
+  @param[in] Count               The number of I/O operations to perform. 
+  @param[in] Buffer              The source buffer to write data from
 
-  @retval EFI_SUCCESS           - The data was writen to the device sucessfully.
-  @retval EFI_UNSUPPORTED       - The Offset is not valid for this device.
-  @retval EFI_INVALID_PARAMETER - Width or Count, or both, were invalid.
-  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
-
+  @retval EFI_SUCCESS            The data was writen to the device sucessfully.
+  @retval EFI_UNSUPPORTED        The Offset is not valid for this device.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoIoWrite (
-  IN     EFI_ISA_IO_PROTOCOL                        *This,
-  IN     EFI_ISA_IO_PROTOCOL_WIDTH                  Width,
-  IN     UINT32                                     Offset,
-  IN     UINTN                                      Count,
-  IN OUT VOID                                       *Buffer
+  IN EFI_ISA_IO_PROTOCOL        *This,
+  IN EFI_ISA_IO_PROTOCOL_WIDTH  Width,
+  IN UINT32                     Offset,
+  IN UINTN                      Count,
+  IN VOID                       *Buffer
   )
 {
   EFI_STATUS    Status;
@@ -233,14 +220,12 @@ IsaIoIoWrite (
              IsaAccessTypeIo,
              Width,
              Count,
-             &Offset
+             Offset
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Call PciIo->Io.Write
-  //
+
   Status = IsaIoDevice->PciIo->Io.Write (
                                     IsaIoDevice->PciIo,
                                     (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
@@ -258,34 +243,29 @@ IsaIoIoWrite (
 }
 
 /**
-  Writes an 8 bit I/O Port
+  Writes an 8-bit I/O Port
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Offset                - The offset in ISA IO space to start the IO operation.  
-  @param Value                 - The data to write port.
+  @param[in] This                A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in] Offset              The offset in ISA IO space to start the IO operation.  
+  @param[in] Value               The data to write port.
 
-  @retval EFI_SUCCESS           - Success.
-  @retval EFI_INVALID_PARAMETER - Parameter is invalid.
-  @retval EFI_UNSUPPORTED       - The address range specified by Offset is not valid.
-  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
-  
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  Parameter is invalid.
+  @retval EFI_UNSUPPORTED        The address range specified by Offset is not valid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 **/
 EFI_STATUS
 WritePort (
-  IN EFI_ISA_IO_PROTOCOL                  *This,
-  IN UINT32                               Offset,
-  IN UINT8                                Value
+  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN UINT32               Offset,
+  IN UINT8                Value
   )
-
 {
   EFI_STATUS    Status;
   ISA_IO_DEVICE *IsaIoDevice;
 
   IsaIoDevice = ISA_IO_DEVICE_FROM_ISA_IO_THIS (This);
 
-  //
-  // Call PciIo->Io.Write
-  //
   Status = IsaIoDevice->PciIo->Io.Write (
                                     IsaIoDevice->PciIo,
                                     EfiPciIoWidthUint8,
@@ -307,29 +287,27 @@ WritePort (
 /**
   Writes I/O operation base address and count number to a 8 bit I/O Port.
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param AddrOffset            - The address' offset.
-  @param PageOffset            - The page's offest.
-  @param CountOffset           - The count's offset.
-  @param BaseAddress           - The base address.
-  @param Count                 - The number of I/O operations to perform. 
+  @param[in] This                A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in] AddrOffset          The address' offset.
+  @param[in] PageOffset          The page's offest.
+  @param[in] CountOffset         The count's offset.
+  @param[in] BaseAddress         The base address.
+  @param[in] Count               The number of I/O operations to perform. 
   
-  @retval EFI_SUCCESS           - Success.
-  @retval EFI_INVALID_PARAMETER - Parameter is invalid.
-  @retval EFI_UNSUPPORTED       - The address range specified by these Offsets and Count is not valid.
-  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
-
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  Parameter is invalid.
+  @retval EFI_UNSUPPORTED        The address range specified by these Offsets and Count is not valid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 **/
 EFI_STATUS
 WriteDmaPort (
-  IN EFI_ISA_IO_PROTOCOL                  *This,
-  IN UINT32                               AddrOffset,
-  IN UINT32                               PageOffset,
-  IN UINT32                               CountOffset,
-  IN UINT32                               BaseAddress,
-  IN UINT16                               Count
+  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN UINT32               AddrOffset,
+  IN UINT32               PageOffset,
+  IN UINT32               CountOffset,
+  IN UINT32               BaseAddress,
+  IN UINT16               Count
   )
-
 {
   EFI_STATUS  Status;
 
@@ -354,28 +332,23 @@ WriteDmaPort (
   }
 
   Status = WritePort (This, CountOffset, (UINT8) ((Count >> 8) & 0xff));
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
   Unmaps a memory region for DMA
 
-  @param This             - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Mapping          - The mapping value returned from EFI_ISA_IO.Map().
+  @param[in] This           A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in] Mapping        The mapping value returned from EFI_ISA_IO.Map().
 
-  @retval EFI_SUCCESS      - The range was unmapped.
-  @retval EFI_DEVICE_ERROR - The data was not committed to the target system memory.
-
+  @retval EFI_SUCCESS       The range was unmapped.
+  @retval EFI_DEVICE_ERROR  The data was not committed to the target system memory.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoUnmap (
-  IN EFI_ISA_IO_PROTOCOL                  *This,
-  IN VOID                                 *Mapping
+  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN VOID                 *Mapping
   )
 {
   ISA_MAP_INFO  *IsaMapInfo;
@@ -421,29 +394,24 @@ IsaIoUnmap (
 }
 
 /**
-  Flushes a DMA buffer
+  Flushes any posted write data to the system memory.
 
-  @param This             - A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in] This             A pointer to the EFI_ISA_IO_PROTOCOL instance.
 
-  @retval  EFI_SUCCESS      - The buffers were flushed.
-  @retval  EFI_DEVICE_ERROR - The buffers were not flushed due to a hardware error.
-
+  @retval  EFI_SUCCESS        The buffers were flushed.
+  @retval  EFI_DEVICE_ERROR   The buffers were not flushed due to a hardware error.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoFlush (
-  IN EFI_ISA_IO_PROTOCOL                  *This
+  IN EFI_ISA_IO_PROTOCOL  *This
   )
-
 {
   EFI_STATUS    Status;
   ISA_IO_DEVICE *IsaIoDevice;
 
   IsaIoDevice = ISA_IO_DEVICE_FROM_ISA_IO_THIS (This);
 
-  //
-  // Call PciIo->Flush
-  //
   Status = IsaIoDevice->PciIo->Flush (IsaIoDevice->PciIo);
 
   if (EFI_ERROR (Status)) {
@@ -456,26 +424,24 @@ IsaIoFlush (
 /**
   Verifies access to an ISA device
 
-  @param IsaIoDevice           - The ISA device to be verified.
-  @param Type                  - The Access type. The input must be either IsaAccessTypeMem or IsaAccessTypeIo.
-  @param Width                 - Signifies the width of the memory operation.
-  @param Count                 - The number of memory operations to perform. 
-  @param Offset                - The offset in ISA memory space to start the memory operation.  
+  @param[in] IsaIoDevice         The ISA device to be verified.
+  @param[in] Type                The Access type. The input must be either IsaAccessTypeMem or IsaAccessTypeIo.
+  @param[in] Width               The width of the memory operation.
+  @param[in] Count               The number of memory operations to perform. 
+  @param[in] Offset              The offset in ISA memory space to start the memory operation.  
   
-  @retval EFI_SUCCESS           - Verify success.
-  @retval EFI_INVALID_PARAMETER - One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED       - The device ont support the access type.
-
+  @retval EFI_SUCCESS            Verify success.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_UNSUPPORTED        The device ont support the access type.
 **/
 EFI_STATUS
 IsaIoVerifyAccess (
-  IN     ISA_IO_DEVICE              *IsaIoDevice,
-  IN     ISA_ACCESS_TYPE            Type,
-  IN     EFI_ISA_IO_PROTOCOL_WIDTH  Width,
-  IN     UINTN                      Count,
-  IN OUT UINT32                     *Offset
+  IN ISA_IO_DEVICE              *IsaIoDevice,
+  IN ISA_ACCESS_TYPE            Type,
+  IN EFI_ISA_IO_PROTOCOL_WIDTH  Width,
+  IN UINTN                      Count,
+  IN UINT32                     Offset
   )
-
 {
   EFI_ISA_ACPI_RESOURCE *Item;
   EFI_STATUS            Status;
@@ -493,7 +459,7 @@ IsaIoVerifyAccess (
   // If Width is EfiIsaIoWidthFifoUintX then convert to EfiIsaIoWidthUintX
   // If Width is EfiIsaIoWidthFillUintX then convert to EfiIsaIoWidthUintX
   //
-  if (Width >= EfiIsaIoWidthFifoUint8 && Width <= EfiIsaIoWidthFifoReserved) {
+  if (Width >= EfiIsaIoWidthFifoUint8 && Width < EfiIsaIoWidthFifoReserved) {
     Count = 1;
   }
 
@@ -503,13 +469,12 @@ IsaIoVerifyAccess (
   Item    = IsaIoDevice->IsaIo.ResourceList->ResourceItem;
   while (Item->Type != EfiIsaAcpiResourceEndOfList) {
     if ((Type == IsaAccessTypeMem && Item->Type == EfiIsaAcpiResourceMemory) ||
-        (Type == IsaAccessTypeIo && Item->Type == EfiIsaAcpiResourceIo)
-        ) {
-      if (*Offset >= Item->StartRange && (*Offset + Count * (UINT32)(1 << Width)) - 1 <= Item->EndRange) {
+        (Type == IsaAccessTypeIo && Item->Type == EfiIsaAcpiResourceIo)) {
+      if (Offset >= Item->StartRange && (Offset + Count * (UINT32)(1 << Width)) - 1 <= Item->EndRange) {
         return EFI_SUCCESS;
       }
 
-      if (*Offset >= Item->StartRange && *Offset <= Item->EndRange) {
+      if (Offset >= Item->StartRange && Offset <= Item->EndRange) {
         Status = EFI_INVALID_PARAMETER;
       }
     }
@@ -521,40 +486,35 @@ IsaIoVerifyAccess (
 }
 
 /**
-
   Performs an ISA Memory Read Cycle
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Width                 - Signifies the width of the memory operation.
-  @param Offset                - The offset in ISA memory space to start the memory operation.  
-  @param Count                 - The number of memory operations to perform. 
-  @param Buffer                - The destination buffer to store the results
+  @param[in]  This               A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in]  Width              Specifies the width of the memory operation.
+  @param[in]  Offset             The offset in ISA memory space to start the memory operation.  
+  @param[in]  Count              The number of memory operations to perform. 
+  @param[out] Buffer             The destination buffer to store the results
  
-  @retval EFI_SUCCESS           - The data was read from the device successfully.
-  @retval EFI_UNSUPPORTED       - The Offset is not valid for this device.
-  @retval EFI_INVALID_PARAMETER - Width or Count, or both, were invalid.
-  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
-
+  @retval EFI_SUCCESS            The data was read from the device successfully.
+  @retval EFI_UNSUPPORTED        The Offset is not valid for this device.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoMemRead (
-  IN     EFI_ISA_IO_PROTOCOL                       *This,
-  IN     EFI_ISA_IO_PROTOCOL_WIDTH                 Width,
-  IN     UINT32                                    Offset,
-  IN     UINTN                                     Count,
-  IN OUT VOID                                      *Buffer
+  IN  EFI_ISA_IO_PROTOCOL        *This,
+  IN  EFI_ISA_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT32                     Offset,
+  IN  UINTN                      Count,
+  OUT VOID                       *Buffer
   )
-
 {
   EFI_STATUS    Status;
   ISA_IO_DEVICE *IsaIoDevice;
 
   //
-  // Set Feature Flag PcdIsaBusSupportBusMaster to FALSE to disable support for 
-  // ISA Bus Master.
-  //
-  // So we just return EFI_UNSUPPORTED for these functions.
+  // Set Feature Flag PcdIsaBusSupportIsaMemory to FALSE to disable support for
+  // ISA bus memory read/write operations.
   //
   if (!FeaturePcdGet (PcdIsaBusSupportIsaMemory)) {
     return EFI_UNSUPPORTED;
@@ -570,14 +530,12 @@ IsaIoMemRead (
              IsaAccessTypeMem,
              Width,
              Count,
-             &Offset
+             Offset
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Call PciIo->Mem.Read
-  //
+
   Status = IsaIoDevice->PciIo->Mem.Read (
                                      IsaIoDevice->PciIo,
                                      (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
@@ -597,36 +555,33 @@ IsaIoMemRead (
 /**
   Performs an ISA Memory Write Cycle
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.  
-  @param Width                 - Signifies the width of the memory operation.
-  @param Offset                - The offset in ISA memory space to start the memory operation.  
-  @param Count                 - The number of memory operations to perform. 
-  @param Buffer                - The source buffer to write data from
+  @param[in] This                A pointer to the EFI_ISA_IO_PROTOCOL instance.  
+  @param[in] Width               Specifies the width of the memory operation.
+  @param[in] Offset              The offset in ISA memory space to start the memory operation.  
+  @param[in] Count               The number of memory operations to perform. 
+  @param[in] Buffer              The source buffer to write data from
 
-  @retval EFI_SUCCESS           - The data was written to the device sucessfully.
-  @retval EFI_UNSUPPORTED       - The Offset is not valid for this device.
-  @retval EFI_INVALID_PARAMETER - Width or Count, or both, were invalid.
-  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
-
+  @retval EFI_SUCCESS            The data was written to the device sucessfully.
+  @retval EFI_UNSUPPORTED        The Offset is not valid for this device.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoMemWrite (
-  IN     EFI_ISA_IO_PROTOCOL                        *This,
-  IN     EFI_ISA_IO_PROTOCOL_WIDTH                  Width,
-  IN     UINT32                                     Offset,
-  IN     UINTN                                      Count,
-  IN OUT VOID                                       *Buffer
+  IN EFI_ISA_IO_PROTOCOL        *This,
+  IN EFI_ISA_IO_PROTOCOL_WIDTH  Width,
+  IN UINT32                     Offset,
+  IN UINTN                      Count,
+  IN VOID                       *Buffer
   )
 {
   EFI_STATUS    Status;
   ISA_IO_DEVICE *IsaIoDevice;
 
   //
-  // Set Feature Flag PcdIsaBusSupportBusMaster to FALSE to disable support for 
-  // ISA Bus Master.
-  //
-  // So we just return EFI_UNSUPPORTED for these functions.
+  // Set Feature Flag PcdIsaBusSupportIsaMemory to FALSE to disable support for
+  // ISA bus memory read/write operations.
   //
   if (!FeaturePcdGet (PcdIsaBusSupportIsaMemory)) {
     return EFI_UNSUPPORTED;
@@ -642,14 +597,12 @@ IsaIoMemWrite (
              IsaAccessTypeMem,
              Width,
              Count,
-             &Offset
+             Offset
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Call PciIo->Mem.Write
-  //
+
   Status = IsaIoDevice->PciIo->Mem.Write (
                                      IsaIoDevice->PciIo,
                                      (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
@@ -667,39 +620,35 @@ IsaIoMemWrite (
 }
 
 /**
-  Performs an ISA I/O Copy Memory 
+  Copy one region of ISA memory space to another region of ISA memory space on the ISA controller.
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Width                 - Signifies the width of the memory copy operation.
-  @param DestOffset            - The offset of the destination 
-  @param SrcOffset             - The offset of the source
-  @param Count                 - The number of memory copy  operations to perform
+  @param[in]  This               A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in]  Width              Specifies the width of the memory copy operation.
+  @param[out] DestOffset         The offset of the destination 
+  @param[in]  SrcOffset          The offset of the source
+  @param[in]  Count              The number of memory copy  operations to perform
 
-  @retval EFI_SUCCESS           - The data was copied sucessfully.
-  @retval EFI_UNSUPPORTED       - The DestOffset or SrcOffset is not valid for this device.
-  @retval EFI_INVALID_PARAMETER - Width or Count, or both, were invalid.
-  @retval EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of resources.
-
+  @retval EFI_SUCCESS            The data was copied sucessfully.
+  @retval EFI_UNSUPPORTED        The DestOffset or SrcOffset is not valid for this device.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a lack of resources.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoCopyMem (
-  IN EFI_ISA_IO_PROTOCOL                        *This,
-  IN EFI_ISA_IO_PROTOCOL_WIDTH                  Width,
-  IN UINT32                                     DestOffset,
-  IN UINT32                                     SrcOffset,
-  IN UINTN                                      Count
+  IN EFI_ISA_IO_PROTOCOL        *This,
+  IN EFI_ISA_IO_PROTOCOL_WIDTH  Width,
+  IN UINT32                     DestOffset,
+  IN UINT32                     SrcOffset,
+  IN UINTN                      Count
   )
-
 {
   EFI_STATUS    Status;
   ISA_IO_DEVICE *IsaIoDevice;
 
   //
-  // Set Feature Flag PcdIsaBusSupportBusMaster to FALSE to disable support for 
-  // ISA Bus Master.
-  //
-  // So we just return EFI_UNSUPPORTED for these functions.
+  // Set Feature Flag PcdIsaBusSupportIsaMemory to FALSE to disable support for
+  // ISA bus memory read/write operations.
   //
   if (!FeaturePcdGet (PcdIsaBusSupportIsaMemory)) {
     return EFI_UNSUPPORTED;
@@ -715,7 +664,7 @@ IsaIoCopyMem (
              IsaAccessTypeMem,
              Width,
              Count,
-             &DestOffset
+             DestOffset
              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -726,14 +675,12 @@ IsaIoCopyMem (
              IsaAccessTypeMem,
              Width,
              Count,
-             &SrcOffset
+             SrcOffset
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Call PciIo->CopyMem
-  //
+
   Status = IsaIoDevice->PciIo->CopyMem (
                                  IsaIoDevice->PciIo,
                                  (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
@@ -755,40 +702,38 @@ IsaIoCopyMem (
   Maps a memory region for DMA, note this implementation
   only supports slave read/write operation to save code size.
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Operation             - Indicates the type of DMA (slave or bus master), and if 
-                          the DMA operation is going to read or write to system memory. 
-  @param ChannelNumber         - The slave channel number to use for this DMA operation. 
-                          If Operation and ChannelAttributes shows that this device 
-                          performs bus mastering DMA, then this field is ignored.  
-                          The legal range for this field is 0..7.  
-  @param ChannelAttributes     - The attributes of the DMA channel to use for this DMA operation
-  @param HostAddress           - The system memory address to map to the device.  
-  @param NumberOfBytes         - On input the number of bytes to map.  On output the number 
-                          of bytes that were mapped.
-  @param DeviceAddress         - The resulting map address for the bus master device to use 
-                          to access the hosts HostAddress.  
-  @param Mapping               - A resulting value to pass to EFI_ISA_IO.Unmap().
+  @param This                    A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param Operation               Indicates the type of DMA (slave or bus master), and if 
+                                 the DMA operation is going to read or write to system memory. 
+  @param ChannelNumber           The slave channel number to use for this DMA operation. 
+                                 If Operation and ChannelAttributes shows that this device 
+                                 performs bus mastering DMA, then this field is ignored.  
+                                 The legal range for this field is 0..7.  
+  @param ChannelAttributes       The attributes of the DMA channel to use for this DMA operation
+  @param HostAddress             The system memory address to map to the device.  
+  @param NumberOfBytes           On input the number of bytes to map.  On output the number 
+                                 of bytes that were mapped.
+  @param DeviceAddress           The resulting map address for the bus master device to use 
+                                 to access the hosts HostAddress.  
+  @param Mapping                 A resulting value to pass to EFI_ISA_IO.Unmap().
 
-  @retval EFI_SUCCESS           - The range was mapped for the returned NumberOfBytes.
-  @retval EFI_INVALID_PARAMETER - The Operation or HostAddress is undefined.
-  @retval EFI_UNSUPPORTED       - The HostAddress can not be mapped as a common buffer.
-  @retval EFI_DEVICE_ERROR      - The system hardware could not map the requested address.
-  @retval EFI_OUT_OF_RESOURCES  - The memory pages could not be allocated.
-
+  @retval EFI_SUCCESS            The range was mapped for the returned NumberOfBytes.
+  @retval EFI_INVALID_PARAMETER  The Operation or HostAddress is undefined.
+  @retval EFI_UNSUPPORTED        The HostAddress can not be mapped as a common buffer.
+  @retval EFI_DEVICE_ERROR       The system hardware could not map the requested address.
+  @retval EFI_OUT_OF_RESOURCES   The memory pages could not be allocated.
 **/
 EFI_STATUS
-IsaIoMap_OnlySupportSlaveReadWrite (
-  IN     EFI_ISA_IO_PROTOCOL                                  *This,
-  IN     EFI_ISA_IO_PROTOCOL_OPERATION                        Operation,
-  IN     UINT8                                                ChannelNumber         OPTIONAL,
-  IN     UINT32                                               ChannelAttributes,
-  IN     VOID                                                 *HostAddress,
-  IN OUT UINTN                                                *NumberOfBytes,
-  OUT    EFI_PHYSICAL_ADDRESS                                 *DeviceAddress,
-  OUT    VOID                                                 **Mapping
+IsaIoMapOnlySupportSlaveReadWrite (
+  IN     EFI_ISA_IO_PROTOCOL            *This,
+  IN     EFI_ISA_IO_PROTOCOL_OPERATION  Operation,
+  IN     UINT8                          ChannelNumber  OPTIONAL,
+  IN     UINT32                         ChannelAttributes,
+  IN     VOID                           *HostAddress,
+  IN OUT UINTN                          *NumberOfBytes,
+  OUT    EFI_PHYSICAL_ADDRESS           *DeviceAddress,
+  OUT    VOID                           **Mapping
   )
-
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  PhysicalAddress;
@@ -797,7 +742,6 @@ IsaIoMap_OnlySupportSlaveReadWrite (
   UINTN                 MaxNumberOfBytes;
   UINT32                BaseAddress;
   UINT16                Count;
-
   UINT8                 DmaMask;
   UINT8                 DmaClear;
   UINT8                 DmaChannelMode;
@@ -810,7 +754,6 @@ IsaIoMap_OnlySupportSlaveReadWrite (
       ) {
     return EFI_INVALID_PARAMETER;
   }
-
 
   //
   // Initialize the return values to their defaults
@@ -837,7 +780,7 @@ IsaIoMap_OnlySupportSlaveReadWrite (
   // Map the HostAddress to a DeviceAddress.
   //
   PhysicalAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
-  if ((PhysicalAddress +*NumberOfBytes) > ISA_MAX_MEMORY_ADDRESS) {
+  if ((PhysicalAddress + *NumberOfBytes) > ISA_MAX_MEMORY_ADDRESS) {
     //
     // Common Buffer operations can not be remapped.  If the common buffer
     // is above 16MB, then it is not possible to generate a mapping, so return
@@ -969,9 +912,9 @@ IsaIoMap_OnlySupportSlaveReadWrite (
 
   Status = WriteDmaPort (
              This,
-             DmaRegisters[ChannelNumber].Address,
-             DmaRegisters[ChannelNumber].Page,
-             DmaRegisters[ChannelNumber].Count,
+             mDmaRegisters[ChannelNumber].Address,
+             mDmaRegisters[ChannelNumber].Page,
+             mDmaRegisters[ChannelNumber].Count,
              BaseAddress,
              Count
              );
@@ -995,30 +938,29 @@ IsaIoMap_OnlySupportSlaveReadWrite (
   Maps a memory region for DMA. This implementation implement the 
   the full mapping support.
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Operation             - Indicates the type of DMA (slave or bus master), and if 
-                          the DMA operation is going to read or write to system memory. 
-  @param ChannelNumber         - The slave channel number to use for this DMA operation. 
-                          If Operation and ChannelAttributes shows that this device 
-                          performs bus mastering DMA, then this field is ignored.  
-                          The legal range for this field is 0..7.  
-  @param ChannelAttributes     - The attributes of the DMA channel to use for this DMA operation
-  @param HostAddress           - The system memory address to map to the device.  
-  @param NumberOfBytes         - On input the number of bytes to map.  On output the number 
-                          of bytes that were mapped.
-  @param DeviceAddress         - The resulting map address for the bus master device to use 
-                        - to access the hosts HostAddress.  
-  @param Mapping               - A resulting value to pass to EFI_ISA_IO.Unmap().
+  @param This                    A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param Operation               Indicates the type of DMA (slave or bus master), and if 
+                                 the DMA operation is going to read or write to system memory. 
+  @param ChannelNumber           The slave channel number to use for this DMA operation. 
+                                 If Operation and ChannelAttributes shows that this device 
+                                 performs bus mastering DMA, then this field is ignored.  
+                                 The legal range for this field is 0..7.  
+  @param ChannelAttributes       The attributes of the DMA channel to use for this DMA operation
+  @param HostAddress             The system memory address to map to the device.  
+  @param NumberOfBytes           On input the number of bytes to map.  On output the number 
+                                 of bytes that were mapped.
+  @param DeviceAddress           The resulting map address for the bus master device to use 
+                                 to access the hosts HostAddress.  
+  @param Mapping                 A resulting value to pass to EFI_ISA_IO.Unmap().
 
   @retval EFI_SUCCESS           - The range was mapped for the returned NumberOfBytes.
   @retval EFI_INVALID_PARAMETER - The Operation or HostAddress is undefined.
   @retval EFI_UNSUPPORTED       - The HostAddress can not be mapped as a common buffer.
   @retval EFI_DEVICE_ERROR      - The system hardware could not map the requested address.
   @retval EFI_OUT_OF_RESOURCES  - The memory pages could not be allocated.
-
 **/
 EFI_STATUS
-IsaIoMap_FullSupport (
+IsaIoMapFullSupport (
   IN     EFI_ISA_IO_PROTOCOL                                  *This,
   IN     EFI_ISA_IO_PROTOCOL_OPERATION                        Operation,
   IN     UINT8                                                ChannelNumber         OPTIONAL,
@@ -1028,7 +970,6 @@ IsaIoMap_FullSupport (
   OUT    EFI_PHYSICAL_ADDRESS                                 *DeviceAddress,
   OUT    VOID                                                 **Mapping
   )
-
 {
   EFI_STATUS            Status;
   BOOLEAN               Master;
@@ -1039,7 +980,6 @@ IsaIoMap_FullSupport (
   UINTN                 MaxNumberOfBytes;
   UINT32                BaseAddress;
   UINT16                Count;
-
   UINT8                 DmaMask;
   UINT8                 DmaClear;
   UINT8                 DmaChannelMode;
@@ -1052,7 +992,6 @@ IsaIoMap_FullSupport (
       ) {
     return EFI_INVALID_PARAMETER;
   }
-
 
   //
   // Initialize the return values to their defaults
@@ -1303,9 +1242,9 @@ IsaIoMap_FullSupport (
 
   Status = WriteDmaPort (
              This,
-             DmaRegisters[ChannelNumber].Address,
-             DmaRegisters[ChannelNumber].Page,
-             DmaRegisters[ChannelNumber].Count,
+             mDmaRegisters[ChannelNumber].Address,
+             mDmaRegisters[ChannelNumber].Page,
+             mDmaRegisters[ChannelNumber].Count,
              BaseAddress,
              Count
              );
@@ -1328,45 +1267,42 @@ IsaIoMap_FullSupport (
 /**
   Maps a memory region for DMA
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Operation             - Indicates the type of DMA (slave or bus master), and if 
-                          the DMA operation is going to read or write to system memory. 
-  @param ChannelNumber         - The slave channel number to use for this DMA operation. 
-                          If Operation and ChannelAttributes shows that this device 
-                          performs bus mastering DMA, then this field is ignored.  
-                          The legal range for this field is 0..7.  
-  @param ChannelAttributes     - The attributes of the DMA channel to use for this DMA operation
-  @param HostAddress           - The system memory address to map to the device.  
-  @param NumberOfBytes         - On input the number of bytes to map.  On output the number 
-                          of bytes that were mapped.
-  @param DeviceAddress         - The resulting map address for the bus master device to use 
-                        - to access the hosts HostAddress.  
-  @param Mapping               - A resulting value to pass to EFI_ISA_IO.Unmap().
+  @param This                    A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param Operation               Indicates the type of DMA (slave or bus master), and if 
+                                 the DMA operation is going to read or write to system memory. 
+  @param ChannelNumber           The slave channel number to use for this DMA operation. 
+                                 If Operation and ChannelAttributes shows that this device 
+                                 performs bus mastering DMA, then this field is ignored.  
+                                 The legal range for this field is 0..7.  
+  @param ChannelAttributes       The attributes of the DMA channel to use for this DMA operation
+  @param HostAddress             The system memory address to map to the device.  
+  @param NumberOfBytes           On input the number of bytes to map.  On output the number 
+                                 of bytes that were mapped.
+  @param DeviceAddress           The resulting map address for the bus master device to use 
+                                 to access the hosts HostAddress.  
+  @param Mapping                 A resulting value to pass to EFI_ISA_IO.Unmap().
 
-
-  @retval EFI_SUCCESS           - The range was mapped for the returned NumberOfBytes.
-  @retval EFI_INVALID_PARAMETER - The Operation or HostAddress is undefined.
-  @retval EFI_UNSUPPORTED       - The HostAddress can not be mapped as a common buffer.
-  @retval EFI_DEVICE_ERROR      - The system hardware could not map the requested address.
-  @retval EFI_OUT_OF_RESOURCES  - The memory pages could not be allocated.
-
+  @retval EFI_SUCCESS            The range was mapped for the returned NumberOfBytes.
+  @retval EFI_INVALID_PARAMETER  The Operation or HostAddress is undefined.
+  @retval EFI_UNSUPPORTED        The HostAddress can not be mapped as a common buffer.
+  @retval EFI_DEVICE_ERROR       The system hardware could not map the requested address.
+  @retval EFI_OUT_OF_RESOURCES   The memory pages could not be allocated.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoMap (
-  IN     EFI_ISA_IO_PROTOCOL                                  *This,
-  IN     EFI_ISA_IO_PROTOCOL_OPERATION                        Operation,
-  IN     UINT8                                                ChannelNumber         OPTIONAL,
-  IN     UINT32                                               ChannelAttributes,
-  IN     VOID                                                 *HostAddress,
-  IN OUT UINTN                                                *NumberOfBytes,
-  OUT    EFI_PHYSICAL_ADDRESS                                 *DeviceAddress,
-  OUT    VOID                                                 **Mapping
+  IN     EFI_ISA_IO_PROTOCOL            *This,
+  IN     EFI_ISA_IO_PROTOCOL_OPERATION  Operation,
+  IN     UINT8                          ChannelNumber  OPTIONAL,
+  IN     UINT32                         ChannelAttributes,
+  IN     VOID                           *HostAddress,
+  IN OUT UINTN                          *NumberOfBytes,
+  OUT    EFI_PHYSICAL_ADDRESS           *DeviceAddress,
+  OUT    VOID                           **Mapping
   )
-
 {
   //
-  // Or unset Feature Flag PcdIsaBusSupportDma to disable support for ISA DMA.
+  // Set Feature Flag PcdIsaBusSupportDma to FALSE to disable support for ISA DMA.
   //
   if (!FeaturePcdGet (PcdIsaBusSupportDma)) {
     return EFI_UNSUPPORTED;
@@ -1378,57 +1314,56 @@ IsaIoMap (
   // So we just return EFI_UNSUPPORTED for these functions.
   //
   if (FeaturePcdGet (PcdIsaBusOnlySupportSlaveDma)) {
-    return IsaIoMap_OnlySupportSlaveReadWrite (
-              This,
-              Operation,
-              ChannelNumber,
-              ChannelAttributes,
-              HostAddress,
-              NumberOfBytes,
-              DeviceAddress,
-              Mapping
+    return IsaIoMapOnlySupportSlaveReadWrite (
+             This,
+             Operation,
+             ChannelNumber,
+             ChannelAttributes,
+             HostAddress,
+             NumberOfBytes,
+             DeviceAddress,
+             Mapping
              );
 
   } else {
-    return IsaIoMap_FullSupport (
-              This,
-              Operation,
-              ChannelNumber,
-              ChannelAttributes,
-              HostAddress,
-              NumberOfBytes,
-              DeviceAddress,
-              Mapping
+    return IsaIoMapFullSupport (
+             This,
+             Operation,
+             ChannelNumber,
+             ChannelAttributes,
+             HostAddress,
+             NumberOfBytes,
+             DeviceAddress,
+             Mapping
              );
   }
 }
 
 /**
-  Allocates a common buffer for DMA
+  Allocates pages that are suitable for an EfiIsaIoOperationBusMasterCommonBuffer mapping.
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Type                  - The type allocation to perform.
-  @param MemoryType            - The type of memory to allocate.
-  @param Pages                 - The number of pages to allocate.
-  @param HostAddress           - A pointer to store the base address of the allocated range.
-  @param Attributes            - The requested bit mask of attributes for the allocated range.
+  @param[in]  This               A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in]  Type               The type allocation to perform.
+  @param[in]  MemoryType         The type of memory to allocate.
+  @param[in]  Pages              The number of pages to allocate.
+  @param[out] HostAddress        A pointer to store the base address of the allocated range.
+  @param[in]  Attributes         The requested bit mask of attributes for the allocated range.
 
-  @retval EFI_SUCCESS           - The requested memory pages were allocated.
-  @retval EFI_INVALID_PARAMETER - Type is invalid or MemoryType is invalid or HostAddress is NULL
-  @retval EFI_UNSUPPORTED       - Attributes is unsupported or the memory range specified 
-                          by HostAddress, Pages, and Type is not available for common buffer use.
-  @retval EFI_OUT_OF_RESOURCES  - The memory pages could not be allocated.
-
+  @retval EFI_SUCCESS            The requested memory pages were allocated.
+  @retval EFI_INVALID_PARAMETER  Type is invalid or MemoryType is invalid or HostAddress is NULL
+  @retval EFI_UNSUPPORTED        Attributes is unsupported or the memory range specified 
+                                 by HostAddress, Pages, and Type is not available for common buffer use.
+  @retval EFI_OUT_OF_RESOURCES   The memory pages could not be allocated.
 **/
 EFI_STATUS
 EFIAPI
 IsaIoAllocateBuffer (
-  IN  EFI_ISA_IO_PROTOCOL                  *This,
-  IN  EFI_ALLOCATE_TYPE                    Type,
-  IN  EFI_MEMORY_TYPE                      MemoryType,
-  IN  UINTN                                Pages,
-  OUT VOID                                 **HostAddress,
-  IN  UINT64                               Attributes
+  IN  EFI_ISA_IO_PROTOCOL  *This,
+  IN  EFI_ALLOCATE_TYPE    Type,
+  IN  EFI_MEMORY_TYPE      MemoryType,
+  IN  UINTN                Pages,
+  OUT VOID                 **HostAddress,
+  IN  UINT64               Attributes
   )
 {
   EFI_STATUS            Status;
@@ -1457,7 +1392,7 @@ IsaIoAllocateBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Attributes &~(EFI_ISA_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE | EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED)) {
+  if (Attributes & ~(EFI_ISA_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE | EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1485,29 +1420,24 @@ IsaIoAllocateBuffer (
 }
 
 /**
+  Frees memory that was allocated with EFI_ISA_IO.AllocateBuffer(). 
 
-  Frees a common buffer 
+  @param[in] This                A pointer to the EFI_ISA_IO_PROTOCOL instance.
+  @param[in] Pages               The number of pages to free.
+  @param[in] HostAddress         The base address of the allocated range.
 
-  @param This                  - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param Pages                 - The number of pages to free.
-  @param HostAddress           - The base address of the allocated range.
-
-
-  @retval EFI_SUCCESS           - The requested memory pages were freed.
-  @retval EFI_INVALID_PARAMETER - The memory was not allocated with EFI_ISA_IO.AllocateBufer().
-
+  @retval EFI_SUCCESS            The requested memory pages were freed.
+  @retval EFI_INVALID_PARAMETER  The memory was not allocated with EFI_ISA_IO.AllocateBufer().
 **/
-
 EFI_STATUS
 EFIAPI
 IsaIoFreeBuffer (
-  IN EFI_ISA_IO_PROTOCOL                  *This,
-  IN UINTN                                Pages,
-  IN VOID                                 *HostAddress
+  IN EFI_ISA_IO_PROTOCOL  *This,
+  IN UINTN                Pages,
+  IN VOID                 *HostAddress
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+  EFI_STATUS  Status;
 
   //
   // Set Feature Flag PcdIsaBusOnlySupportSlaveDma to FALSE to disable support for 
@@ -1518,9 +1448,8 @@ IsaIoFreeBuffer (
     return EFI_UNSUPPORTED;
   }
 
-  PhysicalAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
   Status = gBS->FreePages (
-                  PhysicalAddress,
+                  (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress,
                   Pages
                   );
   if (EFI_ERROR (Status)) {

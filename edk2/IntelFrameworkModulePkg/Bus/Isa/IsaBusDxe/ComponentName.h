@@ -1,6 +1,7 @@
 /**@file
+  Header file for implementation of UEFI Component Name(2) protocol.
 
-Copyright (c) 2006 - 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -11,17 +12,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _EFI_ISA_BUS_COMPONENT_NAME_H
-#define _EFI_ISA_BUS_COMPONENT_NAME_H
+#ifndef _COMPONENT_NAME_H_
+#define _COMPONENT_NAME_H_
 
 #include "InternalIsaBus.h"
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gIsaBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gIsaBusComponentName2;
 
-//
-// EFI Component Name Functions
-//
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -141,12 +139,12 @@ IsaBusComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 IsaBusComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle  OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
-
 #endif
+

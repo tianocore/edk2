@@ -1,12 +1,10 @@
 #/** @file
 # Component description file for IsaBus module.
 #
-# Discovers all the ISA Controllers and their resources by using the ISA PnP
-# Protocol, produces an instance of the ISA I/O Protocol for every ISA
-# Controller found, loads and initializes all ISA Device Drivers, matches ISA
-# Device Drivers with their respective ISA Controllers in a deterministic
-# manner, and informs a ISA Device Driver when it is to start managing an ISA
-# Controller.
+# Discovers all the ISA Controllers and their resources by using the ISA ACPI 
+# Protocol, produces an instance of the ISA I/O Protocol for every ISA 
+# Controller found. This driver is designed to manage a PCI-to-ISA bridge Device
+# such as LPC bridge.
 #
 # Copyright (c) 2007 - 2009, Intel Corporation
 #
