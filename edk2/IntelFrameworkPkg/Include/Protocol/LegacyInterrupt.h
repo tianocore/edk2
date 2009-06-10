@@ -32,9 +32,9 @@ typedef struct _EFI_LEGACY_INTERRUPT_PROTOCOL EFI_LEGACY_INTERRUPT_PROTOCOL;
   Get the number of PIRQs this hardware supports.
 
   @param  This                  Protocol instance pointer.
-  @param  NumberPirsq           Number of PIRQs.
+  @param  NumberPirsq           Number of PIRQs that are supported.
 
-  @retval EFI_SUCCESS           Number of PIRQs returned.
+  @retval EFI_SUCCESS           The number of PIRQs was returned successfully.
 
 **/
 typedef
@@ -52,7 +52,7 @@ EFI_STATUS
   @param  Device                PCI Device
   @param  Function              PCI Function
 
-  @retval EFI_SUCCESS           Bus/Device/Function returned
+  @retval EFI_SUCCESS           The Bus, Device, and Function were returned successfully
 
 **/
 typedef
@@ -88,9 +88,9 @@ EFI_STATUS
 
   @param  This                  Protocol instance pointer.
   @param  PirqNumber            PIRQ register to read.
-  @param  PirqData              Data written.
+  @param  PirqData              Data to write.
 
-  @retval EFI_SUCCESS           Table pointer returned
+  @retval EFI_SUCCESS           The PIRQ was programmed
   @retval EFI_INVALID_PARAMETER Invalid PIRQ number
 
 **/
@@ -102,27 +102,22 @@ EFI_STATUS
   IN UINT8                                   PirqData
   );
 
-/**
-  @par Protocol Description:
-  Abstracts the PIRQ programming from the generic EFI Compatibility Support Modules
-
-  @param GetNumberPirqs
-  Gets the number of PIRQs supported.
-
-  @param GetLocation
-  Gets the PCI bus, device, and function that associated with this protocol.
-
-  @param ReadPirq
-  Reads the indicated PIRQ register.
-
-  @param WritePirq
-  Writes to the indicated PIRQ register.
-
-**/
 struct _EFI_LEGACY_INTERRUPT_PROTOCOL {
+///
+///   Gets the number of PIRQs supported.
+///
   EFI_LEGACY_INTERRUPT_GET_NUMBER_PIRQS GetNumberPirqs;
+///
+/// Gets the PCI bus, device, and function that associated with this protocol.
+///
   EFI_LEGACY_INTERRUPT_GET_LOCATION     GetLocation;
+///
+/// Reads the indicated PIRQ register.
+///
   EFI_LEGACY_INTERRUPT_READ_PIRQ        ReadPirq;
+///
+/// Writes to the indicated PIRQ register.
+///
   EFI_LEGACY_INTERRUPT_WRITE_PIRQ       WritePirq;
 };
 
