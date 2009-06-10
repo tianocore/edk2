@@ -38,5 +38,17 @@ ASM_PFX(InternalLongJump):
     mov     0x30(%rcx), %r13
     mov     0x38(%rcx), %r14
     mov     0x40(%rcx), %r15
+    # load non-volatile fp registers
+    ldmxcsr 0x50(%rcx)
+    movdqa  0x58(%rcx), %xmm6
+    movdqa  0x68(%rcx), %xmm7
+    movdqa  0x78(%rcx), %xmm8
+    movdqa  0x88(%rcx), %xmm9
+    movdqa  0x98(%rcx), %xmm10
+    movdqa  0xA8(%rcx), %xmm11
+    movdqa  0xB8(%rcx), %xmm12
+    movdqa  0xC8(%rcx), %xmm13
+    movdqa  0xD8(%rcx), %xmm14
+    movdqa  0xE8(%rcx), %xmm15  
     mov     %rdx, %rax          # set return value
     jmp     *0x48(%rcx)
