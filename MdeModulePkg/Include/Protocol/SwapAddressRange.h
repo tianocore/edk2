@@ -44,11 +44,11 @@ typedef UINT8 EFI_SWAP_LOCK_CAPABILITY;
   The EFI_GET_RANGE_LOCATION service allows caller to get the range location of 
   boot block and backup block. 
 
-  @param This		Indicates the calling context.  
+  @param This		          Indicates the calling context.  
   @param BootBlockBase		Base address of current boot block.
   @param BootBlockSize	 	Size (in bytes) of current boot block.
-  @param BackupBlockBase		Base address of current backup block.
-  @param BackupBlockSize	 	Size (in bytes) of current backup block.
+  @param BackupBlockBase	Base address of current backup block.
+  @param BackupBlockSize	Size (in bytes) of current backup block.
 
   @retval EFI_SUCCESS	The call was successful.
     
@@ -68,9 +68,9 @@ EFI_STATUS
 
   The EFI_GET_SWAP_STATE service allows caller to get current swap state of boot block and backup block.
 
-  @param This		Indicates the calling context.  
+  @param This		      Indicates the calling context.  
   @param SwapState	 	True if the boot block and backup block has been swapped. 
-                                   False if the boot block and backup block has not been swapped.
+                      False if the boot block and backup block has not been swapped.
 
   @retval EFI_SUCCESS	The call was successful.
     
@@ -89,7 +89,7 @@ EFI_STATUS
   It also acquires and releases software swap lock during operation. Note the setting of new swap state 
   is not affected by the old swap state.
 
-  @param This		Indicates the calling context.  
+  @param This		        Indicates the calling context.  
   @param NewSwapState	 	True to swap real boot block and backup block , False to swap them back..
 
   @retval EFI_SUCCESS	The call was successful.
@@ -113,7 +113,7 @@ EFI_STATUS
   has been removed or failed, this means the swap status was lost in some platform (such as IA32). 
   So it is recommended to check RTC power status before calling GetSwapState().
 
-  @param This   Indicates the calling context.  
+  @param This             Indicates the calling context.  
   @param RtcPowerFailed   True if a RTC (Real Time Clock) power failure has happened.
 
   @retval EFI_SUCCESS The call was successful.
@@ -132,7 +132,7 @@ EFI_STATUS
   The EFI_GET_SWAP_LOCK_CAPABILITY service allows caller to get supported lock method for swap operation in current platform. 
   Note that software and hardware lock mothod can be used simultaneously.
 
-  @param This   Indicates the calling context.
+  @param This             Indicates the calling context.
   @param LockCapability	 	Current lock method for swap operation. 
 
   @retval EFI_SUCCESS The call was successful.
@@ -153,9 +153,9 @@ EFI_STATUS
   The EFI_GET_SWAP_LOCK_CAPABILITY service allows caller to get supported lock method for swap operation in current platform. 
   Note that software and hardware lock mothod can be used simultaneously.
 
-  @param This    Indicates the calling context.
+  @param This              Indicates the calling context.
   @param LockCapability    Indicates which lock to acquire or release.
-  @param NewLockState            True to acquire lock, False to release lock.
+  @param NewLockState      True to acquire lock, False to release lock.
 
   @retval EFI_SUCCESS The call was successful.
     
