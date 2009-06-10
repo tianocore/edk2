@@ -18,7 +18,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  This Protocol is defined in Framework of ACPI Specification.
+  This Protocol is defined in Framework ACPI Specification.
   Version 0.9.
 
 **/
@@ -100,7 +100,7 @@ EFI_STATUS
   @param  Checksum              If TRUE, indicates that the checksum should be
                                 calculated for this table.
   @param  Version               Indicates to which version(s) of ACPI the table should be added.
-  @param  Pointer               to the handle of the table to remove or update.
+  @param  Handle                Pointer to the handle of the table to remove or update.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_INVALID_PARAMETER *Handle was zero and Table was NULL.
@@ -147,20 +147,19 @@ EFI_STATUS
   This protocol provides some basic services to support publishing ACPI system
   tables. The services handle many of the more mundane tasks that are required
   to publish a set of tables.
-
-  @param GetAcpiTable
-  Returns a table specified by an index if it exists.
-
-  @param SetAcpiTable
-  Adds, removes, or updates ACPI tables
-
-  @param PublishTables
-  Publishes the ACPI tables.
-
 **/
 struct _EFI_ACPI_SUPPORT_PROTOCOL {
+///
+/// Returns a table specified by an index if it exists.
+///
   EFI_ACPI_GET_ACPI_TABLE GetAcpiTable;
+///
+/// Adds, removes, or updates ACPI tables
+///
   EFI_ACPI_SET_ACPI_TABLE SetAcpiTable;
+///
+/// Publishes the ACPI tables.
+///
   EFI_ACPI_PUBLISH_TABLES PublishTables;
 };
 
