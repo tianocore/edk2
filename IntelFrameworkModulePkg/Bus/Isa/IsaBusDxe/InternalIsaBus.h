@@ -1,7 +1,7 @@
 /**@file
   The header file for ISA bus driver
   
-Copyright (c) 2006 - 2007, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _EFI_ISA_BUS_H
-#define _EFI_ISA_BUS_H
+#ifndef _INTERNAL_ISA_BUS_H_
+#define _INTERNAL_ISA_BUS_H_
 
 
 #include <PiDxe.h>
@@ -39,13 +39,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 
 #include "ComponentName.h"
-
-//
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL  gIsaBusControllerDriver;
-
-extern EFI_ISA_IO_PROTOCOL          IsaIoInterface;
 
 //
 // 8237 DMA registers
@@ -165,70 +158,92 @@ typedef struct {
 // EFI Driver Binding Protocol Interface Functions
 //
 
+/** 
+  Tests to see if a controller can be managed by the ISA Bus Driver. If a child device is provided, 
+  it further tests to see if this driver supports creating a handle for the specified child device.
+
+  Note that the ISA Bus driver always creates all of its child handles on the first call to Start().
+  How the Start() function of a driver is implemented can affect how the Supported() function is implemented.
+
+  @param[in] This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.  
+  @param[in] Controller           The handle of the controller to test.
+  @param[in] RemainingDevicePath  A pointer to the remaining portion of a device path.
+  
+  @retval EFI_SUCCESS             The device is supported by this driver.
+  @retval EFI_ALREADY_STARTED     The device is already being managed by this driver.
+  @retval EFI_ACCESS_DENIED       The device is already being managed by a different driver 
+                                  or an application that requires exclusive access.
+  @retval EFI_UNSUPPORTED         The device is is not supported by this driver.
+
+**/
 EFI_STATUS
 EFIAPI
 IsaBusControllerDriverSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  * This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
-  )
+  );
+
 /**
+  Start this driver on ControllerHandle. 
+  
+  Note that the ISA Bus driver always creates all of its child handles on the first call to Start().
+  The Start() function is designed to be invoked from the EFI boot service ConnectController(). 
+  As a result, much of the error checking on the parameters to Start() has been moved into this 
+  common boot service. It is legal to call Start() from other locations, but the following calling 
+  restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE.
+  2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
+     EFI_DEVICE_PATH_PROTOCOL.
+  3. Prior to calling Start(), the Supported() function for the driver specified by This must
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
 
-  Routine Description:
-  
-    This function checks to see if a controller can be managed by the ISA Bus 
-    Driver. This is done by checking to see if the controller supports the 
-    EFI_PCI_IO_PROTOCOL protocol, and then looking at the PCI Configuration 
-    Header to see if the device is a PCI to ISA bridge. The class code of 
-    PCI to ISA bridge: Base class 06h, Sub class 01h Interface 00h 
-  
-  Arguments:
-  
-    This                 - The EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller           - The handle of the device to check.
-    RemainingDevicePath  - A pointer to the remaining portion of a device path.
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+                                   This parameter is ignored by device drivers, and is optional for bus drivers.
 
-  Returns:
-  
-    EFI_SUCCESS          - The device is supported by this driver.
-    EFI_UNSUPPORTED      - The device is not supported by this driver.
-
+  @retval EFI_SUCCESS              The device was started.
+  @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.
+                                   Currently not implemented.
+  @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
+  @retval Others                   The driver failded to start the device.
 **/
-;
-
 EFI_STATUS
 EFIAPI
 IsaBusControllerDriverStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  * This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
-  )
+  );
+
 /**
+  Stop this driver on ControllerHandle. 
+  
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
+  As a result, much of the error checking on the parameters to Stop() has been moved 
+  into this common boot service. It is legal to call Stop() from other locations, 
+  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
+     same driver's Start() function.
+  2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid
+     EFI_HANDLE. In addition, all of these handles must have been created in this driver's
+     Start() function, and the Start() function must have called OpenProtocol() on
+     ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
+  
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
+                                support a bus specific I/O protocol for the driver 
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+                                if NumberOfChildren is 0.
 
-  Routine Description:
-  
-    This function tells the ISA Bus Driver to start managing a PCI to ISA 
-    Bridge controller. 
-  
-  Arguments:
-  
-    This                  - The EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller            - A handle to the device being started. 
-    RemainingDevicePath   - A pointer to the remaining portion of a device path.
-
-  Returns:
-  
-    EFI_SUCCESS           - The device was started.
-    EFI_UNSUPPORTED       - The device is not supported.
-    EFI_DEVICE_ERROR      - The device could not be started due to a device error.
-    EFI_ALREADY_STARTED   - The device has already been started.
-    EFI_INVALID_PARAMETER - One of the parameters has an invalid value.
-    EFI_OUT_OF_RESOURCES  - The request could not be completed due to a lack of 
-                            resources.
-  
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
 **/
-;
-
 EFI_STATUS
 EFIAPI
 IsaBusControllerDriverStop (
@@ -236,38 +251,26 @@ IsaBusControllerDriverStop (
   IN  EFI_HANDLE                   Controller,
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   * ChildHandleBuffer OPTIONAL
-  )
-/**
-
-  Routine Description:
-  
-    This function tells the ISA Bus Driver to stop managing a PCI to ISA 
-    Bridge controller. 
-     
-  Arguments:
-  
-    This                   - The EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller             - A handle to the device being stopped.
-    NumberOfChindren       - The number of child device handles in ChildHandleBuffer.
-    ChildHandleBuffer      - An array of child handles to be freed.
-
-  
-  Returns:
-  
-    EFI_SUCCESS            - The device was stopped.
-    EFI_DEVICE_ERROR       - The device could not be stopped due to a device error.
-    EFI_NOT_STARTED        - The device has not been started.
-    EFI_INVALID_PARAMETER  - One of the parameters has an invalid value.
-    EFI_OUT_OF_RESOURCES   - The request could not be completed due to a lack of 
-                             resources.
-
-**/
-;
+  );
 
 //
 // Function Prototypes
 //
 
+/**
+  Create EFI Handle for a ISA device found via ISA ACPI Protocol 
+
+  @param[in] This                   The EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in] Controller             The handle of ISA bus controller(PCI to ISA bridge)
+  @param[in] PciIo                  The Pointer to the PCI protocol 
+  @param[in] ParentDevicePath       Device path of the ISA bus controller
+  @param[in] IsaDeviceResourceList  The resource list of the ISA device
+  @param[in] ChildDevicePath        The pointer to the child device.
+
+  @retval EFI_SUCCESS               The handle for the child device was created.
+  @retval EFI_OUT_OF_RESOURCES      The request could not be completed due to a lack of resources.
+  @retval EFI_DEVICE_ERROR          The handle for the child device can not be created.
+**/
 EFI_STATUS
 IsaCreateDevice (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
@@ -276,53 +279,21 @@ IsaCreateDevice (
   IN EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
   IN EFI_ISA_ACPI_RESOURCE_LIST   *IsaDeviceResourceList,
   OUT EFI_DEVICE_PATH_PROTOCOL    **ChildDevicePath
-  )
+  );
+
 /**
+  Initializes an ISA I/O Instance
 
-  Routine Description:
+  @param[in] IsaIoDevice            The iso device to be initialized.
+  @param[in] IsaDeviceResourceList  The resource list.
   
-    Create ISA device found by IsaPnpProtocol 
-
-  Arguments:
-  
-    This                   - The EFI_DRIVER_BINDING_PROTOCOL instance.
-    Controller             - The handle of ISA bus controller(PCI to ISA bridge)
-    PciIo                  - The Pointer to the PCI protocol 
-    ParentDevicePath       - Device path of the ISA bus controller
-    IsaDeviceResourceList  - The resource list of the ISA device
-    ChildDevicePath        - The pointer to the child device.
-
-  Returns:
-  
-    EFI_SUCCESS            - Create the child device.
-    EFI_OUT_OF_RESOURCES   - The request could not be completed due to a lack of 
-                             resources.
-    EFI_DEVICE_ERROR       - Can not create child device.
-    
+  @retval None
 **/
-;
-
-EFI_STATUS
+VOID
 InitializeIsaIoInstance (
   IN ISA_IO_DEVICE               *IsaIoDevice,
   IN EFI_ISA_ACPI_RESOURCE_LIST  *IsaDevice
-  )
-/**
-
-Routine Description:
-
-  Initializes an ISA I/O Instance
-
-Arguments:
-
-  IsaIoDevice            - The iso device to be initialized.
-  IsaDevice              - The resource list.
-  
-Returns:
-
-  EFI_SUCCESS            - Initial success.
-  
-**/
-;
+  );
 
 #endif
+
