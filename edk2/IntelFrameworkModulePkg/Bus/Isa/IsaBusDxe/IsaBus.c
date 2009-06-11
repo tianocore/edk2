@@ -93,7 +93,6 @@ IsaBusControllerDriverSupported (
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
   EFI_ISA_ACPI_PROTOCOL     *IsaAcpi;
 
   //
@@ -127,6 +126,15 @@ IsaBusControllerDriverSupported (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
+  //
+  // Although this driver creates all child handles at one time,
+  // but because all child handles may be not stopped at one time in EFI Driver Binding.Stop(),
+  // So it is allowed to create child handles again in successive calls to EFI Driver Binding.Start().
+  //
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -145,10 +153,10 @@ IsaBusControllerDriverSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  NULL,
                   This->DriverBindingHandle,
                   Controller,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -257,7 +265,7 @@ IsaBusControllerDriverStart (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
     return Status;
   }
 
@@ -272,7 +280,7 @@ IsaBusControllerDriverStart (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
     //
     // Close opened protocol
     //
@@ -346,6 +354,10 @@ IsaBusControllerDriverStart (
 
     //
     // Create handle for this ISA device
+    //
+    // If any child device handle was created in previous call to Start() and not stopped
+    // in previous call to Stop(), it will not be created again because the
+    // InstallMultipleProtocolInterfaces() boot service will reject same device path.
     //
     Status = IsaCreateDevice (
                This,
@@ -437,6 +449,7 @@ IsaBusControllerDriverStop (
   BOOLEAN                             AllChildrenStopped;
   ISA_IO_DEVICE                       *IsaIoDevice;
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
+  EFI_PCI_IO_PROTOCOL                 *PciIo;
 
   if (NumberOfChildren == 0) {
     //
@@ -489,6 +502,16 @@ IsaBusControllerDriverStop (
 
       IsaIoDevice = ISA_IO_DEVICE_FROM_ISA_IO_THIS (IsaIo);
 
+      //
+      // Close the child handle
+      //
+
+      Status = gBS->CloseProtocol (
+                      Controller,
+                      &gEfiPciIoProtocolGuid,
+                      This->DriverBindingHandle,
+                      ChildHandleBuffer[Index]
+                      );
       Status = gBS->UninstallMultipleProtocolInterfaces (
                       ChildHandleBuffer[Index],
                       &gEfiDevicePathProtocolGuid,
@@ -499,18 +522,21 @@ IsaBusControllerDriverStop (
                       );
 
       if (!EFI_ERROR (Status)) {
-        //
-        // Close the child handle
-        //
-        Status = gBS->CloseProtocol (
-                        Controller,
-                        &gEfiPciIoProtocolGuid,
-                        This->DriverBindingHandle,
-                        ChildHandleBuffer[Index]
-                        );
-
         gBS->FreePool (IsaIoDevice->DevicePath);
         gBS->FreePool (IsaIoDevice);
+      } else {
+        //
+        // Re-open PCI IO Protocol on behalf of the child device
+        // because of failure of destroying the child device handle
+        //
+        gBS->OpenProtocol (
+               Controller,
+               &gEfiPciIoProtocolGuid,
+               (VOID **) &PciIo,
+               This->DriverBindingHandle,
+               ChildHandleBuffer[Index],
+               EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+               );     
       }
     }
 
