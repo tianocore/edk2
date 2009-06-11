@@ -104,13 +104,8 @@ EFI_STATUS
   );
 
 /**
-  Sets the following attributes for a serial device:
-  * baud rate
-  * receive FIFO depth
-  * transmit/receive time out
-  * parity 
-  * data bits
-  * stop bits
+  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity, 
+  data buts, and stop bits on a serial device.
 
   @param  This             Protocol instance pointer.
   @param  BaudRate         The requested baud rate. A BaudRate value of 0 will use the
@@ -208,7 +203,7 @@ EFI_STATUS
   @param  This              Protocol instance pointer.
   @param  BufferSize        On input, the size of the Buffer. On output, the amount of
                             data returned in Buffer.
-  @param  Buffer            The buffer to which to return the data.
+  @param  Buffer            The buffer to return the data into.
 
   @retval EFI_SUCCESS       The data was read.
   @retval EFI_DEVICE_ERROR  The device reported an error.
@@ -277,8 +272,8 @@ typedef struct {
 
 ///
 /// The Serial I/O protocol is used to communicate with UART-style serial devices. 
-/// These can be standard UART serial ports in PC-AT systems, or serial ports attached 
-/// to a USB interface or any character-based I/O device.
+/// These can be standard UART serial ports in PC-AT systems, serial ports attached 
+/// to a USB interface, or potentially any character-based I/O device.
 ///
 struct _EFI_SERIAL_IO_PROTOCOL {
   ///

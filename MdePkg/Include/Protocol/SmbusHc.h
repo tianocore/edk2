@@ -51,6 +51,7 @@ typedef struct _EFI_SMBUS_HC_PROTOCOL EFI_SMBUS_HC_PROTOCOL;
                   EFI_SMBUS_DEVICE_COMMAND is defined in
                   EFI_PEI_SMBUS_PPI.Execute() in the Platform
                   Initialization SMBus PPI Specification.
+
  @param Operation Signifies the particular SMBus
                   hardware protocol instance it will use to
                   execute the SMBus transactions. This SMBus
@@ -249,10 +250,10 @@ EFI_STATUS
   @param  This            A pointer to the EFI_SMBUS_HC_PROTOCOL instance.
   
   @param  SlaveAddress    Address that the host controller detects
-                          as sending a message, and that calls all the registered function.
+                          as sending a message and calls all the registered function.
 
   @param  Data            Data that the host controller detects as sending
-                          message, and that calls all the registered function.
+                          message and calls all the registered function.
 
 
   @param  NotifyFunction  The function to call when the bus

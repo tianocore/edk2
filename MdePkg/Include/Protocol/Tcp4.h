@@ -279,7 +279,7 @@ EFI_STATUS
                                 - This is NULL.
                                 - ConnectionToken is NULL.
                                 - ConnectionToken->CompletionToken.Event is NULL.
-  @retval EFI_OUT_OF_RESOURCES  The driver can't allocate enough resources to initiate the activeopen.
+  @retval EFI_OUT_OF_RESOURCES  The driver can't allocate enough resource to initiate the activeopen.
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
@@ -308,8 +308,8 @@ EFI_STATUS
                                 - This is NULL.
                                 - ListenToken is NULL.
                                 - ListentToken->CompletionToken.Event is NULL.
-  @retval EFI_OUT_OF_RESOURCES  Could not allocate enough resources to finish the operation.
-  @retval EFI_DEVICE_ERROR      Any unexpected error not covered by another error.
+  @retval EFI_OUT_OF_RESOURCES  Could not allocate enough resource to finish the operation.
+  @retval EFI_DEVICE_ERROR      Any unexpected and not belonged to above category error.
 
 **/
 typedef
@@ -389,7 +389,7 @@ EFI_STATUS
                                Tcp4StateListen state.
                                - User has called Close() to disconnect this connection.
   @retval EFI_CONNECTION_FIN   The communication peer has closed the connection and there is
-                               no buffered data in the receive buffer of this instance.
+                               no any buffered data in the receive buffer of this instance.
   @retval EFI_NOT_READY        The receive request could not be queued because the receive queue is full.
 
 **/
@@ -419,8 +419,8 @@ EFI_STATUS
                                 - This is NULL.
                                 - CloseToken is NULL.
                                 - CloseToken->CompletionToken.Event is NULL.
-  @retval EFI_OUT_OF_RESOURCES  Could not allocate enough resources to finish the operation.
-  @retval EFI_DEVICE_ERROR      Any unexpected error not covered by another error.
+  @retval EFI_OUT_OF_RESOURCES  Could not allocate enough resource to finish the operation.
+  @retval EFI_DEVICE_ERROR      Any unexpected and not belonged to above category error.
 
 **/
 typedef

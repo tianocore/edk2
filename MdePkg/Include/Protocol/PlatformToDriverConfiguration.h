@@ -76,7 +76,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
                               should not attempt to free ParameterTypeGuid.
 
   @param ParameterBlock       The platform returns a pointer to the
-                              ParameterBlock structure, which
+                              ParameterBlock structure which
                               contains details about the
                               configuration parameters specific to
                               the ParameterTypeGuid. This structure
@@ -85,7 +85,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
                               protocols. UEFI driver decodes this
                               structure and its contents based on
                               ProtocolGuid. ParameterBlock is
-                              allocated by the platform. The
+                              allocated by the platform and the
                               platform is responsible for freeing
                               the ParameterBlock after Result is
                               called.
@@ -201,33 +201,33 @@ typedef enum {
   ParameterTypeGuid. The platform is responsible for freeing
   ParameterBlock and the UEFI driver must not try to free it.
 
-  @param This               A pointer to the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL instance.
+  @param This                A pointer to the EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL instance.
 
-  @param ControllerHandle   The handle the driver is returning
-                            configuration information about.
+  @param ControllerHandle    The handle the driver is returning
+                             configuration information about.
 
-  @param ChildHandle        The handle of the child controller to
-                            return information on. This is an optional
-                            parameter that may be NULL. It will be
-                            NULL for device drivers, and for bus
-                            drivers that attempt to get options for
-                            the bus controller. It will not be NULL
-                            for a bus driver that attempts to get
-                            options for one of its child controllers.
-                            Instance Instance data returned from
-                            Query().
+  @param ChildHandle         The handle of the child controller to
+                             return information on. This is an optional
+                             parameter that may be NULL. It will be
+                             NULL for device drivers, and for bus
+                             drivers that attempt to get options for
+                             the bus controller. It will not be NULL
+                             for a bus driver that attempts to get
+                             options for one of its child controllers.
+                             Instance Instance data returned from
+                             Query().
 
-  @param Instance           Instance data passed to Query().
+  @param Instance            Instance data passed to Query().
 
-  @param ParameterTypeGuid  ParameterTypeGuid returned from Query.
+  @param ParameterTypeGuid   ParameterTypeGuid returned from Query.
 
-  @param ParameterBlock     ParameterBlock returned from Query.
+  @param ParameterBlock      ParameterBlock returned from Query.
 
-  @param ParameterBlockSize The ParameterBlock size returned from Query.
+  @param ParameterBlockSize  The ParameterBlock size returned from Query.
 
-  @param ConfigurationAction      The driver tells the platform what
-                            action is required for ParameterBlock to
-                            take effect.
+  @param ConfigurationAction The driver tells the platform what
+                             action is required for ParameterBlock to
+                             take effect.
   
   
   @retval EFI_SUCCESS           The platform return parameter information

@@ -181,16 +181,17 @@ EFI_STATUS
   );
 
 /**
-  Write data from or to the file.
+  Write data to a file.
 
   @param  This       Protocol instance pointer.
-  @param  BufferSize On input: size of buffer. On output: amount of data in buffer.
-  @param  Buffer     The buffer in which to write data.
+  @param  BufferSize On input size of buffer, on output amount of data in buffer.
+  @param  Buffer     The buffer in which data to write.
 
   @retval EFI_SUCCESS          Data was written.
   @retval EFI_UNSUPPORT        Writes to Open directory are not supported
   @retval EFI_NO_MEDIA         The device has no media
   @retval EFI_DEVICE_ERROR     The device reported an error
+  @retval EFI_DEVICE_ERROR     An attempt was made to write to a deleted file
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted
   @retval EFI_WRITE_PROTECTED  The device is write protected
   @retval EFI_ACCESS_DENIED    The file was open for read only
@@ -209,7 +210,7 @@ EFI_STATUS
   Set a files current position
 
   @param  This            Protocol instance pointer.
-  @param  Position        Byte position, from the start of the file
+  @param  Position        Byte position from the start of the file
                           
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
@@ -226,7 +227,7 @@ EFI_STATUS
   Get a file's current position
 
   @param  This            Protocol instance pointer.
-  @param  Position        Byte position, from the start of the file
+  @param  Position        Byte position from the start of the file
                           
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
@@ -244,7 +245,7 @@ EFI_STATUS
 
   @param  This            Protocol instance pointer.
   @param  InformationType Type of info to return in Buffer
-  @param  BufferSize      On input: size of buffer. On output: amount of data in buffer.
+  @param  BufferSize      On input size of buffer, on output amount of data in buffer.
   @param  Buffer          The buffer to return data.
 
   @retval EFI_SUCCESS          Data was returned.

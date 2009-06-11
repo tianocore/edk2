@@ -224,7 +224,7 @@ typedef union {
 ///
 /// This is just to make sure you can cross compile with the EBC compiler.
 /// It does not make sense to have a PE loader coded in EBC. You need to 
-/// understand the basic 
+/// understand the basic.
 ///
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_EBC)
 

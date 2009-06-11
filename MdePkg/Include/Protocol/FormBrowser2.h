@@ -29,10 +29,12 @@ typedef struct _EFI_FORM_BROWSER2_PROTOCOL   EFI_FORM_BROWSER2_PROTOCOL;
 /**
    
   @param LeftColumn   Value that designates the text column
-                      at which the browser window will begin (left-most column). 
+                      where the browser window will begin from
+                      the left-hand side of the screen
                       
   @param RightColumn  Value that designates the text
-                      column at which the browser window will end (right-most column).
+                      column where the browser window will end
+                      on the right-hand side of the screen.
 
   @param TopRow       Value that designates the text row from the
                       top of the screen where the browser window

@@ -8,7 +8,7 @@
   allows the PEI phase to pass information to the DXE phase. HOBs are position 
   independent and can be relocated easily to different memory memory locations.
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -419,9 +419,9 @@ BuildMemoryAllocationHob (
   Returns the type of a HOB.
 
   This macro returns the HobType field from the HOB header for the 
-  HOB specified by Hob.
+  HOB specified by HobStart.
 
-  @param  Hob   A pointer to a HOB.
+  @param  HobStart   A pointer to a HOB.
   
   @return HobType.
   
@@ -433,9 +433,9 @@ BuildMemoryAllocationHob (
   Returns the length, in bytes, of a HOB.
 
   This macro returns the HobLength field from the HOB header for the 
-  HOB specified by Hob.
+  HOB specified by HobStart.
 
-  @param  Hob   A pointer to a HOB.
+  @param  HobStart   A pointer to a HOB.
 
   @return HobLength.
 
@@ -447,9 +447,9 @@ BuildMemoryAllocationHob (
   Returns a pointer to the next HOB in the HOB list.
 
   This macro returns a pointer to HOB that follows the 
-  HOB specified by Hob in the HOB List.
+  HOB specified by HobStart in the HOB List.
 
-  @param  Hob   A pointer to a HOB.
+  @param  HobStart   A pointer to a HOB.
 
   @return A pointer to the next HOB in the HOB list.
 
@@ -460,23 +460,23 @@ BuildMemoryAllocationHob (
 /**
   Determines if a HOB is the last HOB in the HOB list.
   
-  This macro determine if the HOB specified by Hob is the 
-  last HOB in the HOB list.  If Hob is last HOB in the HOB list, 
+  This macro determine if the HOB specified by HobStart is the 
+  last HOB in the HOB list.  If HobStart is last HOB in the HOB list, 
   then TRUE is returned.  Otherwise, FALSE is returned.
 
-  @param  Hob   A pointer to a HOB.
+  @param  HobStart   A pointer to a HOB.
 
-  @retval TRUE       The HOB specified by Hob is the last HOB in the HOB list.
-  @retval FALSE      The HOB specified by Hob is not the last HOB in the HOB list.
+  @retval TRUE       The HOB specified by HobStart is the last HOB in the HOB list.
+  @retval FALSE      The HOB specified by HobStart is not the last HOB in the HOB list.
 
 **/
-#define END_OF_HOB_LIST(Hob)  (GET_HOB_TYPE (Hob) == (UINT16)EFI_HOB_TYPE_END_OF_HOB_LIST)
+#define END_OF_HOB_LIST(HobStart)  (GET_HOB_TYPE (HobStart) == (UINT16)EFI_HOB_TYPE_END_OF_HOB_LIST)
 
 /**
   Returns a pointer to data buffer from a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
 
-  This macro returns a pointer to the data buffer in a HOB specified by Hob.
-  Hob is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.   
+  This macro returns a pointer to the data buffer in a HOB specified by HobStart.
+  HobStart is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.   
 
   @param   GuidHob   A pointer to a HOB.
 
@@ -489,8 +489,8 @@ BuildMemoryAllocationHob (
 /**
   Returns the size of the data buffer from a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
 
-  This macro returns the size, in bytes, of the data buffer in a HOB specified by Hob.
-  Hob is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
+  This macro returns the size, in bytes, of the data buffer in a HOB specified by HobStart.
+  HobStart is assumed to be a HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
 
   @param   GuidHob   A pointer to a HOB.
 

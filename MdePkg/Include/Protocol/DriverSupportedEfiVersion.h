@@ -32,7 +32,7 @@
 typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
   ///
   /// The size, in bytes, of the entire structure. Future versions of this 
-  /// specification may increase the size of the structure.
+  /// specification may grow the size of the structure.
   /// 
   UINT32 Length;
   ///

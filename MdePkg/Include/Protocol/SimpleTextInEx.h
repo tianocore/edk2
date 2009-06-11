@@ -151,27 +151,28 @@ typedef struct {
   EFI_NOT_READY. If there is a pending keystroke, then
   KeyData.Key.ScanCode is the EFI scan code defined in Error!
   Reference source not found. The KeyData.Key.UnicodeChar is the
-  actual printable character, or is zero if the key does not
+  actual printable character or is zero if the key does not
   represent a printable character (control key, function key,
   etc.). The KeyData.KeyState is shift state for the character
   reflected in KeyData.Key.UnicodeChar or KeyData.Key.ScanCode .
-  When interpreting the data from this function, printable characters that are
+  When interpreting the data from this function, it should be
+  noted that if a class of printable characters that are
   normally adjusted by shift modifiers (e.g. Shift Key + "f"
-  key) are presented solely as a KeyData.Key.UnicodeChar
-  without the associated shift state. For example,
-  if Shift Key + "f" key are pressed, the only pertinent
+  key) would be presented solely as a KeyData.Key.UnicodeChar
+  without the associated shift state. So in the previous example
+  of a Shift Key + "f" key being pressed, the only pertinent
   data returned would be KeyData.Key.UnicodeChar with the value
-  of "F". This would not typically be the case for
-  non-printable characters such as pressing the Right
-  Shift Key + F10 key, since the corresponding returned data
+  of "F". This of course would not typically be the case for
+  non-printable characters such as the pressing of the Right
+  Shift Key + F10 key since the corresponding returned data
   would be reflected both in the KeyData.KeyState.KeyShiftState
   and KeyData.Key.ScanCode values. UEFI drivers which implement
   the EFI_SIMPLE_TEXT_INPUT_EX protocol are required to return
   KeyData.Key and KeyData.KeyState values. These drivers must
   always return the most current state of
   KeyData.KeyState.KeyShiftState and
-  KeyData.KeyState.KeyToggleState. 
-  Certain input devices may not be able to produce shift or toggle
+  KeyData.KeyState.KeyToggleState. It should also be noted that
+  certain input devices may not be able to produce shift or toggle
   state information, and in those cases the high order bit in the
   respective Toggle and Shift state fields should not be active.
 
@@ -238,7 +239,7 @@ EFI_STATUS
 
 /**
   The RegisterKeystrokeNotify() function registers a function
-  to be called when a specified keystroke will occur.
+  which will be called when a specified keystroke will occur.
   
   @param This                     A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
   
@@ -271,8 +272,8 @@ EFI_STATUS
 );
 
 /**
-  The UnregisterKeystrokeNotify() function removes a
-  notification that was previously registered.
+  The UnregisterKeystrokeNotify() function removes the
+  notification which was previously registered.
   
   @param This               A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.
   

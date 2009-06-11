@@ -90,10 +90,10 @@ typedef struct {
 /**
   Describes font output-related information.
 
-  This structure is used for describing the way a string
+  This structure is used for describing the way in which a string
   should be rendered in a particular font. FontInfo specifies the
-  basic font information, and ForegroundColor and BackgroundColor
-  specify the color in which the characters should be displayed. The flags
+  basic font information and ForegroundColor and BackgroundColor
+  specify the color in which they should be displayed. The flags
   in FontInfoMask describe where the system default should be
   supplied instead of the specified information. The flags also
   describe what options can be used to make a match between the
