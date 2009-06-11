@@ -10,7 +10,7 @@
   these three libraries is identical.  The PCI CF8 Library and PCI Express Library simply use 
   explicit access methods.
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,8 +37,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return The encoded PCI address.
 
 **/
-#define PCI_LIB_ADDRESS(Bus,Device,Function,Offset)   \
-  (((Offset) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
+#define PCI_LIB_ADDRESS(Bus,Device,Function,Register)   \
+  (((Register) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 /**
   Registers a PCI device so PCI configuration registers may be accessed after 
@@ -167,7 +167,7 @@ PciAnd8 (
 
 /**
   Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit
-  value, followed by a  bitwise OR with another 8-bit value.
+  value, followed by a bitwise OR with another 8-bit value.
 
   Reads the 8-bit PCI configuration register specified by Address, performs a
   bitwise AND between the read result and the value specified by AndData,

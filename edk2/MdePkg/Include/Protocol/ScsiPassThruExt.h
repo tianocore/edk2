@@ -153,8 +153,8 @@ typedef struct {
   nonblocking I/O functionality is optional.                                                             
 
   @param  This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
-  @param  Target  The Target is an array of size TARGET_MAX_BYTES. It represents
-                  the id of the SCSI device that will send the SCSI Request Packet. Each
+  @param  Target  The Target is an array of size TARGET_MAX_BYTES and it represents
+                  the id of the SCSI device to send the SCSI Request Packet. Each
                   transport driver may choose to utilize a subset of this size to suit the needs
                   of transport target representation. For example, a Fibre Channel driver
                   may use only 8 bytes (WWN) to represent an FC target.
@@ -201,7 +201,7 @@ EFI_STATUS
 /**
   Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on a SCSI channel. These       
   can either be the list SCSI devices that are actually present on the SCSI channel, or the list of legal
-  Target Ids and LUNs for the SCSI channel. Either way, the caller of this function must probe the       
+  Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the       
   Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI    
   channel.                                                                                               
 
@@ -317,7 +317,7 @@ EFI_STATUS
   Resets a SCSI logical unit that is connected to a SCSI channel.
 
   @param  This   A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
-  @param  Target The Target is an array of size TARGET_MAX_BYTE. It represents the
+  @param  Target The Target is an array of size TARGET_MAX_BYTE and it represents the
                  target port ID of the SCSI device containing the SCSI logical unit to
                  reset. Transport drivers may chose to utilize a subset of this array to suit
                  the representation of their targets.

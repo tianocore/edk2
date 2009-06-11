@@ -262,9 +262,9 @@ EFI_STATUS
                     bits 4..6 are the background color. All other bits are undefined
                     and must be zero. The valid Attributes are defined in this file.
 
-  @retval EFI_SUCCESS     The attribute was set.
+  @retval EFI_SUCCESS       The attribute was set.
   @retval EFI_DEVICE_ERROR  The device had an error and could not complete the request.
-  @retval EFI_UNSUPPORTED The attribute requested is not defined.
+  @retval EFI_UNSUPPORTED   The attribute requested is not defined.
 
 **/
 typedef
@@ -342,35 +342,34 @@ EFI_STATUS
   Mode Structure pointed to by Simple Text Out protocol.
 **/
 typedef struct {
-///
-/// The number of modes supported by QueryMode () and SetMode ().
-///
+  ///
+  /// The number of modes supported by QueryMode () and SetMode ().
+  ///
   INT32   MaxMode;
 
   //
   // current settings
   //
 
-///
-/// The text mode of the output device(s).
-///
+  ///
+  /// The text mode of the output device(s).
+  ///
   INT32   Mode;
-
-///
-/// The current character output attribute
-///
+  ///
+  /// The current character output attribute
+  ///
   INT32   Attribute;
-///
-/// The cursor's column.
-///
+  ///
+  /// The cursor's column.
+  ///
   INT32   CursorColumn;
-///
-/// The cursor's row.
-///
+  ///
+  /// The cursor's row.
+  ///
   INT32   CursorRow;
-///
-/// The cursor is currently visbile or not.
-///
+  ///
+  /// The cursor is currently visbile or not.
+  ///
   BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
 

@@ -402,7 +402,7 @@ struct _EFI_HII_CONFIG_ROUTING_PROTOCOL {
   EFI_HII_ROUTE_CONFIG    RouteConfig;
   EFI_HII_BLOCK_TO_CONFIG BlockToConfig;
   EFI_HII_CONFIG_TO_BLOCK ConfigToBlock;
-  EFI_HII_GET_ALT_CFG             GetAltConfig;
+  EFI_HII_GET_ALT_CFG     GetAltConfig;
 };
 
 extern EFI_GUID gEfiHiiConfigRoutingProtocolGuid;

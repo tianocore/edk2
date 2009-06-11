@@ -489,7 +489,7 @@ typedef UINTN  *BASE_LIST;
   This function rounds the pointer specified by Pointer to the next alignment boundary 
   specified by Alignment. The pointer to the aligned address is returned.  
 
-  @param   Value      The value to round up.
+  @param   Pointer    The pointer to round up.
   @param   Alignment  The alignment boundary to use to return an aligned pointer.
   
   @return  Pointer to the aligned address.
@@ -518,7 +518,6 @@ typedef UINTN  *BASE_LIST;
   This macro returns the maximum of two operand specified by a and b.  
   Both a and b must be the same numerical types, signed or unsigned.
 
-  @param   TYPE     Any numerical data types.
   @param   a        The first operand with any numerical type.
   @param   b        The second operand. It should be the same any numerical type with a.
   
@@ -534,7 +533,6 @@ typedef UINTN  *BASE_LIST;
   This macro returns the minimal of two operand specified by a and b.  
   Both a and b must be the same numerical types, signed or unsigned.
 
-  @param   TYPE     Any numerical data types.
   @param   a        The first operand with any numerical type.
   @param   b        The second operand. It should be the same any numerical type with a.
   

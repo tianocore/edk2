@@ -27,7 +27,7 @@ typedef struct _EFI_COMPONENT_NAME2_PROTOCOL  EFI_COMPONENT_NAME2_PROTOCOL;
 
 
 /**
-  Retrieves a Unicode string that is the user-readable name of
+  Retrieves a Unicode string that is the user readable name of
   the EFI Driver.
 
   @param  This       A pointer to the

@@ -42,7 +42,7 @@ typedef struct _EFI_EBC_PROTOCOL EFI_EBC_PROTOCOL;
   @param  This          A pointer to the EFI_EBC_PROTOCOL instance.
   @param  ImageHandle   Handle of image for which the thunk is being created.
   @param  EbcEntryPoint Address of the actual EBC entry point or protocol service the thunk should call.
-  @param  Thunk         Returned pointer to a created thunk.
+  @param  Thunk         Returned pointer to a thunk created.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Image entry point is not 2-byte aligned.
@@ -119,7 +119,7 @@ EFI_STATUS
   returned version is identical to that returned by the EBC BREAK 1 instruction.
 
   @param  This       A pointer to the EFI_EBC_PROTOCOL instance.  
-  @param  Version 	 Pointer to the location to store the returned version of the interpreter.
+  @param  Version    Pointer to where to store the returned version of the interpreter.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Version pointer is NULL.

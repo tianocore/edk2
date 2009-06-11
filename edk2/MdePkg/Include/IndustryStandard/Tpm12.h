@@ -1602,17 +1602,11 @@ typedef struct tdTPM_CONTEXT_SENSITIVE {
 #define TPM_NV_INDEX_GROUP_RESV_BASE   ((UINT32)0x00010000)
 
 ///
-/// The typedefs TPM_NV_PER_ATTRIBUTES (not present in TPM 1.2 Spec. have been added 
-/// and structure fields that were to hold the following values
-///
-typedef UINT32 TPM_NV_PER_ATTRIBUTES;
-
-///
 /// Part 2, section 19.2: TPM_NV_ATTRIBUTES
 ///
 typedef struct tdTPM_NV_ATTRIBUTES {
   TPM_STRUCTURE_TAG               tag;
-  TPM_NV_PER_ATTRIBUTES           attributes;
+  UINT32                          attributes;
 } TPM_NV_ATTRIBUTES;
 
 #define TPM_NV_PER_READ_STCLEAR        (BIT31)

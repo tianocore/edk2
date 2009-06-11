@@ -208,7 +208,7 @@ EFI_STATUS
   volume, a write may negate a bit in the EFI_FVB_ERASE_POLARITY
   state but cannot flip it back again. In general, before
   calling the Write() function, the caller should call the
-  EraseBlocks() function first to erase the block it intends to
+  EraseBlocks() function first to erase the specified block to
   write. A block erase cycle will transition bits from the
   (NOT)EFI_FVB_ERASE_POLARITY state back to the
   EFI_FVB_ERASE_POLARITY state. Implementations should be
@@ -276,7 +276,7 @@ EFI_STATUS
 /**
   Erases and initializes a firmware volume block.
 
-  The EraseBlocks() function erases one or more blocks, as denoted
+  The EraseBlocks() function erases one or more blocks as denoted
   by the variable argument list. The entire parameter list of
   blocks must be verified before erasing any blocks. If a block is
   requested that does not exist within the associated firmware

@@ -512,7 +512,7 @@ EFI_STATUS
   Abort an asynchronous transmit or receive request.
   
   The Cancel() function is used to abort a pending transmit or receive request.
-  If the token is in the transmit or receive request queues, then after calling this
+  If the token is in the transmit or receive request queues, after calling this
   function, Token->Status will be set to EFI_ABORTED and then Token->Event will
   be signaled. If the token is not in one of the queues, which usually means the
   asynchronous operation has completed, this function will not signal the token

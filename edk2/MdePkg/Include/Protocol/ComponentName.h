@@ -1,6 +1,6 @@
 /** @file
   EFI Component Name Protocol as defined in the EFI 1.1 specification.
-  This protocol is used to retrieve user-readable names of EFI Drivers 
+  This protocol is used to retrieve user readable names of EFI Drivers 
   and controllers managed by EFI Drivers.
 
   Copyright (c) 2006 - 2008, Intel Corporation                                                         
@@ -29,7 +29,7 @@ typedef struct _EFI_COMPONENT_NAME_PROTOCOL  EFI_COMPONENT_NAME_PROTOCOL;
 
 
 /**
-  Retrieves a Unicode string that is the user-readable name of the EFI Driver.
+  Retrieves a Unicode string that is the user readable name of the EFI Driver.
 
   @param  This       A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
   @param  Language   A pointer to a three character ISO 639-2 language identifier.

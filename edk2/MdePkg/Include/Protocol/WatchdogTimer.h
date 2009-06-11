@@ -108,7 +108,8 @@ EFI_STATUS
                            will wait before the watchdog timer is fired. If TimerPeriod of
                            zero is returned, then the watchdog timer is disabled.
 
-  @retval EFI_SUCCESS           The function successfully returned TimerPeriod with the amount of time that the system will wait 															before firing the watchdog timer.
+  @retval EFI_SUCCESS           The amount of time that the system will wait before
+                                firing the watchdog timer was returned in TimerPeriod.
   @retval EFI_INVALID_PARAMETER TimerPeriod is NULL.
 
 **/

@@ -33,7 +33,7 @@ typedef struct {
 
 typedef enum {
   ///
-  /// A pixel is 32-bits. Byte zero represents red, byte one represents green, 
+  /// A pixel is 32-bits and byte zero represents red, byte one represents green, 
   /// byte two represents blue, and byte three is reserved. This is the definition 
   /// for the physical frame buffer. The byte values for the red, green, and blue 
   /// components represent the color intensity. This color intensity value range 
@@ -41,7 +41,7 @@ typedef enum {
   ///
   PixelRedGreenBlueReserved8BitPerColor,
   ///
-  /// A pixel is 32-bits. Byte zero represents blue, byte one represents green, 
+  /// A pixel is 32-bits and byte zero represents blue, byte one represents green, 
   /// byte two represents red, and byte three is reserved. This is the definition 
   /// for the physical frame buffer. The byte values for the red, green, and blue 
   /// components represent the color intensity. This color intensity value range 

@@ -79,7 +79,7 @@ typedef union {
 } EFI_HASH_OUTPUT;
 
 /**
-  Returns the size of the hash that results from a specific algorithm.
+  Returns the size of the hash which results from a specific algorithm.
 
   @param  This                  Points to this instance of EFI_HASH_PROTOCOL.
   @param  HashAlgorithm         Points to the EFI_GUID which identifies the algorithm to use.
@@ -100,7 +100,7 @@ EFI_STATUS
   );      
 
 /**
-  Returns the size of the hash that results from a specific algorithm.
+  Returns the size of the hash which results from a specific algorithm.
 
   @param  This          Points to this instance of EFI_HASH_PROTOCOL.
   @param  HashAlgorithm Points to the EFI_GUID which identifies the algorithm to use.
