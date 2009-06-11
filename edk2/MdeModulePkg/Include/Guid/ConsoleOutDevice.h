@@ -1,9 +1,7 @@
 /** @file
-  This guid is used to specify the device is the console out device.
-  If the device is the console out device, this guid as the protocol guid
-  will be installed into this device handle.
+  This GUID can be installed to the device handle to specify that the device is the console-out device.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at

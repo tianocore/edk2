@@ -16,10 +16,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __RECOVERY_LIB_H__
 
 /**
-  Calling this function causes the system do recovery boot path.
+  Calling this function causes the system to carry out a recovery boot path.
   
-  @retval EFI_SUCESS   Sucess to do recovery.
-  @retval Others       Fail to do recovery.
+  @retval EFI_SUCESS   Sucess.
+  @retval Others       Failure.
 
 **/
 EFI_STATUS

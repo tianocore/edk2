@@ -38,12 +38,10 @@ typedef enum {
 
 //
 // The following structures are used by drivers/applications other
-// than EFI_IP4_PROTOCOL, such as ifconfig shell application, to
-// communicate the IP configuration information to EFI_IP4_CONFIG_PROTOCOL.
-// EFI_IP4_CONFIG_PROTOCOL in turn is used by EFI_IP4_PROTOCOL to get
-// the default IP4 configuration. ifconfig can't use the EFI_IP4_PROTOCOL
-// because it don't know how to configure the default IP address even
-// it has got the address.
+// than EFI_IP4_PROTOCOL, such as the ifconfig shell application, to
+// communicate the IP configuration information to the EFI_IP4_CONFIG_PROTOCOL.
+// The EFI_IP4_PROTOCOL uses the EFI_IP4_CONFIG_PROTOCOL to get
+// the default IP4 configuration.
 //
 
 ///

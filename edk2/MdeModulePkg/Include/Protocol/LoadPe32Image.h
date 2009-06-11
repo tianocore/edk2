@@ -1,7 +1,7 @@
 /** @file
 
-  Load Pe32 Image protocol provides capability to load and unload EFI image into memory and execute it.
-  This protocol bases on File Device Path to get EFI image.
+  Load Pe32 Image protocol enables loading and unloading EFI images into memory and executing those images.
+  This protocol uses File Device Path to get EFI image.
 
 Copyright (c) 2006 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials

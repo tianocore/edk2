@@ -48,7 +48,7 @@ VOID
   Add a Deferred Procedure Call to the end of the DPC queue.
 
   @param  This          Protocol instance pointer.
-  @param  DpcTpl        The EFI_TPL that the DPC should be invoked.
+  @param  DpcTpl        The EFI_TPL that the DPC should invoke.
   @param  DpcProcedure  Pointer to the DPC's function.
   @param  DpcContext    Pointer to the DPC's context.  Passed to DpcProcedure
                         when DpcProcedure is invoked.
@@ -70,10 +70,11 @@ EFI_STATUS
   );
 
 /**
-  Dispatch the queue of DPCs.  ALL DPCs that have been queued with a DpcTpl
-  value greater than or equal to the current TPL are invoked in the order that
-  they were queued.  DPCs with higher DpcTpl values are invoked before DPCs with
-  lower DpcTpl values.
+  Dispatch the queue of DPCs.  
+  
+  DPCs with DpcTpl value greater than the current TPL value are queued, and then DPCs
+  with DpcTpl value lower than the current TPL value are queued. All DPCs in the first group (higher DpcTpl values) 
+  are invoked before DPCs in the second group (lower DpcTpl values). 
 
   @param  This  Protocol instance pointer.
 

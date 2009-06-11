@@ -29,7 +29,7 @@
   of packages is passed in, then NULL is returned.  If the size of the list of 
   package is 0, then NULL is returned.
 
-  The variable arguments are pointers which point to package header that defined 
+  The variable arguments are pointers that point to package headers defined 
   by UEFI VFR compiler and StringGather tool.
 
   #pragma pack (push, 1)
@@ -67,8 +67,8 @@ HiiAddPackages (
 /**
   Removes a package list from the HII database.
 
-  If HiiHandle is NULL, then ASSERT.
-  If HiiHandle is not a valid EFI_HII_HANDLE in the HII database, then ASSERT.
+  If HiiHandle is NULL, then ASSERT().
+  If HiiHandle is not a valid EFI_HII_HANDLE in the HII database, then ASSERT().
 
   @param[in]  HiiHandle   The handle that was previously registered in the HII database
 
@@ -81,7 +81,7 @@ HiiRemovePackages (
 ;
 
 /**
-  This function create a new string in String Package or updates an existing 
+  This function creates a new string in String Package or updates an existing 
   string in a String Package.  If StringId is 0, then a new string is added to
   a String Package.  If StringId is not zero, then a string in String Package is
   updated.  If SupportedLanguages is NULL, then the string is added or updated
@@ -97,7 +97,7 @@ HiiRemovePackages (
   @param[in]  StringId            If zero, then a new string is created in the 
                                   String Package associated with HiiHandle.  If 
                                   non-zero, then the string specified by StringId 
-                                  is updated in the String Package  associated 
+                                  is updated in the String Package associated 
                                   with HiiHandle. 
   @param[in]  String              A pointer to the Null-terminated Unicode string 
                                   to add or update in the String Package associated 
@@ -107,12 +107,12 @@ HiiRemovePackages (
                                   String is added or updated in the String Package 
                                   associated with HiiHandle for all the languages 
                                   that the String Package supports.  If this 
-                                  parameter is not NULL, then then String is added 
+                                  parameter is not NULL, then String is added 
                                   or updated in the String Package associated with 
-                                  HiiHandle for the set oflanguages specified by 
+                                  HiiHandle for the set of languages specified by 
                                   SupportedLanguages.  The format of 
                                   SupportedLanguages must follow the language 
-                                  format assumed the HII Database.
+                                  format assumed in the HII Database.
 
   @retval 0      The string could not be added or updated in the String Package.
   @retval Other  The EFI_STRING_ID of the newly added or updated string.
@@ -138,14 +138,14 @@ HiiSetString (
   for freeing the allocated buffer using FreePool().
   
   If HiiHandle is NULL, then ASSERT().
-  If StringId is 0, then ASSET.
+  If StringId is 0, then ASSERT().
 
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
   @param[in]  StringId   The identifier of the string to retrieved from the string 
                          package associated with HiiHandle.
   @param[in]  Language   The language of the string to retrieve.  If this parameter 
                          is NULL, then the current platform language is used.  The 
-                         format of Language must follow the language format assumed 
+                         format of Language must follow the language format assumed in
                          the HII Database.
 
   @retval NULL   The string specified by StringId is not present in the string package.
@@ -162,7 +162,7 @@ HiiGetString (
 ;
 
 /**
-  Retrieves a string from a string package names by GUID in a specific language.  
+  Retrieves a string from a string package named by GUID, in the specified language.  
   If the language is not specified, then a string from a string package in the 
   current platform  language is retrieved.  If the string can not be retrieved 
   using the specified language or the current platform language, then the string 
@@ -171,7 +171,7 @@ HiiGetString (
   is responsible for freeing the allocated buffer using FreePool().
   
   If PackageListGuid is NULL, then ASSERT().
-  If StringId is 0, then ASSERT.
+  If StringId is 0, then ASSERT().
 
   @param[in]  PackageListGuid  The GUID of a package list that was previously 
                                registered in the HII Database.
@@ -180,7 +180,7 @@ HiiGetString (
   @param[in]  Language         The language of the string to retrieve.  If this 
                                parameter is NULL, then the current platform 
                                language is used.  The format of Language must 
-                               follow the language format assumed the HII Database.
+                               follow the language format assumed in the HII Database.
 
   @retval NULL   The package list specified by PackageListGuid is not present in the
                  HII Database.
@@ -205,10 +205,10 @@ HiiGetPackageString (
   The caller is responsible for freeing the array with FreePool().
 
   @param[in]  PackageListGuid  An optional parameter that is used to request 
-                               an HII Handle that is associatd with a specific
-                               Package List GUID.  If this parameter is NULL
+                               an HII Handle associated with a specific
+                               Package List GUID.  If this parameter is NULL,
                                then all the HII Handles in the HII Database
-                               are returned.  If this parameter is not NULL
+                               are returned.  If this parameter is not NULL,
                                then at most 1 HII Handle is returned.
 
   @retval NULL   No HII handles were found in the HII database
@@ -224,11 +224,11 @@ HiiGetHiiHandles (
 ;
 
 /**
-  Retrieves a pointer to the a Null-terminated ASCII string containing the list 
+  Retrieves a pointer to a Null-terminated ASCII string containing the list 
   of languages that an HII handle in the HII Database supports.  The returned 
   string is allocated using AllocatePool().  The caller is responsible for freeing
   the returned string using FreePool().  The format of the returned string follows
-  the language format assumed the HII Database.
+  the language format assumed in the HII Database.
   
   If HiiHandle is NULL, then ASSERT().
 
@@ -251,7 +251,7 @@ HiiGetSupportedLanguages (
 /**
   Allocates and returns a Null-terminated Unicode <ConfigHdr> string using routing 
   information that includes a GUID, an optional Unicode string name, and a device
-  path.  The string returned is allocated with AllocatePool().  The caller is 
+  path. The string returned is allocated with AllocatePool().  The caller is 
   responsible for freeing the allocated string with FreePool().
   
   The format of a <ConfigHdr> is as follows:
@@ -287,7 +287,7 @@ HiiConstructConfigHdr (
 
 /**
   Reset the default value specified by DefaultId to the driver
-  configuration got by Request string. 
+  configuration specified by the Request string. 
 
   NULL request string support depends on the ExportConfig interface of
   HiiConfigRouting protocol in UEFI specification.
@@ -298,8 +298,8 @@ HiiConstructConfigHdr (
                     entirety of the current HII database will be reset.
   @param DefaultId  Specifies the type of defaults to retrieve.
   
-  @retval TURE    The default value is set successfully.
-  @retval FALSE   The default value can't be found and set.
+  @retval TURE    The default value was set successfully.
+  @retval FALSE   The default value was not found.
 **/
 BOOLEAN
 EFIAPI                               
@@ -309,14 +309,14 @@ HiiSetToDefaults (
   );
 
 /**
-  Validate the current configuration by parsing HII form IFR opcode.
+  Validate the current configuration by parsing the IFR opcode in HII form.
 
   NULL request string support depends on the ExtractConfig interface of
-  HiiConfigRouting protocol in UEFI specification.
+  HiiConfigRouting protocol in the UEFI specification.
   
   @param  Request   A null-terminated Unicode string in 
                     <MultiConfigRequest> format. It can be NULL.
-                    If it is NULL, all current configuration for the
+                    If it is NULL, all current configurations for the
                     entirety of the current HII database will be validated.
   
   @retval TURE    Current configuration is valid.
@@ -350,7 +350,7 @@ HiiIsConfigHdrMatch (
   );
 
 /**
-  Retrieves uncommited data from the Form Browser and converts it to a binary
+  Retrieves uncommitted data from the Form Browser and converts it to a binary
   buffer.
 
   @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
@@ -418,7 +418,7 @@ HiiSetBrowserData (
   an EFI_HII_TIME structure in an EFI_IFR_TYPE_VALUE union.
 
   @param  Hour    The hour value to be encoded.
-  @param  Minute  The miniute value to be encoded.
+  @param  Minute  The minute value to be encoded.
   @param  Second  The second value to be encoded.
 
   @return A 64-bit containing Hour, Minute, and Second.
@@ -882,14 +882,14 @@ HiiCreateOrderedListOpCode (
   comparisons of IFR opcodes are performed from the beginning of the form being 
   updated until an IFR opcode is found that exactly matches the first IFR opcode 
   specifed by StartOpCodeHandle.  The following rules are used to determine if
-  an insert, replace, or delete operation is performed.
+  an insert, replace, or delete operation is performed:
   
   1) If no matches are found, then NULL is returned.  
   2) If a match is found, and EndOpCodeHandle is NULL, then all of the IFR opcodes
      from StartOpcodeHandle except the first opcode are inserted immediately after 
      the matching IFR opcode in the form beng updated.
   3) If a match is found, and EndOpCodeHandle is not NULL, then a search is made 
-     from the matching IFR opcode until an IFR opcode exatly matches the first 
+     from the matching IFR opcode until an IFR opcode exactly matches the first 
      IFR opcode specified by EndOpCodeHandle.  If no match is found for the first
      IFR opcode specified by EndOpCodeHandle, then NULL is returned.  If a match
      is found, then all of the IFR opcodes between the start match and the end 
@@ -915,12 +915,12 @@ HiiCreateOrderedListOpCode (
   @param[in]  EndOpCodeHandle    An OpCcode Handle that contains the IFR opcode
                                  that marks the end of a replace operation in
                                  the form.  This is an optional parameter that
-                                 may be NULL.  If it is NULL, then an the IFR
+                                 may be NULL.  If it is NULL, then the IFR
                                  opcodes specified by StartOpCodeHandle are 
                                  inserted into the form.
   
-  @retval EFI_OUT_OF_RESOURCES   No enough memory resource is allocated.
-  @retval EFI_NOT_FOUND          The following cases will return EFI_NOT_FOUND.
+  @retval EFI_OUT_OF_RESOURCES   Not enough memory resources are allocated.
+  @retval EFI_NOT_FOUND          The following cases will return EFI_NOT_FOUND:
                                  1) The form specified by HiiHandle, FormSetGuid, 
                                  and FormId could not be found in the HII Database.
                                  2) No IFR opcodes in the target form match the first

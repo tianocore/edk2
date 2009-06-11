@@ -1,6 +1,6 @@
 /** @file
   Ihis library is only intended to be used by UEFI network stack modules.
-  It provides basic function for UEFI network stack.
+  It provides basic functions for the UEFI network stack.
 
 Copyright (c) 2005 - 2008, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -76,7 +76,7 @@ typedef struct {
 
 
 //
-// ICMP head definition. ICMP message is categoried as either an error
+// ICMP head definition. Each ICMP message is categorized as either an error
 // message or query message. Two message types have their own head format.
 //
 typedef struct {
@@ -163,13 +163,13 @@ typedef struct {
 /**
   Return the length of the mask. 
   
-  Return the length of the mask, the correct value is from 0 to 32.
+  Return the length of the mask. Valid values are 0 to 32.
   If the mask is invalid, return the invalid length 33, which is IP4_MASK_NUM.
   NetMask is in the host byte order.
 
   @param[in]  NetMask              The netmask to get the length from.
 
-  @return The length of the netmask, IP4_MASK_NUM if the mask is invalid.
+  @return The length of the netmask, or IP4_MASK_NUM (33) if the mask is invalid.
   
 **/
 INTN
@@ -211,13 +211,13 @@ NetGetIpClass (
   
   If Ip is 0, IP is not a valid unicast address.
   Class D address is used for multicasting and class E address is reserved for future. If Ip
-  belongs to class D or class E, IP is not a valid unicast address. 
-  If all bits of the host address of IP are 0 or 1, IP is also not a valid unicast address.
+  belongs to class D or class E, Ip is not a valid unicast address. 
+  If all bits of the host address of Ip are 0 or 1, Ip is not a valid unicast address.
 
   @param[in]  Ip                    The IP to check against.
   @param[in]  NetMask               The mask of the IP.
 
-  @return TRUE if IP is a valid unicast address on the network, otherwise FALSE.
+  @return TRUE if Ip is a valid unicast address on the network, otherwise FALSE.
 
 **/
 BOOLEAN
@@ -245,7 +245,7 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 /**
   Extract a UINT32 from a byte stream.
   
-  Copy a UINT32 from a byte stream, then converts it from Network 
+  This function copies a UINT32 from a byte stream, and then converts it from Network 
   byte order to host byte order. Use this function to avoid alignment error.
 
   @param[in]  Buf                 The buffer to extract the UINT32.
@@ -260,9 +260,9 @@ NetGetUint32 (
   );
 
 /**
-  Put a UINT32 to the byte stream in network byte order. 
+  Puts a UINT32 into the byte stream in network byte order. 
   
-  Converts a UINT32 from host byte order to network byte order. Then copy it to the 
+  Converts a UINT32 from host byte order to network byte order, and then copies it to the 
   byte stream.
 
   @param[in, out]  Buf          The buffer to put the UINT32.
@@ -280,10 +280,10 @@ NetPutUint32 (
   Initialize a random seed using current time.
   
   Get current time first. Then initialize a random seed based on some basic 
-  mathematics operation on the hour, day, minute, second, nanosecond and year 
+  mathematical operations on the hour, day, minute, second, nanosecond and year 
   of the current time.
   
-  @return The random seed initialized with current time.
+  @return The random seed, initialized with current time.
 
 **/
 UINT32
@@ -300,13 +300,13 @@ NetRandomInitSeed (
           CR(Entry, Type, Field, Sig)
 
 //
-// Iterate through the doule linked list. It is NOT delete safe
+// Iterate through the double linked list. It is NOT delete safe
 //
 #define NET_LIST_FOR_EACH(Entry, ListHead) \
   for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
 
 //
-// Iterate through the doule linked list. This is delete-safe.
+// Iterate through the double linked list. This is delete-safe.
 // Don't touch NextEntry. Also, don't use this macro if list
 // entries other than the Entry may be deleted when processing
 // the current Entry.
@@ -318,7 +318,7 @@ NetRandomInitSeed (
      )
 
 //
-// Make sure the list isn't empty before get the frist/last record.
+// Make sure the list isn't empty before getting the first/last record.
 //
 #define NET_LIST_HEAD(ListHead, Type, Field)  \
           NET_LIST_USER_STRUCT((ListHead)->ForwardLink, Type, Field)
@@ -330,8 +330,8 @@ NetRandomInitSeed (
 /**
   Remove the first node entry on the list, and return the removed node entry.
   
-  Removes the first node Entry from a doubly linked list. It is up to the caller of
-  this function to release the memory used by the first node if that is required. On
+  Removes the first node entry from a doubly linked list. It is up to the caller of
+  this function to release the memory used by the first node, if that is required. On
   exit, the removed node is returned. 
 
   If Head is NULL, then ASSERT().
@@ -352,10 +352,10 @@ NetListRemoveHead (
   );
 
 /**
-  Remove the last node entry on the list and and return the removed node entry.
+  Remove the last node entry on the list and return the removed node entry.
 
   Removes the last node entry from a doubly linked list. It is up to the caller of
-  this function to release the memory used by the first node if that is required. On
+  this function to release the memory used by the first node, if that is required. On
   exit, the removed node is returned. 
 
   If Head is NULL, then ASSERT().
@@ -378,10 +378,10 @@ NetListRemoveTail (
 /**
   Insert a new node entry after a designated node entry of a doubly linked list.
   
-  Inserts a new node entry donated by NewEntry after the node entry donated by PrevEntry
+  Inserts a new node entry designated by NewEntry after the node entry designated by PrevEntry
   of the doubly linked list.
  
-  @param[in, out]  PrevEntry             The previous entry to insert after.
+  @param[in, out]  PrevEntry             The entry after which to insert. 
   @param[in, out]  NewEntry              The new entry to insert.
 
 **/
@@ -395,7 +395,7 @@ NetListInsertAfter (
 /**
   Insert a new node entry before a designated node entry of a doubly linked list.
   
-  Inserts a new node entry donated by NewEntry after the node entry donated by PostEntry
+  Inserts a new node entry designated by NewEntry before the node entry designated by PostEntry
   of the doubly linked list.
  
   @param[in, out]  PostEntry             The entry to insert before.
@@ -451,9 +451,9 @@ NetMapInit (
 /**
   To clean up the netmap, that is, release allocated memories.
   
-  Removes all nodes of the Used doubly linked list and free memory of all related netmap items.
+  Removes all nodes of the Used doubly linked list and frees memory of all related netmap items.
   Removes all nodes of the Recycled doubly linked list and free memory of all related netmap items.
-  The number of the <Key, Value> pairs in the netmap is set to be zero.
+  The number of the <Key, Value> pairs in the netmap is set to zero.
   
   If Map is NULL, then ASSERT().
   
@@ -550,7 +550,7 @@ NetMapInsertTail (
   );
 
 /**
-  Find the key in the netmap and returns the point to the item contains the Key.
+  Finds the key in the netmap and returns the point to the item containing the Key.
   
   Iterate the Used doubly linked list of the netmap to get every item. Compare the key of every 
   item with the key to search. It returns the point to the item contains the Key if found.
@@ -695,9 +695,9 @@ NetMapIterate (
   @param[in]       Controller            The controller which has the service installed.
   @param[in]       Image                 The image handle used to open service.
   @param[in]       ServiceBindingGuid    The service's Guid.
-  @param[in, out]  ChildHandle           The handle to receive the create child.
+  @param[in, out]  ChildHandle           The handle to receive the created child.
 
-  @retval EFI_SUCCESS           The child is successfully created.
+  @retval EFI_SUCCESS           The child was successfully created.
   @retval Others                Failed to create the child.
 
 **/
@@ -711,7 +711,7 @@ NetLibCreateServiceChild (
   );
 
 /**
-  Destory a child of the service that is identified by ServiceBindingGuid.
+  Destroy a child of the service that is identified by ServiceBindingGuid.
   
   Get the ServiceBinding Protocol first, then use it to destroy a child.
   
@@ -720,10 +720,10 @@ NetLibCreateServiceChild (
   @param[in]   Controller            The controller which has the service installed.
   @param[in]   Image                 The image handle used to open service.
   @param[in]   ServiceBindingGuid    The service's Guid.
-  @param[in]   ChildHandle           The child to destory.
+  @param[in]   ChildHandle           The child to destroy.
 
-  @retval EFI_SUCCESS           The child is successfully destoried.
-  @retval Others                Failed to destory the child.
+  @retval EFI_SUCCESS           The child is successfully destroyed.
+  @retval Others                Failed to destroy the child.
 
 **/
 EFI_STATUS
@@ -742,18 +742,18 @@ NetLibDestroyServiceChild (
 
   Get the mac address of the Simple Network protocol from the SnpHandle. Then convert
   the mac address into a unicode string. It takes 2 unicode characters to represent 
-  a 1 byte binary buffer. Plus one unicode character for the null-terminator.
+  a 1 byte binary buffer, plus one unicode character for the null terminator.
 
 
-  @param[in]   SnpHandle             The handle where the simple network protocol is
-                                     installed on.
-  @param[in]   ImageHandle           The image handle used to act as the agent handle to
+  @param[in]   SnpHandle             The handle on which the simple network protocol is
+                                     installed.
+  @param[in]   ImageHandle           The image handle to act as the agent handle to
                                      get the simple network protocol.
   @param[out]  MacString             The pointer to store the address of the string
                                      representation of  the mac address.
   
-  @retval EFI_SUCCESS           Convert the mac address a unicode string successfully.
-  @retval EFI_OUT_OF_RESOURCES  There are not enough memory resource.
+  @retval EFI_SUCCESS           Converted the mac address a unicode string successfully.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough memory resources.
   @retval Others                Failed to open the simple network protocol.
 
 **/
@@ -799,8 +799,8 @@ NetLibCreateIPv4DPathNode (
 /**
   Find the UNDI/SNP handle from controller and protocol GUID.
   
-  For example, IP will open a MNP child to transmit/receive
-  packets, when MNP is stopped, IP should also be stopped. IP
+  For example, IP will open an MNP child to transmit/receive
+  packets. When MNP is stopped, IP should also be stopped. IP
   needs to find its own private data which is related the IP's
   service binding instance that is install on UNDI/SNP handle.
   Now, the controller is either a MNP or ARP child handle. But
@@ -926,8 +926,8 @@ typedef struct {
 } NET_VECTOR;
 
 //
-//NET_BLOCK_OP operate on the NET_BLOCK, It specifies
-//where the actual fragment begins and where it ends
+//NET_BLOCK_OP operates on the NET_BLOCK. It specifies
+//where the actual fragment begins and ends
 //
 typedef struct {
   UINT8               *BlockHead;   // Block's head, or the smallest valid Head
@@ -940,13 +940,12 @@ typedef struct {
 
 //
 //NET_BUF is the buffer manage structure used by the
-//network stack. Every network packet may be fragmented,
-//and contains multiple fragments. The Vector points to
-//memory blocks used by the each fragment, and BlockOp
+//network stack. Every network packet may be fragmented. The Vector points to
+//memory blocks used by each fragment, and BlockOp
 //specifies where each fragment begins and ends.
 //
-//It also contains a opaque area for protocol to store
-//per-packet informations. Protocol must be caution not
+//It also contains an opaque area for the protocol to store
+//per-packet information. Protocol must be careful not
 //to overwrite the members after that.
 //
 typedef struct {
@@ -967,7 +966,7 @@ typedef struct {
 
 
 //
-//A queue of NET_BUFs, It is just a thin extension of
+//A queue of NET_BUFs. It is a thin extension of
 //NET_BUF functions.
 //
 typedef struct {
@@ -1043,8 +1042,8 @@ NetbufAlloc (
  
   Decrease the reference count of the net buffer by one. Free the associated net
   vector and itself if the reference count of the net buffer is decreased to 0. 
-  The net vector free operation just decrease the reference count of the net 
-  vector by one and do the real resource free operation when the reference count
+  The net vector free operation decreases the reference count of the net 
+  vector by one, and performs the resource free operation when the reference count
   of the net vector is 0. 
  
   @param[in]  Nbuf                  Pointer to the NET_BUF to be freed.
@@ -1060,8 +1059,8 @@ NetbufFree (
   Get the index of NET_BLOCK_OP that contains the byte at Offset in the net 
   buffer. 
   
-  This can be used to, for example, retrieve the IP header in the packet. It 
-  also can be used to get the fragment that contains the byte which is used 
+  For example, this function can be used to retrieve the IP header in the packet. It 
+  also can be used to get the fragment that contains the byte used 
   mainly by the library implementation itself. 
 
   @param[in]   Nbuf      Pointer to the net buffer.
@@ -1152,7 +1151,7 @@ NetbufGetFragment (
 /**
   Reserve some space in the header room of the net buffer.
 
-  Upon allocation, all the space are in the tail room of the buffer. Call this 
+  Upon allocation, all the space is in the tail room of the buffer. Call this 
   function to move some space to the header room. This function is quite limited
   in that it can only reserve space from the first block of an empty NET_BUF not 
   built from the external. But it should be enough for the network stack. 
@@ -1196,8 +1195,8 @@ NetbufAllocSpace (
   @param[in]      FromHead      The flag to indicate whether trim data from head 
                                 (TRUE) or tail (FALSE).
 
-  @return    Length of the actually trimmed data, which is possible to be less 
-             than Len because the TotalSize of Nbuf is less than Len.
+  @return    Length of the actually trimmed data, which may be less 
+             than Len if the TotalSize of Nbuf is less than Len.
 
 **/
 UINT32
@@ -1212,7 +1211,7 @@ NetbufTrim (
   Copy Len bytes of data from the specific offset of the net buffer to the 
   destination memory.
  
-  The Len bytes of data may cross the several fragments of the net buffer.
+  The Len bytes of data may cross several fragments of the net buffer.
  
   @param[in]   Nbuf         Pointer to the net buffer.
   @param[in]   Offset       The sequence number of the first byte to copy.
@@ -1235,17 +1234,17 @@ NetbufCopy (
 /**
   Build a NET_BUF from external blocks. 
    
-  A new NET_BUF structure will be created from external blocks. Additional block
+  A new NET_BUF structure will be created from external blocks. An additional block
   of memory will be allocated to hold reserved HeadSpace bytes of header room
-  and existing HeadLen bytes of header but the external blocks are shared by the
+  and existing HeadLen bytes of header, but the external blocks are shared by the
   net buffer to avoid data copying.
 
   @param[in]  ExtFragment           Pointer to the data block.
   @param[in]  ExtNum                The number of the data blocks.
   @param[in]  HeadSpace             The head space to be reserved.
-  @param[in]  HeadLen               The length of the protocol header, This function
-                                    will pull that number of data into a linear block.
-  @param[in]  ExtFree               Pointer to the caller provided free function.
+  @param[in]  HeadLen               The length of the protocol header. The function
+                                    pulls this amount of data into a linear block.
+  @param[in]  ExtFree               Pointer to the caller-provided free function.
   @param[in]  Arg                   The argument passed to ExtFree when ExtFree is
                                     called.
 
@@ -1273,7 +1272,7 @@ NetbufFromExt (
   @param[in, out]  ExtFragment           Pointer to the data block.
   @param[in, out]  ExtNum                The number of the data blocks.
 
-  @retval EFI_BUFFER_TOO_SMALL  The number of non-empty block is bigger than 
+  @retval EFI_BUFFER_TOO_SMALL  The number of non-empty blocks is bigger than 
                                 ExtNum.
   @retval EFI_SUCCESS           Fragment table is built successfully.
 
@@ -1294,8 +1293,8 @@ NetbufBuildExt (
    
   @param[in]   BufList    A List of the net buffer.
   @param[in]   HeadSpace  The head space to be reserved.
-  @param[in]   HeaderLen  The length of the protocol header, This function
-                          will pull that number of data into a linear block.
+  @param[in]   HeaderLen  The length of the protocol header. The function
+                          pulls this amount of data into a linear block.
   @param[in]   ExtFree    Pointer to the caller provided free function.
   @param[in]   Arg        The argument passed to ExtFree when ExtFree is called.
 
@@ -1421,8 +1420,8 @@ NetbufQueCopy (
   );
 
 /**
-  Trim Len bytes of data from the queue header, release any of the net buffer 
-  whom is trimmed wholely.
+  Trim Len bytes of data from the queue header and release any net buffer 
+  that is trimmed wholely.
    
   The trimming operation is the same as NetbufTrim but applies to the net buffer
   queue instead of the net buffer.

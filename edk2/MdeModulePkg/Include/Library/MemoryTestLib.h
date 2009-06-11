@@ -26,8 +26,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  Length                 Length of the memory range to test.
   @param  ErrorAddress           Address of the memory where error is encountered.
 
-  @retval RETURN_SUCCESS         The memory range passes test.
-  @retval RETURN_DEVICE_ERROR    The memory range does not pass test.
+  @retval RETURN_SUCCESS         The memory range passed the test.
+  @retval RETURN_DEVICE_ERROR    The memory range failed the test.
 
 **/
 RETURN_STATUS
@@ -39,7 +39,7 @@ QuickMemoryTest (
   );
 
 /**
-  Test a system memory range with sparsely sampled memory units.
+  Tests a system memory range with sparsely sampled memory units.
 
   This function tests a system memory range, whose memory units
   are sampled sparsely. It leads to relatively good performance
@@ -49,8 +49,8 @@ QuickMemoryTest (
   @param  Length                 Length of the memory range to test.
   @param  ErrorAddress           Address of the memory where error is encountered.
 
-  @retval RETURN_SUCCESS         The memory range passes test.
-  @retval RETURN_DEVICE_ERROR    The memory range does not pass test.
+  @retval RETURN_SUCCESS         The memory range passed the test.
+  @retval RETURN_DEVICE_ERROR    The memory range failed the test.
 
 **/
 RETURN_STATUS
@@ -64,7 +64,7 @@ SparseMemoryTest (
 /**
   Test a system memory range with extensively sampled memory units.
 
-  This function tests a system memory range, whose memory units
+  This function tests a system memory range whose memory units
   are sampled extensively. Compared with SparseMemoryTest, it achieves
   more reliability and less performance.
 
@@ -72,8 +72,8 @@ SparseMemoryTest (
   @param  Length                 Length of the memory range to test.
   @param  ErrorAddress           Address of the memory where error is encountered.
 
-  @retval RETURN_SUCCESS         The memory range passes test.
-  @retval RETURN_DEVICE_ERROR    The memory range does not pass test.
+  @retval RETURN_SUCCESS         The memory range passed the test.
+  @retval RETURN_DEVICE_ERROR    The memory range failed the test.
 
 **/
 RETURN_STATUS

@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.
 
-  @param[in]  DpcTpl        The EFI_TPL that the DPC should be invoked.
+  @param[in]  DpcTpl        The EFI_TPL that the DPC should invoke.
   @param[in]  DpcProcedure  Pointer to the DPC's function.
   @param[in]  DpcContext    Pointer to the DPC's context.  Passed to DpcProcedure
                             when DpcProcedure is invoked.
@@ -41,7 +41,7 @@ QueueDpc (
   );
 
 /**
-  Dispatch the queue of DPCs.  ALL DPCs that have been queued with a DpcTpl
+  Dispatch the queue of DPCs. All DPCs that have been queued with a DpcTpl
   value greater than or equal to the current TPL are invoked in the order that
   they were queued.  DPCs with higher DpcTpl values are invoked before DPCs with
   lower DpcTpl values.

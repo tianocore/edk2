@@ -26,15 +26,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
 
 /**
-  Produces a Null-terminated Unicode string in an output buffer based on 
+  Produces a Null-terminated Unicode string in an output buffer, based on 
   a Null-terminated Unicode format string and a BASE_LIST argument list
   
   Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
   and BufferSize.  
   The Unicode string is produced by parsing the format string specified by FormatString.  
-  Arguments are pulled from the variable argument list specified by Marker based on the 
+  Arguments are pulled from the variable argument list specified by Marker. Marker is constructed based on the 
   contents of the format string.  
-  The number of Unicode characters in the produced output buffer is returned not including
+  This function returns the number of Unicode characters in the produced output buffer, not including
   the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
@@ -55,7 +55,7 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
   @param  FormatString    Null-terminated Unicode format string.
   @param  Marker          BASE_LIST marker for the variable argument list.
   
-  @return The number of Unicode characters in the produced output buffer not including the
+  @return The number of Unicode characters in the produced output buffer, not including the
           Null-terminator.
 
 **/
@@ -76,7 +76,7 @@ UINTN
   and BufferSize.
   The Unicode string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list based on the contents of the format string.
-  The number of Unicode characters in the produced output buffer is returned not including
+  This function returns the number of Unicode characters in the produced output buffer, not including
   the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
@@ -112,7 +112,7 @@ UINTN
   );
 
 /**
-  Produces a Null-terminated Unicode string in an output buffer based on a Null-terminated
+  Produces a Null-terminated Unicode string in an output buffer, based on a Null-terminated
   ASCII format string and a BASE_LIST argument list
   
   Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
@@ -120,7 +120,7 @@ UINTN
   The Unicode string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list specified by Marker based on the 
   contents of the format string.
-  The number of Unicode characters in the produced output buffer is returned not including
+  This function returns the number of Unicode characters in the produced output buffer, not including
   the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
@@ -155,14 +155,14 @@ UINTN
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on a Null-terminated 
-  ASCII format string and  variable argument list.
+  ASCII format string and a variable argument list.
   
   Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
   and BufferSize.
   The Unicode string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list based on the contents of the 
   format string.
-  The number of Unicode characters in the produced output buffer is returned not including
+  This function returns the number of Unicode characters in the produced output buffer, not including
   the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
@@ -201,11 +201,11 @@ UINTN
   
   Converts the decimal number specified by Value to a Null-terminated Unicode 
   string specified by Buffer containing at most Width characters. No padding of spaces 
-  is ever performed. If Width is 0 then a width of MAXIMUM_VALUE_CHARACTERS is assumed.
-  The number of Unicode characters in Buffer is returned not including the Null-terminator.
-  If the conversion contains more than Width characters, then only the first
-  Width characters are returned, and the total number of characters 
-  required to perform the conversion is returned.
+  is ever performed. If Width is 0, then a width of MAXIMUM_VALUE_CHARACTERS is assumed.
+  This function returns the number of Unicode characters in Buffer, not including
+  the Null-terminator.
+  If the conversion contains more than Width characters, this function returns 
+  the first Width characters in the conversion, along with the total number of characters in the conversion.
   Additional conversion parameters are specified in Flags.  
   
   The Flags bit LEFT_JUSTIFY is always ignored.
@@ -255,7 +255,7 @@ UINTN
   The ASCII string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list specified by Marker based on 
   the contents of the format string.
-  The number of ASCII characters in the produced output buffer is returned not including
+  This function returns the number of ASCII characters in the output buffer, not including
   the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
@@ -289,14 +289,14 @@ UINTN
 
 /**
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
-  ASCII format string and  variable argument list.
+  ASCII format string and variable argument list.
   
   Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
   and BufferSize.
   The ASCII string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list based on the contents of the 
   format string.
-  The number of ASCII characters in the produced output buffer is returned not including
+  This function returns the number of ASCII characters in the output buffer, not including
   the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
@@ -338,7 +338,7 @@ UINTN
   The ASCII string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list specified by Marker based on 
   the contents of the format string.
-  The number of ASCII characters in the produced output buffer is returned not including
+  This function returns the number of ASCII characters in the output buffer, not including
   the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
@@ -380,7 +380,7 @@ UINTN
   The ASCII string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list based on the contents of the 
   format string.
-  The number of ASCII characters in the produced output buffer is returned not including
+  This function returns the number of ASCII characters in the output buffer, not including
   the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
@@ -420,7 +420,7 @@ UINTN
   Converts the decimal number specified by Value to a Null-terminated ASCII string 
   specified by Buffer containing at most Width characters. No padding of spaces 
   is ever performed.
-  If Width is 0 then a width of  MAXIMUM_VALUE_CHARACTERS is assumed.
+  If Width is 0 then a width of MAXIMUM_VALUE_CHARACTERS is assumed.
   The number of ASCII characters in Buffer is returned not including the Null-terminator.
   If the conversion contains more than Width characters, then only the first Width
   characters are returned, and the total number of characters required to perform

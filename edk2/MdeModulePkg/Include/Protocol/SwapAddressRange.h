@@ -1,9 +1,9 @@
 /** @file
 The EFI_SWAP_ADDRESS_RANGE_PROTOCOL is used to abstract the swap operation of boot block 
 and backup block of FV. This swap is especially needed when updating the boot block of FV. If any 
-power failure happens during updating boot block, the swapped backup block (now is the boot block) 
-can boot the machine with old boot block backuped in it. The swap operation is platform dependent, so 
-other protocols such as FTW (Fault Tolerant Write) should use this protocol instead of handling hardward directly.
+power failure happens during the boot block update, the swapped backup block (now the boot block) 
+can boot the machine with the old boot block backed up in it. The swap operation is platform dependent, so 
+other protocols such as FTW (Fault Tolerant Write) should use this protocol instead of handling hardware directly.
 
 Copyright (c) 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -36,12 +36,11 @@ typedef struct _EFI_SWAP_ADDRESS_RANGE_PROTOCOL  EFI_SWAP_ADDRESS_RANGE_PROTOCOL
 typedef UINT8 EFI_SWAP_LOCK_CAPABILITY;
 
 //
-// Protocl APIs
+// Protocol APIs
 //
 
 /**
-  This service gets the address range location of boot block and backup block.
-  The EFI_GET_RANGE_LOCATION service allows caller to get the range location of 
+  This function gets the address range location of 
   boot block and backup block. 
 
   @param This		          Indicates the calling context.  
@@ -66,8 +65,6 @@ EFI_STATUS
 /**
   This service checks if the boot block and backup block has been swapped.
 
-  The EFI_GET_SWAP_STATE service allows caller to get current swap state of boot block and backup block.
-
   @param This		      Indicates the calling context.  
   @param SwapState	 	True if the boot block and backup block has been swapped. 
                       False if the boot block and backup block has not been swapped.
@@ -85,12 +82,11 @@ EFI_STATUS
 /**
   This service swaps the boot block and backup block, or swaps them back.
 
-  The EFI_SET_SWAP_STATE service allows caller to set the swap state of boot block and backup block. 
-  It also acquires and releases software swap lock during operation. Note the setting of new swap state 
+  It also acquires and releases software swap lock during operation. The setting of the new swap state 
   is not affected by the old swap state.
 
   @param This		        Indicates the calling context.  
-  @param NewSwapState	 	True to swap real boot block and backup block , False to swap them back..
+  @param NewSwapState	 	True to swap real boot block and backup block, False to swap them back.
 
   @retval EFI_SUCCESS	The call was successful.
   @retval EFI_ABORTED	Set swap state error
@@ -106,15 +102,13 @@ EFI_STATUS
 
 
 /**
-  This service checks if a RTC (Real Time Clock) power failure happened.
+  This service checks if a Real Time Clock (RTC) power failure happened.
 
-  The EFI_GET_RTC_POWER_STATUS service allows caller to get Real Time Clock power failure status.  
-  If parameter RtcPowerFailed is true after function returns, the trickle current (from the main battery or trickle supply) 
-  has been removed or failed, this means the swap status was lost in some platform (such as IA32). 
-  So it is recommended to check RTC power status before calling GetSwapState().
+  If parameter RtcPowerFailed is true after the function returns, RTC power supply failed or was removed. 
+  It is recommended to check RTC power status before calling GetSwapState().
 
   @param This             Indicates the calling context.  
-  @param RtcPowerFailed   True if a RTC (Real Time Clock) power failure has happened.
+  @param RtcPowerFailed   True if the RTC (Real Time Clock) power failed or was removed. 
 
   @retval EFI_SUCCESS The call was successful.
     
@@ -127,10 +121,8 @@ EFI_STATUS
   );
 
 /**
-  This service returns supported lock methods for swap operation in current platform. Could be software lock, hardware lock, or unsupport lock.
-
-  The EFI_GET_SWAP_LOCK_CAPABILITY service allows caller to get supported lock method for swap operation in current platform. 
-  Note that software and hardware lock mothod can be used simultaneously.
+  This service returns all lock methods for swap operations that the current platform supports. Could be software lock, hardware lock, or unsupport lock.
+	Note that software and hardware lock methods can be used simultaneously.
 
   @param This             Indicates the calling context.
   @param LockCapability	 	Current lock method for swap operation. 
@@ -150,7 +142,6 @@ EFI_STATUS
 /**
   This service is used to acquire or release appointed kind of lock for Swap Address Range operation.
 
-  The EFI_GET_SWAP_LOCK_CAPABILITY service allows caller to get supported lock method for swap operation in current platform. 
   Note that software and hardware lock mothod can be used simultaneously.
 
   @param This              Indicates the calling context.

@@ -22,7 +22,7 @@ typedef struct _EFI_GENERIC_MEMORY_TEST_PROTOCOL  EFI_GENERIC_MEMORY_TEST_PROTOC
 
 ///
 /// Memory test coverage level
-/// Ignore op not test memory, Quick and Sparse op test memory quickly, Extensive op test memory detailedly.
+/// Ignore chooses not to test memory, Quick and Sparse test some memory, and Extensive performs a detailed memory test.
 ///
 typedef enum {
   IGNORE,
@@ -41,9 +41,7 @@ typedef enum {
   @param  RequireSoftECCInit  Indicate if the memory need software ECC init. 
 
   @retval EFI_SUCCESS         The generic memory test is initialized correctly. 
-  @retval EFI_NO_MEDIA        There is not any non-tested memory found, which means  
-                              that the memory test driver have not detect any 
-                              non-tested extended memory in current system. 
+  @retval EFI_NO_MEDIA        The system had no memory to be tested. 
 
 **/
 typedef
@@ -60,15 +58,14 @@ EFI_STATUS
 
   @param  This                Protocol instance pointer. 
   @param  TestedMemorySize    Return the tested extended memory size. 
-  @param  TotalMemorySize     Return the whole system physical memory size, this  
-                              value may be changed if some error DIMMs is disabled in some case. 
-  @param  ErrorOut            TRUE if the memory error occurs.
-  @param  IfTestAbort         Indicate if the user press "ESC" to skip the memory test. 
+  @param  TotalMemorySize     Return the whole system physical memory size. 
+  														The total memory size does not include memory in a slot with a disabled DIMM.  
+  @param  ErrorOut            TRUE if the memory error occured.
+  @param  IfTestAbort         Indicates that the user pressed "ESC" to skip the memory test. 
 
-  @retval EFI_SUCCESS         One block of memory pass test.
-  @retval EFI_NOT_FOUND       Indicate all the non-tested memory blocks have been
-                              already gone through.
-  @retval EFI_DEVICE_ERROR    Memory device error occurs and no agent can handle it.
+  @retval EFI_SUCCESS         One block of memory passed the test.
+  @retval EFI_NOT_FOUND       All memory blocks have already been tested.
+  @retval EFI_DEVICE_ERROR    Memory device error occured, and no agent can handle it.
 
 **/
 typedef
@@ -87,9 +84,7 @@ EFI_STATUS
 
   @param  This                Protocol instance pointer. 
 
-  @retval EFI_SUCCESS         Success. Then free all the generic memory test driver
-                              allocated resource and notify to platform memory
-                              test driver that memory test finished.
+  @retval EFI_SUCCESS         Success. All resources used in the memory test are freed.
 
 **/
 typedef
@@ -99,8 +94,8 @@ EFI_STATUS
   );
 
 /**
-  Provide capability to test compatible range used by some sepcial
-  driver before BDS perform memory test.
+  Provides the capability to test the compatible range used by a special
+  driver.
 
   @param  This                Protocol instance pointer. 
   @param  StartAddress        The start address of the compatible memory range that
