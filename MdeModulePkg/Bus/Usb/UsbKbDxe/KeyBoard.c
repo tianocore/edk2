@@ -911,7 +911,7 @@ InitUSBKeyboard (
 
   gBS->CreateEvent (
          EVT_TIMER | EVT_NOTIFY_SIGNAL,
-         TPL_NOTIFY,
+         TPL_CALLBACK,
          USBKeyboardRepeatHandler,
          UsbKeyboardDevice,
          &UsbKeyboardDevice->RepeatTimer
