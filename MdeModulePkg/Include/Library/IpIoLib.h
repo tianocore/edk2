@@ -1,6 +1,6 @@
 /** @file
   Ihis library is only intended to be used by UEFI network stack modules.
-  It provides IpIo layer upon EFI IP4 Protocol.
+  It provides the IpIo layer on the EFI IP4 Protocol.
 
 Copyright (c) 2005 - 2008, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/NetLib.h>
 
 //
-// type and code define for ICMP protocol error got
+// type and code define for ICMP protocol error 
 // from IP
 //
 #define ICMP_TYPE_UNREACH              3
@@ -44,7 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ICMP_CODE_UNREACH_TOSHOST      12
 
 /**
-  Get the IP header length from EFI_IP4_HEADER struct. HeaderLength is
+  Get the IP header length from the struct EFI_IP4_HEADER. HeaderLength is
   Internet header length in 32-bit words, so HeaderLength<<2 is the real
   length of IP header.
   
@@ -98,7 +98,7 @@ typedef enum {
 } ICMP_ERROR;
 
 ///
-/// The helper struct for IpIoGetIcmpErrStatus(). It is internal-use only.
+/// The helper struct for IpIoGetIcmpErrStatus(). It is for internal use only.
 ///
 typedef struct {
   BOOLEAN     IsHard;
@@ -121,7 +121,7 @@ typedef struct _EFI_NET_SESSION_DATA {
   @param[in] IcmpErr       Valid when Status is EFI_ICMP_ERROR
   @param[in] NetSession    The IP session for the received packet
   @param[in] Pkt           Packet received
-  @param[in] Context       The data provided by user for the received packet when
+  @param[in] Context       The data provided by the user for the received packet when
                            the callback is registered in IP_IO_OPEN_DATA::RcvdContext.
   
 **/
@@ -155,7 +155,7 @@ VOID
   );
 
 ///
-/// The data structure wraps Ip4 instance. It is used by IpIo Library to do all
+/// This data structure wraps Ip4 instances. The IpIo Library uses it for all
 /// Ip4 operations.
 ///
 typedef struct _IP_IO {
@@ -203,7 +203,7 @@ typedef struct _IP_IO {
 } IP_IO;
 
 ///
-/// The struct is used for user to pass IP configuration and callbacks to IP_IO.
+/// The struct is for the user to pass IP configuration and callbacks to IP_IO.
 /// It is used by IpIoOpen().
 ///
 typedef struct _IP_IO_OPEN_DATA {
@@ -289,8 +289,8 @@ IpIoDestroy (
 /**
   Stop an IP_IO instance.
   
-  This function is paired with IpIoOpen(). The IP_IO will be unconfigured and all
-  the pending send/receive tokens will be canceled.
+  This function is paired with IpIoOpen(). The IP_IO will be unconfigured, and all
+  pending send/receive tokens will be canceled.
 
   @param[in, out]  IpIo            Pointer to the IP_IO instance that needs to stop.
 
@@ -334,14 +334,14 @@ IpIoOpen (
   Send out an IP packet.
   
   This function is called after IpIoOpen(). The data to be sent are wrapped in
-  Pkt. The IP instance wrapped in IpIo is used for sending by default but can be
-  overriden by Sender. Other sending configs, like source address and gateway
-  address etc., are specified in OverrideData.
+  Pkt. The IP instance wrapped in IpIo is used for sending by default, but can be
+  overriden by Sender. Other sending configurations, such as source address and gateway
+  address, are specified in OverrideData.
 
   @param[in, out]  IpIo                  Pointer to an IP_IO instance used for sending IP
                                          packet.
   @param[in, out]  Pkt                   Pointer to the IP packet to be sent.
-  @param[in]       Sender                The IP protocol instance used for sending.
+  @param[in]       Sender                Optional. The IP protocol instance used for sending.
   @param[in]       Context               Optional context data.
   @param[in]       NotifyData            Optional notify data.
   @param[in]       Dest                  The destination IP address to send this packet to.
@@ -386,8 +386,8 @@ IpIoCancelTxToken (
   can later use IpIoFindSender() to get the IP_IO and call IpIoSend() to send
   data.
 
-  @param[in, out]  IpIo               Pointer to a IP_IO instance to add a new IP
-                                      instance for sending purpose.
+  @param[in, out]  IpIo               Pointer to an IP_IO instance to add a new IP
+                                      instance for sending purposes.
 
   @return Pointer to the created IP_IO_IP_INFO structure, NULL if failed.
 
@@ -404,14 +404,14 @@ IpIoAddIp (
 
   @param[in, out]  IpInfo          Pointer to the IP_IO_IP_INFO instance.
   @param[in, out]  Ip4ConfigData   The IP4 configure data used to configure the IP
-                                   instance, if NULL the IP instance is reset. If
+                                   instance. If NULL, the IP instance is reset. If
                                    UseDefaultAddress is set to TRUE, and the configure
                                    operation succeeds, the default address information
                                    is written back in this Ip4ConfigData.
 
-  @retval          EFI_SUCCESS     The IP instance of this IpInfo is configured successfully
-                                   or no need to reconfigure it.
-  @retval          Others          Configuration fails.
+  @retval          EFI_SUCCESS     The IP instance of this IpInfo is configured successfully,
+                                   or there is no need to reconfigure it.
+  @retval          Others          Configuration failed.
 
 **/
 EFI_STATUS
@@ -442,7 +442,7 @@ IpIoRemoveIp (
 
 /**
   Find the first IP protocol maintained in IpIo whose local
-  address is the same with Src.
+  address is the same as Src.
   
   This function is called when the caller needs the IpIo to send data to the
   specified Src. The IpIo was added previously by IpIoAddIp().

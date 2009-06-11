@@ -1,5 +1,5 @@
 /** @file
-  Ihis library is only intended to be used by UEFI network stack modules.
+  This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access UDP service. It is used by both DHCP and MTFTP.
 
 Copyright (c) 2006 - 2008, Intel Corporation.<BR>
@@ -42,12 +42,12 @@ typedef struct {
 } UDP_POINTS;
 
 /**
-  Prototype called when receiving or sending packets from/to a UDP point.
+  Prototype called when receiving or sending packets to or from a UDP point.
 
   This prototype is used by both receive and sending when calling
-  UdpIoRecvDatagram() or UdpIoSendDatagram(). When receiving, Netbuf is allocated by
-  UDP access point, and released by user. When sending, the NetBuf is from user,
-  and provided to the callback as a reference.
+  UdpIoRecvDatagram() or UdpIoSendDatagram(). When receiving, Netbuf is allocated by the
+  UDP access point and released by the user. When sending, the user allocates the the NetBuf, which is then
+  provided to the callback as a reference.
   
   @param[in] Packet       Packet received or sent
   @param[in] Points       The Udp4 address pair corresponds to the Udp4 IO
@@ -65,7 +65,7 @@ VOID
   );
 
 ///
-/// This structure is used internally by UdpIo Library.
+/// This structure is used internally by the UdpIo Library.
 ///
 /// Each receive request is wrapped in an UDP_RX_TOKEN. Upon completion,
 /// the CallBack will be called. Only one receive request is sent to UDP at a
@@ -87,7 +87,7 @@ typedef struct {
 /// This structure is used internally by UdpIo Library.
 ///
 /// Each transmit request is wrapped in an UDP_TX_TOKEN. Upon completion,
-/// the CallBack will be called. There can be several transmit requests and they
+/// the CallBack will be called. There can be several transmit requests. All transmit requests
 /// are linked in a list.
 ///
 typedef struct {
@@ -109,8 +109,8 @@ typedef struct {
 ///
 /// Type defined as UDP_IO_PORT.
 ///
-/// The data structure wraps Udp4 instance and its configuration. It is used by
-/// UdpIo Library to do all Udp4 operations.
+/// This data structure wraps the Udp4 instance and configuration. 
+/// UdpIo Library uses this structure for all Udp4 operations.
 ///
 struct _UDP_IO_PORT {
   UINT32                    Signature;
@@ -140,7 +140,7 @@ struct _UDP_IO_PORT {
   @param[in] UdpIo         The UDP_IO_PORT to configure
   @param[in] Context       User-defined data when calling UdpIoCreatePort()
   
-  @retval EFI_SUCCESS  The configure process succeeds
+  @retval EFI_SUCCESS  The configuration succeeded
   @retval Others       The UDP_IO_PORT fails to configure indicating
                        UdpIoCreatePort() should fail
 **/
@@ -157,7 +157,7 @@ EFI_STATUS
   @param[in] Token        The UDP_TX_TOKEN to decide whether to cancel
   @param[in] Context      User-defined data in UdpIoCancelDgrams()
   
-  @retval TRUE        To cancel the UDP_TX_TOKEN
+  @retval TRUE        Cancel the UDP_TX_TOKEN
   @retval FALSE       Do not cancel this UDP_TX_TOKEN
 
 **/
@@ -169,13 +169,12 @@ BOOLEAN
   );
 
 /**
-  Cancel all the sent datagram that pass the selection criteria of ToCancel.
+  Cancel all sent datagrams selected by the parameter ToCancel.
   If ToCancel is NULL, all the datagrams are cancelled.
 
   @param[in]  UdpIo                 The UDP_IO_PORT to cancel packet.
   @param[in]  IoStatus              The IoStatus to return to the packet owners.
-  @param[in]  ToCancel              The select funtion to test whether to cancel this
-                                    packet or not.
+  @param[in]  ToCancel              Sets the criteria for canceling a packet. 
   @param[in]  Context               The opaque parameter to the ToCancel.
 
 **/
@@ -189,14 +188,14 @@ UdpIoCancelDgrams (
   );
 
 /**
-  Create a UDP_IO_PORT to access the UDP service. It will create and configure
+  Creates a UDP_IO_PORT to access the UDP service. It creates and configures
   a UDP child.
   
-  The function will locate the UDP service binding prototype on the Controller
-  parameter and use it to create a UDP child (aka Udp instance). Then the UDP
-  child will be configured by calling Configure function prototype. Any failures
-  in creating or configure the UDP child will lead to the failure of UDP_IO_PORT
-  creation.
+  This function:
+  # locates the UDP service binding prototype on the Controller parameter
+  # uses the UDP service binding prototype to create a UDP child (also known as a UDP instance)
+  # configures the UDP child by calling Configure function prototype. 
+  Any failures in creating or configuring the UDP child return NULL for failure. 
 
   @param[in]  Controller            The controller that has the UDP service binding.
                                     protocol installed.
@@ -219,7 +218,7 @@ UdpIoCreatePort (
 /**
   Free the UDP_IO_PORT and all its related resources.
   
-  The function will cancel all sent datagram and receive request.
+  The function cancels all sent datagrams and receive requests.
 
   @param[in]  UdpIo                 The UDP_IO_PORT to free.
 
@@ -233,11 +232,10 @@ UdpIoFreePort (
   );
 
 /**
-  Clean up the UDP_IO_PORT without freeing it. The function is called when
-  user wants to re-use the UDP_IO_PORT later.
+  Cleans up the UDP_IO_PORT without freeing it. Call this function 
+  if you intend to later re-use the UDP_IO_PORT.
   
-  It will release all the transmitted datagrams and receive request. It will
-  also configure NULL for the UDP instance.
+  This function releases all transmitted datagrams and receive requests and configures NULL for the UDP instance.
 
   @param[in]  UdpIo                 The UDP_IO_PORT to clean up.
 
@@ -249,15 +247,15 @@ UdpIoCleanPort (
   );
 
 /**
-  Send a packet through the UDP_IO_PORT.
+  Sends a packet through the UDP_IO_PORT.
   
-  The packet will be wrapped in UDP_TX_TOKEN. Function Callback will be called
-  when the packet is sent. The optional parameter EndPoint overrides the default
-  address pair if specified.
+  The packet will be wrapped in UDP_TX_TOKEN. The function specific in the CallBack parameter will be called
+  when the packet is sent. If specified, the optional parameter EndPoint overrides the default
+  address pair.
 
   @param[in]  UdpIo                 The UDP_IO_PORT to send the packet through.
   @param[in]  Packet                The packet to send.
-  @param[in]  EndPoint              The local and remote access point. Override the
+  @param[in]  EndPoint              The local and remote access point. Overrides the
                                     default address pair set during configuration.
   @param[in]  Gateway               The gateway to use.
   @param[in]  CallBack              The function being called when packet is
@@ -283,7 +281,7 @@ UdpIoSendDatagram (
 /**
   Cancel a single sent datagram.
 
-  @param[in]  UdpIo                 The UDP_IO_PORT to cancel the packet from
+  @param[in]  UdpIo                 The UDP_IO_PORT from which to cancel the packet 
   @param[in]  Packet                The packet to cancel
 
 **/
@@ -298,7 +296,7 @@ UdpIoCancelSentDatagram (
   Issue a receive request to the UDP_IO_PORT.
   
   This function is called when upper-layer needs packet from UDP for processing.
-  Only one receive request is acceptable at a time so a common usage model is
+  Only one receive request is acceptable at a time. Therefore, one common usage model is
   to invoke this function inside its Callback function when the former packet
   is processed.
 

@@ -1,6 +1,6 @@
 /** @file
   System reset Library Services.  This library class defines a set of
-  methods to reset whole system.
+  methods that reset the whole system.
 
   Copyright (c) 2005 - 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -17,13 +17,12 @@
 #define __RESET_SYSTEM_LIB_H__
 
 /**
-  Calling this function causes a system-wide reset. This sets
-  all circuitry within the system to its initial state. This type of reset 
+  This function causes a system-wide reset (cold reset), in which
+  all circuitry within the system returns to its initial state. This type of reset 
   is asynchronous to system operation and operates without regard to 
   cycle boundaries.
 
-  System reset should not return, if it returns, it means the system does 
-  not support cold reset.
+  If this function returns, it means that the system does not support cold reset. 
 **/
 VOID
 EFIAPI
@@ -32,11 +31,10 @@ ResetCold (
   );
 
 /**
-  Calling this function causes a system-wide initialization. The processors 
-  are set to their initial state, and pending cycles are not corrupted.
+  This function causes a system-wide initialization (warm reset), in which all processors 
+  are set to their initial state. Pending cycles are not corrupted.
 
-  System reset should not return, if it returns, it means the system does 
-  not support warm reset.
+  If this function returns, it means that the system does not support warm reset.
 **/
 VOID
 EFIAPI
@@ -45,10 +43,10 @@ ResetWarm (
   );
 
 /**
-  Calling this function causes the system to enter a power state equivalent 
+  This function causes the system to enter a power state equivalent 
   to the ACPI G2/S5 or G3 states.
   
-  System shutdown should not return, if it returns, it means the system does 
+  If this function returns, it means the system does 
   not support shut down reset.
 **/
 VOID
@@ -58,11 +56,11 @@ ResetShutdown (
   );
 
 /**
-  Calling this function causes the system to enter S3 and then
+  This function causes the system to enter S3 and then
   wake up immediately.
   
-  Reset update should not return, if it returns, it means the
-  library does not the feature.
+  If this function returns, it means the
+  system does not support the feature.
 **/
 VOID
 EFIAPI

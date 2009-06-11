@@ -1,8 +1,8 @@
 /** @file
-Fault Tolerant Write protocol provides boot-time service to do fault tolerant 
+Fault Tolerant Write protocol provides boot-time service for fault tolerant 
 write capability for block devices.  The protocol provides for non-volatile 
-intermediate storage of the data and private information a caller would need to 
-recover from a critical fault, such as power failure.   
+storage of the intermediate data and private information a caller would need to 
+recover from a critical fault, such as a power failure.   
 
 Copyright (c) 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -29,11 +29,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _EFI_FAULT_TOLERANT_WRITE_PROTOCOL  EFI_FAULT_TOLERANT_WRITE_PROTOCOL;
 
 /**
-  Query the largest block that may be updated in a fault tolerant manner.
+  Get the size of the largest block that can be updated in a fault-tolerant manner.
 
   @param  This                 Indicates a pointer to the calling context.
-  @param  BlockSize            A pointer to a caller allocated UINTN that is
-                               updated to  indicate the size of the largest block
+  @param  BlockSize            A pointer to a caller-allocated UINTN that is
+                               updated to indicate the size of the largest block
                                that can be updated.
 
   @retval EFI_SUCCESS          The function completed successfully
@@ -49,22 +49,22 @@ EFI_STATUS
 
 /**
   Allocates space for the protocol to maintain information about writes.
-  Since writes must be completed in a fault tolerant manner and multiple
-  updates will require more resources to be successful, this function
+  Since writes must be completed in a fault-tolerant manner and multiple
+  writes require more resources to be successful, this function
   enables the protocol to ensure that enough space exists to track
-  information about the upcoming writes.
+  information about upcoming writes.
 
-  @param  This                 Indicates a pointer to the calling context.
+  @param  This                 A pointer to the calling context.
   @param  CallerId             The GUID identifying the write.
   @param  PrivateDataSize      The size of the caller's private data  that must be
                                recorded for each write.
-  @param  NumberOfWrites       The number of fault tolerant block writes  that will
+  @param  NumberOfWrites       The number of fault tolerant block writes that will
                                need to occur.
 
   @retval EFI_SUCCESS          The function completed successfully
   @retval EFI_ABORTED          The function could not complete successfully.
-  @retval EFI_ACCESS_DENIED    All allocated writes have not been completed.   All
-                               writes must be completed or aborted before  another
+  @retval EFI_ACCESS_DENIED    Not all allocated writes have been completed.  All
+                               writes must be completed or aborted before another
                                fault tolerant write can occur.
 
 **/
@@ -79,7 +79,7 @@ EFI_STATUS
 
 /**
   Starts a target block update. This records information about the write
-  in fault tolerant storage and will complete the write in a recoverable
+  in fault tolerant storage, and will complete the write in a recoverable
   manner, ensuring at all times that either the original contents or
   the modified contents are available.
 
@@ -89,18 +89,18 @@ EFI_STATUS
                                data.
   @param  Length               The number of bytes to write to the target block.
   @param  PrivateData          A pointer to private data that the caller requires
-                               to  complete any pending writes in the event of a
+                               to complete any pending writes in the event of a
                                fault.
   @param  FvBlockHandle        The handle of FVB protocol that provides services
-                               for  reading, writing, and erasing the target block.
+                               for reading, writing, and erasing the target block.
   @param  Buffer               The data to write.
 
   @retval EFI_SUCCESS          The function completed successfully
   @retval EFI_ABORTED          The function could not complete successfully.
-  @retval EFI_BAD_BUFFER_SIZE  The write would span a block boundary,  which is not
+  @retval EFI_BAD_BUFFER_SIZE  The write would span a block boundary, which is not
                                a valid action.
   @retval EFI_ACCESS_DENIED    No writes have been allocated.
-  @retval EFI_NOT_READY        The last write has not been completed.   Restart ()
+  @retval EFI_NOT_READY        The last write has not been completed. Restart()
                                must be called to complete it.
 
 **/
@@ -122,7 +122,7 @@ EFI_STATUS
 
   @param  This                 Calling context.
   @param  FvBlockProtocol      The handle of FVB protocol that provides services
-                               for  reading, writing, and erasing the target block.
+                               for reading, writing, and erasing the target block.
 
   @retval EFI_SUCCESS          The function completed successfully
   @retval EFI_ABORTED          The function could not complete successfully.
@@ -137,7 +137,7 @@ EFI_STATUS
   );
 
 /**
-  Aborts all previous allocated writes.
+  Aborts all previously allocated writes.
 
   @param  This                 Calling context
 
@@ -153,8 +153,8 @@ EFI_STATUS
   );
 
 /**
-  Starts a target block update. This records information about the write
-  in fault tolerant storage and will complete the write in a recoverable
+  Starts a target block update. This function records information about the write
+  in fault tolerant storage and completes the write in a recoverable
   manner, ensuring at all times that either the original contents or
   the modified contents are available.
 
@@ -163,13 +163,13 @@ EFI_STATUS
   @param  Lba                  The logical block address of the last write.
   @param  Offset               The offset within the block of the last write.
   @param  Length               The length of the last write.
-  @param  PrivateDataSize      On input, the size of the PrivateData buffer.   On
-                               output, the size of the private data stored  for
+  @param  PrivateDataSize      On input, the size of the PrivateData buffer. On
+                               output, the size of the private data stored for
                                this write.
   @param  PrivateData          A pointer to a buffer. The function will copy
-                               PrivateDataSize bytes from the private data  stored
+                               PrivateDataSize bytes from the private data stored
                                for this write.
-  @param  Complete             A Boolean value with TRUE indicating  that the write
+  @param  Complete             A Boolean value with TRUE indicating that the write
                                was completed.
 
   @retval EFI_SUCCESS          The function completed successfully

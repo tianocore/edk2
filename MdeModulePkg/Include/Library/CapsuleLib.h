@@ -1,6 +1,6 @@
 /** @file
 
-  This library class defines a set of interfaces on how to process capusle image update.
+  This library class defines a set of interfaces for how to process capsule image updates.
 
   Copyright (c) 2007 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -32,12 +32,12 @@ SupportCapsuleImage (
   );
 
 /**
-  The firmware specific implementation processes the capsule image
+  The firmware-specific implementation processes the capsule image
   if it recognized the format of this capsule image.
   
   @param  CapsuleHeader    Point to the UEFI capsule image to be processed. 
    
-  @retval EFI_SUCESS       Process Capsule Image successfully. 
+  @retval EFI_SUCESS       Capsule Image was processed successfully. 
   @retval EFI_UNSUPPORTED  Capsule image is not supported by the firmware.
 **/
 EFI_STATUS

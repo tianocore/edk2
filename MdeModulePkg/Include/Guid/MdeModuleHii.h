@@ -151,7 +151,7 @@ typedef struct _EFI_IFR_GUID_SUBCLASS {
   { 0x31ca5d1a, 0xd511, 0x4931, { 0xb7, 0x82, 0xae, 0x6b, 0x2b, 0x17, 0x8c, 0xd7 } }
 
 ///
-/// Two extended opcode are added, new extension can be added here later.
+/// Two extended opcodes are added, and new extensions can be added here later.
 /// One is for framework OneOf question Option Key value,
 /// Another is for framework vareqval.
 ///
