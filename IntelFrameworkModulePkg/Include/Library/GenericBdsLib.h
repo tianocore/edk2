@@ -768,6 +768,26 @@ SetupResetReminder (
   VOID
   );
 
+
+//
+// Define the boot option default description 
+// NOTE: This is not defined in UEFI spec.
+//
+#define DESCRIPTION_FLOPPY        L"EFI Floppy"
+#define DESCRIPTION_FLOPPY_NUM    L"EFI Floppy %d"
+#define DESCRIPTION_DVD           L"EFI DVD/CDROM"
+#define DESCRIPTION_DVD_NUM       L"EFI DVD/CDROM %d"
+#define DESCRIPTION_USB           L"EFI USB Device"
+#define DESCRIPTION_USB_NUM       L"EFI USB Device %d"
+#define DESCRIPTION_SCSI          L"EFI SCSI Device"
+#define DESCRIPTION_SCSI_NUM      L"EFI SCSI Device %d"
+#define DESCRIPTION_MISC          L"EFI Misc Device"
+#define DESCRIPTION_MISC_NUM      L"EFI Misc Device %d"
+#define DESCRIPTION_NETWORK       L"EFI Network"
+#define DESCRIPTION_NETWORK_NUM   L"EFI Network %d"       
+#define DESCRIPTION_NON_BLOCK     L"EFI Non-Block Boot Device"
+#define DESCRIPTION_NON_BLOCK_NUM L"EFI Non-Block Boot Device %d"
+
 //
 // Define the boot type which to classify the boot option type
 // Different boot option type could have different boot behavior
@@ -785,6 +805,7 @@ SetupResetReminder (
 #define  BDS_EFI_MESSAGE_ATAPI_BOOT       0x0301 // Type 03; Sub-Type 01
 #define  BDS_EFI_MESSAGE_SCSI_BOOT        0x0302 // Type 03; Sub-Type 02
 #define  BDS_EFI_MESSAGE_USB_DEVICE_BOOT  0x0305 // Type 03; Sub-Type 05
+#define  BDS_EFI_MESSAGE_SATA_BOOT        0x0318 // Type 03; Sub-Type 18
 #define  BDS_EFI_MESSAGE_MISC_BOOT        0x03FF
 //
 // Media boot type
@@ -881,7 +902,30 @@ BdsLibIsValidEFIBootOptDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevPath,
   IN BOOLEAN                      CheckMedia
   );
-  
+
+/**
+  Check whether the Device path in a boot option point to a valid bootable device,
+  And if CheckMedia is true, check the device is ready to boot now.
+  If Description is not NULL and the device path point to a fixed BlockIo
+  device, check the description whether conflict with other auto-created
+  boot options.
+
+  @param  DevPath     the Device path in a boot option
+  @param  CheckMedia  if true, check the device is ready to boot now.
+  @param  Description the description in a boot option
+
+  @retval TRUE        the Device path  is valid
+  @retval FALSE       the Device path  is invalid .
+
+**/
+BOOLEAN
+EFIAPI
+BdsLibIsValidEFIBootOptDevicePathExt (
+  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath,
+  IN BOOLEAN                      CheckMedia,
+  IN CHAR16                       *Description
+  );
+
 /**
   For a bootable Device path, return its boot type.
 
