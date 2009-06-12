@@ -387,7 +387,7 @@ IsaIoUnmap (
     // Free the mapped buffer and the MAP_INFO structure.
     //
     gBS->FreePages (IsaMapInfo->MappedHostAddress, IsaMapInfo->NumberOfPages);
-    gBS->FreePool (IsaMapInfo);
+    FreePool (IsaMapInfo);
   }
 
   return EFI_SUCCESS;
@@ -822,7 +822,7 @@ IsaIoMapOnlySupportSlaveReadWrite (
                     &IsaMapInfo->MappedHostAddress
                     );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (IsaMapInfo);
+      FreePool (IsaMapInfo);
       *NumberOfBytes  = 0;
       *Mapping        = NULL;
       return Status;
@@ -1129,7 +1129,7 @@ IsaIoMapFullSupport (
                     &IsaMapInfo->MappedHostAddress
                     );
     if (EFI_ERROR (Status)) {
-      gBS->FreePool (IsaMapInfo);
+      FreePool (IsaMapInfo);
       *NumberOfBytes  = 0;
       *Mapping        = NULL;
       return Status;

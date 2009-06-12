@@ -522,8 +522,8 @@ IsaBusControllerDriverStop (
                       );
 
       if (!EFI_ERROR (Status)) {
-        gBS->FreePool (IsaIoDevice->DevicePath);
-        gBS->FreePool (IsaIoDevice);
+        FreePool (IsaIoDevice->DevicePath);
+        FreePool (IsaIoDevice);
       } else {
         //
         // Re-open PCI IO Protocol on behalf of the child device
@@ -660,10 +660,10 @@ Done:
 
   if (EFI_ERROR (Status)) {
     if (IsaIoDevice->DevicePath != NULL) {
-      gBS->FreePool (IsaIoDevice->DevicePath);
+      FreePool (IsaIoDevice->DevicePath);
     }
 
-    gBS->FreePool (IsaIoDevice);
+    FreePool (IsaIoDevice);
   }
 
   return Status;
