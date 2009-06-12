@@ -53,22 +53,6 @@
   -->
 </style>
 
-<h2 class="main-title">
-  Step-by-step (walk-throughs) for building with edk2
-</h2>
-
-<p class="main-details">
-  This page contains some step-by-step guides in an attempt to give
-  a highly detailed description of how to set up building on an edk2
-  system.&nbsp;
-  A few different operating systems are targeted.&nbsp;
-  It is hoped that these examples can either provide exact steps for
-  setting up an edk2 build environment.&nbsp;
-  If instructions are not available for your exact system configuration,
-  you may still be able to tweak the instructions to work on your
-  system.
-</p>
-
 <!--
  #
  # Getting started for unix-like systems
@@ -689,4 +673,21 @@ bash$ <b>make -C acpica-unix-20090521/compiler</b>
 bash$ <b>ln -s ~/src/acpica-unix-20090521/compiler/iasl ~/programs/iasl</b>
 </pre>
 
+<!--
+ #
+ # Building OVMF
+ #
+-->
+<h2 class="main-title">
+  Build <a href="OVMF.html">OVMF</a> (OPTIONAL)
+</h2>
+
+<p class="build-step-details">
+  Once your build environment is set up you might be interested in
+  <a href="build-ovmf.html">building the OVMF</a>
+  platform which is included in the main edk2 source tree.&nbsp;
+  Since OVMF builds a full system firmware image
+  this may be of more interest to UEFI system firmware developers,
+  rather than application or driver developers.
+</p>
 
