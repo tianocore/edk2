@@ -47,7 +47,7 @@
     border: hidden;
   }
 
-  td {
+  td.dsc-table {
     text-align: center;
     padding-left: 1em;
   }
@@ -135,29 +135,38 @@
   ACTIVE_PLATFORM and TARGET_ARCH in Conf/target.txt.
 </p>
 
-<table class="build-step-details">
+<table class="build-step-details dsc-table">
   <tr>
-    <td>
+    <td class="dsc-table">
       <u>ACTIVE_PLATFORM</u>
     </td>
-    <td>
+    <td class="dsc-table">
       <u>TARGET_ARCH</u>
     </td>
-    <td>
+    <td class="dsc-table">
       <u>PEI code</u>
     </td>
-    <td>
+    <td class="dsc-table">
       <u>DXE/UEFI code</u>
     </td>
   </tr>
   <tr>
-    <td>OvmfPkg/OvmfPkgIa32.dsc</td><td>IA32</td><td>IA32</td><td>IA32</td>
+    <td class="dsc-table">OvmfPkg/OvmfPkgIa32.dsc</td>
+    <td class="dsc-table">IA32</td>
+    <td class="dsc-table">IA32</td>
+    <td class="dsc-table">IA32</td>
   </tr>
   <tr>
-    <td>OvmfPkg/OvmfPkgIa32X64.dsc</td><td>IA32 X64</td><td>IA32</td><td>X64</td>
+    <td class="dsc-table">OvmfPkg/OvmfPkgIa32X64.dsc</td>
+    <td class="dsc-table">IA32 X64</td>
+    <td class="dsc-table">IA32</td>
+    <td class="dsc-table">X64</td>
   </tr>
   <tr>
-    <td>OvmfPkg/OvmfPkgX64.dsc</td><td>X64</td><td>X64</td><td>X64</td>
+    <td class="dsc-table">OvmfPkg/OvmfPkgX64.dsc</td>
+    <td class="dsc-table">X64</td>
+    <td class="dsc-table">X64</td>
+    <td class="dsc-table">X64</td>
   </tr>
 </table>
 
