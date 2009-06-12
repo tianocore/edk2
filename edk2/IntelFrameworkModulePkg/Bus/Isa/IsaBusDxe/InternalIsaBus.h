@@ -16,8 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _INTERNAL_ISA_BUS_H_
 
 
-#include <PiDxe.h>
-#include <FrameworkDxe.h>
+#include <Uefi.h>
 
 #include <Protocol/PciIo.h>
 #include <Protocol/ComponentName.h>
