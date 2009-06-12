@@ -78,7 +78,6 @@
 [Guids]
   gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
   gEfiMiscSubClassGuid                          # SOMETIMES_CONSUMED
-  gEfiMemoryProducerGuid                        # SOMETIMES_CONSUMED
   gEfiMemorySubClassGuid                        # SOMETIMES_CONSUMED
 
 [Protocols]

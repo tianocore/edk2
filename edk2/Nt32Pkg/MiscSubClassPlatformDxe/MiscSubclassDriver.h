@@ -25,7 +25,6 @@ Abstract:
 #include <FrameworkDxe.h>
 #include <WinNtDxe.h>
 #include <Guid/DataHubRecords.h>
-#include <Guid/DataHubProducer.h>
 #include <Protocol/DataHub.h>
 #include <Protocol/WinNtIo.h>
 #include <Library/BaseLib.h>

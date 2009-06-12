@@ -25,7 +25,6 @@ Abstract:
 
 #include <Guid/HobList.h>
 #include <Guid/SmBios.h>
-#include <Guid/DataHubProducer.h>
 #include <Guid/DataHubRecords.h>
 
 #include <Protocol/DataHub.h>

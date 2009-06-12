@@ -91,7 +91,7 @@ InstallProcessorDataHub (
   Status = gDataHub->LogData (
                        gDataHub,
                        &gEfiProcessorSubClassGuid,
-                       &gEfiMiscProducerGuid,
+                       &gEfiCallerIdGuid,
                        EFI_DATA_RECORD_CLASS_DATA,
                        &DataRecord,
                        sizeof (DataRecord.DataRecordHeader) + sizeof (DataRecord.VariableRecord.ProcessorCoreFrequency)
@@ -118,7 +118,7 @@ InstallProcessorDataHub (
   Status = gDataHub->LogData (
                        gDataHub,
                        &gEfiProcessorSubClassGuid,
-                       &gEfiMiscProducerGuid,
+                       &gEfiCallerIdGuid,
                        EFI_DATA_RECORD_CLASS_DATA,
                        &DataRecord,
                        sizeof (DataRecord.DataRecordHeader) + sizeof (DataRecord.VariableRecord.ProcessorVersion)
@@ -172,7 +172,7 @@ InstallMemoryDataHub (
   DataRecord.Record.ArrayStartAddress.MemoryArrayStartAddress = LShiftU64(SmbiosTable.Type19->StartingAddress, 10);
   DataRecord.Record.ArrayStartAddress.MemoryArrayEndAddress = LShiftU64((UINT64) SmbiosTable.Type19->EndingAddress + 1, 10) - 1;
   
-  CopyGuid (&DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName, &gEfiMemoryProducerGuid);
+  CopyGuid (&DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName, &gEfiCallerIdGuid);
   DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.Instance = 0;
   DataRecord.Record.ArrayStartAddress.PhysicalMemoryArrayLink.SubInstance = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
   DataRecord.Record.ArrayStartAddress.MemoryArrayPartitionWidth = (UINT16)(SmbiosTable.Type19->PartitionWidth); 
@@ -180,7 +180,7 @@ InstallMemoryDataHub (
   gDataHub->LogData (
                        gDataHub,
                        &gEfiMemorySubClassGuid,
-                       &gEfiMiscProducerGuid,
+                       &gEfiCallerIdGuid,
                        EFI_DATA_RECORD_CLASS_DATA,
                        &DataRecord,
                        sizeof (DataRecord.Header) + sizeof (DataRecord.Record.ArrayStartAddress)
@@ -256,7 +256,7 @@ InstallMiscDataHub (
   Status = gDataHub->LogData (
                        gDataHub,
                        &gEfiMiscSubClassGuid,
-                       &gEfiMiscProducerGuid,
+                       &gEfiCallerIdGuid,
                        EFI_DATA_RECORD_CLASS_DATA,
                        &DataRecord,
                        sizeof (DataRecord.Header) + sizeof (DataRecord.Record.MiscBiosVendor)
@@ -301,7 +301,7 @@ InstallMiscDataHub (
   Status = gDataHub->LogData (
                        gDataHub,
                        &gEfiMiscSubClassGuid,
-                       &gEfiMiscProducerGuid,
+                       &gEfiCallerIdGuid,
                        EFI_DATA_RECORD_CLASS_DATA,
                        &DataRecord,
                        sizeof (DataRecord.Header) + sizeof (DataRecord.Record.MiscSystemManufacturer)
@@ -346,7 +346,7 @@ DataHubGenEntrypoint (
   }
   
   gStringHandle = HiiAddPackages (
-                    &gEfiMiscProducerGuid,
+                    &gEfiCallerIdGuid,
                     NULL,
                     DataHubGenDxeStrings,
                     NULL

@@ -54,9 +54,7 @@
   gEfiProcessorSubClassGuid
   gEfiMiscSubClassGuid
   gEfiSmbiosTableGuid
-  gEfiMiscProducerGuid
   gEfiMemorySubClassGuid
-  gEfiMemoryProducerGuid
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid

@@ -54,7 +54,6 @@
   
 [Guids]
   gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
-  gEfiProcessorProducerGuid                     # SOMETIMES_CONSUMED
 
 [Protocols]
   gEfiWinNtIoProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
