@@ -65,7 +65,7 @@
   It is hoped that these examples can either provide exact steps for
   setting up an edk2 build environment.&nbsp;
   If instructions are not available for your exact system configuration,
-  you may still be able to <i>tweak</i> the instructions to work on your
+  you may still be able to tweak the instructions to work on your
   system.
 </p>
 
@@ -150,15 +150,15 @@ bash$ <b>echo this bold text is a sample command \
   </tr>
   <tr>
     <td>
-      <a href="https://buildtools.tianocore.org">Buildtools</a> source tree:
+      <a href="https://buildtools.tianocore.org">BaseTools</a> source tree:
     </td>
     <td>
-      <font class="monospace"><b>~/src/buildtools</b></font>
+      <font class="monospace"><b>~/src/BaseTools</b></font>
     </td>
   </tr>
   <tr>
     <td>
-      gcc x64 cross-compiler installation:
+      GCC X64 cross-compiler installation:
     </td>
     <td>
       <font class="monospace"><b>~/programs/gcc/x64</b></font>
@@ -210,6 +210,17 @@ bash$ <b>export ftp_proxy=$http_proxy</b>
     <li><a href="#Ubuntu9.04">Ubuntu 9.04</a></li>
   </ul>
 </font>
+
+<h2 class="main-title">
+  Intel ASL compiler
+</h2>
+
+<p class="build-step-details">
+  Additionally, instructions are provided for
+  <a href="#iasl">installing the Intel ASL</a>
+  compiler for use with edk2.&nbsp;
+  (This is not required for all edk2 developers.)
+</p>
 
 <!--
  #
@@ -642,4 +653,40 @@ bash$ <b>build</b>
 <pre class="build-step-code">
 bash$ <b>ls Build/MdeModule/DEBUG_UNIXGCC/X64/HelloWorld.efi</b>
 </pre>
+
+<!--
+ #
+ # Installing iasl
+ #
+-->
+<h2 class="main-title">
+  <a name="iasl"></a>
+  Install the Intel ASL (iasl) compiler (OPTIONAL)
+</h2>
+
+<p class="build-step-details">
+  The Intel ASL compiler is not required for all edk2 developers.&nbsp;
+  For example, it is unlikely that UEFI Application or UEFI Driver builds
+  will need an ASL compiler.&nbsp;
+  But, if you are building an entire system firmware image, then you may
+  need an ASL compiler.&nbsp;
+  For example, the edk2 OVMF sample platform does require an ASL compiler
+  in order to be built.
+</p>
+
+<p class="build-step-details">
+  First, download the latest ACPI-CA release from
+  <a href="http://www.acpica.org">http://www.acpica.org</a>.&nbsp;
+  At this time, the latest versions of ACPI-CA are not building on Mac OS X,
+  so please use the release from 20081031 instead.
+</p>
+
+<pre class="build-step-code">
+bash$ <b>cd ~/src</b>
+bash$ <b>wget http://www.acpica.org/download/acpica-unix-20090521.tar.gz</b>
+bash$ <b>tar -zxf acpica-unix-20090521.tar.gz</b>
+bash$ <b>make -C acpica-unix-20090521/compiler</b>
+bash$ <b>ln -s ~/src/acpica-unix-20090521/compiler/iasl ~/programs/iasl</b>
+</pre>
+
 
