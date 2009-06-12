@@ -1,7 +1,7 @@
 /** @file
   This protocol defines the generic memory test interfaces in Dxe phase.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,7 +59,7 @@ EFI_STATUS
   @param  This                Protocol instance pointer. 
   @param  TestedMemorySize    Return the tested extended memory size. 
   @param  TotalMemorySize     Return the whole system physical memory size. 
-  														The total memory size does not include memory in a slot with a disabled DIMM.  
+                              The total memory size does not include memory in a slot with a disabled DIMM.  
   @param  ErrorOut            TRUE if the memory error occured.
   @param  IfTestAbort         Indicates that the user pressed "ESC" to skip the memory test. 
 
@@ -94,8 +94,7 @@ EFI_STATUS
   );
 
 /**
-  Provides the capability to test the compatible range used by a special
-  driver.
+  Provides the capability to test the compatible range used by some special drivers.
 
   @param  This                Protocol instance pointer. 
   @param  StartAddress        The start address of the compatible memory range that

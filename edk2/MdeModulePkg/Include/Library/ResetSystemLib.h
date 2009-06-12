@@ -46,8 +46,7 @@ ResetWarm (
   This function causes the system to enter a power state equivalent 
   to the ACPI G2/S5 or G3 states.
   
-  If this function returns, it means the system does 
-  not support shut down reset.
+  If this function returns, it means that the system does not support shut down reset.
 **/
 VOID
 EFIAPI
@@ -56,11 +55,9 @@ ResetShutdown (
   );
 
 /**
-  This function causes the system to enter S3 and then
-  wake up immediately.
+  This function causes the system to enter S3 and then wake up immediately.
   
-  If this function returns, it means the
-  system does not support the feature.
+  If this function returns, it means that the system does not support S3 feature.
 **/
 VOID
 EFIAPI

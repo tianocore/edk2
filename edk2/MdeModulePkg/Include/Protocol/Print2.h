@@ -29,13 +29,13 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
   Produces a Null-terminated Unicode string in an output buffer, based on 
   a Null-terminated Unicode format string and a BASE_LIST argument list
   
-  Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
-  and BufferSize.  
+  Produces a Null-terminated Unicode string in the output buffer 
+  specified by StartOfBuffer and BufferSize.  
   The Unicode string is produced by parsing the format string specified by FormatString.  
-  Arguments are pulled from the variable argument list specified by Marker. Marker is constructed based on the 
-  contents of the format string.  
-  This function returns the number of Unicode characters in the produced output buffer, not including
-  the Null-terminator.
+  Arguments are pulled from the variable argument list specified by Marker.
+  Marker is constructed based on the contents of the format string.  
+  This function returns the number of Unicode characters in the produced output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
@@ -43,8 +43,7 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
   If BufferSize > 1 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than 
-  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
-  ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and produced Null-terminated Unicode string
   contains more than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -72,12 +71,12 @@ UINTN
   Produces a Null-terminated Unicode string in an output buffer based on a Null-terminated 
   Unicode format string and variable argument list.
   
-  Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
-  and BufferSize.
+  Produces a Null-terminated Unicode string in the output buffer 
+  specified by StartOfBuffer and BufferSize.
   The Unicode string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list based on the contents of the format string.
-  This function returns the number of Unicode characters in the produced output buffer, not including
-  the Null-terminator.
+  This function returns the number of Unicode characters in the produced output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
@@ -85,8 +84,7 @@ UINTN
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
   If BufferSize > 1 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than 
-  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
-  ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and produced Null-terminated Unicode string
   contains more than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -115,21 +113,20 @@ UINTN
   Produces a Null-terminated Unicode string in an output buffer, based on a Null-terminated
   ASCII format string and a BASE_LIST argument list
   
-  Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
-  and BufferSize.
+  Produces a Null-terminated Unicode string in the output buffer 
+  specified by StartOfBuffer and BufferSize.
   The Unicode string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list specified by Marker based on the 
   contents of the format string.
-  This function returns the number of Unicode characters in the produced output buffer, not including
-  the Null-terminator.
+  This function returns the number of Unicode characters in the produced output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
-  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
-  ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and produced Null-terminated Unicode string
   contains more than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -157,21 +154,19 @@ UINTN
   Produces a Null-terminated Unicode string in an output buffer based on a Null-terminated 
   ASCII format string and a variable argument list.
   
-  Produces a Null-terminated Unicode string in the output buffer specified by StartOfBuffer
-  and BufferSize.
+  Produces a Null-terminated Unicode string in the output buffer 
+  specified by StartOfBuffer and BufferSize.
   The Unicode string is produced by parsing the format string specified by FormatString.
-  Arguments are pulled from the variable argument list based on the contents of the 
-  format string.
-  This function returns the number of Unicode characters in the produced output buffer, not including
-  the Null-terminator.
+  Arguments are pulled from the variable argument list based on the contents of the format string.
+  This function returns the number of Unicode characters in the produced output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0 or 1, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 1 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 1 and StartOfBuffer is not aligned on a 16-bit boundary, then ASSERT().
   If BufferSize > 1 and FormatString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
-  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
-  ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and produced Null-terminated Unicode string
   contains more than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
@@ -250,20 +245,19 @@ UINTN
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
   ASCII format string and a BASE_LIST argument list.
   
-  Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
-  and BufferSize.
+  Produces a Null-terminated ASCII string in the output buffer 
+  pecified by StartOfBuffer and BufferSize.
   The ASCII string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list specified by Marker based on 
   the contents of the format string.
-  This function returns the number of ASCII characters in the output buffer, not including
-  the Null-terminator.
+  This function returns the number of ASCII characters in the output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
-  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
-  ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and produced Null-terminated ASCII string
   contains more than PcdMaximumAsciiStringLength ASCII characters not including the
   Null-terminator, then ASSERT().
@@ -291,20 +285,18 @@ UINTN
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
   ASCII format string and variable argument list.
   
-  Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
-  and BufferSize.
+  Produces a Null-terminated ASCII string in the output buffer 
+  specified by StartOfBuffer and BufferSize.
   The ASCII string is produced by parsing the format string specified by FormatString.
-  Arguments are pulled from the variable argument list based on the contents of the 
-  format string.
-  This function returns the number of ASCII characters in the output buffer, not including
-  the Null-terminator.
+  Arguments are pulled from the variable argument list based on the contents of the format string.
+  This function returns the number of ASCII characters in the output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and FormatString contains more than
-  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then
-  ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and produced Null-terminated ASCII string
   contains more than PcdMaximumAsciiStringLength ASCII characters not including the
   Null-terminator, then ASSERT().
@@ -333,21 +325,20 @@ UINTN
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
   Unicode format string and a BASE_LIST argument list.
   
-  Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
-  and BufferSize.
+  Produces a Null-terminated ASCII string in the output buffer 
+  specified by StartOfBuffer and BufferSize.
   The ASCII string is produced by parsing the format string specified by FormatString.
   Arguments are pulled from the variable argument list specified by Marker based on 
   the contents of the format string.
-  This function returns the number of ASCII characters in the output buffer, not including
-  the Null-terminator.
+  This function returns the number of ASCII characters in the output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than
-  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
-  ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and produced Null-terminated ASCII string
   contains more than PcdMaximumAsciiStringLength ASCII characters not including the
   Null-terminator, then ASSERT().
@@ -375,21 +366,19 @@ UINTN
   Produces a Null-terminated ASCII string in an output buffer based on a Null-terminated
   Unicode format string and  variable argument list.
   
-  Produces a Null-terminated ASCII string in the output buffer specified by StartOfBuffer
-  and BufferSize.
+  Produces a Null-terminated ASCII string in the output buffer 
+  specified by StartOfBuffer and BufferSize.
   The ASCII string is produced by parsing the format string specified by FormatString.
-  Arguments are pulled from the variable argument list based on the contents of the 
-  format string.
-  This function returns the number of ASCII characters in the output buffer, not including
-  the Null-terminator.
+  Arguments are pulled from the variable argument list based on the contents of the format string.
+  This function returns the number of ASCII characters in the output buffer, 
+  not including the Null-terminator.
   If BufferSize is 0, then no output buffer is produced and 0 is returned.
 
   If BufferSize > 0 and StartOfBuffer is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is NULL, then ASSERT().
   If BufferSize > 0 and FormatString is not aligned on a 16-bit boundary, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than
-  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then
-  ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and FormatString contains more than 
+  PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and produced Null-terminated ASCII string
   contains more than PcdMaximumAsciiStringLength ASCII characters not including the
   Null-terminator, then ASSERT().
@@ -418,8 +407,7 @@ UINTN
   Converts a decimal value to a Null-terminated ASCII string.
   
   Converts the decimal number specified by Value to a Null-terminated ASCII string 
-  specified by Buffer containing at most Width characters. No padding of spaces 
-  is ever performed.
+  specified by Buffer containing at most Width characters. No padding of spaces is ever performed.
   If Width is 0 then a width of MAXIMUM_VALUE_CHARACTERS is assumed.
   The number of ASCII characters in Buffer is returned not including the Null-terminator.
   If the conversion contains more than Width characters, then only the first Width

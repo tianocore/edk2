@@ -43,39 +43,39 @@ typedef UINT8 EFI_SWAP_LOCK_CAPABILITY;
   This function gets the address range location of 
   boot block and backup block. 
 
-  @param This		          Indicates the calling context.  
-  @param BootBlockBase		Base address of current boot block.
-  @param BootBlockSize	 	Size (in bytes) of current boot block.
-  @param BackupBlockBase	Base address of current backup block.
-  @param BackupBlockSize	Size (in bytes) of current backup block.
+  @param This             Indicates the calling context.  
+  @param BootBlockBase    Base address of current boot block.
+  @param BootBlockSize    Size (in bytes) of current boot block.
+  @param BackupBlockBase  Base address of current backup block.
+  @param BackupBlockSize  Size (in bytes) of current backup block.
 
-  @retval EFI_SUCCESS	The call was successful.
+  @retval EFI_SUCCESS  The call was successful.
     
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_GET_RANGE_LOCATION) (
-  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            * This,
-  OUT EFI_PHYSICAL_ADDRESS                      * BootBlockBase,
+  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
+  OUT EFI_PHYSICAL_ADDRESS                      *BootBlockBase,
   OUT UINTN                                     *BootBlockSize,
-  OUT EFI_PHYSICAL_ADDRESS                      * BackupBlockBase,
+  OUT EFI_PHYSICAL_ADDRESS                      *BackupBlockBase,
   OUT UINTN                                     *BackupBlockSize
   );
 
 /**
   This service checks if the boot block and backup block has been swapped.
 
-  @param This		      Indicates the calling context.  
-  @param SwapState	 	True if the boot block and backup block has been swapped. 
-                      False if the boot block and backup block has not been swapped.
+  @param This          Indicates the calling context.  
+  @param SwapState     True if the boot block and backup block has been swapped. 
+                       False if the boot block and backup block has not been swapped.
 
-  @retval EFI_SUCCESS	The call was successful.
+  @retval EFI_SUCCESS  The call was successful.
     
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_GET_SWAP_STATE) (
-  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            * This,
+  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   OUT BOOLEAN                                   *SwapState
   );
 
@@ -85,17 +85,17 @@ EFI_STATUS
   It also acquires and releases software swap lock during operation. The setting of the new swap state 
   is not affected by the old swap state.
 
-  @param This		        Indicates the calling context.  
-  @param NewSwapState	 	True to swap real boot block and backup block, False to swap them back.
+  @param This            Indicates the calling context.  
+  @param NewSwapState    True to swap real boot block and backup block, False to swap them back.
 
-  @retval EFI_SUCCESS	The call was successful.
-  @retval EFI_ABORTED	Set swap state error
+  @retval EFI_SUCCESS  The call was successful.
+  @retval EFI_ABORTED  Set swap state error
     
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SET_SWAP_STATE) (
-  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            * This,
+  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   IN BOOLEAN                                    NewSwapState
   );
 
@@ -116,16 +116,16 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_GET_RTC_POWER_STATUS) (
-  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            * This,
+  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   OUT BOOLEAN                                   *RtcPowerFailed
   );
 
 /**
   This service returns all lock methods for swap operations that the current platform supports. Could be software lock, hardware lock, or unsupport lock.
-	Note that software and hardware lock methods can be used simultaneously.
+  Note that software and hardware lock methods can be used simultaneously.
 
   @param This             Indicates the calling context.
-  @param LockCapability	 	Current lock method for swap operation. 
+  @param LockCapability   Current lock method for swap operation. 
 
   @retval EFI_SUCCESS The call was successful.
     
@@ -133,8 +133,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_GET_SWAP_LOCK_CAPABILITY) (
-  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            * This,
-  OUT EFI_SWAP_LOCK_CAPABILITY                  * LockCapability
+  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
+  OUT EFI_SWAP_LOCK_CAPABILITY                  *LockCapability
   );
 
 
@@ -154,7 +154,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SET_SWAP_LOCK) (
-  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            * This,
+  IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   IN EFI_SWAP_LOCK_CAPABILITY                   LockCapability,
   IN BOOLEAN                                    NewLockState
   );

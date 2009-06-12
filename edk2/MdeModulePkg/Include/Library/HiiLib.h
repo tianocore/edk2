@@ -304,8 +304,8 @@ HiiConstructConfigHdr (
 BOOLEAN
 EFIAPI                               
 HiiSetToDefaults (     
-  IN CONST EFI_STRING	Request,  OPTIONAL
-  IN UINT16				    DefaultId
+  IN CONST EFI_STRING  Request,  OPTIONAL
+  IN UINT16            DefaultId
   );
 
 /**
@@ -325,7 +325,7 @@ HiiSetToDefaults (
 BOOLEAN
 EFIAPI                               
 HiiValidateSettings (
-  IN CONST EFI_STRING	Request  OPTIONAL
+  IN CONST EFI_STRING  Request  OPTIONAL
   );
 
 /**
