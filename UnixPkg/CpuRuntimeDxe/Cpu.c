@@ -27,7 +27,6 @@ Abstract:
 #include <Guid/DataHubRecords.h>
 #include <Protocol/CpuIo.h>
 #include <Protocol/FrameworkHii.h>
-#include <Guid/DataHubProducer.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -452,7 +451,7 @@ Returns:
   // Initialize strings to HII database
   //
   HiiHandle = HiiAddPackages (
-                &gEfiProcessorProducerGuid,
+                &gEfiCallerIdGuid,
                 NULL,
                 CpuStrings,
                 NULL
@@ -469,7 +468,7 @@ Returns:
   Status = DataHub->LogData (
                       DataHub,
                       &gEfiProcessorSubClassGuid,
-                      &gEfiProcessorProducerGuid,
+                      &gEfiCallerIdGuid,
                       EFI_DATA_RECORD_CLASS_DATA,
                       RecordBuffer.Raw,
                       TotalSize
@@ -486,7 +485,7 @@ Returns:
   Status = DataHub->LogData (
                       DataHub,
                       &gEfiProcessorSubClassGuid,
-                      &gEfiProcessorProducerGuid,
+                      &gEfiCallerIdGuid,
                       EFI_DATA_RECORD_CLASS_DATA,
                       RecordBuffer.Raw,
                       TotalSize

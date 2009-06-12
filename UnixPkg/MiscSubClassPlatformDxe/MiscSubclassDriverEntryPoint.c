@@ -318,7 +318,7 @@ Returns:
 
   MemorySubClassData.Record.ArrayStartAddress.MemoryArrayStartAddress               = 0;
   MemorySubClassData.Record.ArrayStartAddress.MemoryArrayEndAddress                 = LShiftU64 (TotalMemorySize, 20) - 1;
-  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName  = gEfiMemoryProducerGuid;
+  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName  = gEfiCallerIdGuid;
   MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.Instance      = 1;
   MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.SubInstance   = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
   MemorySubClassData.Record.ArrayStartAddress.MemoryArrayPartitionWidth             = 0;
@@ -329,7 +329,7 @@ Returns:
   EfiStatus = DataHub->LogData (
                       DataHub,
                       &gEfiMemorySubClassGuid,
-                      &gEfiMemoryProducerGuid,
+                      &gEfiCallerIdGuid,
                       EFI_DATA_RECORD_CLASS_DATA,
                       &MemorySubClassData,
                       sizeof (EFI_SUBCLASS_TYPE1_HEADER) + sizeof (EFI_MEMORY_ARRAY_START_ADDRESS_DATA)
