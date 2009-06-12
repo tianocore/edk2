@@ -3,7 +3,7 @@
   Load Pe32 Image protocol enables loading and unloading EFI images into memory and executing those images.
   This protocol uses File Device Path to get EFI image.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,7 +59,7 @@ EFI_STATUS
   IN  VOID                             *SourceBuffer       OPTIONAL,
   IN  UINTN                            SourceSize,
   IN  EFI_PHYSICAL_ADDRESS             DstBuffer           OPTIONAL,
-  OUT UINTN                            *NumberOfPages      OPTIONAL,
+  IN OUT UINTN                         *NumberOfPages      OPTIONAL,
   OUT EFI_HANDLE                       *ImageHandle,
   OUT EFI_PHYSICAL_ADDRESS             *EntryPoint         OPTIONAL,
   IN  UINT32                           Attribute
