@@ -26,18 +26,7 @@ Notes:
    after you call "nmake cleanall", you have to call "build" command to rebuild platform
 	 or modules because the AutoGen.* files have been be removed. The "makefile" itself
 	 cannot generate AutoGen.* files. Only "build" command can.
-3) build.exe in %WORKSPACE%\BaseTools\Bin\Win32 is generated from following revision of
-   Python source code:
-        r844 <buildtools_project>\BaseTools\Source\Python\Autogen
-        r844 <buildtools_project>\BaseTools\Source\Python\build
-        r844 <buildtools_project>\BaseTools\Source\Python\Common
-        r844 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r844 <buildtools_project>\BaseTools\Source\Python\GenFds
-        
-4) GenFds.exe has is a combo of the follow python source.(This is a temporary branch)
-        r843 <buildtools_project>\BaseTools\Source\Python\Common
-        r843 <buildtools_project>\BaseTools\Source\Python\CommonDataClass
-        r843 <buildtools_project>\BaseTools\Source\Python\GenFds
+3) All .exe binary file including C and python tools are generated from r1623.
 	
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
