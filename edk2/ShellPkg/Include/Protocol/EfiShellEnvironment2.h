@@ -16,9 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _SHELLENV2_H_
 #define _SHELLENV2_H_
 
-#include <Protocol\SimpleTextIn.h>
-#include <Protocol\SimpleTextOut.h>
-#include <Protocol\EfiShellInterface.h>
+#include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextOut.h>
+#include <Protocol/EfiShellInterface.h>
 
 #define DEFAULT_INIT_ROW    1
 #define DEFAULT_AUTO_LF     FALSE

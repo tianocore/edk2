@@ -245,7 +245,7 @@ EFIAPI
 ShellWriteFile(
   IN EFI_FILE_HANDLE            FileHandle,
   IN OUT UINTN                  *BufferSize,
-  IN CONST VOID                 *Buffer
+  IN VOID                       *Buffer
   );
 
 /** 

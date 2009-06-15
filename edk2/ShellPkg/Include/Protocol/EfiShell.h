@@ -902,9 +902,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_WRITE_FILE)(
-  IN EFI_FILE_HANDLE FileHandle,
-  IN OUT UINTN *BufferSize,
-  OUT VOID *Buffer
+  IN EFI_FILE_HANDLE            FileHandle,
+  IN OUT UINTN                  *BufferSize,
+  IN VOID                       *Buffer
   );
 
 typedef struct _EFI_SHELL_PROTOCOL {
