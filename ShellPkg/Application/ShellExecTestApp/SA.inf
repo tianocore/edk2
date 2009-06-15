@@ -30,7 +30,7 @@
 #
 
 [Sources]
-  SA.C
+  SA.c
 
 [Packages]
   MdePkg/MdePkg.dec

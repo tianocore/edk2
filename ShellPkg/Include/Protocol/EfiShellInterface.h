@@ -26,7 +26,7 @@
 #ifndef _SHELLINTERFACE_H_
 #define _SHELLINTERFACE_H_
 
-#include <Protocol\LoadedImage.h>
+#include <Protocol/LoadedImage.h>
 
 #define SHELL_INTERFACE_PROTOCOL_GUID \
   { \
@@ -38,11 +38,11 @@
 ///
 typedef enum {
   ARG_NO_ATTRIB         = 0x0,
-  ARG_IS_QUOTED         = 0x1,
-  ARG_PARTIALLY_QUOTED  = 0x2,
-  ARG_FIRST_HALF_QUOTED = 0x4,
-  ARG_FIRST_CHAR_IS_ESC = 0x8
-};
+  ARG_IS_QUOTED         = BIT0,
+  ARG_PARTIALLY_QUOTED  = BIT1,
+  ARG_FIRST_HALF_QUOTED = BIT2,
+  ARG_FIRST_CHAR_IS_ESC = BIT3
+} EFI_SHELL_ARG_INFO_TYPES;
 
 ///
 /// attributes for an argument.

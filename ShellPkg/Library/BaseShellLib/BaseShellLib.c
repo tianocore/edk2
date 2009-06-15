@@ -455,7 +455,7 @@ ShellOpenFileByDevicePath(
   }
   Status = gBS->OpenProtocol(*DeviceHandle,
                              &gEfiSimpleFileSystemProtocolGuid,
-                             &EfiSimpleFileSystemProtocol,
+                             (VOID**) &EfiSimpleFileSystemProtocol,
                              gImageHandle,
                              NULL,
                              EFI_OPEN_PROTOCOL_GET_PROTOCOL);
@@ -1725,7 +1725,7 @@ ShellCommandLineParse (
                                      CheckPackage, 
                                      ProblemParam, 
                                      AutoPageBreak, 
-                                     mEfiShellParametersProtocol->Argv,
+                                     (CONST CHAR16**) mEfiShellParametersProtocol->Argv,
                                      mEfiShellParametersProtocol->Argc ));
   }
 
@@ -1737,7 +1737,7 @@ ShellCommandLineParse (
                                    CheckPackage, 
                                    ProblemParam, 
                                    AutoPageBreak, 
-                                   mEfiShellInterface->Argv,
+                                   (CONST CHAR16**) mEfiShellInterface->Argv,
                                    mEfiShellInterface->Argc ));
 }
 
