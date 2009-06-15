@@ -36,7 +36,7 @@
   PrintLib|MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   
-  ShellLib|ShellPkg/Library/BaseShellLib/BaseShellLib.inf
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
 
 [PcdsFixedAtBuild.common]
