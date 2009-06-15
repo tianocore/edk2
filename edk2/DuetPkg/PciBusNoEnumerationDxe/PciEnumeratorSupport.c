@@ -484,7 +484,7 @@ Returns:
 {
   PCI_IO_DEVICE                   *PciIoDevice;
   EFI_STATUS                      Status;
-  UINT32                          Value;
+  UINT8                           Value;
   EFI_PCI_IO_PROTOCOL             *PciIo;
   UINT8                           Temp;
 
