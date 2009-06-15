@@ -17,28 +17,27 @@
 <P><FONT size="2">This package contains the following significant features:</FONT></P>
 <UL>
 	<LI>
-		<FONT size="2">PROTOCOLs/PPIs/GUIDs and related data definitions in MdePkg/Include 
+		<FONT size="2">PROTOCOLs/PPIs/GUIDs and related data declarations in MdePkg/Include 
 			directory. They correspond to UEFI2.0, UEFI 2.1 and/or PI1.0 specifications 
 			published by the <A href="http://UEFI.org">UEFI Forum</A> and the EFI1.10 
 			specification published by <A href="http://www.intel.com/technology.ef">Intel.</A>
 		</FONT>
 	<LI>
-		<FONT size="2">Data declarations in MdePkg/Include/IndustryStandard directory for 
-			applicable industry standards. </FONT>
+		<FONT size="2">Data declarations in MdePkg/Include/IndustryStandard directory&nbsp; 
+			support applicable industry standards. </FONT>
 	<LI>
-		<FONT size="2">Public library classes definitions in MdePkg/Include/Library 
-			directory to support module development. </FONT>
+		<FONT size="2">Public library classes definitions in MdePkg/Include/Library support 
+			module development. </FONT>
 	<LI>
-		<FONT size="2">Library instances&nbsp;in MdePkg/Library directory to implement 
-			library classes for module build and platform integration with different CPU 
+		<FONT size="2">Library instances&nbsp;in MdePkg/Library directory&nbsp; implement 
+			library classes for module build and platform integration&nbsp;of different CPU 
 			architectures and module types. </FONT>
 	<LI>
-		<FONT size="2">Data structure definitions which conform to the specification of 
-			"PCD Infrastructure". It also defines common PCD entries with supported usage 
-			models in MdePkg/MdePkg.dec. </FONT>
+		<FONT size="2">Data structure declarations conform to the specification of "PCD 
+			Infrastructure". . </FONT>
 	<LI>
-		<FONT size="2">Build validation file of MdePkg/MdePkg.dsc&nbsp;to list all the 
-			library instances under their supported CPU architectures and module types. </FONT>
+		<FONT size="2">Build validation file of MdePkg/MdePkg.dsc lists the library 
+			instances under their supported CPU architectures and module types. </FONT>
 	</LI>
 </UL>
 <P><FONT size="2">The MdePkg provides developers working on UEFI Applications, UEFI 
@@ -50,16 +49,13 @@
 <P><FONT size="2">The MdePkg 1.00&nbsp;also features the following quality metrics:</FONT></P>
 <UL>
 	<LI>
-		<FONT size="2">The MdePkg source code follows doxygen style comments for file 
-			headers, function headers and data structure definitions. A doxygen build can 
-			be used to generate a MDE package specification in CHM format. </FONT>
+		<FONT size="2">The MdePkg source code follows EDK II Coding Standard, which inludes 
+			the use of Doxygen style file and function headers.&nbsp; The documentation 
+			generated from the MdePkg is available in both CHM and HTML formats.</SPAN> </FONT>
+	</FONT>
 	<LI>
-		<FONT size="2">The MdePkg source code passes EDKII coding style tool check to be 
-			compliant to "EDKII C Coding Standard." Except for some known exception items, 
-			tool reports zero coding style issue. </FONT>
-	<LI>
-		<FONT size="2">The MdePkg source code passes Klocworks (Release 8.0) static code 
-			analysis and zero potential security violation is reported. </FONT>
+		<FONT size="2">The MdePkg source code passed static code analysis and zero 
+			potential security violation is reported. </FONT>
 	<LI>
 		<FONT size="2">All the library source code can build without errors across several 
 			operating systems and tool chains </FONT>
@@ -153,16 +149,13 @@
 		the edk2 directory tree. This file can be displayed using the </font><a href="https://edk2.tianocore.org/source/browse/edk2/trunk/edk2/">
 		<u><font size="2">Subversion web interface</font></u></a><font size="2">. </font>
 </p>
-
-<p><font size="2">Additionally, we have provided some
-  <a href="step-by-step-instructions.html"><u>step-by-step</u></a> instructions
-  for helping new developers set up their build environment and build their
-  first EDK II package.&nbsp;
-  These instructions also cover setting up
-  builds for Unix-like platforms, including building a GCC UEFI cross
-  compiler for EDK II development.
-</font><br /></p>
-
+<p><font size="2">Additionally, we have provided some <a href="step-by-step-instructions.html">
+			<u>step-by-step</u></a> instructions for helping new developers set up 
+		their build environment and build their first EDK II package.&nbsp; These 
+		instructions also cover setting up builds for Unix-like platforms, including 
+		building a GCC UEFI cross compiler for EDK II development. </font>
+	<br>
+</p>
 <p><font size="2"><b>Help!</b> If you have questions about the code or run into 
 		obstacles getting things to work for you, please post a note on the </font><a href="mailto:dev@edk2.tianocore.org">
 		<u><font size="2">dev@edk2.tianocore.org</font></u></a><font size="2"> mailing 
