@@ -138,9 +138,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma|FALSE|BOOLEAN|0x00010041
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory|TRUE|BOOLEAN|0x00010042
   
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable|FALSE|BOOLEAN|0x00010043
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfg2Disable|FALSE|BOOLEAN|0x00010044
-
 [PcdsFixedAtBuild]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask|0|UINT8|0x0001003f
 

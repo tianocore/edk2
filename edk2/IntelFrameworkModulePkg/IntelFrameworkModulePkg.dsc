@@ -148,9 +148,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportDma|TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory|TRUE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfgDisable|TRUE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciCfg2Disable|TRUE
-
 
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
@@ -228,8 +225,6 @@
   IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
-  IntelFrameworkModulePkg/Universal/PcatSingleSegmentPciCfgPei/PcatSingleSegmentPciCfgPei.inf
-  IntelFrameworkModulePkg/Universal/VariablePei/VariablePei.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 
 
