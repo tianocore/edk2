@@ -48,6 +48,5 @@
   ShellPkg/Application/ShellLibTestApp/SA3.inf
   ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
   ShellPkg/Library/UefiShellLib/UefiShellLib.inf
-  ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
-  ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
+  ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
   ShellPkg/Application/ShellCTestApp/ShellCTestApp.inf
