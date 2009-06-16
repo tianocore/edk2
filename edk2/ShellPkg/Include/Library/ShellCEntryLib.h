@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Intermediate entry point for the application that will in turn call into the "C" 
   style main function.
 
-  this application must have a function like:
+  this application must have a function defined as follows:
   INT32 
   EFIAPI 
   main(
