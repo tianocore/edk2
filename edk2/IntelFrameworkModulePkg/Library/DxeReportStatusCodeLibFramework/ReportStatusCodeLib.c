@@ -281,7 +281,8 @@ ReportStatusCodeExtractDebugInfo (
   *ErrorLevel = DebugInfo->ErrorLevel;
 
   //
-  // Here the address returned in Marker is 64-bit aligned.
+  // The first 12 * sizeof (UINT64) bytes following EFI_DEBUG_INFO are for variable arguments
+  // of format in DEBUG string. Its address is returned in Marker and has to be 64-bit aligned.
   // It must be noticed that EFI_DEBUG_INFO follows EFI_STATUS_CODE_DATA, whose size is
   // 20 bytes. The size of EFI_DEBUG_INFO is 4 bytes, so we can ensure that Marker
   // returned is 64-bit aligned.
@@ -289,10 +290,6 @@ ReportStatusCodeExtractDebugInfo (
   // cause unalignment exception.
   //
   *Marker = (BASE_LIST) (DebugInfo + 1);
-  //
-  // The first 12 * UINTN bytes of the string are really an
-  // argument stack to support varargs on the Format string.
-  //
   *Format = (CHAR8 *)(((UINT64 *)*Marker) + 12);
 
   return TRUE;
