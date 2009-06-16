@@ -2,7 +2,7 @@
   GUID used to pass DEBUG() macro information through the Status Code Protocol
   and Status Code PPI
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,7 @@
 typedef struct {
   UINT32  ErrorLevel;
   //
-  // 12 * sizeof (UINT64) Var Arg stack
+  // 12 * sizeof (UINT64) area to store variable arguments for format in DEBUG string
   //
   // ascii DEBUG () Format string
   //
