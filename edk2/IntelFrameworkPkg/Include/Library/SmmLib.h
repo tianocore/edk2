@@ -3,7 +3,7 @@
   
   SMM Library Services that abstracts both S/W SMI generation and detection. 
 
-  Copyright (c) 2007, Intel Corporation                                                         
+  Copyright (c) 2007 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -45,13 +45,13 @@ TriggerRuntimeSoftwareSmi (
 
 
 /**
-  Test if a boot time software SMI happens.  
+  Test if a boot time software SMI happened.  
 
-  This function tests if a software SMM interrupt happens. If a software SMM interrupt happens and
-  it is triggered at boot time, it returns TRUE. Otherwise, it returns FALSE.
+  This function tests if a software SMM interrupt happened. If a software SMM interrupt happened and
+  it was triggered at boot time, it returns TRUE. Otherwise, it returns FALSE.
 
-  @retval TRUE                 A software SMI triggered at boot time happens.
-  @retval FLASE                No software SMI happens or the software SMI is triggered at run time.
+  @retval TRUE   A software SMI triggered at boot time happened.
+  @retval FLASE  No software SMI happened or the software SMI was triggered at run time.
 
 **/
 BOOLEAN
@@ -62,13 +62,13 @@ IsBootServiceSoftwareSmi (
 
 
 /**
-  Test if a run time software SMI happens.  
+  Test if a run time software SMI happened.  
 
-  This function tests if a software SMM interrupt happens. If a software SMM interrupt happens and
-  it is triggered at run time, it returns TRUE. Otherwise, it returns FALSE.
+  This function tests if a software SMM interrupt happened. If a software SMM interrupt happened and
+  it was triggered at run time, it returns TRUE. Otherwise, it returns FALSE.
 
-  @retval TRUE                 A software SMI triggered at run time happens.
-  @retval FLASE                No software SMI happens or the software SMI is triggered at boot time.
+  @retval TRUE   A software SMI triggered at run time happened.
+  @retval FLASE  No software SMI happened or the software SMI was triggered at boot time.
 
 **/
 BOOLEAN
