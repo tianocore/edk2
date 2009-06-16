@@ -12,13 +12,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Uefi.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-
 /**
   This function will retrieve the information about the file for the handle 
   specified and store it in allocated pool memory.
@@ -328,4 +321,75 @@ EFIAPI
 FileHandleGetSize (
   IN EFI_FILE_HANDLE            FileHandle,
   OUT UINT64                    *Size
+  );
+
+/**
+  Function to get a full filename given a EFI_FILE_HANDLE somewhere lower on the 
+  directory 'stack'.
+
+  if Handle is NULL, return EFI_INVALID_PARAMETER
+
+  @param[in] Handle             Handle to the Directory or File to create path to.
+  @param[out] FullFileName      pointer to pointer to generated full file name.  It 
+                                is the responsibility of the caller to free this memory
+                                with a call to FreePool().
+  @retval EFI_SUCCESS           the operation was sucessful and the FullFileName is valid.
+  @retval EFI_INVALID_PARAMETER Handle was NULL.
+  @retval EFI_INVALID_PARAMETER FullFileName was NULL.
+  @retval EFI_OUT_OF_MEMORY     a memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+FileHandleGetFileName (
+  IN CONST EFI_FILE_HANDLE      Handle,
+  OUT CHAR16                    **FullFileName
+  );
+
+/**
+  Function to read a single line (up to but not including the \n) from a file.
+
+  @param[in]      Handle        FileHandle to read from
+  @param[in][out] Buffer        pointer to buffer to read into
+  @param[in][out] Size          pointer to number of bytes in buffer
+  @param[in[      Truncate      if TRUE then allows for truncation of the line to fit.
+                                if FALSE will reset the position to the begining of the 
+                                line if the buffer is not large enough.
+
+  @retval EFI_SUCCESS           the operation was sucessful.  the line is stored in 
+                                Buffer.  (Size was NOT updated)
+  @retval EFI_INVALID_PARAMETER Handle was NULL.
+  @retval EFI_INVALID_PARAMETER Buffer was NULL.
+  @retval EFI_INVALID_PARAMETER Size was NULL.
+  @retval EFI_BUFFER_TOO_SMALL  Size was not enough space to store the line.  
+                                Size was updated to minimum space required.
+  @sa FileHandleRead
+**/
+EFI_STATUS
+EFIAPI
+FileHandleReadLine(
+  IN EFI_FILE_HANDLE            Handle,
+  IN OUT VOID                   *Buffer,
+  IN OUT UINTN                  *Size,
+  IN BOOLEAN                    Truncate
+  );
+
+/**
+  function to write a line of unicode text to a file.
+
+  if Handle is NULL, ASSERT.
+  if Buffer is NULL, do nothing.  (return SUCCESS)
+
+  @param[in]     Handle         FileHandle to write to
+  @param[in]     Buffer         Buffer to write
+
+  @retval  EFI_SUCCESS          the data was written.
+  @retval  other                failure.
+
+  @sa FileHandleWrite
+**/
+EFI_STATUS
+EFIAPI
+FileHandleWriteLine(
+  IN EFI_FILE_HANDLE Handle,
+  IN CHAR16          *Buffer
   );

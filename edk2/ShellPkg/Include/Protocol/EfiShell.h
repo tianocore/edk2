@@ -501,7 +501,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SHELL_GET_HELP_TEXT) (
   IN CONST CHAR16 *Command,
-  IN CONST CHAR16 *Sections,
+  IN CONST CHAR16 *Sections OPTIONAL,
   OUT CHAR16 **HelpText
   );
 

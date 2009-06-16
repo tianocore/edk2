@@ -14,11 +14,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 
-#include <Library/ShellLib.h>
+#include <Protocol/SimpleFileSystem.h>
+
+#include <Guid/FileInfo.h>
+
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-
-#include <Protocol/SimpleFileSystem.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 
 #define MAX_FILE_NAME_LEN 522 // (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
 #define FIND_XXXXX_FILE_BUFFER_SIZE (SIZE_OF_EFI_FILE_INFO + MAX_FILE_NAME_LEN)
@@ -620,4 +623,297 @@ FileHandleGetSize (
   FreePool(FileInfo);
 
   return (EFI_SUCCESS);
+}
+
+
+/**
+  Safely append (on the left) with automatic string resizing given length of Destination and 
+  desired length of copy from Source.
+
+  append the first D characters of Source to the end of Destination, where D is 
+  the lesser of Count and the StrLen() of Source. If appending those D characters 
+  will fit within Destination (whose Size is given as CurrentSize) and 
+  still leave room for a null terminator, then those characters are appended, 
+  starting at the original terminating null of Destination, and a new terminating 
+  null is appended.
+
+  If appending D characters onto Destination will result in a overflow of the size
+  given in CurrentSize the string will be grown such that the copy can be performed
+  and CurrentSize will be updated to the new size.
+
+  If Source is NULL, there is nothing to append, just return the current buffer in 
+  Destination.
+
+  if Destination is NULL, then ASSERT()
+  if Destination's current length (including NULL terminator) is already more then 
+  CurrentSize, then ASSERT()
+
+  @param[in][out] Destination   The String to append onto
+  @param[in][out] CurrentSize   on call the number of bytes in Destination.  On 
+                                return possibly the new size (still in bytes).  if NULL
+                                then allocate whatever is needed.
+  @param[in]      Source        The String to append from
+  @param[in]      Count         Maximum number of characters to append.  if 0 then 
+                                all are appended.
+
+  @return Destination           return the resultant string.
+**/
+CHAR16* 
+EFIAPI
+StrnCatGrowLeft (
+  IN OUT CHAR16           **Destination,
+  IN OUT UINTN            *CurrentSize,
+  IN     CONST CHAR16     *Source,
+  IN     UINTN            Count
+  ){
+  UINTN DestinationStartSize;
+  UINTN NewSize;
+
+  //
+  // ASSERTs
+  //
+  ASSERT(Destination != NULL);
+
+  //
+  // If there's nothing to do then just return Destination
+  //
+  if (Source == NULL) {
+    return (*Destination);
+  }
+
+  //
+  // allow for NULL pointers address as Destination
+  //
+  if (*Destination != NULL) {
+    ASSERT(CurrentSize != 0);
+    DestinationStartSize = StrSize(*Destination);
+    ASSERT(DestinationStartSize <= *CurrentSize);
+  } else {
+    DestinationStartSize = 0;
+//    ASSERT(*CurrentSize == 0);
+  }
+
+  //
+  // Append all of Source?
+  //
+  if (Count == 0) {
+    Count = StrLen(Source);
+  }
+
+  //
+  // Test and grow if required
+  //
+  if (CurrentSize != NULL) {
+    NewSize = *CurrentSize;
+    while (NewSize < (DestinationStartSize + (Count*sizeof(CHAR16)))) {
+      NewSize += 2 * Count * sizeof(CHAR16);
+    }
+    *Destination = ReallocatePool(*CurrentSize, NewSize, *Destination);
+    *CurrentSize = NewSize;
+  } else {
+    *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
+  }
+
+  *Destination = CopyMem(*Destination+StrLen(Source), *Destination, StrSize(*Destination));
+  *Destination = CopyMem(*Destination, Source, StrLen(Source));
+  return (*Destination);
+}
+
+/**
+  Function to get a full filename given a EFI_FILE_HANDLE somewhere lower on the 
+  directory 'stack'.
+
+  if Handle is NULL, return EFI_INVALID_PARAMETER
+
+  @param[in] Handle             Handle to the Directory or File to create path to.
+  @param[out] FullFileName      pointer to pointer to generated full file name.  It 
+                                is the responsibility of the caller to free this memory
+                                with a call to FreePool().
+  @retval EFI_SUCCESS           the operation was sucessful and the FullFileName is valid.
+  @retval EFI_INVALID_PARAMETER Handle was NULL.
+  @retval EFI_INVALID_PARAMETER FullFileName was NULL.
+  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+FileHandleGetFileName (
+  IN CONST EFI_FILE_HANDLE      Handle,
+  OUT CHAR16                    **FullFileName
+  ){
+  EFI_STATUS      Status;
+  UINTN           Size;
+  EFI_FILE_HANDLE CurrentHandle;
+  EFI_FILE_HANDLE NextHigherHandle;
+  EFI_FILE_INFO   *FileInfo;
+
+  Size = 0;
+  *FullFileName = NULL;
+
+  //
+  // Check our parameters
+  //
+  if (FullFileName == NULL || Handle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
+  Status = Handle->Open(Handle, &CurrentHandle, L".", EFI_FILE_MODE_READ, 0);
+  if (!EFI_ERROR(Status)) {
+    //
+    // Reverse out the current directory on the device
+    //
+    for (;;) {
+      FileInfo = FileHandleGetInfo(CurrentHandle);
+      if (FileInfo == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      } else {
+        //
+        // We got info... do we have a name? if yes preceed the current path with it...
+        //
+        if (StrLen (FileInfo->FileName) == 0) {
+          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
+          FreePool(FileInfo);
+          break;
+        } else {
+          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, FileInfo->FileName, 0);
+          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
+          FreePool(FileInfo);
+        }
+      }
+      //
+      // Move to the parent directory
+      //
+      Status = CurrentHandle->Open (CurrentHandle, &NextHigherHandle, L"..", EFI_FILE_MODE_READ, 0);
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+
+      FileHandleClose(CurrentHandle);
+      CurrentHandle = NextHigherHandle;
+    }
+  }
+
+  if (CurrentHandle != NULL) {
+    CurrentHandle->Close (CurrentHandle);
+  }
+
+  if (EFI_ERROR(Status) && *FullFileName != NULL) {
+    FreePool(FullFileName);
+  }
+
+  return (Status);
+}
+
+/**
+  Function to read a single line (up to but not including the \n) from a file.
+
+  @param[in]      Handle        FileHandle to read from
+  @param[in][out] Buffer        pointer to buffer to read into
+  @param[in][out] Size          pointer to number of bytes in buffer
+  @param[in[      Truncate      if TRUE then allows for truncation of the line to fit.
+                                if FALSE will reset the position to the begining of the 
+                                line if the buffer is not large enough.
+
+  @retval EFI_SUCCESS           the operation was sucessful.  the line is stored in 
+                                Buffer.
+  @retval EFI_INVALID_PARAMETER Handle was NULL.
+  @retval EFI_INVALID_PARAMETER Buffer was NULL.
+  @retval EFI_INVALID_PARAMETER Size was NULL.
+  @retval EFI_BUFFER_TOO_SMALL  Size was not enough space to store the line.  
+                                Size was updated to minimum space required.
+  @sa FileHandleRead
+**/
+EFI_STATUS
+EFIAPI
+FileHandleReadLine(
+  IN EFI_FILE_HANDLE            Handle,
+  IN OUT VOID                   *Buffer,
+  IN OUT UINTN                  *Size,
+  IN BOOLEAN                    Truncate
+  ){
+  EFI_STATUS  Status;
+  CHAR16      CharBuffer;
+  UINTN       CharSize;
+  UINTN       CountSoFar;
+  UINT64      Position;
+
+
+  if (Handle == NULL
+    ||Buffer == NULL
+    ||Size   == NULL
+    ){
+  return (EFI_INVALID_PARAMETER);
+  }
+  FileHandleGetPosition(Handle, &Position);
+
+  for (CountSoFar = 0;;CountSoFar++){
+    CharSize = sizeof(CharBuffer);
+    Status = FileHandleRead(Handle, &CharSize, &CharBuffer);
+    if (  EFI_ERROR(Status) 
+       || CharSize == 0 
+       || CharBuffer == '\n'
+      ){
+      break;
+    }
+    //
+    // if we have space save it...
+    //
+    if ((CountSoFar+1)*sizeof(CHAR16) < *Size){
+      ((CHAR16*)Buffer)[CountSoFar] = CharBuffer;
+      ((CHAR16*)Buffer)[CountSoFar+1] = '\0';
+    }
+  }
+
+  //
+  // if we ran out of space tell when...
+  //
+  if ((CountSoFar+1)*sizeof(CHAR16) > *Size){
+    *Size = (CountSoFar+1)*sizeof(CHAR16);
+    if (Truncate == FALSE) {
+      FileHandleSetPosition(Handle, Position);
+    } else {
+      DEBUG((DEBUG_WARN, "The line was truncated in ReadLine"));
+    }
+    return (EFI_BUFFER_TOO_SMALL);
+  }
+  *Size = (CountSoFar+1)*sizeof(CHAR16);
+  return (Status);
+}
+
+/**
+  function to write a line of unicode text to a file.
+
+  if Handle is NULL, ASSERT.
+  if Buffer is NULL, do nothing.  (return SUCCESS)
+
+  @param[in]     Handle         FileHandle to write to
+  @param[in]     Buffer         Buffer to write
+
+  @retval  EFI_SUCCESS          the data was written.
+  @retval  other                failure.
+
+  @sa FileHandleWrite
+**/
+EFI_STATUS
+EFIAPI
+FileHandleWriteLine(
+  IN EFI_FILE_HANDLE Handle,
+  IN CHAR16          *Buffer
+  ){
+  EFI_STATUS Status;
+  UINTN      Size;
+
+  ASSERT(Handle != NULL);
+
+  if (Buffer == NULL) {
+    return (EFI_SUCCESS);
+  }
+
+  Size = StrLen(Buffer);
+  Status = FileHandleWrite(Handle, &Size, Buffer);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
+  Size = StrLen(L"\r\n");
+  return FileHandleWrite(Handle, &Size, L"\r\n");
 }

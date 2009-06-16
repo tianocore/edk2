@@ -43,6 +43,8 @@
   BaseMemoryLib
   DebugLib
   FileHandleLib
+  PrintLib
+  UefiLib
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # ALWAYS_CONSUMED
@@ -61,3 +63,4 @@
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize  # ALWAYS_CONSUMED
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize # ALWAYS_CONSUMED
