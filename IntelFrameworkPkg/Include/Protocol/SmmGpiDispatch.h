@@ -1,10 +1,12 @@
 /** @file
-  This file declares Smm Gpi Smi Child Protocol
-  The EFI_SMM_GPI_DISPATCH_PROTOCOL provides the ability to install child handlers for the
-  given event types. Several inputs can be enabled. This purpose of this interface is to generate an
+  This file declares Smm Gpi Smi Child Protocol.
+  
+  The EFI_SMM_GPI_DISPATCH_PROTOCOL is defined in Framework of EFI SMM Core Interface Spec
+  Version 0.9. It provides the ability to install child handlers for the given event types.
+  Several inputs can be enabled. This purpose of this interface is to generate an
   SMI in response to any of these inputs having a true value provided.
   
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,16 +15,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  SmmGpiDispatch.h
-
-  @par Revision Reference:
-  This Protocol is defined in Framework of EFI SMM Core Interface Spec
-  Version 0.9.
-
 **/
 
-#ifndef _EFI_SMM_GPI_DISPATCH_H_
-#define _EFI_SMM_GPI_DISPATCH_H_
+#ifndef _SMM_GPI_DISPATCH_H_
+#define _SMM_GPI_DISPATCH_H_
 
 #include <PiDxe.h>
 
@@ -39,6 +35,7 @@ typedef struct _EFI_SMM_GPI_DISPATCH_PROTOCOL  EFI_SMM_GPI_DISPATCH_PROTOCOL;
 //
 // Related Definitions
 //
+
 //
 // GpiMask is a bit mask of 32 possible general purpose inputs that can generate a
 // a SMI.  Bit 0 corresponds to logical GPI[0], 1 corresponds to logical GPI[1], etc.
@@ -54,6 +51,7 @@ typedef struct {
 //
 // Member functions
 //
+
 /**
   Dispatch function for a GPI SMI handler.
 
@@ -61,9 +59,6 @@ typedef struct {
   @param  DispatchContext       Pointer to the dispatch function's context.
                                 The DispatchContext fields are filled in by the dispatching driver prior to
                                 invoking this dispatch function.
-
-  @return None
-
 **/
 typedef
 VOID
@@ -126,27 +121,17 @@ EFI_STATUS
 //
 // Interface structure for the SMM GPI SMI Dispatch Protocol
 //
-/**
-  @par Protocol Description:
-  Provides the parent dispatch service for the General Purpose Input
-  (GPI) SMI source generator.
-
-  @param Register
-  Installs a child service to be dispatched by this protocol.
-
-  @param UnRegister
-  Removes a child service dispatched by this protocol.
-
-  @param NumSupportedGpis
-  Denotes the maximum value of inputs that can have handlers attached.
-
-**/
 struct _EFI_SMM_GPI_DISPATCH_PROTOCOL {
   EFI_SMM_GPI_REGISTER    Register;
   EFI_SMM_GPI_UNREGISTER  UnRegister;
+
+  //
+  // Denotes the maximum value of inputs that can have handlers attached.
+  //
   UINTN                   NumSupportedGpis;
 };
 
 extern EFI_GUID gEfiSmmGpiDispatchProtocolGuid;
 
 #endif
+
