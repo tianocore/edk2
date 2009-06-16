@@ -1946,6 +1946,65 @@ ShellCommandLineGetRawValue (
   }
   return (NULL);
 }
+/**
+  This is a find and replace function.  it will return the NewString as a copy of 
+  SourceString with each instance of FindTarget replaced with ReplaceWith.
+
+  If the string would grow bigger than NewSize it will halt and return error.
+
+  @param[in] SourceString             String with source buffer
+  @param[in][out] NewString           String with resultant buffer
+  @param[in] NewSize                  Size in bytes of NewString
+  @param[in] FindTarget               String to look for
+  @param[in[ ReplaceWith              String to replace FindTarget with
+
+  @retval EFI_INVALID_PARAMETER       SourceString was NULL
+  @retval EFI_INVALID_PARAMETER       NewString was NULL
+  @retval EFI_INVALID_PARAMETER       FindTarget was NULL
+  @retval EFI_INVALID_PARAMETER       ReplaceWith was NULL
+  @retval EFI_INVALID_PARAMETER       FindTarget had length < 1
+  @retval EFI_INVALID_PARAMETER       SourceString had length < 1
+  @retval EFI_BUFFER_TOO_SMALL        NewSize was less than the minimum size to hold 
+                                      the new string (truncation occurred)
+  @retval EFI_SUCCESS                 the string was sucessfully copied with replacement
+**/
+
+EFI_STATUS
+EFIAPI
+CopyReplace(
+  IN CHAR16 CONST                     *SourceString,
+  IN CHAR16                           *NewString,
+  IN UINTN                            NewSize,
+  IN CONST CHAR16                     *FindTarget,
+  IN CONST CHAR16                     *ReplaceWith
+  ){
+  if ( (SourceString == NULL)
+    || (NewString    == NULL)
+    || (FindTarget   == NULL)
+    || (ReplaceWith  == NULL)
+    || (StrLen(FindTarget) < 1)
+    || (StrLen(SourceString) < 1)
+    ){
+    return (EFI_INVALID_PARAMETER);
+  }
+  NewString = SetMem16(NewString, NewSize, L'\0');
+  while (*SourceString != L'\0') {
+    if (StrnCmp(SourceString, FindTarget, StrLen(FindTarget)) == 0) {
+      SourceString += StrLen(FindTarget);
+      if (StrSize(NewString) + (StrLen(ReplaceWith)*sizeof(CHAR16)) > NewSize) {
+        return (EFI_BUFFER_TOO_SMALL);
+      }
+      StrCat(NewString, ReplaceWith);
+    } else {
+      if (StrSize(NewString) + sizeof(CHAR16) > NewSize) {
+        return (EFI_BUFFER_TOO_SMALL);
+      }
+      StrnCat(NewString, SourceString, 1);
+      SourceString++;
+    }
+  }
+  return (EFI_SUCCESS);
+}
 
 /**
   Print at a specific location on the screen.
@@ -1986,33 +2045,114 @@ ShellPrintEx(
   ){
   VA_LIST           Marker;
   UINTN             BufferSize;
-  CHAR16            *Buffer;
+  CHAR16            *PostReplaceFormat;
+  CHAR16            *PostReplaceFormat2;
   UINTN             Return;
   INT32             CurrentCol;
   INT32             CurrentRow;
   EFI_STATUS        Status;
-  
-  BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
-  Buffer = AllocateZeroPool (BufferSize);
-  ASSERT (Buffer != NULL);
+  UINTN             NormalAttribute;
+  CHAR16            *ResumeLocation;
+  CHAR16            *FormatWalker;
 
   VA_START (Marker, Format);
-  Return = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
+  
+  BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
+  PostReplaceFormat = AllocateZeroPool (BufferSize);
+  ASSERT (PostReplaceFormat != NULL);
+  PostReplaceFormat2 = AllocateZeroPool (BufferSize);
+  ASSERT (PostReplaceFormat2 != NULL);
+
+  //
+  // Back and forth each time fixing up 1 of our flags...
+  //
+  Status = CopyReplace(Format,             PostReplaceFormat,  BufferSize, L"%N", L"%%N");
+  ASSERT_EFI_ERROR(Status);
+  Status = CopyReplace(PostReplaceFormat,  PostReplaceFormat2, BufferSize, L"%E", L"%%E");
+  ASSERT_EFI_ERROR(Status);
+  Status = CopyReplace(PostReplaceFormat2, PostReplaceFormat,  BufferSize, L"%H", L"%%H");
+  ASSERT_EFI_ERROR(Status);
+  Status = CopyReplace(PostReplaceFormat,  PostReplaceFormat2, BufferSize, L"%B", L"%%B");
+  ASSERT_EFI_ERROR(Status);
+  Status = CopyReplace(PostReplaceFormat2, PostReplaceFormat,  BufferSize, L"%V", L"%%V");
+  ASSERT_EFI_ERROR(Status);
+
+  //
+  // Use the last buffer from replacing to print from...
+  //
+  Return = UnicodeVSPrint (PostReplaceFormat2, BufferSize, PostReplaceFormat, Marker);
+
+  FreePool(PostReplaceFormat);
 
   if (Col != -1 && Row != -1) {
     CurrentCol = gST->ConOut->Mode->CursorColumn;
     CurrentRow = gST->ConOut->Mode->CursorRow;
     Status = gST->ConOut->SetCursorPosition(gST->ConOut, Col, Row);
     ASSERT_EFI_ERROR(Status);
-    Status = gST->ConOut->OutputString(gST->ConOut, Buffer);
-    ASSERT_EFI_ERROR(Status);
-    Status = gST->ConOut->SetCursorPosition(gST->ConOut, CurrentCol, CurrentRow);
-    ASSERT_EFI_ERROR(Status);
   } else {
-    Status = gST->ConOut->OutputString(gST->ConOut, Buffer);
+    CurrentCol = 0;
+    CurrentRow = 0;
+  }
+
+  NormalAttribute = gST->ConOut->Mode->Attribute;
+  FormatWalker = PostReplaceFormat2;
+  while (*FormatWalker != L'\0') {
+    //
+    // Find the next attribute change request
+    //
+    ResumeLocation = StrStr(FormatWalker, L"%");
+    if (ResumeLocation != NULL) {
+      *ResumeLocation = L'\0';
+    }
+    //
+    // print the current FormatWalker string
+    //
+    Status = gST->ConOut->OutputString(gST->ConOut, FormatWalker);
+    ASSERT_EFI_ERROR(Status);
+    //
+    // update the attribute
+    //
+    if (ResumeLocation != NULL) {
+      switch (*(ResumeLocation+1)) {
+        case (L'N'):
+          gST->ConOut->SetAttribute(gST->ConOut, NormalAttribute);
+          break;
+        case (L'E'):
+          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_YELLOW, ((NormalAttribute&(BIT4|BIT5|BIT6))>>4)));
+          break;
+        case (L'H'):
+          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_WHITE, ((NormalAttribute&(BIT4|BIT5|BIT6))>>4)));
+          break;
+        case (L'B'):
+          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_BLUE, ((NormalAttribute&(BIT4|BIT5|BIT6))>>4)));
+          break;
+        case (L'V'):
+          gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_GREEN, ((NormalAttribute&(BIT4|BIT5|BIT6))>>4)));
+          break;
+        default:
+          ASSERT(FALSE);
+          break;
+      }
+    } else {
+      //
+      // reset to normal now...
+      //
+      gST->ConOut->SetAttribute(gST->ConOut, NormalAttribute);
+      break;
+    }
+
+    //
+    // update FormatWalker to Resume + 2 (skip the % and the indicator)
+    //
+    FormatWalker = ResumeLocation + 2;
+  }
+    
+  if (Col != -1 && Row != -1) {
+    Status = gST->ConOut->SetCursorPosition(gST->ConOut, CurrentCol, CurrentRow);
     ASSERT_EFI_ERROR(Status);
   }
 
-  FreePool(Buffer);
+  FreePool(PostReplaceFormat2);
+
   return (Return);
 }
