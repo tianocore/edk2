@@ -36,6 +36,9 @@
   ##                 used by Shell and ShellLib
   ##
   FileHandleLib|Include/Library/FileHandleLib.h
+  
+  ## Allows for a shell application to have a C style entry point
+  ShellCEntryLib|Include/Library/ShellCEntryLib.h
 
 
 [Guids.common]
@@ -48,7 +51,7 @@
   gEfiShellEnvironment2Guid       = {0x47c7b221, 0xc42a, 0x11d2, {0x8e, 0x57, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
   gEfiShellInterfaceGuid          = {0x47c7b223, 0xc42a, 0x11d2, {0x8e, 0x57, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
 
-[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
+[PcdsFixedAtBuild]
   ## This flag is used to control initialization of the shell library
-  ## This should be FALSE for compiling the shell application itself onlty.
+  ## This should be FALSE for compiling the shell application itself only.
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|TRUE|BOOLEAN|0x00000005

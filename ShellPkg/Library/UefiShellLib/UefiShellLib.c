@@ -22,13 +22,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 #include <Library/FileHandleLib.h>
+#include <Library/PrintLib.h>
+#include <Library/UefiLib.h>
+
 #include <Protocol/EfiShellEnvironment2.h>
 #include <Protocol/EfiShellInterface.h>
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/SimpleFileSystem.h>
 
-#include "BaseShellLib.h"
+#include "UefiShellLib.h"
 
 #define MAX_FILE_NAME_LEN 522 // (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
 #define FIND_XXXXX_FILE_BUFFER_SIZE (SIZE_OF_EFI_FILE_INFO + MAX_FILE_NAME_LEN)
@@ -237,7 +240,6 @@ ShellLibConstructor (
   mEfiShellInterface          = NULL;
   mEfiShellEnvironment2Handle = NULL;
 
-  ///@todo make a worker constructor so initialize function works
   //
   // verify that auto initialize is not set false
   // 
@@ -455,7 +457,7 @@ ShellOpenFileByDevicePath(
   }
   Status = gBS->OpenProtocol(*DeviceHandle,
                              &gEfiSimpleFileSystemProtocolGuid,
-                             (VOID**) &EfiSimpleFileSystemProtocol,
+                             (VOID**)&EfiSimpleFileSystemProtocol,
                              gImageHandle,
                              NULL,
                              EFI_OPEN_PROTOCOL_GET_PROTOCOL);
@@ -569,6 +571,8 @@ ShellOpenFileByName(
 {
   EFI_HANDLE                    DeviceHandle;
   EFI_DEVICE_PATH_PROTOCOL      *FilePath;
+  EFI_STATUS                    Status;
+  EFI_FILE_INFO                 *FileInfo;
 
   //
   // ASSERT if FileName is NULL
@@ -579,11 +583,16 @@ ShellOpenFileByName(
     //
     // Use UEFI Shell 2.0 method
     //
-    return (mEfiShellProtocol->OpenFileByName(FileName,
-                                             FileHandle,
-                                             OpenMode));
-
-    ///@todo add the attributes
+    Status = mEfiShellProtocol->OpenFileByName(FileName,
+                                               FileHandle,
+                                               OpenMode);
+    if (!EFI_ERROR(Status)){
+      FileInfo = FileHandleGetInfo(*FileHandle);
+      ASSERT(FileInfo != NULL);
+      FileInfo->Attribute = Attributes;
+      Status = FileHandleSetInfo(*FileHandle, FileInfo);
+    }
+    return (Status);
   } 
   //
   // Using EFI Shell version
@@ -1602,29 +1611,6 @@ InternalCommandLineParse (
       //
       // do nothing for NULL argv
       //
-    } else if (GetItemValue == TRUE) {
-      ASSERT(CurrentItemPackage != NULL);
-      //
-      // get the item VALUE for the previous flag
-      //
-      GetItemValue = FALSE;
-      CurrentItemPackage->Value = AllocateZeroPool(StrSize(Argv[LoopCounter]));
-      ASSERT(CurrentItemPackage->Value != NULL);
-      StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
-      InsertTailList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
-    } else if (InternalIsFlag(Argv[LoopCounter]) == FALSE) {
-      //
-      // add this one as a non-flag
-      //
-      CurrentItemPackage = AllocatePool(sizeof(SHELL_PARAM_PACKAGE));
-      ASSERT(CurrentItemPackage != NULL);
-      CurrentItemPackage->Name  = NULL;
-      CurrentItemPackage->Type  = TypePosition;
-      CurrentItemPackage->Value = AllocatePool(StrSize(Argv[LoopCounter]));
-      ASSERT(CurrentItemPackage->Value != NULL);
-      StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
-      CurrentItemPackage->OriginalPosition = Count++;
-      InsertTailList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
     } else if (InternalIsOnCheckList(Argv[LoopCounter], CheckList, &CurrentItemType) == TRUE) {
       //
       // this is a flag
@@ -1636,6 +1622,7 @@ InternalCommandLineParse (
       StrCpy(CurrentItemPackage->Name,  Argv[LoopCounter]);
       CurrentItemPackage->Type  = CurrentItemType;
       CurrentItemPackage->OriginalPosition = (UINTN)(-1);
+      CurrentItemPackage->Value = NULL;
 
       //
       // Does this flag require a value
@@ -1649,9 +1636,31 @@ InternalCommandLineParse (
         //
         // this item has no value expected; we are done
         //
-        CurrentItemPackage->Value = NULL;
-        InsertTailList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
+        InsertHeadList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
       }
+    } else if (GetItemValue == TRUE && InternalIsFlag(Argv[LoopCounter]) == FALSE) {
+      ASSERT(CurrentItemPackage != NULL);
+      //
+      // get the item VALUE for the previous flag
+      //
+      GetItemValue = FALSE;
+      CurrentItemPackage->Value = AllocateZeroPool(StrSize(Argv[LoopCounter]));
+      ASSERT(CurrentItemPackage->Value != NULL);
+      StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
+      InsertHeadList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
+    } else if (InternalIsFlag(Argv[LoopCounter]) == FALSE) {
+      //
+      // add this one as a non-flag
+      //
+      CurrentItemPackage = AllocatePool(sizeof(SHELL_PARAM_PACKAGE));
+      ASSERT(CurrentItemPackage != NULL);
+      CurrentItemPackage->Name  = NULL;
+      CurrentItemPackage->Type  = TypePosition;
+      CurrentItemPackage->Value = AllocatePool(StrSize(Argv[LoopCounter]));
+      ASSERT(CurrentItemPackage->Value != NULL);
+      StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
+      CurrentItemPackage->OriginalPosition = Count++;
+      InsertHeadList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
     } else if (ProblemParam) {
       //
       // this was a non-recognised flag... error!
@@ -1936,4 +1945,74 @@ ShellCommandLineGetRawValue (
     }
   }
   return (NULL);
+}
+
+/**
+  Print at a specific location on the screen.
+
+  This function will move the cursor to a given screen location, print the specified string, 
+  and return the cursor to the original locaiton.  
+  
+  If -1 is specified for either the Row or Col the current screen location for BOTH 
+  will be used and the cursor's position will not be moved back to an original location.
+
+  if either Row or Col is out of range for the current console, then ASSERT
+  if Format is NULL, then ASSERT
+
+  In addition to the standard %-based flags as supported by UefiLib Print() this supports 
+  the following additional flags:
+    %N       -   Set output attribute to normal
+    %H       -   Set output attribute to highlight
+    %E       -   Set output attribute to error
+    %B       -   Set output attribute to blue color
+    %V       -   Set output attribute to green color
+
+  Note: The background color is controlled by the shell command cls.
+
+  @param[in] Row        the row to print at
+  @param[in] Col        the column to print at
+  @param[in] Format     the format string
+
+  @return the number of characters printed to the screen
+**/
+
+UINTN
+EFIAPI
+ShellPrintEx(
+  IN INT32                Col OPTIONAL,
+  IN INT32                Row OPTIONAL,
+  IN CONST CHAR16         *Format,
+  ...
+  ){
+  VA_LIST           Marker;
+  UINTN             BufferSize;
+  CHAR16            *Buffer;
+  UINTN             Return;
+  INT32             CurrentCol;
+  INT32             CurrentRow;
+  EFI_STATUS        Status;
+  
+  BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
+  Buffer = AllocateZeroPool (BufferSize);
+  ASSERT (Buffer != NULL);
+
+  VA_START (Marker, Format);
+  Return = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
+
+  if (Col != -1 && Row != -1) {
+    CurrentCol = gST->ConOut->Mode->CursorColumn;
+    CurrentRow = gST->ConOut->Mode->CursorRow;
+    Status = gST->ConOut->SetCursorPosition(gST->ConOut, Col, Row);
+    ASSERT_EFI_ERROR(Status);
+    Status = gST->ConOut->OutputString(gST->ConOut, Buffer);
+    ASSERT_EFI_ERROR(Status);
+    Status = gST->ConOut->SetCursorPosition(gST->ConOut, CurrentCol, CurrentRow);
+    ASSERT_EFI_ERROR(Status);
+  } else {
+    Status = gST->ConOut->OutputString(gST->ConOut, Buffer);
+    ASSERT_EFI_ERROR(Status);
+  }
+
+  FreePool(Buffer);
+  return (Return);
 }

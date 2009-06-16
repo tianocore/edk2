@@ -749,4 +749,42 @@ EFIAPI
 ShellInitialize (
   );
 
+/**
+  Print at a specific location on the screen.
+
+  This function will move the cursor to a given screen location, print the specified string, 
+  and return the cursor to the original locaiton.  
+  
+  If -1 is specified for either the Row or Col the current screen location for BOTH 
+  will be used and the cursor's position will not be moved back to an original location.
+
+  if either Row or Col is out of range for the current console, then ASSERT
+  if Format is NULL, then ASSERT
+
+  In addition to the standard %-based flags as supported by UefiLib Print() this supports 
+  the following additional flags:
+    %N       -   Set output attribute to normal
+    %H       -   Set output attribute to highlight
+    %E       -   Set output attribute to error
+    %B       -   Set output attribute to blue color
+    %V       -   Set output attribute to green color
+
+  Note: The background color is controlled by the shell command cls.
+
+  @param[in] Row        the row to print at
+  @param[in] Col        the column to print at
+  @param[in] Format     the format string
+
+  @return the number of characters printed to the screen
+**/
+
+UINTN
+EFIAPI
+ShellPrintEx(
+  IN INT32                Col OPTIONAL,
+  IN INT32                Row OPTIONAL,
+  IN CONST CHAR16         *Format,
+  ...
+  );
+
 #endif // __SHELL_LIB__
