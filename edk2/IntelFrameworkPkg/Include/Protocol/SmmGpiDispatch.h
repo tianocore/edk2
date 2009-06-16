@@ -125,9 +125,9 @@ struct _EFI_SMM_GPI_DISPATCH_PROTOCOL {
   EFI_SMM_GPI_REGISTER    Register;
   EFI_SMM_GPI_UNREGISTER  UnRegister;
 
-  //
-  // Denotes the maximum value of inputs that can have handlers attached.
-  //
+  ///
+  /// Denotes the maximum value of inputs that can have handlers attached.
+  ///
   UINTN                   NumSupportedGpis;
 };
 
