@@ -19,7 +19,6 @@
 #include <FrameworkDxe.h>
 #include <Guid/DataHubStatusCodeRecord.h>
 #include <Protocol/DataHub.h>
-#include <Protocol/SerialIo.h>
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Protocol/StatusCode.h>
 #include <Guid/StatusCodeDataTypeId.h>
