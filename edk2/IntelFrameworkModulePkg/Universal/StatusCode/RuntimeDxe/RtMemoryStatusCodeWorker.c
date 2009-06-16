@@ -32,15 +32,14 @@ RtMemoryStatusCodeInitializeWorker (
   //
   mRtMemoryStatusCodeTable = AllocateRuntimePool (
                                sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) +
-                               PcdGet16 (PcdStatusCodeRuntimeMemorySize) *
-                               1024
+                               PcdGet16 (PcdStatusCodeMemorySize) * 1024
                                );
   ASSERT (mRtMemoryStatusCodeTable != NULL);
 
   mRtMemoryStatusCodeTable->RecordIndex      = 0;
   mRtMemoryStatusCodeTable->NumberOfRecords  = 0;
   mRtMemoryStatusCodeTable->MaxRecordsNumber = 
-    (PcdGet16 (PcdStatusCodeRuntimeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
+    (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
 
   return EFI_SUCCESS;
 }

@@ -68,7 +68,7 @@
 
 
 [Pcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|PcdStatusCodeUseMemory
 
 [Depex]
   TRUE

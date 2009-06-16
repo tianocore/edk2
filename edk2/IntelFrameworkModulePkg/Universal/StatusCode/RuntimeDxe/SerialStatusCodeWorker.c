@@ -14,33 +14,6 @@
 
 #include "StatusCodeRuntimeDxe.h"
 
-EFI_SERIAL_IO_PROTOCOL *mSerialIoProtocol;
-
-/**
-  Locates Serial I/O Protocol as initialization for serial status code worker.
- 
-  @retval EFI_SUCCESS  Serial I/O Protocol is successfully located.
-
-**/
-EFI_STATUS
-EfiSerialStatusCodeInitializeWorker (
-  VOID
-  )
-{
-  EFI_STATUS Status;
-
-  Status = gBS->LocateProtocol (
-             &gEfiSerialIoProtocolGuid,
-             NULL,
-             (VOID **) &mSerialIoProtocol
-             );
-
-  ASSERT_EFI_ERROR (Status);
-
-  return EFI_SUCCESS;
-}
-
-
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
  
@@ -77,15 +50,6 @@ SerialStatusCodeReportWorker (
   UINT32          LineNumber;
   UINTN           CharCount;
   BASE_LIST       Marker;
-
-  if (FeaturePcdGet (PcdStatusCodeUseEfiSerial)) {
-    if (EfiAtRuntime ()) {
-      return EFI_DEVICE_ERROR;
-    }
-    if (EfiGetCurrentTpl () > TPL_CALLBACK ) {
-      return EFI_DEVICE_ERROR;
-    }
-  }
 
   Buffer[0] = '\0';
 
@@ -174,20 +138,10 @@ SerialStatusCodeReportWorker (
                   );
   }
 
-
-  if (FeaturePcdGet (PcdStatusCodeUseHardSerial)) {
-    //
-    // Call SerialPort Lib function to do print.
-    //
-    SerialPortWrite ((UINT8 *) Buffer, CharCount);
-  }
-  if (FeaturePcdGet (PcdStatusCodeUseEfiSerial)) {
-    mSerialIoProtocol->Write (
-      mSerialIoProtocol,
-      &CharCount,
-      Buffer
-      );
-  }
+  //
+  // Call SerialPort Lib function to do print.
+  //
+  SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
   return EFI_SUCCESS;
 }

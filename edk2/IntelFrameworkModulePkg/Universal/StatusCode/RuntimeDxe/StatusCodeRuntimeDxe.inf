@@ -71,23 +71,16 @@
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## PRODUCES
   gEfiDataHubProtocolGuid                       ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
-  gEfiSerialIoProtocolGuid                      ## SOMETIMES_CONSUMES (Needed if Serial is supported for status code.)
 
-
-[FeaturePcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInOEM
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInRuntimeMemory
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInDataHub
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInSerial
+[FeaturePcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseRuntimeMemory
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseEfiSerial
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
 
-
-[Pcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeRuntimeMemorySize
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| PcdStatusCodeUseMemory
 
 [Depex]
   TRUE
