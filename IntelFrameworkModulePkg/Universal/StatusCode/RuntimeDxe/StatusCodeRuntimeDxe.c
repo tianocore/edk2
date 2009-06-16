@@ -119,7 +119,7 @@ ReportDispatcher (
     return EFI_DEVICE_ERROR;
   }
 
-  if (FeaturePcdGet (PcdStatusCodeUseEfiSerial) || FeaturePcdGet (PcdStatusCodeUseHardSerial)) {
+  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
     SerialStatusCodeReportWorker (
       CodeType,
       Value,
@@ -128,7 +128,7 @@ ReportDispatcher (
       Data
       );
   }
-  if (FeaturePcdGet (PcdStatusCodeUseRuntimeMemory)) {
+  if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
     RtMemoryStatusCodeReportWorker (
       CodeType,
       Value,
@@ -214,18 +214,14 @@ InitializationDispatcherWorker (
   // if enable UseRuntimeMemory, then initialize runtime memory status code worker.
   // if enable UseDataHub, then initialize data hub status code worker.
   //
-  if (FeaturePcdGet (PcdStatusCodeUseEfiSerial)) {
-    Status = EfiSerialStatusCodeInitializeWorker ();
-    ASSERT_EFI_ERROR (Status);
-  }
-  if (FeaturePcdGet (PcdStatusCodeUseHardSerial)) {
+  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
     //
     // Call Serial Port Lib API to initialize serial port.
     //
     Status = SerialPortInitialize ();
     ASSERT_EFI_ERROR (Status);
   }
-  if (FeaturePcdGet (PcdStatusCodeUseRuntimeMemory)) {
+  if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
     Status = RtMemoryStatusCodeInitializeWorker ();
     ASSERT_EFI_ERROR (Status);
   }
@@ -244,82 +240,78 @@ InitializationDispatcherWorker (
   //
   // Replay Status code which saved in GUID'ed HOB to all supported devices. 
   //
-
-  // 
-  // Journal GUID'ed HOBs to find all record entry, if found, 
-  // then output record to support replay device.
-  //
-  ExpectedPacketIndex = 0;
-  Hob.Raw   = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
-  HobStart  = Hob.Raw;
-  while (Hob.Raw != NULL) {
-    PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
-    if (PacketHeader->PacketIndex == ExpectedPacketIndex) {
-      Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
-      for (Index = 0; Index < PacketHeader->RecordIndex; Index++) {
-        //
-        // Dispatch records to devices based on feature flag.
-        //
-        if (FeaturePcdGet (PcdStatusCodeReplayInSerial) && 
-            (FeaturePcdGet (PcdStatusCodeUseHardSerial) ||
-             FeaturePcdGet (PcdStatusCodeUseEfiSerial))) {
-          SerialStatusCodeReportWorker (
-            Record[Index].CodeType,
-            Record[Index].Value,
-            Record[Index].Instance,
-            NULL,
-            NULL
-            );
-        }
-        if (FeaturePcdGet (PcdStatusCodeReplayInRuntimeMemory) &&
-            FeaturePcdGet (PcdStatusCodeUseRuntimeMemory)) {
-          RtMemoryStatusCodeReportWorker (
-            Record[Index].CodeType,
-            Record[Index].Value,
-            Record[Index].Instance
-            );
-        }
-        if (FeaturePcdGet (PcdStatusCodeReplayInDataHub) &&
-            FeaturePcdGet (PcdStatusCodeUseDataHub)) {
-          DataHubStatusCodeReportWorker (
-            Record[Index].CodeType,
-            Record[Index].Value,
-            Record[Index].Instance,
-            NULL,
-            NULL
-            );
-        }
-        if (FeaturePcdGet (PcdStatusCodeReplayInOEM) &&
-            FeaturePcdGet (PcdStatusCodeUseOEM)) {
+  if (FeaturePcdGet (PcdStatusCodeReplayIn)) {
+    // 
+    // Journal GUID'ed HOBs to find all record entry, if found, 
+    // then output record to support replay device.
+    //
+    ExpectedPacketIndex = 0;
+    Hob.Raw   = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
+    HobStart  = Hob.Raw;
+    while (Hob.Raw != NULL) {
+      PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
+      if (PacketHeader->PacketIndex == ExpectedPacketIndex) {
+        Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
+        for (Index = 0; Index < PacketHeader->RecordIndex; Index++) {
           //
-          // Call OEM hook status code library API to report status code to OEM device
+          // Dispatch records to devices based on feature flag.
           //
-          OemHookStatusCodeReport (
-            Record[Index].CodeType,
-            Record[Index].Value,
-            Record[Index].Instance,
-            NULL,
-            NULL
-            );
+          if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+            SerialStatusCodeReportWorker (
+              Record[Index].CodeType,
+              Record[Index].Value,
+              Record[Index].Instance,
+              NULL,
+              NULL
+              );
+          }
+          if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+            RtMemoryStatusCodeReportWorker (
+              Record[Index].CodeType,
+              Record[Index].Value,
+              Record[Index].Instance
+              );
+          }
+          if (FeaturePcdGet (PcdStatusCodeUseDataHub)) {
+            DataHubStatusCodeReportWorker (
+              Record[Index].CodeType,
+              Record[Index].Value,
+              Record[Index].Instance,
+              NULL,
+              NULL
+              );
+          }
+          if (FeaturePcdGet (PcdStatusCodeUseOEM)) {
+            //
+            // Call OEM hook status code library API to report status code to OEM device
+            //
+            OemHookStatusCodeReport (
+              Record[Index].CodeType,
+              Record[Index].Value,
+              Record[Index].Instance,
+              NULL,
+              NULL
+              );
+          }
         }
+        ExpectedPacketIndex++;
+  
+        //
+        // See whether there is gap of packet or not
+        //
+        if (HobStart != NULL) {
+          HobStart  = NULL;
+          Hob.Raw   = HobStart;
+          continue;
+        }
+      } else if (HobStart != NULL) {
+        //
+        // Cache the found packet for improve the performance
+        //
+        HobStart = Hob.Raw;
       }
-      ExpectedPacketIndex++;
-
-      //
-      // See whether there is gap of packet or not
-      //
-      if (HobStart != NULL) {
-        HobStart  = NULL;
-        Hob.Raw   = HobStart;
-        continue;
-      }
-    } else if (HobStart != NULL) {
-      //
-      // Cache the found packet for improve the performance
-      //
-      HobStart = Hob.Raw;
+  
+      Hob.Raw = GetNextGuidHob (&gMemoryStatusCodeRecordGuid, Hob.Raw);
     }
-
-    Hob.Raw = GetNextGuidHob (&gMemoryStatusCodeRecordGuid, Hob.Raw);
   }
 }
