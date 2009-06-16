@@ -1,6 +1,10 @@
 /** @file
   Provides the parent dispatch service for the standby button SMI source generator.
 
+  The SMM Standby Button Dispatch Protocol is defined in 
+  the Intel Platform Innovation Framework for EFI SMM Core Interface Specification
+  (SMM CIS) Version 0.9.
+
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -10,18 +14,12 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  SmmStandbyButtonDispatch.h
-
-  @par Revision Reference:
-  This Protocol is defined in Framework of EFI SMM Core Interface Spec
-  Version 0.9.
-
 **/
 
 #ifndef _EFI_SMM_STANDBY_BUTTON_DISPATCH_H_
 #define _EFI_SMM_STANDBY_BUTTON_DISPATCH_H_
 
-#include <PiDxe.h>
+#include <FrameworkSmm.h>
 
 //
 // Global ID for the Standby Button SMI Protocol
@@ -36,6 +34,7 @@ typedef struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL  EFI_SMM_STANDBY_BUTTON
 //
 // Related Definitions
 //
+
 //
 // Standby Button. Example, Use for changing LEDs before ACPI OS is on.
 //    - DXE/BDS Phase
@@ -43,17 +42,22 @@ typedef struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL  EFI_SMM_STANDBY_BUTTON
 //
 typedef enum {
   EfiStandbyButtonEntry,
-  EfiStandbyButtonExit,
-  EfiStandbyButtonMax
+  EfiStandbyButtonExit
 } EFI_STANDBY_BUTTON_PHASE;
 
 typedef struct {
+  //
+  // Describes whether the child handler should be invoked upon the entry to the button
+  // activation or upon exit (i.e., upon receipt of the button press event or upon release of
+  // the event).
+  //
   EFI_STANDBY_BUTTON_PHASE  Phase;
 } EFI_SMM_STANDBY_BUTTON_DISPATCH_CONTEXT;
 
 //
 // Member functions
 //
+
 /**
   Dispatch function for a Standby Button SMI handler.
 
@@ -62,8 +66,6 @@ typedef struct {
                                 The DispatchContext fields are filled in
                                 by the dispatching driver prior to
                                 invoking this dispatch function.
-
-  @return None
 
 **/
 typedef
@@ -106,37 +108,27 @@ EFI_STATUS
 /**
   Unregister a child SMI source dispatch function with a parent SMM driver
 
-  @param  This                  Pointer to the EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL instance.
-  @param  DispatchHandle        Handle of the service to remove.
+  @param  This                   Pointer to the EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL instance.
+  @param  DispatchHandle         Handle of the service to remove.
 
-  @retval EFI_SUCCESS           The dispatch function has been successfully
-                                unregistered and the SMI source has been disabled
-                                if there are no other registered child dispatch
-                                functions for this SMI source.
-  @retval EFI_INVALID_PARAMETER Handle is invalid.
+  @retval EFI_SUCCESS            The dispatch function has been successfully
+                                 unregistered and the SMI source has been disabled
+                                 if there are no other registered child dispatch
+                                 functions for this SMI source.
+  @retval EFI_INVALID_PARAMETER  Handle is invalid.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SMM_STANDBY_BUTTON_UNREGISTER)(
-  IN EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL           *This,
-  IN EFI_HANDLE                                        DispatchHandle
+  IN EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL  *This,
+  IN EFI_HANDLE                                DispatchHandle
   );
 
 //
 // Interface structure for the SMM Standby Button SMI Dispatch Protocol
 //
-/**
-  @par Protocol Description:
-  Provides the parent dispatch service for the standby button SMI source generator.
 
-  @param Register
-  Installs a child service to be dispatched by this protocol.
-
-  @param UnRegister
-  Removes a child service dispatched by this protocol.
-
-**/
 struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL {
   EFI_SMM_STANDBY_BUTTON_REGISTER   Register;
   EFI_SMM_STANDBY_BUTTON_UNREGISTER UnRegister;
