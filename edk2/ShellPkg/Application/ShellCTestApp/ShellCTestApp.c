@@ -17,11 +17,19 @@
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 
-INT32 
+INTN 
 EFIAPI 
-main(
-  UINTN Argc, 
-  CHAR16 **Argv
-  ){
-  Print(L"Test Complete\r\n");
+ShellAppMain (
+  IN INTN Argc, 
+  IN CHAR16 **Argv
+  )
+{
+  INTN Index;
+
+  Print(L"ShellCTestApp.c:ShellAppMain called with %d parameters\n", Argc);
+  for (Index = 0; Index < Argc; Index++) {
+    Print(L"Argv[%d]: %s\n", Index, Argv[Index]);
+  }
+
+  return 0;
 }

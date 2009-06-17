@@ -20,19 +20,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/DebugLib.h>
 
-INT32 
+INTN
 EFIAPI 
-main(
-  UINTN Argc, 
-  CHAR16 **Argv
-);
+ShellAppMain (
+  IN INTN Argc, 
+  IN CHAR16 **Argv
+  );
 
+/**
+  UEFI entry point for an application that will in turn call a C 
+  style ShellAppMain function.
+
+  This application must have a function defined as follows:
+
+  INTN
+  EFIAPI
+  ShellAppMain (
+    IN INTN Argc, 
+    IN CHAR16 **Argv
+    );
+**/
 EFI_STATUS
 EFIAPI
-ShellCEntryLib(
+ShellCEntryLib (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
-  ){
+  )
+{
   INT32                         ReturnFromMain;
   EFI_SHELL_PARAMETERS_PROTOCOL *EfiShellParametersProtocol;
   EFI_SHELL_INTERFACE           *EfiShellInterface;
@@ -53,7 +67,10 @@ ShellCEntryLib(
     //
     // use shell 2.0 interface
     //
-    ReturnFromMain = main(EfiShellInterface->Argc, EfiShellInterface->Argv);
+    ReturnFromMain = ShellAppMain (
+                       EfiShellInterface->Argc,
+                       EfiShellInterface->Argv
+                       );
   } else {
     //
     // try to get shell 1.0 interface instead.
@@ -69,7 +86,10 @@ ShellCEntryLib(
       //
       // use shell 1.0 interface
       // 
-      ReturnFromMain = main(EfiShellParametersProtocol->Argc, EfiShellParametersProtocol->Argv);
+      ReturnFromMain = ShellAppMain (
+                         EfiShellParametersProtocol->Argc,
+                         EfiShellParametersProtocol->Argv
+                         );
     } else {
       ASSERT(FALSE);
     }
