@@ -62,12 +62,7 @@
 #define FRAMEWORK_EFI_IFR_VARSTORE_OP             0x24
 #define FRAMEWORK_EFI_IFR_VARSTORE_SELECT_OP      0x25
 #define FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR_OP 0x26
-#define FRAMEWORK_EFI_IFR_TRUE_OP                 0x27
-#define FRAMEWORK_EFI_IFR_FALSE_OP                0x28
-#define FRAMEWORK_EFI_IFR_GT_OP                   0x29
-#define FRAMEWORK_EFI_IFR_GE_OP                   0x2A
-#define FRAMEWORK_EFI_IFR_OEM_DEFINED_OP          0x2B
-#define FRAMEWORK_EFI_IFR_LAST_OPCODE             FRAMEWORK_EFI_IFR_OEM_DEFINED_OP
+#define FRAMEWORK_EFI_IFR_LAST_OPCODE             FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR_OP
 #define FRAMEWORK_EFI_IFR_OEM_OP                  0xFE
 #define FRAMEWORK_EFI_IFR_NV_ACCESS_COMMAND       0xFF
 
@@ -377,22 +372,6 @@ typedef struct {
   UINT16                            VarId;          // variable store ID, as referenced elsewhere in the form
   UINT16                            SecondaryVarId; // variable store ID, as referenced elsewhere in the form
 } FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR;
-
-typedef struct {
-  FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-} FRAMEWORK_EFI_IFR_TRUE;
-
-typedef struct {
-  FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-} FRAMEWORK_EFI_IFR_FALSE;
-
-typedef struct {
-  FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-} FRAMEWORK_EFI_IFR_GT;
-
-typedef struct {
-  FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-} FRAMEWORK_EFI_IFR_GE;
 
 //
 // Save defaults and restore defaults have same structure

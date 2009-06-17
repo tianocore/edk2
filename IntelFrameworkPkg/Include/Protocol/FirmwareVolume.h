@@ -188,12 +188,13 @@ EFI_STATUS
                                 required to complete the read
   @param  AuthenticationStatus  pointer to the authentication status of the data
 
-  @retval EFI_SUCCESS
-  @retval EFI_WARN_BUFFER_TOO_SMALL
-  @retval EFI_OUT_OF_RESOURCES
-  @retval EFI_NOT_FOUND
-  @retval EFI_DEVICE_ERROR
-  @retval EFI_ACCESS_DENIED
+  @retval EFI_SUCCESS                The call completed successfully.
+  @retval EFI_WARN_BUFFER_TOO_SMALL  The buffer is too small to contain the requested output. 
+                                     The buffer is filled and the output is truncated.
+  @retval EFI_OUT_OF_RESOURCES       An allocation failure occurred.
+  @retval EFI_NOT_FOUND              Name was not found in the firmware volume.
+  @retval EFI_DEVICE_ERROR           A hardware error occurred when attempting to access the firmware volume.
+  @retval EFI_ACCESS_DENIED          The firmware volume is configured to disallow reads.
 
 **/
 typedef
@@ -232,13 +233,16 @@ typedef struct {
                                 element in the array indicates a file to write, and there are
                                 NumberOfFiles elements in the input array.
 
-  @retval EFI_SUCCESS
-  @retval EFI_OUT_OF_RESOURCES
-  @retval EFI_DEVICE_ERROR
-  @retval EFI_WRITE_PROTECTED
-  @retval EFI_NOT_FOUND
-  @retval EFI_INVALID_PARAMETER
-
+  @retval EFI_SUCCESS           The write completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The firmware volume does not have enough free space to store file(s).
+  @retval EFI_DEVICE_ERROR      A hardware error occurred when attempting to access the firmware volume.
+  @retval EFI_WRITE_PROTECTED   The firmware volume is configured to disallow writes.
+  @retval EFI_NOT_FOUND         A delete was requested, but the requested file was not 
+                                found in the firmware volume.
+  @retval EFI_INVALID_PARAMETER A delete was requested with a multiple file write.
+                                An unsupported WritePolicy was requested.
+                                An unknown file type was specified.
+                                A file system specific error has occurred.
 **/
 typedef
 EFI_STATUS
@@ -261,10 +265,12 @@ EFI_STATUS
   @param  Attributes            pointer to Attributes of the file found
   @param  Size                  pointer to Size in bytes of the file found
 
-  @retval EFI_SUCCESS
-  @retval EFI_NOT_FOUND
-  @retval EFI_DEVICE_ERROR
-  @retval EFI_ACCESS_DENIED
+  @retval EFI_SUCCESS           The output parameters are filled with data obtained from 
+                                the first matching file that was found.
+  @retval EFI_NOT_FOUND         No files of type FileType were found.
+  @retval EFI_DEVICE_ERROR      A hardware error occurred when attempting to access 
+                                the firmware volume.
+  @retval EFI_ACCESS_DENIED     The firmware volume is configured to disallow reads.
 
 **/
 typedef

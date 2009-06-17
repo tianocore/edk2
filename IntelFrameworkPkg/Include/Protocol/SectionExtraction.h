@@ -26,6 +26,7 @@
 #define _SECTION_EXTRACTION_PROTOCOL_H_
 
 #include <PiDxe.h>
+#include <Framework/FirmwareVolumeImageFormat.h>
 
 //
 // Protocol GUID definition
@@ -101,8 +102,8 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process
                                 the request.
   @retval EFI_INVALID_PARAMETER The SectionStreamHandle does not exist.
-  @retval EFI_BUFFER_TOO_SMALL  The size of the input buffer is insufficient to
-                                contain the requested section.
+  @retval EFI_WARN_BUFFER_TOO_SMALL The size of the input buffer is insufficient to contain the requested
+                                    section. The input buffer is filled and section contents are truncated.
 
 **/
 typedef

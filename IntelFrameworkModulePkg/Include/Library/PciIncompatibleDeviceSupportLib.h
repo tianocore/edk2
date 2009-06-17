@@ -1,7 +1,8 @@
 /** @file
-  PCI Incompatible device support Libary.
+  PCI Incompatible device support Libary. Platform can implement an 
+  instance to support the incompatible PCI devices.
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -74,8 +75,8 @@ typedef struct {
   @param  PciDeviceInfo       A pointer to PCI device information.
   @param  Configuration       Returned information.
 
-  @retval returns EFI_SUCCESS if check incompatible device ok.
-          Otherwise return EFI_UNSUPPORTED.
+  @retval EFI_SUCCESS         The incompatible device is supported.
+  @retval EFI_UNSUPPORTED     The incompatible device is not supported.
 **/
 RETURN_STATUS
 EFIAPI
@@ -96,8 +97,8 @@ PciResourceUpdateCheck (
   @param  Offset              The address within the PCI configuration space.
   @param  Configuration       Returned information.
 
-  @retval returns EFI_SUCCESS if check incompatible device ok.
-          Otherwise return EFI_UNSUPPORTED.
+  @retval EFI_SUCCESS         The incompatible device is supported.
+  @retval EFI_UNSUPPORTED     The incompatible device is not supported.
 **/
 RETURN_STATUS
 EFIAPI
@@ -123,8 +124,8 @@ PciRegisterUpdateCheck (
   @param  AccessWidth         Access width needs to check incompatibility.
   @param  Configuration       Returned information.
 
-  @retval returns EFI_SUCCESS if check incompatible device ok.
-          Otherwise return EFI_UNSUPPORTED.
+  @retval EFI_SUCCESS         The incompatible device is supported.
+  @retval EFI_UNSUPPORTED     The incompatible device is not supported.
 **/
 RETURN_STATUS
 EFIAPI
