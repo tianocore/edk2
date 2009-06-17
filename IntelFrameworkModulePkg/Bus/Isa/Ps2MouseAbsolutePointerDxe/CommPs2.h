@@ -1,5 +1,5 @@
-/**@file
-  PS2 Mouse Communication Interface 
+/** @file
+  Using PS2 Mouse to simulation Absolution Pointer Device.
   
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _COMMPS2_H_
-#define _COMMPS2_H_
+#ifndef __COMMPS2_H__
+#define __COMMPS2_H__
 
 #define PS2_PACKET_LENGTH       3
 #define PS2_SYNC_MASK           0xc
@@ -246,7 +246,7 @@ PS2MouseEnable (
 /**
   Get mouse packet . Only care first 3 bytes
 
-  @param MouseDev  Pointer of PS2 Mouse Private Data Structure 
+  @param MouseAbsolutePointerDev  Pointer to PS2 Absolute Pointer Simulation Device Private Data Structure
 
   @retval EFI_NOT_READY  Mouse Device not ready to input data packet, or some error happened during getting the packet
   @retval EFI_SUCCESS    The data packet is gotten successfully.
@@ -359,7 +359,7 @@ In8042AuxData (
   I/O work flow of outing 8042 Aux data.
   
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
-  @param Command Aux I/O command
+  @param Data    Buffer holding return value.
   
   @retval EFI_SUCCESS Success to excute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
@@ -371,7 +371,7 @@ Out8042AuxData (
   );
 
 /**
-  Check keyboard controller status, if it is output buffer full and for auxiliary device
+  Check keyboard controller status, if it is output buffer full and for auxiliary device.
   
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   
@@ -413,4 +413,4 @@ WaitOutputFull (
   IN UINTN                                Timeout
   );
 
-#endif // _COMMPS2_H_
+#endif // __COMMPS2_H__

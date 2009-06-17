@@ -1,5 +1,5 @@
-/**@file
-  A faked PS/2 Touchpad driver. Routines that interacts with callers,
+/** @file
+  A faked PS/2 Absolute Pointer driver. Routines that interacts with callers,
   conforming to EFI driver model
   
 Copyright (c) 2006 - 2007, Intel Corporation
@@ -486,7 +486,7 @@ PS2MouseAbsolutePointerDriverStop (
 }
 
 /**
-  Reset the Mouse and do BAT test for it, if ExtendedVerification isTRUE and there is a mouse device connectted to system
+  Reset the Mouse and do BAT test for it, if ExtendedVerification isTRUE and there is a mouse device connectted to system.
 
   @param This                 - Pointer of simple pointer Protocol.
   @param ExtendedVerification - Whether configure mouse parameters. True: do; FALSE: skip.
@@ -604,7 +604,7 @@ Exit:
 /**
   Check whether there is Ps/2 mouse device in system
 
-  @param PS2_MOUSE_DEV - Mouse Private Data Structure
+  @param MouseAbsolutePointerDev - Absolute Pointer Device Private Data Structure
 
   @retval TRUE                - Keyboard in System.
   @retval FALSE               - Keyboard not in System.
@@ -674,22 +674,19 @@ MouseAbsolutePointerGetState (
 
 /**
 
-  Event notification function for SIMPLE_POINTER.WaitForInput event
-  Signal the event if there is input from mouse
+  Event notification function for SIMPLE_POINTER.WaitForInput event.
+  Signal the event if there is input from mouse.
 
   @param Event    event object
   @param Context  event context
 
 **/
-
 VOID
 EFIAPI
 MouseAbsolutePointerWaitForInput (
   IN  EFI_EVENT               Event,
   IN  VOID                    *Context
   )
-// GC_TODO:    Event - add argument and description to function comment
-// GC_TODO:    Context - add argument and description to function comment
 {
   PS2_MOUSE_ABSOLUTE_POINTER_DEV *MouseAbsolutePointerDev;
 
@@ -706,8 +703,8 @@ MouseAbsolutePointerWaitForInput (
 }
 
 /**
-  Event notification function for TimerEvent event
-  If mouse device is connected to system, try to get the mouse packet data
+  Event notification function for TimerEvent event.
+  If mouse device is connected to system, try to get the mouse packet data.
 
   @param Event      -  TimerEvent in PS2_MOUSE_DEV
   @param Context    -  Pointer to PS2_MOUSE_DEV structure

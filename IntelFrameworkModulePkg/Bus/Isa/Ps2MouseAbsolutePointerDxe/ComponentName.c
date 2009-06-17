@@ -1,4 +1,5 @@
-/**@file
+/** @file
+  UEFI Component Name(2) protocol implementation for Ps2 Absolute Pointer Simulation Dxe driver.
 
 Copyright (c) 2006 - 2007, Intel Corporation
 All rights reserved. This program and the accompanying materials

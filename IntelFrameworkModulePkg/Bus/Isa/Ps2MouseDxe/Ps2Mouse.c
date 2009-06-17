@@ -716,8 +716,8 @@ MouseWaitForInput (
 }
 
 /**
-  Event notification function for TimerEvent event
-  If mouse device is connected to system, try to get the mouse packet data
+  Event notification function for TimerEvent event.
+  If mouse device is connected to system, try to get the mouse packet data.
 
   @param Event      -  TimerEvent in PS2_MOUSE_DEV
   @param Context    -  Pointer to PS2_MOUSE_DEV structure
