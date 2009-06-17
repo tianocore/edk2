@@ -68,8 +68,8 @@ ShellCEntryLib (
     // use shell 2.0 interface
     //
     ReturnFromMain = ShellAppMain (
-                       EfiShellInterface->Argc,
-                       EfiShellInterface->Argv
+                       EfiShellParametersProtocol->Argc,
+                       EfiShellParametersProtocol->Argv
                        );
   } else {
     //
@@ -87,8 +87,8 @@ ShellCEntryLib (
       // use shell 1.0 interface
       // 
       ReturnFromMain = ShellAppMain (
-                         EfiShellParametersProtocol->Argc,
-                         EfiShellParametersProtocol->Argv
+                         EfiShellInterface->Argc,
+                         EfiShellInterface->Argv
                          );
     } else {
       ASSERT(FALSE);
