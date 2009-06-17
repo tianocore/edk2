@@ -1,7 +1,10 @@
 /** @file
-  Generic BDS library definition, include the data structure and function.
+  Generic BDS library defines general interfaces for BDS driver including:
+    1) BDS boot policy interface;
+    2) BDS boot device connect interface;
+    3) BDS Misc interfaces for mainting boot variable, ouput string.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at

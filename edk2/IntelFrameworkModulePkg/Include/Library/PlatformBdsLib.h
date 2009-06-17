@@ -1,8 +1,8 @@
 /** @file
-  Platform BDS library definition. Platform package can provide hook library
-  instances to implement platform specific behavior.
+  Platform BDS library definition. Platform can implement an
+  instances to support the platform specific behavior.
 
-Copyright (c) 2008, Intel Corporation. <BR>
+Copyright (c) 2008 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at

@@ -68,3 +68,11 @@ EDK_5216: Non-Compatible: qwang12
 
 		Possible Impacts:
 		1) Modules that may reference this definitions need to be updated.
+EDK_8583: Non-Compatible: lgao4
+      Retire the following framework HII opcodes, which are not defined in FrameworkHii specification.
+	  #define FRAMEWORK_EFI_IFR_TRUE_OP                 0x27
+	  #define FRAMEWORK_EFI_IFR_FALSE_OP                0x28
+	  #define FRAMEWORK_EFI_IFR_GT_OP                   0x29
+	  #define FRAMEWORK_EFI_IFR_GE_OP                   0x2A
+	  #define FRAMEWORK_EFI_IFR_OEM_DEFINED_OP          0x2B
+	  
