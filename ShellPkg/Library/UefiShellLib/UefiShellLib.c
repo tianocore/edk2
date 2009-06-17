@@ -2009,11 +2009,10 @@ CopyReplace(
 /**
   Print at a specific location on the screen.
 
-  This function will move the cursor to a given screen location, print the specified string, 
-  and return the cursor to the original locaiton.  
+  This function will move the cursor to a given screen location and print the specified string
   
   If -1 is specified for either the Row or Col the current screen location for BOTH 
-  will be used and the cursor's position will not be moved back to an original location.
+  will be used.
 
   if either Row or Col is out of range for the current console, then ASSERT
   if Format is NULL, then ASSERT
@@ -2048,8 +2047,7 @@ ShellPrintEx(
   CHAR16            *PostReplaceFormat;
   CHAR16            *PostReplaceFormat2;
   UINTN             Return;
-  INT32             CurrentCol;
-  INT32             CurrentRow;
+
   EFI_STATUS        Status;
   UINTN             NormalAttribute;
   CHAR16            *ResumeLocation;
@@ -2085,13 +2083,8 @@ ShellPrintEx(
   FreePool(PostReplaceFormat);
 
   if (Col != -1 && Row != -1) {
-    CurrentCol = gST->ConOut->Mode->CursorColumn;
-    CurrentRow = gST->ConOut->Mode->CursorRow;
     Status = gST->ConOut->SetCursorPosition(gST->ConOut, Col, Row);
     ASSERT_EFI_ERROR(Status);
-  } else {
-    CurrentCol = 0;
-    CurrentRow = 0;
   }
 
   NormalAttribute = gST->ConOut->Mode->Attribute;
@@ -2145,11 +2138,6 @@ ShellPrintEx(
     // update FormatWalker to Resume + 2 (skip the % and the indicator)
     //
     FormatWalker = ResumeLocation + 2;
-  }
-    
-  if (Col != -1 && Row != -1) {
-    Status = gST->ConOut->SetCursorPosition(gST->ConOut, CurrentCol, CurrentRow);
-    ASSERT_EFI_ERROR(Status);
   }
 
   FreePool(PostReplaceFormat2);
