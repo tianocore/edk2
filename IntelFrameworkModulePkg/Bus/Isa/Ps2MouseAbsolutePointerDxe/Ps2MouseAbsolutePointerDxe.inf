@@ -58,4 +58,14 @@
   gEfiAbsolutePointerProtocolGuid               # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
+# [Event]
+#   ##
+#   # Event will be signaled for WaitForKey event.
+#   #
+#   EVT_NOTIFY_WAIT                             ## PRODUCES
+#
+#   ##
+#   # Event will be used to poll mouse state.
+#   #
+#   EVT_NOTIFY_SIGNAL                           ## PRODUCES
 
