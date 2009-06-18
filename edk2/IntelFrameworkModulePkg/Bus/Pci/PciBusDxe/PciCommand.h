@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -114,29 +114,100 @@ LocateCapabilityRegBlock (
   OUT UINT8         *NextRegBlock OPTIONAL
   );
 
+/**  
+  Macro that reads command register.
 
-#define PciReadCommandRegister(a,b) \
-        PciOperateRegister (a,0, PCI_COMMAND_OFFSET, EFI_GET_REGISTER, b)
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[out]           Pointer to the 16-bit value read from command register.
+  
+  @return status of PciIo operation
 
-#define PciSetCommandRegister(a,b) \
-        PciOperateRegister (a,b, PCI_COMMAND_OFFSET, EFI_SET_REGISTER, NULL)
-        
-#define PciEnableCommandRegister(a,b) \
-        PciOperateRegister (a,b, PCI_COMMAND_OFFSET, EFI_ENABLE_REGISTER, NULL)
-        
-#define PciDisableCommandRegister(a,b) \
-        PciOperateRegister (a,b, PCI_COMMAND_OFFSET, EFI_DISABLE_REGISTER, NULL)
+**/
+#define PCI_READ_COMMAND_REGISTER(a,b) \
+        PciOperateRegister (a, 0, PCI_COMMAND_OFFSET, EFI_GET_REGISTER, b)
 
-#define PciReadBridgeControlRegister(a,b) \
-        PciOperateRegister (a,0, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_GET_REGISTER, b)
-        
-#define PciSetBridgeControlRegister(a,b) \
-        PciOperateRegister (a,b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_SET_REGISTER, NULL)
+/**  
+  Macro that writes command register.
 
-#define PciEnableBridgeControlRegister(a,b) \
-        PciOperateRegister (a,b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_ENABLE_REGISTER, NULL)
-        
-#define PciDisableBridgeControlRegister(a,b) \
-        PciOperateRegister (a,b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_DISABLE_REGISTER, NULL)
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[in]            The 16-bit value written into command register.
+  
+  @return status of PciIo operation
+
+**/
+#define PCI_SET_COMMAND_REGISTER(a,b) \
+        PciOperateRegister (a, b, PCI_COMMAND_OFFSET, EFI_SET_REGISTER, NULL)
+
+/**  
+  Macro that enables command register.
+
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[in]            The enabled value written into command register.
+  
+  @return status of PciIo operation
+
+**/        
+#define PCI_ENABLE_COMMAND_REGISTER(a,b) \
+        PciOperateRegister (a, b, PCI_COMMAND_OFFSET, EFI_ENABLE_REGISTER, NULL)
+
+/**  
+  Macro that disalbes command register.
+
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[in]            The disabled value written into command register.
+  
+  @return status of PciIo operation
+
+**/        
+#define PCI_DISABLE_COMMAND_REGISTER(a,b) \
+        PciOperateRegister (a, b, PCI_COMMAND_OFFSET, EFI_DISABLE_REGISTER, NULL)
+
+/**  
+  Macro that reads PCI bridge control register.
+
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[out]           The 16-bit value read from control register.
+  
+  @return status of PciIo operation
+
+**/
+#define PCI_READ_BRIDGE_CONTROL_REGISTER(a,b) \
+        PciOperateRegister (a, 0, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_GET_REGISTER, b)
+
+/**  
+  Macro that writes PCI bridge control register.
+
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[in]            The 16-bit value written into control register.
+  
+  @return status of PciIo operation
+
+**/        
+#define PCI_SET_BRIDGE_CONTROL_REGISTER(a,b) \
+        PciOperateRegister (a, b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_SET_REGISTER, NULL)
+
+/**  
+  Macro that enables PCI bridge control register.
+
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[in]            The enabled value written into command register.
+  
+  @return status of PciIo operation
+
+**/
+#define PCI_ENABLE_BRIDGE_CONTROL_REGISTER(a,b) \
+        PciOperateRegister (a, b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_ENABLE_REGISTER, NULL)
+
+/**  
+ Macro that disalbes PCI bridge control register.
+
+  @param a[in]            Pointer to instance of PCI_IO_DEVICE.
+  @param b[in]            The disabled value written into command register.
+  
+  @return status of PciIo operation
+
+**/        
+#define PCI_DISABLE_BRIDGE_CONTROL_REGISTER(a,b) \
+        PciOperateRegister (a, b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_DISABLE_REGISTER, NULL)
 
 #endif

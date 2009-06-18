@@ -196,13 +196,15 @@ CalculateApertureIo16 (
   IN PCI_RESOURCE_NODE *Bridge
   )
 {
-
-  UINT64            Aperture;
-  LIST_ENTRY        *CurrentLink;
-  PCI_RESOURCE_NODE *Node;
-  UINT64            Offset;
-  BOOLEAN           IsaEnable;
-  BOOLEAN           VGAEnable;
+  EFI_STATUS              Status;
+  UINT64                  Aperture;
+  LIST_ENTRY              *CurrentLink;
+  PCI_RESOURCE_NODE       *Node;
+  UINT64                  Offset;
+  BOOLEAN                 IsaEnable;
+  BOOLEAN                 VGAEnable;
+  EFI_PCI_PLATFORM_POLICY PciPolicy;
+  
 
   //
   // Always assume there is ISA device and VGA device on the platform
@@ -211,12 +213,22 @@ CalculateApertureIo16 (
   IsaEnable = FALSE;
   VGAEnable = FALSE;
 
-  if (FeaturePcdGet (PcdPciIsaEnable)){
-    IsaEnable = TRUE;
-  }
-
-  if (FeaturePcdGet (PcdPciVgaEnable)){
-    VGAEnable = TRUE;
+  //
+  // Check PciPlatform policy
+  //
+  if (gPciPlatformProtocol != NULL) {
+    Status = gPciPlatformProtocol->GetPlatformPolicy (
+                                     gPciPlatformProtocol,
+                                     &PciPolicy
+                                     );
+    if (!EFI_ERROR (Status)) {
+      if (PciPolicy & EFI_RESERVE_ISA_IO_ALIAS) {
+        IsaEnable = TRUE;
+      }
+      if (PciPolicy & EFI_RESERVE_VGA_IO_ALIAS) {
+        VGAEnable = TRUE;
+      }
+    }
   }
 
   Aperture = 0;
@@ -1386,10 +1398,10 @@ ProgrameUpstreamBridgeForRom (
     //
     if (Enable) {
       ProgramPpbApperture (OptionRomBase, &Node);
-      PciEnableCommandRegister (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
+      PCI_ENABLE_COMMAND_REGISTER (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
     } else {
       InitializePpb (Parent);
-      PciDisableCommandRegister (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
+      PCI_DISABLE_COMMAND_REGISTER (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
     }
 
     Parent = Parent->Parent;

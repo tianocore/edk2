@@ -595,14 +595,14 @@ RomDecode (
     //
     // Setting the memory space bit in the function's command register
     //
-    PciEnableCommandRegister(PciDevice, EFI_PCI_COMMAND_MEMORY_SPACE);
+    PCI_ENABLE_COMMAND_REGISTER(PciDevice, EFI_PCI_COMMAND_MEMORY_SPACE);
 
   } else {
 
     //
     // disable command register decode to memory
     //
-    PciDisableCommandRegister(PciDevice, EFI_PCI_COMMAND_MEMORY_SPACE);
+    PCI_DISABLE_COMMAND_REGISTER(PciDevice, EFI_PCI_COMMAND_MEMORY_SPACE);
 
     //
     // Destroy the programmed bar in all the upstream bridge.

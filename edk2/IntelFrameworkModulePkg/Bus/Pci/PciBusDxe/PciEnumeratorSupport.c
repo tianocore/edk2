@@ -355,7 +355,7 @@ GatherDeviceInfo (
   //
   if (gFullEnumeration) {
 
-    PciDisableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
+    PCI_DISABLE_COMMAND_REGISTER (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
 
   }
 
@@ -418,12 +418,12 @@ GatherPpbInfo (
     );
 
   if (gFullEnumeration) {
-    PciDisableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
+    PCI_DISABLE_COMMAND_REGISTER (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
 
     //
     // Initalize the bridge control register
     //
-    PciDisableBridgeControlRegister (PciIoDevice, EFI_PCI_BRIDGE_CONTROL_BITS_OWNED);
+    PCI_DISABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, EFI_PCI_BRIDGE_CONTROL_BITS_OWNED);
 
   }
 
@@ -537,12 +537,12 @@ GatherP2CInfo (
     );
 
   if (gFullEnumeration) {
-    PciDisableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
+    PCI_DISABLE_COMMAND_REGISTER (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
 
     //
     // Initalize the bridge control register
     //
-    PciDisableBridgeControlRegister (PciIoDevice, EFI_PCCARD_BRIDGE_CONTROL_BITS_OWNED);
+    PCI_DISABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, EFI_PCCARD_BRIDGE_CONTROL_BITS_OWNED);
 
   }
   //
@@ -684,20 +684,20 @@ PciTestSupportedAttribute (
   //
   // Preserve the original value
   //
-  PciReadCommandRegister (PciIoDevice, OldCommand);
+  PCI_READ_COMMAND_REGISTER (PciIoDevice, OldCommand);
 
   //
   // Raise TPL to high level to disable timer interrupt while the BAR is probed
   //
   OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
-  PciSetCommandRegister (PciIoDevice, *Command);
-  PciReadCommandRegister (PciIoDevice, Command);
+  PCI_SET_COMMAND_REGISTER (PciIoDevice, *Command);
+  PCI_READ_COMMAND_REGISTER (PciIoDevice, Command);
 
   //
   // Write back the original value
   //
-  PciSetCommandRegister (PciIoDevice, *OldCommand);
+  PCI_SET_COMMAND_REGISTER (PciIoDevice, *OldCommand);
 
   //
   // Restore TPL to its original level
@@ -709,20 +709,20 @@ PciTestSupportedAttribute (
     //
     // Preserve the original value
     //
-    PciReadBridgeControlRegister (PciIoDevice, OldBridgeControl);
+    PCI_READ_BRIDGE_CONTROL_REGISTER (PciIoDevice, OldBridgeControl);
 
     //
     // Raise TPL to high level to disable timer interrupt while the BAR is probed
     //
     OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
-    PciSetBridgeControlRegister (PciIoDevice, *BridgeControl);
-    PciReadBridgeControlRegister (PciIoDevice, BridgeControl);
+    PCI_SET_BRIDGE_CONTROL_REGISTER (PciIoDevice, *BridgeControl);
+    PCI_READ_BRIDGE_CONTROL_REGISTER (PciIoDevice, BridgeControl);
 
     //
     // Write back the original value
     //
-    PciSetBridgeControlRegister (PciIoDevice, *OldBridgeControl);
+    PCI_SET_BRIDGE_CONTROL_REGISTER (PciIoDevice, *OldBridgeControl);
 
     //
     // Restore TPL to its original level
@@ -981,7 +981,7 @@ DetermineDeviceAttribute (
     //
     // Enable other supported attributes but not defined in PCI_IO_PROTOCOL
     //
-    PciEnableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE);
+    PCI_ENABLE_COMMAND_REGISTER (PciIoDevice, EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE);
 
     //
     // Enable IDE native mode
@@ -1057,9 +1057,9 @@ DetermineDeviceAttribute (
 
       if (EFI_ERROR (Status) || (!FastB2BSupport)) {
         FastB2BSupport = FALSE;
-        PciDisableBridgeControlRegister (PciIoDevice, EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK);
+        PCI_DISABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK);
       } else {
-        PciEnableBridgeControlRegister (PciIoDevice, EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK);
+        PCI_ENABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, EFI_PCI_BRIDGE_CONTROL_FAST_BACK_TO_BACK);
       }
     }
 
@@ -1067,9 +1067,9 @@ DetermineDeviceAttribute (
     while (CurrentLink != NULL && CurrentLink != &PciIoDevice->ChildList) {
       Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
       if (FastB2BSupport) {
-        PciEnableCommandRegister (Temp, EFI_PCI_COMMAND_FAST_BACK_TO_BACK);
+        PCI_ENABLE_COMMAND_REGISTER (Temp, EFI_PCI_COMMAND_FAST_BACK_TO_BACK);
       } else {
-        PciDisableCommandRegister (Temp, EFI_PCI_COMMAND_FAST_BACK_TO_BACK);
+        PCI_DISABLE_COMMAND_REGISTER (Temp, EFI_PCI_COMMAND_FAST_BACK_TO_BACK);
       }
 
       CurrentLink = CurrentLink->ForwardLink;
