@@ -1,7 +1,7 @@
 /** @file
-  Debug Library that fowards all messages to ReportStatusCode()
+  Debug Library based on report status code library.
 
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,11 +25,10 @@
 #include <Library/PcdLib.h>
 
 /**
-
   Prints a debug message to the debug output device if the specified error level is enabled.
 
-  If any bit in ErrorLevel is also set in PcdDebugPrintErrorLevel, then print
-  the message specified by Format and the associated variable argument list to
+  If any bit in ErrorLevel is also set in PcdDebugPrintErrorLevel, then print 
+  the message specified by Format and the associated variable argument list to 
   the debug output device.
 
   If Format is NULL, then ASSERT().
@@ -65,14 +64,14 @@ DebugPrint (
   //
   // Check driver Debug Level value and global debug level
   //
-  if ((ErrorLevel & PcdGet32(PcdDebugPrintErrorLevel)) == 0) {
+  if ((ErrorLevel & PcdGet32 (PcdDebugPrintErrorLevel)) == 0) {
     return;
   }
 
   //
   // Compute the total size of the record
   //
-  TotalSize = sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrLen (Format) + 1;
+  TotalSize = sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrSize (Format);
 
   //
   // If the TotalSize is larger than the maximum record size, then return
@@ -83,6 +82,11 @@ DebugPrint (
 
   //
   // Fill in EFI_DEBUG_INFO
+  //
+  // Here we skip the first 4 bytes of Buffer, because we must ensure BaseListMarker is
+  // 64-bit aligned, otherwise retrieving 64-bit parameter from BaseListMarker will cause
+  // exception on IPF. Buffer starts at 64-bit aligned address, so skipping 4 types (sizeof(EFI_DEBUG_INFO))
+  // just makes addess of BaseListMarker, which follows DebugInfo, 64-bit aligned.
   //
   DebugInfo             = (EFI_DEBUG_INFO *)(Buffer) + 1;
   DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
@@ -95,10 +99,15 @@ DebugPrint (
   AsciiStrCpy (FormatString, Format);
 
   //
-  // 256 byte mini Var Arg stack. That is followed by the format string.
+  // The first 12 * sizeof (UINT64) bytes following EFI_DEBUG_INFO are for variable arguments
+  // of format in DEBUG string, which is followed by the DEBUG format string.
+  // Here we will process the variable arguments and pack them in this area.
   //
   VA_START (VaListMarker, Format);
   for (; *Format != '\0'; Format++) {
+    //
+    // Only format with prefix % is processed.
+    //
     if (*Format != '%') {
       continue;
     }
@@ -124,12 +133,22 @@ DebugPrint (
       case '7':
       case '8':
       case '9':
+        //
+        // These characters in format field are omitted.
+        //
         break;
       case 'L':
       case 'l': 
+        //
+        // 'L" or "l" in format field means the number being printed is a UINT64
+        //
         Long = TRUE;
         break;
       case '*':
+        //
+        // '*' in format field means the precision of the field is specified by
+        // a UINTN argument in the argument list.
+        //
         BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
         break;
       case '\0':
@@ -142,13 +161,17 @@ DebugPrint (
         // break skipped on purpose.
         //
       default:
+        //
+        // When valid argument type detected or format string terminates unexpectedly,
+        // the inner loop is done.
+        //
         Done = TRUE;
         break;
       }
     } 
         
     //
-    // Handle each argument type
+    // Pack variable arguments into the storage area following EFI_DEBUG_INFO.
     //
     switch (*Format) {
     case 'p':
@@ -210,21 +233,19 @@ DebugPrint (
 }
 
 /**
-
-  Prints an assert message containing a filename, line number, and description.
+  Prints an assert message containing a filename, line number, and description.  
   This may be followed by a breakpoint or a dead loop.
 
   Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n"
-  to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of
-  PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if
-  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then
-  CpuDeadLoop() is called.  If neither of these bits are set, then this function
+  to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of 
+  PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if 
+  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
+  CpuDeadLoop() is called.  If neither of these bits are set, then this function 
   returns immediately after the message is printed to the debug output device.
   DebugAssert() must actively prevent recursion.  If DebugAssert() is called while
   processing another DebugAssert(), then DebugAssert() must return immediately.
 
   If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
-
   If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
 
   @param  FileName     Pointer to the name of the source file that generated the assert condition.
@@ -244,15 +265,15 @@ DebugAssert (
   EFI_DEBUG_ASSERT_DATA  *AssertData;
   UINTN                  TotalSize;
   CHAR8                  *Temp;
-  UINTN                  FileNameLength;
-  UINTN                  DescriptionLength;
+  UINTN                  FileNameSize;
+  UINTN                  DescriptionSize;
 
   //
   // Make sure it will all fit in the passed in buffer
   //
-  FileNameLength    = AsciiStrLen (FileName);
-  DescriptionLength = AsciiStrLen (Description);
-  TotalSize = sizeof (EFI_DEBUG_ASSERT_DATA) + FileNameLength + 1 + DescriptionLength + 1;
+  FileNameSize    = AsciiStrSize (FileName);
+  DescriptionSize = AsciiStrSize (Description);
+  TotalSize = sizeof (EFI_DEBUG_ASSERT_DATA) + FileNameSize + DescriptionSize;
   if (TotalSize <= sizeof (Buffer)) {
     //
     // Fill in EFI_DEBUG_ASSERT_DATA
@@ -268,7 +289,7 @@ DebugAssert (
     //
     // Copy Ascii Description
     //
-    AsciiStrCpy (Temp + AsciiStrLen (FileName) + 1, Description);
+    AsciiStrCpy (Temp + FileNameSize, Description);
 
     REPORT_STATUS_CODE_EX (
       (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED),
@@ -284,29 +305,27 @@ DebugAssert (
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
   //
-  if ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED) != 0) {
+  if ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED) != 0) {
     CpuBreakpoint ();
-  } else if ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED) != 0) {
+  } else if ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED) != 0) {
     CpuDeadLoop ();
   }
 }
 
 
 /**
-
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
 
-  This function fills Length bytes of Buffer with the value specified by
+  This function fills Length bytes of Buffer with the value specified by 
   PcdDebugClearMemoryValue, and returns Buffer.
 
   If Buffer is NULL, then ASSERT().
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
-  If Length is greater than (MAX_ADDRESS ? Buffer + 1), then ASSERT().
+  @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
+  @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
-  @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue.
-
-  @return  Buffer
+  @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *
@@ -316,23 +335,16 @@ DebugClearMemory (
   IN UINTN  Length
   )
 {
-  //
-  // If Buffer is NULL, then ASSERT().
-  //
   ASSERT (Buffer != NULL);
 
-  //
-  // SetMem() checks for the the ASSERT() condition on Length and returns Buffer
-  //
-  return SetMem (Buffer, Length, PcdGet8(PcdDebugClearMemoryValue));
+  return SetMem (Buffer, Length, PcdGet8 (PcdDebugClearMemoryValue));
 }
 
 
 /**
-
   Returns TRUE if ASSERT() macros are enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
@@ -345,15 +357,15 @@ DebugAssertEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
+  __asm int 3
+  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
 
 
-/**
+/**  
+  Returns TRUE if DEBUG() macros are enabled.
 
-  Returns TRUE if DEBUG()macros are enabled.
-
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
@@ -366,15 +378,14 @@ DebugPrintEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
 }
 
 
-/**
+/**  
+  Returns TRUE if DEBUG_CODE() macros are enabled.
 
-  Returns TRUE if DEBUG_CODE()macros are enabled.
-
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
@@ -387,19 +398,18 @@ DebugCodeEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
 
 
-/**
+/**  
+  Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
 
-  Returns TRUE if DEBUG_CLEAR_MEMORY()macro is enabled.
-
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of
+  This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
 
 **/
 BOOLEAN
@@ -408,5 +418,5 @@ DebugClearMemoryEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
 }
