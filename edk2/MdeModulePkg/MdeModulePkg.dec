@@ -169,7 +169,9 @@
     
   ## If TRUE, enable the statistic functionality about variable usage. Such information is
   #  stored as a vendor configuration table into the EFI system table.
-  #  If user wants to get variable usage info, this pcd should be set as TRUE.
+  #  If user wants to use VariableInfo application in MdeModulePkg\Application directory to get
+  #  variable usage info, this pcd should be set as TRUE. Otherwise VariableInfo application can 
+  #  not output useful info.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE|BOOLEAN|0x0001003f
   
   ## If TRUE, Unicode Collation Protocol will be installed.
