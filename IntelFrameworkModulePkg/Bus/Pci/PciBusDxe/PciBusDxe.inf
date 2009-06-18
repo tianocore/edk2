@@ -100,11 +100,9 @@
   gEfiLoadFile2ProtocolGuid						          # SOMETIMES_CONSUMED
 
 [FeaturePcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable
 
-[FixedPcd.common]
+[Pcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask
 
 

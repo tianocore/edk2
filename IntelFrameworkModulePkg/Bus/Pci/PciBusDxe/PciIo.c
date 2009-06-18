@@ -1230,7 +1230,7 @@ SupportPaletteSnoopAttributes (
   //
   if (Temp->Parent == PciIoDevice->Parent) {
 
-    PciReadCommandRegister (Temp, &VGACommand);
+    PCI_READ_COMMAND_REGISTER (Temp, &VGACommand);
 
     //
     // If they are on the same bus, either one can
@@ -1266,7 +1266,7 @@ SupportPaletteSnoopAttributes (
     // GFX should be set to decode
     //
     if (Operation == EfiPciIoAttributeOperationDisable) {
-      PciEnableCommandRegister (Temp, EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
+      PCI_ENABLE_COMMAND_REGISTER (Temp, EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
       Temp->Attributes |= EFI_PCI_COMMAND_VGA_PALETTE_SNOOP;
     } else {
       return EFI_UNSUPPORTED;
@@ -1277,7 +1277,7 @@ SupportPaletteSnoopAttributes (
     // GFX should be set to snoop
     //
     if (Operation == EfiPciIoAttributeOperationEnable) {
-      PciDisableCommandRegister (Temp, EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
+      PCI_DISABLE_COMMAND_REGISTER (Temp, EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
       Temp->Attributes &= (~EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
     } else {
       return EFI_UNSUPPORTED;
@@ -1536,9 +1536,9 @@ PciIoAttributes (
     //
     // Enable relevant attributes to command register and bridge control register
     //
-    Status = PciEnableCommandRegister (PciIoDevice, Command);
+    Status = PCI_ENABLE_COMMAND_REGISTER (PciIoDevice, Command);
     if (BridgeControl != 0) {
-      Status = PciEnableBridgeControlRegister (PciIoDevice, BridgeControl);
+      Status = PCI_ENABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, BridgeControl);
     }
 
     PciIoDevice->Attributes |= Attributes;
@@ -1557,9 +1557,9 @@ PciIoAttributes (
     //
     // Disable relevant attributes to command register and bridge control register
     //
-    Status = PciDisableCommandRegister (PciIoDevice, Command);
+    Status = PCI_DISABLE_COMMAND_REGISTER (PciIoDevice, Command);
     if (BridgeControl != 0) {
-      Status = PciDisableBridgeControlRegister (PciIoDevice, BridgeControl);
+      Status = PCI_DISABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, BridgeControl);
     }
 
     PciIoDevice->Attributes &= (~Attributes);
