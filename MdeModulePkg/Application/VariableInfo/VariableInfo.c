@@ -82,6 +82,13 @@ UefiMain (
       VariableInfo = VariableInfo->Next;
     } while (VariableInfo != NULL);
 
+  } else {
+    Print (L"Warning: Variable Dxe driver doesn't enable the feature of statistical information!\n");
+    Print (L"If you want to see this info, please:\n");
+    Print (L"  1. Set PcdVariableCollectStatistics as TRUE\n");
+    Print (L"  2. Rebuild Variable Dxe driver\n");
+    Print (L"  3. Run \"VariableInfo\" cmd again\n");
+
   }
 
   return Status;
