@@ -1,5 +1,5 @@
 /** @file
-This PPI which is same with PciCfg PPI. But Modify API is removed.
+This PPI is the same as the PPI in the framework PciCfg, with one exception: this PPI does not include a modify API, while the PPI in the framework PciCfg does. 
 
 Copyright (c) 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -25,15 +25,15 @@ typedef struct _ECP_PEI_PCI_CFG_PPI ECP_PEI_PCI_CFG_PPI;
 /**
   PCI read and write operation.
   
-  Write to/read from a given location in the PCI configuration space.
+  Writes to or reads from a given location in the PCI configuration space.
 
   @param  PeiServices                   An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This                              Pointer to local data for the interface.
   @param  Width                            The width of the access. Enumerated in bytes.
-                                                    See EFI_PEI_PCI_CFG_PPI_WIDTH above.
+                                                    See EFI_PEI_PCI_CFG_PPI_WIDTH in MDEPkg.
   @param  Address                         The physical address of the access. The format of
                                                     the address is described by EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS.
-  @param  Buffer                            A pointer to the buffer of data..
+  @param  Buffer                            A pointer to the buffer of data.
   @retval EFI_SUCCESS                   The function completed successfully.
   @retval EFI_DEVICE_ERROR          There was a problem with the transaction.
   @retval EFI_DEVICE_NOT_READY  The device is not capable of supporting the operation at this
