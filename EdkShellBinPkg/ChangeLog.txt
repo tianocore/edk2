@@ -37,6 +37,23 @@ EDK_0000: Compatible: owner
 
 !!!!!!!!!!!!!!!!!!                     End of Notes                     !!!!!!!!!!!!!!!!!!
 ##########################################################################################
+EDK_8598: Non-Compatible: ftian
+	
+	Shell Applications: Remove the binary files of those applications which have been
+	contained in Minimum Shell. Only retain those applications which is in Full Shell
+	but not in Minimum Shell.
+	
+	Code Change:
+	1) Remove the binary files of those applications in EdkShellBinPkg\Bin\Ia32\Apps
+	   which don't be covered by Minimum Shell
+	2) Remove the binary files of those applications in EdkShellBinPkg\Bin\X64\Apps
+	   which don't be covered by Minimum Shell
+	3) Remove the binary files of those applications in EdkShellBinPkg\Bin\Ipf\Apps
+	   which don't be covered by Minimum Shell
+
+	Possible Impacts:
+	1) Platform FDF files that directly refer to these applications should be updated
+	   to avoid build break.
 
 =========================================================================================
 EDK_4227: Compatible: qhuang8
