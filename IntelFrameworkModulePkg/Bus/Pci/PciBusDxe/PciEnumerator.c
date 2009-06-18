@@ -1104,7 +1104,7 @@ ConstructAcpiResourceRequestor (
       Ptr->AddrLen      = IoNode->Length;
       Ptr->AddrRangeMax = IoNode->Alignment;
 
-      Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((UINT8 *) Ptr + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
+      Ptr++;
     }
     //
     // Deal with mem32 aperture
@@ -1127,7 +1127,7 @@ ConstructAcpiResourceRequestor (
       Ptr->AddrLen      = Mem32Node->Length;
       Ptr->AddrRangeMax = Mem32Node->Alignment;
 
-      Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((UINT8 *) Ptr + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
+      Ptr++;
     }
 
     //
@@ -1151,7 +1151,7 @@ ConstructAcpiResourceRequestor (
       Ptr->AddrLen      = PMem32Node->Length;
       Ptr->AddrRangeMax = PMem32Node->Alignment;
 
-      Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((UINT8 *) Ptr + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
+      Ptr++;
     }
     //
     // Deal with mem64 aperture
@@ -1174,7 +1174,7 @@ ConstructAcpiResourceRequestor (
       Ptr->AddrLen      = Mem64Node->Length;
       Ptr->AddrRangeMax = Mem64Node->Alignment;
 
-      Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((UINT8 *) Ptr + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
+      Ptr++;
     }
     //
     // Deal with Pmem64 aperture
@@ -1197,13 +1197,13 @@ ConstructAcpiResourceRequestor (
       Ptr->AddrLen      = PMem64Node->Length;
       Ptr->AddrRangeMax = PMem64Node->Alignment;
 
-      Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((UINT8 *) Ptr + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
+      Ptr++;
     }
 
     //
     // put the checksum
     //
-    PtrEnd            = (EFI_ACPI_END_TAG_DESCRIPTOR *) ((UINT8 *) Ptr);
+    PtrEnd            = (EFI_ACPI_END_TAG_DESCRIPTOR *) Ptr;
 
     PtrEnd->Desc      = ACPI_END_TAG_DESCRIPTOR;
     PtrEnd->Checksum  = 0;
@@ -1223,7 +1223,7 @@ ConstructAcpiResourceRequestor (
     Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) (Configuration);
     Ptr->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
 
-    PtrEnd            = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Configuration + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
+    PtrEnd            = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Ptr + 1);
     PtrEnd->Desc      = ACPI_END_TAG_DESCRIPTOR;
     PtrEnd->Checksum  = 0;
   }
