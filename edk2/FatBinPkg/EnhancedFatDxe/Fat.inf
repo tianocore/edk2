@@ -1,8 +1,12 @@
 #/** @file
-# Make a FFS section for an FV that contains the FAT driver.*.FFS files are compressed FFS sections.
 #
-# This is the FAT 32 EFI/Tiano Driver
-# Copyright 2007, Intel Corporation
+#  Binary FAT32 EFI Driver for IA32, X64, IPF and EBC arch.
+#
+#  This UEFI driver detects the FAT file system in the disk.
+#  It also produces the Simple File System protocol for the consumer to
+#  perform file and directory operations on the disk.
+#
+#  Copyright 2007 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
