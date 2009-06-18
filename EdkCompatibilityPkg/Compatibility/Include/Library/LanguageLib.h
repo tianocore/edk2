@@ -16,24 +16,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __LANGUAGE_LIB__
 
 /**
-  Convert an ISO 639-2 language code to a RFC 4646 language code.
-  If the ISO 639-2 language code has a corresponding ISO 639-1 code, then the ISO 639-1
-  code is returned. Else the original ISO 639-2 code is returned. The returned RFC 4646
+  Converts an ISO 639-2 language code to an RFC 4646 language code.
+  If the ISO 639-2 language code has a corresponding ISO 639-1 code, then that ISO 639-1
+  code is returned in the out parameter. Else the original ISO 639-2 code is returned. The returned RFC 4646
   language code is composed of only a primary language subtag.
 
-  If Iso639Language is NULL, then ASSERT.
-  If Rfc4646Language is NULL, then ASSERT.
+  If Iso639Language is NULL, then ASSERT().
+  If Rfc4646Language is NULL, then ASSERT().
 
   @param[out] Rfc4646Language  Pointers to a buffer large enough for an ASCII string
-                               which reprsents a RFC 4646 language code containging only
+                               representing an RFC 4646 language code containing only
                                either a ISO 639-1 or ISO 639-2 primary language subtag.
                                This string is Null-terminated.
-  @param[in]  Iso639Language   Pointer to a 3-letter ASCII string which represents
+  @param[in]  Iso639Language   Pointer to a 3-letter ASCII string that represents
                                an ISO 639-2 language code. This string is not required
                                to be Null-terminated.
 
-  @retval TRUE                 The ISO 639-2 language code was converted to a ISO 639-1 code.
-  @retval FALSE                The language code does not have corresponding ISO 639-1 code.
+  @retval TRUE                 The ISO 639-2 language code was converted to an ISO 639-1 code.
+  @retval FALSE                The language code does not have a corresponding ISO 639-1 code.
 
 **/
 BOOLEAN
@@ -44,16 +44,16 @@ ConvertIso639ToRfc4646 (
   );
 
 /**
-  Convert a RFC 4646 language code to an ISO 639-2 language code. The primary language
+  Converts an RFC 4646 language code to an ISO 639-2 language code. The primary language
   subtag of the RFC 4646 code must be either an ISO 639-1 or 639-2 code. If the primary
   language subtag is an ISO 639-1 code, then it is converted to its corresponding ISO 639-2
   code (T code if applies). Else the ISO 639-2 code is returned.
 
-  If Rfc4646Language is NULL, then ASSERT.
-  If Iso639Language is NULL, then ASSERT.
+  If Rfc4646Language is NULL, then ASSERT().
+  If Iso639Language is NULL, then ASSERT().
 
   @param[out] Iso639Language   Pointers to a buffer large enough for a 3-letter ASCII string
-                               which reprsents an ISO 639-2 language code. The string is Null-terminated.
+                               representing an ISO 639-2 language code. The string is Null-terminated.
   @param[in]  Rfc4646Language  Pointer to a RFC 4646 language code string. This string is terminated
                                by a NULL or a ';' character.
 
@@ -69,12 +69,12 @@ ConvertRfc4646ToIso639 (
   );
 
 /**
-  Convert ISO 639-2 language codes to RFC 4646 codes and return the converted codes.
+  Converts ISO 639-2 language codes to RFC 4646 codes and returns the converted codes.
   Caller is responsible for freeing the allocated buffer.
 
   If Iso639Languages is NULL, then ASSERT.
 
-  @param[in] Iso639Languages  Pointers to a Null-terminated ISO 639-2 language codes string containing
+  @param[in] Iso639Languages  Pointers to Null-terminated ISO 639-2 language code strings containing
                               one or more ISO 639-2 3-letter language codes.
   
   @retval NULL                Invalid ISO 639-2 language code found.
@@ -91,7 +91,7 @@ ConvertLanguagesIso639ToRfc4646 (
   );
 
 /**
-  Convert RFC 4646 language codes to ISO 639-2 codes and return the converted codes.
+  Converts RFC 4646 language codes to ISO 639-2 codes and returns the converted codes.
   The primary language subtag of the RFC 4646 code must be either an ISO 639-1 or 639-2 code.
   Caller is responsible for freeing the allocated buffer.
 

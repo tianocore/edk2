@@ -1,8 +1,10 @@
 #/** @file
-# EDK Compatibility Package
-#
-# This Package provides headers and libraries that allow a EDK Module (https://edk.tianocore.org)
-# to be used in the context of EDK II environment.
+# The EdkCompatibilityPkg provides header files and libraries that enable you to build the EDK module 
+# in UEFI 2.0 + Framework 0.9x mode. This package also provides Thunk modules that enable Framework 0.9x modules to work with UEFI2.1/PI1.0 EDK II Cores.
+# EdkCompatibilityPkg is based on the EDK 1.01 release, found at http://edk.tianocore.org. This package only 
+# contains the header files and libraries found in the original EDK. EdkCompatibilityPkg code is ANSI C compliant, so the modules can be built with GCC tool-chains. 
+# This package also incorporates bug fixes released in EDK 1.04.
+# 
 #
 # All rights reserved.
 #    This program and the accompanying materials are licensed and made available under
