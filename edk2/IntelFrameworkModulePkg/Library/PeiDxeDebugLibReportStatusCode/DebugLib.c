@@ -357,7 +357,6 @@ DebugAssertEnabled (
   VOID
   )
 {
-  __asm int 3
   return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
 
