@@ -413,7 +413,7 @@ IDEBusDriverBindingStart (
     }
 
     EndIdeDevice = (UINT8) MIN ((MaxDevices - 1), EndIdeDevice);
-
+    ASSERT (EndIdeDevice < IdeMaxDevice);
     //
     // Now inform the IDE Controller Init Module. Sept10
     //
@@ -556,7 +556,7 @@ IDEBusDriverBindingStart (
         //
         // Submit identify data to IDE controller init driver
         //
-        CopyMem (&IdentifyData, IdeBlkIoDevicePtr->pIdData, sizeof (IdentifyData));
+        CopyMem (&IdentifyData, IdeBlkIoDevicePtr->IdData, sizeof (IdentifyData));
         IdeBusDriverPrivateData->DeviceFound[IdeChannel * 2 + IdeDevice] = TRUE;
         IdeInit->SubmitData (IdeInit, IdeChannel, IdeDevice, &IdentifyData);
       } else {
@@ -611,7 +611,7 @@ IDEBusDriverBindingStart (
       //
       // Set best supported PIO mode on this IDE device
       //
-      if (SupportedModes->PioMode.Mode <= ATA_PIO_MODE_2) {
+      if (SupportedModes->PioMode.Mode <= AtaPioMode2) {
         TransferMode.ModeCategory = ATA_MODE_CATEGORY_DEFAULT_PIO;
       } else {
         TransferMode.ModeCategory = ATA_MODE_CATEGORY_FLOW_PIO;
@@ -672,9 +672,9 @@ IDEBusDriverBindingStart (
       //
       // Init driver parameters
       //
-      DriveParameters.Sector          = (UINT8) IdeBlkIoDevicePtr->pIdData->AtaData.sectors_per_track;
-      DriveParameters.Heads           = (UINT8) (IdeBlkIoDevicePtr->pIdData->AtaData.heads - 1);
-      DriveParameters.MultipleSector  = (UINT8) IdeBlkIoDevicePtr->pIdData->AtaData.multi_sector_cmd_max_sct_cnt;
+      DriveParameters.Sector          = (UINT8) IdeBlkIoDevicePtr->IdData->AtaData.sectors_per_track;
+      DriveParameters.Heads           = (UINT8) (IdeBlkIoDevicePtr->IdData->AtaData.heads - 1);
+      DriveParameters.MultipleSector  = (UINT8) IdeBlkIoDevicePtr->IdData->AtaData.multi_sector_cmd_max_sct_cnt;
       //
       // Set Parameters for the device:
       // 1) Init
@@ -1307,11 +1307,11 @@ IDEDiskInfoInquiry (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  if (IdeBlkIoDevice->pInquiryData == NULL) {
+  if (IdeBlkIoDevice->InquiryData == NULL) {
     return EFI_NOT_FOUND;
   }
 
-  gBS->CopyMem (InquiryData, IdeBlkIoDevice->pInquiryData, sizeof (ATAPI_INQUIRY_DATA));
+  gBS->CopyMem (InquiryData, IdeBlkIoDevice->InquiryData, sizeof (ATAPI_INQUIRY_DATA));
   *InquiryDataSize = sizeof (ATAPI_INQUIRY_DATA);
 
   return EFI_SUCCESS;
@@ -1348,11 +1348,11 @@ IDEDiskInfoIdentify (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  if (IdeBlkIoDevice->pIdData == NULL) {
+  if (IdeBlkIoDevice->IdData == NULL) {
     return EFI_NOT_FOUND;
   }
 
-  gBS->CopyMem (IdentifyData, IdeBlkIoDevice->pIdData, sizeof (EFI_IDENTIFY_DATA));
+  gBS->CopyMem (IdentifyData, IdeBlkIoDevice->IdData, sizeof (EFI_IDENTIFY_DATA));
   *IdentifyDataSize = sizeof (EFI_IDENTIFY_DATA);
 
   return EFI_SUCCESS;

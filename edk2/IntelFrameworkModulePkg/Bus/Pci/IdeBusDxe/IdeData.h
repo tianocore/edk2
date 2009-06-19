@@ -197,35 +197,35 @@ typedef struct {
 #define SETFEATURE        TRUE
 #define CLEARFEATURE      FALSE
 
-//
-// PIO mode definition
-//
-typedef enum {
-  ATA_PIO_MODE_BELOW_2,
-  ATA_PIO_MODE_2,
-  ATA_PIO_MODE_3,
-  ATA_PIO_MODE_4
+///
+/// PIO mode definition
+///
+typedef enum _ATA_PIO_MODE_ {
+  AtaPioModeBelow2,
+  AtaPioMode2,
+  AtaPioMode3,
+  AtaPioMode4
 } ATA_PIO_MODE;
 
 //
 // Multi word DMA definition
 //
-typedef enum {
-  ATA_MDMA_MODE_0,
-  ATA_MDMA_MODE_1,
-  ATA_MDMA_MODE_2
+typedef enum _ATA_MDMA_MODE_ {
+  AtaMdmaMode0,
+  AtaMdmaMode1,
+  AtaMdmaMode2
 } ATA_MDMA_MODE;
 
 //
 // UDMA mode definition
 //
-typedef enum {
-  ATA_UDMA_MODE_0,
-  ATA_UDMA_MODE_1,
-  ATA_UDMA_MODE_2,
-  ATA_UDMA_MODE_3,
-  ATA_UDMA_MODE_4,
-  ATA_UDMA_MODE_5
+typedef enum _ATA_UDMA_MODE_ {
+  AtaUdmaMode0,
+  AtaUdmaMode1,
+  AtaUdmaMode2,
+  AtaUdmaMode3,
+  AtaUdmaMode4,
+  AtaUdmaMode5
 } ATA_UDMA_MODE;
 
 #define ATA_MODE_CATEGORY_DEFAULT_PIO 0x00

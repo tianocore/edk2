@@ -1,7 +1,8 @@
 #/** @file
-#  Graphics Library for UEFI drivers
 #
-#  This library provides supports for basic graphic functions.
+#  This library provides API to invoke the S3 resume vector in the APCI Table in S3 resume mode. 
+#  This library instance is only for PEI phase use and the APIs in this instance
+#
 #  Copyright (c) 2006 - 2009, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -39,11 +40,10 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
-  BaseLib
   PeiServicesTablePointerLib
   DebugLib
 
 [Ppis]
-  gEfiPeiS3ResumePpiGuid                # PPI ALWAYS_CONSUMED
+  gEfiPeiS3ResumePpiGuid                # ALWAYS_CONSUMES
 
 

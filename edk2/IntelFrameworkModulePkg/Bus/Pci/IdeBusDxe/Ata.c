@@ -96,7 +96,7 @@ ATAIdentify (
     //
     if (!EFI_ERROR (Status)) {
 
-      IdeDev->pIdData = AtaIdentifyPointer;
+      IdeDev->IdData = AtaIdentifyPointer;
 
       //
       // Print ATA Module Name
@@ -173,7 +173,7 @@ ATAIdentify (
   //
   // Make sure the pIdData will not be freed again.
   //
-  IdeDev->pIdData = NULL;
+  IdeDev->IdData = NULL;
 
   return EFI_DEVICE_ERROR;
 }
@@ -212,11 +212,11 @@ AtaAtapi6Identify (
   EFI_LBA           Capacity;
   EFI_IDENTIFY_DATA *Atapi6IdentifyStruct;
 
-  if (IdeDev->pIdData == NULL) {
+  if (IdeDev->IdData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Atapi6IdentifyStruct = IdeDev->pIdData;
+  Atapi6IdentifyStruct = IdeDev->IdData;
 
   if ((Atapi6IdentifyStruct->AtapiData.cmd_set_support_83 & (BIT15 | BIT14)) != 0x4000) {
     //
@@ -282,11 +282,11 @@ PrintAtaModuleName (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
 {
-  if (IdeDev->pIdData == NULL) {
+  if (IdeDev->IdData == NULL) {
     return ;
   }
 
-  SwapStringChars (IdeDev->ModelName, IdeDev->pIdData->AtaData.ModelName, 40);
+  SwapStringChars (IdeDev->ModelName, IdeDev->IdData->AtaData.ModelName, 40);
   IdeDev->ModelName[40] = 0x00;
 }
 
@@ -1779,13 +1779,13 @@ AtaSMARTSupport (
   //
   // Detect if the device supports S.M.A.R.T.
   //
-  if ((IdeDev->pIdData->AtaData.command_set_supported_83 & 0xc000) != 0x4000) {
+  if ((IdeDev->IdData->AtaData.command_set_supported_83 & 0xc000) != 0x4000) {
     //
     // Data in word 82 is not valid (bit15 shall be zero and bit14 shall be to one)
     //
     return ;
   } else {
-    if ((IdeDev->pIdData->AtaData.command_set_supported_82 & 0x0001) != 0x0001) {
+    if ((IdeDev->IdData->AtaData.command_set_supported_82 & 0x0001) != 0x0001) {
       //
       // S.M.A.R.T is not supported by the device
       //
@@ -1921,12 +1921,12 @@ AtaEnableLongPhysicalSector (
   EFI_ATA_IDENTIFY_DATA  *AtaIdentifyData;
   UINT16                 PhyLogicSectorSupport;
 
-  ASSERT (IdeDev->pIdData != NULL);
+  ASSERT (IdeDev->IdData != NULL);
   //
   // Only valid for ATA device
   //
-  AtaIdentifyData       = (EFI_ATA_IDENTIFY_DATA *) &IdeDev->pIdData->AtaData;
-  if (AtaIdentifyData->config & 0x8000) {
+  AtaIdentifyData       = (EFI_ATA_IDENTIFY_DATA *) &IdeDev->IdData->AtaData;
+  if ((AtaIdentifyData->config & 0x8000) != 0) {
     return EFI_UNSUPPORTED;
   }
   PhyLogicSectorSupport = AtaIdentifyData->phy_logic_sector_support;
@@ -1939,7 +1939,7 @@ AtaEnableLongPhysicalSector (
     //
     // Check whether one physical block contains multiple physical blocks
     //
-    if (PhyLogicSectorSupport & 0x2000) {
+    if ((PhyLogicSectorSupport & 0x2000) != 0) {
       IdeDev->BlkIo.Media->LogicalBlocksPerPhysicalBlock =
         (UINT32) (1 << (PhyLogicSectorSupport & 0x000f));
       //
@@ -1954,7 +1954,7 @@ AtaEnableLongPhysicalSector (
     // Check logical block size
     //
     IdeDev->BlkIo.Media->BlockSize = 0x200;
-    if (PhyLogicSectorSupport & 0x1000) {
+    if ((PhyLogicSectorSupport & 0x1000) != 0) {
       IdeDev->BlkIo.Media->BlockSize = (UINT32) (
         ((AtaIdentifyData->logic_sector_size_hi << 16) |
          AtaIdentifyData->logic_sector_size_lo) * sizeof (UINT16)

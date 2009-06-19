@@ -259,7 +259,7 @@ ATAPIIdentify (
     return EFI_DEVICE_ERROR;
   }
 
-  IdeDev->pIdData = AtapiIdentifyPointer;
+  IdeDev->IdData = AtapiIdentifyPointer;
   PrintAtaModuleName (IdeDev);
 
   //
@@ -267,22 +267,22 @@ ATAPIIdentify (
   //
   Status = AtapiInquiry (IdeDev);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (IdeDev->pIdData);
+    gBS->FreePool (IdeDev->IdData);
     //
     // Make sure the pIdData will not be freed again.
     //
-    IdeDev->pIdData = NULL;
+    IdeDev->IdData = NULL;
     return EFI_DEVICE_ERROR;
   }
   //
   // Get media removable info from INQUIRY data.
   //
-  IdeDev->BlkIo.Media->RemovableMedia = (UINT8) ((IdeDev->pInquiryData->RMB & 0x80) == 0x80);
+  IdeDev->BlkIo.Media->RemovableMedia = (UINT8) ((IdeDev->InquiryData->RMB & 0x80) == 0x80);
 
   //
   // Identify device type via INQUIRY data.
   //
-  switch (IdeDev->pInquiryData->peripheral_type & 0x1f) {
+  switch (IdeDev->InquiryData->peripheral_type & 0x1f) {
 
   //
   // Magnetic Disk
@@ -338,13 +338,13 @@ ATAPIIdentify (
 
   default:
     IdeDev->Type = IdeUnknown;
-    gBS->FreePool (IdeDev->pIdData);
-    gBS->FreePool (IdeDev->pInquiryData);
+    gBS->FreePool (IdeDev->IdData);
+    gBS->FreePool (IdeDev->InquiryData);
     //
     // Make sure the pIdData and pInquiryData will not be freed again.
     //
-    IdeDev->pIdData       = NULL;
-    IdeDev->pInquiryData  = NULL;
+    IdeDev->IdData       = NULL;
+    IdeDev->InquiryData  = NULL;
     return EFI_DEVICE_ERROR;
   }
 
@@ -355,13 +355,13 @@ ATAPIIdentify (
 
   IdeDev->SenseData = AllocatePool (IdeDev->SenseDataNumber * sizeof (ATAPI_REQUEST_SENSE_DATA));
   if (IdeDev->SenseData == NULL) {
-    gBS->FreePool (IdeDev->pIdData);
-    gBS->FreePool (IdeDev->pInquiryData);
+    gBS->FreePool (IdeDev->IdData);
+    gBS->FreePool (IdeDev->InquiryData);
     //
     // Make sure the pIdData and pInquiryData will not be freed again.
     //
-    IdeDev->pIdData       = NULL;
-    IdeDev->pInquiryData  = NULL;
+    IdeDev->IdData       = NULL;
+    IdeDev->InquiryData  = NULL;
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -423,7 +423,7 @@ AtapiInquiry (
     return EFI_DEVICE_ERROR;
   }
 
-  IdeDev->pInquiryData = InquiryData;
+  IdeDev->InquiryData = InquiryData;
 
   return EFI_SUCCESS;
 }
