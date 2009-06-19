@@ -1368,14 +1368,14 @@ ReleaseIdeResources (
     IdeBlkIoDevice->Cache = NULL;
   }
 
-  if (IdeBlkIoDevice->pIdData != NULL) {
-    gBS->FreePool (IdeBlkIoDevice->pIdData);
-    IdeBlkIoDevice->pIdData = NULL;
+  if (IdeBlkIoDevice->IdData != NULL) {
+    gBS->FreePool (IdeBlkIoDevice->IdData);
+    IdeBlkIoDevice->IdData = NULL;
   }
 
-  if (IdeBlkIoDevice->pInquiryData != NULL) {
-    gBS->FreePool (IdeBlkIoDevice->pInquiryData);
-    IdeBlkIoDevice->pInquiryData = NULL;
+  if (IdeBlkIoDevice->InquiryData != NULL) {
+    gBS->FreePool (IdeBlkIoDevice->InquiryData);
+    IdeBlkIoDevice->InquiryData = NULL;
   }
 
   if (IdeBlkIoDevice->ControllerNameTable != NULL) {

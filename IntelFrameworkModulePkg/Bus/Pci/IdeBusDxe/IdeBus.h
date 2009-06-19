@@ -95,8 +95,8 @@ typedef struct {
   IDE_BASE_REGISTERS          *IoPort;
   UINT16                      AtapiError;
 
-  ATAPI_INQUIRY_DATA                *pInquiryData;
-  EFI_IDENTIFY_DATA           *pIdData;
+  ATAPI_INQUIRY_DATA                *InquiryData;
+  EFI_IDENTIFY_DATA           *IdData;
   ATA_PIO_MODE                PioMode;
   EFI_ATA_MODE                UdmaMode;
   CHAR8                       ModelName[41];
@@ -315,7 +315,7 @@ IDEBlkIoReset (
 
   @param  This TODO: add argument description
   @param  MediaId TODO: add argument description
-  @param  LBA TODO: add argument description
+  @param  Lba TODO: add argument description
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
@@ -327,7 +327,7 @@ EFIAPI
 IDEBlkIoReadBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL       *This,
   IN  UINT32                      MediaId,
-  IN  EFI_LBA                     LBA,
+  IN  EFI_LBA                     Lba,
   IN  UINTN                       BufferSize,
   OUT VOID                        *Buffer
   );
@@ -337,7 +337,7 @@ IDEBlkIoReadBlocks (
 
   @param  This TODO: add argument description
   @param  MediaId TODO: add argument description
-  @param  LBA TODO: add argument description
+  @param  Lba TODO: add argument description
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
@@ -349,7 +349,7 @@ EFIAPI
 IDEBlkIoWriteBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL       *This,
   IN  UINT32                      MediaId,
-  IN  EFI_LBA                     LBA,
+  IN  EFI_LBA                     Lba,
   IN  UINTN                       BufferSize,
   IN  VOID                        *Buffer
   );

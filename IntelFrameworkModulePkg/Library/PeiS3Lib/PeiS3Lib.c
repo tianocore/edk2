@@ -1,5 +1,6 @@
 /**@file
-  S3 Library. This library class defines a set of methods related do S3 mode
+  This library provides API to invoke the S3 resume vector in the APCI Table in S3 resume mode. 
+  This library instance is only for PEI phase use and the APIs in this instance
 
 Copyright (c) 2006 - 2008 Intel Corporation
 All rights reserved. This program and the accompanying materials

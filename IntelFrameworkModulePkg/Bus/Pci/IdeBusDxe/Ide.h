@@ -506,7 +506,7 @@ AtaSoftReset (
 
   @param  IdeBlkIoDevice TODO: add argument description
   @param  MediaId TODO: add argument description
-  @param  LBA TODO: add argument description
+  @param  Lba TODO: add argument description
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
@@ -517,7 +517,7 @@ EFI_STATUS
 AtaBlkIoReadBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN UINT32           MediaId,
-  IN EFI_LBA          LBA,
+  IN EFI_LBA          Lba,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   );
@@ -527,7 +527,7 @@ AtaBlkIoReadBlocks (
 
   @param  IdeBlkIoDevice TODO: add argument description
   @param  MediaId TODO: add argument description
-  @param  LBA TODO: add argument description
+  @param  Lba TODO: add argument description
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
@@ -538,7 +538,7 @@ EFI_STATUS
 AtaBlkIoWriteBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN UINT32           MediaId,
-  IN EFI_LBA          LBA,
+  IN EFI_LBA          Lba,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   );
@@ -751,7 +751,7 @@ AtapiSoftReset (
 
   @param  IdeBlkIoDevice TODO: add argument description
   @param  MediaId TODO: add argument description
-  @param  LBA TODO: add argument description
+  @param  Lba TODO: add argument description
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
@@ -762,7 +762,7 @@ EFI_STATUS
 AtapiBlkIoReadBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN UINT32           MediaId,
-  IN EFI_LBA          LBA,
+  IN EFI_LBA          Lba,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   );
@@ -772,7 +772,7 @@ AtapiBlkIoReadBlocks (
 
   @param  IdeBlkIoDevice TODO: add argument description
   @param  MediaId TODO: add argument description
-  @param  LBA TODO: add argument description
+  @param  Lba TODO: add argument description
   @param  BufferSize TODO: add argument description
   @param  Buffer TODO: add argument description
 
@@ -783,7 +783,7 @@ EFI_STATUS
 AtapiBlkIoWriteBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN UINT32           MediaId,
-  IN EFI_LBA          LBA,
+  IN EFI_LBA          Lba,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   );
