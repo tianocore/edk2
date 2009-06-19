@@ -620,7 +620,7 @@ GetProducerString (
 }
 
 /**
-  Convert Processor Frequency Data to a string
+  Convert Processor Frequency Data to a string.
 
   @param ProcessorFrequency The frequency data to process
   @param String             The string that is created

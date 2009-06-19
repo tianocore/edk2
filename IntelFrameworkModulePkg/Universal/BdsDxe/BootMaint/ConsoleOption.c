@@ -1,7 +1,7 @@
 /** @file
   handles console redirection from boot manager
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -864,19 +864,19 @@ IsTerminalDevicePath (
   CopyMem (&TempGuid, &Vendor->Guid, sizeof (EFI_GUID));
 
   if (CompareGuid (&TempGuid, &TerminalTypeGuid[0])) {
-    *Termi      = PC_ANSI;
+    *Termi      = TerminalTypePcAnsi;
     IsTerminal  = TRUE;
   } else {
     if (CompareGuid (&TempGuid, &TerminalTypeGuid[1])) {
-      *Termi      = VT_100;
+      *Termi      = TerminalTypeVt100;
       IsTerminal  = TRUE;
     } else {
       if (CompareGuid (&TempGuid, &TerminalTypeGuid[2])) {
-        *Termi      = VT_100_PLUS;
+        *Termi      = TerminalTypeVt100Plus;
         IsTerminal  = TRUE;
       } else {
         if (CompareGuid (&TempGuid, &TerminalTypeGuid[3])) {
-          *Termi      = VT_UTF8;
+          *Termi      = TerminalTypeVtUtf8;
           IsTerminal  = TRUE;
         } else {
           IsTerminal = FALSE;

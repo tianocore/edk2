@@ -3,7 +3,7 @@
   and manage the legacy boot option, all legacy boot option is getting from
   the legacy BBS table.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1482,7 +1482,7 @@ BdsSetBootPriority4SameTypeDev (
   Print the BBS Table.
 
   @param LocalBbsTable   The BBS table.
-
+  @param BbsCount        The count of entry in BBS table.
 **/
 VOID
 PrintBbsTable (
