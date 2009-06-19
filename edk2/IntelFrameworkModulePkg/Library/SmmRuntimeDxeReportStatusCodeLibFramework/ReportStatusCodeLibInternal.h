@@ -2,7 +2,7 @@
   Internal Header file of Report Status Code Library for RUNTIME
   DXE Phase.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-#ifndef __REPORT_STATUS_CODE_LIB_INTERNAL__H
-#define __REPORT_STATUS_CODE_LIB_INTERNAL__H
+#ifndef __REPORT_STATUS_CODE_LIB_INTERNAL__H__
+#define __REPORT_STATUS_CODE_LIB_INTERNAL__H__
 
 #include <FrameworkDxe.h>
 
@@ -25,19 +25,29 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/OemHookStatusCodeLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <Guid/EventGroup.h>
-#include <Protocol/StatusCode.h>
 
-extern EFI_REPORT_STATUS_CODE  mReportStatusCode;
+#include <Protocol/StatusCode.h>
+#include <Protocol/SmmBase.h>
+
+
+extern EFI_STATUS_CODE_DATA    *mStatusCodeData;
 
 /**
-  Locatet he report status code service.
+  Locate the report status code service.
 
-  @return     EFI_REPORT_STATUS_CODE    function point to
-              ReportStatusCode.
+  In SMM, it retrieves OemHookStatusCodeReport() from customized OEM Hook Status Code Lib.
+  Otherwise, it first tries to retrieve ReportStatusCode() in Runtime Services Table.
+  If not found, it then tries to retrieve ReportStatusCode() API of Report Status Code Protocol.
+
+  @return   Function pointer to the report status code service.
+            NULL is returned if no status code service is available.
+
 **/
 EFI_REPORT_STATUS_CODE
 InternalGetReportStatusCode (
@@ -45,13 +55,12 @@ InternalGetReportStatusCode (
   );
 
 /**
-  Internal worker function that reports a status code through the Status Code Protocol
+  Internal worker function that reports a status code through the status code service.
 
-  This function checks to see if a Status Code Protocol is present in the handle
-  database.  If a Status Code Protocol is not present, then EFI_UNSUPPORTED is
-  returned.  If a Status Code Protocol is present, then it is cached in gStatusCode,
-  and the ReportStatusCode() service of the Status Code Protocol is called passing in
-  Type, Value, Instance, CallerId, and Data.  The result of this call is returned.
+  If status code service is not cached, then this function checks if status code service is
+  available in system.  If status code service is not available, then EFI_UNSUPPORTED is
+  returned.  If status code service is present, then it is cached in mReportStatusCode.
+  Finally this function reports status code through the status code service.
 
   @param  Type              Status code type.
   @param  Value             Status code value.
@@ -62,9 +71,9 @@ InternalGetReportStatusCode (
   @param  Data              Pointer to the extended data buffer.  This is an
                             optional parameter that may be NULL.
 
-  @retval  EFI_SUCCESS           The status code was reported.
-  @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to report the status code.
-  @retval  EFI_UNSUPPORTED       Status Code Protocol is not available.
+  @retval EFI_SUCCESS       The status code was reported.
+  @retval EFI_UNSUPPORTED   Status code service is not available.
+  @retval EFI_UNSUPPORTED   Status code type is not supported.
 
 **/
 EFI_STATUS
@@ -76,60 +85,5 @@ InternalReportStatusCode (
   IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL
   );
 
-/**
-  Reports a status code with full parameters.
-
-  The function reports a status code.  If ExtendedData is NULL and ExtendedDataSize
-  is 0, then an extended data buffer is not reported.  If ExtendedData is not
-  NULL and ExtendedDataSize is not 0, then an extended data buffer is allocated.
-  ExtendedData is assumed not have the standard status code header, so this function
-  is responsible for allocating a buffer large enough for the standard header and
-  the extended data passed into this function.  The standard header is filled in
-  with a GUID specified by ExtendedDataGuid.  If ExtendedDataGuid is NULL, then a
-  GUID of gEfiStatusCodeSpecificDatauid is used.  The status code is reported with
-  an instance specified by Instance and a caller ID specified by CallerId.  If
-  CallerId is NULL, then a caller ID of gEfiCallerIdGuid is used.
-
-  ReportStatusCodeEx()must actively prevent recursion.  If ReportStatusCodeEx()
-  is called while processing another any other Report Status Code Library function,
-  then ReportStatusCodeEx() must return EFI_DEVICE_ERROR immediately.
-
-  If ExtendedData is NULL and ExtendedDataSize is not zero, then ASSERT().
-  If ExtendedData is not NULL and ExtendedDataSize is zero, then ASSERT().
-
-  @param  Type              Status code type.
-  @param  Value             Status code value.
-  @param  Instance          Status code instance number.
-  @param  CallerId          Pointer to a GUID that identifies the caller of this
-                            function.  If this parameter is NULL, then a caller
-                            ID of gEfiCallerIdGuid is used.
-  @param  ExtendedDataGuid  Pointer to the GUID for the extended data buffer.
-                            If this parameter is NULL, then a the status code
-                            standard header is filled in with
-                            gEfiStatusCodeSpecificDataGuid.
-  @param  ExtendedData      Pointer to the extended data buffer.  This is an
-                            optional parameter that may be NULL.
-  @param  ExtendedDataSize  The size, in bytes, of the extended data buffer.
-
-  @retval  EFI_SUCCESS           The status code was reported.
-  @retval  EFI_OUT_OF_RESOURCES  There were not enough resources to allocate
-                                 the extended data section if it was specified.
-  @retval  EFI_UNSUPPORTED       Report status code is not supported
-
-**/
-EFI_STATUS
-EFIAPI
-InternalReportStatusCodeEx (
-  IN EFI_STATUS_CODE_TYPE   Type,
-  IN EFI_STATUS_CODE_VALUE  Value,
-  IN UINT32                 Instance,
-  IN CONST EFI_GUID         *CallerId          OPTIONAL,
-  IN CONST EFI_GUID         *ExtendedDataGuid  OPTIONAL,
-  IN CONST VOID             *ExtendedData      OPTIONAL,
-  IN UINTN                  ExtendedDataSize
-  );
-
-
-
-#endif // __REPORT_STATUS_CODE_LIB_INTERNAL__H
+#endif
 
