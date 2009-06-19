@@ -1,6 +1,7 @@
 /** @file
+  Implements EFI Driver Binding Protocol and VGA Mini Port Protocol for VGA Mini Port Driver.
 
-Copyright (c) 2006 Intel Corporation. All rights reserved
+Copyright (c) 2006 - 2009 Intel Corporation. All rights reserved
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,12 +35,16 @@ EFI_DRIVER_BINDING_PROTOCOL gPciVgaMiniPortDriverBinding = {
 };
 
 /**
-  Driver entry point for VgaMiniPort driver.
-  
-  @param ImageHandle  Driver image handle.
-  @param SystemTable  Point to EFI_SYSTEM_TABLE.
-  
-  @retval Status of install driver binding protocol.
+  Entrypoint of VGA Mini Port Driver.
+
+  This function is the entrypoint of UVGA Mini Port Driver. It installs Driver Binding
+  Protocols together with Component Name Protocols.
+
+  @param  ImageHandle       The firmware allocated handle for the EFI image.
+  @param  SystemTable       A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -48,21 +53,24 @@ PciVgaMiniPortDriverEntryPoint (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  return EfiLibInstallDriverBindingComponentName2 (
-           ImageHandle,
-           SystemTable,
-           &gPciVgaMiniPortDriverBinding,
-           ImageHandle,
-           &gPciVgaMiniPortComponentName,
-           &gPciVgaMiniPortComponentName2
-           );
+  EFI_STATUS              Status;
+
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gPciVgaMiniPortDriverBinding,
+             ImageHandle,
+             &gPciVgaMiniPortComponentName,
+             &gPciVgaMiniPortComponentName2
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
 }
 
 
 /**
-  Supported.
-
-  (Standard DriverBinding Protocol Supported() function)
+  Check whether VGA Mini Port driver supports this device.
 
   @param  This                   The driver binding protocol.
   @param  Controller             The controller handle to check.
@@ -124,20 +132,21 @@ PciVgaMiniPortDriverBindingSupported (
 
 Done:
   gBS->CloseProtocol (
-        Controller,
-        &gEfiPciIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   return Status;
 }
 
 
 /**
-  Install VGA Mini Port Protocol onto VGA device handles
+  Starts the VGA device with this driver.
 
-  (Standard DriverBinding Protocol Start() function)
+  This function consumes PCI I/O Protocol, and installs VGA Mini Port Protocol
+  onto the VGA device handle.
 
   @param  This                   The driver binding instance.
   @param  Controller             The controller to check.
@@ -179,16 +188,8 @@ PciVgaMiniPortDriverBindingStart (
   //
   // Allocate the private device structure
   //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (PCI_VGA_MINI_PORT_DEV),
-                  (VOID **) &PciVgaMiniPortPrivate
-                  );
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-
-  ZeroMem (PciVgaMiniPortPrivate, sizeof (PCI_VGA_MINI_PORT_DEV));
+  PciVgaMiniPortPrivate = AllocateZeroPool (sizeof (PCI_VGA_MINI_PORT_DEV));
+  ASSERT (PciVgaMiniPortPrivate != NULL);
 
   //
   // Initialize the private device structure
@@ -207,7 +208,7 @@ PciVgaMiniPortDriverBindingStart (
   PciVgaMiniPortPrivate->VgaMiniPort.MaxMode = 1;
 
   //
-  // Install Vga Mini Port Protocol
+  // Install VGA Mini Port Protocol
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Controller,
@@ -218,13 +219,13 @@ PciVgaMiniPortDriverBindingStart (
 Done:
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
-          Controller,
-          &gEfiPciIoProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
+           Controller,
+           &gEfiPciIoProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
     if (PciVgaMiniPortPrivate != NULL) {
-      gBS->FreePool (PciVgaMiniPortPrivate);
+      FreePool (PciVgaMiniPortPrivate);
     }
   }
 
@@ -233,9 +234,10 @@ Done:
 
 
 /**
-  Stop.
+  Stop the VGA device with this driver.
 
-  (Standard DriverBinding Protocol Stop() function)
+  This function uninstalls VGA Mini Port Protocol from the VGA device handle,
+  and closes PCI I/O Protocol.
 
   @param  This                   The driver binding protocol.
   @param  Controller             The controller to release.
@@ -284,13 +286,13 @@ PciVgaMiniPortDriverBindingStop (
   }
 
   gBS->CloseProtocol (
-        Controller,
-        &gEfiPciIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
-  gBS->FreePool (PciVgaMiniPortPrivate);
+  FreePool (PciVgaMiniPortPrivate);
 
   return EFI_SUCCESS;
 }
@@ -299,14 +301,19 @@ PciVgaMiniPortDriverBindingStop (
 //
 
 /**
-  Thunk function of EFI_VGA_MINI_PORT_SET_MODE.
+  Sets the text display mode of a VGA controller.
 
-  @param  This             Point to instance of EFI_VGA_MINI_PORT_PROTOCOL.
-  @param  ModeNumber       Mode number.
+  This function implements EFI_VGA_MINI_PORT_PROTOCOL.SetMode().
+  If ModeNumber exceeds the valid range, then EFI_UNSUPPORTED is returned.
+  Otherwise, EFI_SUCCESS is directly returned without real operation.
+  
+  @param This                 Protocol instance pointer.
+  @param ModeNumber           Mode number.  0 - 80x25   1-80x50
 
-  @retval EFI_UNSUPPORTED  Invalid mode number.
-  @retval EFI_SUCCESS      Success.
-
+  @retval EFI_SUCCESS         The mode was set
+  @retval EFI_UNSUPPORTED     ModeNumber is not supported.
+  @retval EFI_DEVICE_ERROR    The device is not functioning properly.
+  
 **/
 EFI_STATUS
 EFIAPI
