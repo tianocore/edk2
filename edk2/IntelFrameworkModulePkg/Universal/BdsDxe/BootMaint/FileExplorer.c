@@ -1,7 +1,7 @@
 /** @file
   File explorer related functions.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,9 +47,9 @@ UpdateFileExplorePage (
       continue;
     }
 
-    if ((NewFileContext->IsDir) || (BOOT_FROM_FILE_STATE == CallbackData->FeCurrentState)) {
+    if ((NewFileContext->IsDir) || (FileExplorerStateBootFromFile == CallbackData->FeCurrentState)) {
       //
-      // Create Text opcode for directory, also create Text opcode for file in BOOT_FROM_FILE_STATE.
+      // Create Text opcode for directory, also create Text opcode for file in FileExplorerStateBootFromFile.
       //
       HiiCreateActionOpCode (
         mStartOpCodeHandle,
@@ -61,11 +61,11 @@ UpdateFileExplorePage (
         );
     } else {
       //
-      // Create Goto opcode for file in ADD_BOOT_OPTION_STATE or ADD_DRIVER_OPTION_STATE.
+      // Create Goto opcode for file in FileExplorerStateAddBootOption or FileExplorerStateAddDriverOptionState.
       //
-      if (ADD_BOOT_OPTION_STATE == CallbackData->FeCurrentState) {
+      if (FileExplorerStateAddBootOption == CallbackData->FeCurrentState) {
         FormId = FORM_BOOT_ADD_DESCRIPTION_ID;
-      } else if (ADD_DRIVER_OPTION_STATE == CallbackData->FeCurrentState) {
+      } else if (FileExplorerStateAddDriverOptionState == CallbackData->FeCurrentState) {
         FormId = FORM_DRIVER_ADD_FILE_DESCRIPTION_ID;
       }
 
@@ -119,7 +119,7 @@ UpdateFileExplorer (
 
   FileOptionMask    = (UINT16) (FILE_OPTION_MASK & KeyValue);
 
-  if (UNKNOWN_CONTEXT == CallbackData->FeDisplayContext) {
+  if (FileExplorerDisplayUnknown == CallbackData->FeDisplayContext) {
     //
     // First in, display file system.
     //
@@ -129,15 +129,15 @@ UpdateFileExplorer (
 
     UpdateFileExplorePage (CallbackData, &FsOptionMenu);
 
-    CallbackData->FeDisplayContext = FILE_SYSTEM;
+    CallbackData->FeDisplayContext = FileExplorerDisplayFileSystem;
   } else {
-    if (FILE_SYSTEM == CallbackData->FeDisplayContext) {
+    if (FileExplorerDisplayFileSystem == CallbackData->FeDisplayContext) {
       NewMenuEntry = BOpt_GetMenuEntry (&FsOptionMenu, FileOptionMask);
-    } else if (DIRECTORY == CallbackData->FeDisplayContext) {
+    } else if (FileExplorerDisplayDirectory == CallbackData->FeDisplayContext) {
       NewMenuEntry = BOpt_GetMenuEntry (&DirectoryMenu, FileOptionMask);
     }
 
-    CallbackData->FeDisplayContext  = DIRECTORY;
+    CallbackData->FeDisplayContext  = FileExplorerDisplayDirectory;
 
     NewFileContext                  = (BM_FILE_CONTEXT *) NewMenuEntry->VariableContext;
 
@@ -156,7 +156,7 @@ UpdateFileExplorer (
 
     } else {
       switch (CallbackData->FeCurrentState) {
-      case BOOT_FROM_FILE_STATE:
+      case FileExplorerStateBootFromFile:
         //
         // Here boot from file
         //
@@ -164,9 +164,9 @@ UpdateFileExplorer (
         ExitFileExplorer = TRUE;
         break;
 
-      case ADD_BOOT_OPTION_STATE:
-      case ADD_DRIVER_OPTION_STATE:
-        if (ADD_BOOT_OPTION_STATE == CallbackData->FeCurrentState) {
+      case FileExplorerStateAddBootOption:
+      case FileExplorerStateAddDriverOptionState:
+        if (FileExplorerStateAddBootOption == CallbackData->FeCurrentState) {
           FormId = FORM_BOOT_ADD_DESCRIPTION_ID;
         } else {
           FormId = FORM_DRIVER_ADD_FILE_DESCRIPTION_ID;
@@ -267,7 +267,7 @@ FileExplorerCallback (
     //
     // Apply changes and exit formset
     //
-    if (ADD_BOOT_OPTION_STATE == Private->FeCurrentState) {
+    if (FileExplorerStateAddBootOption == Private->FeCurrentState) {
       Status = Var_UpdateBootOption (Private, NvRamMap);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -275,7 +275,7 @@ FileExplorerCallback (
 
       BOpt_GetBootOptions (Private);
       CreateMenuStringToken (Private, Private->FeHiiHandle, &BootOptionMenu);
-    } else if (ADD_DRIVER_OPTION_STATE == Private->FeCurrentState) {
+    } else if (FileExplorerStateAddDriverOptionState == Private->FeCurrentState) {
       Status = Var_UpdateDriverOption (
                 Private,
                 Private->FeHiiHandle,

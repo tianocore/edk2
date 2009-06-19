@@ -1,7 +1,7 @@
 /** @file
   The functions for Boot Maintainence Main menu.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -450,7 +450,7 @@ BootMaintCallback (
     if (QuestionId < CONFIG_OPTION_OFFSET) {
       switch (QuestionId) {
       case KEY_VALUE_BOOT_FROM_FILE:
-        Private->FeCurrentState = BOOT_FROM_FILE_STATE;
+        Private->FeCurrentState = FileExplorerStateBootFromFile;
 
         //
         // Exit Bmm main formset to send File Explorer formset.
@@ -459,7 +459,7 @@ BootMaintCallback (
         break;
 
       case FORM_BOOT_ADD_ID:
-        Private->FeCurrentState = ADD_BOOT_OPTION_STATE;
+        Private->FeCurrentState = FileExplorerStateAddBootOption;
 
         //
         // Exit Bmm main formset to send File Explorer formset.
@@ -468,7 +468,7 @@ BootMaintCallback (
         break;
 
       case FORM_DRV_ADD_FILE_ID:
-        Private->FeCurrentState = ADD_DRIVER_OPTION_STATE;
+        Private->FeCurrentState = FileExplorerStateAddDriverOptionState;
 
         //
         // Exit Bmm main formset to send File Explorer formset.
@@ -890,8 +890,8 @@ InitializeBM (
   BmmCallbackInfo->FeConfigAccess.ExtractConfig  = FakeExtractConfig;
   BmmCallbackInfo->FeConfigAccess.RouteConfig    = FakeRouteConfig;
   BmmCallbackInfo->FeConfigAccess.Callback       = FileExplorerCallback;
-  BmmCallbackInfo->FeCurrentState                = INACTIVE_STATE;
-  BmmCallbackInfo->FeDisplayContext              = UNKNOWN_CONTEXT;
+  BmmCallbackInfo->FeCurrentState                = FileExplorerStateInActive;
+  BmmCallbackInfo->FeDisplayContext              = FileExplorerDisplayUnknown;
 
   //
   // Install Device Path Protocol and Config Access protocol to driver handle
@@ -1355,7 +1355,7 @@ FormSetDispatcher (
     //
     // When this Formset returns, check if we are going to explore files.
     //
-    if (INACTIVE_STATE != CallbackData->FeCurrentState) {
+    if (FileExplorerStateInActive != CallbackData->FeCurrentState) {
       UpdateFileExplorer (CallbackData, 0);
 
       ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
@@ -1372,8 +1372,8 @@ FormSetDispatcher (
         EnableResetRequired ();
       }
 
-      CallbackData->FeCurrentState    = INACTIVE_STATE;
-      CallbackData->FeDisplayContext  = UNKNOWN_CONTEXT;
+      CallbackData->FeCurrentState    = FileExplorerStateInActive;
+      CallbackData->FeDisplayContext  = FileExplorerDisplayUnknown;
       ReclaimStringDepository ();
     } else {
       break;

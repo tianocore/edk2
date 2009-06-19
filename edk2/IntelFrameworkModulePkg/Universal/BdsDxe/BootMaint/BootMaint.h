@@ -1,7 +1,7 @@
 /** @file
   Header file for boot maintenance module.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -93,53 +93,25 @@ extern UINT8    FEBin[];
 //
 typedef UINT8 BBS_TYPE;
 
-typedef enum {
-  PC_ANSI                             = 0,
-  VT_100,
-  VT_100_PLUS,
-  VT_UTF8
+typedef enum _TYPE_OF_TERMINAL {
+  TerminalTypePcAnsi                             = 0,
+  TerminalTypeVt100,
+  TerminalTypeVt100Plus,
+  TerminalTypeVtUtf8
 } TYPE_OF_TERMINAL;
 
-typedef enum {
-  COM1                                = 0,
-  COM2,
-  UNKNOW_COM
-} TYPE_OF_COM;
-
-typedef enum {
-  CONIN                               = 0,
-  CONOUT,
-  CONERR,
-  UNKNOWN_CON
-} TYPE_OF_CON;
-
-typedef enum {
-  BAUDRATE                            = 0,
-  DATABITS,
-  PARITY,
-  STOPBITS,
-  UNKNOW_ATTR
-} TYPE_OF_ATTRIBUTE;
-
-typedef enum {
-  MANNER_GOTO                         = 0,
-  MANNER_CHECK,
-  MANNER_ONEOF,
-  MANNER_USER_DEFINE
-} TYPE_OF_UPATE_MANNER;
-
-typedef enum {
-  INACTIVE_STATE                      = 0,
-  BOOT_FROM_FILE_STATE,
-  ADD_BOOT_OPTION_STATE,
-  ADD_DRIVER_OPTION_STATE,
-  UNKNOWN_STATE
+typedef enum _FILE_EXPLORER_STATE {
+  FileExplorerStateInActive                      = 0,
+  FileExplorerStateBootFromFile,
+  FileExplorerStateAddBootOption,
+  FileExplorerStateAddDriverOptionState,
+  FileExplorerStateUnknown
 } FILE_EXPLORER_STATE;
 
-typedef enum {
-  FILE_SYSTEM,
-  DIRECTORY,
-  UNKNOWN_CONTEXT
+typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
+  FileExplorerDisplayFileSystem,
+  FileExplorerDisplayDirectory,
+  FileExplorerDisplayUnknown
 } FILE_EXPLORER_DISPLAY_CONTEXT;
 
 //
@@ -436,10 +408,12 @@ typedef struct {
   FILE_EXPLORER_NV_DATA          FeFakeNvData;
 } BMM_CALLBACK_DATA;
 
-typedef struct _STRING_LIST_NODE {
+typedef struct _STRING_LIST_NODE STRING_LIST_NODE;
+
+struct _STRING_LIST_NODE {
   EFI_STRING_ID             StringToken;
-  struct _STRING_LIST_NODE  *Next;
-} STRING_LIST_NODE;
+  STRING_LIST_NODE          *Next;
+};
 
 typedef struct _STRING_DEPOSITORY {
   UINTN             TotalNodeNumber;
