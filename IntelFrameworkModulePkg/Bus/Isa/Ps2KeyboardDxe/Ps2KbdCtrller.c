@@ -1,5 +1,4 @@
 /**@file
-  PS/2 Keyboard driver
   Routines that access 8042 keyboard controller
 
 Copyright (c) 2006 - 2007, Intel Corporation
@@ -567,64 +566,6 @@ UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 
 BOOLEAN          mEnableMouseInterface;
 
-//
-// Function declarations
-//
-UINT8
-KeyReadDataRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  );
-
-VOID
-KeyWriteDataRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-VOID
-KeyWriteCommandRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-VOID
-KeyboardError (
-  IN KEYBOARD_CONSOLE_IN_DEV*ConsoleIn,
-  IN CHAR16                 *ErrMsg // should be a unicode string
-  );
-
-EFI_STATUS
-GetScancodeBufHead (
-  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
-  IN UINT32                Count,
-  OUT UINT8                *Buf
-  );
-
-EFI_STATUS
-PopScancodeBufHead (
-  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
-  IN UINT32                Count,
-  OUT UINT8                *Buf
-  );
-
-EFI_STATUS
-KeyboardWrite (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-EFI_STATUS
-KeyboardCommand (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
-  );
-
-EFI_STATUS
-KeyboardWaitForValue (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Value
-  );
-
 /**
   Read data register 
 
@@ -687,9 +628,6 @@ KeyWriteDataRegister (
               &Data
               );
 
-  //
-  // outp(ConsoleIn->DataRegisterAddress, Data);
-  //
 }
 
 /**
@@ -770,11 +708,6 @@ KeyboardError (
   )
 {
   ConsoleIn->KeyboardErr = TRUE;
-
-  //
-  // gST -> ConOut -> OutputString (gST -> ConOut, L"Keyboard Driver: ");
-  // gST -> ConOut -> OutputString (gST -> ConOut, ErrMsg);
-  //
 }
 
 /**
@@ -784,8 +717,8 @@ KeyboardError (
   the memory buffer or empty the keyboard buffer.
   It is registered as running under TPL_NOTIFY
 
-  @param Event - The timer event
-  @param Context - A KEYBOARD_CONSOLE_IN_DEV pointer
+  @param Event       The timer event
+  @param Context     A KEYBOARD_CONSOLE_IN_DEV pointer
 
 **/
 VOID
@@ -814,6 +747,7 @@ KeyboardTimerHandler (
     gBS->RestoreTPL (OldTpl);
     return ;
   }
+
   //
   // To let KB driver support Hot plug, here should skip the 'resend' command  for the case that
   // KB is not connected to system. If KB is not connected to system, driver will find there's  something
@@ -827,7 +761,7 @@ KeyboardTimerHandler (
   //
   // if there is no key present, just return
   //
-  if ((KeyReadStatusRegister (Context) & 0x21) != 0x1) {
+  if ((KeyReadStatusRegister (Context) & (KEYBOARD_STATUS_REGISTER_TRANSMIT_TIMEOUT|KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA)) != KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA) {
     //
     // Leave critical section and return
     //
@@ -1019,13 +953,13 @@ KeyboardRead (
   // wait till output buffer full then perform the read
   //
   for (TimeOut = 0; TimeOut < KEYBOARD_TIMEOUT; TimeOut += 30) {
-    if (KeyReadStatusRegister (ConsoleIn) & 0x01) {
+    if (KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA) {
       RegFilled = 1;
       *Data     = KeyReadDataRegister (ConsoleIn);
       break;
     }
 
-    gBS->Stall (30);
+    MicroSecondDelay (30);
   }
 
   if (!RegFilled) {
@@ -1041,8 +975,8 @@ KeyboardRead (
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   @param Data      value wanted to be written
 
-  @retval EFI_TIMEOUT - GC_TODO: Add description for return value
-  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+  @retval EFI_TIMEOUT   The input buffer register is full for putting new value util timeout
+  @retval EFI_SUCCESS   The new value is sucess put into input buffer register.
 
 **/
 EFI_STATUS
@@ -1066,7 +1000,7 @@ KeyboardWrite (
       break;
     }
 
-    gBS->Stall (30);
+    MicroSecondDelay (30);
   }
 
   if (!RegEmptied) {
@@ -1111,7 +1045,7 @@ KeyboardCommand (
       break;
     }
 
-    gBS->Stall (30);
+    MicroSecondDelay (30);
   }
 
   if (!RegEmptied) {
@@ -1132,7 +1066,7 @@ KeyboardCommand (
       break;
     }
 
-    gBS->Stall (30);
+    MicroSecondDelay (30);
   }
 
   if (!RegEmptied) {
@@ -1191,7 +1125,7 @@ KeyboardWaitForValue (
         break;
       }
 
-      gBS->Stall (30);
+      MicroSecondDelay (30);
     }
 
     SumTimeOut += TimeOut;
@@ -1208,7 +1142,7 @@ KeyboardWaitForValue (
   //
   // Check results
   //
-  if (GotIt) {
+  if (GotIt == 1) {
     return EFI_SUCCESS;
   } else {
     return EFI_TIMEOUT;
@@ -1222,7 +1156,7 @@ KeyboardWaitForValue (
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   
-  @return status
+  @return status of updating keyboard register
 
 **/
 EFI_STATUS
@@ -1276,8 +1210,8 @@ UpdateStatusLights (
 
   @param ConsoleIn KEYBOARD_CONSOLE_IN_DEV instance pointer
 
-  @retval EFI_NOT_READY - Input from console not ready yet.
-  @retval EFI_SUCCESS   - Function executed successfully.
+  @retval EFI_NOT_READY  Input from console not ready yet.
+  @retval EFI_SUCCESS    Function executed successfully.
 
 **/
 EFI_STATUS
@@ -1365,7 +1299,7 @@ KeyGetchar (
   // Check if there are enough bytes of scancode representing a single key
   // available in the buffer
   //
-  while (1) {
+  while (TRUE) {
 
     Status          = GetScancodeBufHead (ConsoleIn, 1, ScancodeArr);
     ScancodeArrPos  = 0;
@@ -1516,7 +1450,7 @@ KeyGetchar (
   //
   if (Extended && ScanCode == 0x35) {
     ConsoleIn->Key.ScanCode     = SCAN_NULL;
-    ConsoleIn->Key.UnicodeChar  = '/';
+    ConsoleIn->Key.UnicodeChar  = L'/';
     return EFI_SUCCESS;
   }
   //
@@ -1531,7 +1465,7 @@ KeyGetchar (
         // Need not return associated shift state if a class of printable characters that
         // are normally adjusted by shift modifiers. e.g. Shift Key + 'f' key = 'F'
         //
-        if (ConsoleIn->Key.UnicodeChar >= 'A' && ConsoleIn->Key.UnicodeChar <= 'Z') {
+        if (ConsoleIn->Key.UnicodeChar >= L'A' && ConsoleIn->Key.UnicodeChar <= L'Z') {
           ConsoleIn->LeftShift  = FALSE;
           ConsoleIn->RightShift = FALSE;
         }
@@ -1542,9 +1476,9 @@ KeyGetchar (
       // alphabetic key is affected by CapsLock State
       //
       if (ConsoleIn->CapsLock) {
-        if (ConsoleIn->Key.UnicodeChar >= 'a' && ConsoleIn->Key.UnicodeChar <= 'z') {
+        if (ConsoleIn->Key.UnicodeChar >= L'a' && ConsoleIn->Key.UnicodeChar <= L'z') {
           ConsoleIn->Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar;
-        } else if (ConsoleIn->Key.UnicodeChar >= 'A' && ConsoleIn->Key.UnicodeChar <= 'Z') {
+        } else if (ConsoleIn->Key.UnicodeChar >= L'A' && ConsoleIn->Key.UnicodeChar <= L'Z') {
           ConsoleIn->Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar;
         }
       }
@@ -1552,10 +1486,10 @@ KeyGetchar (
       // Translate the CTRL-Alpha characters to their corresponding control value (ctrl-a = 0x0001 through ctrl-Z = 0x001A)
       //
       if (ConsoleIn->Ctrled) {
-        if (ConsoleIn->Key.UnicodeChar >= 'a' && ConsoleIn->Key.UnicodeChar <= 'z') {
-          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - 'a' + 1);
-        } else if (ConsoleIn->Key.UnicodeChar >= 'A' && ConsoleIn->Key.UnicodeChar <= 'Z') {
-          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - 'A' + 1);
+        if (ConsoleIn->Key.UnicodeChar >= L'a' && ConsoleIn->Key.UnicodeChar <= L'z') {
+          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - L'a' + 1);
+        } else if (ConsoleIn->Key.UnicodeChar >= L'A' && ConsoleIn->Key.UnicodeChar <= L'Z') {
+          ConsoleIn->Key.UnicodeChar = (UINT16) (ConsoleIn->Key.UnicodeChar - L'A' + 1);
         }
       }
 
@@ -1571,13 +1505,13 @@ KeyGetchar (
     if (ConsoleIn->NumLock && !ConsoleIn->Shift && !Extended) {
       ConsoleIn->Key.ScanCode = SCAN_NULL;
     } else if (ScanCode != 0x4a && ScanCode != 0x4e) {
-      ConsoleIn->Key.UnicodeChar = 0x00;
+      ConsoleIn->Key.UnicodeChar = 0x0000;
     }
   }
   //
   // If the key can not be converted then just return.
   //
-  if (ConsoleIn->Key.ScanCode == SCAN_NULL && ConsoleIn->Key.UnicodeChar == 0x00) {
+  if (ConsoleIn->Key.ScanCode == SCAN_NULL && ConsoleIn->Key.UnicodeChar == 0x0000) {
     return EFI_NOT_READY;
   }
 
@@ -1690,7 +1624,7 @@ InitKeyboard (
   // Test the system flag in to determine whether this is the first
   // time initialization
   //
-  if ((KeyReadStatusRegister (ConsoleIn) & 0x04)) {
+  if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_SYSTEM_FLAG)) {
     //
     // 8042 controller is already setup (by myself or by mouse driver):
     //   See whether mouse interface is already enabled
@@ -1699,7 +1633,7 @@ InitKeyboard (
     //
     // Read the command byte of 8042 controller
     //
-    Status = KeyboardCommand (ConsoleIn, 0x20);
+    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_READ);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"\n\r");
       goto Done;
@@ -1728,13 +1662,13 @@ InitKeyboard (
     //
     // Disable keyboard and mouse interfaces
     //
-    Status = KeyboardCommand (ConsoleIn, 0xad);
+    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_KEYBOARD_INTERFACE);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"\n\r");
       goto Done;
     }
 
-    Status = KeyboardCommand (ConsoleIn, 0xa7);
+    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_MOUSE_INTERFACE);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"\n\r");
       goto Done;
@@ -1748,7 +1682,7 @@ InitKeyboard (
     //
     // 8042 Controller Self Test
     //
-    Status = KeyboardCommand (ConsoleIn, 0xaa);
+    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_CONTROLLER_SELF_TEST);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
       goto Done;
@@ -1787,7 +1721,7 @@ InitKeyboard (
   //  1: Enable Auxiliary device interrupt
   //  0: Enable Keyboard interrupt )
   //
-  Status = KeyboardCommand (ConsoleIn, 0x60);
+  Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_WRITE);
   if (EFI_ERROR (Status)) {
     KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
     goto Done;
@@ -1837,7 +1771,7 @@ InitKeyboard (
     //
     // Keyboard Interface Test
     //
-    Status = KeyboardCommand (ConsoleIn, 0xab);
+    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_KEYBOARD_INTERFACE_SELF_TEST);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
       goto Done;
@@ -1854,13 +1788,13 @@ InitKeyboard (
     //
     // Keyboard reset with a BAT(Basic Assurance Test)
     //
-    Status = KeyboardWrite (ConsoleIn, 0xff);
+    Status = KeyboardWrite (ConsoleIn, KEYBOARD_8048_COMMAND_RESET);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"8042 controller data write error!\n\r");
       goto Done;
     }
 
-    Status = KeyboardWaitForValue (ConsoleIn, 0xfa);
+    Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_ACK);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"Some specific value not aquired from 8042 controller!\n\r");
       goto Done;
@@ -1870,7 +1804,7 @@ InitKeyboard (
     //
     mWaitForValueTimeOut  = KEYBOARD_BAT_TIMEOUT;
 
-    Status                = KeyboardWaitForValue (ConsoleIn, 0xaa);
+    Status                = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_BAT_SUCCESS);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"Keyboard self test failed!\n\r");
       goto Done;
@@ -1881,13 +1815,13 @@ InitKeyboard (
     //
     // Set Keyboard to use Scan Code Set 2
     //
-    Status = KeyboardWrite (ConsoleIn, 0xf0);
+    Status = KeyboardWrite (ConsoleIn, KEYBOARD_8048_COMMAND_SELECT_SCAN_CODE_SET);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"8042 controller data write error!\n\r");
       goto Done;
     }
 
-    Status = KeyboardWaitForValue (ConsoleIn, 0xfa);
+    Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_ACK);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"Some specific value not aquired from 8042 controller!\n\r");
       goto Done;
@@ -1899,7 +1833,7 @@ InitKeyboard (
       goto Done;
     }
 
-    Status = KeyboardWaitForValue (ConsoleIn, 0xfa);
+    Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_ACK);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"Some specific value not aquired from 8042 controller!\n\r");
       goto Done;
@@ -1908,13 +1842,13 @@ InitKeyboard (
   //
   // Clear Keyboard Scancode Buffer
   //
-  Status = KeyboardWrite (ConsoleIn, 0xf4);
+  Status = KeyboardWrite (ConsoleIn, KEYBOARD_8048_COMMAND_CLEAR_OUTPUT_DATA);
   if (EFI_ERROR (Status)) {
     KeyboardError (ConsoleIn, L"8042 controller data write error!\n\r");
     goto Done;
   }
 
-  Status = KeyboardWaitForValue (ConsoleIn, 0xfa);
+  Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_ACK);
   if (EFI_ERROR (Status)) {
     KeyboardError (ConsoleIn, L"Some specific value not aquired from 8042 controller!\n\r");
     goto Done;
@@ -1951,7 +1885,7 @@ Done:
     //
     // Enable mouse interface
     //
-    Status1 = KeyboardCommand (ConsoleIn, 0xa8);
+    Status1 = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_ENABLE_MOUSE_INTERFACE);
     if (EFI_ERROR (Status1)) {
       KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
       return EFI_DEVICE_ERROR;
@@ -1984,7 +1918,7 @@ DisableKeyboard (
   //
   // Disable keyboard interface
   //
-  Status = KeyboardCommand (ConsoleIn, 0xad);
+  Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_KEYBOARD_INTERFACE);
   if (EFI_ERROR (Status)) {
     KeyboardError (ConsoleIn, L"\n\r");
     return EFI_DEVICE_ERROR;

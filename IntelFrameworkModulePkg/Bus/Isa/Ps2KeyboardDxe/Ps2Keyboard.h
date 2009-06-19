@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/TimerLib.h>
 
 //
 // Global Variables
@@ -179,6 +180,32 @@ InstallPs2KeyboardDriver (
 #define SCANCODE_MENU_BREAK             0xDD
 #define SCANCODE_SYS_REQ_MAKE           0x37
 #define SCANCODE_MAX_MAKE               0x60
+
+#define KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA     BIT0        ///< 0 - Output register has no data; 1 - Output register has data
+#define KEYBOARD_STATUS_REGISTER_HAS_INPUT_DATA      BIT1        ///< 0 - Input register has no data;  1 - Input register has data
+#define KEYBOARD_STATUS_REGISTER_SYSTEM_FLAG         BIT2        ///< Set to 0 after power on reset
+#define KEYBOARD_STATUS_REGISTER_INPUT_DATA_TYPE     BIT3        ///< 0 - Data in input register is data; 1 - Data in input register is command
+#define KEYBOARD_STATUS_REGISTER_ENABLE_FLAG         BIT4        ///< 0 - Keyboard is disable; 1 - Keyboard is enable
+#define KEYBOARD_STATUS_REGISTER_TRANSMIT_TIMEOUT    BIT5        ///< 0 - Transmit is complete without timeout; 1 - Transmit is timeout without complete
+#define KEYBOARD_STATUS_REGISTER_RECEIVE_TIMEOUT     BIT6        ///< 0 - Receive is complete without timeout; 1 - Receive is timeout without complete
+#define KEYBOARD_STATUS_REGISTER_PARITY              BIT7        ///< 0 - Odd parity; 1 - Even parity
+
+#define KEYBOARD_8042_COMMAND_READ                          0x20
+#define KEYBOARD_8042_COMMAND_WRITE                         0x60
+#define KEYBOARD_8042_COMMAND_DISABLE_MOUSE_INTERFACE       0xA7
+#define KEYBOARD_8042_COMMAND_ENABLE_MOUSE_INTERFACE        0xA8
+#define KEYBOARD_8042_COMMAND_CONTROLLER_SELF_TEST          0xAA
+#define KEYBOARD_8042_COMMAND_KEYBOARD_INTERFACE_SELF_TEST  0xAB
+#define KEYBOARD_8042_COMMAND_DISABLE_KEYBOARD_INTERFACE    0xAD
+
+#define KEYBOARD_8048_COMMAND_CLEAR_OUTPUT_DATA             0xF4
+#define KEYBOARD_8048_COMMAND_RESET                         0xFF
+#define KEYBOARD_8048_COMMAND_SELECT_SCAN_CODE_SET          0xF0
+
+#define KEYBOARD_8048_RETURN_8042_BAT_SUCCESS               0xAA
+#define KEYBOARD_8048_RETURN_8042_BAT_ERROR                 0xFC
+#define KEYBOARD_8048_RETURN_8042_ACK                       0xFA
+
 
 //
 // Keyboard Controller Status

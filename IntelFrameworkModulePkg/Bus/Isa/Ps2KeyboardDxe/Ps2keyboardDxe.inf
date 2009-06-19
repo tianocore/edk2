@@ -54,7 +54,8 @@
   UefiDriverEntryPoint
   BaseLib
   BaseMemoryLib
-
+  TimerLib
+  
 [Protocols]
   gEfiPs2PolicyProtocolGuid                     # PROTOCOL TO_START
   gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
