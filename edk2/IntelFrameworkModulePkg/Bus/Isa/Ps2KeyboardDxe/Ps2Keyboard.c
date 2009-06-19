@@ -555,7 +555,7 @@ KbdFreeNotifyList (
 }
 
 /**
-  The user Entry Point for module Ps2Keyboard. The user code starts with this function.
+  The module Entry Point for module Ps2Keyboard. 
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
   @param[in] SystemTable    A pointer to the EFI System Table.
