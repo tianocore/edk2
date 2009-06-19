@@ -4,7 +4,7 @@
   driver to describe the unique features of a platform. This
   protocol is optional.
   
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -36,22 +36,45 @@ typedef struct _EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_PLATFORM_PROTOCOL;
 
 typedef    UINT32   EFI_PCI_PLATFORM_POLICY;
 
-
+//
+// There are 4 legal combinations of following bit values:
+// EFI_RESERVE_NONE_IO_ALIAS,
+// EFI_RESERVE_ISA_IO_ALIAS | EFI_RESERVE_VGA_IO_ALIAS,
+// EFI_RESERVE_ISA_IO_NO_ALIAS | EFI_RESERVE_VGA_IO_ALIAS,
+// EFI_RESERVE_ISA_IO_NO_ALIAS | EFI_RESERVE_VGA_IO_NO_ALIAS
+//
 #define     EFI_RESERVE_NONE_IO_ALIAS        0x0000
 #define     EFI_RESERVE_ISA_IO_ALIAS         0x0001
 #define     EFI_RESERVE_ISA_IO_NO_ALIAS      0x0002
 #define     EFI_RESERVE_VGA_IO_ALIAS         0x0004
 #define     EFI_RESERVE_VGA_IO_NO_ALIAS      0x0008
 
-
+///
+/// EFI_PCI_CHIPSET_EXECUTION_PHASE is used to call a platform protocol and execute
+/// platform-specific code.
+///
 typedef enum {
+  ///
+  /// The phase that indicates the entry point to the PCI Bus Notify phase. This
+  /// platform hook is called before the PCI bus driver calls the
+  /// EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL driver.
+  ///
   ChipsetEntry,
+  ///
+  /// The phase that indicates the exit point to the Chipset Notify phase before
+  /// returning to the PCI Bus Driver Notify phase. This platform hook is called after
+  /// the PCI bus driver calls the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  /// driver.
+  ///
   ChipsetExit,
   MaximumChipsetPhase
 } EFI_PCI_CHIPSET_EXECUTION_PHASE;
 
 
 /**
+  The notification from the PCI bus enumerator to the platform that it is
+  about to enter a certain phase during the enumeration process.
+
   The PlatformNotify() function can be used to notify the platform driver so that
   it can perform platform-specific actions. No specific actions are required.
   Eight notification points are defined at this time. More synchronization points
@@ -83,6 +106,9 @@ EFI_STATUS
 
 
 /**
+  The notification from the PCI bus enumerator to the platform for each PCI
+  controller at several predefined points during PCI controller initialization.
+
   The PlatformPrepController() function can be used to notify the platform driver so that
   it can perform platform-specific actions. No specific actions are required.
   Several notification points are defined at this time. More synchronization points may be
@@ -118,6 +144,8 @@ EFI_STATUS
 
 
 /**
+  Retrieves the platform policy regarding enumeration.
+
   The GetPlatformPolicy() function retrieves the platform policy regarding PCI
   enumeration. The PCI bus driver and the PCI Host Bridge Resource Allocation Protocol
   driver can call this member function to retrieve the policy.
@@ -138,6 +166,8 @@ EFI_STATUS
 
 
 /**
+  Gets the PCI device's option ROM from a platform-specific location.
+
   The GetPciRom() function gets the PCI device's option ROM from a platform-specific location.
   The option ROM will be loaded into memory. This member function is used to return an image
   that is packaged as a PCI 2.2 option ROM. The image may contain both legacy and EFI option
@@ -173,29 +203,13 @@ EFI_STATUS
   OUT  UINTN                        *RomSize
 );
 
-/**
-  @par Protocol Description:
-  This protocol provides the interface between the PCI bus driver/PCI Host
-  Bridge Resource Allocation driver and a platform-specific driver to describe
-  the unique features of a platform.
-
-  @param PlatformNotify
-  The notification from the PCI bus enumerator to the platform that it is
-  about to enter a certain phase during the enumeration process.
-
-  @param PlatformPrepController
-  The notification from the PCI bus enumerator to the platform for each PCI
-  controller at several predefined points during PCI controller initialization.
-
-  @param GetPlatformPolicy
-  Retrieves the platform policy regarding enumeration.
-
-  @param GetPciRom
-  Gets the PCI device's option ROM from a platform-specific location.
-
-**/
+///
+/// This protocol provides the interface between the PCI bus driver/PCI Host
+/// Bridge Resource Allocation driver and a platform-specific driver to describe
+/// the unique features of a platform.
+///
 struct _EFI_PCI_PLATFORM_PROTOCOL {
-  EFI_PCI_PLATFORM_PHASE_NOTIFY          PhaseNotify;
+  EFI_PCI_PLATFORM_PHASE_NOTIFY          PlatformNotify;
   EFI_PCI_PLATFORM_PREPROCESS_CONTROLLER PlatformPrepController;
   EFI_PCI_PLATFORM_GET_PLATFORM_POLICY   GetPlatformPolicy;
   EFI_PCI_PLATFORM_GET_PCI_ROM           GetPciRom;
