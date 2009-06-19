@@ -34,6 +34,7 @@ EFI_REPORT_STATUS_CODE  mReportStatusCode = NULL;
   Locate the report status code service.
 
   @return   Function pointer to the report status code service.
+            NULL is returned if no status code service is available.
 
 **/
 EFI_REPORT_STATUS_CODE
