@@ -297,8 +297,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|TRUE
   gEfiEdkModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE
-  gEfiGenericPlatformTokenSpaceGuid.PcdPciIsaEnable|FALSE
-  gEfiGenericPlatformTokenSpaceGuid.PcdPciVgaEnable|FALSE
   gEfiGenericPlatformTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE
   #gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|FALSE
@@ -322,8 +320,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
 
