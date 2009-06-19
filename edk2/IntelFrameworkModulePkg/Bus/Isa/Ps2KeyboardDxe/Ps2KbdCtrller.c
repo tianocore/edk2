@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Routines that access 8042 keyboard controller
 
 Copyright (c) 2006 - 2007, Intel Corporation
@@ -567,7 +567,7 @@ UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 BOOLEAN          mEnableMouseInterface;
 
 /**
-  Read data register 
+  Read data register .
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
 
@@ -600,7 +600,7 @@ KeyReadDataRegister (
 }
 
 /**
-  Write data register
+  Write data register.
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   @param Data      value wanted to be written
@@ -631,7 +631,7 @@ KeyWriteDataRegister (
 }
 
 /**
-  Read status register
+  Read status register.
 
   @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
 
@@ -664,13 +664,12 @@ KeyReadStatusRegister (
 }
 
 /**
-  Write command register 
+  Write command register .
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   @param Data      The value wanted to be written
 
 **/
-
 VOID
 KeyWriteCommandRegister (
   IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
@@ -695,7 +694,7 @@ KeyWriteCommandRegister (
 }
 
 /**
-  Display error message
+  Display error message.
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   @param ErrMsg    Unicode string of error message
@@ -826,8 +825,9 @@ KeyboardTimerHandler (
   This function is called to see if there are enough bytes of scancode
   representing a single key.
 
-  @param Count - Number of bytes to be read
-  @param Buf - Store the results
+  @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Count      Number of bytes to be read
+  @param Buf        Store the results
 
   @retval EFI_SUCCESS success to scan the keyboard code
   @retval EFI_NOT_READY invalid parameter
@@ -878,8 +878,9 @@ GetScancodeBufHead (
   Read & remove several bytes from the scancode buffer.
   This function is usually called after GetScancodeBufHead()
 
-  @param Count - Number of bytes to be read
-  @param Buf - Store the results
+  @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
+  @param Count      Number of bytes to be read
+  @param Buf        Store the results
 
   @retval EFI_SUCCESS success to scan the keyboard code
   @retval EFI_NOT_READY invalid parameter
@@ -927,7 +928,7 @@ PopScancodeBufHead (
 }
 
 /**
-  Read key value 
+  Read key value .
 
   @param ConsoleIn - Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   @param Data      - Pointer to outof buffer for keeping key value
@@ -962,7 +963,7 @@ KeyboardRead (
     MicroSecondDelay (30);
   }
 
-  if (!RegFilled) {
+  if (RegFilled == 0) {
     return EFI_TIMEOUT;
   }
 
@@ -995,7 +996,7 @@ KeyboardWrite (
   // wait for input buffer empty
   //
   for (TimeOut = 0; TimeOut < KEYBOARD_TIMEOUT; TimeOut += 30) {
-    if (!(KeyReadStatusRegister (ConsoleIn) & 0x02)) {
+    if ((KeyReadStatusRegister (ConsoleIn) & 0x02) == 0) {
       RegEmptied = 1;
       break;
     }
@@ -1003,7 +1004,7 @@ KeyboardWrite (
     MicroSecondDelay (30);
   }
 
-  if (!RegEmptied) {
+  if (RegEmptied == 0) {
     return EFI_TIMEOUT;
   }
   //
@@ -1015,7 +1016,7 @@ KeyboardWrite (
 }
 
 /**
-  Issue keyboard command
+  Issue keyboard command.
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   @param Data      The buff holding the command 
@@ -1040,7 +1041,7 @@ KeyboardCommand (
   // Wait For Input Buffer Empty
   //
   for (TimeOut = 0; TimeOut < KEYBOARD_TIMEOUT; TimeOut += 30) {
-    if (!(KeyReadStatusRegister (ConsoleIn) & 0x02)) {
+    if ((KeyReadStatusRegister (ConsoleIn) & 0x02) == 0) {
       RegEmptied = 1;
       break;
     }
@@ -1048,7 +1049,7 @@ KeyboardCommand (
     MicroSecondDelay (30);
   }
 
-  if (!RegEmptied) {
+  if (RegEmptied == 0) {
     return EFI_TIMEOUT;
   }
   //
@@ -1061,7 +1062,7 @@ KeyboardCommand (
   //
   RegEmptied = 0;
   for (TimeOut = 0; TimeOut < KEYBOARD_TIMEOUT; TimeOut += 30) {
-    if (!(KeyReadStatusRegister (ConsoleIn) & 0x02)) {
+    if ((KeyReadStatusRegister (ConsoleIn) & 0x02) == 0) {
       RegEmptied = 1;
       break;
     }
@@ -1069,7 +1070,7 @@ KeyboardCommand (
     MicroSecondDelay (30);
   }
 
-  if (!RegEmptied) {
+  if (RegEmptied == 0) {
     return EFI_TIMEOUT;
   }
 
@@ -1519,10 +1520,10 @@ KeyGetchar (
   // Save the Shift/Toggle state
   //
   if (ConsoleIn->Ctrl) {
-    ConsoleIn->KeyState.KeyShiftState  |= (Extended == TRUE) ? EFI_RIGHT_CONTROL_PRESSED : EFI_LEFT_CONTROL_PRESSED;
+    ConsoleIn->KeyState.KeyShiftState  |= (Extended) ? EFI_RIGHT_CONTROL_PRESSED : EFI_LEFT_CONTROL_PRESSED;
   }                                    
   if (ConsoleIn->Alt) {                
-    ConsoleIn->KeyState.KeyShiftState  |= (Extended == TRUE) ? EFI_RIGHT_ALT_PRESSED : EFI_LEFT_ALT_PRESSED;
+    ConsoleIn->KeyState.KeyShiftState  |= (Extended) ? EFI_RIGHT_ALT_PRESSED : EFI_LEFT_ALT_PRESSED;
   }                                    
   if (ConsoleIn->LeftShift) {          
     ConsoleIn->KeyState.KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
@@ -1556,7 +1557,7 @@ KeyGetchar (
 }
 
 /**
-  Perform 8042 controller and keyboard Initialization
+  Perform 8042 controller and keyboard Initialization.  
   If ExtendedVerification is TRUE, do additional test for
   the keyboard interface
 
@@ -1624,7 +1625,7 @@ InitKeyboard (
   // Test the system flag in to determine whether this is the first
   // time initialization
   //
-  if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_SYSTEM_FLAG)) {
+  if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_SYSTEM_FLAG) != 0) {
     //
     // 8042 controller is already setup (by myself or by mouse driver):
     //   See whether mouse interface is already enabled
@@ -1647,7 +1648,7 @@ InitKeyboard (
     //
     // Test the mouse enabling bit
     //
-    if (CommandByte & 0x20) {
+    if ((CommandByte & 0x20) != 0) {
       mEnableMouseInterface = FALSE;
     } else {
       mEnableMouseInterface = TRUE;
@@ -1901,9 +1902,9 @@ Done:
 }
 
 /**
-  Disable the keyboard interface of the 8042 controller
+  Disable the keyboard interface of the 8042 controller.
 
-  @param ConsoleIn   - the device instance
+  @param ConsoleIn   The device instance
 
   @return status of issuing disable command
 

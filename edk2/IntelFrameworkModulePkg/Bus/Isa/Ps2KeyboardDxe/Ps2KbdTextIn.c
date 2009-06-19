@@ -1,8 +1,8 @@
-/**@file
+/** @file
   Routines implements SIMPLE_TEXT_IN protocol's interfaces based on 8042 interfaces
   provided by Ps2KbdCtrller.c.
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ps2Keyboard.h"
 
 /**
-  Check keyboard for given key value
+  Check keyboard for given key value.
   
   @param  This  Point to instance of EFI_SIMPLE_TEXT_INPUT_PROTOCOL
   
@@ -248,7 +248,7 @@ KeyboardEfiReset (
   //
   // Report the status If keyboard is locked
   //
-  if (!(KeyReadStatusRegister (ConsoleIn) & 0x10)) {
+  if ((KeyReadStatusRegister (ConsoleIn) & 0x10) == 0) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
       EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_EC_LOCKED,

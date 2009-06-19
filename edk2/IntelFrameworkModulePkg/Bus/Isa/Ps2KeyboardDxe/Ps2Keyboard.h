@@ -1,7 +1,7 @@
-/**@file
+/** @file
   PS/2 keyboard driver header file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _PS2KEYBOARD_H
-#define _PS2KEYBOARD_H
+#ifndef _PS2KEYBOARD_H_
+#define _PS2KEYBOARD_H_
 
 #include <PiDxe.h>
 #include <Framework/StatusCode.h>
@@ -231,7 +231,7 @@ UpdateStatusLights (
   );
 
 /**
-  write key to keyboard
+  write key to keyboard.
 
   @param ConsoleIn Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
   @param Data      value wanted to be written
@@ -263,7 +263,7 @@ KeyGetchar (
   );
 
 /**
-  Perform 8042 controller and keyboard Initialization
+  Perform 8042 controller and keyboard Initialization.
   If ExtendedVerification is TRUE, do additional test for
   the keyboard interface
 
@@ -280,7 +280,7 @@ InitKeyboard (
   );
 
 /**
-  Disable the keyboard interface of the 8042 controller
+  Disable the keyboard interface of the 8042 controller.
 
   @param ConsoleIn   - the device instance
 
@@ -360,7 +360,7 @@ KeyboardWaitForKey (
   );
 
 /**
-  Read status register
+  Read status register.
 
   @param ConsoleIn  Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
 
@@ -377,7 +377,7 @@ KeyReadStatusRegister (
   If Keyboard receives 0xF4, it will respond with 'ACK'. If it doesn't respond, the device
   should not be in system.
 
-  @param[in]  BiosKeyboardPrivate   Keyboard Private Data Structure
+  @param[in]  ConsoleIn   Pointer to instance of KEYBOARD_CONSOLE_IN_DEV
 
   @retval     TRUE                  Keyboard in System.
   @retval     FALSE                 Keyboard not in System.
