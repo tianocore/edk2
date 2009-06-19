@@ -1,9 +1,9 @@
-/**@file
+/** @file
 
   PS/2 Keyboard driver. Routines that interacts with callers,
   conforming to EFI driver model
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Function prototypes
 //
+/**
+  Test controller is a keyboard Controller.
+  
+  @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller           driver's controller
+  @param RemainingDevicePath  children device path
+  
+  @retval EFI_UNSUPPORTED controller is not floppy disk
+  @retval EFI_SUCCESS     controller is floppy disk
+**/
 EFI_STATUS
 EFIAPI
 KbdControllerDriverSupported (
@@ -27,6 +37,15 @@ KbdControllerDriverSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Create KEYBOARD_CONSOLE_IN_DEV instance on controller.
+  
+  @param This         Pointer of EFI_DRIVER_BINDING_PROTOCOL
+  @param Controller   driver controller handle
+  @param RemainingDevicePath Children's device path
+  
+  @retval whether success to create floppy control instance.
+**/
 EFI_STATUS
 EFIAPI
 KbdControllerDriverStart (
@@ -35,6 +54,20 @@ KbdControllerDriverStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Stop this driver on ControllerHandle. Support stoping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 KbdControllerDriverStop (
@@ -44,6 +77,14 @@ KbdControllerDriverStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
 
+/**
+  Free the waiting key notify list.
+  
+  @param ListHead  Pointer to list head
+  
+  @retval EFI_INVALID_PARAMETER  ListHead is NULL
+  @retval EFI_SUCCESS            Sucess to free NotifyList
+**/
 EFI_STATUS
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
@@ -62,7 +103,7 @@ EFI_DRIVER_BINDING_PROTOCOL gKeyboardControllerDriver = {
 };
 
 /**
-  Test controller is a keyboard Controller
+  Test controller is a keyboard Controller.
   
   @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
   @param Controller           driver's controller
@@ -461,7 +502,7 @@ KbdControllerDriverStop (
     ConsoleIn->DevicePath
     );
 
-  if (ConsoleIn->TimerEvent) {
+  if (ConsoleIn->TimerEvent != NULL) {
     gBS->CloseEvent (ConsoleIn->TimerEvent);
     ConsoleIn->TimerEvent = NULL;
   }
@@ -529,6 +570,9 @@ KbdControllerDriverStop (
   Free the waiting key notify list.
   
   @param ListHead  Pointer to list head
+  
+  @retval EFI_INVALID_PARAMETER  ListHead is NULL
+  @retval EFI_SUCCESS            Sucess to free NotifyList
 **/
 EFI_STATUS
 KbdFreeNotifyList (
