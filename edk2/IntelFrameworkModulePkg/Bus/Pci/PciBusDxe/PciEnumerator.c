@@ -1727,9 +1727,9 @@ NotifyPhase (
     HostBridgeHandle = PciRootBridgeIo->ParentHandle;
 
     //
-    // Call PlatformPci::PhaseNotify() if the protocol is present.
+    // Call PlatformPci::PlatformNotify() if the protocol is present.
     //
-    gPciPlatformProtocol->PhaseNotify (
+    gPciPlatformProtocol->PlatformNotify (
                             gPciPlatformProtocol,
                             HostBridgeHandle,
                             Phase,
@@ -1744,9 +1744,9 @@ NotifyPhase (
 
   if (gPciPlatformProtocol != NULL) {
     //
-    // Call PlatformPci::PhaseNotify() if the protocol is present.
+    // Call PlatformPci::PlatformNotify() if the protocol is present.
     //
-    gPciPlatformProtocol->PhaseNotify (
+    gPciPlatformProtocol->PlatformNotify (
                             gPciPlatformProtocol,
                             HostBridgeHandle,
                             Phase,
