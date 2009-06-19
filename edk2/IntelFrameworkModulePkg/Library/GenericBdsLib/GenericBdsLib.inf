@@ -38,7 +38,8 @@
   BdsConsole.c
   BdsBoot.c
   InternalBdsLib.h
-
+  Bmp.h
+  
 [Sources.IPF]
   Ipf/ShadowRom.c
 

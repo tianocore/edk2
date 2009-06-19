@@ -79,7 +79,6 @@ BdsLibDoLegacyBoot (
   @retval FALSE     If not.
   
 **/
-
 BOOLEAN
 IsBootOptionValidNVVarialbe (
   IN  BDS_COMMON_OPTION             *OptionToCheck
