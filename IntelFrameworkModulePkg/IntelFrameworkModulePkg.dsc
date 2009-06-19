@@ -132,8 +132,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIsaEnable|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciVgaEnable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportDma|TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma|FALSE
