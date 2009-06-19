@@ -1,4 +1,4 @@
-/**@file
+/** @file
   This library provides API to invoke the S3 resume vector in the APCI Table in S3 resume mode. 
   This library instance is only for PEI phase use and the APIs in this instance
 
