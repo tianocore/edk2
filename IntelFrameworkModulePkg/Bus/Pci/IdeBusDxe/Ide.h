@@ -876,22 +876,6 @@ ReadNativeMaxAddress (
   OUT EFI_LBA                       *NativeMaxAddress
   );
 
-/**
-  TODO: Add function description
-
-  @param  IdeDev TODO: add argument description
-  @param  MaxAddress TODO: add argument description
-  @param  bVolatile TODO: add argument description
-
-  TODO: add return values.
-
-**/
-EFI_STATUS
-SetMaxAddress (
-  IN  IDE_BLK_IO_DEV                *IdeDev,
-  IN  EFI_LBA                       MaxAddress,
-  IN  BOOLEAN                       bVolatile
-  );
 
 /**
   TODO: Add function description
