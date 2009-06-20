@@ -1089,7 +1089,6 @@ This function extends the capability of SetFilePointer to accept 64 bit paramete
 {
   EFI_STATUS    Status;
   LARGE_INTEGER LargeInt;
-  UINT32        ErrorCode;
 
   LargeInt.QuadPart = DistanceToMove;
   Status            = EFI_SUCCESS;
@@ -1101,8 +1100,7 @@ This function extends the capability of SetFilePointer to accept 64 bit paramete
                                             MoveMethod
                                             );
 
-  if (LargeInt.LowPart == -1 &&
-      (ErrorCode = Private->WinNtThunk->GetLastError ()) != NO_ERROR) {
+  if (LargeInt.LowPart == -1 && Private->WinNtThunk->GetLastError () != NO_ERROR) {
     Status = EFI_INVALID_PARAMETER;
   }
 

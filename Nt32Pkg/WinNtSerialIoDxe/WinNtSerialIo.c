@@ -192,7 +192,7 @@ Returns:
         DevicePathNodeLength((EFI_DEVICE_PATH_PROTOCOL *)UartNode) != sizeof(UART_DEVICE_PATH)) {
       goto Error;
     }
-    if (UartNode->BaudRate < 0 || UartNode->BaudRate > SERIAL_PORT_MAX_BAUD_RATE) {
+    if ( UartNode->BaudRate > SERIAL_PORT_MAX_BAUD_RATE) {
       goto Error;
     }
     if (UartNode->Parity < NoParity || UartNode->Parity > SpaceParity) {
@@ -339,9 +339,9 @@ Returns:
                               Node.BaudRate,
                               SerialIo->Mode->ReceiveFifoDepth,
                               SerialIo->Mode->Timeout,
-                              Node.Parity,
+                              (EFI_PARITY_TYPE)Node.Parity,
                               Node.DataBits,
-                              Node.StopBits
+                              (EFI_STOP_BITS_TYPE)Node.StopBits
                               );
         }
         break;
@@ -699,9 +699,9 @@ Returns:
                 This->Mode->BaudRate,
                 This->Mode->ReceiveFifoDepth,
                 This->Mode->Timeout,
-                This->Mode->Parity,
+                (EFI_PARITY_TYPE)This->Mode->Parity,
                 (UINT8) This->Mode->DataBits,
-                This->Mode->StopBits
+                (EFI_STOP_BITS_TYPE)This->Mode->StopBits
                 );
 }
 
@@ -774,7 +774,7 @@ Returns:
   }
 
   if (Parity == DefaultParity) {
-    Parity = FixedPcdGet8 (PcdUartDefaultParity);
+    Parity = (EFI_PARITY_TYPE) (FixedPcdGet8 (PcdUartDefaultParity));
   }
 
   if (DataBits == 0) {
