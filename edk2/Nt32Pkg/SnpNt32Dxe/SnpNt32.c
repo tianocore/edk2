@@ -42,7 +42,7 @@ SNPNT32_GLOBAL_DATA         gSnpNt32GlobalData = {
   {
     0,
     0,
-    0
+    EfiLockUninitialized
   },                          //  Lock
   //
   //  Private functions
@@ -1083,7 +1083,7 @@ SnpNt32InitializeGlobalData (
   //
   //  Get the WinNT thunk
   //
-  Status = gBS->LocateProtocol (&gEfiWinNtThunkProtocolGuid, NULL, &This->WinNtThunk);
+  Status = gBS->LocateProtocol (&gEfiWinNtThunkProtocolGuid, NULL, (VOID **)&This->WinNtThunk);
 
   if (EFI_ERROR (Status)) {
     return Status;

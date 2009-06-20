@@ -140,13 +140,13 @@ WinNtGopConvertParamToEfiKey (
   // Set toggle state
   //    
   case VK_NUMLOCK:     
-    Private->NumLock    = !Private->NumLock;
+    Private->NumLock    = (BOOLEAN)(!Private->NumLock);
     break;
   case VK_SCROLL:
-    Private->ScrollLock = !Private->ScrollLock;
+    Private->ScrollLock = (BOOLEAN)(!Private->ScrollLock);
     break;  
   case VK_CAPITAL:
-    Private->CapsLock   = !Private->CapsLock;
+    Private->CapsLock   = (BOOLEAN)(!Private->CapsLock);
     break;  
   }
   
@@ -821,7 +821,6 @@ WinNtGopThreadWinMain (
 {
   MSG               Message;
   GOP_PRIVATE_DATA  *Private;
-  ATOM              Atom;
   RECT              Rect;
 
   Private = (GOP_PRIVATE_DATA *) lpParameter;
@@ -857,7 +856,7 @@ WinNtGopThreadWinMain (
   // Class, including the callback function, unless the Class is unregistered and
   // successfully registered again.
   //
-  Atom = Private->WinNtThunk->RegisterClassEx (&Private->WindowsClass);
+  Private->WinNtThunk->RegisterClassEx (&Private->WindowsClass);
 
   //
   // Setting Rect values to allow for the AdjustWindowRect to provide
@@ -882,7 +881,7 @@ WinNtGopThreadWinMain (
                                                 NULL,
                                                 NULL,
                                                 NULL,
-                                                &Private
+                                                (VOID **)&Private
                                                 );
 
   //
@@ -1050,8 +1049,6 @@ WinNtGopDestructor (
   GOP_PRIVATE_DATA     *Private
   )
 {
-  UINT32  UnregisterReturn;
-
   if (!Private->HardwareNeedsStarting) {
     //
     // BugBug: Shutdown GOP Hardware and any child devices.
@@ -1071,10 +1068,10 @@ WinNtGopDestructor (
       Private->WinNtThunk->TlsFree (mTlsIndex);
       mTlsIndex = TLS_OUT_OF_INDEXES;
 
-      UnregisterReturn = Private->WinNtThunk->UnregisterClass (
-                                                Private->WindowsClass.lpszClassName,
-                                                Private->WindowsClass.hInstance
-                                                );
+      Private->WinNtThunk->UnregisterClass (
+                              Private->WindowsClass.lpszClassName,
+                              Private->WindowsClass.hInstance
+                              );
     }
 
     WinNtGopDestroySimpleTextInForWindow (Private);
@@ -1111,6 +1108,5 @@ KillNtGopThread (
   IN VOID       *Context
   )
 {
-  EFI_STATUS  Status;
-  Status = WinNtGopDestructor (Context);
+  WinNtGopDestructor (Context);
 }
