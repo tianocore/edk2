@@ -175,7 +175,7 @@ typedef struct {
   SMBIOS_TABLE_STRING     Version;
   SMBIOS_TABLE_STRING     SerialNumber;
   GUID                    Uuid;
-  MISC_SYSTEM_WAKEUP_TYPE WakeUpType;
+  UINT8                   WakeUpType;           ///< enumeration value from MISC_SYSTEM_WAKEUP_TYPE
   SMBIOS_TABLE_STRING     SKUNumber;
   SMBIOS_TABLE_STRING     Family;
 } SMBIOS_TABLE_TYPE1;
@@ -227,7 +227,7 @@ typedef struct {
   BASE_BOARD_FEATURE_FLAGS  FeatureFlag;
   SMBIOS_TABLE_STRING       LocationInChassis;
   UINT16                    ChassisHandle;
-  BASE_BOARD_TYPE           BoardType;
+  UINT8                     BoardType;              ///< enumeration value from BASE_BOARD_TYPE
   UINT8                     NumberOfContainedObjectHandles;
   UINT16                    ContainedObjectHandles[1];
 } SMBIOS_TABLE_TYPE2;
@@ -316,10 +316,10 @@ typedef struct {
   SMBIOS_TABLE_STRING         Version;
   SMBIOS_TABLE_STRING         SerialNumber;
   SMBIOS_TABLE_STRING         AssetTag;
-  MISC_CHASSIS_STATE          BootupState;
-  MISC_CHASSIS_STATE          PowerSupplyState;
-  MISC_CHASSIS_STATE          ThermalState;
-  MISC_CHASSIS_SECURITY_STATE SecurityStatus;
+  UINT8                       BootupState;            ///< enumeration value from MISC_CHASSIS_STATE
+  UINT8                       PowerSupplyState;       ///< enumeration value from MISC_CHASSIS_STATE
+  UINT8                       ThermalState;           ///< enumeration value from MISC_CHASSIS_STATE
+  UINT8                       SecurityStatus;         ///< enumeration value from MISC_CHASSIS_SECURITY_STATE
   UINT8                       OemDefined[4];
   UINT8                       Height;
   UINT8                       NumberofPowerCords;
@@ -521,13 +521,6 @@ typedef struct {
 } PROCESSOR_SIGNATURE;
 
 typedef struct {
-  UINT32  ProcessorBrandIndex :8;
-  UINT32  ProcessorClflush    :8;
-  UINT32  ProcessorReserved   :8;
-  UINT32  ProcessorDfltApicId :8;
-} PROCESSOR_MISC_INFO;
-
-typedef struct {
   UINT32  ProcessorFpu       :1;
   UINT32  ProcessorVme       :1;
   UINT32  ProcessorDe        :1;
@@ -563,8 +556,6 @@ typedef struct {
 
 typedef struct {
   PROCESSOR_SIGNATURE     Signature;
-  PROCESSOR_MISC_INFO     MiscInfo;
-  UINT32                  Reserved;
   PROCESSOR_FEATURE_FLAGS FeatureFlags;
 } PROCESSOR_ID_DATA;
 
@@ -579,9 +570,9 @@ typedef struct {
 ///
 typedef struct { 
   SMBIOS_STRUCTURE      Hdr;
-  UINT8                 Socket;
-  PROCESSOR_TYPE_DATA   ProcessorType;
-  PROCESSOR_FAMILY_DATA ProcessorFamily;
+  SMBIOS_TABLE_STRING   Socket;
+  UINT8                 ProcessorType;          ///< enumeration value from PROCESSOR_TYPE_DATA
+  UINT8                 ProcessorFamily;        ///< enumeration value from PROCESSOR_FAMILY_DATA
   SMBIOS_TABLE_STRING   ProcessorManufacture;
   PROCESSOR_ID_DATA     ProcessorId;
   SMBIOS_TABLE_STRING   ProcessorVersion;
@@ -590,7 +581,7 @@ typedef struct {
   UINT16                MaxSpeed;
   UINT16                CurrentSpeed;
   UINT8                 Status;
-  PROCESSOR_UPGRADE     ProcessorUpgrade;
+  UINT8                 ProcessorUpgrade;      ///< enumeration value from PROCESSOR_UPGRADE
   UINT16                L1CacheHandle;
   UINT16                L2CacheHandle;
   UINT16                L3CacheHandle;
@@ -676,10 +667,10 @@ typedef struct {
 ///
 typedef struct {
   SMBIOS_STRUCTURE                Hdr;
-  MEMORY_ERROR_DETECT_METHOD      ErrDetectMethod;
+  UINT8                           ErrDetectMethod;            ///< enumeration value from MEMORY_ERROR_DETECT_METHOD
   MEMORY_ERROR_CORRECT_CAPABILITY ErrCorrectCapability;
-  MEMORY_SUPPORT_INTERLEAVE_TYPE  SupportInterleave;
-  UINT8                           CurrentInterleave;
+  UINT8                           SupportInterleave;          ///< enumeration value from MEMORY_SUPPORT_INTERLEAVE_TYPE
+  UINT8                           CurrentInterleave;          ///< enumeration value from MEMORY_SUPPORT_INTERLEAVE_TYPE      
   UINT8                           MaxMemoryModuleSize;
   MEMORY_SPEED_TYPE               SupportSpeed;
   UINT16                          SupportMemoryType;
@@ -805,9 +796,9 @@ typedef struct {
   CACHE_SRAM_TYPE_DATA      SupportedSRAMType;
   CACHE_SRAM_TYPE_DATA      CurrentSRAMType;
   UINT8                     CacheSpeed;
-  CACHE_ERROR_TYPE_DATA     ErrorCorrectionType;
-  CACHE_TYPE_DATA           SystemCacheType;
-  CACHE_ASSOCIATIVITY_DATA  Associativity;
+  UINT8                     ErrorCorrectionType;            ///< enumeration value from CACHE_ERROR_TYPE_DATA
+  UINT8                     SystemCacheType;                ///< enumeration value from CACHE_TYPE_DATA
+  UINT8                     Associativity;                  ///< enumeration value from CACHE_ASSOCIATIVITY_DATA
 } SMBIOS_TABLE_TYPE7;
 
 ///
@@ -907,10 +898,10 @@ typedef enum {
 typedef struct {
   SMBIOS_STRUCTURE          Hdr;
   SMBIOS_TABLE_STRING       InternalReferenceDesignator;
-  MISC_PORT_CONNECTOR_TYPE  InternalConnectorType;
+  UINT8                     InternalConnectorType;          ///< enumeration value from MISC_PORT_CONNECTOR_TYPE
   SMBIOS_TABLE_STRING       ExternalReferenceDesignator;
-  MISC_PORT_CONNECTOR_TYPE  ExternalConnectorType;
-  MISC_PORT_TYPE            PortType;
+  UINT8                     ExternalConnectorType;          ///< enumeration value from MISC_PORT_CONNECTOR_TYPE
+  UINT8                     PortType;                       ///< enumeration value from MISC_PORT_TYPE
 } SMBIOS_TABLE_TYPE8;
 
 ///
@@ -1022,10 +1013,10 @@ typedef struct {
 typedef struct {
   SMBIOS_STRUCTURE            Hdr;
   SMBIOS_TABLE_STRING         SlotDesignation;
-  MISC_SLOT_TYPE              SlotType;
-  MISC_SLOT_DATA_BUS_WIDTH    SlotDataBusWidth;
-  MISC_SLOT_USAGE             CurrentUsage;
-  MISC_SLOT_LENGTH            SlotLength;
+  UINT8                       SlotType;                 ///< enumeration value from MISC_SLOT_TYPE
+  UINT8                       SlotDataBusWidth;         ///< enumeration value from MISC_SLOT_DATA_BUS_WIDTH
+  UINT8                       CurrentUsage;             ///< enumeration value from MISC_SLOT_USAGE
+  UINT8                       SlotLength;               ///< enumeration value from MISC_SLOT_LENGTH
   UINT16                      SlotID;
   MISC_SLOT_CHARACTERISTICS1  SlotCharacteristics1;
   MISC_SLOT_CHARACTERISTICS2  SlotCharacteristics2;
@@ -1054,7 +1045,8 @@ typedef enum {
 /// Device Item Entry
 ///
 typedef struct {
-  MISC_ONBOARD_DEVICE_TYPE  DeviceType;
+  UINT8                     DeviceType;             ///< Bit [6:0] - enumeration type of device from MISC_ONBOARD_DEVICE_TYPE
+                                                    ///< Bit 7     - 1 : device enabled, 0 : device disabled
   SMBIOS_TABLE_STRING       DescriptionString;
 } DEVICE_STRUCT;
 
@@ -1166,7 +1158,7 @@ typedef struct {
 /// Event Log Type Descriptors
 ///
 typedef struct {
-  EVENT_LOG_TYPE_DATA   LogType;
+  UINT8                 LogType;                    ///< enumeration value from EVENT_LOG_TYPE_DATA
   UINT8                 DataFormatType;
 } EVENT_LOG_TYPE;
 
@@ -1260,9 +1252,9 @@ typedef enum {
 ///
 typedef struct {
   SMBIOS_STRUCTURE          Hdr;
-  MEMORY_ARRAY_LOCATION     Location;
-  MEMORY_ARRAY_USE          Use;
-  MEMORY_ERROR_CORRECTION   MemoryErrorCorrection;
+  UINT8                     Location;                       ///< enumeration value from MEMORY_ARRAY_LOCATION
+  UINT8                     Use;                            ///< enumeration value from MEMORY_ARRAY_USE
+  UINT8                     MemoryErrorCorrection;          ///< enumeration value from MEMORY_ERROR_CORRECTION
   UINT32                    MaximumCapacity;
   UINT16                    MemoryErrorInformationHandle;
   UINT16                    NumberOfMemoryDevices;
@@ -1348,11 +1340,11 @@ typedef struct {
   UINT16                    TotalWidth;
   UINT16                    DataWidth;
   UINT16                    Size;
-  MEMORY_FORM_FACTOR        FormFactor;
+  UINT8                     FormFactor;                     ///< enumeration value from MEMORY_FORM_FACTOR
   UINT8                     DeviceSet;
   SMBIOS_TABLE_STRING       DeviceLocator;
   SMBIOS_TABLE_STRING       BankLocator;
-  MEMORY_DEVICE_TYPE        MemoryType;
+  UINT8                     MemoryType;                     ///< enumeration value from MEMORY_DEVICE_TYPE
   MEMORY_DEVICE_TYPE_DETAIL TypeDetail;
   UINT16                    Speed;
   SMBIOS_TABLE_STRING       Manufacturer;
@@ -1414,9 +1406,9 @@ typedef enum {
 ///
 typedef struct {
   SMBIOS_STRUCTURE          Hdr;
-  MEMORY_ERROR_TYPE         ErrorType;
-  MEMORY_ERROR_GRANULARITY  ErrorGranularity;
-  MEMORY_ERROR_OPERATION    ErrorOperation;
+  UINT8                     ErrorType;                  ///< enumeration value from MEMORY_ERROR_TYPE
+  UINT8                     ErrorGranularity;           ///< enumeration value from MEMORY_ERROR_GRANULARITY
+  UINT8                     ErrorOperation;             ///< enumeration value from MEMORY_ERROR_OPERATION
   UINT32                    VendorSyndrome;
   UINT32                    MemoryArrayErrorAddress;
   UINT32                    DeviceErrorAddress;
@@ -1495,8 +1487,8 @@ typedef enum {
 ///
 typedef struct {
   SMBIOS_STRUCTURE                  Hdr;
-  BUILTIN_POINTING_DEVICE_TYPE      Type;
-  BUILTIN_POINTING_DEVICE_INTERFACE Interface;
+  UINT8                             Type;                   ///< enumeration value from BUILTIN_POINTING_DEVICE_TYPE
+  UINT8                             Interface;              ///< enumeration value from BUILTIN_POINTING_DEVICE_INTERFACE
   UINT8                             NumberOfButtons;
 } SMBIOS_TABLE_TYPE21;
 
@@ -1528,7 +1520,7 @@ typedef struct {
   SMBIOS_TABLE_STRING               ManufactureDate;
   SMBIOS_TABLE_STRING               SerialNumber;
   SMBIOS_TABLE_STRING               DeviceName;
-  PORTABLE_BATTERY_DEVICE_CHEMISTRY DeviceChemistry;
+  UINT8                             DeviceChemistry;              ///< enumeration value from PORTABLE_BATTERY_DEVICE_CHEMISTRY
   UINT16                            DeviceCapacity;
   UINT16                            DesignVoltage;
   SMBIOS_TABLE_STRING               SBDSVersionNumber;
@@ -1750,7 +1742,7 @@ typedef enum {
 typedef struct {
   SMBIOS_STRUCTURE                        Hdr;
   UINT8                                   Reserved[6];
-  MISC_BOOT_INFORMATION_STATUS_DATA_TYPE  BootStatus;
+  UINT8                                   BootStatus;     ///< enumeration value from MISC_BOOT_INFORMATION_STATUS_DATA_TYPE
 } SMBIOS_TABLE_TYPE32;
 
 ///
@@ -1761,9 +1753,9 @@ typedef struct {
 ///    
 typedef struct {
   SMBIOS_STRUCTURE          Hdr;
-  MEMORY_ERROR_TYPE         ErrorType;          ///< Same as Type 18
-  MEMORY_ERROR_GRANULARITY  ErrorGranularity;   ///< Same as Type 18
-  MEMORY_ERROR_OPERATION    ErrorOperation;     ///< Same as Type 18
+  UINT8                     ErrorType;                    ///< enumeration value from MEMORY_ERROR_TYPE
+  UINT8                     ErrorGranularity;             ///< enumeration value from MEMORY_ERROR_GRANULARITY
+  UINT8                     ErrorOperation;               ///< enumeration value from MEMORY_ERROR_OPERATION
   UINT32                    VendorSyndrome;
   UINT64                    MemoryArrayErrorAddress;
   UINT64                    DeviceErrorAddress;
@@ -1810,9 +1802,9 @@ typedef enum {
 typedef struct {
   SMBIOS_STRUCTURE                      Hdr;
   SMBIOS_TABLE_STRING                   Description;
-  MISC_MANAGEMENT_DEVICE_TYPE           Type;
+  UINT8                                 Type;                     ///< enumeration value from MISC_MANAGEMENT_DEVICE_TYPE
   UINT32                                Address;
-  MISC_MANAGEMENT_DEVICE_ADDRESS_TYPE   AddressType;
+  UINT8                                 AddressType;              ///< enumeration value from MISC_MANAGEMENT_DEVICE_ADDRESS_TYPE
 } SMBIOS_TABLE_TYPE34;
 
 ///
@@ -1897,7 +1889,7 @@ typedef enum {
 /// 
 typedef struct {
   SMBIOS_STRUCTURE      Hdr;
-  BMC_INTERFACE_TYPE    InterfaceType;
+  UINT8                 InterfaceType;              ///< enumeration value from BMC_INTERFACE_TYPE
   UINT8                 IPMISpecificationRevision;
   UINT8                 I2CSlaveAddress;
   UINT8                 NVStorageDeviceAddress;
@@ -1992,7 +1984,7 @@ typedef enum{
 typedef struct {
   SMBIOS_STRUCTURE                  Hdr;
   SMBIOS_TABLE_STRING               ReferenceDesignation;
-  ONBOARD_DEVICE_EXTENDED_INFO_TYPE DeviceType;
+  UINT8                             DeviceType;             ///< enumeration value from ONBOARD_DEVICE_EXTENDED_INFO_TYPE
   UINT8                             DeviceTypeInstance;
   UINT16                            SegmentGroupNum;
   UINT8                             BusNum;
