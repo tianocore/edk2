@@ -30,7 +30,6 @@
 
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
-#include <Guid/FrameworkDevicePath.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>

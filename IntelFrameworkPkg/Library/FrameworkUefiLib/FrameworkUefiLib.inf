@@ -54,7 +54,6 @@
   DevicePathLib
   
 [Guids]
-  gEfiFrameworkDevicePathGuid                   # ALWAYS_CONSUMED
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
 
