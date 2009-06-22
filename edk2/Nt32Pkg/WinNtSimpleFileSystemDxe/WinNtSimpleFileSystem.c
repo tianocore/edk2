@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2469,20 +2469,31 @@ Returns:
   //
   // Make full pathname from new filename and rootpath.
   //
-  Size  = StrSize (PrivateRoot->FilePath);
-  Size += StrSize (L"\\");
-  Size += StrSize (NewFileInfo->FileName);
-  NewFileName = AllocatePool (Size);
-  if (NewFileName == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
-  StrCpy (NewFileName, PrivateRoot->FilePath);
-  StrCat (NewFileName, L"\\");
   if (NewFileInfo->FileName[0] == '\\') {
+    Size  = StrSize (PrivateRoot->FilePath);
+    Size += StrSize (L"\\");
+    Size += StrSize (NewFileInfo->FileName);
+    NewFileName = AllocatePool (Size);
+    if (NewFileName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+
+    StrCpy (NewFileName, PrivateRoot->FilePath);
+    StrCat (NewFileName, L"\\");
     StrCat (NewFileName, NewFileInfo->FileName + 1);
   } else {
+    Size  = StrSize (PrivateFile->FilePath);
+    Size += StrSize (L"\\");
+    Size += StrSize (NewFileInfo->FileName);
+    NewFileName = AllocatePool (Size);
+    if (NewFileName == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+
+    StrCpy (NewFileName, PrivateFile->FilePath);
+    StrCat (NewFileName, L"\\");
     StrCat (NewFileName, NewFileInfo->FileName);
   }
 
