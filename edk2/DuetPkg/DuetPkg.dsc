@@ -184,9 +184,6 @@
   # Sample Application
   #
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-  
-[Components.IA32]
-  DuetPkg/BootSector/BootSector.inf
 
 [BuildOptions.common]
   MSFT:*_*_*_CC_FLAGS = /FAsc /FR$(@R).SBR
