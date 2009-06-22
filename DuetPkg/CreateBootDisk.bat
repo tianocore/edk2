@@ -4,6 +4,7 @@
 
 @set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
 @set BUILD_DIR=%WORKSPACE%\Build\DuetPkg\DEBUG_MYTOOLS
+@set BOOTSECTOR_BIN_DIR=%WORKSPACE%\DuetPkg\BootSector\bin
 @set DISK_LABEL=DUET
 @echo on
 
@@ -28,13 +29,13 @@ goto Help
 @del FormatCommandInput.txt
 @echo Create boot sector ...
 %BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o FDBs.com
-%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bootsect.com -f
+%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com %BOOTSECTOR_BIN_DIR%\Bootsect.com -f
 @REM @del FDBS.com
-%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bootsect.com
+%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bootsect.com
 @echo Done.
 copy %BUILD_DIR%\FV\EfiLdr %EFI_BOOT_DISK%
 mkdir %EFI_BOOT_DISK%\efi\boot
-copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
 @goto end
 
 :CreateFile
@@ -42,9 +43,9 @@ copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\boot
 @echo Start to create file boot disk ...
 @echo Create boot sector ...
 %BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o FDBs.com
-%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bootsect.com -f
+%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com %BOOTSECTOR_BIN_DIR%\Bootsect.com -f
 @REM @del FDBS.com
-%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bootsect.com
+%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bootsect.com
 @echo Done.
 @goto end
 
@@ -62,9 +63,9 @@ copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\boot
 @del FormatCommandInput.txt
 @echo Create boot sector ...
 @%BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o UsbBs16.com
-@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs16.com %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bs16.com -f
-@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bs16.com
-@%BASETOOLS_DIR%\Genbootsector.exe -m -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Mbr.com
+@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs16.com %BOOTSECTOR_BIN_DIR%\Bs16.com -f
+@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bs16.com
+@%BASETOOLS_DIR%\Genbootsector.exe -m -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Mbr.com
 @echo Done.
 @echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN!
 @goto end
@@ -72,7 +73,7 @@ copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\boot
 :CreateUsb_FAT16_step2
 @copy %BUILD_DIR%\FV\EfiLdr16 %EFI_BOOT_DISK%
 @mkdir %EFI_BOOT_DISK%\efi\boot
-@copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\Ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
 @goto end
 
 :CreateUsb_FAT32
@@ -83,10 +84,10 @@ copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\boot
 @del FormatCommandInput.txt
 @echo Create boot sector ...
 @%BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o UsbBs32.com
-@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs32.com %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bs32.com -f
+@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs32.com %BOOTSECTOR_BIN_DIR%\Bs32.com -f
 @del UsbBs32.com
-@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Bs32.com
-@%BASETOOLS_DIR%\Genbootsector.exe -m -o %EFI_BOOT_DISK% -i %BUILD_DIR%\IA32\DuetPkg\BootSector\BootSector\OUTPUT\Mbr.com
+@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bs32.com
+@%BASETOOLS_DIR%\Genbootsector.exe -m -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Mbr.com
 @echo Done.
 @echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN!
 @goto end  
@@ -94,7 +95,7 @@ copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\boot
 :CreateUsb_FAT32_step2
 @copy %BUILD_DIR%\FV\EfiLdr20 %EFI_BOOT_DISK%
 @mkdir %EFI_BOOT_DISK%\efi\boot
-@copy %WORKSPACE%\EdkShellBinPkg\bin\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+@copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
 @goto end
 
 :CreateIde

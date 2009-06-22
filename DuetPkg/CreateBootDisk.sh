@@ -3,6 +3,7 @@
 # Set up environment at fisrt.
 export BUILD_DIR=$WORKSPACE/Build/DuetPkg/DEBUG_UNIXGCC
 export BASETOOLS_DIR=$WORKSPACE/Conf/BaseToolsSource/Source/C/bin
+export BOOTSECTOR_BIN_DIR=$WORKSPACE/DuetPkg/BootSector/bin
 export DISK_LABEL=DUET
 export PROCESS_MARK=TRUE
 
@@ -36,15 +37,15 @@ then
 				echo Create boot sector ...
 				## Linux version of GenBootSector has not pass build yet.
 				$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_DEVICE -o FDBs.com
-				$BASETOOLS_DIR/BootSectImage -g FDBs.com $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/bootsect.com -f
-				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/bootsect.com
+				$BASETOOLS_DIR/BootSectImage -g FDBs.com $BOOTSECTOR_BIN_DIR/bootsect.com -f
+				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/bootsect.com
 	
 				cp $BUILD_DIR/FV/Efildr $EFI_BOOT_MEDIA
 	
 				mkdir -p $EFI_BOOT_MEDIA/efi
 				mkdir -p $EFI_BOOT_MEDIA/efi/boot
 
-				cp $WORKSPACE/EdkShellBinPkg/Bin/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
+				cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
 	
 				echo Done.
 			else
@@ -60,8 +61,8 @@ then
 	
 				## Linux version of GenBootSector has not pass build yet.
 				$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_MEDIA -o FDBs.com
-				$BASETOOLS_DIR/BootSectImage -g FDBs.com $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Bootsect.com -f
-				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_MEDIA -i $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Bootsect.com
+				$BASETOOLS_DIR/BootSectImage -g FDBs.com $BOOTSECTOR_BIN_DIR/bootsect.com -f
+				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_MEDIA -i $BOOTSECTOR_BIN_DIR/bootsect.com
 				echo Done.
 			else
 				echo "Wrong FAT type" $4 "for floppy!"
@@ -76,7 +77,7 @@ then
 				then
 					cp $BUILD_DIR/FV/Efildr16 $EFI_BOOT_MEDIA
 					mkdir $EFI_BOOT_MEDIA/efi/boot
-					cp $WORKSPACE/EdkShellBinPkg/bin/ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi
+					cp $WORKSPACE/EdkShellBinPkg/MinimumShell/ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi
 					echo "step2 Done!"
 				else
 					echo Format $EFI_BOOT_DEVICE ...
@@ -84,9 +85,9 @@ then
 					echo Create boot sector ...
 					## Linux version of GenBootSector & Bootsectimage has not pass build yet.
 					$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_DEVICE -o UsbBs16.com
-					$BASETOOLS_DIR/BootSectImage -g UsbBs16.com $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Bs16.com -f
-					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Bs16.com
-					$BASETOOLS_DIR/GnuGenBootSector -m -o $EFI_BOOT_DEVICE -i $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Mbr.com
+					$BASETOOLS_DIR/BootSectImage -g UsbBs16.com $BOOTSECTOR_BIN_DIR/bs16.com -f
+					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/bs16.com
+					$BASETOOLS_DIR/GnuGenBootSector -m -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/Mbr.com
 					echo Done.
 					echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN TO DO STEP2!
 				fi
@@ -96,7 +97,7 @@ then
 				then
 					cp $BUILD_DIR/FV/Efildr20 $EFI_BOOT_MEDIA
 					mkdir $EFI_BOOT_MEDIA/efi/boot
-					cp $WORKSPACE/EdkShellBinPkg/bin/ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi
+					cp $WORKSPACE/EdkShellBinPkg/MinimumShell/ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi
 					echo "step2 Done!"
 				else
 					echo Format $EFI_BOOT_DEVICE ...
@@ -104,9 +105,9 @@ then
 					echo Create boot sector ...
 					## Linux version of GenBootSector & Bootsectimage has not pass build yet.
 					$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_DEVICE -o UsbBs32.com
-					$BASETOOLS_DIR/BootSectImage -g UsbBs32.com $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Bs32.com -f
-					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Bs32.com
-					$BASETOOLS_DIR/GnuGenBootSector -m -o $EFI_BOOT_DEVICE -i $BUILD_DIR/IA32/DuetPkg/BootSector/BootSector/OUTPUT/Mbr.com
+					$BASETOOLS_DIR/BootSectImage -g UsbBs32.com $BOOTSECTOR_BIN_DIR/bs32.com -f
+					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/bs32.com
+					$BASETOOLS_DIR/GnuGenBootSector -m -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/Mbr.com
 					echo Done.
 					echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN TO DO STEP2!
 				fi			
