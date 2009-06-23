@@ -549,8 +549,19 @@ UpdateOrderPage (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
   
-  for (Index = 0; ((Index < OptionMenu->MenuNumber) && \
-       (Index < (sizeof (CallbackData->BmmFakeNvData.OptionOrder) / sizeof (UINT8))))); Index++) {
+  for (
+        Index = 0;
+        (
+          (Index < OptionMenu->MenuNumber) &&
+          (Index <
+            (
+              sizeof (CallbackData->BmmFakeNvData.OptionOrder) /
+              sizeof (UINT8)
+            )
+          )
+        );
+        Index++
+      ) {
     NewMenuEntry = BOpt_GetMenuEntry (OptionMenu, Index);
     HiiCreateOneOfOptionOpCode (
       OptionsOpCodeHandle,
