@@ -258,8 +258,7 @@ EFIAPI
 ShellLibDestructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
+  ){
   if (mEfiShellEnvironment2 != NULL) {
     gBS->CloseProtocol(mEfiShellEnvironment2Handle==NULL?ImageHandle:mEfiShellEnvironment2Handle,
                        &gEfiShellEnvironment2Guid,
@@ -984,7 +983,7 @@ ShellGetExecutionBreakFlag(
 CONST CHAR16*
 EFIAPI
 ShellGetEnvironmentVariable (
-  IN CHAR16                     *EnvKey
+  IN CONST CHAR16                *EnvKey
   )
 {
   // 
@@ -1002,7 +1001,7 @@ ShellGetEnvironmentVariable (
   //
   // using EFI Shell
   //
-  return (mEfiShellEnvironment2->GetEnv(EnvKey));
+  return (mEfiShellEnvironment2->GetEnv((CHAR16*)EnvKey));
 }
 /**
   set the value of an environment variable
@@ -1220,32 +1219,26 @@ typedef struct {
   EFI_SHELL_FILE_INFO based list.  it is up to the caller to free the memory via
   the ShellCloseFileMetaArg function.
 
-  @param FileList               the EFI shell list type
+  @param[in] FileList           the EFI shell list type
+  @param[in][out] ListHead      the list to add to
 
   @retval the resultant head of the double linked new format list;
 **/
 LIST_ENTRY*
 EFIAPI
 InternalShellConvertFileListType (
-  LIST_ENTRY                *FileList
-  )
-{
-  LIST_ENTRY                    *ListHead;
+  IN LIST_ENTRY                 *FileList,
+  IN OUT LIST_ENTRY             *ListHead
+  ){
   SHELL_FILE_ARG                *OldInfo;
-  LIST_ENTRY                *Link;
+  LIST_ENTRY                    *Link;
   EFI_SHELL_FILE_INFO_NO_CONST  *NewInfo;
 
   //
-  // ASSERT that FileList is not NULL
+  // ASSERTs
   //
-  ASSERT(FileList != NULL);
-
-  //
-  // Allocate our list head and initialize the list
-  //
-  ListHead = AllocateZeroPool(sizeof(LIST_ENTRY));
-  ASSERT (ListHead != NULL);
-  ListHead = InitializeListHead (ListHead);
+  ASSERT(FileList  != NULL);
+  ASSERT(ListHead  != NULL);
 
   //
   // enumerate through each member of the old list and copy
@@ -1299,7 +1292,7 @@ InternalShellConvertFileListType (
     //
     // add that to the list
     //
-    InsertTailList(ListHead, (LIST_ENTRY*)NewInfo);
+    InsertTailList(ListHead, &NewInfo->Link);
   }
   return (ListHead);
 }
@@ -1313,7 +1306,7 @@ InternalShellConvertFileListType (
   and will process '?' and '*' as such.  the list must be freed with a call to 
   ShellCloseFileMetaArg().
 
-  This function will fail if called sequentially without freeing the list in the middle.
+  If you are NOT appending to an existing list *ListHead must be NULL.
 
   @param Arg                    pointer to path string
   @param OpenMode               mode to open files with
@@ -1336,8 +1329,7 @@ ShellOpenFileMetaArg (
   )
 {
   EFI_STATUS                    Status;
-  LIST_ENTRY                    *EmptyNode;
-  LIST_ENTRY                    *mOldStyleFileList;
+  LIST_ENTRY                    mOldStyleFileList;
   
   //
   // ASSERT that Arg and ListHead are not NULL
@@ -1360,42 +1352,35 @@ ShellOpenFileMetaArg (
   ASSERT(mEfiShellEnvironment2 != NULL);
 
   //
-  // allocate memory for old list head
-  //
-  mOldStyleFileList = (LIST_ENTRY*)AllocatePool(sizeof(LIST_ENTRY));
-  ASSERT(mOldStyleFileList != NULL);
-
-  //
   // make sure the list head is initialized
   //
-  InitializeListHead((LIST_ENTRY*)mOldStyleFileList);
+  InitializeListHead(&mOldStyleFileList);
 
   //
   // Get the EFI Shell list of files
   //
-  Status = mEfiShellEnvironment2->FileMetaArg(Arg, mOldStyleFileList);
+  Status = mEfiShellEnvironment2->FileMetaArg(Arg, &mOldStyleFileList);
   if (EFI_ERROR(Status)) {
     *ListHead = NULL;
     return (Status);
   }
 
+  if (*ListHead == NULL) {
+    *ListHead = (EFI_SHELL_FILE_INFO    *)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+    if (*ListHead == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
+  }
+
   //
   // Convert that to equivalent of UEFI Shell 2.0 structure
   //
-  EmptyNode = InternalShellConvertFileListType(mOldStyleFileList);
+  InternalShellConvertFileListType(&mOldStyleFileList, &(*ListHead)->Link);
 
   //
   // Free the EFI Shell version that was converted.
   //
-  ASSERT_EFI_ERROR(mEfiShellEnvironment2->FreeFileList(mOldStyleFileList));
-  FreePool(mOldStyleFileList);
-  mOldStyleFileList = NULL;
-
-  //
-  // remove the empty head of the list
-  //
-  *ListHead = (EFI_SHELL_FILE_INFO*)RemoveEntryList(EmptyNode);
-  FreePool(EmptyNode);  
+  mEfiShellEnvironment2->FreeFileList(&mOldStyleFileList);
 
   return (Status);
 }
@@ -1431,7 +1416,9 @@ ShellCloseFileMetaArg (
     // Since this is EFI Shell version we need to free our internally made copy 
     // of the list
     //
-    for (Node = GetFirstNode((LIST_ENTRY*)*ListHead) ; IsListEmpty((LIST_ENTRY*)*ListHead) == FALSE ; Node = GetFirstNode((LIST_ENTRY*)*ListHead)) {
+    for ( Node = GetFirstNode(&(*ListHead)->Link) 
+        ; IsListEmpty(&(*ListHead)->Link) == FALSE 
+        ; Node = GetFirstNode(&(*ListHead)->Link)) {
       RemoveEntryList(Node);
       ((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->Handle->Close(((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->Handle);
       FreePool(((EFI_SHELL_FILE_INFO_NO_CONST*)Node)->FullName);
@@ -1444,7 +1431,7 @@ ShellCloseFileMetaArg (
 }
 
 typedef struct {
-  LIST_ENTRY List;
+  LIST_ENTRY     Link;
   CHAR16         *Name;
   ParamType      Type;
   CHAR16         *Value;
@@ -1636,7 +1623,7 @@ InternalCommandLineParse (
         //
         // this item has no value expected; we are done
         //
-        InsertHeadList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
+        InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
       }
     } else if (GetItemValue == TRUE && InternalIsFlag(Argv[LoopCounter]) == FALSE) {
       ASSERT(CurrentItemPackage != NULL);
@@ -1647,7 +1634,7 @@ InternalCommandLineParse (
       CurrentItemPackage->Value = AllocateZeroPool(StrSize(Argv[LoopCounter]));
       ASSERT(CurrentItemPackage->Value != NULL);
       StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
-      InsertHeadList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
+      InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
     } else if (InternalIsFlag(Argv[LoopCounter]) == FALSE) {
       //
       // add this one as a non-flag
@@ -1660,7 +1647,7 @@ InternalCommandLineParse (
       ASSERT(CurrentItemPackage->Value != NULL);
       StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
       CurrentItemPackage->OriginalPosition = Count++;
-      InsertHeadList(*CheckPackage, (LIST_ENTRY*)CurrentItemPackage);
+      InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
     } else if (ProblemParam) {
       //
       // this was a non-recognised flag... error!

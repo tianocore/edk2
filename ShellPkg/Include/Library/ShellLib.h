@@ -455,7 +455,7 @@ ShellGetExecutionBreakFlag(
 CONST CHAR16*
 EFIAPI
 ShellGetEnvironmentVariable (
-  IN CHAR16                     *EnvKey
+  IN CONST CHAR16                *EnvKey
   );
 
 /**
@@ -566,7 +566,7 @@ ShellSetPageBreakMode (
   and will process '?' and '*' as such.  the list must be freed with a call to 
   ShellCloseFileMetaArg().
 
-  This function will fail if called sequentially without freeing the list in the middle.
+  If you are NOT appending to an existing list *ListHead must be NULL.
 
   @param Arg                    pointer to path string
   @param OpenMode               mode to open files with
