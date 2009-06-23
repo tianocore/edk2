@@ -469,7 +469,7 @@ HotkeyRegisterNotify (
         return Status;
       }
       Index ++;
-    } while (Index < Hotkey->CodeCount);
+    } while ((Index < Hotkey->CodeCount) && (Index < (sizeof (Hotkey->KeyData) / sizeof (EFI_KEY_DATA))));
 
     Link = GetNextNode (&mHotkeyList, Link);
   }

@@ -755,6 +755,7 @@ GetConsoleMenu (
     NewMenuEntry->OptionNumber    = Index2;
 
     NewConsoleContext->DevicePath = DuplicateDevicePath (DevicePathInst);
+    ASSERT (NewConsoleContext->DevicePath != NULL);
     NewMenuEntry->DisplayString   = EfiLibStrFromDatahub (NewConsoleContext->DevicePath);
     if (NULL == NewMenuEntry->DisplayString) {
       NewMenuEntry->DisplayString = DevicePathToStr (NewConsoleContext->DevicePath);
