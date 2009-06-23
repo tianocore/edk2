@@ -41,11 +41,18 @@ typedef struct {
 #define EFI_VARIABLE_INDEX_TABLE_GUID \
   { 0x8cfdb8c8, 0xd6b2, 0x40f3, { 0x8e, 0x97, 0x02, 0x30, 0x7c, 0xc9, 0x8b, 0x7c } }
 
+///
+/// Use this data structure to store variable-related info, which can decrease
+/// the cost of access to NV.
+///
 typedef struct {
   UINT16          Length;
   UINT16          GoneThrough;
   VARIABLE_HEADER *EndPtr;
   VARIABLE_HEADER *StartPtr;
+  ///
+  /// This field is used to store the distance of two neighbouring VAR_ADDED type variables.
+  /// The meaning of the field is implement-dependent.
   UINT16          Index[VARIABLE_INDEX_TABLE_VOLUME];
 } VARIABLE_INDEX_TABLE;
 
@@ -144,36 +151,6 @@ PeiGetNextVariableName (
   IN OUT UINTN                              *VariableNameSize,
   IN OUT CHAR16                             *VariableName,
   IN OUT EFI_GUID                           *VariableGuid
-  );
-
-/**
-  Get one variable by the index count.
-
-  @param  IndexTable  The pointer to variable index table.
-  @param  Count       The index count of variable in index table.
-
-  @return The pointer to variable header indexed by count.
-
-**/
-VARIABLE_HEADER *
-GetVariableByIndex (
-  IN VARIABLE_INDEX_TABLE        *IndexTable,
-  IN UINT32                      Count
-  );
-
-/**
-  Record Variable in VariableIndex HOB.
-
-  Record Variable in VariableIndex HOB and update the length of variable index table.
-
-  @param  IndexTable  The pointer to variable index table.
-  @param  Variable    The pointer to the variable that will be recorded.
-
-**/
-VOID
-VariableIndexTableUpdate (
-  IN OUT  VARIABLE_INDEX_TABLE   *IndexTable,
-  IN      VARIABLE_HEADER        *Variable
   );
 
 #endif

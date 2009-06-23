@@ -366,10 +366,13 @@ FindVariable (
   EFI_HOB_GUID_TYPE       *GuidHob;
   VARIABLE_STORE_HEADER   *VariableStoreHeader;
   VARIABLE_HEADER         *Variable;
+  VARIABLE_HEADER         *LastVariable;
   VARIABLE_HEADER         *MaxIndex;
   VARIABLE_INDEX_TABLE    *IndexTable;
   UINT32                  Count;
+  UINT32                  Offset;
   UINT8                   *VariableBase;
+  BOOLEAN                 StopRecord;
 
   if (VariableName[0] != 0 && VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -378,9 +381,16 @@ FindVariable (
   // No Variable Address equals zero, so 0 as initial value is safe.
   //
   MaxIndex = 0;
+  StopRecord = FALSE;
 
   GuidHob = GetFirstGuidHob (&mEfiVariableIndexTableGuid);
   if (GuidHob == NULL) {
+    //
+    // If it's the first time to access variable region in flash, create a guid hob to record
+    // VAR_ADDED type variable info.
+    // Note that as the resource of PEI phase is limited, only store the number of 
+    // VARIABLE_INDEX_TABLE_VOLUME of VAR_ADDED type variables to reduce access time.
+    //
     IndexTable = BuildGuidHob (&mEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
     IndexTable->Length      = 0;
     IndexTable->StartPtr    = NULL;
@@ -388,9 +398,13 @@ FindVariable (
     IndexTable->GoneThrough = 0;
   } else {
     IndexTable = GET_GUID_HOB_DATA (GuidHob);
-    for (Count = 0; Count < IndexTable->Length; Count++) {
-      MaxIndex = GetVariableByIndex (IndexTable, Count);
-
+    for (Offset = 0, Count = 0; Count < IndexTable->Length; Count++) {
+      //
+      // traverse the variable info list to look for varible.
+      // The IndexTable->Index[Count] records the distance of two neighbouring VAR_ADDED type variables.
+      //
+      Offset   += IndexTable->Index[Count];
+      MaxIndex  = (VARIABLE_HEADER *)((CHAR8 *)(IndexTable->StartPtr) + Offset);
       if (CompareWithValidVariable (MaxIndex, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
         PtrTrack->StartPtr  = IndexTable->StartPtr;
         PtrTrack->EndPtr    = IndexTable->EndPtr;
@@ -407,7 +421,8 @@ FindVariable (
   // If not found in HOB, then let's start from the MaxIndex we've found.
   //
   if (MaxIndex != NULL) {
-    Variable = GetNextVariablePtr (MaxIndex);
+    Variable     = GetNextVariablePtr (MaxIndex);
+    LastVariable = MaxIndex;
   } else {
     if ((IndexTable->StartPtr != NULL) || (IndexTable->EndPtr != NULL)) {
       Variable = IndexTable->StartPtr;
@@ -435,6 +450,8 @@ FindVariable (
       //
       Variable = IndexTable->StartPtr;
     }
+
+    LastVariable = IndexTable->StartPtr;
   }
   //
   // Find the variable by walk through non-volatile variable store
@@ -447,8 +464,23 @@ FindVariable (
       //
       // Record Variable in VariableIndex HOB
       //
-      VariableIndexTableUpdate (IndexTable, Variable);
-      
+      if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME && StopRecord != TRUE) {
+        Offset = (UINT32)((UINTN)Variable - (UINTN)LastVariable);
+        //
+        // The distance of two neighbouring VAR_ADDED variable is larger than 2^16, 
+        // which is beyond the allowable scope(UINT16) of record. In such case, need not to
+        // record the subsequent VAR_ADDED type variables again.
+        //
+        if ((Offset & 0xFFFF0000UL) != 0) {
+          StopRecord = TRUE;
+        }
+
+        if (StopRecord != TRUE) {
+          IndexTable->Index[IndexTable->Length++] = (UINT16) Offset;
+        }
+        LastVariable = Variable;
+      }
+
       if (CompareWithValidVariable (Variable, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
         return EFI_SUCCESS;
       }
