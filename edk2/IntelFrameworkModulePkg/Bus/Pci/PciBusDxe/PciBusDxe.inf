@@ -3,7 +3,8 @@
 #
 #  PCI bus driver. This module will probe all PCI devices and allocate MMIO and IO
 #  space for these devices. Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable
-#  support hot plug.
+#  hot plug supporting.
+#
 #  Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -86,18 +87,18 @@
   PeCoffLib
 
 [Protocols]
-  gEfiPciHotPlugRequestProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
-  gEfiBusSpecificDriverOverrideProtocolGuid     # PROTOCOL BY_START
-  gEfiPciIoProtocolGuid                         # PROTOCOL BY_START
-  gEfiLoadedImageProtocolGuid                   # PROTOCOL TO_START
-  gEfiDecompressProtocolGuid                    # PROTOCOL TO_START
-  gEfiPciHotPlugInitProtocolGuid                # PROTOCOL TO_START
-  gEfiPciHostBridgeResourceAllocationProtocolGuid # PROTOCOL TO_START
-  gEfiPciPlatformProtocolGuid                   # PROTOCOL TO_START
-  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL TO_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
-  gEfiIncompatiblePciDeviceSupportProtocolGuid  # PROTOCOL TO_START
-  gEfiLoadFile2ProtocolGuid						          # SOMETIMES_CONSUMED
+  gEfiPciHotPlugRequestProtocolGuid               ## BY_START
+  gEfiPciIoProtocolGuid                           ## BY_START
+  gEfiDevicePathProtocolGuid                      ## BY_START   
+  gEfiBusSpecificDriverOverrideProtocolGuid       ## CONSUMED
+  gEfiLoadedImageProtocolGuid                     ## CONSUMED
+  gEfiDecompressProtocolGuid                      ## CONSUMED
+  gEfiPciHotPlugInitProtocolGuid                  ## CONSUMED
+  gEfiPciHostBridgeResourceAllocationProtocolGuid ## CONSUMED
+  gEfiPciPlatformProtocolGuid                     ## CONSUMED
+  gEfiPciRootBridgeIoProtocolGuid                 ## CONSUMED
+  gEfiIncompatiblePciDeviceSupportProtocolGuid    ## CONSUMED
+  gEfiLoadFile2ProtocolGuid                       ## CONSUMED
 
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport

@@ -49,14 +49,6 @@ typedef struct {
   UINT8                              *AllocRes;
 } EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD;
 
-/**
-  Install protocol gEfiPciHotPlugRequestProtocolGuid
-  @param Status    return status of protocol installation.
-**/
-VOID
-InstallHotPlugRequestProtocol (
-  IN  EFI_STATUS                    *Status
-  );
 
 /**
   Retrieve the BAR information via PciIo interface.

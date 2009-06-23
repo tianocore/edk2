@@ -1,4 +1,5 @@
 /** @file
+  Header files and data structures needed by PCI Bus module.
 
 Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -15,9 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_PCI_BUS_H_
 #define _EFI_PCI_BUS_H_
 
-
 #include <FrameworkDxe.h>
-
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciHostBridgeResourceAllocation.h>
@@ -30,7 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/PciHotPlugInit.h>
 #include <Protocol/Decompress.h>
 #include <Protocol/BusSpecificDriverOverride.h>
-#include <Protocol/UgaIo.h>
 #include <Protocol/IncompatiblePciDeviceSupport.h>
 
 #include <Library/DebugLib.h>
@@ -49,20 +47,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/PeImage.h>
 #include <IndustryStandard/Acpi.h>
+
+typedef struct _PCI_IO_DEVICE              PCI_IO_DEVICE;
+typedef struct _PCI_BAR                    PCI_BAR;
+typedef enum   _PCI_BAR_TYPE               PCI_BAR_TYPE;
+
 #include "ComponentName.h"
-
-
-//
-// Global Variables
-//
-extern EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL *gEfiIncompatiblePciDeviceSupport;
-extern EFI_DRIVER_BINDING_PROTOCOL                  gPciBusDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL                  gPciBusComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL                 gPciBusComponentName2;
-
-//
-// Driver Produced Protocol Prototypes
-//
+#include "PciIo.h"
+#include "PciCommand.h"
+#include "PciDeviceSupport.h"
+#include "PciEnumerator.h"
+#include "PciEnumeratorSupport.h"
+#include "PciDriverOverride.h"
+#include "PciRomTable.h"
+#include "PciOptionRomSupport.h"
+#include "PciPowerManagement.h"
+#include "PciHotPlugSupport.h"
+#include "PciLib.h"
 
 #define VGABASE1  0x3B0
 #define VGALIMIT1 0x3BB
@@ -73,7 +74,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL                 gPciBusComponentName2;
 #define ISABASE   0x100
 #define ISALIMIT  0x3FF
 
-typedef enum {
+enum _PCI_BAR_TYPE {
   PciBarTypeUnknown = 0,
   PciBarTypeIo16,
   PciBarTypeIo32,
@@ -84,9 +85,12 @@ typedef enum {
   PciBarTypeIo,
   PciBarTypeMem,
   PciBarTypeMaxType
-} PCI_BAR_TYPE;
+};
 
-typedef struct {
+//
+// PCI BAR parameters
+//
+struct _PCI_BAR {
   UINT64        BaseAddress;
   UINT64        Length;
   UINT64        Alignment;
@@ -94,7 +98,7 @@ typedef struct {
   BOOLEAN       Prefetchable;
   UINT8         MemType;
   UINT8         Offset;
-} PCI_BAR;
+};
 
 #define PPB_BAR_0                             0
 #define PPB_BAR_1                             1
@@ -109,8 +113,6 @@ typedef struct {
 #define P2C_MEM_2                             2
 #define P2C_IO_1                              3
 #define P2C_IO_2                              4
-
-#define PCI_IO_DEVICE_SIGNATURE               SIGNATURE_32 ('p', 'c', 'i', 'o')
 
 #define EFI_BRIDGE_IO32_DECODE_SUPPORTED      0x0001
 #define EFI_BRIDGE_PMEM32_DECODE_SUPPORTED    0x0002
@@ -128,7 +130,7 @@ typedef struct {
 #define EFI_SET_SUPPORTS    0
 #define EFI_SET_ATTRIBUTES  1
 
-typedef struct _PCI_IO_DEVICE              PCI_IO_DEVICE;
+#define PCI_IO_DEVICE_SIGNATURE               SIGNATURE_32 ('p', 'c', 'i', 'o')
 
 struct _PCI_IO_DEVICE {
   UINT32                                    Signature;
@@ -215,7 +217,7 @@ struct _PCI_IO_DEVICE {
   BOOLEAN                                   BusOverride;
 
   //
-  //  A list tracking reserved resource on a bridge device
+  // A list tracking reserved resource on a bridge device
   //
   LIST_ENTRY                                ReservedResourceList;
 
@@ -231,7 +233,6 @@ struct _PCI_IO_DEVICE {
 
 };
 
-
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \
   CR (a, PCI_IO_DEVICE, PciIo, PCI_IO_DEVICE_SIGNATURE)
 
@@ -244,39 +245,40 @@ struct _PCI_IO_DEVICE {
 #define PCI_IO_DEVICE_FROM_LOAD_FILE2_THIS(a) \
   CR (a, PCI_IO_DEVICE, LoadFile2, PCI_IO_DEVICE_SIGNATURE)
 
+
+
 //
 // Global Variables
 //
-extern LIST_ENTRY                                   gPciDevicePool;
+extern EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL *gEfiIncompatiblePciDeviceSupport;
+extern EFI_DRIVER_BINDING_PROTOCOL                  gPciBusDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL                  gPciBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL                 gPciBusComponentName2;
 extern BOOLEAN                                      gFullEnumeration;
 extern UINTN                                        gPciHostBridgeNumber;
 extern EFI_HANDLE                                   gPciHostBrigeHandles[PCI_MAX_HOST_BRIDGE_NUM];
 extern UINT64                                       gAllOne;
 extern UINT64                                       gAllZero;
-
 extern EFI_PCI_PLATFORM_PROTOCOL                    *gPciPlatformProtocol;
 
-#include "PciIo.h"
-#include "PciCommand.h"
-#include "PciDeviceSupport.h"
-#include "PciEnumerator.h"
-#include "PciEnumeratorSupport.h"
-#include "PciDriverOverride.h"
-#include "PciRomTable.h"
-#include "PciOptionRomSupport.h"
-#include "PciPowerManagement.h"
-#include "PciHotPlugSupport.h"
-#include "PciLib.h"
 
-//
-// PCI Bus Support Function Prototypes
-//
+/**  
+  Macro that checks whether device is a GFX device.
+
+  @param  _p      Specified device.
+
+  @retval TRUE    Device is a a GFX device.
+  @retval FALSE   Device is not a a GFX device.
+
+**/
+#define IS_PCI_GFX(_p)     IS_CLASS2 (_p, PCI_CLASS_DISPLAY, PCI_CLASS_DISPLAY_OTHER)
+
 /**
   Test to see if this driver supports ControllerHandle. Any ControllerHandle
   than contains a gEfiPciRootBridgeIoProtocolGuid protocol can be supported.
 
   @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test.
+  @param  Controller          Handle of device to test.
   @param  RemainingDevicePath Optional parameter use to pick a specific child.
                               device to start.
 
@@ -298,7 +300,7 @@ PciBusDriverBindingSupported (
   all device under PCI bus.
 
   @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  Controller           Handle of device to bind driver to.
   @param  RemainingDevicePath  Optional parameter use to pick a specific child.
                                device to start.
 
@@ -320,7 +322,7 @@ PciBusDriverBindingStart (
   created by this driver.
 
   @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on.
+  @param  Controller        Handle of device to stop driver on.
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
   @param  ChildHandleBuffer List of Child Handles to Stop.
@@ -337,7 +339,5 @@ PciBusDriverBindingStop (
   IN  UINTN                         NumberOfChildren,
   IN  EFI_HANDLE                    *ChildHandleBuffer
   );
-
-#define IS_PCI_GFX(_p)     IS_CLASS2 (_p, PCI_CLASS_DISPLAY, PCI_CLASS_DISPLAY_OTHER)
 
 #endif
