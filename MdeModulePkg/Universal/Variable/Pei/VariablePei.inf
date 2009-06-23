@@ -32,18 +32,6 @@
   Variable.c
   Variable.h
 
-[Sources.Ia32]
-  VariableWorker.c
-
-[Sources.X64]
-  VariableWorker.c
-
-[Sources.IPF]
-  Ipf/VariableWorker.c
-
-[Sources.EBC]
-  VariableWorker.c
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
