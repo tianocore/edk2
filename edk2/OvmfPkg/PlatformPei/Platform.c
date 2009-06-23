@@ -136,8 +136,7 @@ MemMapInitialization (
   //
   // Video memory + Legacy BIOS region
   //
-  AddMemoryRangeHob (0x0A0000, 0x0B0000);
-  AddIoMemoryRangeHob (0x0B0000, 0x100000);
+  AddIoMemoryRangeHob (0x0A0000, 0x100000);
 }
 
 
