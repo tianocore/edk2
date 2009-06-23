@@ -50,7 +50,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _PCI_IO_DEVICE              PCI_IO_DEVICE;
 typedef struct _PCI_BAR                    PCI_BAR;
-typedef enum   _PCI_BAR_TYPE               PCI_BAR_TYPE;
+
+typedef enum {
+  PciBarTypeUnknown = 0,
+  PciBarTypeIo16,
+  PciBarTypeIo32,
+  PciBarTypeMem32,
+  PciBarTypePMem32,
+  PciBarTypeMem64,
+  PciBarTypePMem64,
+  PciBarTypeIo,
+  PciBarTypeMem,
+  PciBarTypeMaxType
+} PCI_BAR_TYPE;
 
 #include "ComponentName.h"
 #include "PciIo.h"
@@ -73,19 +85,6 @@ typedef enum   _PCI_BAR_TYPE               PCI_BAR_TYPE;
 
 #define ISABASE   0x100
 #define ISALIMIT  0x3FF
-
-enum _PCI_BAR_TYPE {
-  PciBarTypeUnknown = 0,
-  PciBarTypeIo16,
-  PciBarTypeIo32,
-  PciBarTypeMem32,
-  PciBarTypePMem32,
-  PciBarTypeMem64,
-  PciBarTypePMem64,
-  PciBarTypeIo,
-  PciBarTypeMem,
-  PciBarTypeMaxType
-};
 
 //
 // PCI BAR parameters
