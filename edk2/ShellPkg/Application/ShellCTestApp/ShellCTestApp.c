@@ -16,7 +16,22 @@
 
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
+#include <Library/ShellCEntryLib.h>
 
+/**
+  UEFI application entry point which has an interface similar to a
+  standard C main function.
+
+  The ShellCEntryLib library instance wrappers the actual UEFI application
+  entry point and calls this ShellAppMain function.
+
+  @param  ImageHandle  The image handle of the UEFI Application.
+  @param  SystemTable  A pointer to the EFI System Table.
+
+  @retval  0               The application exited normally.
+  @retval  Other           An error occurred.
+
+**/
 INTN 
 EFIAPI 
 ShellAppMain (

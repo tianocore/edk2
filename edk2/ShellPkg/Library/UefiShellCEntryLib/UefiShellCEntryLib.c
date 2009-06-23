@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/EfiShellInterface.h>
 #include <Protocol/EfiShellParameters.h>
 
+#include <Library/ShellCEntryLib.h>
 #include <Library/DebugLib.h>
 
 INTN
@@ -28,17 +29,19 @@ ShellAppMain (
   );
 
 /**
-  UEFI entry point for an application that will in turn call a C 
-  style ShellAppMain function.
+  UEFI entry point for an application that will in turn call the
+  ShellAppMain function which has parameters similar to a standard C
+  main function.
 
-  This application must have a function defined as follows:
+  An application that uses UefiShellCEntryLib must have a ShellAppMain
+  function as prototyped in Include/Library/ShellCEntryLib.h.
 
-  INTN
-  EFIAPI
-  ShellAppMain (
-    IN INTN Argc, 
-    IN CHAR16 **Argv
-    );
+  @param  ImageHandle  The image handle of the UEFI Application.
+  @param  SystemTable  A pointer to the EFI System Table.
+
+  @retval  EFI_SUCCESS               The application exited normally.
+  @retval  Other                     An error occurred.
+
 **/
 EFI_STATUS
 EFIAPI
