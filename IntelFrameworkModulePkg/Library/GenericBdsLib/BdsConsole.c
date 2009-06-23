@@ -41,6 +41,10 @@ IsNvNeed (
     Ptr++;
   }
 
+  if ((((UINTN)Ptr - (UINTN)ConVarName) / sizeof (CHAR16)) <= 3) {
+    return TRUE;
+  }
+  
   if ((*(Ptr - 3) == 'D') && (*(Ptr - 2) == 'e') && (*(Ptr - 1) == 'v')) {
     return FALSE;
   } else {
