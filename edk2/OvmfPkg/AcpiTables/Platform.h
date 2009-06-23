@@ -29,7 +29,7 @@
 
 #define INT_MODEL       0x01
 #define SCI_INT_VECTOR  0x0009 
-#define SMI_CMD_IO_PORT 0x000000B2
+#define SMI_CMD_IO_PORT 0 // If SMM was supported, then this would be 0xB2
 #define ACPI_ENABLE     0x0E1
 #define ACPI_DISABLE    0x01E
 #define S4BIOS_REQ      0x00
