@@ -3,7 +3,7 @@
 
   This should be executed with "/Param2 Val1" and "/Param1" as the 2 command line options!
 
-  Copyright (c) 2008, Intel Corporation                                                         
+  Copyright (c) 2008-2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -211,7 +211,7 @@ UefiMain (
   ASSERT(NoFile == FALSE);
   Status = ShellFindNextFile(FileHandle, pFileInfo, &NoFile);
   ASSERT_EFI_ERROR(Status);
-  /// @todo - why is NoFile never set? limitation of NT32 file system?
+  ///@todo - why is NoFile never set? limitation of NT32 file system?
   Status = ShellDeleteFile(&FileHandle);
   ASSERT(Status == RETURN_WARN_DELETE_FAILURE);
   Print(L"FindFirst - pass\r\n");
