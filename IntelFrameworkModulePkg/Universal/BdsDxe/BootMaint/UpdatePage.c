@@ -459,8 +459,8 @@ UpdateConsolePage (
 
   UpdatePageStart (CallbackData);
 
-  ASSERT (ConsoleMenu->MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.ConsoleCheck) / sizeof (CallbackData->BmmFakeNvData.ConsoleCheck[0])));
-  for (Index = 0; Index < ConsoleMenu->MenuNumber; Index++) {
+  for (Index = 0; ((Index < ConsoleMenu->MenuNumber) && \
+       (Index < (sizeof (CallbackData->BmmFakeNvData.ConsoleCheck) / sizeof (UINT8)))) ; Index++) {
     NewMenuEntry      = BOpt_GetMenuEntry (ConsoleMenu, Index);
     NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
     CheckFlags        = 0;
@@ -484,7 +484,8 @@ UpdateConsolePage (
       );
   }
 
-  for (Index2 = 0; Index2 < TerminalMenu.MenuNumber; Index2++) {
+  for (Index2 = 0; ((Index2 < TerminalMenu.MenuNumber) && \
+       (Index2 < (sizeof (CallbackData->BmmFakeNvData.ConsoleCheck) / sizeof (UINT8)))); Index2++) {
     CheckFlags          = 0;
     NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, Index2);
     NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
@@ -548,7 +549,8 @@ UpdateOrderPage (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
   
-  for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
+  for (Index = 0; ((Index < OptionMenu->MenuNumber) && \
+       (Index < (sizeof (CallbackData->BmmFakeNvData.OptionOrder) / sizeof (UINT8))))); Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (OptionMenu, Index);
     HiiCreateOneOfOptionOpCode (
       OptionsOpCodeHandle,
