@@ -223,7 +223,7 @@ PciRootBridgeEnumerator (
                           Configuration
                           );
   
-  gBS->FreePool (Configuration);
+  FreePool (Configuration);
   
   if (EFI_ERROR (Status)) {
     return Status;
@@ -683,9 +683,9 @@ RejectPciDevice (
   //
   // Remove the padding resource from a bridge
   //
-  if ( IS_PCI_BRIDGE(&PciDevice->Pci) && \
+  if ( IS_PCI_BRIDGE(&PciDevice->Pci) && 
        PciDevice->ResourcePaddingDescriptors != NULL ) {
-    gBS->FreePool (PciDevice->ResourcePaddingDescriptors);
+    FreePool (PciDevice->ResourcePaddingDescriptors);
     PciDevice->ResourcePaddingDescriptors = NULL;
     return EFI_SUCCESS;
   }
@@ -1950,7 +1950,7 @@ PciHotPlugRequestNotify (
               ChildHandleBuffer
               );
 
-    return EFI_SUCCESS;
+    return Status;
   }
 
   if (Operation == EfiPciHotplugRequestRemove) {
@@ -1959,8 +1959,8 @@ PciHotPlugRequestNotify (
       //
       // Remove all devices on the bridge
       //
-      Status = RemoveAllPciDeviceOnBridge (RootBridgeHandle, Bridge);
-      return Status;
+      RemoveAllPciDeviceOnBridge (RootBridgeHandle, Bridge);
+      return EFI_SUCCESS;
 
     }
 

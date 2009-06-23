@@ -1,7 +1,7 @@
 /** @file
-   Driver Binding functions for PCI bus module.
+  Driver Binding functions for PCI Bus module.
    
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -12,13 +12,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-
 #include "PciBus.h"
 
 //
 // PCI Bus Driver Global Variables
 //
-
 EFI_DRIVER_BINDING_PROTOCOL                   gPciBusDriverBinding = {
   PciBusDriverBindingSupported,
   PciBusDriverBindingStart,
@@ -28,26 +26,32 @@ EFI_DRIVER_BINDING_PROTOCOL                   gPciBusDriverBinding = {
   NULL
 };
 
-EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *gEfiIncompatiblePciDeviceSupport = NULL;
 EFI_HANDLE                                    gPciHostBrigeHandles[PCI_MAX_HOST_BRIDGE_NUM];
-UINTN                                         gPciHostBridgeNumber;
-BOOLEAN                                       gFullEnumeration;
-UINT64                                        gAllOne   = 0xFFFFFFFFFFFFFFFFULL;
-UINT64                                        gAllZero  = 0;
+EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *gEfiIncompatiblePciDeviceSupport = NULL;
+UINTN                                         gPciHostBridgeNumber = 0;
+BOOLEAN                                       gFullEnumeration     = TRUE;
+UINT64                                        gAllOne              = 0xFFFFFFFFFFFFFFFFULL;
+UINT64                                        gAllZero             = 0;
 
 EFI_PCI_PLATFORM_PROTOCOL                     *gPciPlatformProtocol;
 
-//
-// PCI Bus Driver Support Functions
-//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL mPciHotPlugRequest = {
+  PciHotPlugRequestNotify
+};
+
 /**
-  Initialize the global variables
-  publish the driver binding protocol
+  The Entry Point for PCI Bus module. The user code starts with this function.
 
-  @param[in] ImageHandle,
-  @param[in] *SystemTable
+  Installs driver module protocols and. Creates virtual device handles for ConIn,
+  ConOut, and StdErr. Installs Simple Text In protocol, Simple Text In Ex protocol,
+  Simple Pointer protocol, Absolute Pointer protocol on those virtual handlers.
+  Installs Graphics Output protocol and/or UGA Draw protocol if needed.
 
-  @retval status of installing driver binding component name protocol.
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
+  @param[in] SystemTable    A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
@@ -58,13 +62,13 @@ PciBusEntryPoint (
   )
 {
   EFI_STATUS  Status;
-
+  EFI_HANDLE  Handle;
+ 
+  //
+  // Initializes PCI devices pool
+  //
   InitializePciDevicePool ();
 
-  gFullEnumeration      = TRUE;
-
-  gPciHostBridgeNumber  = 0;
-  
   //
   // Install driver model protocol(s).
   //
@@ -78,8 +82,19 @@ PciBusEntryPoint (
              );
   ASSERT_EFI_ERROR (Status);
 
-  InstallHotPlugRequestProtocol (&Status);
-  
+  if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
+    //  
+    // If Hot Plug is supported, install EFI PCI Hot Plug Request protocol.
+    //
+    Handle = NULL;
+    Status = gBS->InstallProtocolInterface (
+                    &Handle,
+                    &gEfiPciHotPlugRequestProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mPciHotPlugRequest
+                    );
+  }
+
   return Status;
 }
 
@@ -88,13 +103,13 @@ PciBusEntryPoint (
   than contains a gEfiPciRootBridgeIoProtocolGuid protocol can be supported.
 
   @param  This                Protocol instance pointer.
-  @param  ControllerHandle    Handle of device to test
-  @param  RemainingDevicePath Optional parameter use to pick a specific child
+  @param  Controller          Handle of device to test.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child.
                               device to start.
 
-  @retval EFI_SUCCESS         This driver supports this device
-  @retval EFI_ALREADY_STARTED This driver is already running on this device
-  @retval other               This driver does not support this device
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval EFI_ALREADY_STARTED This driver is already running on this device.
+  @retval other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -175,13 +190,13 @@ PciBusDriverBindingSupported (
   all device under PCI bus.
 
   @param  This                 Protocol instance pointer.
-  @param  ControllerHandle     Handle of device to bind driver to
-  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+  @param  Controller           Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child.
                                device to start.
 
-  @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
-  @retval other                This driver does not support this device
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle.
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle.
+  @retval other                This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -237,13 +252,13 @@ PciBusDriverBindingStart (
   created by this driver.
 
   @param  This              Protocol instance pointer.
-  @param  ControllerHandle  Handle of device to stop driver on
+  @param  Controller        Handle of device to stop driver on.
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
                             children is zero stop the entire bus driver.
   @param  ChildHandleBuffer List of Child Handles to Stop.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle
-  @retval other             This driver was not removed from this device
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle.
+  @retval other             This driver was not removed from this device.
 
 **/
 EFI_STATUS

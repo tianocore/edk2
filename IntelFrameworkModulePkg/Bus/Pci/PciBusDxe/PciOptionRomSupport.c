@@ -140,7 +140,7 @@ LocalLoadFile2 (
                              Scratch,
                              ScratchSize
                              );
-      gBS->FreePool (Scratch);
+      FreePool (Scratch);
       
       if (EFI_ERROR (Status)) {
         return EFI_DEVICE_ERROR;
@@ -432,7 +432,7 @@ LoadOpRomImage (
 
   RomPcir = AllocatePool (sizeof (PCI_DATA_STRUCTURE));
   if (RomPcir == NULL) {
-    gBS->FreePool (RomHeader);
+    FreePool (RomHeader);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -496,8 +496,8 @@ LoadOpRomImage (
     Image     = AllocatePool ((UINT32) RomImageSize);
     if (Image == NULL) {
       RomDecode (PciDevice, RomBarIndex, RomBar, FALSE);
-      gBS->FreePool (RomHeader);
-      gBS->FreePool (RomPcir);
+      FreePool (RomHeader);
+      FreePool (RomPcir);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -536,8 +536,8 @@ LoadOpRomImage (
   //
   // Free allocated memory
   //
-  gBS->FreePool (RomHeader);
-  gBS->FreePool (RomPcir);
+  FreePool (RomHeader);
+  FreePool (RomPcir);
 
   return RetStatus;
 }
@@ -725,7 +725,7 @@ ProcessOpRomImage (
                       );
     }
 
-    gBS->FreePool (PciOptionRomImageDevicePath);
+    FreePool (PciOptionRomImageDevicePath);
 
     if (!EFI_ERROR (Status)) {
       Status = gBS->StartImage (ImageHandle, NULL, NULL);

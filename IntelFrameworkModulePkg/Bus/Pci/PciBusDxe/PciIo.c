@@ -1,5 +1,5 @@
 /** @file
-  Implement all interfaces for EFI_PCI_IO_PROTOCOL.
+  Implements all interfaces for EFI_PCI_IO_PROTOCOL.
   
 Copyright (c) 2006 - 2008, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -16,13 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciBus.h"
 
 //
-// Internal use only
-//
-
-//
 // Pci Io Protocol Interface
 //
-EFI_PCI_IO_PROTOCOL  PciIoInterface = {
+EFI_PCI_IO_PROTOCOL  mPciIoInterface = {
   PciIoPollMem,
   PciIoPollIo,
   {
@@ -56,6 +52,7 @@ EFI_PCI_IO_PROTOCOL  PciIoInterface = {
   
   @param PciIoDevice Pci device instance.
   @param Code        status code.
+
 **/
 EFI_STATUS
 ReportErrorStatusCode (
@@ -98,7 +95,7 @@ InitializePciIoInstance (
   PCI_IO_DEVICE  *PciIoDevice
   )
 {
-  CopyMem (&PciIoDevice->PciIo, &PciIoInterface, sizeof (EFI_PCI_IO_PROTOCOL));
+  CopyMem (&PciIoDevice->PciIo, &mPciIoInterface, sizeof (EFI_PCI_IO_PROTOCOL));
 }
 
 /**

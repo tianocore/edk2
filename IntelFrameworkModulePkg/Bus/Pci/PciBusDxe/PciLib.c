@@ -17,33 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PciBus.h"
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL gPciHotPlugRequest = {
-  PciHotPlugRequestNotify
-};
-
-/**
-  Install protocol gEfiPciHotPlugRequestProtocolGuid
-  @param Status    return status of protocol installation.
-**/
-VOID
-InstallHotPlugRequestProtocol (
-  IN EFI_STATUS *Status
-  )
-{
-  EFI_HANDLE  Handle;
-
-  if (!FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
-    return;
-  }
-
-  Handle = NULL;
-  *Status = gBS->InstallProtocolInterface (
-                  &Handle,
-                  &gEfiPciHotPlugRequestProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &gPciHotPlugRequest
-                  );
-}
 
 /**
   Retrieve the BAR information via PciIo interface.
@@ -68,12 +41,12 @@ GetBackPcCardBar (
 
     Address = 0;
     PciIoRead (
-                            &(PciIoDevice->PciIo),
-                            EfiPciIoWidthUint32,
-                            0x1c,
-                            1,
-                            &Address
-                            );
+      &(PciIoDevice->PciIo),
+      EfiPciIoWidthUint32,
+      0x1c,
+      1,
+      &Address
+      );
 
     (PciIoDevice->PciBar)[P2C_MEM_1].BaseAddress  = (UINT64) (Address);
     (PciIoDevice->PciBar)[P2C_MEM_1].Length       = 0x2000000;
@@ -81,36 +54,36 @@ GetBackPcCardBar (
 
     Address = 0;
     PciIoRead (
-                            &(PciIoDevice->PciIo),
-                            EfiPciIoWidthUint32,
-                            0x20,
-                            1,
-                            &Address
-                            );
+      &(PciIoDevice->PciIo),
+      EfiPciIoWidthUint32,
+      0x20,
+      1,
+      &Address
+      );
     (PciIoDevice->PciBar)[P2C_MEM_2].BaseAddress  = (UINT64) (Address);
     (PciIoDevice->PciBar)[P2C_MEM_2].Length       = 0x2000000;
     (PciIoDevice->PciBar)[P2C_MEM_2].BarType      = PciBarTypePMem32;
 
     Address = 0;
     PciIoRead (
-                            &(PciIoDevice->PciIo),
-                            EfiPciIoWidthUint32,
-                            0x2c,
-                            1,
-                            &Address
-                            );
+      &(PciIoDevice->PciIo),
+      EfiPciIoWidthUint32,
+      0x2c,
+      1,
+      &Address
+      );
     (PciIoDevice->PciBar)[P2C_IO_1].BaseAddress = (UINT64) (Address);
     (PciIoDevice->PciBar)[P2C_IO_1].Length      = 0x100;
     (PciIoDevice->PciBar)[P2C_IO_1].BarType     = PciBarTypeIo16;
 
     Address = 0;
     PciIoRead (
-                            &(PciIoDevice->PciIo),
-                            EfiPciIoWidthUint32,
-                            0x34,
-                            1,
-                            &Address
-                            );
+      &(PciIoDevice->PciIo),
+      EfiPciIoWidthUint32,
+      0x34,
+      1,
+      &Address
+      );
     (PciIoDevice->PciBar)[P2C_IO_2].BaseAddress = (UINT64) (Address);
     (PciIoDevice->PciBar)[P2C_IO_2].Length      = 0x100;
     (PciIoDevice->PciBar)[P2C_IO_2].BarType     = PciBarTypeIo16;
@@ -165,7 +138,6 @@ RemoveRejectedPciDevices (
         //
         // For P2C, remove all devices on it
         //
-
         if (!IsListEmpty (&Temp->ChildList)) {
           RemoveAllPciDeviceOnBridge (RootBridgeHandle, Temp);
         }
@@ -173,7 +145,6 @@ RemoveRejectedPciDevices (
         //
         // Finally remove itself
         //
-
         LastLink = CurrentLink->BackLink;
         RemoveEntryList (CurrentLink);
         FreePciDevice (Temp);
@@ -278,13 +249,13 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
     //
 
     IoBridge = CreateResourceNode (
-                RootBridgeDev,
-                0,
-                0xFFF,
-                0,
-                PciBarTypeIo16,
-                PciResUsageTypical
-                );
+                 RootBridgeDev,
+                 0,
+                 0xFFF,
+                 0,
+                 PciBarTypeIo16,
+                 PciResUsageTypical
+                 );
 
     Mem32Bridge = CreateResourceNode (
                     RootBridgeDev,
@@ -296,13 +267,13 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
                     );
 
     PMem32Bridge = CreateResourceNode (
-                    RootBridgeDev,
-                    0,
-                    0xFFFFF,
-                    0,
-                    PciBarTypePMem32,
-                    PciResUsageTypical
-                    );
+                     RootBridgeDev,
+                     0,
+                     0xFFFFF,
+                     0,
+                     PciBarTypePMem32,
+                     PciResUsageTypical
+                     );
 
     Mem64Bridge = CreateResourceNode (
                     RootBridgeDev,
@@ -314,25 +285,25 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
                     );
 
     PMem64Bridge = CreateResourceNode (
-                    RootBridgeDev,
-                    0,
-                    0xFFFFF,
-                    0,
-                    PciBarTypePMem64,
-                    PciResUsageTypical
-                    );
+                     RootBridgeDev,
+                     0,
+                     0xFFFFF,
+                     0,
+                     PciBarTypePMem64,
+                     PciResUsageTypical
+                     );
 
     //
     // Create resourcemap by going through all the devices subject to this root bridge
     //
     Status = CreateResourceMap (
-              RootBridgeDev,
-              IoBridge,
-              Mem32Bridge,
-              PMem32Bridge,
-              Mem64Bridge,
-              PMem64Bridge
-              );
+               RootBridgeDev,
+               IoBridge,
+               Mem32Bridge,
+               PMem32Bridge,
+               Mem64Bridge,
+               PMem64Bridge
+               );
 
     //
     // Get the max ROM size that the root bridge can process
@@ -366,14 +337,14 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
     // submit the resource aperture to pci host bridge protocol
     //
     Status = ConstructAcpiResourceRequestor (
-              RootBridgeDev,
-              IoBridge,
-              Mem32Bridge,
-              PMem32Bridge,
-              Mem64Bridge,
-              PMem64Bridge,
-              &AcpiConfig
-              );
+               RootBridgeDev,
+               IoBridge,
+               Mem32Bridge,
+               PMem32Bridge,
+               Mem64Bridge,
+               PMem64Bridge,
+               &AcpiConfig
+               );
 
     //
     // Insert these resource nodes into the database
@@ -493,18 +464,18 @@ PciHostBridgeResourceAllocator_WithoutHotPlugDeviceSupport (
     // enumerator. Several resource tree was created
     //
     Status = GetResourceMap (
-              RootBridgeDev,
-              &IoBridge,
-              &Mem32Bridge,
-              &PMem32Bridge,
-              &Mem64Bridge,
-              &PMem64Bridge,
-              &IoPool,
-              &Mem32Pool,
-              &PMem32Pool,
-              &Mem64Pool,
-              &PMem64Pool
-              );
+               RootBridgeDev,
+               &IoBridge,
+               &Mem32Bridge,
+               &PMem32Bridge,
+               &Mem64Bridge,
+               &PMem64Bridge,
+               &IoPool,
+               &Mem32Pool,
+               &PMem32Pool,
+               &Mem64Pool,
+               &PMem64Pool
+               );
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -650,13 +621,13 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
       //
 
       IoBridge = CreateResourceNode (
-                  RootBridgeDev,
-                  0,
-                  0xFFF,
-                  0,
-                  PciBarTypeIo16,
-                  PciResUsageTypical
-                  );
+                   RootBridgeDev,
+                   0,
+                   0xFFF,
+                   0,
+                   PciBarTypeIo16,
+                   PciResUsageTypical
+                   );
 
       Mem32Bridge = CreateResourceNode (
                       RootBridgeDev,
@@ -668,13 +639,13 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
                       );
 
       PMem32Bridge = CreateResourceNode (
-                      RootBridgeDev,
-                      0,
-                      0xFFFFF,
-                      0,
-                      PciBarTypePMem32,
-                      PciResUsageTypical
-                      );
+                       RootBridgeDev,
+                       0,
+                       0xFFFFF,
+                       0,
+                       PciBarTypePMem32,
+                       PciResUsageTypical
+                       );
 
       Mem64Bridge = CreateResourceNode (
                       RootBridgeDev,
@@ -686,25 +657,25 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
                       );
 
       PMem64Bridge = CreateResourceNode (
-                      RootBridgeDev,
-                      0,
-                      0xFFFFF,
-                      0,
-                      PciBarTypePMem64,
-                      PciResUsageTypical
-                      );
+                       RootBridgeDev,
+                       0,
+                       0xFFFFF,
+                       0,
+                       PciBarTypePMem64,
+                       PciResUsageTypical
+                       );
 
       //
       // Create resourcemap by going through all the devices subject to this root bridge
       //
       Status = CreateResourceMap (
-                RootBridgeDev,
-                IoBridge,
-                Mem32Bridge,
-                PMem32Bridge,
-                Mem64Bridge,
-                PMem64Bridge
-                );
+                 RootBridgeDev,
+                 IoBridge,
+                 Mem32Bridge,
+                 PMem32Bridge,
+                 Mem64Bridge,
+                 PMem64Bridge
+                 );
 
       //
       // Get the max ROM size that the root bridge can process
@@ -743,14 +714,14 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
       // submit the resource aperture to pci host bridge protocol
       //
       Status = ConstructAcpiResourceRequestor (
-                RootBridgeDev,
-                IoBridge,
-                Mem32Bridge,
-                PMem32Bridge,
-                Mem64Bridge,
-                PMem64Bridge,
-                &AcpiConfig
-                );
+                 RootBridgeDev,
+                 IoBridge,
+                 Mem32Bridge,
+                 PMem32Bridge,
+                 Mem64Bridge,
+                 PMem64Bridge,
+                 &AcpiConfig
+                 );
 
       //
       // Insert these resource nodes into the database
@@ -883,17 +854,17 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
           );
 
     Status = PciHostBridgeAdjustAllocation (
-              &IoPool,
-              &Mem32Pool,
-              &PMem32Pool,
-              &Mem64Pool,
-              &PMem64Pool,
-              IoResStatus,
-              Mem32ResStatus,
-              PMem32ResStatus,
-              Mem64ResStatus,
-              PMem64ResStatus
-              );
+               &IoPool,
+               &Mem32Pool,
+               &PMem32Pool,
+               &Mem64Pool,
+               &PMem64Pool,
+               IoResStatus,
+               Mem32ResStatus,
+               PMem32ResStatus,
+               Mem64ResStatus,
+               PMem64ResStatus
+               );
 
     //
     // Destroy all the resource tree
@@ -984,18 +955,18 @@ PciHostBridgeResourceAllocator_WithHotPlugDeviceSupport (
     // enumerator. Several resource tree was created
     //
     Status = GetResourceMap (
-              RootBridgeDev,
-              &IoBridge,
-              &Mem32Bridge,
-              &PMem32Bridge,
-              &Mem64Bridge,
-              &PMem64Bridge,
-              &IoPool,
-              &Mem32Pool,
-              &PMem32Pool,
-              &Mem64Pool,
-              &PMem64Pool
-              );
+               RootBridgeDev,
+               &IoBridge,
+               &Mem32Bridge,
+               &PMem32Bridge,
+               &Mem64Bridge,
+               &PMem64Bridge,
+               &IoPool,
+               &Mem32Pool,
+               &PMem32Pool,
+               &Mem64Pool,
+               &PMem64Pool
+               );
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1447,7 +1418,7 @@ PciScanBus_WithHotPlugDeviceSupport (
                       &BusRange
                       );
 
-            gBS->FreePool (Descriptors);
+            FreePool (Descriptors);
 
             if (EFI_ERROR (Status)) {
               return Status;
@@ -1787,7 +1758,7 @@ PciHostBridgeEnumerator (
           StartBusNumber
         );
 
-        gBS->FreePool (Configuration);
+        FreePool (Configuration);
         Link = GetNextNode (&RootBridgeList, Link);
         DestroyRootBridge (RootBridgeDev);
       }

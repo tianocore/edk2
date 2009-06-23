@@ -1224,7 +1224,9 @@ UpdatePciInfo (
     Ptr++;
   }
 
-  gBS->FreePool (Configuration);
+  if (Configuration != NULL) {
+    FreePool (Configuration);
+  }
   return Status;
 
 }
@@ -1618,23 +1620,12 @@ CreatePciIoDevice (
   UINT8                               Func
   )
 {
-
-  EFI_STATUS    Status;
   PCI_IO_DEVICE *PciIoDevice;
 
-  PciIoDevice = NULL;
-
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (PCI_IO_DEVICE),
-                  (VOID **) &PciIoDevice
-                  );
-
-  if (EFI_ERROR (Status)) {
+  PciIoDevice = AllocateZeroPool (sizeof (PCI_IO_DEVICE));
+  if (PciIoDevice == NULL) {
     return NULL;
   }
-
-  ZeroMem (PciIoDevice, sizeof (PCI_IO_DEVICE));
 
   PciIoDevice->Signature        = PCI_IO_DEVICE_SIGNATURE;
   PciIoDevice->Handle           = NULL;
@@ -1644,6 +1635,7 @@ CreatePciIoDevice (
   PciIoDevice->DeviceNumber     = Device;
   PciIoDevice->FunctionNumber   = Func;
   PciIoDevice->Decodes          = 0;
+
   if (gFullEnumeration) {
     PciIoDevice->Allocated = FALSE;
   } else {
@@ -1663,7 +1655,6 @@ CreatePciIoDevice (
   //
   // Initialize the PCI I/O instance structure
   //
-
   InitializePciIoInstance (PciIoDevice);
   InitializePciDriverOverrideInstance (PciIoDevice);
   InitializePciLoadFile2 (PciIoDevice);
