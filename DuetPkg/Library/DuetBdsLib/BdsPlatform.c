@@ -1462,38 +1462,6 @@ Returns:
   return EFI_UNSUPPORTED;
 }  
 
-UINT8
-GetBufferCheckSum (
-  IN VOID *      Buffer,
-  IN UINTN       Length
-  )
-/*++
-
-Routine Description:
-  Caculate buffer checksum (8-bit)
-
-Arguments:
-  Buffer - Pointer to Buffer that to be caculated
-  Length - How many bytes are to be caculated  
-
-Returns:
-  Checksum of the buffer
-
---*/
-{
-  UINT8   CheckSum;
-  UINT8   *Ptr8;
-  
-  CheckSum = 0;
-  Ptr8 = (UINT8 *) Buffer;
-  
-  while (Length > 0) {
-    CheckSum = (UINT8) (CheckSum + *Ptr8++);
-    Length--;
-  }
-  
-  return (UINT8)((0xFF - CheckSum) + 1);
-}  
 
 EFI_STATUS
 ConvertAcpiTable (
@@ -1628,7 +1596,7 @@ Returns:
   SmbiosTableNew->TableAddress = (UINT32)BufferPtr;
   SmbiosTableNew->IntermediateChecksum = 0;
   SmbiosTableNew->IntermediateChecksum = 
-          GetBufferCheckSum ((UINT8*)SmbiosTableNew + 0x10, SmbiosEntryLen -0x10);
+          CalculateCheckSum8 ((UINT8*)SmbiosTableNew + 0x10, SmbiosEntryLen -0x10);
   //
   // Change the SMBIOS pointer
   //
@@ -1727,10 +1695,10 @@ Returns:
         MpsTableNew->OemTablePointer = (UINT32)(UINTN)OemTableNew;
     }
     MpsTableNew->Checksum = 0;
-    MpsTableNew->Checksum = GetBufferCheckSum (MpsTableNew, MpsTableOri->BaseTableLength);
+    MpsTableNew->Checksum = CalculateCheckSum8 (MpsTableNew, MpsTableOri->BaseTableLength);
     MpsFloatingPointerNew->PhysicalAddress = (UINT32)(UINTN)MpsTableNew;
     MpsFloatingPointerNew->Checksum = 0;
-    MpsFloatingPointerNew->Checksum = GetBufferCheckSum (MpsFloatingPointerNew, FPLength);
+    MpsFloatingPointerNew->Checksum = CalculateCheckSum8 (MpsFloatingPointerNew, FPLength);
   }
   //
   // Change the pointer
