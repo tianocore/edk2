@@ -1695,10 +1695,10 @@ Returns:
         MpsTableNew->OemTablePointer = (UINT32)(UINTN)OemTableNew;
     }
     MpsTableNew->Checksum = 0;
-    MpsTableNew->Checksum = CalculateCheckSum8 (MpsTableNew, MpsTableOri->BaseTableLength);
+    MpsTableNew->Checksum = CalculateCheckSum8 ((UINT8*)MpsTableNew, MpsTableOri->BaseTableLength);
     MpsFloatingPointerNew->PhysicalAddress = (UINT32)(UINTN)MpsTableNew;
     MpsFloatingPointerNew->Checksum = 0;
-    MpsFloatingPointerNew->Checksum = CalculateCheckSum8 (MpsFloatingPointerNew, FPLength);
+    MpsFloatingPointerNew->Checksum = CalculateCheckSum8 ((UINT8*)MpsFloatingPointerNew, FPLength);
   }
   //
   // Change the pointer
