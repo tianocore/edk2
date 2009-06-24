@@ -3,23 +3,17 @@
   data and those wishing to be made aware of all information that
   has been logged.
 
-  For more information please look at Intel Platform Innovation
-  Framework for EFI Data Hub Specification.
-
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  DataHub.h
-
-  @par Revision Reference:
   This protocol is defined in Framework for EFI Data Hub Specification.
   Version 0.9.
+
+Copyright (c) 2007 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -81,7 +75,6 @@ typedef struct _EFI_DATA_HUB_PROTOCOL EFI_DATA_HUB_PROTOCOL;
   Logs a data record to the system event log.
 
   @param  This                  The EFI_DATA_HUB_PROTOCOL instance.
-  @param  description
   @param  DataRecordGuid        A GUID that indicates the format of the data passed into RawData.
   @param  ProducerName          A GUID that indicates the identity of the caller to this API.
   @param  DataRecordClass       This class indicates the generic type of the data record.
