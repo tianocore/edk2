@@ -1,4 +1,6 @@
 /** @file
+   This file contains all helper functions on the ATAPI command 
+  
   Copyright (c) 2006 - 2008, Intel Corporation                                                        
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -17,28 +19,18 @@
   in the LS-120 drive or ZIP drive. The media status is returned in the 
   Error Status.
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
+  @param IdeDev   pointer pointing to IDE_BLK_IO_DEV data structure, used
+                  to record all the information of the IDE device.
 
-  @retval EFI_SUCCESS
-  The media status is achieved successfully and the media
-  can be read/written.
-  
-  @retval EFI_DEVICE_ERROR
-  Get Media Status Command is failed.
-  
-  @retval EFI_NO_MEDIA
-  There is no media in the drive.
-  
-  @retval EFI_WRITE_PROTECTED
-  The media is writing protected.
+  @retval EFI_SUCCESS         The media status is achieved successfully and the media
+                              can be read/written.
+  @retval EFI_DEVICE_ERROR    Get Media Status Command is failed.
+  @retval EFI_NO_MEDIA        There is no media in the drive.
+  @retval EFI_WRITE_PROTECTED The media is writing protected.
 
-  @note
-  This function must be called after the LS120EnableMediaStatus() 
-  with second parameter set to TRUE 
-  (means enable media status notification) is called.
-
+  @note  This function must be called after the LS120EnableMediaStatus() 
+         with second parameter set to TRUE 
+         (means enable media status notification) is called.
 **/
 EFI_STATUS
 LS120GetMediaStatus (
@@ -100,25 +92,17 @@ LS120GetMediaStatus (
     return EFI_SUCCESS;
   }
 }
-
 /**
   This function is used to send Enable Media Status Notification Command
   or Disable Media Status Notification Command.
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
+  @param IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
+                to record all the information of the IDE device.
 
-  @param[in] Enable
-  a flag that indicates whether enable or disable media
-  status notification.
-
-  @retval EFI_SUCCESS
-  If command completes successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  If command failed.
-
+  @param Enable a flag that indicates whether enable or disable media
+                status notification.
+  @retval EFI_SUCCESS      If command completes successfully.
+  @retval EFI_DEVICE_ERROR If command failed.
 **/
 EFI_STATUS
 LS120EnableMediaStatus (
@@ -179,47 +163,452 @@ LS120EnableMediaStatus (
 
   return EFI_SUCCESS;
 }
+/**
+  This function reads the pending data in the device.
 
+  @param IdeDev   Indicates the calling context.
+
+  @retval EFI_SUCCESS   Successfully read.
+  @retval EFI_NOT_READY The BSY is set avoiding reading.
+
+**/
+EFI_STATUS
+AtapiReadPendingData (
+  IN IDE_BLK_IO_DEV     *IdeDev
+  )
+{
+  UINT8     AltRegister;
+  UINT16    TempWordBuffer;
+
+  AltRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.AltStatus);
+  if ((AltRegister & ATA_STSREG_BSY) == ATA_STSREG_BSY) {
+    return EFI_NOT_READY;
+  }
+  if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
+    TempWordBuffer = IDEReadPortB (IdeDev->PciIo,IdeDev->IoPort->Alt.AltStatus);
+    while ((TempWordBuffer & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
+      IDEReadPortWMultiple (
+        IdeDev->PciIo,
+        IdeDev->IoPort->Data, 
+        1, 
+        &TempWordBuffer
+        );
+      TempWordBuffer = IDEReadPortB (IdeDev->PciIo,IdeDev->IoPort->Alt.AltStatus);
+    }
+  }
+  return EFI_SUCCESS;
+}
+
+/**
+  This function is called by either AtapiPacketCommandIn() or AtapiPacketCommandOut(). 
+  It is used to transfer data between host and device. The data direction is specified
+  by the fourth parameter.
+
+  @param IdeDev     pointer pointing to IDE_BLK_IO_DEV data structure, used to record
+                    all the information of the IDE device.
+  @param Buffer     buffer contained data transferred between host and device.
+  @param ByteCount  data size in byte unit of the buffer.
+  @param Read       flag used to determine the data transfer direction.
+                    Read equals 1, means data transferred from device to host;
+                    Read equals 0, means data transferred from host to device.
+  @param TimeOut    timeout value for wait DRQ ready before each data stream's transfer.
+
+  @retval EFI_SUCCESS      data is transferred successfully.
+  @retval EFI_DEVICE_ERROR the device failed to transfer data.
+**/
+EFI_STATUS
+PioReadWriteData (
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  IN  UINT16          *Buffer,
+  IN  UINT32          ByteCount,
+  IN  BOOLEAN         Read,
+  IN  UINTN           TimeOut
+  )
+{
+  //
+  // required transfer data in word unit.
+  //
+  UINT32      RequiredWordCount;
+
+  //
+  // actual transfer data in word unit.
+  //
+  UINT32      ActualWordCount;
+  UINT32      WordCount;
+  EFI_STATUS  Status;
+  UINT16      *PtrBuffer;
+
+  //
+  // No data transfer is premitted.
+  //
+  if (ByteCount == 0) {
+    return EFI_SUCCESS;
+  }
+  //
+  // for performance, we assert the ByteCount is an even number
+  // which is actually a resonable assumption  
+  ASSERT((ByteCount%2) == 0);
+  
+  PtrBuffer         = Buffer;
+  RequiredWordCount = ByteCount / 2;
+  //
+  // ActuralWordCount means the word count of data really transferred.
+  //
+  ActualWordCount = 0;
+
+  while (ActualWordCount < RequiredWordCount) {
+    
+    //
+    // before each data transfer stream, the host should poll DRQ bit ready,
+    // to see whether indicates device is ready to transfer data.
+    //
+    Status = DRQReady2 (IdeDev, TimeOut);
+    if (EFI_ERROR (Status)) {
+      return CheckErrorStatus (IdeDev);
+    }
+    
+    //
+    // read Status Register will clear interrupt
+    //
+    IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
+
+    //
+    // get current data transfer size from Cylinder Registers.
+    //
+    WordCount = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderMsb) << 8;
+    WordCount = WordCount | IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderLsb);
+    WordCount = WordCount & 0xffff;
+    WordCount /= 2;
+
+    WordCount = MIN (WordCount, (RequiredWordCount - ActualWordCount));
+
+    if (Read) {
+      IDEReadPortWMultiple (
+        IdeDev->PciIo,
+        IdeDev->IoPort->Data,
+        WordCount,
+        PtrBuffer
+        );
+    } else {
+      IDEWritePortWMultiple (
+        IdeDev->PciIo,
+        IdeDev->IoPort->Data,
+        WordCount,
+        PtrBuffer
+        );
+    }
+
+    PtrBuffer += WordCount;
+    ActualWordCount += WordCount;
+  }
+  
+  if (Read) {
+    //
+    // In the case where the drive wants to send more data than we need to read,
+    // the DRQ bit will be set and cause delays from DRQClear2().
+    // We need to read data from the drive until it clears DRQ so we can move on.
+    //
+    AtapiReadPendingData (IdeDev);
+  }
+
+  //
+  // After data transfer is completed, normally, DRQ bit should clear.
+  //
+  Status = DRQClear2 (IdeDev, ATAPITIMEOUT);
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // read status register to check whether error happens.
+  //
+  return CheckErrorStatus (IdeDev);
+}
+
+/**
+  This function is used to send out ATAPI commands conforms to the Packet Command 
+  with PIO Data In Protocol.
+
+  @param IdeDev    pointer pointing to IDE_BLK_IO_DEV data structure, used
+                   to record all the information of the IDE device.
+  @param Packet    pointer pointing to ATAPI_PACKET_COMMAND data structure
+                   which contains the contents of the command.     
+  @param Buffer    buffer contained data transferred from device to host.
+  @param ByteCount data size in byte unit of the buffer.
+  @param TimeOut   this parameter is used to specify the timeout value for the 
+                   PioReadWriteData() function. 
+
+  @retval EFI_SUCCESS       send out the ATAPI packet command successfully
+                            and device sends data successfully.
+  @retval EFI_DEVICE_ERROR  the device failed to send data.
+
+**/
+EFI_STATUS
+AtapiPacketCommandIn (
+  IN  IDE_BLK_IO_DEV        *IdeDev,
+  IN  ATAPI_PACKET_COMMAND  *Packet,
+  IN  UINT16                *Buffer,
+  IN  UINT32                ByteCount,
+  IN  UINTN                 TimeOut
+  )
+{
+  UINT16      *CommandIndex;
+  EFI_STATUS  Status;
+  UINT32      Count;
+
+  //
+  // Set all the command parameters by fill related registers.
+  // Before write to all the following registers, BSY and DRQ must be 0.
+  //
+  Status = DRQClear2 (IdeDev, ATAPITIMEOUT);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Select device via Device/Head Register.
+  //
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->Head,
+    (UINT8) ((IdeDev->Device << 4) | ATA_DEFAULT_CMD)  // DEFAULT_CMD: 0xa0 (1010,0000)
+    );
+
+  //
+  // No OVL; No DMA
+  //
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x00);
+
+  //
+  // set the transfersize to ATAPI_MAX_BYTE_COUNT to let the device
+  // determine how many data should be transferred.
+  //
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->CylinderLsb,
+    (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff)
+    );
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->CylinderMsb,
+    (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8)
+    );
+
+  //
+  //  ATA_DEFAULT_CTL:0x0a (0000,1010)
+  //  Disable interrupt
+  //
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, ATA_DEFAULT_CTL);
+
+  //
+  // Send Packet command to inform device
+  // that the following data bytes are command packet.
+  //
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, ATA_CMD_PACKET);
+
+  Status = DRQReady (IdeDev, ATAPITIMEOUT);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Send out command packet
+  //
+  CommandIndex = Packet->Data16;
+  for (Count = 0; Count < 6; Count++, CommandIndex++) {
+
+    IDEWritePortW (IdeDev->PciIo, IdeDev->IoPort->Data, *CommandIndex);
+    gBS->Stall (10);
+  }
+
+  //
+  // call PioReadWriteData() function to get
+  // requested transfer data form device.
+  //
+  return PioReadWriteData (IdeDev, Buffer, ByteCount, 1, TimeOut);
+}
+/**
+  This function is used to send out ATAPI commands conforms to the Packet Command
+  with PIO Data Out Protocol.
+
+  @param IdeDev      pointer pointing to IDE_BLK_IO_DEV data structure, used
+                     to record all the information of the IDE device.
+  @param Packet      pointer pointing to ATAPI_PACKET_COMMAND data structure
+                     which contains the contents of the command.
+  @param Buffer      buffer contained data transferred from host to device.
+  @param ByteCount   data size in byte unit of the buffer.
+  @param TimeOut     this parameter is used to specify the timeout value 
+                     for the PioReadWriteData() function. 
+  @retval EFI_SUCCESS      send out the ATAPI packet command successfully
+                           and device received data successfully.  
+  @retval EFI_DEVICE_ERROR the device failed to send data.
+
+**/
+EFI_STATUS
+AtapiPacketCommandOut (
+  IN  IDE_BLK_IO_DEV        *IdeDev,
+  IN  ATAPI_PACKET_COMMAND  *Packet,
+  IN  UINT16                *Buffer,
+  IN  UINT32                ByteCount,
+  IN  UINTN                 TimeOut
+  )
+{
+  UINT16      *CommandIndex;
+  EFI_STATUS  Status;
+  UINT32      Count;
+
+  //
+  // set all the command parameters
+  // Before write to all the following registers, BSY and DRQ must be 0.
+  //
+  Status = DRQClear2 (IdeDev, ATAPITIMEOUT);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
+  // Select device via Device/Head Register.
+  //
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->Head,
+    (UINT8) ((IdeDev->Device << 4) | ATA_DEFAULT_CMD)   // ATA_DEFAULT_CMD: 0xa0 (1010,0000)
+    );
+
+  //
+  // No OVL; No DMA
+  //
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x00);
+
+  //
+  // set the transfersize to ATAPI_MAX_BYTE_COUNT to
+  // let the device determine how many data should be transferred.
+  //
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->CylinderLsb,
+    (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff)
+    );
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->CylinderMsb,
+    (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8)
+    );
+
+  //
+  //  DEFAULT_CTL:0x0a (0000,1010)
+  //  Disable interrupt
+  //
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, ATA_DEFAULT_CTL);
+
+  //
+  // Send Packet command to inform device
+  // that the following data bytes are command packet.
+  //
+  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, ATA_CMD_PACKET);
+
+  Status = DRQReady2 (IdeDev, ATAPITIMEOUT);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Send out command packet
+  //
+  CommandIndex = Packet->Data16;
+  for (Count = 0; Count < 6; Count++, CommandIndex++) {
+    IDEWritePortW (IdeDev->PciIo, IdeDev->IoPort->Data, *CommandIndex);
+    gBS->Stall (10);
+  }
+
+  //
+  // call PioReadWriteData() function to send requested transfer data to device.
+  //
+  return PioReadWriteData (IdeDev, Buffer, ByteCount, 0, TimeOut);
+}
+/**
+  Sends out ATAPI Inquiry Packet Command to the specified device. This command will
+  return INQUIRY data of the device.
+
+  @param IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
+                to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS       Inquiry command completes successfully.
+  @retval EFI_DEVICE_ERROR  Inquiry command failed.
+
+  @note  Parameter "IdeDev" will be updated in this function.
+
+**/
+EFI_STATUS
+AtapiInquiry (
+  IN  IDE_BLK_IO_DEV  *IdeDev
+  )
+{
+  ATAPI_PACKET_COMMAND  Packet;
+  EFI_STATUS            Status;
+  ATAPI_INQUIRY_DATA          *InquiryData;
+
+  //
+  // prepare command packet for the ATAPI Inquiry Packet Command.
+  //
+  ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
+  Packet.Inquiry.opcode             = ATA_CMD_INQUIRY;
+  Packet.Inquiry.page_code          = 0;
+  Packet.Inquiry.allocation_length  = sizeof (ATAPI_INQUIRY_DATA);
+
+  InquiryData                       = AllocatePool (sizeof (ATAPI_INQUIRY_DATA));
+  if (InquiryData == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Send command packet and get requested Inquiry data.
+  //
+  Status = AtapiPacketCommandIn (
+            IdeDev,
+            &Packet,
+            (UINT16 *) InquiryData,
+            sizeof (ATAPI_INQUIRY_DATA),
+            ATAPITIMEOUT
+            );
+  if (EFI_ERROR (Status)) {
+    gBS->FreePool (InquiryData);
+    return EFI_DEVICE_ERROR;
+  }
+
+  IdeDev->InquiryData = InquiryData;
+
+  return EFI_SUCCESS;
+}
 /**
   This function is called by DiscoverIdeDevice() during its device
   identification.
-
   Its main purpose is to get enough information for the device media
   to fill in the Media data structure of the Block I/O Protocol interface.
 
   There are 5 steps to reach such objective:
-
   1. Sends out the ATAPI Identify Command to the specified device. 
   Only ATAPI device responses to this command. If the command succeeds,
   it returns the Identify data structure which filled with information 
   about the device. Since the ATAPI device contains removable media, 
   the only meaningful information is the device module name.
-
   2. Sends out ATAPI Inquiry Packet Command to the specified device.
   This command will return inquiry data of the device, which contains
   the device type information.
-
   3. Allocate sense data space for future use. We don't detect the media
   presence here to improvement boot performance, especially when CD 
   media is present. The media detection will be performed just before
   each BLK_IO read/write
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @retval EFI_SUCCESS
-  Identify ATAPI device successfully.
   
-  @retval EFI_DEVICE_ERROR
-  ATAPI Identify Device Command failed or device type
-  is not supported by this IDE driver.
+  @param IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
+                 to record all the information of the IDE device.
 
-  @note
-  Parameter "IdeDev" will be updated in this function.
+  @retval EFI_SUCCESS       Identify ATAPI device successfully.
+  @retval EFI_DEVICE_ERROR  ATAPI Identify Device Command failed or device type
+                            is not supported by this IDE driver.
+  @retval EFI_OUT_OF_RESOURCES Allocate memory for sense data failed 
 
-  TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-  TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
+  @note   Parameter "IdeDev" will be updated in this function.
 **/
 EFI_STATUS
 ATAPIIdentify (
@@ -367,501 +756,19 @@ ATAPIIdentify (
 
   return EFI_SUCCESS;
 }
-
 /**
-  Sends out ATAPI Inquiry Packet Command to the specified device.
-  This command will return INQUIRY data of the device.
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @retval EFI_SUCCESS
-  Inquiry command completes successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  Inquiry command failed.
-
-  @note
-  Parameter "IdeDev" will be updated in this function.
-
-**/
-EFI_STATUS
-AtapiInquiry (
-  IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-{
-  ATAPI_PACKET_COMMAND  Packet;
-  EFI_STATUS            Status;
-  ATAPI_INQUIRY_DATA          *InquiryData;
-
-  //
-  // prepare command packet for the ATAPI Inquiry Packet Command.
-  //
-  ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-  Packet.Inquiry.opcode             = ATA_CMD_INQUIRY;
-  Packet.Inquiry.page_code          = 0;
-  Packet.Inquiry.allocation_length  = sizeof (ATAPI_INQUIRY_DATA);
-
-  InquiryData                       = AllocatePool (sizeof (ATAPI_INQUIRY_DATA));
-  if (InquiryData == NULL) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  //
-  // Send command packet and get requested Inquiry data.
-  //
-  Status = AtapiPacketCommandIn (
-            IdeDev,
-            &Packet,
-            (UINT16 *) InquiryData,
-            sizeof (ATAPI_INQUIRY_DATA),
-            ATAPITIMEOUT
-            );
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (InquiryData);
-    return EFI_DEVICE_ERROR;
-  }
-
-  IdeDev->InquiryData = InquiryData;
-
-  return EFI_SUCCESS;
-}
-
-/**
-  This function is used to send out ATAPI commands conforms to the 
-  Packet Command with PIO Data In Protocol.
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[in] *Packet
-  pointer pointing to ATAPI_PACKET_COMMAND data structure
-  which contains the contents of the command.     
-
-  @param[in] *Buffer
-  buffer contained data transferred from device to host.
-
-  @param[in] ByteCount
-  data size in byte unit of the buffer.
-
-  @param[in] TimeOut
-  this parameter is used to specify the timeout 
-  value for the PioReadWriteData() function. 
-
-  @retval EFI_SUCCESS
-  send out the ATAPI packet command successfully
-  and device sends data successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  the device failed to send data.
-
-**/
-EFI_STATUS
-AtapiPacketCommandIn (
-  IN  IDE_BLK_IO_DEV        *IdeDev,
-  IN  ATAPI_PACKET_COMMAND  *Packet,
-  IN  UINT16                *Buffer,
-  IN  UINT32                ByteCount,
-  IN  UINTN                 TimeOut
-  )
-{
-  UINT16      *CommandIndex;
-  EFI_STATUS  Status;
-  UINT32      Count;
-
-  //
-  // Set all the command parameters by fill related registers.
-  // Before write to all the following registers, BSY and DRQ must be 0.
-  //
-  Status = DRQClear2 (IdeDev, ATAPITIMEOUT);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Select device via Device/Head Register.
-  //
-  IDEWritePortB (
-    IdeDev->PciIo,
-    IdeDev->IoPort->Head,
-    (UINT8) ((IdeDev->Device << 4) | ATA_DEFAULT_CMD)  // DEFAULT_CMD: 0xa0 (1010,0000)
-    );
-
-  //
-  // No OVL; No DMA
-  //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x00);
-
-  //
-  // set the transfersize to ATAPI_MAX_BYTE_COUNT to let the device
-  // determine how many data should be transferred.
-  //
-  IDEWritePortB (
-    IdeDev->PciIo,
-    IdeDev->IoPort->CylinderLsb,
-    (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff)
-    );
-  IDEWritePortB (
-    IdeDev->PciIo,
-    IdeDev->IoPort->CylinderMsb,
-    (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8)
-    );
-
-  //
-  //  ATA_DEFAULT_CTL:0x0a (0000,1010)
-  //  Disable interrupt
-  //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, ATA_DEFAULT_CTL);
-
-  //
-  // Send Packet command to inform device
-  // that the following data bytes are command packet.
-  //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, ATA_CMD_PACKET);
-
-  Status = DRQReady (IdeDev, ATAPITIMEOUT);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Send out command packet
-  //
-  CommandIndex = Packet->Data16;
-  for (Count = 0; Count < 6; Count++, CommandIndex++) {
-
-    IDEWritePortW (IdeDev->PciIo, IdeDev->IoPort->Data, *CommandIndex);
-    gBS->Stall (10);
-  }
-
-  //
-  // call PioReadWriteData() function to get
-  // requested transfer data form device.
-  //
-  return PioReadWriteData (IdeDev, Buffer, ByteCount, 1, TimeOut);
-}
-
-/**
-  This function is used to send out ATAPI commands conforms to the 
-  Packet Command with PIO Data Out Protocol.
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[in] *Packet
-  pointer pointing to ATAPI_PACKET_COMMAND data structure
-  which contains the contents of the command.
-
-  @param[in] *Buffer
-  buffer contained data transferred from host to device.
-
-  @param[in] ByteCount
-  data size in byte unit of the buffer.
-
-  @param[in] TimeOut
-  this parameter is used to specify the timeout 
-  value for the PioReadWriteData() function. 
-
-  @retval EFI_SUCCESS
-  send out the ATAPI packet command successfully
-  and device received data successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  the device failed to send data.
-
-**/
-EFI_STATUS
-AtapiPacketCommandOut (
-  IN  IDE_BLK_IO_DEV        *IdeDev,
-  IN  ATAPI_PACKET_COMMAND  *Packet,
-  IN  UINT16                *Buffer,
-  IN  UINT32                ByteCount,
-  IN  UINTN                 TimeOut
-  )
-{
-  UINT16      *CommandIndex;
-  EFI_STATUS  Status;
-  UINT32      Count;
-
-  //
-  // set all the command parameters
-  // Before write to all the following registers, BSY and DRQ must be 0.
-  //
-  Status = DRQClear2 (IdeDev, ATAPITIMEOUT);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  
-  //
-  // Select device via Device/Head Register.
-  //
-  IDEWritePortB (
-    IdeDev->PciIo,
-    IdeDev->IoPort->Head,
-    (UINT8) ((IdeDev->Device << 4) | ATA_DEFAULT_CMD)   // ATA_DEFAULT_CMD: 0xa0 (1010,0000)
-    );
-
-  //
-  // No OVL; No DMA
-  //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg1.Feature, 0x00);
-
-  //
-  // set the transfersize to ATAPI_MAX_BYTE_COUNT to
-  // let the device determine how many data should be transferred.
-  //
-  IDEWritePortB (
-    IdeDev->PciIo,
-    IdeDev->IoPort->CylinderLsb,
-    (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff)
-    );
-  IDEWritePortB (
-    IdeDev->PciIo,
-    IdeDev->IoPort->CylinderMsb,
-    (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8)
-    );
-
-  //
-  //  DEFAULT_CTL:0x0a (0000,1010)
-  //  Disable interrupt
-  //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Alt.DeviceControl, ATA_DEFAULT_CTL);
-
-  //
-  // Send Packet command to inform device
-  // that the following data bytes are command packet.
-  //
-  IDEWritePortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Command, ATA_CMD_PACKET);
-
-  Status = DRQReady2 (IdeDev, ATAPITIMEOUT);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Send out command packet
-  //
-  CommandIndex = Packet->Data16;
-  for (Count = 0; Count < 6; Count++, CommandIndex++) {
-    IDEWritePortW (IdeDev->PciIo, IdeDev->IoPort->Data, *CommandIndex);
-    gBS->Stall (10);
-  }
-
-  //
-  // call PioReadWriteData() function to send requested transfer data to device.
-  //
-  return PioReadWriteData (IdeDev, Buffer, ByteCount, 0, TimeOut);
-}
-
-/**
-  This function is called by either AtapiPacketCommandIn() or 
-  AtapiPacketCommandOut(). It is used to transfer data between
-  host and device. The data direction is specified by the fourth
-  parameter.
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[in] *Buffer
-  buffer contained data transferred between host and device.
-
-  @param[in] ByteCount
-  data size in byte unit of the buffer.
-
-  @param[in] Read
-  flag used to determine the data transfer direction.
-  Read equals 1, means data transferred from device to host;
-  Read equals 0, means data transferred from host to device.
-
-  @param[in] TimeOut
-  timeout value for wait DRQ ready before each data 
-  stream's transfer.
-
-  @retval EFI_SUCCESS
-  data is transferred successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  the device failed to transfer data.
-
-**/
-EFI_STATUS
-PioReadWriteData (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  UINT16          *Buffer,
-  IN  UINT32          ByteCount,
-  IN  BOOLEAN         Read,
-  IN  UINTN           TimeOut
-  )
-{
-  //
-  // required transfer data in word unit.
-  //
-  UINT32      RequiredWordCount;
-
-  //
-  // actual transfer data in word unit.
-  //
-  UINT32      ActualWordCount;
-  UINT32      WordCount;
-  EFI_STATUS  Status;
-  UINT16      *PtrBuffer;
-
-  //
-  // No data transfer is premitted.
-  //
-  if (ByteCount == 0) {
-    return EFI_SUCCESS;
-  }
-  //
-  // for performance, we assert the ByteCount is an even number
-  // which is actually a resonable assumption  
-  ASSERT((ByteCount%2) == 0);
-  
-  PtrBuffer         = Buffer;
-  RequiredWordCount = ByteCount / 2;
-  //
-  // ActuralWordCount means the word count of data really transferred.
-  //
-  ActualWordCount = 0;
-
-  while (ActualWordCount < RequiredWordCount) {
-    
-    //
-    // before each data transfer stream, the host should poll DRQ bit ready,
-    // to see whether indicates device is ready to transfer data.
-    //
-    Status = DRQReady2 (IdeDev, TimeOut);
-    if (EFI_ERROR (Status)) {
-      return CheckErrorStatus (IdeDev);
-    }
-    
-    //
-    // read Status Register will clear interrupt
-    //
-    IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Reg.Status);
-
-    //
-    // get current data transfer size from Cylinder Registers.
-    //
-    WordCount = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderMsb) << 8;
-    WordCount = WordCount | IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->CylinderLsb);
-    WordCount = WordCount & 0xffff;
-    WordCount /= 2;
-
-    WordCount = MIN (WordCount, (RequiredWordCount - ActualWordCount));
-
-    if (Read) {
-      IDEReadPortWMultiple (
-        IdeDev->PciIo,
-        IdeDev->IoPort->Data,
-        WordCount,
-        PtrBuffer
-        );
-    } else {
-      IDEWritePortWMultiple (
-        IdeDev->PciIo,
-        IdeDev->IoPort->Data,
-        WordCount,
-        PtrBuffer
-        );
-    }
-
-    PtrBuffer += WordCount;
-    ActualWordCount += WordCount;
-  }
-  
-  if (Read) {
-    //
-    // In the case where the drive wants to send more data than we need to read,
-    // the DRQ bit will be set and cause delays from DRQClear2().
-    // We need to read data from the drive until it clears DRQ so we can move on.
-    //
-    AtapiReadPendingData (IdeDev);
-  }
-
-  //
-  // After data transfer is completed, normally, DRQ bit should clear.
-  //
-  Status = DRQClear2 (IdeDev, ATAPITIMEOUT);
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  //
-  // read status register to check whether error happens.
-  //
-  return CheckErrorStatus (IdeDev);
-}
-
-/**
-  Sends out ATAPI Test Unit Ready Packet Command to the specified device
-  to find out whether device is accessible.
-
-  @param[in] *IdeDev     Pointer pointing to IDE_BLK_IO_DEV data structure, used
-                         to record all the information of the IDE device.
-  @param[out] *SResult   Sense result for this packet command.
-
-  @retval EFI_SUCCESS      Device is accessible.
-  @retval EFI_DEVICE_ERROR Device is not accessible.
-
-**/
-EFI_STATUS
-AtapiTestUnitReady (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  OUT SENSE_RESULT    *SResult  
-  )
-{
-  ATAPI_PACKET_COMMAND  Packet;
-  EFI_STATUS            Status;
-  UINTN 				SenseCount;
-
-  //
-  // fill command packet
-  //
-  ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-  Packet.TestUnitReady.opcode = ATA_CMD_TEST_UNIT_READY;
-
-  //
-  // send command packet
-  //
-  Status = AtapiPacketCommandIn (IdeDev, &Packet, NULL, 0, ATAPITIMEOUT);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = AtapiRequestSense (IdeDev, &SenseCount);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  ParseSenseData (IdeDev, SenseCount, SResult);
-  return EFI_SUCCESS;
-}
-
-/**
-  Sends out ATAPI Request Sense Packet Command to the specified device.
-  This command will return all the current Sense data in the device. 
-  This function will pack all the Sense data in one single buffer.
-
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[out] **SenseCounts
-  allocated in this function, and freed by the calling function.
-  This buffer is used to accommodate all the sense data returned 
-  by the device.
-
-  @retval EFI_SUCCESS
-  Request Sense command completes successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  Request Sense command failed.
-
+  Sends out ATAPI Request Sense Packet Command to the specified device. This command
+  will return all the current Sense data in the device.  This function will pack 
+  all the Sense data in one single buffer.
+
+  @param IdeDev       pointer pointing to IDE_BLK_IO_DEV data structure, used
+                      to record all the information of the IDE device.
+  @param SenseCounts  allocated in this function, and freed by the calling function.
+                      This buffer is used to accommodate all the sense data returned 
+                      by the device.
+
+  @retval EFI_SUCCESS      Request Sense command completes successfully.
+  @retval EFI_DEVICE_ERROR Request Sense command failed.
 **/
 EFI_STATUS
 AtapiRequestSense (
@@ -941,6 +848,124 @@ AtapiRequestSense (
 
   return EFI_SUCCESS;
 }
+/**
+  This function is used to parse sense data. Only the first sense data is honoured
+  
+  @param IdeDev     Indicates the calling context.
+  @param SenseCount Count of sense data.
+  @param Result    The parsed result.
+
+  @retval EFI_SUCCESS           Successfully parsed.
+  @retval EFI_INVALID_PARAMETER Count of sense data is zero.
+
+**/
+EFI_STATUS
+ParseSenseData (
+  IN IDE_BLK_IO_DEV     *IdeDev,
+  IN UINTN              SenseCount,
+  OUT SENSE_RESULT      *Result
+  )
+{
+  ATAPI_REQUEST_SENSE_DATA      *SenseData;
+
+  if (SenseCount == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Only use the first sense data
+  //
+  SenseData = IdeDev->SenseData;
+  *Result   = SenseOtherSense;
+
+  switch (SenseData->sense_key) {
+  case ATA_SK_NO_SENSE:
+    *Result = SenseNoSenseKey;
+    break;
+  case ATA_SK_NOT_READY:
+    switch (SenseData->addnl_sense_code) {
+    case ATA_ASC_NO_MEDIA:
+      *Result = SenseNoMedia;
+      break;
+    case ATA_ASC_MEDIA_UPSIDE_DOWN:
+      *Result = SenseMediaError;
+      break;
+    case ATA_ASC_NOT_READY:
+      if (SenseData->addnl_sense_code_qualifier == ATA_ASCQ_IN_PROGRESS) {
+        *Result = SenseDeviceNotReadyNeedRetry;
+      } else {
+        *Result = SenseDeviceNotReadyNoRetry;
+      }
+      break;
+    }
+    break;
+  case ATA_SK_UNIT_ATTENTION:
+    if (SenseData->addnl_sense_code == ATA_ASC_MEDIA_CHANGE) {
+      *Result = SenseMediaChange;
+    }
+    break;
+  case ATA_SK_MEDIUM_ERROR:
+    switch (SenseData->addnl_sense_code) {
+    case ATA_ASC_MEDIA_ERR1:
+    case ATA_ASC_MEDIA_ERR2:
+    case ATA_ASC_MEDIA_ERR3:
+    case ATA_ASC_MEDIA_ERR4:
+      *Result = SenseMediaError;
+      break;
+    }
+    break;
+  default:
+    break;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Sends out ATAPI Test Unit Ready Packet Command to the specified device
+  to find out whether device is accessible.
+
+  @param IdeDev    Pointer pointing to IDE_BLK_IO_DEV data structure, used
+                   to record all the information of the IDE device.
+  @param SResult   Sense result for this packet command.
+
+  @retval EFI_SUCCESS      Device is accessible.
+  @retval EFI_DEVICE_ERROR Device is not accessible.
+
+**/
+EFI_STATUS
+AtapiTestUnitReady (
+  IN  IDE_BLK_IO_DEV  *IdeDev,
+  OUT SENSE_RESULT    *SResult  
+  )
+{
+  ATAPI_PACKET_COMMAND  Packet;
+  EFI_STATUS            Status;
+  UINTN 				SenseCount;
+
+  //
+  // fill command packet
+  //
+  ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
+  Packet.TestUnitReady.opcode = ATA_CMD_TEST_UNIT_READY;
+
+  //
+  // send command packet
+  //
+  Status = AtapiPacketCommandIn (IdeDev, &Packet, NULL, 0, ATAPITIMEOUT);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AtapiRequestSense (IdeDev, &SenseCount);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  ParseSenseData (IdeDev, SenseCount, SResult);
+  return EFI_SUCCESS;
+}
+
 
 /**
   Sends out ATAPI Read Capacity Packet Command to the specified device.
@@ -953,16 +978,17 @@ AtapiRequestSense (
   if the Read Capacity Command failed, the Sense data must be requested
   and be analyzed to determine if the Read Capacity Command should retry.
 
-  @param[in] *IdeDev    Pointer pointing to IDE_BLK_IO_DEV data structure, used
-                        to record all the information of the IDE device.
-  @param[out] SResult   Sense result for this packet command
+  @param IdeDev    Pointer pointing to IDE_BLK_IO_DEV data structure, used
+                   to record all the information of the IDE device.
+  @param SResult   Sense result for this packet command
 
   @retval EFI_SUCCESS      Read Capacity Command finally completes successfully.
   @retval EFI_DEVICE_ERROR Read Capacity Command failed because of device error.
+  @retval EFI_NOT_READY    Operation succeeds but returned capacity is 0
 
   @note Parameter "IdeDev" will be updated in this function.
 
-  TODO:    EFI_NOT_READY - add return value to function comment
+  
 **/
 EFI_STATUS
 AtapiReadCapacity (
@@ -1082,30 +1108,70 @@ AtapiReadCapacity (
     return EFI_DEVICE_ERROR;
   }
 }
+/**
+  This function is used to test the current media write-protected or not residing
+  in the LS-120 drive or ZIP drive. 
+  @param IdeDev          pointer pointing to IDE_BLK_IO_DEV data structure, used
+                         to record all the information of the IDE device.
+  @param WriteProtected  if True, current media is write protected.
+                         if FALSE, current media is writable
+
+  @retval EFI_SUCCESS         The media write-protected status is achieved successfully
+  @retval EFI_DEVICE_ERROR    Get Media Status Command is failed.
+**/
+EFI_STATUS
+IsLS120orZipWriteProtected (
+  IN  IDE_BLK_IO_DEV    *IdeDev,
+  OUT BOOLEAN           *WriteProtected
+  )
+{
+  EFI_STATUS  Status;
+
+  *WriteProtected = FALSE;
+
+  Status          = LS120EnableMediaStatus (IdeDev, TRUE);
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // the Get Media Status Command is only valid
+  // if a Set Features/Enable Media Status Command has been priviously issued.
+  //
+  if (LS120GetMediaStatus (IdeDev) == EFI_WRITE_PROTECTED) {
+
+    *WriteProtected = TRUE;
+  } else {
+
+    *WriteProtected = FALSE;
+  }
+
+  //
+  // After Get Media Status Command completes,
+  // Set Features/Disable Media Command should be sent.
+  //
+  Status = LS120EnableMediaStatus (IdeDev, FALSE);
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
-  Used before read/write blocks from/to ATAPI device media. 
-  Since ATAPI device media is removable, it is necessary to detect
-  whether media is present and get current present media's
-  information, and if media has been changed, Block I/O Protocol
-  need to be reinstalled.
+  Used before read/write blocks from/to ATAPI device media. Since ATAPI device 
+  media is removable, it is necessary to detect whether media is present and 
+  get current present media's information, and if media has been changed, Block
+  I/O Protocol need to be reinstalled.
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
+  @param IdeDev       pointer pointing to IDE_BLK_IO_DEV data structure, used
+                      to record all the information of the IDE device.
+  @param MediaChange  return value that indicates if the media of the device has been
+                      changed.
 
-  @param[out] *MediaChange
-  return value that indicates if the media of the device has been
-  changed.
-
-  @retval EFI_SUCCESS
-  media found successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  any error encounters during media detection.
-  
-  @retval EFI_NO_MEDIA
-  media not found.
+  @retval EFI_SUCCESS       media found successfully.
+  @retval EFI_DEVICE_ERROR  any error encounters during media detection.
+  @retval EFI_NO_MEDIA      media not found.
 
   @note
   parameter IdeDev may be updated in this function.
@@ -1350,22 +1416,14 @@ AtapiDetectMedia (
   65536. This is the main difference between READ(10) and READ(12) 
   Command. The maximum number of blocks in READ(12) is 2 power 32.
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
+  @param IdeDev           pointer pointing to IDE_BLK_IO_DEV data structure, used
+                          to record all the information of the IDE device.
+  @param Buffer           A pointer to the destination buffer for the data. 
+  @param Lba              The starting logical block address to read from on the 
+                          device media.
+  @param NumberOfBlocks   The number of transfer data blocks.
 
-  @param[in] *Buffer
-  A pointer to the destination buffer for the data. 
-
-  @param[in] Lba
-  The starting logical block address to read from 
-  on the device media.
-
-  @param[in] NumberOfBlocks
-  The number of transfer data blocks.
-
-  @return status is fully dependent on the return status
-  of AtapiPacketCommandIn() function.
+  @return status is fully dependent on the return status of AtapiPacketCommandIn() function.
 
 **/
 EFI_STATUS
@@ -1475,22 +1533,14 @@ AtapiReadSectors (
   unit. The maximum number of blocks that can be transferred once is
   65536. 
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
-
-  @param[in] *Buffer
-  A pointer to the source buffer for the data. 
-
-  @param[in] Lba
-  The starting logical block address to write onto 
-  the device media.
-
-  @param[in] NumberOfBlocks
-  The number of transfer data blocks.
-
-  @return status is fully dependent on the return status
-  of AtapiPacketCommandOut() function.
+  @param IdeDev          pointer pointing to IDE_BLK_IO_DEV data structure, used
+                         to record all the information of the IDE device.
+  @param Buffer          A pointer to the source buffer for the data. 
+  @param Lba             The starting logical block address to write onto 
+                         the device media.
+  @param NumberOfBlocks  The number of transfer data blocks.
+  
+  @return status is fully dependent on the return status of AtapiPacketCommandOut() function.
 
 **/
 EFI_STATUS
@@ -1586,7 +1636,6 @@ AtapiWriteSectors (
 
   return Status;
 }
-
 /**
   This function is used to implement the Soft Reset on the specified
   ATAPI device. Different from the AtaSoftReset(), here reset is a ATA
@@ -1599,15 +1648,11 @@ AtapiWriteSectors (
   This function is called by IdeBlkIoReset(), 
   a interface function of Block I/O protocol.
 
-  @param[in] *IdeDev
-  pointer pointing to IDE_BLK_IO_DEV data structure, used
-  to record all the information of the IDE device.
+  @param IdeDev    pointer pointing to IDE_BLK_IO_DEV data structure, used
+                   to record all the information of the IDE device.
 
-  @retval EFI_SUCCESS
-  Soft reset completes successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  Any step during the reset process is failed.
+  @retval EFI_SUCCESS      Soft reset completes successfully.
+  @retval EFI_DEVICE_ERROR Any step during the reset process is failed.
 
 **/
 EFI_STATUS
@@ -1651,45 +1696,23 @@ AtapiSoftReset (
   This function is the ATAPI implementation for ReadBlocks in the
   Block I/O Protocol interface.
 
-  @param[in] *IdeBlkIoDevice
-  Indicates the calling context.
-
-  @param[in] MediaId
-  The media id that the read request is for.
-
-  @param[in] LBA
-  The starting logical block address to read from 
-  on the device.
-
-  @param[in] BufferSize
-  The size of the Buffer in bytes. This must be a
-  multiple of the intrinsic block size of the device.
-
-  @param[out] *Buffer
-  A pointer to the destination buffer for the data. 
-  The caller is responsible for either having implicit
-  or explicit ownership of the memory that data is read into.
-
-  @retval EFI_SUCCESS
-  Read Blocks successfully.
+  @param IdeBlkIoDevice Indicates the calling context.
+  @param MediaId        The media id that the read request is for.
+  @param LBA            The starting logical block address to read from on the device.
+  @param BufferSize     The size of the Buffer in bytes. This must be a multiple
+                        of the intrinsic block size of the device.
+  @param Buffer         A pointer to the destination buffer for the data. The caller
+                        is responsible for either having implicit or explicit 
+                        ownership of the memory that data is read into.
   
-  @retval EFI_DEVICE_ERROR
-  Read Blocks failed.
-  
-  @retval EFI_NO_MEDIA
-  There is no media in the device.
-  
-  @retval EFI_MEDIA_CHANGED
-  The MediaId is not for the current media.
-  
-  @retval EFI_BAD_BUFFER_SIZE
-  The BufferSize parameter is not a multiple of the
-  intrinsic block size of the device.
-  
-  @retval EFI_INVALID_PARAMETER
-  The read request contains LBAs that are not valid,
-  or the data buffer is not valid.
-
+  @retval EFI_SUCCESS           Read Blocks successfully.
+  @retval EFI_DEVICE_ERROR      Read Blocks failed.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
+  @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of the
+                                intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
+                                or the data buffer is not valid.
 **/
 EFI_STATUS
 AtapiBlkIoReadBlocks (
@@ -1799,53 +1822,29 @@ AtapiBlkIoReadBlocks (
   return EFI_SUCCESS;
 
 }
-
 /**
   This function is the ATAPI implementation for WriteBlocks in the
   Block I/O Protocol interface.
 
-  @param[in] *IdeBlkIoDevice
-  Indicates the calling context.
+  @param IdeBlkIoDevice  Indicates the calling context.
+  @param MediaId         The media id that the write request is for.
+  @param LBA             The starting logical block address to write onto the device.
+  @param BufferSize      The size of the Buffer in bytes. This must be a multiple
+                         of the intrinsic block size of the device.
+  @param Buffer          A pointer to the source buffer for the data. The caller
+                         is responsible for either having implicit or explicit ownership
+                         of the memory that data is written from.
 
-  @param[in] MediaId
-  The media id that the write request is for.
+  @retval EFI_SUCCESS            Write Blocks successfully.
+  @retval EFI_DEVICE_ERROR       Write Blocks failed.
+  @retval EFI_NO_MEDIA           There is no media in the device.
+  @retval EFI_MEDIA_CHANGE       The MediaId is not for the current media.
+  @retval EFI_BAD_BUFFER_SIZE    The BufferSize parameter is not a multiple of the
+                                 intrinsic block size of the device.  
+  @retval EFI_INVALID_PARAMETER  The write request contains LBAs that are not valid, 
+                                 or the data buffer is not valid.
 
-  @param[in] LBA
-  The starting logical block address to write onto 
-  the device.
-
-  @param[in] BufferSize
-  The size of the Buffer in bytes. This must be a
-  multiple of the intrinsic block size of the device.
-
-  @param[out] *Buffer
-  A pointer to the source buffer for the data. 
-  The caller is responsible for either having implicit
-  or explicit ownership of the memory that data is 
-  written from.
-
-  @retval EFI_SUCCESS
-  Write Blocks successfully.
-  
-  @retval EFI_DEVICE_ERROR
-  Write Blocks failed.
-  
-  @retval EFI_NO_MEDIA
-  There is no media in the device.
-  
-  @retval EFI_MEDIA_CHANGE
-  The MediaId is not for the current media.
-  
-  @retval EFI_BAD_BUFFER_SIZE
-  The BufferSize parameter is not a multiple of the
-  intrinsic block size of the device.
-  
-  @retval EFI_INVALID_PARAMETER
-  The write request contains LBAs that are not valid,
-  or the data buffer is not valid.
-
-  TODO:    EFI_MEDIA_CHANGED - add return value to function comment
-  TODO:    EFI_WRITE_PROTECTED - add return value to function comment
+  @retval EFI_WRITE_PROTECTED    The write protected is enabled or the media does not support write
 **/
 EFI_STATUS
 AtapiBlkIoWriteBlocks (
@@ -1949,162 +1948,5 @@ AtapiBlkIoWriteBlocks (
 
 }
 
-/**
-  This function is used to parse sense data. Only the first
-  sense data is honoured.
 
-  @param[in] IdeDev     Indicates the calling context.
-  @param[in] SenseCount Count of sense data.
-  @param[out] Result    The parsed result.
 
-  @retval EFI_SUCCESS           Successfully parsed.
-  @retval EFI_INVALID_PARAMETER Count of sense data is zero.
-
-**/
-EFI_STATUS
-ParseSenseData (
-  IN IDE_BLK_IO_DEV     *IdeDev,
-  IN UINTN              SenseCount,
-  OUT SENSE_RESULT      *Result
-  )
-{
-  ATAPI_REQUEST_SENSE_DATA      *SenseData;
-
-  if (SenseCount == 0) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Only use the first sense data
-  //
-  SenseData = IdeDev->SenseData;
-  *Result   = SenseOtherSense;
-
-  switch (SenseData->sense_key) {
-  case ATA_SK_NO_SENSE:
-    *Result = SenseNoSenseKey;
-    break;
-  case ATA_SK_NOT_READY:
-    switch (SenseData->addnl_sense_code) {
-    case ATA_ASC_NO_MEDIA:
-      *Result = SenseNoMedia;
-      break;
-    case ATA_ASC_MEDIA_UPSIDE_DOWN:
-      *Result = SenseMediaError;
-      break;
-    case ATA_ASC_NOT_READY:
-      if (SenseData->addnl_sense_code_qualifier == ATA_ASCQ_IN_PROGRESS) {
-        *Result = SenseDeviceNotReadyNeedRetry;
-      } else {
-        *Result = SenseDeviceNotReadyNoRetry;
-      }
-      break;
-    }
-    break;
-  case ATA_SK_UNIT_ATTENTION:
-    if (SenseData->addnl_sense_code == ATA_ASC_MEDIA_CHANGE) {
-      *Result = SenseMediaChange;
-    }
-    break;
-  case ATA_SK_MEDIUM_ERROR:
-    switch (SenseData->addnl_sense_code) {
-    case ATA_ASC_MEDIA_ERR1:
-    case ATA_ASC_MEDIA_ERR2:
-    case ATA_ASC_MEDIA_ERR3:
-    case ATA_ASC_MEDIA_ERR4:
-      *Result = SenseMediaError;
-      break;
-    }
-    break;
-  default:
-    break;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  This function reads the pending data in the device.
-
-  @param[in] IdeDev   Indicates the calling context.
-
-  @retval EFI_SUCCESS   Successfully read.
-  @retval EFI_NOT_READY The BSY is set avoiding reading.
-
-**/
-EFI_STATUS
-AtapiReadPendingData (
-  IN IDE_BLK_IO_DEV     *IdeDev
-  )
-{
-  UINT8     AltRegister;
-  UINT16    TempWordBuffer;
-
-  AltRegister = IDEReadPortB (IdeDev->PciIo, IdeDev->IoPort->Alt.AltStatus);
-  if ((AltRegister & ATA_STSREG_BSY) == ATA_STSREG_BSY) {
-    return EFI_NOT_READY;
-  }
-  if ((AltRegister & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
-    TempWordBuffer = IDEReadPortB (IdeDev->PciIo,IdeDev->IoPort->Alt.AltStatus);
-    while ((TempWordBuffer & (ATA_STSREG_BSY | ATA_STSREG_DRQ)) == ATA_STSREG_DRQ) {
-      IDEReadPortWMultiple (
-        IdeDev->PciIo,
-        IdeDev->IoPort->Data, 
-        1, 
-        &TempWordBuffer
-        );
-      TempWordBuffer = IDEReadPortB (IdeDev->PciIo,IdeDev->IoPort->Alt.AltStatus);
-    }
-  }
-  return EFI_SUCCESS;
-}
-
-/**
-  TODO: Add function description
-
-  @param  IdeDev TODO: add argument description
-  @param  WriteProtected TODO: add argument description
-
-  @retval  EFI_DEVICE_ERROR TODO: Add description for return value
-  @retval  EFI_DEVICE_ERROR TODO: Add description for return value
-  @retval  EFI_SUCCESS TODO: Add description for return value.
-
-**/
-EFI_STATUS
-IsLS120orZipWriteProtected (
-  IN  IDE_BLK_IO_DEV    *IdeDev,
-  OUT BOOLEAN           *WriteProtected
-  )
-{
-  EFI_STATUS  Status;
-
-  *WriteProtected = FALSE;
-
-  Status          = LS120EnableMediaStatus (IdeDev, TRUE);
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  //
-  // the Get Media Status Command is only valid
-  // if a Set Features/Enable Media Status Command has been priviously issued.
-  //
-  if (LS120GetMediaStatus (IdeDev) == EFI_WRITE_PROTECTED) {
-
-    *WriteProtected = TRUE;
-  } else {
-
-    *WriteProtected = FALSE;
-  }
-
-  //
-  // After Get Media Status Command completes,
-  // Set Features/Disable Media Command should be sent.
-  //
-  Status = LS120EnableMediaStatus (IdeDev, FALSE);
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  return EFI_SUCCESS;
-}

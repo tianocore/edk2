@@ -1,4 +1,8 @@
 /** @file
+  This file implement UEFI driver for IDE Bus which includes device identification, 
+  Child device(Disk, CDROM, etc) enumeration and child handler installation, and 
+  driver stop.
+    
   Copyright (c) 2006 - 2008, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -30,21 +34,106 @@ EFI_DRIVER_BINDING_PROTOCOL gIDEBusDriverBinding = {
   NULL,
   NULL
 };
-
-//
-// ***********************************************************************************
-// IDEBusDriverBindingSupported
-// ***********************************************************************************
-//
 /**
-  Register Driver Binding protocol for this driver.
+  Deregister an IDE device and free resources
 
-  @param[in] This   -- A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in] ControllerHandle    -- The handle of the controller to test.
-  @param[in] RemainingDevicePath -- A pointer to the remaining portion of a device path.
+  @param  This Protocol instance pointer.
+  @param  Controller Ide device handle
+  @param  Handle Handle of device to deregister driver on
+
+  @retval EFI_SUCCESS  Deregiter a specific IDE device successfully
+  
+
+**/
+EFI_STATUS
+DeRegisterIdeDevice (
+  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
+  IN  EFI_HANDLE                     Controller,
+  IN  EFI_HANDLE                     Handle
+  )
+{
+  EFI_STATUS            Status;
+  EFI_BLOCK_IO_PROTOCOL *BlkIo;
+  IDE_BLK_IO_DEV        *IdeBlkIoDevice;
+  EFI_PCI_IO_PROTOCOL   *PciIo;
+  UINTN                 Index;
+
+  Status = gBS->OpenProtocol (
+                  Handle,
+                  &gEfiBlockIoProtocolGuid,
+                  (VOID **) &BlkIo,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (BlkIo);
+
+  //
+  // Report Status code: Device disabled
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_P_PC_DISABLE),
+    IdeBlkIoDevice->DevicePath
+    );
+
+  //
+  // Close the child handle
+  //
+  Status = gBS->CloseProtocol (
+                  Controller,
+                  &gEfiPciIoProtocolGuid,
+                  This->DriverBindingHandle,
+                  Handle
+                  );
+
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  IdeBlkIoDevice->DevicePath,
+                  &gEfiBlockIoProtocolGuid,
+                  &IdeBlkIoDevice->BlkIo,
+                  &gEfiDiskInfoProtocolGuid,
+                  &IdeBlkIoDevice->DiskInfo,
+                  NULL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    gBS->OpenProtocol (
+          Controller,
+          &gEfiPciIoProtocolGuid,
+          (VOID **) &PciIo,
+          This->DriverBindingHandle,
+          Handle,
+          EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+          );
+    return Status;
+  }
+
+  //
+  // Release allocated resources
+  //
+  Index = IdeBlkIoDevice->Channel * 2 + IdeBlkIoDevice->Device;
+  if (Index < MAX_IDE_DEVICE) {
+    IdeBlkIoDevice->IdeBusDriverPrivateData->HaveScannedDevice[Index] = FALSE;
+  }
+  ReleaseIdeResources (IdeBlkIoDevice);
+
+  return EFI_SUCCESS;
+}
+/**
+  Supported function of Driver Binding protocol for this driver.
+
+  @param This                A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param ControllerHandle    The handle of the controller to test.
+  @param RemainingDevicePath A pointer to the remaining portion of a device path.
 
   @retval  EFI_SUCCESS Driver loaded.
-  @retval  other Driver not loaded.
+  @retval  other       Driver not loaded.
 
 **/
 EFI_STATUS
@@ -54,8 +143,6 @@ IDEBusDriverBindingSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-// TODO:    Controller - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
 {
   EFI_STATUS                        Status;
   EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
@@ -134,22 +221,18 @@ IDEBusDriverBindingSupported (
   return Status;
 }
 
-//
-// ***********************************************************************************
-// IDEBusDriverBindingStart
-// ***********************************************************************************
-//
+
 /**
-  Start this driver on Controller by detecting all disks and installing
-  BlockIo protocol on them.
+  Start function of Driver binding protocol which start this driver on Controller
+  by detecting all disks and installing BlockIo protocol on them.
 
-  @param  This Protocol instance pointer.
-  @param  Controller Handle of device to bind driver to.
-  @param  RemainingDevicePath Not used, always produce all possible children.
+  @param  This                Protocol instance pointer.
+  @param  Controller          Handle of device to bind driver to.
+  @param  RemainingDevicePath produce all possible children.
 
-  @retval  EFI_SUCCESS This driver is added to ControllerHandle.
+  @retval  EFI_SUCCESS         This driver is added to ControllerHandle.
   @retval  EFI_ALREADY_STARTED This driver is already running on ControllerHandle.
-  @retval  other This driver does not support this device.
+  @retval  other               This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -698,7 +781,7 @@ IDEBusDriverBindingStart (
       // Add Component Name for the IDE/ATAPI device that was discovered.
       //
       IdeBlkIoDevicePtr->ControllerNameTable = NULL;
-      ADD_NAME (IdeBlkIoDevicePtr);
+      ADD_IDE_ATAPI_NAME (IdeBlkIoDevicePtr);
 
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &IdeBlkIoDevicePtr->Handle,
@@ -821,14 +904,9 @@ ErrorExit:
   return Status;
 
 }
-
-//
-// ***********************************************************************************
-// IDEBusDriverBindingStop
-// ***********************************************************************************
-//
 /**
-  Stop this driver on Controller Handle.
+  Stop function of Driver Binding Protocol which is to stop the driver on Controller Handle and all
+  child handle attached to the controller handle if there are.
 
   @param  This Protocol instance pointer.
   @param  Controller Handle of device to stop driver on
@@ -847,8 +925,6 @@ IDEBusDriverBindingStop (
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
   )
-// TODO:    Controller - add argument and description to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   EFI_STATUS                  Status;
   EFI_PCI_IO_PROTOCOL         *PciIo;
@@ -949,115 +1025,15 @@ IDEBusDriverBindingStop (
   return EFI_SUCCESS;
 }
 
-//
-// ***********************************************************************************
-// DeRegisterIdeDevice
-// ***********************************************************************************
-//
 /**
-  Deregister an IDE device and free resources
+  issue ATA or ATAPI command to reset a block IO device.
+  @param  This                  Block IO protocol instance pointer.
+  @param  ExtendedVerification  If FALSE,for ATAPI device, driver will only invoke ATAPI reset method
+                                If TRUE, for ATAPI device, driver need invoke ATA reset method after
+                                invoke ATAPI reset method
 
-  @param  This Protocol instance pointer.
-  @param  Controller Ide device handle
-  @param  Handle Handle of device to deregister driver on
-
-  @return EFI_STATUS
-
-**/
-EFI_STATUS
-DeRegisterIdeDevice (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  EFI_HANDLE                     Handle
-  )
-// TODO:    EFI_SUCCESS - add return value to function comment
-{
-  EFI_STATUS            Status;
-  EFI_BLOCK_IO_PROTOCOL *BlkIo;
-  IDE_BLK_IO_DEV        *IdeBlkIoDevice;
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  UINTN                 Index;
-
-  Status = gBS->OpenProtocol (
-                  Handle,
-                  &gEfiBlockIoProtocolGuid,
-                  (VOID **) &BlkIo,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  IdeBlkIoDevice = IDE_BLOCK_IO_DEV_FROM_THIS (BlkIo);
-
-  //
-  // Report Status code: Device disabled
-  //
-  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-    EFI_PROGRESS_CODE,
-    (EFI_IO_BUS_ATA_ATAPI | EFI_P_PC_DISABLE),
-    IdeBlkIoDevice->DevicePath
-    );
-
-  //
-  // Close the child handle
-  //
-  Status = gBS->CloseProtocol (
-                  Controller,
-                  &gEfiPciIoProtocolGuid,
-                  This->DriverBindingHandle,
-                  Handle
-                  );
-
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-                  Handle,
-                  &gEfiDevicePathProtocolGuid,
-                  IdeBlkIoDevice->DevicePath,
-                  &gEfiBlockIoProtocolGuid,
-                  &IdeBlkIoDevice->BlkIo,
-                  &gEfiDiskInfoProtocolGuid,
-                  &IdeBlkIoDevice->DiskInfo,
-                  NULL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    gBS->OpenProtocol (
-          Controller,
-          &gEfiPciIoProtocolGuid,
-          (VOID **) &PciIo,
-          This->DriverBindingHandle,
-          Handle,
-          EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-          );
-    return Status;
-  }
-
-  //
-  // Release allocated resources
-  //
-  Index = IdeBlkIoDevice->Channel * 2 + IdeBlkIoDevice->Device;
-  if (Index < MAX_IDE_DEVICE) {
-    IdeBlkIoDevice->IdeBusDriverPrivateData->HaveScannedDevice[Index] = FALSE;
-  }
-  ReleaseIdeResources (IdeBlkIoDevice);
-
-  return EFI_SUCCESS;
-}
-
-//
-// ***********************************************************************************
-// IDEBlkIoReset
-// ***********************************************************************************
-//
-/**
-  GC_TODO: Add function description
-
-  @param  This                  GC_TODO: add argument description.
-  @param  ExtendedVerification  GC_TODO: add argument description.
-
-  @retval EFI_DEVICE_ERROR      GC_TODO: Add description for return value.
+  @retval EFI_DEVICE_ERROR      When the device is neighther ATA device or ATAPI device.
+  @retval EFI_SUCCESS           The device reset successfully
 
 **/
 EFI_STATUS
@@ -1107,15 +1083,16 @@ Done:
 }
 
 /**
-  Read data from block io device
+  Read data from a block IO device
 
-  @param  This Protocol instance pointer.
-  @param  MediaId The media ID of the device
-  @param  LBA Starting LBA address to read data
+  @param  This       Block IO protocol instance pointer.
+  @param  MediaId    The media ID of the device
+  @param  LBA        Starting LBA address to read data
   @param  BufferSize The size of data to be read
-  @param  Buffer Caller supplied buffer to save data
+  @param  Buffer     Caller supplied buffer to save data
 
-  @return read data status
+  @retval EFI_DEVICE_ERROR  unknown device type
+  @retval other             read data status.
 
 **/
 EFI_STATUS
@@ -1127,7 +1104,6 @@ IDEBlkIoReadBlocks (
   IN  UINTN                   BufferSize,
   OUT VOID                    *Buffer
   )
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
   EFI_STATUS      Status;
@@ -1182,13 +1158,14 @@ Done:
 /**
   Write data to block io device
 
-  @param  This Protocol instance pointer.
-  @param  MediaId The media ID of the device
-  @param  LBA Starting LBA address to write data
+  @param  This       Protocol instance pointer.
+  @param  MediaId    The media ID of the device
+  @param  LBA        Starting LBA address to write data
   @param  BufferSize The size of data to be written
-  @param  Buffer Caller supplied buffer to save data
+  @param  Buffer     Caller supplied buffer to save data
 
-  @return write data status
+  @retval EFI_DEVICE_ERROR  unknown device type
+  @retval other             write data status
 
 **/
 EFI_STATUS
@@ -1200,7 +1177,6 @@ IDEBlkIoWriteBlocks (
   IN  UINTN                   BufferSize,
   IN  VOID                    *Buffer
   )
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
   EFI_STATUS      Status;
@@ -1250,19 +1226,13 @@ Done:
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
-//
-// ***********************************************************************************
-// IDEBlkIoFlushBlocks
-// ***********************************************************************************
-//
 /**
-  TODO: Add function description
+  Flushes all modified data to a physical block devices
 
-  @param  This TODO: add argument description
+  @param  This  Indicates a pointer to the calling context which to sepcify a 
+                sepcific block device
 
-  @retval EFI_SUCCESS   GC_TODO: Add description for return value.
-
+  @retval EFI_SUCCESS   Always return success.
 **/
 EFI_STATUS
 EFIAPI
@@ -1362,14 +1332,14 @@ IDEDiskInfoIdentify (
   Return the results of the Request Sense command to a drive in SenseData.
   Data format of Sense data is defined by the Interface GUID.
 
-  @param  This Protocol instance pointer.
-  @param  SenseData Results of Request Sense command to device
-  @param  SenseDataSize Size of SenseData in bytes.
+  @param  This            Protocol instance pointer.
+  @param  SenseData       Results of Request Sense command to device
+  @param  SenseDataSize   Size of SenseData in bytes.
   @param  SenseDataNumber Type of SenseData
 
-  @retval  EFI_SUCCESS InquiryData valid
-  @retval  EFI_NOT_FOUND Device does not support this data class
-  @retval  EFI_DEVICE_ERROR Error reading InquiryData from device
+  @retval  EFI_SUCCESS          InquiryData valid
+  @retval  EFI_NOT_FOUND        Device does not support this data class
+  @retval  EFI_DEVICE_ERROR     Error reading InquiryData from device
   @retval  EFI_BUFFER_TOO_SMALL SenseDataSize not big enough
 
 **/
@@ -1389,11 +1359,11 @@ IDEDiskInfoSenseData (
   Return the results of the Request Sense command to a drive in SenseData.
   Data format of Sense data is defined by the Interface GUID.
 
-  @param  This Protocol instance pointer.
+  @param  This       Protocol instance pointer.
   @param  IdeChannel Primary or Secondary
-  @param  IdeDevice Master or Slave
+  @param  IdeDevice  Master or Slave
 
-  @retval  EFI_SUCCESS IdeChannel and IdeDevice are valid
+  @retval  EFI_SUCCESS     IdeChannel and IdeDevice are valid
   @retval  EFI_UNSUPPORTED This is not an IDE device
 
 **/
@@ -1412,6 +1382,103 @@ IDEDiskInfoWhichIde (
   *IdeDevice      = IdeBlkIoDevice->Device;
 
   return EFI_SUCCESS;
+}
+
+/**
+  The is an event(generally the event is exitBootService event) call back function. 
+  Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
+
+  @param  Event   Pointer to this event
+  @param  Context Event hanlder private data
+
+**/
+VOID
+EFIAPI
+ClearInterrupt (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS      Status;
+  UINT64          IoPortForBmis;
+  UINT8           RegisterValue;
+  IDE_BLK_IO_DEV  *IdeDev;
+
+  //
+  // Get our context
+  //
+  IdeDev = (IDE_BLK_IO_DEV *) Context;
+
+  //
+  // Obtain IDE IO port registers' base addresses
+  //
+  Status = ReassignIdeResources (IdeDev);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Check whether interrupt is pending
+  //
+
+  //
+  // Reset IDE device to force it de-assert interrupt pin
+  // Note: this will reset all devices on this IDE channel
+  //
+  AtaSoftReset (IdeDev);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Get base address of IDE Bus Master Status Regsiter
+  //
+  if (IdePrimary == IdeDev->Channel) {
+    IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISP_OFFSET;
+  } else {
+    if (IdeSecondary == IdeDev->Channel) {
+      IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISS_OFFSET;
+    } else {
+      return;
+    }
+  }
+  //
+  // Read BMIS register and clear ERROR and INTR bit
+  //
+  IdeDev->PciIo->Io.Read (
+                      IdeDev->PciIo,
+                      EfiPciIoWidthUint8,
+                      EFI_PCI_IO_PASS_THROUGH_BAR,
+                      IoPortForBmis,
+                      1,
+                      &RegisterValue
+                      );
+
+  RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
+
+  IdeDev->PciIo->Io.Write (
+                      IdeDev->PciIo,
+                      EfiPciIoWidthUint8,
+                      EFI_PCI_IO_PASS_THROUGH_BAR,
+                      IoPortForBmis,
+                      1,
+                      &RegisterValue
+                      );
+
+  //
+  // Select the other device on this channel to ensure this device to release the interrupt pin
+  //
+  if (IdeDev->Device == 0) {
+    RegisterValue = (1 << 4) | 0xe0;
+  } else {
+    RegisterValue = (0 << 4) | 0xe0;
+  }
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->Head,
+    RegisterValue
+    );
+
 }
 
 /**
