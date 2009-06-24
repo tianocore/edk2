@@ -18,7 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Check if we need to save the EFI variable with "ConVarName" as name
   as NV type
-
+  If ConVarName is NULL, then ASSERT().
+  
   @param ConVarName The name of the EFI variable.
 
   @retval TRUE    Set the EFI variable as NV type.
@@ -31,6 +32,8 @@ IsNvNeed (
 {
   CHAR16 *Ptr;
 
+  ASSERT (ConVarName != NULL);
+  
   Ptr = ConVarName;
 
   //
