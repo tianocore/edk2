@@ -6,7 +6,7 @@
   For more information please look at Intel Platform Innovation
   Framework for EFI Data Hub Specification.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -184,28 +184,29 @@ EFI_STATUS
   );
 
 /**
-  @par Protocol Description:
   This protocol is used to log information and register filter drivers
   to receive data records.
-
-  @param LogData
-  Logs a data record.
-
-  @param GetNextDataRecord
-  Gets a data record. Used both to view the memory-based log and to
-  get information about which data records have been consumed by a filter driver.
-
-  @param RegisterFilterDriver
-  Allows the registration of an EFI event to act as a filter driver for all data records that are logged.
-
-  @param UnregisterFilterDriver
-  Used to remove a filter driver that was added with RegisterFilterDriver().
-
 **/
 struct _EFI_DATA_HUB_PROTOCOL {
-  EFI_DATA_HUB_LOG_DATA                 LogData;
+  ///
+  /// Logs a data record.
+  ///
+  EFI_DATA_HUB_LOG_DATA                 LogData; 
+  
+  ///
+  /// Gets a data record. Used both to view the memory-based log and to
+  /// get information about which data records have been consumed by a filter driver.
+  ///
   EFI_DATA_HUB_GET_NEXT_RECORD          GetNextRecord;
+  
+  ///
+  /// Allows the registration of an EFI event to act as a filter driver for all data records that are logged.
+  ///
   EFI_DATA_HUB_REGISTER_FILTER_DRIVER   RegisterFilterDriver;
+  
+  ///
+  /// Used to remove a filter driver that was added with RegisterFilterDriver().
+  ///
   EFI_DATA_HUB_UNREGISTER_FILTER_DRIVER UnregisterFilterDriver;
 };
 
