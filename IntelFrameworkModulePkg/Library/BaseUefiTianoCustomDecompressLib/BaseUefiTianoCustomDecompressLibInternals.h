@@ -1,7 +1,7 @@
 /** @file
-  Internal include file for Base UEFI Decompress Libary.
+  Internal data structure and interfaces defintions for UEFI and Tiano Decompress Libary.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -9,8 +9,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  BaseUefiCustomDecompressLibInternals.h
 
 **/
 
@@ -72,16 +70,16 @@ typedef struct {
   UINT16  mCTable[4096];
   UINT16  mPTTable[256];
 
-  //
-  // The length of the field 'Position Set Code Length Array Size' in Block Header.
-  // For UEFI 2.0 de/compression algorithm, mPBit = 4
-  // For Tiano de/compression algorithm, mPBit = 5
-  //
+  ///
+  /// The length of the field 'Position Set Code Length Array Size' in Block Header.
+  /// For UEFI 2.0 de/compression algorithm, mPBit = 4
+  /// For Tiano de/compression algorithm, mPBit = 5
+  ///
   UINT8   mPBit;
 } SCRATCH_DATA;
 
 /**
-  Read NumOfBit of bits from source into mBitBuf
+  Read NumOfBit of bits from source into mBitBuf.
 
   Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
 
@@ -96,10 +94,10 @@ FillBuf (
   );
 
 /**
-  Get NumOfBits of bits out from mBitBuf
+  Get NumOfBits of bits out from mBitBuf.
 
-  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent 
-  NumOfBits of bits from source. Returns NumOfBits of bits that are 
+  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent
+  NumOfBits of bits from source. Returns NumOfBits of bits that are
   popped out.
 
   @param  Sd        The global scratch data.
@@ -124,7 +122,7 @@ GetBits (
   @param  NumOfChar Number of symbols in the symbol set
   @param  BitLen    Code length array
   @param  TableBits The width of the mapping table
-  @param  Table     The table
+  @param  Table     The table to be created.
 
   @retval  0 OK.
   @retval  BAD_TABLE The table is corrupted.
@@ -211,23 +209,12 @@ DecodeC (
 /**
   Decode the source data and put the resulting data into the destination buffer.
 
-  Decode the source data and put the resulting data into the destination buffer.
-  
   @param  Sd The global scratch data
 
 **/
 VOID
 Decode (
   SCRATCH_DATA  *Sd
-  );
-
-RETURN_STATUS
-EFIAPI
-UefiTianoDecompress (
-  IN CONST VOID  *Source,
-  IN OUT VOID    *Destination,
-  IN OUT VOID    *Scratch,
-  IN UINT32      Version
   );
 
 #endif

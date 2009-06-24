@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   The caller must free the resulting buffer.
 
   @param  Str      Tracks the allocated pool, size in use, and amount of pool allocated.
-  @param  fmt      The format string
+  @param  Fmt      The format string
   @param  ...      The data will be printed.
 
   @return Allocated buffer with the formatted string printed in it.
@@ -32,7 +32,7 @@ CHAR16 *
 EFIAPI
 CatPrint (
   IN OUT POOL_PRINT   *Str,
-  IN CHAR16           *fmt,
+  IN CHAR16           *Fmt,
   ...
   )
 {
@@ -42,36 +42,36 @@ CatPrint (
 
   AppendStr = AllocateZeroPool (0x1000);
   if (AppendStr == NULL) {
-    return Str->str;
+    return Str->Str;
   }
 
-  VA_START (Args, fmt);
-  UnicodeVSPrint (AppendStr, 0x1000, fmt, Args);
+  VA_START (Args, Fmt);
+  UnicodeVSPrint (AppendStr, 0x1000, Fmt, Args);
   VA_END (Args);
-  if (NULL == Str->str) {
+  if (NULL == Str->Str) {
     StringSize   = StrSize (AppendStr);
-    Str->str  = AllocateZeroPool (StringSize);
-    ASSERT (Str->str != NULL);
+    Str->Str  = AllocateZeroPool (StringSize);
+    ASSERT (Str->Str != NULL);
   } else {
     StringSize = StrSize (AppendStr);
-    StringSize += (StrSize (Str->str) - sizeof (UINT16));
+    StringSize += (StrSize (Str->Str) - sizeof (UINT16));
 
-    Str->str = ReallocatePool (
-                StrSize (Str->str),
+    Str->Str = ReallocatePool (
+                StrSize (Str->Str),
                 StringSize,
-                Str->str
+                Str->Str
                 );
-    ASSERT (Str->str != NULL);
+    ASSERT (Str->Str != NULL);
   }
 
-  Str->maxlen = MAX_CHAR * sizeof (UINT16);
-  if (StringSize < Str->maxlen) {
-    StrCat (Str->str, AppendStr);
-    Str->len = StringSize - sizeof (UINT16);
+  Str->Maxlen = MAX_CHAR * sizeof (UINT16);
+  if (StringSize < Str->Maxlen) {
+    StrCat (Str->Str, AppendStr);
+    Str->Len = StringSize - sizeof (UINT16);
   }
 
   FreePool (AppendStr);
-  return Str->str;
+  return Str->Str;
 }
 
 /**
@@ -1521,7 +1521,7 @@ DevicePathToStr (
     //
     //  Put a path seperator in if needed
     //
-    if (Str.len && DumpNode != DevPathEndInstance) {
+    if (Str.Len && DumpNode != DevPathEndInstance) {
       CatPrint (&Str, L"/");
     }
     //
@@ -1536,9 +1536,9 @@ DevicePathToStr (
   }
 
 Done:
-  NewSize = (Str.len + 1) * sizeof (CHAR16);
-  Str.str = ReallocatePool (NewSize, NewSize, Str.str);
-  ASSERT (Str.str != NULL);
-  Str.str[Str.len] = 0;
-  return Str.str;
+  NewSize = (Str.Len + 1) * sizeof (CHAR16);
+  Str.Str = ReallocatePool (NewSize, NewSize, Str.Str);
+  ASSERT (Str.Str != NULL);
+  Str.Str[Str.Len] = 0;
+  return Str.Str;
 }

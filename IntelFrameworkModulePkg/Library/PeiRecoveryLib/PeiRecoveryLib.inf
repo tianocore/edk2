@@ -1,5 +1,5 @@
 #/** @file
-#  Recovery Library for PEIM
+#  PEIM Recovery Library supports system recovery boot.
 #
 #  Copyright (c) 2006 - 2009, Intel Corporation.
 #
@@ -42,6 +42,6 @@
   DebugLib
 
 [Ppis]
-  gEfiPeiRecoveryModulePpiGuid            # PPI ALWAYS_CONSUMED
+  gEfiPeiRecoveryModulePpiGuid            ## CONSUMES
   
   
