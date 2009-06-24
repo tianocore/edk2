@@ -625,8 +625,9 @@ ApplyChangeHandler (
     break;
 
   case FORM_BOOT_DEL_ID:
-    ASSERT (BootOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->BootOptionDel) / sizeof (UINT8)));
-    for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < BootOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->BootOptionDel) / sizeof (UINT8)))); 
+         Index ++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&BootOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
       NewLoadContext->Deleted = CurrentFakeNVMap->BootOptionDel[Index];
@@ -636,8 +637,9 @@ ApplyChangeHandler (
     break;
 
   case FORM_DRV_DEL_ID:
-    ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CurrentFakeNVMap->DriverOptionDel) / sizeof (UINT8)));
-    for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < DriverOptionMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->DriverOptionDel) / sizeof (UINT8)))); 
+         Index++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
       NewLoadContext->Deleted = CurrentFakeNVMap->DriverOptionDel[Index];
@@ -700,14 +702,17 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_IN_ID:
-    ASSERT ((ConsoleInpMenu.MenuNumber + TerminalMenu.MenuNumber) <= (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)));
-    for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < ConsoleInpMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)))); 
+         Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < TerminalMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8) - ConsoleInpMenu.MenuNumber))); 
+         Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
       NewTerminalContext->IsConIn = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleInpMenu.MenuNumber];
@@ -717,14 +722,17 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_OUT_ID:
-    ASSERT ((ConsoleOutMenu.MenuNumber + TerminalMenu.MenuNumber) <= (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)));
-    for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < ConsoleOutMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)))); 
+         Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < TerminalMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8) - ConsoleOutMenu.MenuNumber))); 
+         Index++) {
       NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
       NewTerminalContext->IsConOut  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleOutMenu.MenuNumber];
@@ -735,13 +743,17 @@ ApplyChangeHandler (
 
   case FORM_CON_ERR_ID:
     ASSERT ((ConsoleErrMenu.MenuNumber + TerminalMenu.MenuNumber) <= (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)));
-    for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < ConsoleErrMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)))); 
+         Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    for (Index = 0; 
+         ((Index < TerminalMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8) - ConsoleErrMenu.MenuNumber))); 
+         Index++) {
       NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
       NewTerminalContext->IsStdErr  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleErrMenu.MenuNumber];
