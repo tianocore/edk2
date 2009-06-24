@@ -337,7 +337,7 @@ EfiDevicePathInstanceCount (
   UINTN Size;
 
   Count = 0;
-  while (GetNextDevicePathInstance (&DevicePath, &Size)) {
+  while (GetNextDevicePathInstance (&DevicePath, &Size) != NULL) {
     Count += 1;
   }
 

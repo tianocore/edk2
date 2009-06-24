@@ -551,7 +551,7 @@ KbdControllerDriverStop (
   //
   // Free other resources
   //
-  if ((ConsoleIn->ConIn).WaitForKey) {
+  if ((ConsoleIn->ConIn).WaitForKey != NULL) {
     gBS->CloseEvent ((ConsoleIn->ConIn).WaitForKey);
     (ConsoleIn->ConIn).WaitForKey = NULL;
   }

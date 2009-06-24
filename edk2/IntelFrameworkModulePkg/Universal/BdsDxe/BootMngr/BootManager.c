@@ -259,7 +259,7 @@ CallBootManager (
     //
     // Don't display the boot option marked as LOAD_OPTION_HIDDEN
     //
-    if (Option->Attribute & LOAD_OPTION_HIDDEN) {
+    if ((Option->Attribute & LOAD_OPTION_HIDDEN) != 0) {
       continue;
     }
 
