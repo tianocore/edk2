@@ -1,10 +1,8 @@
-/**@file
-  UEFI and Custom Decompress Library 
-  The function of UefiTianoDecompress() is interface for this module,
-  it will do tiano or uefi decompress with different verison parameter.
-  See EFI specification 1.1 Chapter 17 to get LZ77 compress/decompress.
+/** @file
+  UEFI and Tiano Custom Decompress Library 
+  Tt will do Tiano or UEFI decompress with different verison parameter.
   
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -29,8 +27,14 @@ FillBuf (
   IN  UINT16        NumOfBits
   )
 {
+  //
+  // Left shift NumOfBits of bits in advance
+  //
   Sd->mBitBuf = (UINT32) (Sd->mBitBuf << NumOfBits);
 
+  //
+  // Copy data needed in bytes into mSbuBitBuf
+  //
   while (NumOfBits > Sd->mBitCount) {
 
     Sd->mBitBuf |= (UINT32) (Sd->mSubBitBuf << (NumOfBits = (UINT16) (NumOfBits - Sd->mBitCount)));
@@ -54,7 +58,14 @@ FillBuf (
     }
   }
 
+  //
+  // Caculate additional bit count read to update mBitCount
+  //
   Sd->mBitCount = (UINT16) (Sd->mBitCount - NumOfBits);
+  
+  //
+  // Copy NumOfBits of bits from mSubBitBuf into mBitBuf
+  //
   Sd->mBitBuf |= Sd->mSubBitBuf >> Sd->mBitCount;
 }
 
@@ -79,8 +90,14 @@ GetBits (
 {
   UINT32  OutBits;
 
+  //
+  // Pop NumOfBits of Bits from Left
+  //  
   OutBits = (UINT32) (Sd->mBitBuf >> (BITBUFSIZ - NumOfBits));
 
+  //
+  // Fill up mBitBuf from source
+  //
   FillBuf (Sd, NumOfBits);
 
   return OutBits;
@@ -96,7 +113,7 @@ GetBits (
   @param  NumOfChar Number of symbols in the symbol set
   @param  BitLen    Code length array
   @param  TableBits The width of the mapping table
-  @param  Table     The table
+  @param  Table     The table to be created.
 
   @retval  0 OK.
   @retval  BAD_TABLE The table is corrupted.
@@ -227,6 +244,8 @@ MakeTable (
 /**
   Decodes a position value.
   
+  Get a position value according to Position Huffman Table.
+
   @param Sd      the global scratch data
   
   @return The position value decoded.
@@ -247,7 +266,7 @@ DecodeP (
 
     do {
 
-      if (Sd->mBitBuf & Mask) {
+      if ((Sd->mBitBuf & Mask) != 0) {
         Val = Sd->mRight[Val];
       } else {
         Val = Sd->mLeft[Val];
@@ -471,21 +490,38 @@ DecodeC (
   if (Sd->mBlockSize == 0) {
     //
     // Starting a new block
-    //
+    // Read BlockSize from block header
+    // 
     Sd->mBlockSize    = (UINT16) GetBits (Sd, 16);
+
+    //
+    // Read in the Extra Set Code Length Arrary,
+    // Generate the Huffman code mapping table for Extra Set.
+    //
     Sd->mBadTableFlag = ReadPTLen (Sd, NT, TBIT, 3);
     if (Sd->mBadTableFlag != 0) {
       return 0;
     }
 
+    //
+    // Read in and decode the Char&Len Set Code Length Arrary,
+    // Generate the Huffman code mapping table for Char&Len Set.
+    //
     ReadCLen (Sd);
 
+    //
+    // Read in the Position Set Code Length Arrary, 
+    // Generate the Huffman code mapping table for the Position Set.
+    //
     Sd->mBadTableFlag = ReadPTLen (Sd, MAXNP, Sd->mPBit, (UINT16) (-1));
     if (Sd->mBadTableFlag != 0) {
       return 0;
     }
   }
 
+  //
+  // Get one code according to Code&Set Huffman Table
+  //
   Sd->mBlockSize--;
   Index2 = Sd->mCTable[Sd->mBitBuf >> (BITBUFSIZ - 12)];
 
@@ -493,7 +529,7 @@ DecodeC (
     Mask = 1U << (BITBUFSIZ - 1 - 12);
 
     do {
-      if (Sd->mBitBuf & Mask) {
+      if ((Sd->mBitBuf & Mask) != 0) {
         Index2 = Sd->mRight[Index2];
       } else {
         Index2 = Sd->mLeft[Index2];
@@ -511,9 +547,9 @@ DecodeC (
 }
 
 /**
-  Decode the source data ad put the resulting data into the destination buffer.
+  Decode the source data and put the resulting data into the destination buffer.
   
-  @param Sd            - The global scratch data
+  @param  Sd The global scratch data
 **/
 VOID
 Decode (
@@ -529,9 +565,12 @@ Decode (
   DataIdx     = 0;
 
   for (;;) {
+    //
+    // Get one code from mBitBuf
+    // 
     CharC = DecodeC (Sd);
     if (Sd->mBadTableFlag != 0) {
-      goto Done ;
+      goto Done;
     }
 
     if (CharC < 256) {
@@ -539,8 +578,11 @@ Decode (
       // Process an Original character
       //
       if (Sd->mOutBuf >= Sd->mOrigSize) {
-        goto Done ;
+        goto Done;
       } else {
+        //
+        // Write orignal character into mDstBase
+        //
         Sd->mDstBase[Sd->mOutBuf++] = (UINT8) CharC;
       }
 
@@ -549,11 +591,20 @@ Decode (
       // Process a Pointer
       //
       CharC       = (UINT16) (CharC - (BIT8 - THRESHOLD));
-
+ 
+      //
+      // Get string length
+      //
       BytesRemain = CharC;
 
+      //
+      // Locate string position
+      //
       DataIdx     = Sd->mOutBuf - DecodeP (Sd) - 1;
 
+      //
+      // Write BytesRemain of bytes into mDstBase
+      //
       BytesRemain--;
       while ((INT16) (BytesRemain) >= 0) {
         Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
@@ -571,15 +622,43 @@ Done:
 }
 
 /**
-  The internal implementation of *_DECOMPRESS_PROTOCOL.GetInfo().
-  
-  @param Source           The source buffer containing the compressed data.
-  @param SourceSize       The size of source buffer
-  @param DestinationSize  The size of destination buffer.
-  @param ScratchSize      The size of scratch buffer.
+  Given a compressed source buffer, this function retrieves the size of 
+  the uncompressed buffer and the size of the scratch buffer required 
+  to decompress the compressed source buffer.
 
-  @retval RETURN_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
-  @retval RETURN_INVALID_PARAMETER - The source data is corrupted
+  Retrieves the size of the uncompressed buffer and the temporary scratch buffer 
+  required to decompress the buffer specified by Source and SourceSize.
+  If the size of the uncompressed buffer or the size of the scratch buffer cannot
+  be determined from the compressed data specified by Source and SourceData, 
+  then RETURN_INVALID_PARAMETER is returned.  Otherwise, the size of the uncompressed
+  buffer is returned in DestinationSize, the size of the scratch buffer is returned
+  in ScratchSize, and RETURN_SUCCESS is returned.
+  This function does not have scratch buffer available to perform a thorough 
+  checking of the validity of the source data.  It just retrieves the "Original Size"
+  field from the beginning bytes of the source data and output it as DestinationSize.
+  And ScratchSize is specific to the decompression implementation.
+
+  If Source is NULL, then ASSERT().
+  If DestinationSize is NULL, then ASSERT().
+  If ScratchSize is NULL, then ASSERT().
+
+  @param  Source          The source buffer containing the compressed data.
+  @param  SourceSize      The size, in bytes, of the source buffer.
+  @param  DestinationSize A pointer to the size, in bytes, of the uncompressed buffer
+                          that will be generated when the compressed buffer specified
+                          by Source and SourceSize is decompressed..
+  @param  ScratchSize     A pointer to the size, in bytes, of the scratch buffer that
+                          is required to decompress the compressed buffer specified 
+                          by Source and SourceSize.
+
+  @retval  RETURN_SUCCESS The size of the uncompressed data was returned 
+                          in DestinationSize and the size of the scratch 
+                          buffer was returned in ScratchSize.
+  @retval  RETURN_INVALID_PARAMETER 
+                          The size of the uncompressed data or the size of 
+                          the scratch buffer cannot be determined from 
+                          the compressed data specified by Source 
+                          and SourceSize.
 **/
 RETURN_STATUS
 EFIAPI
@@ -612,15 +691,34 @@ UefiDecompressGetInfo (
 }
 
 /**
-  The internal implementation of *_DECOMPRESS_PROTOCOL.Decompress().
+  Decompresses a compressed source buffer by EFI or Tiano algorithm.
 
-  @param Source           The source buffer containing the compressed data.
-  @param Destination      The destination buffer to store the decompressed data
-  @param Scratch          The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
-  @param Version          1 for UEFI Decompress algoruthm, 2 for Tiano Decompess algorithm
+  Extracts decompressed data to its original form.
+  This function is designed so that the decompression algorithm can be implemented
+  without using any memory services.  As a result, this function is not allowed to
+  call any memory allocation services in its implementation.  It is the caller's 
+  responsibility to allocate and free the Destination and Scratch buffers.
+  If the compressed source data specified by Source is successfully decompressed 
+  into Destination, then RETURN_SUCCESS is returned.  If the compressed source data 
+  specified by Source is not in a valid compressed data format,
+  then RETURN_INVALID_PARAMETER is returned.
 
-  @retval RETURN_SUCCESS            Decompression is successfull
-  @retval RETURN_INVALID_PARAMETER  The source data is corrupted
+  If Source is NULL, then ASSERT().
+  If Destination is NULL, then ASSERT().
+  If the required scratch buffer size > 0 and Scratch is NULL, then ASSERT().
+
+  @param  Source      The source buffer containing the compressed data.
+  @param  Destination The destination buffer to store the decompressed data
+  @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
+                      This is an optional parameter that may be NULL if the 
+                      required scratch buffer size is 0.
+  @param  Version     1 for UEFI Decompress algoruthm, 2 for Tiano Decompess algorithm.
+
+  @retval  RETURN_SUCCESS Decompression completed successfully, and 
+                          the uncompressed buffer is returned in Destination.
+  @retval  RETURN_INVALID_PARAMETER 
+                          The source buffer specified by Source is corrupted 
+                          (not in a valid compressed format).
 **/
 RETURN_STATUS
 EFIAPI
@@ -677,6 +775,9 @@ UefiTianoDecompress (
   }
   Sd->mSrcBase  = (UINT8 *)Src;
   Sd->mDstBase  = Dst;
+  //
+  // CompSize and OrigSize are caculated in bytes
+  //
   Sd->mCompSize = CompSize;
   Sd->mOrigSize = OrigSize;
 
@@ -701,14 +802,33 @@ UefiTianoDecompress (
 }
 
 /**
-  The internal implementation of *_DECOMPRESS_PROTOCOL.Decompress().
-  
-  @param Source          - The source buffer containing the compressed data.
-  @param Destination     - The destination buffer to store the decompressed data
-  @param Scratch         - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  Decompresses a UEFI compressed source buffer.
 
-  @retval RETURN_SUCCESS           - Decompression is successfull
-  @retval RETURN_INVALID_PARAMETER - The source data is corrupted  
+  Extracts decompressed data to its original form.
+  This function is designed so that the decompression algorithm can be implemented
+  without using any memory services.  As a result, this function is not allowed to
+  call any memory allocation services in its implementation.  It is the caller's 
+  responsibility to allocate and free the Destination and Scratch buffers.
+  If the compressed source data specified by Source is successfully decompressed 
+  into Destination, then RETURN_SUCCESS is returned.  If the compressed source data 
+  specified by Source is not in a valid compressed data format,
+  then RETURN_INVALID_PARAMETER is returned.
+
+  If Source is NULL, then ASSERT().
+  If Destination is NULL, then ASSERT().
+  If the required scratch buffer size > 0 and Scratch is NULL, then ASSERT().
+
+  @param  Source      The source buffer containing the compressed data.
+  @param  Destination The destination buffer to store the decompressed data
+  @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
+                      This is an optional parameter that may be NULL if the 
+                      required scratch buffer size is 0.
+
+  @retval  RETURN_SUCCESS Decompression completed successfully, and 
+                          the uncompressed buffer is returned in Destination.
+  @retval  RETURN_INVALID_PARAMETER 
+                          The source buffer specified by Source is corrupted 
+                          (not in a valid compressed format).
 **/
 RETURN_STATUS
 EFIAPI
@@ -722,16 +842,37 @@ UefiDecompress (
 }
 
 /**
-  The internal implementation of Tiano decompress GetInfo.
+  Examines a GUIDed section and returns the size of the decoded buffer and the
+  size of an optional scratch buffer required to actually decode the data in a GUIDed section.
 
-  @param InputSection          Buffer containing the input GUIDed section to be processed. 
-  @param OutputBufferSize      The size of OutputBuffer.
-  @param ScratchBufferSize     The size of ScratchBuffer.
-  @param SectionAttribute      The attribute of the input guided section.
+  Examines a GUIDed section specified by InputSection.  
+  If GUID for InputSection does not match the GUID that this handler supports,
+  then RETURN_UNSUPPORTED is returned.  
+  If the required information can not be retrieved from InputSection,
+  then RETURN_INVALID_PARAMETER is returned.
+  If the GUID of InputSection does match the GUID that this handler supports,
+  then the size required to hold the decoded buffer is returned in OututBufferSize,
+  the size of an optional scratch buffer is returned in ScratchSize, and the Attributes field
+  from EFI_GUID_DEFINED_SECTION header of InputSection is returned in SectionAttribute.
+  
+  If InputSection is NULL, then ASSERT().
+  If OutputBufferSize is NULL, then ASSERT().
+  If ScratchBufferSize is NULL, then ASSERT().
+  If SectionAttribute is NULL, then ASSERT().
 
-  @retval RETURN_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
-  @retval RETURN_INVALID_PARAMETER - The source data is corrupted
-                             The GUID in InputSection does not match this instance guid.
+
+  @param[in]  InputSection       A pointer to a GUIDed section of an FFS formatted file.
+  @param[out] OutputBufferSize   A pointer to the size, in bytes, of an output buffer required
+                                 if the buffer specified by InputSection were decoded.
+  @param[out] ScratchBufferSize  A pointer to the size, in bytes, required as scratch space
+                                 if the buffer specified by InputSection were decoded.
+  @param[out] SectionAttribute   A pointer to the attributes of the GUIDed section. See the Attributes
+                                 field of EFI_GUID_DEFINED_SECTION in the PI Specification.
+
+  @retval  RETURN_SUCCESS            The information about InputSection was returned.
+  @retval  RETURN_UNSUPPORTED        The section specified by InputSection does not match the GUID this handler supports.
+  @retval  RETURN_INVALID_PARAMETER  The information can not be retrieved from the section specified by InputSection.
+
 **/
 RETURN_STATUS
 EFIAPI
@@ -771,19 +912,36 @@ TianoDecompressGetInfo (
 }
 
 /**
-  The implementation of Tiano Decompress().
+  Decompress a Tiano compressed GUIDed section into a caller allocated output buffer.
+  
+  Decodes the GUIDed section specified by InputSection.  
+  If GUID for InputSection does not match the GUID that this handler supports, then RETURN_UNSUPPORTED is returned.  
+  If the data in InputSection can not be decoded, then RETURN_INVALID_PARAMETER is returned.
+  If the GUID of InputSection does match the GUID that this handler supports, then InputSection
+  is decoded into the buffer specified by OutputBuffer and the authentication status of this
+  decode operation is returned in AuthenticationStatus.  If the decoded buffer is identical to the
+  data in InputSection, then OutputBuffer is set to point at the data in InputSection.  Otherwise,
+  the decoded data will be placed in caller allocated buffer specified by OutputBuffer.
+  
+  If InputSection is NULL, then ASSERT().
+  If OutputBuffer is NULL, then ASSERT().
+  If ScratchBuffer is NULL and this decode operation requires a scratch buffer, then ASSERT().
+  If AuthenticationStatus is NULL, then ASSERT().
 
-  @param InputSection           Buffer containing the input GUIDed section to be processed. 
-  @param OutputBuffer           OutputBuffer to point to the start of the section's contents.
-                                if guided data is not prcessed. Otherwise,
-                                OutputBuffer to contain the output data, which is allocated by the caller.
-  @param ScratchBuffer          A pointer to a caller-allocated buffer for function internal use. 
-  @param AuthenticationStatus   A pointer to a caller-allocated UINT32 that indicates the
-                                authentication status of the output buffer. 
 
-  @retval RETURN_SUCCESS            Decompression is successfull
-  @retval RETURN_INVALID_PARAMETER  The source data is corrupted, or
-                                    The GUID in InputSection does not match this instance guid.
+  @param[in]  InputSection  A pointer to a GUIDed section of an FFS formatted file.
+  @param[out] OutputBuffer  A pointer to a buffer that contains the result of a decode operation. 
+  @param[in] ScratchBuffer  A caller allocated buffer that may be required by this function
+                            as a scratch buffer to perform the decode operation. 
+  @param[out] AuthenticationStatus 
+                            A pointer to the authentication status of the decoded output buffer.
+                            See the definition of authentication status in the EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI
+                            section of the PI Specification. EFI_AUTH_STATUS_PLATFORM_OVERRIDE must
+                            never be set by this handler.
+
+  @retval  RETURN_SUCCESS            The buffer specified by InputSection was decoded.
+  @retval  RETURN_UNSUPPORTED        The section specified by InputSection does not match the GUID this handler supports.
+  @retval  RETURN_INVALID_PARAMETER  The section specified by InputSection can not be decoded.
 
 **/
 RETURN_STATUS
@@ -796,10 +954,7 @@ TianoDecompress (
   )
 {
   ASSERT (OutputBuffer != NULL);
-
-  if (InputSection == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
+  ASSERT (InputSection != NULL);
 
   if (!CompareGuid (
         &gTianoCustomDecompressGuid, 
@@ -824,7 +979,7 @@ TianoDecompress (
 }
 
 /**
-  Register TianoDecompress handler.
+  Registers TianoDecompress and TianoDecompressGetInfo handlers with TianoCustomerDecompressGuid
 
   @retval  RETURN_SUCCESS            Register successfully.
   @retval  RETURN_OUT_OF_RESOURCES   No enough memory to store this handler.

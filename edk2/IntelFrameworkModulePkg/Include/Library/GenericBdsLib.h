@@ -551,9 +551,9 @@ DevicePathToStr (
 // Internal definitions
 //
 typedef struct {
-  CHAR16  *str;
-  UINTN   len;
-  UINTN   maxlen;
+  CHAR16  *Str;
+  UINTN   Len;
+  UINTN   Maxlen;
 } POOL_PRINT;
 
 typedef struct {
@@ -1045,7 +1045,7 @@ DevPathVendor (
   The caller must free the resulting buffer.
 
   @param  Str      Tracks the allocated pool, size in use, and amount of pool allocated.
-  @param  fmt      The format string
+  @param  Fmt      The format string
   @param  ...      The data will be printed.
 
   @return Allocated buffer with the formatted string printed in it.
@@ -1057,7 +1057,7 @@ CHAR16 *
 EFIAPI
 CatPrint (
   IN OUT POOL_PRINT   *Str,
-  IN CHAR16           *fmt,
+  IN CHAR16           *Fmt,
   ...
   );
 
