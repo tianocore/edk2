@@ -448,6 +448,7 @@ IScsiPublishIbft (
   UINTN                                     HandleCount;
   EFI_HANDLE                                *HandleBuffer;
   UINT8                                     *Heap;
+  UINT8                                     Checksum;
 
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **)&AcpiTableProtocol);
   if (EFI_ERROR (Status)) {
@@ -481,7 +482,7 @@ IScsiPublishIbft (
   //
   // Allocate 4k bytes to hold the ACPI table.
   //
-  Table = AllocatePool (IBFT_MAX_SIZE);
+  Table = AllocateZeroPool (IBFT_MAX_SIZE);
   if (Table == NULL) {
     return ;
   }
@@ -495,6 +496,9 @@ IScsiPublishIbft (
   IScsiInitControlSection (Table, HandleCount);
   IScsiFillInitiatorSection (Table, &Heap, HandleBuffer[0]);
   IScsiFillNICAndTargetSections (Table, &Heap, HandleCount, HandleBuffer);
+
+  Checksum = CalculateCheckSum8((UINT8 *)Table, Table->Length);
+  Table->Checksum = Checksum;
 
   FreePool (HandleBuffer);
 
