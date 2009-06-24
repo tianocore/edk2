@@ -23,22 +23,6 @@ CONST EFI_GUID gZeroGuid  = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 //
 DATA_HUB_INSTANCE mPrivateData;
 
-//
-// Worker functions private to this file
-//
-DATA_HUB_FILTER_DRIVER  *
-FindFilterDriverByEvent (
-  IN  LIST_ENTRY      *Head,
-  IN  EFI_EVENT       Event
-  );
-
-EFI_DATA_RECORD_HEADER  *
-GetNextDataRecord (
-  IN  LIST_ENTRY          *Head,
-  IN  UINT64              ClassFilter,
-  IN OUT  UINT64          *PtrCurrentMTC
-  );
-
 /**
   Log data record into the data logging hub
 
@@ -155,6 +139,110 @@ DataHubLogData (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Search the Head doubly linked list for the passed in MTC. Return the 
+  matching element in Head and the MTC on the next entry.
+
+  @param Head             Head of Data Log linked list.
+  @param ClassFilter      Only match the MTC if it is in the same Class as the
+                          ClassFilter.
+  @param PtrCurrentMTC    On IN contians MTC to search for. On OUT contians next
+                          MTC in the data log list or zero if at end of the list.
+  
+  @retval EFI_DATA_LOG_ENTRY  Return pointer to data log data from Head list.
+  @retval NULL                If no data record exists.
+
+**/
+EFI_DATA_RECORD_HEADER *
+GetNextDataRecord (
+  IN  LIST_ENTRY          *Head,
+  IN  UINT64              ClassFilter,
+  IN OUT  UINT64          *PtrCurrentMTC
+  )
+
+{
+  EFI_DATA_ENTRY          *LogEntry;
+  LIST_ENTRY              *Link;
+  BOOLEAN                 ReturnFirstEntry;
+  EFI_DATA_RECORD_HEADER  *Record;
+  EFI_DATA_ENTRY          *NextLogEntry;
+
+  //
+  // If MonotonicCount == 0 just return the first one
+  //
+  ReturnFirstEntry  = (BOOLEAN) (*PtrCurrentMTC == 0);
+
+  Record            = NULL;
+  for (Link = GetFirstNode(Head); Link != Head; Link = GetNextNode(Head, Link)) {
+    LogEntry = DATA_ENTRY_FROM_LINK (Link);
+    if ((LogEntry->Record->DataRecordClass & ClassFilter) == 0) {
+      //
+      // Skip any entry that does not have the correct ClassFilter
+      //
+      continue;
+    }
+
+    if ((LogEntry->Record->LogMonotonicCount == *PtrCurrentMTC) || ReturnFirstEntry) {
+      //
+      // Return record to the user
+      //
+      Record = LogEntry->Record;
+
+      //
+      // Calculate the next MTC value. If there is no next entry set
+      // MTC to zero.
+      //
+      *PtrCurrentMTC = 0;
+      for (Link = GetNextNode(Head, Link); Link != Head; Link = GetNextNode(Head, Link)) {
+        NextLogEntry = DATA_ENTRY_FROM_LINK (Link);
+        if ((NextLogEntry->Record->DataRecordClass & ClassFilter) != 0) {
+          //
+          // Return the MTC of the next thing to search for if found
+          //
+          *PtrCurrentMTC = NextLogEntry->Record->LogMonotonicCount;
+          break;
+        }
+      }
+      //
+      // Record found exit loop and return
+      //
+      break;
+    }
+  }
+
+  return Record;
+}
+
+/**
+  Search the Head list for a EFI_DATA_HUB_FILTER_DRIVER member that
+  represents Event and return it.
+
+  @param Head   Pointer to head of dual linked list of EFI_DATA_HUB_FILTER_DRIVER structures.
+  @param Event  Event to be search for in the Head list.
+
+  @retval EFI_DATA_HUB_FILTER_DRIVER  Returned if Event stored in the Head doubly linked list.
+  @retval NULL                        If Event is not in the list
+
+**/
+DATA_HUB_FILTER_DRIVER *
+FindFilterDriverByEvent (
+  IN  LIST_ENTRY      *Head,
+  IN  EFI_EVENT       Event
+  )
+{
+  DATA_HUB_FILTER_DRIVER  *FilterEntry;
+  LIST_ENTRY              *Link;
+
+  for (Link = GetFirstNode(Head); Link != Head; Link = GetNextNode(Head, Link)) {
+    FilterEntry = FILTER_ENTRY_FROM_LINK (Link);
+    if (FilterEntry->Event == Event) {
+      return FilterEntry;
+    }
+  }
+
+  return NULL;
 }
 
 /**
@@ -417,109 +505,7 @@ DataHubUnregisterFilterDriver (
   return EFI_SUCCESS;
 }
 
-/**
-  Search the Head list for a EFI_DATA_HUB_FILTER_DRIVER member that
-  represents Event and return it.
 
-  @param Head   Pointer to head of dual linked list of EFI_DATA_HUB_FILTER_DRIVER structures.
-  @param Event  Event to be search for in the Head list.
-
-  @retval EFI_DATA_HUB_FILTER_DRIVER  Returned if Event stored in the Head doubly linked list.
-  @retval NULL                        If Event is not in the list
-
-**/
-DATA_HUB_FILTER_DRIVER *
-FindFilterDriverByEvent (
-  IN  LIST_ENTRY      *Head,
-  IN  EFI_EVENT       Event
-  )
-{
-  DATA_HUB_FILTER_DRIVER  *FilterEntry;
-  LIST_ENTRY              *Link;
-
-  for (Link = GetFirstNode(Head); Link != Head; Link = GetNextNode(Head, Link)) {
-    FilterEntry = FILTER_ENTRY_FROM_LINK (Link);
-    if (FilterEntry->Event == Event) {
-      return FilterEntry;
-    }
-  }
-
-  return NULL;
-}
-
-/**
-  Search the Head doubly linked list for the passed in MTC. Return the 
-  matching element in Head and the MTC on the next entry.
-
-  @param Head             Head of Data Log linked list.
-  @param ClassFilter      Only match the MTC if it is in the same Class as the
-                          ClassFilter.
-  @param PtrCurrentMTC    On IN contians MTC to search for. On OUT contians next
-                          MTC in the data log list or zero if at end of the list.
-  
-  @retval EFI_DATA_LOG_ENTRY  Return pointer to data log data from Head list.
-  @retval NULL                If no data record exists.
-
-**/
-EFI_DATA_RECORD_HEADER *
-GetNextDataRecord (
-  IN  LIST_ENTRY          *Head,
-  IN  UINT64              ClassFilter,
-  IN OUT  UINT64          *PtrCurrentMTC
-  )
-
-{
-  EFI_DATA_ENTRY          *LogEntry;
-  LIST_ENTRY              *Link;
-  BOOLEAN                 ReturnFirstEntry;
-  EFI_DATA_RECORD_HEADER  *Record;
-  EFI_DATA_ENTRY          *NextLogEntry;
-
-  //
-  // If MonotonicCount == 0 just return the first one
-  //
-  ReturnFirstEntry  = (BOOLEAN) (*PtrCurrentMTC == 0);
-
-  Record            = NULL;
-  for (Link = GetFirstNode(Head); Link != Head; Link = GetNextNode(Head, Link)) {
-    LogEntry = DATA_ENTRY_FROM_LINK (Link);
-    if ((LogEntry->Record->DataRecordClass & ClassFilter) == 0) {
-      //
-      // Skip any entry that does not have the correct ClassFilter
-      //
-      continue;
-    }
-
-    if ((LogEntry->Record->LogMonotonicCount == *PtrCurrentMTC) || ReturnFirstEntry) {
-      //
-      // Return record to the user
-      //
-      Record = LogEntry->Record;
-
-      //
-      // Calculate the next MTC value. If there is no next entry set
-      // MTC to zero.
-      //
-      *PtrCurrentMTC = 0;
-      for (Link = GetNextNode(Head, Link); Link != Head; Link = GetNextNode(Head, Link)) {
-        NextLogEntry = DATA_ENTRY_FROM_LINK (Link);
-        if ((NextLogEntry->Record->DataRecordClass & ClassFilter) != 0) {
-          //
-          // Return the MTC of the next thing to search for if found
-          //
-          *PtrCurrentMTC = NextLogEntry->Record->LogMonotonicCount;
-          break;
-        }
-      }
-      //
-      // Record found exit loop and return
-      //
-      break;
-    }
-  }
-
-  return Record;
-}
 
 /**
   Driver's Entry point routine that install Driver to produce Data Hub protocol. 
