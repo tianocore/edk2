@@ -586,7 +586,7 @@ BOpt_FindFiles (
     return EFI_NOT_FOUND;
   }
 
-  if (!(DirInfo->Attribute & EFI_FILE_DIRECTORY)) {
+  if ((DirInfo->Attribute & EFI_FILE_DIRECTORY) == 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -614,8 +614,8 @@ BOpt_FindFiles (
         break;
       }
 
-      if ((DirInfo->Attribute & EFI_FILE_DIRECTORY && Pass == 2) ||
-          (!(DirInfo->Attribute & EFI_FILE_DIRECTORY) && Pass == 1)
+      if (((DirInfo->Attribute & EFI_FILE_DIRECTORY) != 0 && Pass == 2) ||
+          ((DirInfo->Attribute & EFI_FILE_DIRECTORY) == 0 && Pass == 1)
           ) {
         //
         // Pass 1 is for Directories
@@ -624,7 +624,7 @@ BOpt_FindFiles (
         continue;
       }
 
-      if (!(BOpt_IsEfiImageName (DirInfo->FileName) || DirInfo->Attribute & EFI_FILE_DIRECTORY)) {
+      if (!(BOpt_IsEfiImageName (DirInfo->FileName) || (DirInfo->Attribute & EFI_FILE_DIRECTORY) != 0)) {
         //
         // Slip file unless it is a directory entry or a .EFI file
         //
