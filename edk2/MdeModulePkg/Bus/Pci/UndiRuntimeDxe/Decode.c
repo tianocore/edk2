@@ -1381,38 +1381,6 @@ badcdb:
 
 
 /**
-  This does an 8 bit check sum of the passed in buffer for Len bytes.
-  This is primarily used to update the check sum in the SW UNDI header.
-
-  @param  Buffer               Pointer to the passed in buffer to check sum
-  @param  Len                  Length of buffer to be check summed in bytes.
-
-  @return None
-
-**/
-UINT8
-ChkSum (
-  IN  VOID   *Buffer,
-  IN  UINT16 Len
-  )
-{
-  UINT8 Chksum;
-  INT8  *Bp;
-
-  Chksum = 0;
-  if ((Bp = Buffer) != NULL) {
-    while (Len--) {
-      Chksum = (UINT8) (Chksum +*Bp++);
-
-    }
-
-  }
-
-  return Chksum;
-}
-
-
-/**
   When called with a null NicPtr, this routine decrements the number of NICs
   this UNDI is supporting and removes the NIC_DATA_POINTER from the array.
   Otherwise, it increments the number of NICs this UNDI is supported and
@@ -1423,7 +1391,6 @@ ChkSum (
   @return None
 
 **/
-// TODO:    PxePtr - add argument and description to function comment
 VOID
 PxeUpdate (
   IN  NIC_DATA_INSTANCE *NicPtr,
@@ -1438,7 +1405,7 @@ PxeUpdate (
       PxePtr->IFcnt--;
     }
 
-    PxePtr->Fudge = (UINT8) (PxePtr->Fudge - ChkSum ((VOID *) PxePtr, PxePtr->Len));
+    PxePtr->Fudge = (UINT8) (PxePtr->Fudge - CalculateSum8 ((VOID *) PxePtr, PxePtr->Len));
     return ;
   }
 
@@ -1446,7 +1413,7 @@ PxeUpdate (
   // number of NICs this undi supports
   //
   PxePtr->IFcnt++;
-  PxePtr->Fudge = (UINT8) (PxePtr->Fudge - ChkSum ((VOID *) PxePtr, PxePtr->Len));
+  PxePtr->Fudge = (UINT8) (PxePtr->Fudge - CalculateSum8 ((VOID *) PxePtr, PxePtr->Len));
 
   return ;
 }
@@ -1455,14 +1422,12 @@ PxeUpdate (
 /**
   Initialize the !PXE structure
 
-  @param  RemainingDevicePath  Not used, always produce all possible children.
+  @param  PxePtr               Pointer to SW_UNDI data structure.
 
   @retval EFI_SUCCESS          This driver is added to Controller.
   @retval other                This driver does not support this device.
 
 **/
-// TODO:    PxePtr - add argument and description to function comment
-// TODO:    VersionFlag - add argument and description to function comment
 VOID
 PxeStructInit (
   IN PXE_SW_UNDI *PxePtr
@@ -1507,6 +1472,6 @@ PxeStructInit (
   PxePtr->BusCnt        = 1;
   PxePtr->BusType[0]    = PXE_BUSTYPE_PCI;
 
-  PxePtr->Fudge         = (UINT8) (PxePtr->Fudge - ChkSum ((VOID *) PxePtr, PxePtr->Len));
+  PxePtr->Fudge         = (UINT8) (PxePtr->Fudge - CalculateSum8 ((VOID *) PxePtr, PxePtr->Len));
 }
 
