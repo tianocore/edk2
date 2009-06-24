@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Data Hub filter driver that takes DEBUG () info from Data Hub and writes it
   to StdErr if it exists.
 

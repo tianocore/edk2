@@ -1,4 +1,4 @@
-/**@file
+/** @file
   This code supports a the private implementation 
   of the Data Hub protocol
   
