@@ -288,6 +288,8 @@ PublishTables (
 
 /**
   Installs an ACPI table into the RSDT/XSDT.
+  Note that the ACPI table should be checksumed before installing it.
+  Otherwise it will assert.
 
   @param  This                 Protocol instance pointer.
   @param  AcpiTableBuffer      A pointer to a buffer containing the ACPI table to be installed.
@@ -313,6 +315,8 @@ InstallAcpiTable (
   EFI_ACPI_TABLE_INSTANCE   *AcpiTableInstance;
   EFI_STATUS                Status;
   VOID                      *AcpiTableBufferConst;
+  UINT32                    Length;
+  UINT8                     Checksum;
 
   //
   // Check for invalid input parameters
@@ -321,6 +325,10 @@ InstallAcpiTable (
      || (((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTableBuffer)->Length != AcpiTableBufferSize)) {
     return EFI_INVALID_PARAMETER;
   }
+
+  Length   = ((EFI_ACPI_COMMON_HEADER *) AcpiTableBuffer)->Length;
+  Checksum = CalculateCheckSum8 ((UINT8 *)AcpiTableBuffer, Length);
+  ASSERT (Checksum == 0);
 
   //
   // Get the instance of the ACPI table protocol
