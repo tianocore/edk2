@@ -115,14 +115,14 @@
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
 
 [PcdsFeatureFlag]
-  ## This PCD specifies whether StatusCode is reported to Serial port.
+  ## This PCD specifies whether StatusCode is reported via Serial port.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
 
   ## This PCD specifies whether StatusCode is stored in memory.
-  #  Pei Phase Memory is boot time memory. Dxe Phase memory is runtime memory.
+  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
 
-  ## This PCD specifies whether StatusCode is reported to OEM device.
+  ## This PCD specifies whether StatusCode is reported via OEM device.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|FALSE|BOOLEAN|0x00010024
 
   ## This PCD specifies whether StatusCode is loged into DataHub.
