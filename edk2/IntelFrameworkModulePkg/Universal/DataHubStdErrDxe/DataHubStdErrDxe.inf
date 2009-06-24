@@ -1,7 +1,6 @@
 #/** @file
-#  Component description file for Data Hub filter driver.
-#
 #  This driver takes DEBUG () info from Data Hub and writes it to StdErr if it exists.
+#
 #  Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -10,7 +9,6 @@
 #  http://opensource.org/licenses/bsd-license.php
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
 #
 #**/
 
@@ -37,15 +35,11 @@
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
-
-
-
 [LibraryClasses]
   UefiBootServicesTableLib
   BaseMemoryLib
   UefiDriverEntryPoint
   DebugLib
-
 
 [Guids]
   gEfiStatusCodeDataTypeDebugGuid               # SOMETIMES_CONSUMED
@@ -53,8 +47,7 @@
 
 
 [Protocols]
-  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-
+  gEfiDataHubProtocolGuid                       # PROTOCOL CONSUMED
 
 [Depex]
   gEfiDataHubProtocolGuid
