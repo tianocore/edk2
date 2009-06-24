@@ -46,6 +46,7 @@
   DebugLib
   UefiRuntimeLib
   UefiDriverEntryPoint
+  BaseLib
 
 [Protocols]
   gEfiNetworkInterfaceIdentifierProtocolGuid_31
