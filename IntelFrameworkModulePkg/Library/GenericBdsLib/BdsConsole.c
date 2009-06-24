@@ -44,7 +44,7 @@ IsNvNeed (
     Ptr++;
   }
 
-  if ((((UINTN)Ptr - (UINTN)ConVarName) / sizeof (CHAR16)) <= 3) {
+  if (((INTN)((UINTN)Ptr - (UINTN)ConVarName) / sizeof (CHAR16)) <= 3) {
     return TRUE;
   }
   
