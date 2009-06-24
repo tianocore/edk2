@@ -2,7 +2,7 @@
   Data Hub filter driver that takes DEBUG () info from Data Hub and writes it
   to StdErr if it exists.
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,10 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-
 #include <FrameworkDxe.h>
-
-
 #include <Guid/DataHubStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
@@ -36,8 +33,8 @@ EFI_EVENT             mDataHubStdErrEvent;
   Event handler registered with the Data Hub to parse EFI_DEBUG_CODE. This
   handler reads the Data Hub and sends any DEBUG info to StdErr.
 
-  @param Event    - The event that occured, not used
-  @param Context  - DataHub Protocol Pointer
+  @param Event      The event that occured, not used
+  @param Context    DataHub Protocol Pointer
 **/
 VOID
 EFIAPI
@@ -68,6 +65,7 @@ DataHubStdErrEventHandler (
   if (gST->StdErr == NULL) {
     return ;
   }
+  
   //
   // Mtc of zero means return the next record that has not been read by the
   // event handler.
@@ -100,12 +98,11 @@ DataHubStdErrEventHandler (
   Register an event handler with the Data Hub to parse EFI_DEBUG_CODE. This
   handler reads the Data Hub and sends any DEBUG info to StdErr.
 
-  @param ImageHandle - Image handle of this driver.
-  @param SystemTable - Pointer to EFI system table.
+  @param ImageHandle                Image handle of this driver.
+  @param SystemTable                Pointer to EFI system table.
 
-  @retval EFI_SUCCESS             - The event handler was registered.
-  @retval EFI_OUT_OF_RESOURCES    - The event hadler was not registered due to lack of
-                            system resources.
+  @retval EFI_SUCCESS               The event handler was registered.
+  @retval EFI_OUT_OF_RESOURCES      The event hadler was not registered due to lack of system resources.
 **/
 EFI_STATUS
 EFIAPI
