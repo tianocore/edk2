@@ -1,4 +1,7 @@
 /** @file
+  
+  UEFI Component Name(2) protocol implementation header file for IDE Bus driver.
+  
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -13,7 +16,7 @@
 #ifndef _IDE_BUS_COMPONENT_NAME_H_
 #define _IDE_BUS_COMPONENT_NAME_H_
 
-#define ADD_NAME(x) AddName ((x));
+#define ADD_IDE_ATAPI_NAME(x) AddName ((x));
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gIDEBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gIDEBusComponentName2;
@@ -150,11 +153,9 @@ IDEBusComponentNameGetControllerName (
 
 
 /**
-  TODO: Add function description
+  Add the component name for the IDE/ATAPI device
 
-  @param  IdeBlkIoDevicePtr TODO: add argument description
-
-  TODO: add return values.
+  @param  IdeBlkIoDevicePtr A pointer to the IDE_BLK_IO_DEV instance.
 
 **/
 VOID
