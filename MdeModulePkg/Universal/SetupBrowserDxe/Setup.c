@@ -1779,8 +1779,10 @@ GetQuestionDefault (
   QUESTION_OPTION         *Option;
   EFI_HII_VALUE           *HiiValue;
   UINT8                   Index;
+  EFI_STRING              StrValue;
 
-  Status = EFI_SUCCESS;
+  Status   = EFI_SUCCESS;
+  StrValue = NULL;
 
   //
   // Statement don't have storage, skip them
@@ -1821,6 +1823,14 @@ GetQuestionDefault (
           // Default value is embedded in EFI_IFR_DEFAULT
           //
           CopyMem (HiiValue, &Default->Value, sizeof (EFI_HII_VALUE));
+        }
+
+        if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
+          StrValue = HiiGetString (FormSet->HiiHandle, HiiValue->Value.string, NULL);
+          if (StrValue == NULL) {
+            return EFI_NOT_FOUND;
+          }
+          Question->BufferValue = AllocateCopyPool (StrSize (StrValue), StrValue);
         }
 
         return EFI_SUCCESS;

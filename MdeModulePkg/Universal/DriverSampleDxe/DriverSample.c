@@ -22,11 +22,6 @@ EFI_GUID   mFormSetGuid = FORMSET_GUID;
 EFI_GUID   mInventoryGuid = INVENTORY_GUID;
 
 CHAR16     VariableName[] = L"MyIfrNVData";
-//
-// <ConfigHdr> Template
-//
-CONST CHAR16 mDriverSampleConfigHdr[] = L"GUID=00000000000000000000000000000000&NAME=0000&PATH=00";
-
 EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
 DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData = NULL;
 
@@ -347,17 +342,19 @@ ExtractConfig (
   DRIVER_SAMPLE_PRIVATE_DATA       *PrivateData;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
   EFI_STRING                       ConfigRequest;
+  EFI_STRING                       ConfigRequestHdr;
   UINTN                            Size;
   
-  if (Progress == NULL || Results == NULL) {
+  if (Progress == NULL || Results == NULL || Request == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   //
   // Initialize the local variables.
   //
-  ConfigRequest    = NULL;
-  Size             = 0;
-  *Progress        = Request;
+  ConfigRequestHdr  = NULL;
+  ConfigRequest     = NULL;
+  Size              = 0;
+  *Progress         = Request;
 
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
   HiiConfigRouting = PrivateData->HiiConfigRouting;
@@ -387,9 +384,11 @@ ExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template 
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
-    Size = (StrLen (mDriverSampleConfigHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
+    Size = (StrLen (ConfigRequest) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
-    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", mDriverSampleConfigHdr, (UINT64)BufferSize);
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
   } else {
     //
     // Check routing data in <ConfigHdr>.
@@ -822,7 +821,7 @@ DriverSampleInit (
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   BOOLEAN                         ActionFlag;
   EFI_STRING                      ConfigRequestHdr;  
-
+  
   //
   // Initialize the local variables.
   //
