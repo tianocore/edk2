@@ -141,9 +141,41 @@ BdsLibBootViaBootOption (
 
 
 /**
-  This function will enumerate all possible boot device in the system,
-  it will only excute once of every boot.
-
+  For EFI boot option, BDS separate them as six types:
+  1. Network - The boot option points to the SimpleNetworkProtocol device. 
+               Bds will try to automatically create this type boot option when enumerate.
+  2. Shell   - The boot option points to internal flash shell. 
+               Bds will try to automatically create this type boot option when enumerate.
+  3. Removable BlockIo      - The boot option only points to the removable media
+                              device, like USB flash disk, DVD, Floppy etc.
+                              These device should contain a *removable* blockIo
+                              protocol in their device handle.
+                              Bds will try to automatically create this type boot option 
+                              when enumerate.
+  4. Fixed BlockIo          - The boot option only points to a Fixed blockIo device, 
+                              like HardDisk.
+                              These device should contain a *fixed* blockIo
+                              protocol in their device handle.
+                              BDS will skip fixed blockIo devices, and NOT
+                              automatically create boot option for them. But BDS 
+                              will help to delete those fixed blockIo boot option, 
+                              whose description rule conflict with other auto-created
+                              boot options.
+  5. Non-BlockIo Simplefile - The boot option points to a device whose handle 
+                              has SimpleFileSystem Protocol, but has no blockio
+                              protocol. These devices do not offer blockIo
+                              protocol, but BDS still can get the 
+                              \EFI\BOOT\boot{machinename}.EFI by SimpleFileSystem
+                              Protocol.
+  6. File    - The boot option points to a file. These boot options are usually 
+               created by user manually or OS loader. BDS will not delete or modify
+               these boot options.        
+    
+  This function will enumerate all possible boot device in the system, and
+  automatically create boot options for Network, Shell, Removable BlockIo, 
+  and Non-BlockIo Simplefile devices.
+  It will only excute once of every boot.
+  
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
 

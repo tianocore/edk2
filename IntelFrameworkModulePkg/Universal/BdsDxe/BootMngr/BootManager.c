@@ -201,6 +201,7 @@ CallBootManager (
   VOID                        *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
+  CHAR16                      *BootStringNumber;
 
   gOption = NULL;
   InitializeListHead (&BdsBootOptionList);
@@ -262,7 +263,47 @@ CallBootManager (
     if ((Option->Attribute & LOAD_OPTION_HIDDEN) != 0) {
       continue;
     }
-
+    
+    //
+    // Replace description string with UNI file string.
+    //
+    BootStringNumber = AllocateZeroPool (StrSize (Option->Description));
+    ASSERT (BootStringNumber != NULL);
+    
+    if (StrStr (Option->Description, DESCRIPTION_FLOPPY) != NULL) {
+      BootStringNumber = Option->Description + StrLen (DESCRIPTION_FLOPPY) + 1;
+      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY));
+      
+    } else if (StrStr (Option->Description, DESCRIPTION_DVD) != NULL) {
+      BootStringNumber = Option->Description + StrLen (DESCRIPTION_DVD) + 1;
+      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_DVD));
+      
+    } else if (StrStr (Option->Description, DESCRIPTION_USB) != NULL) {
+      BootStringNumber = Option->Description + StrLen (DESCRIPTION_USB) + 1;
+      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_USB));
+      
+    } else if (StrStr (Option->Description, DESCRIPTION_SCSI) != NULL) {
+       BootStringNumber = Option->Description + StrLen (DESCRIPTION_SCSI) + 1;
+      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI));
+      
+    } else if (StrStr (Option->Description, DESCRIPTION_MISC) != NULL) {
+      BootStringNumber = Option->Description + StrLen (DESCRIPTION_MISC) + 1;
+      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC));
+      
+    } else if (StrStr (Option->Description, DESCRIPTION_NETWORK) != NULL) {
+      BootStringNumber = Option->Description + StrLen (DESCRIPTION_NETWORK) + 1;
+      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK));
+      
+    } else if (StrStr (Option->Description, DESCRIPTION_NON_BLOCK) != NULL) {
+      BootStringNumber = Option->Description + StrLen (DESCRIPTION_NON_BLOCK) + 1;
+      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NON_BLOCK));
+    }
+    
+    if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
+      StrCat (Option->Description, L" ");
+      StrCat (Option->Description, BootStringNumber);
+    }
+  
     Token = HiiSetString (HiiHandle, 0, Option->Description, NULL);
 
     TempStr = DevicePathToStr (Option->DevicePath);
