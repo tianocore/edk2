@@ -21,7 +21,6 @@
   FILE_GUID                      = 2899C94A-1FB6-4b1a-B96B-8364975303E0
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializePs2MouseAbsolutePointer
 
 #

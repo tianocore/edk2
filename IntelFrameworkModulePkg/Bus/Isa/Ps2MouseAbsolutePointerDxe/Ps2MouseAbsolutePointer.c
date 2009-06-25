@@ -109,9 +109,9 @@ PS2MouseAbsolutePointerDriverSupported (
 }
 
 /**
-  Start this driver on ControllerHandle by opening a IsaIo
-  protocol, creating PS2_MOUSE_ABSOLUTE_POINTER_DEV device and install gEfiAbsolutePointerProtocolGuid
-  finnally.
+  Start this driver on ControllerHandle by opening a IsaIo protocol, creating
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV device and install gEfiAbsolutePointerProtocolGuid
+  finally.
 
   @param  This                 Protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to
@@ -363,7 +363,7 @@ ErrorExit:
   }
 
   if (MouseAbsolutePointerDev != NULL) {
-    gBS->FreePool (MouseAbsolutePointerDev);
+    FreePool (MouseAbsolutePointerDev);
   }
 
   gBS->CloseProtocol (
@@ -466,7 +466,7 @@ PS2MouseAbsolutePointerDriverStop (
 
   gBS->CloseEvent (MouseAbsolutePointerDev->AbsolutePointerProtocol.WaitForInput);
   FreeUnicodeStringTable (MouseAbsolutePointerDev->ControllerNameTable);
-  gBS->FreePool (MouseAbsolutePointerDev);
+  FreePool (MouseAbsolutePointerDev);
 
   gBS->CloseProtocol (
          Controller,
