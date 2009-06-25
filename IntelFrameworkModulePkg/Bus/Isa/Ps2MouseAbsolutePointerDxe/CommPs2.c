@@ -312,7 +312,7 @@ PS2MouseSetScaling (
 {
   UINT8 Command;
 
-  Command = (UINT8) (Scaling == SF1 ? SETSF1_CMD : SETSF2_CMD);
+  Command = (UINT8) (Scaling == Scaling1 ? SETSF1_CMD : SETSF2_CMD);
 
   //
   // Send auxiliary command to set mouse scaling data
