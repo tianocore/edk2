@@ -811,7 +811,7 @@ BdsLibOutputStrings (
 }
 
 //
-//  Following are BDS Lib functions which  contain all the code about setup browser reset reminder feature.
+//  Following are BDS Lib functions which contain all the code about setup browser reset reminder feature.
 //  Setup Browser reset reminder feature is that an reset reminder will be given before user leaves the setup browser  if
 //  user change any option setting which needs a reset to be effective, and  the reset will be applied according to  the user selection.
 //

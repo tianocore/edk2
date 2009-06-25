@@ -904,7 +904,7 @@ BdsDeleteAllInvalidEfiBootOption (
   This function will enumerate all possible boot device in the system, and
   automatically create boot options for Network, Shell, Removable BlockIo, 
   and Non-BlockIo Simplefile devices.
-  It will only excute once of every boot.
+  It will only execute once of every boot.
   
   @param  BdsBootOptionList      The header of the link list which indexed all
                                  current boot options
@@ -924,6 +924,7 @@ BdsLibEnumerateAllBootOption (
   UINT16                        CdromNumber;
   UINT16                        UsbNumber;
   UINT16                        MiscNumber;
+  UINT16                        ScsiNumber;
   UINT16                        NonBlockNumber;
   UINTN                         NumberBlockIoHandles;
   EFI_HANDLE                    *BlockIoHandles;
@@ -937,8 +938,8 @@ BdsLibEnumerateAllBootOption (
   UINTN                         Size;
   EFI_FV_FILE_ATTRIBUTES        Attributes;
   UINT32                        AuthenticationStatus;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
-  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
   UINTN                         DevicePathType;
   CHAR16                        Buffer[40];
   EFI_HANDLE                    *FileSystemHandles;
@@ -952,6 +953,7 @@ BdsLibEnumerateAllBootOption (
   CdromNumber   = 0;
   UsbNumber     = 0;
   MiscNumber    = 0;
+  ScsiNumber    = 0;
   ZeroMem (Buffer, sizeof (Buffer));
   
   //
@@ -1005,11 +1007,7 @@ BdsLibEnumerateAllBootOption (
 
     switch (DevicePathType) {
     case BDS_EFI_ACPI_FLOPPY_BOOT:
-      if (FloppyNumber == 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_FLOPPY);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_FLOPPY_NUM, FloppyNumber);
-      }
+      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_FLOPPY_NUM, FloppyNumber); 
       BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
       FloppyNumber++;
       break;
@@ -1019,42 +1017,26 @@ BdsLibEnumerateAllBootOption (
     //
     case BDS_EFI_MESSAGE_ATAPI_BOOT:
     case BDS_EFI_MESSAGE_SATA_BOOT:
-      if (CdromNumber == 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_DVD);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_DVD_NUM, CdromNumber);
-      }
+      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_DVD_NUM, CdromNumber);
       BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
       CdromNumber++;
       break;
 
     case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
-      if (UsbNumber == 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_USB);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_USB_NUM, UsbNumber);
-      }
+      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_USB_NUM, UsbNumber);
       BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
       UsbNumber++;
       break;
 
     case BDS_EFI_MESSAGE_SCSI_BOOT:
-      if (UsbNumber == 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_SCSI);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_SCSI_NUM, UsbNumber);
-      }
-      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
-      UsbNumber++;
+      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_SCSI_NUM, ScsiNumber);
+      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);      
+      ScsiNumber++;
       break;
 
     case BDS_EFI_MESSAGE_MISC_BOOT:
-      if (MiscNumber == 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_MISC);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_MISC_NUM, MiscNumber);
-      }
-      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);
+      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_MISC_NUM, MiscNumber);
+      BdsLibBuildOptionFromHandle (BlockIoHandles[Index], BdsBootOptionList, Buffer);      
       MiscNumber++;
       break;
 
@@ -1115,11 +1097,7 @@ BdsLibEnumerateAllBootOption (
       //
       BdsLibDeleteOptionFromHandle (FileSystemHandles[Index]);
     } else {
-      if (NonBlockNumber == 0) {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_NON_BLOCK);
-      } else {
-        UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_NON_BLOCK_NUM, NonBlockNumber);
-      }
+      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_NON_BLOCK_NUM, NonBlockNumber);
       BdsLibBuildOptionFromHandle (FileSystemHandles[Index], BdsBootOptionList, Buffer);
       NonBlockNumber++;
     }
@@ -1139,12 +1117,9 @@ BdsLibEnumerateAllBootOption (
         &NumberSimpleNetworkHandles,
         &SimpleNetworkHandles
         );
+
   for (Index = 0; Index < NumberSimpleNetworkHandles; Index++) {
-    if (Index == 0) {
-      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_NETWORK);
-    } else {
-      UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_NETWORK_NUM, Index);
-    }
+    UnicodeSPrint (Buffer, sizeof (Buffer), DESCRIPTION_NETWORK_NUM, Index);
     BdsLibBuildOptionFromHandle (SimpleNetworkHandles[Index], BdsBootOptionList, Buffer);
   }
 
@@ -1223,7 +1198,7 @@ BdsLibBuildOptionFromHandle (
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
-  DevicePath  = DevicePathFromHandle (Handle);
+  DevicePath = DevicePathFromHandle (Handle);
 
   //
   // Create and register new boot option
@@ -1804,8 +1779,8 @@ BdsLibIsValidEFIBootOptDevicePathExt (
   
   //
   // If the boot option point to a blockIO device:
-  // if it is a removable blockIo device, it is valid.
-  // if it is a fixed blockIo device, check its description confliction. 
+  //    if it is a removable blockIo device, it is valid.
+  //    if it is a fixed blockIo device, check its description confliction. 
   //
   TempDevicePath = DevPath;
   Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &TempDevicePath, &Handle);
