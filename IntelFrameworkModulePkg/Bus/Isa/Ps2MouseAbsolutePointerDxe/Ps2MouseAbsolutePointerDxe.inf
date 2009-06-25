@@ -53,18 +53,17 @@
   DebugLib
 
 [Protocols]
-  gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
-  gEfiAbsolutePointerProtocolGuid               # PROTOCOL BY_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEfiIsaIoProtocolGuid                         ## TO_START
+  gEfiAbsolutePointerProtocolGuid               ## BY_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
 
 # [Event]
 #   ##
-#   # Event will be signaled for WaitForKey event.
+#   # Event for EFI_SIMPLE_POINTER_PROTOCOL.WaitForInput.
 #   #
-#   EVT_NOTIFY_WAIT                             ## PRODUCES
+#   EVENT_TYPE_NOTIFY_WAIT                             ## PRODUCES
 #
-#   ##
-#   # Event will be used to poll mouse state.
+#   # Periodic timer event to poll the fake Ps2 mouse device and get its packet data.
 #   #
-#   EVT_NOTIFY_SIGNAL                           ## PRODUCES
+#   EVENT_TYPE_PERIODIC_TIMER                          ## PRODUCES
 
