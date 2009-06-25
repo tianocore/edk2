@@ -1,5 +1,5 @@
 /** @file
-  LZMA Decompress interfaces
+  LZMA Decompress Library internal header file declares Lzma decompress interfaces.
 
   Copyright (c) 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -12,99 +12,15 @@
 
 **/
 
-#include "LzmaDecompressLibInternal.h"
-#include "Sdk/C/Types.h"
-#include "Sdk/C/7zVersion.h"
-#include "Sdk/C/LzmaDec.h"
+#ifndef __LZMADECOMPRESSLIB_INTERNAL_H__
+#define __LZMADECOMPRESSLIB_INTERNAL_H__
 
-//
-// Global data
-//
-
-CONST VOID  *mSourceLastUsedWithGetInfo;
-UINT32      mSizeOfLastSource;
-UINT32      mDecompressedSizeForLastSource;
-VOID        *mScratchBuffer;
-UINTN       mScratchBufferSize;
-
-#define SCRATCH_BUFFER_REQUEST_SIZE SIZE_64KB
-
-/**
-  Allocation routine used by LZMA decompression.
-
-  @param P                Pointer to the ISzAlloc instance
-  @param Size             The size in bytes to be allocated
-
-  @return The allocated pointer address, or NULL on failure
-**/
-VOID *
-SzAlloc (
-  VOID *P,
-  size_t Size
-  )
-{
-  VOID *Addr;
-
-  if (mScratchBufferSize >= Size) {
-    Addr = mScratchBuffer;
-    mScratchBuffer = (VOID*) ((UINT8*)Addr + Size);
-    mScratchBufferSize -= Size;
-    return Addr;
-  } else {
-    ASSERT (FALSE);
-    return NULL;
-  }
-}
-
-/**
-  Free routine used by LZMA decompression.
-
-  @param P                Pointer to the ISzAlloc instance
-  @param Address          The address to be freed
-**/
-VOID
-SzFree (
-  VOID *P,
-  VOID *Address
-  )
-{
-  //
-  // We use the 'scratch buffer' for allocations, so there is no free
-  // operation required.  The scratch buffer will be freed by the caller
-  // of the decompression code.
-  //
-}
-
-STATIC ISzAlloc g_Alloc = { SzAlloc, SzFree };
-
-#define LZMA_HEADER_SIZE (LZMA_PROPS_SIZE + 8)
-
-/**
-  Get the size of the uncompressed buffer by parsing EncodeData header.
-
-  @param EncodedData  Pointer to the compressed data.
-
-  @return The size of the uncompressed buffer.
-**/
-UINT64
-GetDecodedSizeOfBuf(
-  UINT8 *EncodedData
-  )
-{
-  UINT64 DecodedSize;
-  INTN   Index;
-
-  /* Parse header */
-  DecodedSize = 0;
-  for (Index = LZMA_PROPS_SIZE + 7; Index >= LZMA_PROPS_SIZE; Index--)
-    DecodedSize = LShiftU64(DecodedSize, 8) + EncodedData[Index];
-
-  return DecodedSize;
-}
-
-//
-// LZMA functions and data as defined in local LzmaDecompressLibInternal.h
-//
+#include <PiPei.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/ExtractGuidedSectionLib.h>
+#include <Guid/LzmaDecompress.h>
 
 /**
   Given a Lzma compressed source buffer, this function retrieves the size of 
@@ -143,22 +59,7 @@ LzmaUefiDecompressGetInfo (
   IN  UINT32      SourceSize,
   OUT UINT32      *DestinationSize,
   OUT UINT32      *ScratchSize
-  )
-{
-  UInt64  DecodedSize;
-
-  ASSERT(SourceSize >= LZMA_HEADER_SIZE);
-
-  DecodedSize = GetDecodedSizeOfBuf((UINT8*)Source);
-
-  mSourceLastUsedWithGetInfo = Source;
-  mSizeOfLastSource = SourceSize;
-  mDecompressedSizeForLastSource = (UInt32)DecodedSize;
-  *DestinationSize = mDecompressedSizeForLastSource;
-  *ScratchSize = SCRATCH_BUFFER_REQUEST_SIZE;
-  return RETURN_SUCCESS;
-}
-
+  );
 
 /**
   Decompresses a Lzma compressed source buffer.
@@ -187,39 +88,7 @@ LzmaUefiDecompress (
   IN CONST VOID  *Source,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
-  )
-{
-  SRes        LzmaResult;
-  ELzmaStatus Status;
-  SizeT       DecodedBufSize;
-  SizeT       EncodedDataSize;
+  );
 
-  if (Source != mSourceLastUsedWithGetInfo) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  DecodedBufSize = (SizeT)mDecompressedSizeForLastSource;
-  EncodedDataSize = (SizeT)(mSizeOfLastSource - LZMA_HEADER_SIZE);
-
-  mScratchBuffer = Scratch;
-  mScratchBufferSize = SCRATCH_BUFFER_REQUEST_SIZE;
-
-  LzmaResult = LzmaDecode(
-    Destination,
-    &DecodedBufSize,
-    (Byte*)((UINT8*)Source + LZMA_HEADER_SIZE),
-    &EncodedDataSize,
-    Source,
-    LZMA_PROPS_SIZE,
-    LZMA_FINISH_END,
-    &Status,
-    &g_Alloc
-    );
-
-  if (LzmaResult == SZ_OK) {
-    return RETURN_SUCCESS;
-  } else {
-    return RETURN_INVALID_PARAMETER;
-  }
-}
+#endif
 

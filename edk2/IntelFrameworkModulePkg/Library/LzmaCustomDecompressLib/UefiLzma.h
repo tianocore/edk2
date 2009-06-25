@@ -1,5 +1,5 @@
 /** @file
-  LZMA UEFI Library header file
+  LZMA UEFI header file
 
   Allows LZMA code to build under UEFI (edk2) build environment
 
