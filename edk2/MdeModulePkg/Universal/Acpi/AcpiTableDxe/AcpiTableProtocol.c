@@ -343,7 +343,7 @@ InstallAcpiTable (
   Status = SetAcpiTable (
              AcpiTableInstance,
              AcpiTableBufferConst,
-             TRUE,
+             FALSE,
              EFI_ACPI_TABLE_VERSION_1_0B | EFI_ACPI_TABLE_VERSION_2_0 | EFI_ACPI_TABLE_VERSION_3_0,
              TableKey
              );
