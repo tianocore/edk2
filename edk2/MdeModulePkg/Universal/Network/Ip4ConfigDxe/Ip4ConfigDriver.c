@@ -257,17 +257,9 @@ Ip4ConfigDriverBindingStart (
       Instance->NicIndex        = Index;
 
       if (Instance->NicAddr.Type == NET_IFTYPE_ETHERNET) {
-        Instance->NicName[0]  = 'e';
-        Instance->NicName[1]  = 't';
-        Instance->NicName[2]  = 'h';
-        Instance->NicName[3]  = (UINT16) ('0' + Index);
-        Instance->NicName[4]  = 0;
+        UnicodeSPrint (Instance->NicName, (UINTN) IP4_NIC_NAME_LENGTH, L"eth%d", Index);
       } else {
-        Instance->NicName[0]  = 'u';
-        Instance->NicName[1]  = 'n';
-        Instance->NicName[2]  = 'k';
-        Instance->NicName[3]  = (UINT16) ('0' + Index);
-        Instance->NicName[4]  = 0;
+        UnicodeSPrint (Instance->NicName, (UINTN) IP4_NIC_NAME_LENGTH, L"unk%d", Index);
       }
 
       break;
