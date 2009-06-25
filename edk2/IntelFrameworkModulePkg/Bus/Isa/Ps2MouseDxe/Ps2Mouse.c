@@ -1,8 +1,8 @@
 /** @file
   PS/2 Mouse driver. Routines that interacts with callers,
-  conforming to EFI driver model
+  conforming to EFI driver model.
   
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,9 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ps2Mouse.h"
 #include "CommPs2.h"
 
-//
-// DriverBinding Protocol Instance
-//
+///
+/// DriverBinding Protocol Instance
+///
 EFI_DRIVER_BINDING_PROTOCOL gPS2MouseDriver = {
   PS2MouseDriverSupported,
   PS2MouseDriverStart,
@@ -109,9 +109,9 @@ PS2MouseDriverSupported (
 }
 
 /**
-  Start this driver on ControllerHandle by opening a IsaIo
-  protocol, creating PS2_MOUSE_ABSOLUTE_POINTER_DEV device and install gEfiAbsolutePointerProtocolGuid
-  finnally.
+  Start this driver on ControllerHandle by opening a IsaIo protocol, creating 
+  PS2_MOUSE_ABSOLUTE_POINTER_DEV device and install gEfiAbsolutePointerProtocolGuid
+  finally.
 
   @param  This                 Protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to
@@ -377,7 +377,7 @@ ErrorExit:
   }
 
   if (MouseDev != NULL) {
-    gBS->FreePool (MouseDev);
+    FreePool (MouseDev);
   }
 
   gBS->CloseProtocol (
@@ -480,7 +480,7 @@ PS2MouseDriverStop (
 
   gBS->CloseEvent (MouseDev->SimplePointerProtocol.WaitForInput);
   FreeUnicodeStringTable (MouseDev->ControllerNameTable);
-  gBS->FreePool (MouseDev);
+  FreePool (MouseDev);
 
   gBS->CloseProtocol (
          Controller,

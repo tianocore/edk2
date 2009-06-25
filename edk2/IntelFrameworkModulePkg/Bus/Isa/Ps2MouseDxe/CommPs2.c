@@ -1,7 +1,7 @@
 /** @file
   PS2 Mouse Communication Interface.
   
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -892,23 +892,6 @@ WaitOutputFull (
   IN EFI_ISA_IO_PROTOCOL                  *IsaIo,
   IN UINTN                                Timeout
   )
-/**
-
-Routine Description:
-
-  GC_TODO: Add function description
-
-Arguments:
-
-  IsaIo   - GC_TODO: add argument description
-  Timeout - GC_TODO: add argument description
-
-Returns:
-
-  EFI_TIMEOUT - GC_TODO: Add description for return value
-  EFI_SUCCESS - GC_TODO: Add description for return value
-
-**/
 {
   UINTN Delay;
   UINT8 Data;
