@@ -1,13 +1,14 @@
 /** @file
+  PCI command register operations supporting functions declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -32,7 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 //
 // The PCI Bridge Control register bits owned by PCI Bus driver.
-// 
+//
 // They should be cleared at the beginning. The other registers
 // are owned by chipset, we should not touch them.
 //
@@ -45,7 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 //
 // The PCCard Bridge Control register bits owned by PCI Bus driver.
-// 
+//
 // They should be cleared at the beginning. The other registers
 // are owned by chipset, we should not touch them.
 //
@@ -63,14 +64,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Operate the PCI register via PciIo function interface.
-  
-  @param PciIoDevice    Pointer to instance of PCI_IO_DEVICE
-  @param Command        Operator command
+
+  @param PciIoDevice    Pointer to instance of PCI_IO_DEVICE.
+  @param Command        Operator command.
   @param Offset         The address within the PCI configuration space for the PCI controller.
-  @param Operation      Type of Operation
-  @param PtrCommand     Return buffer holding old PCI command, if operation is not EFI_SET_REGISTER
-  
-  @return status of PciIo operation
+  @param Operation      Type of Operation.
+  @param PtrCommand     Return buffer holding old PCI command, if operation is not EFI_SET_REGISTER.
+
+  @return Status of PciIo operation.
+
 **/
 EFI_STATUS
 PciOperateRegister (
@@ -82,12 +84,13 @@ PciOperateRegister (
   );
 
 /**
-  check the cpability of this device supports
-  
-  @param PciIoDevice  Pointer to instance of PCI_IO_DEVICE
-  
-  @retval TRUE  Support
-  @retval FALSE Not support.
+  Check the cpability supporting by given device.
+
+  @param PciIoDevice   Pointer to instance of PCI_IO_DEVICE.
+
+  @retval TRUE         Cpability supportted.
+  @retval FALSE        Cpability not supportted.
+
 **/
 BOOLEAN
 PciCapabilitySupport (
@@ -95,16 +98,17 @@ PciCapabilitySupport (
   );
 
 /**
-  Locate cap reg.
-  
-  @param PciIoDevice         - A pointer to the PCI_IO_DEVICE.
-  @param CapId               - The cap ID.
-  @param Offset              - A pointer to the offset.
-  @param NextRegBlock        - A pointer to the next block.
-  
-  @retval EFI_UNSUPPORTED  Pci device does not support
+  Locate capability register block per capability ID.
+
+  @param PciIoDevice       A pointer to the PCI_IO_DEVICE.
+  @param CapId             The capability ID.
+  @param Offset            A pointer to the offset returned.
+  @param NextRegBlock      A pointer to the next block returned.
+
+  @retval EFI_SUCCESS      Successfuly located capability register block.
+  @retval EFI_UNSUPPORTED  Pci device does not support capability.
   @retval EFI_NOT_FOUND    Pci device support but can not find register block.
-  @retval EFI_SUCCESS      Success to locate capability register block
+
 **/
 EFI_STATUS
 LocateCapabilityRegBlock (
@@ -114,99 +118,99 @@ LocateCapabilityRegBlock (
   OUT UINT8         *NextRegBlock OPTIONAL
   );
 
-/**  
+/**
   Macro that reads command register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[out]           Pointer to the 16-bit value read from command register.
-  
+
   @return status of PciIo operation
 
 **/
 #define PCI_READ_COMMAND_REGISTER(a,b) \
         PciOperateRegister (a, 0, PCI_COMMAND_OFFSET, EFI_GET_REGISTER, b)
 
-/**  
+/**
   Macro that writes command register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[in]            The 16-bit value written into command register.
-  
+
   @return status of PciIo operation
 
 **/
 #define PCI_SET_COMMAND_REGISTER(a,b) \
         PciOperateRegister (a, b, PCI_COMMAND_OFFSET, EFI_SET_REGISTER, NULL)
 
-/**  
+/**
   Macro that enables command register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[in]            The enabled value written into command register.
-  
+
   @return status of PciIo operation
 
-**/        
+**/
 #define PCI_ENABLE_COMMAND_REGISTER(a,b) \
         PciOperateRegister (a, b, PCI_COMMAND_OFFSET, EFI_ENABLE_REGISTER, NULL)
 
-/**  
+/**
   Macro that disalbes command register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[in]            The disabled value written into command register.
-  
+
   @return status of PciIo operation
 
-**/        
+**/
 #define PCI_DISABLE_COMMAND_REGISTER(a,b) \
         PciOperateRegister (a, b, PCI_COMMAND_OFFSET, EFI_DISABLE_REGISTER, NULL)
 
-/**  
+/**
   Macro that reads PCI bridge control register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[out]           The 16-bit value read from control register.
-  
+
   @return status of PciIo operation
 
 **/
 #define PCI_READ_BRIDGE_CONTROL_REGISTER(a,b) \
         PciOperateRegister (a, 0, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_GET_REGISTER, b)
 
-/**  
+/**
   Macro that writes PCI bridge control register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[in]            The 16-bit value written into control register.
-  
+
   @return status of PciIo operation
 
-**/        
+**/
 #define PCI_SET_BRIDGE_CONTROL_REGISTER(a,b) \
         PciOperateRegister (a, b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_SET_REGISTER, NULL)
 
-/**  
+/**
   Macro that enables PCI bridge control register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[in]            The enabled value written into command register.
-  
+
   @return status of PciIo operation
 
 **/
 #define PCI_ENABLE_BRIDGE_CONTROL_REGISTER(a,b) \
         PciOperateRegister (a, b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_ENABLE_REGISTER, NULL)
 
-/**  
+/**
  Macro that disalbes PCI bridge control register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.
   @param b[in]            The disabled value written into command register.
-  
+
   @return status of PciIo operation
 
-**/        
+**/
 #define PCI_DISABLE_BRIDGE_CONTROL_REGISTER(a,b) \
         PciOperateRegister (a, b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_DISABLE_REGISTER, NULL)
 

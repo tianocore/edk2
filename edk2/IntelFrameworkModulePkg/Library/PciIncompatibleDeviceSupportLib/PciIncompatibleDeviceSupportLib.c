@@ -1,26 +1,32 @@
 /** @file
-  The implementation of PCI incompatible device support libary.
+  The template of PCI incompatible device support libary.
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+Copyright (c) 2006 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
 #include "IncompatiblePciDeviceList.h"
 
+EFI_PCI_REGISTER_ACCESS_DATA mPciRegisterAccessData = {0, 0, 0}; 
+EFI_PCI_REGISTER_VALUE_DATA  mPciRegisterValueData  = {0, 0};
+ 
+
 /**
-  Check whether two PCI devices matched
+  Check whether two PCI devices matched.
 
-  @param  PciDeviceInfo       A pointer to EFI_PCI_DEVICE_INFO.
-  @param  Header              A pointer to EFI_PCI_DEVICE_INFO.
+  @param  PciDeviceInfo      A pointer to EFI_PCI_DEVICE_INFO.
+  @param  Header             A pointer to EFI_PCI_DEVICE_INFO.
 
-  @retval returns EFI_SUCCESS if two PCI device matched.
+  @retval EFI_SUCCESS        Two PCI devices matched.
+  @retval EFI_UNSUPPORTED    Two PCI devices don't match.
+
 **/
 EFI_STATUS
 DeviceCheck (
@@ -67,19 +73,22 @@ DeviceCheck (
 
 /**
   Check the incompatible device list for ACPI resource update and return
-  the configuration
+  the configuration.
 
   This function searches the incompatible device list according to request
   information. If the PCI device belongs to the devices list, corresponding
   configuration informtion will be returned, in the meantime return EFI_SUCCESS.
 
-  @param  PciDeviceInfo       A pointer to PCI device information.
-  @param  Configuration       Returned information.
+  @param  PciDeviceInfo        A pointer to PCI device information.
+  @param  Configuration        Returned information.
 
-  @retval returns EFI_SUCCESS if check incompatible device ok.
-          Otherwise return EFI_UNSUPPORTED.
+  @retval EFI_SUCCESS          If check incompatible device successfully.
+  @retval EFI_ABORTED          No any resource type.
+  @retval EFI_OUT_OF_RESOURCES No memory available.
+  @retval EFI_UNSUPPORTED      Invalid Tag encounted.
+
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 PciResourceUpdateCheck (
   IN  EFI_PCI_DEVICE_INFO           *PciDeviceInfo,
@@ -103,7 +112,7 @@ PciResourceUpdateCheck (
   //
   * (VOID **) Configuration = NULL;
 
-  ListPtr                   = IncompatiblePciDeviceListForResource;
+  ListPtr                   = gIncompatiblePciDeviceListForResource;
   while (*ListPtr != LIST_END_TAG) {
 
     Tag = *ListPtr;
@@ -136,7 +145,7 @@ PciResourceUpdateCheck (
 
       AcpiPtr = AllocateZeroPool (
                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * Index + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
-                );
+                  );
       if (AcpiPtr == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
@@ -204,10 +213,11 @@ PciResourceUpdateCheck (
   @param  Offset              The address within the PCI configuration space.
   @param  Configuration       Returned information.
 
-  @retval returns EFI_SUCCESS if check incompatible device ok.
-          Otherwise return EFI_UNSUPPORTED.
+  @retval EFI_SUCCESS         If check incompatible device successfully.
+  @retval EFI_UNSUPPORTED     Failed to check incompatibility device.
+
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 PciRegisterUpdateCheck (
   IN  EFI_PCI_DEVICE_INFO           *PciDeviceInfo,
@@ -224,7 +234,7 @@ PciRegisterUpdateCheck (
 
   ASSERT (PciDeviceInfo != NULL);
 
-  ListPtr                   = IncompatiblePciDeviceListForRegister;
+  ListPtr                   = gIncompatiblePciDeviceListForRegister;
 
   //
   // Initialize the return value to NULL
@@ -257,10 +267,8 @@ PciRegisterUpdateCheck (
           if (((EFI_PCI_REGISTER_VALUE_DESCRIPTOR *)ListPtr)->AccessType == AccessType) {
 
             Dsc = (EFI_PCI_REGISTER_VALUE_DATA *) (ListPtr + 2);
-            RegisterPtr = AllocateZeroPool (sizeof (EFI_PCI_REGISTER_VALUE_DATA));
-            if (RegisterPtr == NULL) {
-              return EFI_SUCCESS;
-            }
+ 
+            RegisterPtr = &mPciRegisterValueData;
 
             RegisterPtr->AndValue      = Dsc->AndValue;
             RegisterPtr->OrValue       = Dsc->OrValue;
@@ -304,10 +312,11 @@ PciRegisterUpdateCheck (
   @param  AccessWidth         Access width needs to check incompatibility.
   @param  Configuration       Returned information.
 
-  @retval returns EFI_SUCCESS if check incompatible device ok.
-          Otherwise return EFI_UNSUPPORTED.
+  @retval EFI_SUCCESS         If check incompatible device successfully.
+  @retval EFI_UNSUPPORTED     Failed to check incompatibility device.
+
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 PciRegisterAccessCheck (
   IN  EFI_PCI_DEVICE_INFO           *PciDeviceInfo,
@@ -325,7 +334,7 @@ PciRegisterAccessCheck (
 
   ASSERT (PciDeviceInfo != NULL);
 
-  ListPtr                   = DeviceListForAccessWidth;
+  ListPtr                   = gDeviceListForAccessWidth;
 
   //
   // Initialize the return value to NULL
@@ -361,10 +370,7 @@ PciRegisterAccessCheck (
 
           if((Dsc->StartOffset <= Offset) && (Dsc->EndOffset > Offset)) {
 
-            RegisterPtr = AllocateZeroPool (sizeof (EFI_PCI_REGISTER_ACCESS_DATA));
-            if (RegisterPtr == NULL) {
-              return EFI_OUT_OF_RESOURCES;
-            }
+            RegisterPtr = &mPciRegisterAccessData;
 
             RegisterPtr->StartOffset      = Dsc->StartOffset;
             RegisterPtr->EndOffset        = Dsc->EndOffset;

@@ -1,15 +1,15 @@
 /** @file
-  PCI Incompatible device support Libary. Platform can implement an 
+  PCI Incompatible device support Libary. Platform can implement an
   instance to support the incompatible PCI devices.
 
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+Copyright (c) 2006 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -65,20 +65,23 @@ typedef struct {
 } EFI_PCI_RESOUCE_DESCRIPTOR;
 
 /**
-  Checks the incompatible device list for ACPI resource update and return
+  Check the incompatible device list for ACPI resource update and return
   the configuration.
 
   This function searches the incompatible device list according to request
   information. If the PCI device belongs to the devices list, corresponding
   configuration informtion will be returned, in the meantime return EFI_SUCCESS.
 
-  @param  PciDeviceInfo       A pointer to PCI device information.
-  @param  Configuration       Returned information.
+  @param  PciDeviceInfo        A pointer to PCI device information.
+  @param  Configuration        Returned information.
 
-  @retval EFI_SUCCESS         The incompatible device is supported.
-  @retval EFI_UNSUPPORTED     The incompatible device is not supported.
+  @retval EFI_SUCCESS          If check incompatible device successfully.
+  @retval EFI_ABORTED          No any resource type.
+  @retval EFI_OUT_OF_RESOURCES No memory available.
+  @retval EFI_UNSUPPORTED      Invalid Tag encounted.
+
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 PciResourceUpdateCheck (
   IN  EFI_PCI_DEVICE_INFO           *PciDeviceInfo,
@@ -86,7 +89,7 @@ PciResourceUpdateCheck (
   );
 
 /**
-  Checks the incompatible device list and return configuration register mask values.
+  Check the incompatible device list and return configuraton register mask values.
 
   This function searches the incompatible device list according to request
   information. If the PCI device belongs to the devices list, corresponding
@@ -97,10 +100,11 @@ PciResourceUpdateCheck (
   @param  Offset              The address within the PCI configuration space.
   @param  Configuration       Returned information.
 
-  @retval EFI_SUCCESS         The incompatible device is supported.
-  @retval EFI_UNSUPPORTED     The incompatible device is not supported.
+  @retval EFI_SUCCESS         If check incompatible device successfully.
+  @retval EFI_UNSUPPORTED     Failed to check incompatibility device.
+
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 PciRegisterUpdateCheck (
   IN  EFI_PCI_DEVICE_INFO           *PciDeviceInfo,
@@ -110,7 +114,7 @@ PciRegisterUpdateCheck (
   );
 
 /**
-  Checks the incompatible device list for access width incompatibility and
+  Check the incompatible device list for access width incompatibility and
   return the configuration
 
   This function searches the incompatible device list for access width
@@ -124,10 +128,11 @@ PciRegisterUpdateCheck (
   @param  AccessWidth         Access width needs to check incompatibility.
   @param  Configuration       Returned information.
 
-  @retval EFI_SUCCESS         The incompatible device is supported.
-  @retval EFI_UNSUPPORTED     The incompatible device is not supported.
+  @retval EFI_SUCCESS         If check incompatible device successfully.
+  @retval EFI_UNSUPPORTED     Failed to check incompatibility device.
+
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 PciRegisterAccessCheck (
   IN  EFI_PCI_DEVICE_INFO           *PciDeviceInfo,

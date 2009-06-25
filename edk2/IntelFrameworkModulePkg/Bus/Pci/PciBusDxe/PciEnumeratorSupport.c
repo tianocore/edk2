@@ -1,4 +1,5 @@
 /** @file
+  PCI emumeration support functions implementation for PCI Bus module.
 
 Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -11,31 +12,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-
 #include "PciBus.h"
-#include "PciEnumeratorSupport.h"
-#include "PciCommand.h"
-#include "PciIo.h"
 
 /**
   This routine is used to check whether the pci device is present.
-  
+
   @param PciRootBridgeIo   Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param Pci               Output buffer for PCI device structure.
+  @param Pci               Output buffer for PCI device configuration space.
   @param Bus               PCI bus NO.
   @param Device            PCI device NO.
   @param Func              PCI Func NO.
-  
-  @retval EFI_NOT_FOUND device not present.
-  @retval EFI_SUCCESS   device is found.
+
+  @retval EFI_NOT_FOUND    PCI device not present.
+  @retval EFI_SUCCESS      PCI device is found.
+
 **/
 EFI_STATUS
 PciDevicePresent (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
-  PCI_TYPE00                          *Pci,
-  UINT8                               Bus,
-  UINT8                               Device,
-  UINT8                               Func
+  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL     *PciRootBridgeIo,
+  OUT PCI_TYPE00                          *Pci,
+  IN  UINT8                               Bus,
+  IN  UINT8                               Device,
+  IN  UINT8                               Func
   )
 {
   UINT64      Address;
@@ -47,31 +45,29 @@ PciDevicePresent (
   Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
 
   //
-  // Read the Vendor Id register
+  // Read the Vendor ID register
   //
   Status = PciRootBridgeIoRead (
-                                  PciRootBridgeIo,
-                                  NULL,
-                                  EfiPciWidthUint32,
-                                  Address,
-                                  1,
-                                  Pci
-                                  );
+             PciRootBridgeIo,
+             NULL,
+             EfiPciWidthUint32,
+             Address,
+             1,
+             Pci
+             );
 
   if (!EFI_ERROR (Status) && (Pci->Hdr).VendorId != 0xffff) {
-
     //
     // Read the entire config header for the device
     //
-
     Status = PciRootBridgeIoRead (
-                                    PciRootBridgeIo,
-                                    NULL,
-                                    EfiPciWidthUint32,
-                                    Address,
-                                    sizeof (PCI_TYPE00) / sizeof (UINT32),
-                                    Pci
-                                    );
+               PciRootBridgeIo,
+               NULL,
+               EfiPciWidthUint32,
+               Address,
+               sizeof (PCI_TYPE00) / sizeof (UINT32),
+               Pci
+               );
 
     return EFI_SUCCESS;
   }
@@ -80,17 +76,22 @@ PciDevicePresent (
 }
 
 /**
-  Collect all the resource information under this root bridge
+  Collect all the resource information under this root bridge.
+
   A database that records all the information about pci device subject to this
   root bridge will then be created.
-    
+
   @param Bridge         Parent bridge instance.
-  @param StartBusNumber Bus number of begining. 
+  @param StartBusNumber Bus number of begining.
+
+  @retval EFI_SUCCESS   PCI device is found.
+  @retval other         Some error occurred when reading PCI bridge information.
+
 **/
 EFI_STATUS
 PciPciDeviceInfoCollector (
   IN PCI_IO_DEVICE                      *Bridge,
-  UINT8                                 StartBusNumber
+  IN UINT8                              StartBusNumber
   )
 {
   EFI_STATUS          Status;
@@ -111,15 +112,13 @@ PciPciDeviceInfoCollector (
       //
       // Check to see whether PCI device is present
       //
-
       Status = PciDevicePresent (
-                Bridge->PciRootBridgeIo,
-                &Pci,
-                (UINT8) StartBusNumber,
-                (UINT8) Device,
-                (UINT8) Func
-                );
-
+                 Bridge->PciRootBridgeIo,
+                 &Pci,
+                 (UINT8) StartBusNumber,
+                 (UINT8) Device,
+                 (UINT8) Func
+                 );
       if (!EFI_ERROR (Status)) {
 
         //
@@ -131,19 +130,18 @@ PciPciDeviceInfoCollector (
         // Collect all the information about the PCI device discovered
         //
         Status = PciSearchDevice (
-                  Bridge,
-                  &Pci,
-                  (UINT8) StartBusNumber,
-                  Device,
-                  Func,
-                  &PciIoDevice
-                  );
+                   Bridge,
+                   &Pci,
+                   (UINT8) StartBusNumber,
+                   Device,
+                   Func,
+                   &PciIoDevice
+                   );
 
         //
         // Recursively scan PCI busses on the other side of PCI-PCI bridges
         //
         //
-
         if (!EFI_ERROR (Status) && (IS_PCI_BRIDGE (&Pci) || IS_CARDBUS_BRIDGE (&Pci))) {
 
           //
@@ -151,7 +149,7 @@ PciPciDeviceInfoCollector (
           //
           PciIo   = &(PciIoDevice->PciIo);
 
-          Status  = PciIoRead (PciIo, EfiPciIoWidthUint8, 0x19, 1, &SecBus);
+          Status  = PciIoRead (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET, 1, &SecBus);
 
           if (EFI_ERROR (Status)) {
             return Status;
@@ -166,9 +164,9 @@ PciPciDeviceInfoCollector (
           // Deep enumerate the next level bus
           //
           Status = PciPciDeviceInfoCollector (
-                    PciIoDevice,
-                    (UINT8) (SecBus)
-                    );
+                     PciIoDevice,
+                     (UINT8) (SecBus)
+                     );
 
         }
 
@@ -188,14 +186,18 @@ PciPciDeviceInfoCollector (
 }
 
 /**
-  Seach required device and get PCI device info block
-  
+  Seach required device and create PCI device instance.
+
   @param Bridge     Parent bridge instance.
-  @param Pci        Output of PCI device info block.
+  @param Pci        Input PCI device information block.
   @param Bus        PCI bus NO.
   @param Device     PCI device NO.
   @param Func       PCI func  NO.
-  @param PciDevice  output of searched PCI device instance.
+  @param PciDevice  Output of searched PCI device instance.
+
+  @retval EFI_SUCCESS           Successfully created PCI device instance.
+  @retval EFI_OUT_OF_RESOURCES  Cannot get PCI device information.
+
 **/
 EFI_STATUS
 PciSearchDevice (
@@ -305,23 +307,24 @@ PciSearchDevice (
 }
 
 /**
-  Create PCI private data for PCI device
-  
-  @param Bridge Parent bridge instance.
-  @param Pci    PCI bar block
-  @param Bus    PCI device Bus NO.
-  @param Device PCI device DeviceNO.
-  @param Func   PCI device's func NO.
-  
-  @return new PCI device's private date structure.
+  Create PCI device instance for PCI device.
+
+  @param Bridge   Parent bridge instance.
+  @param Pci      Input PCI device information block.
+  @param Bus      PCI device Bus NO.
+  @param Device   PCI device Device NO.
+  @param Func     PCI device's func NO.
+
+  @return  Created PCI device instance.
+
 **/
 PCI_IO_DEVICE *
 GatherDeviceInfo (
   IN PCI_IO_DEVICE                    *Bridge,
   IN PCI_TYPE00                       *Pci,
-  UINT8                               Bus,
-  UINT8                               Device,
-  UINT8                               Func
+  IN UINT8                            Bus,
+  IN UINT8                            Device,
+  IN UINT8                            Func
   )
 {
   UINTN                           Offset;
@@ -370,23 +373,24 @@ GatherDeviceInfo (
 }
 
 /**
-  Create private data for bridge device's PPB.
-  
-  @param Bridge     Parent bridge 
-  @param Pci        Pci device block
-  @param Bus        Bridge device's bus NO.
-  @param Device     Bridge device's device NO.
-  @param Func       Bridge device's func NO.
-  
-  @return bridge device instance.
+  Create PCI device instance for PCI-PCI bridge.
+
+  @param Bridge   Parent bridge instance.
+  @param Pci      Input PCI device information block.
+  @param Bus      PCI device Bus NO.
+  @param Device   PCI device Device NO.
+  @param Func     PCI device's func NO.
+
+  @return  Created PCI device instance.
+
 **/
 PCI_IO_DEVICE *
 GatherPpbInfo (
   IN PCI_IO_DEVICE                    *Bridge,
   IN PCI_TYPE00                       *Pci,
-  UINT8                               Bus,
-  UINT8                               Device,
-  UINT8                               Func
+  IN UINT8                            Bus,
+  IN UINT8                            Device,
+  IN UINT8                            Func
   )
 {
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
@@ -463,7 +467,7 @@ GatherPpbInfo (
             );
 
   //
-  // test if it supports 64 memory or not
+  // Test if it supports 64 memory or not
   //
   if (!EFI_ERROR (Status)) {
 
@@ -492,24 +496,26 @@ GatherPpbInfo (
   return PciIoDevice;
 }
 
+
 /**
-  Create private data for hotplug bridge device
-  
-  @param Bridge Parent bridge instance
-  @param Pci    PCI bar block
-  @param Bus    hotplug bridge device's bus NO.
-  @param Device hotplug bridge device's device NO.
-  @param Func   hotplug bridge device's Func NO.
-  
-  @return hotplug bridge device instance.
+  Create PCI device instance for PCI Card bridge device.
+
+  @param Bridge   Parent bridge instance.
+  @param Pci      Input PCI device information block.
+  @param Bus      PCI device Bus NO.
+  @param Device   PCI device Device NO.
+  @param Func     PCI device's func NO.
+
+  @return  Created PCI device instance.
+
 **/
 PCI_IO_DEVICE *
 GatherP2CInfo (
   IN PCI_IO_DEVICE                    *Bridge,
   IN PCI_TYPE00                       *Pci,
-  UINT8                               Bus,
-  UINT8                               Device,
-  UINT8                               Func
+  IN UINT8                            Bus,
+  IN UINT8                            Device,
+  IN UINT8                            Func
   )
 {
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
@@ -543,8 +549,8 @@ GatherP2CInfo (
     // Initalize the bridge control register
     //
     PCI_DISABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, EFI_PCCARD_BRIDGE_CONTROL_BITS_OWNED);
-
   }
+
   //
   // P2C only has one bar that is in 0x10
   //
@@ -562,12 +568,13 @@ GatherP2CInfo (
 }
 
 /**
-  Create device path for pci deivce
-  
+  Create device path for pci deivce.
+
   @param ParentDevicePath  Parent bridge's path.
   @param PciIoDevice       Pci device instance.
-  
-  @return device path protocol instance for specific pci device.
+
+  @return Device path protocol instance for specific pci device.
+
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 CreatePciDevicePath (
@@ -593,25 +600,24 @@ CreatePciDevicePath (
 }
 
 /**
-  Check the bar is existed or not.
+  Check whether the bar is existed or not.
 
-  @param PciIoDevice       - A pointer to the PCI_IO_DEVICE.
-  @param Offset            - The offset.
-  @param BarLengthValue    - The bar length value.
-  @param OriginalBarValue  - The original bar value.
+  @param PciIoDevice       A pointer to the PCI_IO_DEVICE.
+  @param Offset            The offset.
+  @param BarLengthValue    The bar length value returned.
+  @param OriginalBarValue  The original bar value returned.
 
-  @retval EFI_NOT_FOUND     - The bar don't exist.
-  @retval EFI_SUCCESS       - The bar exist.
+  @retval EFI_NOT_FOUND    The bar doesn't exist.
+  @retval EFI_SUCCESS      The bar exist.
 
 **/
 EFI_STATUS
 BarExisted (
-  IN PCI_IO_DEVICE *PciIoDevice,
-  IN UINTN         Offset,
-  OUT UINT32       *BarLengthValue,
-  OUT UINT32       *OriginalBarValue
+  IN  PCI_IO_DEVICE *PciIoDevice,
+  IN  UINTN         Offset,
+  OUT UINT32        *BarLengthValue,
+  OUT UINT32        *OriginalBarValue
   )
-
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT32              OriginalValue;
@@ -623,7 +629,6 @@ BarExisted (
   //
   // Preserve the original value
   //
-
   PciIoRead (PciIo, EfiPciIoWidthUint32, (UINT8) Offset, 1, &OriginalValue);
 
   //
@@ -660,23 +665,24 @@ BarExisted (
 }
 
 /**
-  Test whether the device can support attributes 
-  
-  @param PciIoDevice   Pci device instance.
-  @param Command       Command register value.
-  @param BridgeControl Bridge control value for PPB or P2C.
-  @param OldCommand    Old command register offset.
-  @param OldBridgeControl Old Bridge control value for PPB or P2C.
-  
-  @return EFI_SUCCESS.
+  Test whether the device can support given attributes.
+
+  @param PciIoDevice      Pci device instance.
+  @param Command          Input command register value, and
+                          returned supported register value.
+  @param BridgeControl    Inout bridge control value for PPB or P2C, and
+                          returned supported bridge control value.
+  @param OldCommand       Returned and stored old command register offset.
+  @param OldBridgeControl Returned and stored old Bridge control value for PPB or P2C.
+
 **/
-EFI_STATUS
+VOID
 PciTestSupportedAttribute (
-  IN PCI_IO_DEVICE                      *PciIoDevice,
-  IN UINT16                             *Command,
-  IN UINT16                             *BridgeControl,
-  IN UINT16                             *OldCommand,
-  IN UINT16                             *OldBridgeControl
+  IN     PCI_IO_DEVICE                      *PciIoDevice,
+  IN OUT UINT16                             *Command,
+  IN OUT UINT16                             *BridgeControl,
+     OUT UINT16                             *OldCommand,
+     OUT UINT16                             *OldBridgeControl
   )
 {
   EFI_TPL OldTpl;
@@ -733,20 +739,18 @@ PciTestSupportedAttribute (
     *OldBridgeControl = 0;
     *BridgeControl    = 0;
   }
-
-  return EFI_SUCCESS;
 }
 
 /**
-  Set the supported or current attributes of a PCI device
-  
-  @param PciIoDevice   - Structure pointer for PCI device.
-  @param Command       - Command register value.
-  @param BridgeControl - Bridge control value for PPB or P2C.
-  @param Option        - Make a choice of EFI_SET_SUPPORTS or EFI_SET_ATTRIBUTES.
-  
+  Set the supported or current attributes of a PCI device.
+
+  @param PciIoDevice    Structure pointer for PCI device.
+  @param Command        Command register value.
+  @param BridgeControl  Bridge control value for PPB or P2C.
+  @param Option         Make a choice of EFI_SET_SUPPORTS or EFI_SET_ATTRIBUTES.
+
 **/
-EFI_STATUS
+VOID
 PciSetDeviceAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice,
   IN UINT16                             Command,
@@ -830,15 +834,17 @@ PciSetDeviceAttribute (
   } else {
     PciIoDevice->Attributes = Attributes;
   }
-
-  return EFI_SUCCESS;
 }
 
 /**
   Determine if the device can support Fast Back to Back attribute.
-  
+
   @param PciIoDevice  Pci device instance.
   @param StatusIndex  Status register value.
+
+  @retval EFI_SUCCESS       This device support Fast Back to Back attribute.
+  @retval EFI_UNSUPPORTED   This device doesn't support Fast Back to Back attribute.
+
 **/
 EFI_STATUS
 GetFastBackToBackSupport (
@@ -867,7 +873,6 @@ GetFastBackToBackSupport (
   } else {
     return EFI_UNSUPPORTED;
   }
-
 }
 
 /**
@@ -875,10 +880,9 @@ GetFastBackToBackSupport (
   It can only be used after the first full Option ROM process.
 
   @param PciIoDevice Pci device instance.
-  
-  @retval EFI_SUCCESS Success Operation.
+
 **/
-EFI_STATUS
+VOID
 ProcessOptionRomLight (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
@@ -907,15 +911,13 @@ ProcessOptionRomLight (
 
     CurrentLink = CurrentLink->ForwardLink;
   }
-
-  return EFI_SUCCESS;
 }
 
 /**
- Determine the related attributes of all devices under a Root Bridge
- 
- @param PciIoDevice   PCI device instance.
- 
+  Determine the related attributes of all devices under a Root Bridge.
+
+  @param PciIoDevice   PCI device instance.
+
 **/
 EFI_STATUS
 DetermineDeviceAttribute (
@@ -927,11 +929,6 @@ DetermineDeviceAttribute (
   UINT16          OldCommand;
   UINT16          OldBridgeControl;
   BOOLEAN         FastB2BSupport;
-
-  /*
-  UINT8  IdePI;
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  */
   PCI_IO_DEVICE   *Temp;
   LIST_ENTRY      *CurrentLink;
   EFI_STATUS      Status;
@@ -982,38 +979,6 @@ DetermineDeviceAttribute (
     // Enable other supported attributes but not defined in PCI_IO_PROTOCOL
     //
     PCI_ENABLE_COMMAND_REGISTER (PciIoDevice, EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE);
-
-    //
-    // Enable IDE native mode
-    //
-    /*
-    if (IS_PCI_IDE(&PciIoDevice->Pci)) {
-
-      PciIo = &PciIoDevice->PciIo;
-
-      PciIoRead (
-                              PciIo,
-                              EfiPciIoWidthUint8,
-                              0x09,
-                              1,
-                              &IdePI
-                              );
-
-      //
-      // Set native mode if it can be supported
-      //
-      IdePI |= (((IdePI & 0x0F) >> 1) & 0x05);
-
-      PciIoWrite (
-                              PciIo,
-                              EfiPciIoWidthUint8,
-                              0x09,
-                              1,
-                              &IdePI
-                              );
-
-    }
-    */
   }
 
   FastB2BSupport = TRUE;
@@ -1082,10 +1047,14 @@ DetermineDeviceAttribute (
 }
 
 /**
-  This routine is used to update the bar information for those incompatible PCI device
-  
+  This routine is used to update the bar information for those incompatible PCI device.
+
   @param PciIoDevice      Pci device instance.
-  @return EFI_UNSUPPORTED failed to update Pci Info.
+
+  @retval EFI_SUCCESS     Successfully updated bar information.
+  @retval EFI_UNSUPPORTED Given PCI device doesn't belong to incompatible PCI device list.
+  @retval other           Failed to check incompatibility device.
+
 **/
 EFI_STATUS
 UpdatePciInfo (
@@ -1227,21 +1196,21 @@ UpdatePciInfo (
   if (Configuration != NULL) {
     FreePool (Configuration);
   }
-  return Status;
 
+  return EFI_SUCCESS;
 }
 
 /**
-  This routine will update the alignment with the new alignment
-  
-  @param Alignment old alignment.
-  @param NewAlignment new alignment.
-  
+  This routine will update the alignment with the new alignment.
+
+  @param Alignment    Old alignment.
+  @param NewAlignment New alignment.
+
 **/
 VOID
 SetNewAlign (
-  IN UINT64 *Alignment,
-  IN UINT64 NewAlignment
+  IN UINT64     *Alignment,
+  IN UINT64     NewAlignment
   )
 {
   UINT64  OldAlignment;
@@ -1302,13 +1271,14 @@ SetNewAlign (
 }
 
 /**
-  Parse PCI bar bit.
-  
+  Parse PCI bar information and fill them into PCI device instance.
+
   @param PciIoDevice  Pci device instance.
-  @param Offset       bar offset.
-  @param BarIndex     bar index.
-  
-  @return next bar offset.
+  @param Offset       Bar offset.
+  @param BarIndex     Bar index.
+
+  @return Next bar offset.
+
 **/
 UINTN
 PciParseBar (
@@ -1490,13 +1460,15 @@ PciParseBar (
 
 /**
   This routine is used to initialize the bar of a PCI device.
-  It can be called typically when a device is going to be rejected.
 
   @param PciIoDevice Pci device instance.
+
+  @note It can be called typically when a device is going to be rejected.
+
 **/
-EFI_STATUS
+VOID
 InitializePciDevice (
-  IN PCI_IO_DEVICE *PciIoDevice
+  IN PCI_IO_DEVICE    *PciIoDevice
   )
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
@@ -1512,18 +1484,17 @@ InitializePciDevice (
   for (Offset = 0x10; Offset <= 0x24; Offset += sizeof (UINT32)) {
     PciIoWrite (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllOne);
   }
-
-  return EFI_SUCCESS;
 }
 
 /**
-  Init PPB for bridge device
-  
-  @param  PciIoDevice Pci device instance.
+  This routine is used to initialize the bar of a PCI-PCI Bridge device.
+
+  @param  PciIoDevice PCI-PCI bridge device instance.
+
 **/
-EFI_STATUS
+VOID
 InitializePpb (
-  IN PCI_IO_DEVICE *PciIoDevice
+  IN PCI_IO_DEVICE    *PciIoDevice
   )
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
@@ -1557,18 +1528,17 @@ InitializePpb (
   // Force Interrupt line to zero for cards that come up randomly
   //
   PciIoWrite (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
-
-  return EFI_SUCCESS;
 }
 
 /**
-  Init private data for Hotplug bridge device
-  
-  @param PciIoDevice hotplug bridge device.
+  This routine is used to initialize the bar of a PCI Card Bridge device.
+
+  @param PciIoDevice  PCI Card bridge device.
+
 **/
-EFI_STATUS
+VOID
 InitializeP2C (
-  IN PCI_IO_DEVICE *PciIoDevice
+  IN PCI_IO_DEVICE    *PciIoDevice
   )
 {
   EFI_PCI_IO_PROTOCOL *PciIo;
@@ -1596,28 +1566,28 @@ InitializeP2C (
   // Force Interrupt line to zero for cards that come up randomly
   //
   PciIoWrite (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
-  return EFI_SUCCESS;
 }
 
 /**
   Create and initiliaze general PCI I/O device instance for
   PCI device/bridge device/hotplug bridge device.
-  
+
   @param PciRootBridgeIo   Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param Pci               Pci bar block.
-  @param Bus               device Bus NO.
-  @param Device            device device NO.
-  @param Func              device func NO.
-  
-  @return instance of PCI device.
+  @param Pci               Input Pci information block.
+  @param Bus               Device Bus NO.
+  @param Device            Device device NO.
+  @param Func              Device func NO.
+
+  @return Instance of PCI device. NULL means no instance created.
+
 **/
 PCI_IO_DEVICE *
 CreatePciIoDevice (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   IN PCI_TYPE00                       *Pci,
-  UINT8                               Bus,
-  UINT8                               Device,
-  UINT8                               Func
+  IN UINT8                            Bus,
+  IN UINT8                            Device,
+  IN UINT8                            Func
   )
 {
   PCI_IO_DEVICE *PciIoDevice;
@@ -1659,7 +1629,6 @@ CreatePciIoDevice (
   InitializePciDriverOverrideInstance (PciIoDevice);
   InitializePciLoadFile2 (PciIoDevice);
 
-
   //
   // Initialize the reserved resource list
   //
@@ -1680,12 +1649,15 @@ CreatePciIoDevice (
 
 /**
   This routine is used to enumerate entire pci bus system
-  in a given platform
+  in a given platform.
+
   It is only called on the second start on the same Root Bridge.
 
-  @param Controller  Parent bridge handler.
-  
-  @return status of operation.
+  @param  Controller     Parent bridge handler.
+
+  @retval EFI_SUCCESS    PCI enumeration finished successfully.
+  @retval other          Some error occurred when enumerating the pci bus system.
+
 **/
 EFI_STATUS
 PciEnumeratorLight (
@@ -1745,7 +1717,7 @@ PciEnumeratorLight (
     }
 
     //
-    // Record the root bridge io protocol
+    // Record the root bridgeio protocol
     //
     RootBridgeDev->PciRootBridgeIo = PciRootBridgeIo;
 
@@ -1790,15 +1762,16 @@ PciEnumeratorLight (
 }
 
 /**
-  Get bus range.
-  
+  Get bus range from PCI resource descriptor list.
+
   @param Descriptors  A pointer to the address space descriptor.
-  @param MinBus       The min bus.
-  @param MaxBus       The max bus.
-  @param BusRange     The bus range.
-  
-  @retval EFI_SUCCESS Success operation.
-  @retval EFI_NOT_FOUND  can not find the specific bus.
+  @param MinBus       The min bus returned.
+  @param MaxBus       The max bus returned.
+  @param BusRange     The bus range returned.
+
+  @retval EFI_SUCCESS    Successfully got bus range.
+  @retval EFI_NOT_FOUND  Can not find the specific bus.
+
 **/
 EFI_STATUS
 PciGetBusRange (
@@ -1808,7 +1781,6 @@ PciGetBusRange (
   OUT    UINT16                             *BusRange
   )
 {
-
   while ((*Descriptors)->Desc != ACPI_END_TAG_DESCRIPTOR) {
     if ((*Descriptors)->ResType == ACPI_ADDRESS_SPACE_TYPE_BUS) {
       if (MinBus != NULL) {
@@ -1838,7 +1810,8 @@ PciGetBusRange (
   @param RootBridgeDev     Pci device instance.
 
   @retval EFI_SUCCESS      This device started.
-  
+  @retval other            Failed to get PCI Root Bridge I/O protocol.
+
 **/
 EFI_STATUS
 StartManagingRootBridge (
@@ -1852,8 +1825,8 @@ StartManagingRootBridge (
   //
   // Get the root bridge handle
   //
-  RootBridgeHandle  = RootBridgeDev->Handle;
-  PciRootBridgeIo   = NULL;
+  RootBridgeHandle = RootBridgeDev->Handle;
+  PciRootBridgeIo  = NULL;
 
   //
   // Get the pci root bridge io protocol
@@ -1881,13 +1854,13 @@ StartManagingRootBridge (
 }
 
 /**
-  This routine can be used to check whether a PCI device should be rejected when light enumeration
+  This routine can be used to check whether a PCI device should be rejected when light enumeration.
 
   @param PciIoDevice  Pci device instance.
 
   @retval TRUE      This device should be rejected.
   @retval FALSE     This device shouldn't be rejected.
-  
+
 **/
 BOOLEAN
 IsPciDeviceRejected (
@@ -1945,7 +1918,6 @@ IsPciDeviceRejected (
       //
       // IO Bar
       //
-
       Mask      = 0xFFFFFFFC;
       TestValue = TestValue & Mask;
       if ((TestValue != 0) && (TestValue == (OldValue & Mask))) {
@@ -1957,7 +1929,6 @@ IsPciDeviceRejected (
       //
       // Mem Bar
       //
-
       Mask      = 0xFFFFFFF0;
       TestValue = TestValue & Mask;
 
@@ -1972,7 +1943,6 @@ IsPciDeviceRejected (
           //
           // Test its high 32-Bit BAR
           //
-
           Status = BarExisted (PciIoDevice, BarOffset, &TestValue, &OldValue);
           if (TestValue == OldValue) {
             return TRUE;
@@ -1995,12 +1965,13 @@ IsPciDeviceRejected (
 }
 
 /**
-  Reset and all bus number from specific bridge.
-  
+  Reset all bus number from specific bridge.
+
   @param Bridge           Parent specific bridge.
-  @param StartBusNumber   start bus number.
+  @param StartBusNumber   Start bus number.
+
 **/
-EFI_STATUS
+VOID
 ResetAllPpbBusNumber (
   IN PCI_IO_DEVICE                      *Bridge,
   IN UINT8                              StartBusNumber
@@ -2071,7 +2042,5 @@ ResetAllPpbBusNumber (
       }
     }
   }
-
-  return EFI_SUCCESS;
 }
 

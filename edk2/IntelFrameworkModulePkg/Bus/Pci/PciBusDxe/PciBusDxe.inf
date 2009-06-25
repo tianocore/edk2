@@ -89,8 +89,8 @@
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid               ## BY_START
   gEfiPciIoProtocolGuid                           ## BY_START
-  gEfiDevicePathProtocolGuid                      ## BY_START   
-  gEfiBusSpecificDriverOverrideProtocolGuid       ## CONSUMED
+  gEfiDevicePathProtocolGuid                      ## BY_START
+  gEfiBusSpecificDriverOverrideProtocolGuid       ## BY_START
   gEfiLoadedImageProtocolGuid                     ## CONSUMED
   gEfiDecompressProtocolGuid                      ## CONSUMED
   gEfiPciHotPlugInitProtocolGuid                  ## CONSUMED
@@ -106,4 +106,10 @@
 [Pcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask
 
-
+# [Event]
+#   ##
+#   # Notify event set by CreateEventForHpc () for PCI Hot Plug controller.
+#   #
+#   EVT_NOTIFY_SIGNAL                   ## PRODUCES
+#
+#

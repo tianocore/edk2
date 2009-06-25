@@ -99,6 +99,26 @@ struct _PCI_BAR {
   UINT8         Offset;
 };
 
+//
+// defined in PCI Card Specification, 8.0
+//
+#define PCI_CARD_MEMORY_BASE_0                0x1C
+#define PCI_CARD_MEMORY_LIMIT_0               0x20
+#define PCI_CARD_MEMORY_BASE_1                0x24
+#define PCI_CARD_MEMORY_LIMIT_1               0x28
+#define PCI_CARD_IO_BASE_0_LOWER              0x2C
+#define PCI_CARD_IO_BASE_0_UPPER              0x2E
+#define PCI_CARD_IO_LIMIT_0_LOWER             0x30
+#define PCI_CARD_IO_LIMIT_0_UPPER             0x32
+#define PCI_CARD_IO_BASE_1_LOWER              0x34
+#define PCI_CARD_IO_BASE_1_UPPER              0x36
+#define PCI_CARD_IO_LIMIT_1_LOWER             0x38
+#define PCI_CARD_IO_LIMIT_1_UPPER             0x3A
+#define PCI_CARD_BRIDGE_CONTROL               0x3E
+
+#define PCI_CARD_PREFETCHABLE_MEMORY_0_ENABLE BIT8
+#define PCI_CARD_PREFETCHABLE_MEMORY_1_ENABLE BIT9
+
 #define PPB_BAR_0                             0
 #define PPB_BAR_1                             1
 #define PPB_IO_RANGE                          2
@@ -261,7 +281,7 @@ extern UINT64                                       gAllZero;
 extern EFI_PCI_PLATFORM_PROTOCOL                    *gPciPlatformProtocol;
 
 
-/**  
+/**
   Macro that checks whether device is a GFX device.
 
   @param  _p      Specified device.
