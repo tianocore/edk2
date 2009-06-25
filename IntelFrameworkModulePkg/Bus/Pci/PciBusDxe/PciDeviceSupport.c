@@ -1,14 +1,14 @@
 /** @file
   Supporting functions implementaion for PCI devices management.
 
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -66,9 +66,9 @@ InsertPciDevice (
 
 /**
   Destroy root bridge and remove it from deivce tree.
-  
+
   @param RootBridge     The bridge want to be removed.
-  
+
 **/
 VOID
 DestroyRootBridge (
@@ -187,10 +187,10 @@ DestroyRootBridgeByHandle (
 }
 
 /**
-  This function registers the PCI IO device. 
+  This function registers the PCI IO device.
 
-  It creates a handle for this PCI IO device (if the handle does not exist), attaches 
-  appropriate protocols onto the handle, does necessary initialization, and sets up 
+  It creates a handle for this PCI IO device (if the handle does not exist), attaches
+  appropriate protocols onto the handle, does necessary initialization, and sets up
   parent/child relationship with its bus controller.
 
   @param Controller     An EFI handle for the PCI bus controller.
@@ -198,7 +198,7 @@ DestroyRootBridgeByHandle (
   @param Handle         A pointer to hold the returned EFI handle for the PCI IO device.
 
   @retval EFI_SUCCESS   The PCI device is successfully registered.
-  @retval Others        An error occurred when registering the PCI device.
+  @retval other         An error occurred when registering the PCI device.
 
 **/
 EFI_STATUS
@@ -244,7 +244,7 @@ RegisterPciDevice (
   if (!EFI_ERROR (Status)) {
     PciIoDevice->IsPciExp = TRUE;
   }
-  
+
   //
   // Force Interrupt line to "Unknown" or "No Connection"
   //
@@ -330,7 +330,7 @@ RegisterPciDevice (
 
   if (PciIoDevice->BusOverride) {
     //
-    // Install BusSpecificDriverOverride Protocol
+    // Install Bus Specific Driver Override Protocol
     //
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &PciIoDevice->Handle,
@@ -437,7 +437,7 @@ RemoveAllPciDeviceOnBridge (
   @param Handle        PCI device handle.
 
   @retval EFI_SUCCESS  The PCI device is successfully de-registered.
-  @retval Others       An error occurred when de-registering the PCI device.
+  @retval other        An error occurred when de-registering the PCI device.
 
 **/
 EFI_STATUS
@@ -503,7 +503,8 @@ DeRegisterPciDevice (
                     );
 
     //
-    // Un-install the device path protocol and pci io protocol
+    // Un-install the Device Path protocol and PCI I/O protocol
+    // and Bus Specific Driver Override protocol if needed.
     //
     if (PciIoDevice->BusOverride) {
       Status = gBS->UninstallMultipleProtocolInterfaces (
@@ -595,8 +596,8 @@ DeRegisterPciDevice (
 
   @retval EFI_NOT_READY   Device is not allocated.
   @retval EFI_UNSUPPORTED Device only support PCI-PCI bridge.
-  @retval EFI_NOT_FOUND   Can not find the specific device
-  @retval EFI_SUCCESS     Success to start Pci device on bridge
+  @retval EFI_NOT_FOUND   Can not find the specific device.
+  @retval EFI_SUCCESS     Success to start Pci device on bridge.
 
 **/
 EFI_STATUS
@@ -625,7 +626,7 @@ StartPciDevicesOnBridge (
 
       Node.DevPath = RemainingDevicePath;
 
-      if (Node.Pci->Device != PciIoDevice->DeviceNumber || 
+      if (Node.Pci->Device != PciIoDevice->DeviceNumber ||
           Node.Pci->Function != PciIoDevice->FunctionNumber) {
         CurrentLink = CurrentLink->ForwardLink;
         continue;
@@ -637,7 +638,7 @@ StartPciDevicesOnBridge (
       if (!PciIoDevice->Allocated) {
         return EFI_NOT_READY;
       }
-      
+
       //
       // Check if the current node has been registered before
       // If it is not, register it
@@ -655,7 +656,7 @@ StartPciDevicesOnBridge (
         ChildHandleBuffer[*NumberOfChildren] = PciIoDevice->Handle;
         (*NumberOfChildren)++;
       }
-      
+
       //
       // Get the next device path
       //
@@ -752,18 +753,21 @@ StartPciDevicesOnBridge (
 }
 
 /**
-  Start to manage all the PCI devices it found previously under 
+  Start to manage all the PCI devices it found previously under
   the entire host bridge.
 
   @param Controller          The root bridge handle.
+
+  @retval EFI_NOT_READY   Device is not allocated.
+  @retval EFI_SUCCESS     Success to start Pci device on host bridge.
 
 **/
 EFI_STATUS
 StartPciDevices (
   IN EFI_HANDLE                         Controller
   )
-
 {
+  EFI_STATUS        Status;
   PCI_IO_DEVICE     *RootBridge;
   EFI_HANDLE        ThisHostBridge;
   LIST_ENTRY        *CurrentLink;
@@ -781,13 +785,16 @@ StartPciDevices (
     // Locate the right root bridge to start
     //
     if (RootBridge->PciRootBridgeIo->ParentHandle == ThisHostBridge) {
-      StartPciDevicesOnBridge (
-        RootBridge->Handle,
-        RootBridge,
-        NULL,
-        NULL,
-        NULL
-        );
+      Status = StartPciDevicesOnBridge (
+                  RootBridge->Handle,
+                  RootBridge,
+                  NULL,
+                  NULL,
+                  NULL
+                  );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
 
     CurrentLink = CurrentLink->ForwardLink;
@@ -913,10 +920,10 @@ GetRootBridgeByHandle (
 
 /**
   Judege whether Pci device existed.
-  
+
   @param Bridge       Parent bridege instance.
   @param PciIoDevice  Device instance.
-  
+
   @retval TRUE        Pci device existed.
   @retval FALSE       Pci device did not exist.
 
@@ -955,9 +962,9 @@ PciDeviceExisted (
 
 /**
   Get the active VGA device on the same segment.
-  
+
   @param VgaDevice    PCI IO instance for the VGA device.
-  
+
   @return The active VGA device on the same segment.
 
 **/
@@ -992,9 +999,9 @@ ActiveVGADeviceOnTheSameSegment (
 
 /**
   Get the active VGA device on the root bridge.
-  
+
   @param RootBridge  PCI IO instance for the root bridge.
-  
+
   @return The active VGA device.
 
 **/
@@ -1042,10 +1049,10 @@ ActiveVGADeviceOnTheRootBridge (
   @param RootBridge           Root bridege Io instance.
   @param RemainingDevicePath  Given searching device path.
   @param PciAddress           Buffer holding searched result.
-  
+
   @retval EFI_SUCCESS         PCI address was stored in PciAddress
   @retval EFI_NOT_FOUND       Can not find the specific device path.
-  
+
 **/
 EFI_STATUS
 GetHpcPciAddressFromRootBridge (

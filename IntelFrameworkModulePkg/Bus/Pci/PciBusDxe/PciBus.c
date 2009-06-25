@@ -1,14 +1,21 @@
 /** @file
   Driver Binding functions for PCI Bus module.
-   
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+  Single PCI bus driver instance will manager all PCI Root Bridges in one EFI based firmware,
+  since all PCI Root Bridges' resources need to be managed together.
+  Supported() function will try to get PCI Root Bridge IO Protocol.
+  Start() function will get PCI Host Bridge Resource Allocation Protocol to manage all
+  PCI Root Bridges. So it means platform needs install PCI Root Bridge IO protocol for each
+  PCI Root Bus and install PCI Host Bridge Resource Allocation Protocol.
+
+Copyright (c) 2006 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -51,7 +58,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL mPciHotPlugReques
   @param[in] SystemTable    A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs when executing this entry point.
+  @retval other             Some error occurred when executing this entry point.
 
 **/
 EFI_STATUS
@@ -63,7 +70,7 @@ PciBusEntryPoint (
 {
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
- 
+
   //
   // Initializes PCI devices pool
   //
@@ -83,7 +90,7 @@ PciBusEntryPoint (
   ASSERT_EFI_ERROR (Status);
 
   if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
-    //  
+    //
     // If Hot Plug is supported, install EFI PCI Hot Plug Request protocol.
     //
     Handle = NULL;
@@ -159,6 +166,9 @@ PciBusDriverBindingSupported (
         Controller
         );
 
+  //
+  // Check if Pci Root Bridge IO protocol is installed by platform
+  //
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciRootBridgeIoProtocolGuid,
@@ -238,7 +248,7 @@ PciBusDriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Start all the devices under the entire host bridge.
   //

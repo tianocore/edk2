@@ -1,7 +1,7 @@
 #/** @file
-#  PCI Incompatible device support Library
+#  PCI Incompatible device support Library template.
 #
-#  Check PCI incompatible devices and set necessary configuration
+#  Check PCI incompatible devices and set necessary configuration.
 #  Copyright (c) 2007 - 2009, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials

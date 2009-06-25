@@ -1,42 +1,47 @@
 /** @file
+  PCI Hot Plug support functions declaration for PCI Bus module.
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
 
 #ifndef _EFI_PCI_HOT_PLUG_SUPPORT_H_
 #define _EFI_PCI_HOT_PLUG_SUPPORT_H_
 
+//
+// stall 1 second, its unit is 100ns
+//
+#define STALL_1_SECOND        1000000
 
 //
-// stall 1 second
+// PCI Hot Plug controller private data
 //
-#define STALL_1_SECOND        1000000 
-
 typedef struct {
   EFI_EVENT Event;
   BOOLEAN   Initialized;
   VOID      *Padding;
 } ROOT_HPC_DATA;
 
+//
+// Reference of some global variabes
+//
 extern EFI_PCI_HOT_PLUG_INIT_PROTOCOL *gPciHotPlugInit;
 extern EFI_HPC_LOCATION               *gPciRootHpcPool;
-extern UINTN                          gPciRootHpcCount;
 extern ROOT_HPC_DATA                  *gPciRootHpcData;
 
 /**
-  Init HPC private data.
-  
-  @param  Event     event object
-  @param  Context   HPC private data.
+  Event notification function to set Hot Plug controller status.
+
+  @param  Event                    The event that invoke this function.
+  @param  Context                  The calling context, pointer to ROOT_HPC_DATA.
+
 **/
 VOID
 EFIAPI
@@ -46,13 +51,14 @@ PciHPCInitialized (
   );
 
 /**
-  Compare two device path
-  
-  @param DevicePath1    the first device path want to be compared.
-  @param DevicePath2    the first device path want to be compared.
-  
-  @retval TRUE    equal.
-  @retval FALSE   different.
+  Compare two device pathes to check if they are exactly same.
+
+  @param DevicePath1    A pointer to the first device path data structure.
+  @param DevicePath2    A pointer to the second device path data structure.
+
+  @retval TRUE    They are same.
+  @retval FALSE   They are not same.
+
 **/
 BOOLEAN
 EfiCompareDevicePath (
@@ -61,8 +67,17 @@ EfiCompareDevicePath (
   );
 
 /**
-  Init hot plug support and root hot plug private data.
-  
+  Check hot plug support and initialize root hot plug private data.
+
+  If Hot Plug is supported by the platform, call PCI Hot Plug Init protocol
+  to get PCI Hot Plug controller's information and constructor the root hot plug
+  private data structure.
+
+  @retval EFI_SUCCESS           They are same.
+  @retval EFI_UNSUPPORTED       No PCI Hot Plug controler on the platform.
+  @retval EFI_OUT_OF_RESOURCES  No memory to constructor root hot plug private
+                                data structure.
+
 **/
 EFI_STATUS
 InitializeHotPlugSupport (
@@ -71,40 +86,45 @@ InitializeHotPlugSupport (
 
 /**
   Test whether PCI device is hot plug bus.
-  
+
   @param PciIoDevice  PCI device instance.
-  
-  @retval EFI_SUCCESS   PCI device is hot plug bus.
-  @retval EFI_NOT_FOUND PCI device is not hot plug bus.
+
+  @retval TRUE    PCI device is a hot plug bus.
+  @retval FALSE   PCI device is not a hot plug bus.
+
 **/
-EFI_STATUS
+BOOLEAN
 IsPciHotPlugBus (
   PCI_IO_DEVICE                       *PciIoDevice
   );
 
 /**
-  Test whether device path is for root pci hot plug bus
-  
-  @param HpbDevicePath  tested device path
-  @param HpIndex        Return the index of root hot plug in global array.
-  
-  @retval TRUE  device path is for root pci hot plug
-  @retval FALSE device path is not for root pci hot plug
+  Test whether device path is for root pci hot plug bus.
+
+  @param HpbDevicePath  A pointer to device path data structure to be tested.
+  @param HpIndex        If HpIndex is not NULL, return the index of root hot
+                        plug in global array when TRUE is retuned.
+
+  @retval TRUE          The device path is for root pci hot plug bus.
+  @retval FALSE         The device path is not for root pci hot plug bus.
+
 **/
 BOOLEAN
 IsRootPciHotPlugBus (
-  IN EFI_DEVICE_PATH_PROTOCOL         *HpbDevicePath,
-  OUT UINTN                           *HpIndex
+  IN  EFI_DEVICE_PATH_PROTOCOL        *HpbDevicePath,
+  OUT UINTN                           *HpIndex    OPTIONAL
   );
 
 /**
-  Test whether device path is for root pci hot plug controller
-  
-  @param HpcDevicePath  tested device path.
-  @param HpIndex        Return the index of root hot plug in global array.
-  
-  @retval TRUE  device path is for root pci hot plug controller.
-  @retval FALSE device path is not for root pci hot plug controller.
+  Test whether device path is for root pci hot plug controller.
+
+  @param HpbDevicePath  A pointer to device path data structure to be tested.
+  @param HpIndex        If HpIndex is not NULL, return the index of root hot
+                        plug in global array when TRUE is retuned.
+
+  @retval TRUE          The device path is for root pci hot plug controller.
+  @retval FALSE         The device path is not for root pci hot plug controller.
+
 **/
 BOOLEAN
 IsRootPciHotPlugController (
@@ -113,23 +133,28 @@ IsRootPciHotPlugController (
   );
 
 /**
-  Wrapper for creating event object for HPC 
-  
-  @param  HpIndex   index of hot plug device in global array.
-  @param  Event     event object.
-  
-  @return status of create event invoken.
+  Creating event object for PCI Hot Plug controller.
+
+  @param  HpIndex   Index of hot plug device in global array.
+  @param  Event     The retuned event that invoke this function.
+
+  @return Status of create event invoken.
+
 **/
 EFI_STATUS
 CreateEventForHpc (
-  IN UINTN       HpIndex,
+  IN  UINTN      HpIndex,
   OUT EFI_EVENT  *Event
   );
 
 /**
-  Wait for all root HPC initialized.
-  
-  @param TimeoutInMicroSeconds  microseconds to wait for all root hpc's initialization.
+  Wait for all root PCI Hot Plug controller finished initializing.
+
+  @param TimeoutInMicroSeconds  Microseconds to wait for all root HPCs' initialization.
+
+  @retval EFI_SUCCESS           All HPCs initialization finished.
+  @retval EFI_TIMEOUT           Not ALL HPCs initialization finished in Microseconds.
+
 **/
 EFI_STATUS
 AllRootHPCInitialized (
@@ -137,29 +162,28 @@ AllRootHPCInitialized (
   );
 
 /**
-  Check HPC capability register block
-  
-  @param PciIoDevice PCI device instance.
-  
-  @retval EFI_SUCCESS   PCI device is HPC.
-  @retval EFI_NOT_FOUND PCI device is not HPC.
+  Check whether PCI-PCI bridge has PCI Hot Plug capability register block.
+
+  @param PciIoDevice    A Pointer to the PCI-PCI bridge.
+
+  @retval TRUE    PCI device is HPC.
+  @retval FALSE   PCI device is not HPC.
+
 **/
-EFI_STATUS
+BOOLEAN
 IsSHPC (
-  PCI_IO_DEVICE                       *PciIoDevice
+  IN PCI_IO_DEVICE                      *PciIoDevice
   );
 
 /**
-  Get resource padding for hot plug bus
-  
-  @param PciIoDevice PCI device instance.
-  
-  @retval EFI_SUCCESS   success get padding and set it into PCI device instance.
-  @retval EFI_NOT_FOUND PCI device is not a hot plug bus.
+  Get resource padding if the specified PCI bridge is a hot plug bus.
+
+  @param PciIoDevice    PCI bridge instance.
+
 **/
-EFI_STATUS
+VOID
 GetResourcePaddingForHpb (
-  IN PCI_IO_DEVICE *PciIoDevice
+  IN PCI_IO_DEVICE      *PciIoDevice
   );
 
 #endif

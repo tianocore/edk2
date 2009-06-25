@@ -1,7 +1,7 @@
 /** @file
-  The incompatible PCI device list
+  The incompatible PCI device list template.
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 
-#include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Acpi.h>
 
 
@@ -51,11 +51,10 @@ typedef struct {
   EFI_PCI_REGISTER_VALUE_DATA    PciRegisterValueData;
 } EFI_PCI_REGISTER_VALUE_DESCRIPTOR;
 
-
 //
 // the incompatible PCI devices list for ACPI resource
 //
-GLOBAL_REMOVE_IF_UNREFERENCED UINT64 IncompatiblePciDeviceListForResource[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED UINT64 gIncompatiblePciDeviceListForResource[] = {
   //
   // DEVICE_INF_TAG,
   // PCI_DEVICE_ID (VendorID, DeviceID, Revision, SubVendorId, SubDeviceId),
@@ -63,76 +62,37 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINT64 IncompatiblePciDeviceListForResource[] = {
   // ResType,  GFlag , SFlag,   Granularity,  RangeMin,
   // RangeMax, Offset, AddrLen
   //
+
   //
-  // Device Adaptec 9004
+  // Sample Device 1
   //
-  DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x9004, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
+  //DEVICE_INF_TAG,
+  //PCI_DEVICE_ID(0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  //DEVICE_RES_TAG,
+  //PCI_BAR_TYPE_IO,
+  //PCI_ACPI_UNUSED,
+  //PCI_ACPI_UNUSED,
+  //PCI_ACPI_UNUSED,
+  //PCI_ACPI_UNUSED,
+  //PCI_BAR_EVEN_ALIGN,
+  //PCI_BAR_ALL,
+  //PCI_BAR_NOCHANGE,
+
   //
-  // Device Adaptec 9005
+  // Sample Device 2
   //
-  DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x9005, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
-  //
-  // Device QLogic  1007
-  //
-  DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x1077, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
-  //
-  // Device Agilent 103C
-  //
-  DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x103C, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
-  //
-  // Device Agilent 15BC
-  //
-  DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x15BC, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
+  //DEVICE_INF_TAG,
+  //PCI_DEVICE_ID(0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  //DEVICE_RES_TAG,
+  //PCI_BAR_TYPE_IO,
+  //PCI_ACPI_UNUSED,
+  //PCI_ACPI_UNUSED,
+  //PCI_ACPI_UNUSED,
+  //PCI_ACPI_UNUSED,
+  //PCI_BAR_EVEN_ALIGN,
+  //PCI_BAR_ALL,
+  //PCI_BAR_NOCHANGE,
+
   //
   // The end of the list
   //
@@ -142,7 +102,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINT64 IncompatiblePciDeviceListForResource[] = {
 //
 // the incompatible PCI devices list for the values of configuration registers
 //
-GLOBAL_REMOVE_IF_UNREFERENCED UINT64 IncompatiblePciDeviceListForRegister[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED UINT64 gIncompatiblePciDeviceListForRegister[] = {
   //
   // DEVICE_INF_TAG,
   // PCI_DEVICE_ID (VendorID, DeviceID, Revision, SubVendorId, SubDeviceId),
@@ -151,26 +111,26 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINT64 IncompatiblePciDeviceListForRegister[] = {
   // AND_VALUE, OR_VALUE
 
   //
-  // Device Lava 0x1407, DeviceId 0x0110
+  // Sample Device 1
   //
-  DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x1407, 0x0110, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  DEVICE_RES_TAG,
-  PCI_REGISTER_READ,
-  PCI_CAPBILITY_POINTER_OFFSET,
-  0xffffff00,
-  VALUE_NOCARE,
+  //DEVICE_INF_TAG,
+  //PCI_DEVICE_ID(0xXXXX, 0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  //DEVICE_RES_TAG,
+  //PCI_REGISTER_READ,
+  //PCI_CAPBILITY_POINTER_OFFSET,
+  //0xffffff00,
+  //VALUE_NOCARE,
 
   //
-  // Device Lava 0x1407, DeviceId 0x0111
+  // Sample Device 2
   //
-  DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x1407, 0x0111, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  DEVICE_RES_TAG,
-  PCI_REGISTER_READ,
-  PCI_CAPBILITY_POINTER_OFFSET,
-  0xffffff00,
-  VALUE_NOCARE,
+  //DEVICE_INF_TAG,
+  //PCI_DEVICE_ID(0xXXXX, 0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  //DEVICE_RES_TAG,
+  //PCI_REGISTER_READ,
+  //PCI_CAPBILITY_POINTER_OFFSET,
+  //0xffffff00,
+  //VALUE_NOCARE,
 
   //
   // The end of the list
@@ -181,7 +141,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINT64 IncompatiblePciDeviceListForRegister[] = {
 //
 // the incompatible PCI devices list for the access width of configuration registers
 //
-GLOBAL_REMOVE_IF_UNREFERENCED UINT64 DeviceListForAccessWidth[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED UINT64 gDeviceListForAccessWidth[] = {
   //
   // DEVICE_INF_TAG,
   // PCI_DEVICE_ID (VendorID, DeviceID, Revision, SubVendorId, SubDeviceId),

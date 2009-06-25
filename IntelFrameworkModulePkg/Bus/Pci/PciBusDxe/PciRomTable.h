@@ -1,14 +1,14 @@
 /** @file
-  Option Rom Support for PCI Bus Driver
+  Set up ROM Table for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2009, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Add the Rom Image to internal database for later PCI light enumeration.
-  
+
   @param ImageHandle    Option Rom image handle.
   @param Seg            Segment of PCI space.
   @param Bus            Bus NO of PCI space.
@@ -25,30 +25,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param Func           Func NO of PCI space.
   @param RomAddress     Base address of OptionRom.
   @param RomLength      Length of rom image.
+
 **/
 VOID
 PciRomAddImageMapping (
-  IN EFI_HANDLE  ImageHandle,
-  IN UINTN       Seg,
-  IN UINT8       Bus,
-  IN UINT8       Dev,
-  IN UINT8       Func,
-  IN UINT64      RomAddress,
-  IN UINT64      RomLength
+  IN  EFI_HANDLE  ImageHandle,
+  IN  UINTN       Seg,
+  IN  UINT8       Bus,
+  IN  UINT8       Dev,
+  IN  UINT8       Func,
+  IN  UINT64      RomAddress,
+  IN  UINT64      RomLength
   );
 
 /**
   Get Option rom driver's mapping for PCI device.
-  
+
   @param PciIoDevice Device instance.
 
   @retval TRUE   Found Image mapping.
-  @retval FALSE
+  @retval FALSE  Cannot found image mapping.
 
 **/
 BOOLEAN
 PciRomGetImageMapping (
-  PCI_IO_DEVICE                       *PciIoDevice
+  IN  PCI_IO_DEVICE                       *PciIoDevice
   );
 
 #endif
