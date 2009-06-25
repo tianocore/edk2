@@ -41,33 +41,33 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2MouseComponentName2;
 // PS/2 mouse sample rate
 //
 typedef enum {
-  SSR_10,
-  SSR_20,
-  SSR_40,
-  SSR_60,
-  SSR_80,
-  SSR_100,
-  SSR_200,
-  MAX_SR
+  SampleRate10,
+  SampleRate20,
+  SampleRate40,
+  SampleRate60,
+  SampleRate80,
+  SampleRate100,
+  SampleRate200,
+  MaxSampleRate
 } MOUSE_SR;
 
 //
 // PS/2 mouse resolution
 //
 typedef enum {
-  CMR1,
-  CMR2,
-  CMR4,
-  CMR8,
-  MAX_CMR
+  MouseResolution1,
+  MouseResolution2,
+  MouseResolution4,
+  MouseResolution8,
+  MaxResolution
 } MOUSE_RE;
 
 //
 // PS/2 mouse scaling
 //
 typedef enum {
-  SF1,
-  SF2
+  Scaling1,
+  Scaling2
 } MOUSE_SF;
 
 //

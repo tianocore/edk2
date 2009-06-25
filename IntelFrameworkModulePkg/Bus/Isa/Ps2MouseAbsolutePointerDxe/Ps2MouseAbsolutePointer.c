@@ -205,9 +205,9 @@ PS2MouseAbsolutePointerDriverStart (
   //
   MouseAbsolutePointerDev->Signature       = PS2_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE;
   MouseAbsolutePointerDev->Handle          = Controller;
-  MouseAbsolutePointerDev->SampleRate      = SSR_20;
-  MouseAbsolutePointerDev->Resolution      = CMR4;
-  MouseAbsolutePointerDev->Scaling         = SF1;
+  MouseAbsolutePointerDev->SampleRate      = SampleRate20;
+  MouseAbsolutePointerDev->Resolution      = MouseResolution4;
+  MouseAbsolutePointerDev->Scaling         = Scaling1;
   MouseAbsolutePointerDev->DataPackageSize = 3;
   MouseAbsolutePointerDev->IsaIo           = IsaIo;
   MouseAbsolutePointerDev->DevicePath      = ParentDevicePath;

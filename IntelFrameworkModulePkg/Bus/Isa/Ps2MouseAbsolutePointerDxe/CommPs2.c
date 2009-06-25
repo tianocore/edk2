@@ -15,9 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ps2MouseAbsolutePointer.h"
 #include "CommPs2.h"
 
-UINT8 SampleRateTbl[MAX_SR]   = { 0xa, 0x14, 0x28, 0x3c, 0x50, 0x64, 0xc8 };
+UINT8 SampleRateTbl[MaxSampleRate]  = { 0xa, 0x14, 0x28, 0x3c, 0x50, 0x64, 0xc8 };
 
-UINT8 ResolutionTbl[MAX_CMR]  = { 0, 1, 2, 3 };
+UINT8 ResolutionTbl[MaxResolution]  = { 0, 1, 2, 3 };
 
 /**
   Issue self test command via IsaIo interface.

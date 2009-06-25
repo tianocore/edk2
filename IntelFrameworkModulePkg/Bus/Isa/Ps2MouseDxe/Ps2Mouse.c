@@ -205,9 +205,9 @@ PS2MouseDriverStart (
   //
   MouseDev->Signature       = PS2_MOUSE_DEV_SIGNATURE;
   MouseDev->Handle          = Controller;
-  MouseDev->SampleRate      = SSR_20;
-  MouseDev->Resolution      = CMR4;
-  MouseDev->Scaling         = SF1;
+  MouseDev->SampleRate      = SampleRate20;
+  MouseDev->Resolution      = MouseResolution4;
+  MouseDev->Scaling         = Scaling1;
   MouseDev->DataPackageSize = 3;
   MouseDev->IsaIo           = IsaIo;
   MouseDev->DevicePath      = ParentDevicePath;
