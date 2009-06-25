@@ -1,8 +1,11 @@
 #/** @file
-# LZMA GUIDed Section Extraction Protocol Library
+#  LzmaCustomDecompressLib produces LZMA custom decompression algorithm.
 #
-# Uefi Decompression library instance
-# Copyright (c) 2006, 2009, Intel Corporation.
+#  It is based on the LZMA SDK 4.65.
+#  LZMA SDK 4.65 was placed in the public domain on 2009-02-03.  
+#  It was released on the http://www.7-zip.org/sdk.html website.
+#
+#  Copyright (c) 2009, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,9 +24,6 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BASE
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   CONSTRUCTOR                    = LzmaDecompressLibConstructor
 
 #
@@ -37,13 +37,15 @@
   Sdk/C/LzFind.c
   Sdk/C/LzmaDec.c
   GuidedSectionExtraction.c
+  UefiLzma.h
+  LzmaDecompressLibInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [Guids]
-  gLzmaCustomDecompressGuid 
+  gLzmaCustomDecompressGuid  ## PRODUCED  ## GUID specifies LZMA custom decompress algorithm.
 
 [LibraryClasses]
   BaseLib

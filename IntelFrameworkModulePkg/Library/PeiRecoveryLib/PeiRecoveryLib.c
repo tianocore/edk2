@@ -1,5 +1,5 @@
 /** @file
-  This Library uses Framework RecoveryModule PPI to system recovery.
+  This Library uses Framework RecoveryModule PPI to do system recovery.
 
 Copyright (c) 2006 - 2009 Intel Corporation
 All rights reserved. This program and the accompanying materials
