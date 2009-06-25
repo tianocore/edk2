@@ -1,5 +1,5 @@
 #/** @file
-# Ps2 Mouse Driver
+# Ps2 Mouse Driver.
 #
 # This dirver directly uses IsaIo protocol service to support Ps2 mouse work.
 # Copyright (c) 2006 - 2009, Intel Corporation.
@@ -21,7 +21,6 @@
   FILE_GUID                      = 202A2B0E-9A31-4812-B291-8747DF152439
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializePs2Mouse
 
 #
@@ -59,3 +58,13 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
 
+# [Event]
+#   ##
+#   # Event will be signaled for WaitForKey event.
+#   #
+#   EVT_NOTIFY_WAIT                             ## PRODUCES
+#
+#   ##
+#   # Event will be used to poll mouse state.
+#   #
+#   EVT_NOTIFY_SIGNAL                           ## PRODUCES
