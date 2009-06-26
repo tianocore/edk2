@@ -1,7 +1,7 @@
-/**@file
+/** @file
   Include for Serial Driver
   
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _SERIAL_H
-#define _SERIAL_H
+#ifndef _SERIAL_H_
+#define _SERIAL_H_
 
 
 #include <PiDxe.h>
@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PcdLib.h>
+
 //
 // Driver Binding Externs
 //
@@ -65,10 +66,10 @@ typedef struct {
 } SERIAL_DEV_FIFO;
 
 typedef enum {
-  UART8250  = 0,
-  UART16450 = 1,
-  UART16550 = 2,
-  UART16550A= 3
+  Uart8250  = 0,
+  Uart16450 = 1,
+  Uart16550 = 2,
+  Uart16550A= 3
 } EFI_UART_TYPE;
 
 //
@@ -110,23 +111,13 @@ typedef struct {
   EFI_UNICODE_STRING_TABLE               *ControllerNameTable;
 } SERIAL_DEV;
 
-#include "ComponentName.h"
-
 #define SERIAL_DEV_FROM_THIS(a) CR (a, SERIAL_DEV, SerialIo, SERIAL_DEV_SIGNATURE)
-
 
 //
 // Serial Driver Defaults
 //
 #define SERIAL_PORT_DEFAULT_RECEIVE_FIFO_DEPTH  1
 #define SERIAL_PORT_DEFAULT_TIMEOUT             1000000
-
-/*
-#define SERIAL_PORT_DEFAULT_BAUD_RATE           115200
-#define SERIAL_PORT_DEFAULT_PARITY              NoParity
-#define SERIAL_PORT_DEFAULT_DATA_BITS           8
-#define SERIAL_PORT_DEFAULT_STOP_BITS           1
-*/
 #define SERIAL_PORT_DEFAULT_CONTROL_MASK        0
 
 
@@ -165,17 +156,17 @@ typedef struct {
 //  Purpose:  Define each bit in Interrupt Enable Register
 //  Context:
 //  Fields:
-//     RAVIE  Bit0: Receiver Data Available Interrupt Enable
-//     THEIE  Bit1: Transmistter Holding Register Empty Interrupt Enable
-//     RIE      Bit2: Receiver Interrupt Enable
-//     MIE      Bit3: Modem Interrupt Enable
+//     Ravie  Bit0: Receiver Data Available Interrupt Enable
+//     Theie  Bit1: Transmistter Holding Register Empty Interrupt Enable
+//     Rie      Bit2: Receiver Interrupt Enable
+//     Mie      Bit3: Modem Interrupt Enable
 //     Reserved Bit4-Bit7: Reserved
 //
 typedef struct {
-  UINT8 RAVIE : 1;
-  UINT8 THEIE : 1;
-  UINT8 RIE : 1;
-  UINT8 MIE : 1;
+  UINT8 Ravie : 1;
+  UINT8 Theie : 1;
+  UINT8 Rie : 1;
+  UINT8 Mie : 1;
   UINT8 Reserved : 4;
 } SERIAL_PORT_IER_BITS;
 
@@ -193,54 +184,24 @@ typedef union {
 } SERIAL_PORT_IER;
 
 //
-//  Name:   SERIAL_PORT_IIR_BITS
-//  Purpose:  Define each bit in Interrupt Identification Register
-//  Context:
-//  Fields:
-//      IPS    Bit0: Interrupt Pending Status
-//      IIB    Bit1-Bit3: Interrupt ID Bits
-//      Reserved Bit4-Bit5: Reserved
-//      FIFOES   Bit6-Bit7: FIFO Mode Enable Status
-//
-typedef struct {
-  UINT8 IPS : 1;
-  UINT8 IIB : 3;
-  UINT8 Reserved : 2;
-  UINT8 FIFOES : 2;
-} SERIAL_PORT_IIR_BITS;
-
-//
-//  Name:   SERIAL_PORT_IIR
-//  Purpose:
-//  Context:
-//  Fields:
-//      Bits    SERIAL_PORT_IIR_BITS:  Bits of the IIR
-//      Data    UINT8: the value of the IIR
-//
-typedef union {
-  SERIAL_PORT_IIR_BITS  Bits;
-  UINT8                 Data;
-} SERIAL_PORT_IIR;
-
-//
 //  Name:   SERIAL_PORT_FCR_BITS
 //  Purpose:  Define each bit in FIFO Control Register
 //  Context:
 //  Fields:
-//      TRFIFOE    Bit0: Transmit and Receive FIFO Enable
-//      RESETRF    Bit1: Reset Reciever FIFO
-//      RESETTF    Bit2: Reset Transmistter FIFO
-//      DMS        Bit3: DMA Mode Select
+//      TrFIFOE    Bit0: Transmit and Receive FIFO Enable
+//      ResetRF    Bit1: Reset Reciever FIFO
+//      ResetTF    Bit2: Reset Transmistter FIFO
+//      Dms        Bit3: DMA Mode Select
 //      Reserved   Bit4-Bit5: Reserved
-//      RTB        Bit6-Bit7: Receive Trigger Bits
+//      Rtb        Bit6-Bit7: Receive Trigger Bits
 //
 typedef struct {
-  UINT8 TRFIFOE : 1;
-  UINT8 RESETRF : 1;
-  UINT8 RESETTF : 1;
-  UINT8 DMS : 1;
+  UINT8 TrFIFOE : 1;
+  UINT8 ResetRF : 1;
+  UINT8 ResetTF : 1;
+  UINT8 Dms : 1;
   UINT8 Reserved : 2;
-  UINT8 RTB : 2;
+  UINT8 Rtb : 2;
 } SERIAL_PORT_FCR_BITS;
 
 //
@@ -261,22 +222,22 @@ typedef union {
 //  Purpose:  Define each bit in Line Control Register
 //  Context:
 //  Fields:
-//      SERIALDB  Bit0-Bit1: Number of Serial Data Bits
-//      STOPB   Bit2: Number of Stop Bits
-//      PAREN   Bit3: Parity Enable
-//      EVENPAR   Bit4: Even Parity Select
-//      STICPAR   Bit5: Sticky Parity
-//      BRCON   Bit6: Break Control
-//      DLAB    Bit7: Divisor Latch Access Bit
+//      SerialDB  Bit0-Bit1: Number of Serial Data Bits
+//      StopB     Bit2: Number of Stop Bits
+//      ParEn     Bit3: Parity Enable
+//      EvenPar   Bit4: Even Parity Select
+//      SticPar   Bit5: Sticky Parity
+//      BrCon     Bit6: Break Control
+//      DLab      Bit7: Divisor Latch Access Bit
 //
 typedef struct {
-  UINT8 SERIALDB : 2;
-  UINT8 STOPB : 1;
-  UINT8 PAREN : 1;
-  UINT8 EVENPAR : 1;
-  UINT8 STICPAR : 1;
-  UINT8 BRCON : 1;
-  UINT8 DLAB : 1;
+  UINT8 SerialDB : 2;
+  UINT8 StopB : 1;
+  UINT8 ParEn : 1;
+  UINT8 EvenPar : 1;
+  UINT8 SticPar : 1;
+  UINT8 BrCon : 1;
+  UINT8 DLab : 1;
 } SERIAL_PORT_LCR_BITS;
 
 //
@@ -297,19 +258,19 @@ typedef union {
 //  Purpose:  Define each bit in Modem Control Register
 //  Context:
 //  Fields:
-//      DTRC     Bit0: Data Terminal Ready Control
-//      RTS      Bit1: Request To Send Control
-//      OUT1     Bit2: Output1
-//      OUT2     Bit3: Output2, used to disable interrupt
-//      LME;     Bit4: Loopback Mode Enable
+//      DtrC     Bit0: Data Terminal Ready Control
+//      Rts      Bit1: Request To Send Control
+//      Out1     Bit2: Output1
+//      Out2     Bit3: Output2, used to disable interrupt
+//      Lme;     Bit4: Loopback Mode Enable
 //      Reserved Bit5-Bit7: Reserved
 //
 typedef struct {
-  UINT8 DTRC : 1;
-  UINT8 RTS : 1;
-  UINT8 OUT1 : 1;
-  UINT8 OUT2 : 1;
-  UINT8 LME : 1;
+  UINT8 DtrC : 1;
+  UINT8 Rts : 1;
+  UINT8 Out1 : 1;
+  UINT8 Out2 : 1;
+  UINT8 Lme : 1;
   UINT8 Reserved : 3;
 } SERIAL_PORT_MCR_BITS;
 
@@ -331,24 +292,24 @@ typedef union {
 //  Purpose:  Define each bit in Line Status Register
 //  Context:
 //  Fields:
-//      DR    Bit0: Receiver Data Ready Status
-//      OE    Bit1: Overrun Error Status
-//      PE    Bit2: Parity Error Status
-//      FE    Bit3: Framing Error Status
-//      BI    Bit4: Break Interrupt Status
-//      THRE  Bit5: Transmistter Holding Register Status
-//      TEMT  Bit6: Transmitter Empty Status
-//      FIFOE Bit7: FIFO Error Status
+//      Dr    Bit0: Receiver Data Ready Status
+//      Oe    Bit1: Overrun Error Status
+//      Pe    Bit2: Parity Error Status
+//      Fe    Bit3: Framing Error Status
+//      Bi    Bit4: Break Interrupt Status
+//      Thre  Bit5: Transmistter Holding Register Status
+//      Temt  Bit6: Transmitter Empty Status
+//      FIFOe Bit7: FIFO Error Status
 //
 typedef struct {
-  UINT8 DR : 1;
-  UINT8 OE : 1;
-  UINT8 PE : 1;
-  UINT8 FE : 1;
-  UINT8 BI : 1;
-  UINT8 THRE : 1;
-  UINT8 TEMT : 1;
-  UINT8 FIFOE : 1;
+  UINT8 Dr : 1;
+  UINT8 Oe : 1;
+  UINT8 Pe : 1;
+  UINT8 Fe : 1;
+  UINT8 Bi : 1;
+  UINT8 Thre : 1;
+  UINT8 Temt : 1;
+  UINT8 FIFOe : 1;
 } SERIAL_PORT_LSR_BITS;
 
 //
@@ -373,20 +334,20 @@ typedef union {
 //      DeltaDSR        Bit1: Delta Data Set Ready Status
 //      TrailingEdgeRI  Bit2: Trailing Edge of Ring Indicator Status
 //      DeltaDCD        Bit3: Delta Data Carrier Detect Status
-//      CTS             Bit4: Clear To Send Status
-//      DSR             Bit5: Data Set Ready Status
-//      RI              Bit6: Ring Indicator Status
-//      DCD             Bit7: Data Carrier Detect Status
+//      Cts             Bit4: Clear To Send Status
+//      Dsr             Bit5: Data Set Ready Status
+//      Ri              Bit6: Ring Indicator Status
+//      Dcd             Bit7: Data Carrier Detect Status
 //
 typedef struct {
   UINT8 DeltaCTS : 1;
   UINT8 DeltaDSR : 1;
   UINT8 TrailingEdgeRI : 1;
   UINT8 DeltaDCD : 1;
-  UINT8 CTS : 1;
-  UINT8 DSR : 1;
-  UINT8 RI : 1;
-  UINT8 DCD : 1;
+  UINT8 Cts : 1;
+  UINT8 Dsr : 1;
+  UINT8 Ri : 1;
+  UINT8 Dcd : 1;
 } SERIAL_PORT_MSR_BITS;
 
 //
@@ -432,7 +393,16 @@ typedef union {
 // Prototypes
 // Driver model protocol interface
 //
+/**
+  Check to see if this driver supports the given controller
 
+  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller           The handle of the controller to test.
+  @param  RemainingDevicePath  A pointer to the remaining portion of a device path.
+
+  @return EFI_SUCCESS          This driver can support the given controller
+
+**/
 EFI_STATUS
 EFIAPI
 SerialControllerDriverSupported (
@@ -441,6 +411,15 @@ SerialControllerDriverSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Start to management the controller passed in
+
+  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller           The handle of the controller to test.
+  @param  RemainingDevicePath  A pointer to the remaining portion of a device path.
+
+  @return EFI_SUCCESS          Driver is started successfully
+**/
 EFI_STATUS
 EFIAPI
 SerialControllerDriverStart (
@@ -449,6 +428,18 @@ SerialControllerDriverStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   );
 
+/**
+  Disconnect this driver with the controller, uninstall related protocol instance
+
+  @param  This                  A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller            The handle of the controller to test.
+  @param  NumberOfChildren      Number of child device.
+  @param  ChildHandleBuffer     A pointer to the remaining portion of a device path.
+
+  @retval EFI_SUCCESS           Operation successfully
+  @retval EFI_DEVICE_ERROR      Cannot stop the driver successfully
+
+**/
 EFI_STATUS
 EFIAPI
 SerialControllerDriverStop (
@@ -461,12 +452,38 @@ SerialControllerDriverStop (
 //
 // Serial I/O Protocol Interface
 //
+/**
+  Reset serial device.
+
+  @param This               Pointer to EFI_SERIAL_IO_PROTOCOL
+
+  @retval EFI_SUCCESS        Reset successfully
+  @retval EFI_DEVICE_ERROR   Failed to reset
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialReset (
   IN EFI_SERIAL_IO_PROTOCOL         *This
   );
 
+/**
+  Set new attributes to a serial device.
+
+  @param This                     Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param  BaudRate                 The baudrate of the serial device
+  @param  ReceiveFifoDepth         The depth of receive FIFO buffer
+  @param  Timeout                  The request timeout for a single char
+  @param  Parity                   The type of parity used in serial device
+  @param  DataBits                 Number of databits used in serial device
+  @param  StopBits                 Number of stopbits used in serial device
+
+  @retval  EFI_SUCCESS              The new attributes were set
+  @retval  EFI_INVALID_PARAMETERS   One or more attributes have an unsupported value
+  @retval  EFI_UNSUPPORTED          Data Bits can not set to 5 or 6
+  @retval  EFI_DEVICE_ERROR         The serial device is not functioning correctly (no return)
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialSetAttributes (
@@ -479,6 +496,16 @@ IsaSerialSetAttributes (
   IN EFI_STOP_BITS_TYPE             StopBits
   );
 
+/**
+  Set Control Bits.
+
+  @param This              Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param Control           Control bits that can be settable
+
+  @retval EFI_SUCCESS       New Control bits were set successfully
+  @retval EFI_UNSUPPORTED   The Control bits wanted to set are not supported
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialSetControl (
@@ -486,6 +513,15 @@ IsaSerialSetControl (
   IN UINT32                         Control
   );
 
+/**
+  Get ControlBits.
+
+  @param This          Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param Control       Control signals of the serial device
+
+  @retval EFI_SUCCESS   Get Control signals successfully
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialGetControl (
@@ -493,6 +529,19 @@ IsaSerialGetControl (
   OUT UINT32                        *Control
   );
 
+/**
+  Write the specified number of bytes to serial device.
+
+  @param This                Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param  BufferSize         On input the size of Buffer, on output the amount of
+                             data actually written
+  @param  Buffer             The buffer of data to write
+
+  @retval EFI_SUCCESS        The data were written successfully
+  @retval EFI_DEVICE_ERROR   The device reported an error
+  @retval EFI_TIMEOUT        The write operation was stopped due to timeout
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialWrite (
@@ -501,6 +550,19 @@ IsaSerialWrite (
   IN VOID                           *Buffer
   );
 
+/**
+  Read the specified number of bytes from serial device.
+
+  @param This               Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param BufferSize         On input the size of Buffer, on output the amount of
+                            data returned in buffer
+  @param Buffer             The buffer to return the data into
+
+  @retval EFI_SUCCESS        The data were read successfully
+  @retval EFI_DEVICE_ERROR   The device reported an error
+  @retval EFI_TIMEOUT        The read operation was stopped due to timeout
+
+**/
 EFI_STATUS
 EFIAPI
 IsaSerialRead (
@@ -512,38 +574,101 @@ IsaSerialRead (
 //
 // Internal Functions
 //
+/**
+  Use scratchpad register to test if this serial port is present.
+
+  @param SerialDevice   Pointer to serial device structure
+
+  @return if this serial port is present
+**/
 BOOLEAN
 IsaSerialPortPresent (
   IN SERIAL_DEV                     *SerialDevice
   );
 
+/**
+  Detect whether specific FIFO is full or not.
+
+  @param Fifo    A pointer to the Data Structure SERIAL_DEV_FIFO
+
+  @return whether specific FIFO is full or not
+
+**/
 BOOLEAN
 IsaSerialFifoFull (
   IN SERIAL_DEV_FIFO                *Fifo
   );
 
+/**
+  Detect whether specific FIFO is empty or not.
+ 
+  @param  Fifo    A pointer to the Data Structure SERIAL_DEV_FIFO
+
+  @return whether specific FIFO is empty or not
+
+**/
 BOOLEAN
 IsaSerialFifoEmpty (
   IN SERIAL_DEV_FIFO                *Fifo
   );
 
+/**
+  Add data to specific FIFO.
+
+  @param Fifo                  A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param Data                  the data added to FIFO
+
+  @retval EFI_SUCCESS           Add data to specific FIFO successfully
+  @retval EFI_OUT_OF_RESOURCE   Failed to add data because FIFO is already full
+
+**/
 EFI_STATUS
 IsaSerialFifoAdd (
   IN SERIAL_DEV_FIFO                *Fifo,
   IN UINT8                          Data
   );
 
+/**
+  Remove data from specific FIFO.
+
+  @param Fifo                  A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param Data                  the data removed from FIFO
+
+  @retval EFI_SUCCESS           Remove data from specific FIFO successfully
+  @retval EFI_OUT_OF_RESOURCE   Failed to remove data because FIFO is empty
+
+**/
 EFI_STATUS
 IsaSerialFifoRemove (
   IN  SERIAL_DEV_FIFO               *Fifo,
   OUT UINT8                         *Data
   );
 
+/**
+  Reads and writes all avaliable data.
+
+  @param SerialDevice           The device to flush
+
+  @retval EFI_SUCCESS           Data was read/written successfully.
+  @retval EFI_OUT_OF_RESOURCE   Failed because software receive FIFO is full.  Note, when
+                                this happens, pending writes are not done.
+
+**/
 EFI_STATUS
 IsaSerialReceiveTransmit (
   IN SERIAL_DEV                     *SerialDevice
   );
 
+/**
+  Use IsaIo protocol to read serial port.
+
+  @param IsaIo         Pointer to EFI_ISA_IO_PROTOCOL instance
+  @param BaseAddress   Serial port register group base address
+  @param Offset        Offset in register group
+
+  @return Data read from serial port
+
+**/
 UINT8
 IsaSerialReadPort (
   IN EFI_ISA_IO_PROTOCOL                    *IsaIo,
@@ -551,12 +676,165 @@ IsaSerialReadPort (
   IN UINT32                                 Offset
   );
 
+/**
+  Use IsaIo protocol to write serial port.
+
+  @param  IsaIo         Pointer to EFI_ISA_IO_PROTOCOL instance
+  @param  BaseAddress   Serial port register group base address
+  @param  Offset        Offset in register group
+  @param  Data          data which is to be written to some serial port register
+
+**/
 VOID
 IsaSerialWritePort (
   IN EFI_ISA_IO_PROTOCOL                    *IsaIo,
   IN UINT16                                 BaseAddress,
   IN UINT32                                 Offset,
   IN UINT8                                  Data
+  );
+
+
+//
+// EFI Component Name Functions
+//
+/**
+  Retrieves a Unicode string that is the user readable name of the driver.
+
+  This function retrieves the user readable name of a driver in the form of a
+  Unicode string. If the driver specified by This has a user readable name in
+  the language specified by Language, then a pointer to the driver name is
+  returned in DriverName, and EFI_SUCCESS is returned. If the driver specified
+  by This does not support the language specified by Language,
+  then EFI_UNSUPPORTED is returned.
+
+  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+                                EFI_COMPONENT_NAME_PROTOCOL instance.
+
+  @param  Language[in]          A pointer to a Null-terminated ASCII string
+                                array indicating the language. This is the
+                                language of the driver name that the caller is
+                                requesting, and it must match one of the
+                                languages specified in SupportedLanguages. The
+                                number of languages supported by a driver is up
+                                to the driver writer. Language is specified
+                                in RFC 4646 or ISO 639-2 language code format.
+
+  @param  DriverName[out]       A pointer to the Unicode string to return.
+                                This Unicode string is the name of the
+                                driver specified by This in the language
+                                specified by Language.
+
+  @retval EFI_SUCCESS           The Unicode string for the Driver specified by
+                                This and the language specified by Language was
+                                returned in DriverName.
+
+  @retval EFI_INVALID_PARAMETER Language is NULL.
+
+  @retval EFI_INVALID_PARAMETER DriverName is NULL.
+
+  @retval EFI_UNSUPPORTED       The driver specified by This does not support
+                                the language specified by Language.
+
+**/
+EFI_STATUS
+EFIAPI
+IsaSerialComponentNameGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
+  );
+
+
+/**
+  Retrieves a Unicode string that is the user readable name of the controller
+  that is being managed by a driver.
+
+  This function retrieves the user readable name of the controller specified by
+  ControllerHandle and ChildHandle in the form of a Unicode string. If the
+  driver specified by This has a user readable name in the language specified by
+  Language, then a pointer to the controller name is returned in ControllerName,
+  and EFI_SUCCESS is returned.  If the driver specified by This is not currently
+  managing the controller specified by ControllerHandle and ChildHandle,
+  then EFI_UNSUPPORTED is returned.  If the driver specified by This does not
+  support the language specified by Language, then EFI_UNSUPPORTED is returned.
+
+  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+                                EFI_COMPONENT_NAME_PROTOCOL instance.
+
+  @param  ControllerHandle[in]  The handle of a controller that the driver
+                                specified by This is managing.  This handle
+                                specifies the controller whose name is to be
+                                returned.
+
+  @param  ChildHandle[in]       The handle of the child controller to retrieve
+                                the name of.  This is an optional parameter that
+                                may be NULL.  It will be NULL for device
+                                drivers.  It will also be NULL for a bus drivers
+                                that wish to retrieve the name of the bus
+                                controller.  It will not be NULL for a bus
+                                driver that wishes to retrieve the name of a
+                                child controller.
+
+  @param  Language[in]          A pointer to a Null-terminated ASCII string
+                                array indicating the language.  This is the
+                                language of the driver name that the caller is
+                                requesting, and it must match one of the
+                                languages specified in SupportedLanguages. The
+                                number of languages supported by a driver is up
+                                to the driver writer. Language is specified in
+                                RFC 4646 or ISO 639-2 language code format.
+
+  @param  ControllerName[out]   A pointer to the Unicode string to return.
+                                This Unicode string is the name of the
+                                controller specified by ControllerHandle and
+                                ChildHandle in the language specified by
+                                Language from the point of view of the driver
+                                specified by This.
+
+  @retval EFI_SUCCESS           The Unicode string for the user readable name in
+                                the language specified by Language for the
+                                driver specified by This was returned in
+                                DriverName.
+
+  @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
+
+  @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
+                                EFI_HANDLE.
+
+  @retval EFI_INVALID_PARAMETER Language is NULL.
+
+  @retval EFI_INVALID_PARAMETER ControllerName is NULL.
+
+  @retval EFI_UNSUPPORTED       The driver specified by This is not currently
+                                managing the controller specified by
+                                ControllerHandle and ChildHandle.
+
+  @retval EFI_UNSUPPORTED       The driver specified by This does not support
+                                the language specified by Language.
+
+**/
+EFI_STATUS
+EFIAPI
+IsaSerialComponentNameGetControllerName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
+  IN  EFI_HANDLE                                      ControllerHandle,
+  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
+  IN  CHAR8                                           *Language,
+  OUT CHAR16                                          **ControllerName
+  );
+
+/**
+  Add the component name for the serial io device
+
+  @param SerialDevice     A pointer to the SERIAL_DEV instance.
+
+  @param IsaIo            A pointer to the EFI_ISA_IO_PROTOCOL instance.
+
+**/
+VOID
+AddName (
+  IN  SERIAL_DEV                                   *SerialDevice,
+  IN  EFI_ISA_IO_PROTOCOL                          *IsaIo
   );
 
 #endif

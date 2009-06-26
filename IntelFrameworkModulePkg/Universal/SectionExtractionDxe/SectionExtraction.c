@@ -808,7 +808,7 @@ CreateChildNode (
         // Make sure we initialize the new stream with the correct 
         // authentication status for both aggregate and local status fields.
         //
-        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) != 0) {
+        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
           //
           // OR in the parent stream's aggregate status.
           //
@@ -837,7 +837,7 @@ CreateChildNode (
         //
         // There's no GUIDed section extraction protocol available.
         //
-        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) {
+        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == EFI_GUIDED_SECTION_PROCESSING_REQUIRED) {
           //
           // If the section REQUIRES an extraction protocol, then we're toast
           //
@@ -849,7 +849,7 @@ CreateChildNode (
         // Figure out the proper authentication status
         //
         AuthenticationStatus = Stream->AuthenticationStatus;
-        if (GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+        if ((GuidedHeader->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
           //
           //  The local status of the new stream is contained in 
           //  AuthenticaionStatus.  This value needs to be ORed into the

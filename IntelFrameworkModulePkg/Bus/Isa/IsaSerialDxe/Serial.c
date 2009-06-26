@@ -1,14 +1,14 @@
-/**@file
+/** @file
   Serial driver for standard UARTS on an ISA bus.
 
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -82,7 +82,7 @@ SERIAL_DEV  gSerialDevTempate = {
   },
   FALSE,
   FALSE,
-  UART16550A,
+  Uart16550A,
   NULL
 };
 
@@ -125,11 +125,11 @@ InitializeIsaSerial (
 /**
   Check to see if this driver supports the given controller
 
-  @param  This - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param  Controller - The handle of the controller to test.
-  @param  RemainingDevicePath - A pointer to the remaining portion of a device path.
+  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller           The handle of the controller to test.
+  @param  RemainingDevicePath  A pointer to the remaining portion of a device path.
 
-  @return EFI_SUCCESS - This driver can support the given controller
+  @return EFI_SUCCESS          This driver can support the given controller
 
 **/
 EFI_STATUS
@@ -261,11 +261,11 @@ Error:
 /**
   Start to management the controller passed in
 
-  @param  This - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param  Controller - The handle of the controller to test.
-  @param  RemainingDevicePath - A pointer to the remaining portion of a device path.
+  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller           The handle of the controller to test.
+  @param  RemainingDevicePath  A pointer to the remaining portion of a device path.
 
-  @return EFI_SUCCESS - Driver is started successfully
+  @return EFI_SUCCESS   Driver is started successfully
 
 **/
 EFI_STATUS
@@ -388,7 +388,7 @@ SerialControllerDriverStart (
   SerialDevice->IsaIo               = IsaIo;
   SerialDevice->ParentDevicePath    = ParentDevicePath;
 
-  ADD_SERIAL_NAME (SerialDevice, IsaIo);
+  AddName (SerialDevice, IsaIo);
 
   for (Index = 0; SerialDevice->IsaIo->ResourceList->ResourceItem[Index].Type != EfiIsaAcpiResourceEndOfList; Index++) {
     if (SerialDevice->IsaIo->ResourceList->ResourceItem[Index].Type == EfiIsaAcpiResourceIo) {
@@ -501,8 +501,8 @@ Error:
            This->DriverBindingHandle,
            Controller
            );
-    if (SerialDevice) {
-      if (SerialDevice->DevicePath) {
+    if (SerialDevice != NULL) {
+      if (SerialDevice->DevicePath != NULL) {
         gBS->FreePool (SerialDevice->DevicePath);
       }
 
@@ -517,13 +517,13 @@ Error:
 /**
   Disconnect this driver with the controller, uninstall related protocol instance
 
-  @param  This                - A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param  Controller          - The handle of the controller to test.
-  @param  NumberOfChildren    - Number of child device.
-  @param  ChildHandleBuffer   - A pointer to the remaining portion of a device path.
+  @param  This                  A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller            The handle of the controller to test.
+  @param  NumberOfChildren      Number of child device.
+  @param  ChildHandleBuffer     A pointer to the remaining portion of a device path.
 
-  @retval EFI_SUCCESS         - Operation successfully
-  @retval EFI_DEVICE_ERROR    - Cannot stop the driver successfully
+  @retval EFI_SUCCESS           Operation successfully
+  @retval EFI_DEVICE_ERROR      Cannot stop the driver successfully
 
 **/
 EFI_STATUS
@@ -624,7 +624,7 @@ SerialControllerDriverStop (
                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                );
       } else {
-        if (SerialDevice->DevicePath) {
+        if (SerialDevice->DevicePath != NULL) {
           gBS->FreePool (SerialDevice->DevicePath);
         }
 
@@ -646,9 +646,9 @@ SerialControllerDriverStop (
 }
 
 /**
-  Detect whether specific FIFO is full or not
+  Detect whether specific FIFO is full or not.
 
-  @param Fifo  - A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param Fifo    A pointer to the Data Structure SERIAL_DEV_FIFO
 
   @return whether specific FIFO is full or not
 
@@ -667,10 +667,9 @@ IsaSerialFifoFull (
 }
 
 /**
-  Detect whether specific FIFO is empty or not
-
+  Detect whether specific FIFO is empty or not.
  
-  @param  Fifo  - A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param  Fifo    A pointer to the Data Structure SERIAL_DEV_FIFO
 
   @return whether specific FIFO is empty or not
 
@@ -689,13 +688,13 @@ IsaSerialFifoEmpty (
 }
 
 /**
-  Add data to specific FIFO
+  Add data to specific FIFO.
 
-  @param Fifo                - A pointer to the Data Structure SERIAL_DEV_FIFO
-  @param Data                - the data added to FIFO
+  @param Fifo                  A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param Data                  the data added to FIFO
 
-  @retval EFI_SUCCESS         - Add data to specific FIFO successfully
-  @retval EFI_OUT_OF_RESOURCE - Failed to add data because FIFO is already full
+  @retval EFI_SUCCESS           Add data to specific FIFO successfully
+  @retval EFI_OUT_OF_RESOURCE   Failed to add data because FIFO is already full
 
 **/
 EFI_STATUS
@@ -725,13 +724,13 @@ IsaSerialFifoAdd (
 }
 
 /**
-  Remove data from specific FIFO
+  Remove data from specific FIFO.
 
-  @param Fifo                - A pointer to the Data Structure SERIAL_DEV_FIFO
-  @param Data                - the data removed from FIFO
+  @param Fifo                  A pointer to the Data Structure SERIAL_DEV_FIFO
+  @param Data                  the data removed from FIFO
 
-  @retval EFI_SUCCESS         - Remove data from specific FIFO successfully
-  @retval EFI_OUT_OF_RESOURCE - Failed to remove data because FIFO is empty
+  @retval EFI_SUCCESS           Remove data from specific FIFO successfully
+  @retval EFI_OUT_OF_RESOURCE   Failed to remove data because FIFO is empty
 
 **/
 EFI_STATUS
@@ -763,10 +762,10 @@ IsaSerialFifoRemove (
 /**
   Reads and writes all avaliable data.
 
-  @param SerialDevice         - The device to flush
+  @param SerialDevice           The device to flush
 
-  @retval EFI_SUCCESS         - Data was read/written successfully.
-  @retval EFI_OUT_OF_RESOURCE - Failed because software receive FIFO is full.  Note, when
+  @retval EFI_SUCCESS           Data was read/written successfully.
+  @retval EFI_OUT_OF_RESOURCE   Failed because software receive FIFO is full.  Note, when
                                 this happens, pending writes are not done.
 
 **/
@@ -808,16 +807,16 @@ IsaSerialReceiveTransmit (
       //
       // Flush incomming data to prevent a an overrun during a long write
       //
-      if (Lsr.Bits.DR && !ReceiveFifoFull) {
+      if ((Lsr.Bits.Dr == 1) && !ReceiveFifoFull) {
         ReceiveFifoFull = IsaSerialFifoFull (&SerialDevice->Receive);
         if (!ReceiveFifoFull) {
-          if (Lsr.Bits.FIFOE || Lsr.Bits.OE || Lsr.Bits.PE || Lsr.Bits.FE || Lsr.Bits.BI) {
+          if (Lsr.Bits.FIFOe == 1 || Lsr.Bits.Oe == 1 || Lsr.Bits.Pe == 1 || Lsr.Bits.Fe == 1 || Lsr.Bits.Bi == 1) {
             REPORT_STATUS_CODE_WITH_DEVICE_PATH (
               EFI_ERROR_CODE,
               EFI_P_EC_INPUT_ERROR | EFI_PERIPHERAL_SERIAL_PORT,
               SerialDevice->DevicePath
               );
-            if (Lsr.Bits.FIFOE || Lsr.Bits.PE || Lsr.Bits.FE || Lsr.Bits.BI) {
+            if (Lsr.Bits.FIFOe == 1 || Lsr.Bits.Pe == 1|| Lsr.Bits.Fe == 1 || Lsr.Bits.Bi == 1) {
               Data = READ_RBR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
               continue;
             }
@@ -827,7 +826,7 @@ IsaSerialReceiveTransmit (
           //
           if (SerialDevice->HardwareFlowControl) {
             Mcr.Data = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-            Mcr.Bits.DTRC &= 0;
+            Mcr.Bits.DtrC &= 0;
             WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
           }
 
@@ -838,7 +837,7 @@ IsaSerialReceiveTransmit (
           //
           if (SerialDevice->HardwareFlowControl) {
             Mcr.Data = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-            Mcr.Bits.DTRC |= 1;
+            Mcr.Bits.DtrC |= 1;
             WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
           }
 
@@ -856,7 +855,7 @@ IsaSerialReceiveTransmit (
       //
       // Do the write
       //
-      if (Lsr.Bits.THRE && !IsaSerialFifoEmpty (&SerialDevice->Transmit)) {
+      if (Lsr.Bits.Thre == 1 && !IsaSerialFifoEmpty (&SerialDevice->Transmit)) {
         //
         // Make sure the transmit data will not be missed
         //
@@ -865,14 +864,14 @@ IsaSerialReceiveTransmit (
           // Send RTS
           //
           Mcr.Data = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-          Mcr.Bits.RTS |= 1;
+          Mcr.Bits.Rts |= 1;
           WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
           //
           // Wait for CTS
           //
           TimeOut   = 0;
           Msr.Data  = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-          while (!Msr.Bits.CTS) {
+          while (Msr.Bits.Cts == 0) {
             gBS->Stall (TIMEOUT_STALL_INTERVAL);
             TimeOut++;
             if (TimeOut > 5) {
@@ -882,7 +881,7 @@ IsaSerialReceiveTransmit (
             Msr.Data = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
           }
 
-          if (Msr.Bits.CTS) {
+          if (Msr.Bits.Cts == 1) {
             IsaSerialFifoRemove (&SerialDevice->Transmit, &Data);
             WRITE_THR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Data);
           }
@@ -902,11 +901,11 @@ IsaSerialReceiveTransmit (
           // Assert RTS
           //
           Mcr.Data = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-          Mcr.Bits.RTS &= 0;
+          Mcr.Bits.Rts &= 0;
           WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
         }
       }
-    } while (Lsr.Bits.THRE && !IsaSerialFifoEmpty (&SerialDevice->Transmit));
+    } while (Lsr.Bits.Thre == 1 && !IsaSerialFifoEmpty (&SerialDevice->Transmit));
   }
 
   return EFI_SUCCESS;
@@ -916,12 +915,12 @@ IsaSerialReceiveTransmit (
 // Interface Functions
 //
 /**
-  Reset serial device
+  Reset serial device.
 
-  @param This             - Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param This               Pointer to EFI_SERIAL_IO_PROTOCOL
 
-  @retval EFI_SUCCESS      - Reset successfully
-  @retval EFI_DEVICE_ERROR - Failed to reset
+  @retval EFI_SUCCESS        Reset successfully
+  @retval EFI_DEVICE_ERROR   Failed to reset
 
 **/
 EFI_STATUS
@@ -955,32 +954,32 @@ IsaSerialReset (
   // Make sure DLAB is 0.
   //
   Lcr.Data      = READ_LCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-  Lcr.Bits.DLAB = 0;
+  Lcr.Bits.DLab = 0;
   WRITE_LCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Lcr.Data);
 
   //
   // Turn off all interrupts
   //
   Ier.Data        = READ_IER (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-  Ier.Bits.RAVIE  = 0;
-  Ier.Bits.THEIE  = 0;
-  Ier.Bits.RIE    = 0;
-  Ier.Bits.MIE    = 0;
+  Ier.Bits.Ravie  = 0;
+  Ier.Bits.Theie  = 0;
+  Ier.Bits.Rie    = 0;
+  Ier.Bits.Mie    = 0;
   WRITE_IER (SerialDevice->IsaIo, SerialDevice->BaseAddress, Ier.Data);
 
   //
   // Disable the FIFO.
   //
-  Fcr.Bits.TRFIFOE = 0;
+  Fcr.Bits.TrFIFOE = 0;
   WRITE_FCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Fcr.Data);
 
   //
   // Turn off loopback and disable device interrupt.
   //
   Mcr.Data      = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-  Mcr.Bits.OUT1 = 0;
-  Mcr.Bits.OUT2 = 0;
-  Mcr.Bits.LME  = 0;
+  Mcr.Bits.Out1 = 0;
+  Mcr.Bits.Out2 = 0;
+  Mcr.Bits.Lme  = 0;
   WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
 
   //
@@ -1020,9 +1019,9 @@ IsaSerialReset (
   //
   // for 16550A enable FIFO, 16550 disable FIFO
   //
-  Fcr.Bits.TRFIFOE  = 1;
-  Fcr.Bits.RESETRF  = 1;
-  Fcr.Bits.RESETTF  = 1;
+  Fcr.Bits.TrFIFOE  = 1;
+  Fcr.Bits.ResetRF  = 1;
+  Fcr.Bits.ResetTF  = 1;
   WRITE_FCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Fcr.Data);
 
   //
@@ -1044,20 +1043,20 @@ IsaSerialReset (
 }
 
 /**
-  Set new attributes to a serial device
+  Set new attributes to a serial device.
 
-  @param This                   - Pointer to EFI_SERIAL_IO_PROTOCOL
-  @param  BaudRate               - The baudrate of the serial device
-  @param  ReceiveFifoDepth       - The depth of receive FIFO buffer
-  @param  Timeout                - The request timeout for a single char
-  @param  Parity                 - The type of parity used in serial device
-  @param  DataBits               - Number of databits used in serial device
-  @param  StopBits               - Number of stopbits used in serial device
+  @param This                     Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param  BaudRate                 The baudrate of the serial device
+  @param  ReceiveFifoDepth         The depth of receive FIFO buffer
+  @param  Timeout                  The request timeout for a single char
+  @param  Parity                   The type of parity used in serial device
+  @param  DataBits                 Number of databits used in serial device
+  @param  StopBits                 Number of stopbits used in serial device
 
-  @retval  EFI_SUCCESS            - The new attributes were set
-  @retval  EFI_INVALID_PARAMETERS - One or more attributes have an unsupported value
-  @retval  EFI_UNSUPPORTED        - Data Bits can not set to 5 or 6
-  @retval  EFI_DEVICE_ERROR       - The serial device is not functioning correctly (no return)
+  @retval  EFI_SUCCESS              The new attributes were set
+  @retval  EFI_INVALID_PARAMETERS   One or more attributes have an unsupported value
+  @retval  EFI_UNSUPPORTED          Data Bits can not set to 5 or 6
+  @retval  EFI_DEVICE_ERROR         The serial device is not functioning correctly (no return)
 
 **/
 EFI_STATUS
@@ -1205,11 +1204,11 @@ IsaSerialSetAttributes (
                        ((UINT32) BaudRate * 16),
                        &Remained
                        );
-  if (Remained) {
+  if (Remained != 0) {
     Divisor += 1;
   }
 
-  if ((Divisor == 0) || (Divisor & 0xffff0000)) {
+  if ((Divisor == 0) || ((Divisor & 0xffff0000) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1224,7 +1223,7 @@ IsaSerialSetAttributes (
   // Put serial port on Divisor Latch Mode
   //
   Lcr.Data      = READ_LCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-  Lcr.Bits.DLAB = 1;
+  Lcr.Bits.DLab = 1;
   WRITE_LCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Lcr.Data);
 
   //
@@ -1236,37 +1235,37 @@ IsaSerialSetAttributes (
   //
   // Put serial port back in normal mode and set remaining attributes.
   //
-  Lcr.Bits.DLAB = 0;
+  Lcr.Bits.DLab = 0;
 
   switch (Parity) {
   case NoParity:
-    Lcr.Bits.PAREN    = 0;
-    Lcr.Bits.EVENPAR  = 0;
-    Lcr.Bits.STICPAR  = 0;
+    Lcr.Bits.ParEn    = 0;
+    Lcr.Bits.EvenPar  = 0;
+    Lcr.Bits.SticPar  = 0;
     break;
 
   case EvenParity:
-    Lcr.Bits.PAREN    = 1;
-    Lcr.Bits.EVENPAR  = 1;
-    Lcr.Bits.STICPAR  = 0;
+    Lcr.Bits.ParEn    = 1;
+    Lcr.Bits.EvenPar  = 1;
+    Lcr.Bits.SticPar  = 0;
     break;
 
   case OddParity:
-    Lcr.Bits.PAREN    = 1;
-    Lcr.Bits.EVENPAR  = 0;
-    Lcr.Bits.STICPAR  = 0;
+    Lcr.Bits.ParEn    = 1;
+    Lcr.Bits.EvenPar  = 0;
+    Lcr.Bits.SticPar  = 0;
     break;
 
   case SpaceParity:
-    Lcr.Bits.PAREN    = 1;
-    Lcr.Bits.EVENPAR  = 1;
-    Lcr.Bits.STICPAR  = 1;
+    Lcr.Bits.ParEn    = 1;
+    Lcr.Bits.EvenPar  = 1;
+    Lcr.Bits.SticPar  = 1;
     break;
 
   case MarkParity:
-    Lcr.Bits.PAREN    = 1;
-    Lcr.Bits.EVENPAR  = 0;
-    Lcr.Bits.STICPAR  = 1;
+    Lcr.Bits.ParEn    = 1;
+    Lcr.Bits.EvenPar  = 0;
+    Lcr.Bits.SticPar  = 1;
     break;
 
   default:
@@ -1275,12 +1274,12 @@ IsaSerialSetAttributes (
 
   switch (StopBits) {
   case OneStopBit:
-    Lcr.Bits.STOPB = 0;
+    Lcr.Bits.StopB = 0;
     break;
 
   case OneFiveStopBits:
   case TwoStopBits:
-    Lcr.Bits.STOPB = 1;
+    Lcr.Bits.StopB = 1;
     break;
 
   default:
@@ -1289,7 +1288,7 @@ IsaSerialSetAttributes (
   //
   // DataBits
   //
-  Lcr.Bits.SERIALDB = (UINT8) ((DataBits - 5) & 0x03);
+  Lcr.Bits.SerialDB = (UINT8) ((DataBits - 5) & 0x03);
   WRITE_LCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Lcr.Data);
 
   //
@@ -1343,7 +1342,7 @@ IsaSerialSetAttributes (
     }
   }
 
-  if (SerialDevice->DevicePath) {
+  if (SerialDevice->DevicePath != NULL) {
     gBS->FreePool (SerialDevice->DevicePath);
   }
 
@@ -1355,13 +1354,13 @@ IsaSerialSetAttributes (
 }
 
 /**
-  Set Control Bits
+  Set Control Bits.
 
-  @param This            - Pointer to EFI_SERIAL_IO_PROTOCOL
-  @param Control         - Control bits that can be settable
+  @param This              Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param Control           Control bits that can be settable
 
-  @retval EFI_SUCCESS     - New Control bits were set successfully
-  @retval EFI_UNSUPPORTED - The Control bits wanted to set are not supported
+  @retval EFI_SUCCESS       New Control bits were set successfully
+  @retval EFI_UNSUPPORTED   The Control bits wanted to set are not supported
 
 **/
 EFI_STATUS
@@ -1387,38 +1386,38 @@ IsaSerialSetControl (
   //
   // first determine the parameter is invalid
   //
-  if (Control & 0xffff8ffc) {
+  if ((Control & 0xffff8ffc) != 0) {
     return EFI_UNSUPPORTED;
   }
 
   Tpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   Mcr.Data = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-  Mcr.Bits.DTRC = 0;
-  Mcr.Bits.RTS = 0;
-  Mcr.Bits.LME = 0;
+  Mcr.Bits.DtrC = 0;
+  Mcr.Bits.Rts = 0;
+  Mcr.Bits.Lme = 0;
   SerialDevice->SoftwareLoopbackEnable = FALSE;
   SerialDevice->HardwareFlowControl = FALSE;
 
-  if (Control & EFI_SERIAL_DATA_TERMINAL_READY) {
-    Mcr.Bits.DTRC = 1;
+  if ((Control & EFI_SERIAL_DATA_TERMINAL_READY) == EFI_SERIAL_DATA_TERMINAL_READY) {
+    Mcr.Bits.DtrC = 1;
   }
 
-  if (Control & EFI_SERIAL_REQUEST_TO_SEND) {
-    Mcr.Bits.RTS = 1;
+  if ((Control & EFI_SERIAL_REQUEST_TO_SEND) == EFI_SERIAL_REQUEST_TO_SEND) {
+    Mcr.Bits.Rts = 1;
   }
 
-  if (Control & EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE) {
-    Mcr.Bits.LME = 1;
+  if ((Control & EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE) == EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE) {
+    Mcr.Bits.Lme = 1;
   }
 
-  if (Control & EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE) {
+  if ((Control & EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE) == EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE) {
     SerialDevice->HardwareFlowControl = TRUE;
   }
 
   WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
 
-  if (Control & EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE) {
+  if ((Control & EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE) == EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE) {
     SerialDevice->SoftwareLoopbackEnable = TRUE;
   }
 
@@ -1428,12 +1427,12 @@ IsaSerialSetControl (
 }
 
 /**
-  Get ControlBits
+  Get ControlBits.
 
-  @param This        - Pointer to EFI_SERIAL_IO_PROTOCOL
-  @param Control     - Control signals of the serial device
+  @param This          Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param Control       Control signals of the serial device
 
-  @retval EFI_SUCCESS - Get Control signals successfully
+  @retval EFI_SUCCESS   Get Control signals successfully
 
 **/
 EFI_STATUS
@@ -1459,19 +1458,19 @@ IsaSerialGetControl (
   //
   Msr.Data = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
 
-  if (Msr.Bits.CTS) {
+  if (Msr.Bits.Cts == 1) {
     *Control |= EFI_SERIAL_CLEAR_TO_SEND;
   }
 
-  if (Msr.Bits.DSR) {
+  if (Msr.Bits.Dsr == 1) {
     *Control |= EFI_SERIAL_DATA_SET_READY;
   }
 
-  if (Msr.Bits.RI) {
+  if (Msr.Bits.Ri == 1) {
     *Control |= EFI_SERIAL_RING_INDICATE;
   }
 
-  if (Msr.Bits.DCD) {
+  if (Msr.Bits.Dcd == 1) {
     *Control |= EFI_SERIAL_CARRIER_DETECT;
   }
   //
@@ -1479,15 +1478,15 @@ IsaSerialGetControl (
   //
   Mcr.Data = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
 
-  if (Mcr.Bits.DTRC) {
+  if (Mcr.Bits.DtrC == 1) {
     *Control |= EFI_SERIAL_DATA_TERMINAL_READY;
   }
 
-  if (Mcr.Bits.RTS) {
+  if (Mcr.Bits.Rts == 1) {
     *Control |= EFI_SERIAL_REQUEST_TO_SEND;
   }
 
-  if (Mcr.Bits.LME) {
+  if (Mcr.Bits.Lme == 1) {
     *Control |= EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE;
   }
 
@@ -1521,16 +1520,16 @@ IsaSerialGetControl (
 }
 
 /**
-  Write the specified number of bytes to serial device
+  Write the specified number of bytes to serial device.
 
-  @param This             - Pointer to EFI_SERIAL_IO_PROTOCOL
-  @param  BufferSize       - On input the size of Buffer, on output the amount of
+  @param This               Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param  BufferSize         On input the size of Buffer, on output the amount of
                        data actually written
-  @param  Buffer           - The buffer of data to write
+  @param  Buffer             The buffer of data to write
 
-  @retval EFI_SUCCESS      - The data were written successfully
-  @retval EFI_DEVICE_ERROR - The device reported an error
-  @retval EFI_TIMEOUT      - The write operation was stopped due to timeout
+  @retval EFI_SUCCESS        The data were written successfully
+  @retval EFI_DEVICE_ERROR   The device reported an error
+  @retval EFI_TIMEOUT        The write operation was stopped due to timeout
 
 **/
 EFI_STATUS
@@ -1556,7 +1555,7 @@ IsaSerialWrite (
     return EFI_SUCCESS;
   }
 
-  if (!Buffer) {
+  if (Buffer == NULL) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE,
       EFI_P_EC_OUTPUT_ERROR | EFI_PERIPHERAL_SERIAL_PORT,
@@ -1602,16 +1601,16 @@ IsaSerialWrite (
 }
 
 /**
-  Read the specified number of bytes from serial device
+  Read the specified number of bytes from serial device.
 
-  @param This             - Pointer to EFI_SERIAL_IO_PROTOCOL
-  @param BufferSize       - On input the size of Buffer, on output the amount of
-                       data returned in buffer
-  @param Buffer           -  The buffer to return the data into
+  @param This               Pointer to EFI_SERIAL_IO_PROTOCOL
+  @param BufferSize         On input the size of Buffer, on output the amount of
+                            data returned in buffer
+  @param Buffer             The buffer to return the data into
 
-  @retval EFI_SUCCESS      - The data were read successfully
-  @retval EFI_DEVICE_ERROR - The device reported an error
-  @retval EFI_TIMEOUT      - The read operation was stopped due to timeout
+  @retval EFI_SUCCESS        The data were read successfully
+  @retval EFI_DEVICE_ERROR   The device reported an error
+  @retval EFI_TIMEOUT        The read operation was stopped due to timeout
 
 **/
 EFI_STATUS
@@ -1636,7 +1635,7 @@ IsaSerialRead (
     return EFI_SUCCESS;
   }
 
-  if (!Buffer) {
+  if (Buffer == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -1696,9 +1695,9 @@ IsaSerialRead (
 }
 
 /**
-  Use scratchpad register to test if this serial port is present
+  Use scratchpad register to test if this serial port is present.
 
-  @param SerialDevice - Pointer to serial device structure
+  @param SerialDevice   Pointer to serial device structure
 
   @return if this serial port is present
 **/
@@ -1736,11 +1735,11 @@ IsaSerialPortPresent (
 }
 
 /**
-  Use IsaIo protocol to read serial port
+  Use IsaIo protocol to read serial port.
 
-  @param IsaIo       - Pointer to EFI_ISA_IO_PROTOCOL instance
-  @param BaseAddress - Serial port register group base address
-  @param Offset      - Offset in register group
+  @param IsaIo         Pointer to EFI_ISA_IO_PROTOCOL instance
+  @param BaseAddress   Serial port register group base address
+  @param Offset        Offset in register group
 
   @return Data read from serial port
 
@@ -1768,12 +1767,12 @@ IsaSerialReadPort (
 }
 
 /**
-  Use IsaIo protocol to write serial port
+  Use IsaIo protocol to write serial port.
 
-  @param  IsaIo       - Pointer to EFI_ISA_IO_PROTOCOL instance
-  @param  BaseAddress - Serial port register group base address
-  @param  Offset      - Offset in register group
-  @param  Data        - data which is to be written to some serial port register
+  @param  IsaIo         Pointer to EFI_ISA_IO_PROTOCOL instance
+  @param  BaseAddress   Serial port register group base address
+  @param  Offset        Offset in register group
+  @param  Data          data which is to be written to some serial port register
 
 **/
 VOID

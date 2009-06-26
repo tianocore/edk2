@@ -835,7 +835,7 @@ EFIAPI
 UefiDecompress (
   IN CONST VOID  *Source,
   IN OUT VOID    *Destination,
-  IN OUT VOID    *Scratch
+  IN OUT VOID    *Scratch  OPTIONAL
   )
 {
   return UefiTianoDecompress (Source, Destination, Scratch, 1);
