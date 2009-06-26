@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Header file for implementation of UEFI Component Name(2) protocol.
 
 Copyright (c) 2006 - 2009, Intel Corporation<BR>

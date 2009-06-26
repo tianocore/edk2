@@ -1,4 +1,4 @@
-/**@file
+/** @file
   UEFI Component Name(2) protocol implementation for IsaBus driver.
 
 Copyright (c) 2006 - 2009, Intel Corporation. <BR>

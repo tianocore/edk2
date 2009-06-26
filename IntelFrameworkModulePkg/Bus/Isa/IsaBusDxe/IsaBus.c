@@ -1,4 +1,4 @@
-/**@file
+/** @file
   ISA Bus UEFI driver.
 
   Discovers all the ISA Controllers and their resources by using the ISA ACPI 
@@ -564,7 +564,7 @@ IsaBusControllerDriverStop (
   @param[in] PciIo                  The Pointer to the PCI protocol 
   @param[in] ParentDevicePath       Device path of the ISA bus controller
   @param[in] IsaDeviceResourceList  The resource list of the ISA device
-  @param[in] ChildDevicePath        The pointer to the child device.
+  @param[out] ChildDevicePath       The pointer to the child device.
 
   @retval EFI_SUCCESS               The handle for the child device was created.
   @retval EFI_OUT_OF_RESOURCES      The request could not be completed due to a lack of resources.

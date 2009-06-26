@@ -1,4 +1,4 @@
-/**@file
+/** @file
   The implementation for EFI_ISA_IO_PROTOCOL. 
   
 Copyright (c) 2006 - 2009, Intel Corporation.<BR>
@@ -104,7 +104,6 @@ ReportErrorStatusCode (
   @param[in] IsaIoDevice            The iso device to be initialized.
   @param[in] IsaDeviceResourceList  The resource list.
   
-  @retval None
 **/
 VOID
 InitializeIsaIoInstance (
@@ -624,7 +623,7 @@ IsaIoMemWrite (
 
   @param[in]  This               A pointer to the EFI_ISA_IO_PROTOCOL instance.
   @param[in]  Width              Specifies the width of the memory copy operation.
-  @param[out] DestOffset         The offset of the destination 
+  @param[in]  DestOffset         The offset of the destination 
   @param[in]  SrcOffset          The offset of the source
   @param[in]  Count              The number of memory copy  operations to perform
 
@@ -1037,17 +1036,14 @@ IsaIoMapFullSupport (
     //
     // This implementation only support COMPATIBLE DMA Transfers
     //
-    if (!(ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_COMPATIBLE)) {
+    if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_COMPATIBLE) == 0) {
       return EFI_INVALID_PARAMETER;
     }
 
-    if (ChannelAttributes &
-       (
-         EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_A |
-         EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_B |
-         EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_C
-       )
-       ) {
+    if ((ChannelAttributes &
+         (EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_A |
+          EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_B |
+          EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_C)) != 0) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -1055,8 +1051,8 @@ IsaIoMapFullSupport (
       //
       // If this is Channel 0..3, then the width must be 8 bit
       //
-      if (!(ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8) ||
-          (ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_16)
+      if (((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8) == 0) ||
+          ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_16) != 0)
           ) {
         return EFI_INVALID_PARAMETER;
       }
@@ -1064,21 +1060,20 @@ IsaIoMapFullSupport (
       //
       // If this is Channel 4..7, then the width must be 16 bit
       //
-      if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8) ||
-          (!(ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_16))
-          ) {
+      if (((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8) != 0) ||
+          ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_16) == 0)) {
         return EFI_INVALID_PARAMETER;
       }
     }
     //
     // Either Demand Mode or Single Mode must be selected, but not both
     //
-    if (ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE) {
-      if (ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE) {
+    if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE) != 0) {
+      if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE) != 0) {
         return EFI_INVALID_PARAMETER;
       }
     } else {
-      if (!(ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE)) {
+      if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE) == 0) {
         return EFI_INVALID_PARAMETER;
       }
     }
@@ -1173,15 +1168,15 @@ IsaIoMapFullSupport (
     DmaMode |= V_8237_DMA_CHMODE_IO2MEM;
   }
 
-  if (ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_AUTO_INITIALIZE) {
+  if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_AUTO_INITIALIZE) != 0) {
     DmaMode |= B_8237_DMA_CHMODE_AE;
   }
 
-  if (ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE) {
+  if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE) != 0) {
     DmaMode |= V_8237_DMA_CHMODE_DEMAND;
   }
 
-  if (ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE) {
+  if ((ChannelAttributes & EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE) != 0) {
     DmaMode |= V_8237_DMA_CHMODE_SINGLE;
   }
   //
@@ -1392,7 +1387,7 @@ IsaIoAllocateBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Attributes & ~(EFI_ISA_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE | EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED)) {
+  if ((Attributes & ~(EFI_ISA_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE | EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED)) != 0) {
     return EFI_UNSUPPORTED;
   }
 
