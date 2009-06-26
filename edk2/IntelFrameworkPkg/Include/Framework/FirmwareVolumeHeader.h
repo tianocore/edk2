@@ -3,7 +3,7 @@
   all firmware volumes that are either memory mapped, or have an
   associated FirmwareVolumeBlock protocol.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006-2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,8 +11,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  FirmwareVolumeHeader.h
 
   @par Revision Reference:
   These definitions are from Firmware Volume Block Spec 0.9.
@@ -22,9 +20,10 @@
 #ifndef __EFI_FIRMWARE_VOLUME_HEADER_H__
 #define __EFI_FIRMWARE_VOLUME_HEADER_H__
 
-//
-// Firmware Volume Block Attributes bit definitions
-//
+///
+/// Firmware Volume Block Attributes bit definitions
+
+//@{
 #define EFI_FVB_READ_DISABLED_CAP   0x00000001
 #define EFI_FVB_READ_ENABLED_CAP    0x00000002
 #define EFI_FVB_READ_STATUS         0x00000004
@@ -57,21 +56,31 @@
 #define EFI_FVB_ALIGNMENT_16K       0x20000000
 #define EFI_FVB_ALIGNMENT_32K       0x40000000
 #define EFI_FVB_ALIGNMENT_64K       0x80000000
+//@}
 
-#define EFI_FVB_CAPABILITIES  (EFI_FVB_READ_DISABLED_CAP | \
-                              EFI_FVB_READ_ENABLED_CAP | \
-                              EFI_FVB_WRITE_DISABLED_CAP | \
-                              EFI_FVB_WRITE_ENABLED_CAP | \
-                              EFI_FVB_LOCK_CAP \
+/// This is a simple macro defined as the set of all FV Block Attributes signifying capabilities.
+#define EFI_FVB_CAPABILITIES  ( EFI_FVB_READ_DISABLED_CAP  | \
+                                EFI_FVB_READ_ENABLED_CAP   | \
+                                EFI_FVB_WRITE_DISABLED_CAP | \
+                                EFI_FVB_WRITE_ENABLED_CAP  | \
+                                EFI_FVB_LOCK_CAP \
                               )
 
-#define EFI_TEST_FFS_ATTRIBUTES_BIT(FvbAttributes, TestAttributes, Bit) \
-    ( \
-      (BOOLEAN) ( \
-          (FvbAttributes & EFI_FVB_ERASE_POLARITY) ? (((~TestAttributes) & Bit) == Bit) : ((TestAttributes & Bit) == Bit) \
-        ) \
+/** A parameterized macro defining a boolean expression which tests the state of a particular bit.
+  *
+  * @param FvbAttributes  Indicates test for CLEAR if EFI_FVB_ERASE_POLARITY is 1, else test for SET
+  *
+  * @param TestAttributes The set of bits to test.
+  *
+  * @param Bit            A value indicating the bit(s) to test.
+  *                       If multiple bits are set, the logical OR of their tests is the expression's value.
+**/
+#define EFI_TEST_FFS_ATTRIBUTES_BIT( FvbAttributes, TestAttributes, Bit) \
+    ((BOOLEAN) \
+      ((FvbAttributes & EFI_FVB_ERASE_POLARITY) ? (((~TestAttributes) & Bit) == Bit) : ((TestAttributes & Bit) == Bit)) \
     )
 
+/// A simple macro defined as the set of all FV Block Attribute bits which indicate status.
 #define EFI_FVB_STATUS    (EFI_FVB_READ_STATUS | EFI_FVB_WRITE_STATUS | EFI_FVB_LOCK_STATUS)
 
-#endif
+#endif  /* __EFI_FIRMWARE_VOLUME_HEADER_H__ */
