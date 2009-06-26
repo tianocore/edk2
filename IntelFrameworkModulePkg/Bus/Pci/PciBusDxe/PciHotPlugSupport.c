@@ -169,7 +169,7 @@ IsRootPciHotPlugBus (
 /**
   Test whether device path is for root pci hot plug controller.
 
-  @param HpbDevicePath  A pointer to device path data structure to be tested.
+  @param HpcDevicePath  A pointer to device path data structure to be tested.
   @param HpIndex        If HpIndex is not NULL, return the index of root hot
                         plug in global array when TRUE is retuned.
 

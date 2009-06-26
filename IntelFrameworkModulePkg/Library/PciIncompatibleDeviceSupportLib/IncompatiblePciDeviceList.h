@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H
-#define _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H
+#ifndef _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H_
+#define _EFI_INCOMPATIBLE_PCI_DEVICE_LIST_H_
 
 #include <Library/PciIncompatibleDeviceSupportLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -50,124 +50,5 @@ typedef struct {
   UINT64                         Offset;
   EFI_PCI_REGISTER_VALUE_DATA    PciRegisterValueData;
 } EFI_PCI_REGISTER_VALUE_DESCRIPTOR;
-
-//
-// the incompatible PCI devices list for ACPI resource
-//
-GLOBAL_REMOVE_IF_UNREFERENCED UINT64 gIncompatiblePciDeviceListForResource[] = {
-  //
-  // DEVICE_INF_TAG,
-  // PCI_DEVICE_ID (VendorID, DeviceID, Revision, SubVendorId, SubDeviceId),
-  // DEVICE_RES_TAG,
-  // ResType,  GFlag , SFlag,   Granularity,  RangeMin,
-  // RangeMax, Offset, AddrLen
-  //
-
-  //
-  // Sample Device 1
-  //
-  //DEVICE_INF_TAG,
-  //PCI_DEVICE_ID(0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  //DEVICE_RES_TAG,
-  //PCI_BAR_TYPE_IO,
-  //PCI_ACPI_UNUSED,
-  //PCI_ACPI_UNUSED,
-  //PCI_ACPI_UNUSED,
-  //PCI_ACPI_UNUSED,
-  //PCI_BAR_EVEN_ALIGN,
-  //PCI_BAR_ALL,
-  //PCI_BAR_NOCHANGE,
-
-  //
-  // Sample Device 2
-  //
-  //DEVICE_INF_TAG,
-  //PCI_DEVICE_ID(0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  //DEVICE_RES_TAG,
-  //PCI_BAR_TYPE_IO,
-  //PCI_ACPI_UNUSED,
-  //PCI_ACPI_UNUSED,
-  //PCI_ACPI_UNUSED,
-  //PCI_ACPI_UNUSED,
-  //PCI_BAR_EVEN_ALIGN,
-  //PCI_BAR_ALL,
-  //PCI_BAR_NOCHANGE,
-
-  //
-  // The end of the list
-  //
-  LIST_END_TAG
-};
-
-//
-// the incompatible PCI devices list for the values of configuration registers
-//
-GLOBAL_REMOVE_IF_UNREFERENCED UINT64 gIncompatiblePciDeviceListForRegister[] = {
-  //
-  // DEVICE_INF_TAG,
-  // PCI_DEVICE_ID (VendorID, DeviceID, Revision, SubVendorId, SubDeviceId),
-  // PCI_RES_TAG,
-  // PCI_ACCESS_TYPE, PCI_CONFIG_ADDRESS,
-  // AND_VALUE, OR_VALUE
-
-  //
-  // Sample Device 1
-  //
-  //DEVICE_INF_TAG,
-  //PCI_DEVICE_ID(0xXXXX, 0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  //DEVICE_RES_TAG,
-  //PCI_REGISTER_READ,
-  //PCI_CAPBILITY_POINTER_OFFSET,
-  //0xffffff00,
-  //VALUE_NOCARE,
-
-  //
-  // Sample Device 2
-  //
-  //DEVICE_INF_TAG,
-  //PCI_DEVICE_ID(0xXXXX, 0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  //DEVICE_RES_TAG,
-  //PCI_REGISTER_READ,
-  //PCI_CAPBILITY_POINTER_OFFSET,
-  //0xffffff00,
-  //VALUE_NOCARE,
-
-  //
-  // The end of the list
-  //
-  LIST_END_TAG
-};
-
-//
-// the incompatible PCI devices list for the access width of configuration registers
-//
-GLOBAL_REMOVE_IF_UNREFERENCED UINT64 gDeviceListForAccessWidth[] = {
-  //
-  // DEVICE_INF_TAG,
-  // PCI_DEVICE_ID (VendorID, DeviceID, Revision, SubVendorId, SubDeviceId),
-  // DEVICE_RES_TAG,
-  // PCI_ACCESS_TYPE, PCI_ACCESS_WIDTH,
-  // START_ADDRESS, END_ADDRESS,
-  // ACTUAL_PCI_ACCESS_WIDTH,
-  //
-
-  //
-  // Sample Device
-  //
-  //DEVICE_INF_TAG,
-  //PCI_DEVICE_ID(0xXXXX, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
-  //DEVICE_RES_TAG,
-  //PCI_REGISTER_READ,
-  //EfiPciWidthUint8,
-  //0,
-  //0xFF,
-  //EfiPciWidthUint32,
-  //
-
-  //
-  // The end of the list
-  //
-  LIST_END_TAG
-};
 
 #endif

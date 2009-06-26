@@ -154,7 +154,7 @@ PciHostBridgeEnumerator (
 
   @param  PciIo               A pointer to the EFI_PCI_O_PROTOCOL.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -170,7 +170,7 @@ EFI_STATUS
 PciIoRead (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
   IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
-  IN       UINT32                                 Address,
+  IN       UINT32                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   );
@@ -198,7 +198,7 @@ EFI_STATUS
 PciIoWrite (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
   IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
-  IN       UINT32                                 Address,
+  IN       UINT32                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   );
@@ -209,7 +209,7 @@ PciIoWrite (
   @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -224,7 +224,7 @@ PciRootBridgeIoWrite (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
   IN       PCI_TYPE00                             *Pci,
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   );
@@ -235,7 +235,7 @@ PciRootBridgeIoWrite (
   @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -250,8 +250,9 @@ PciRootBridgeIoRead (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
   IN       PCI_TYPE00                             *Pci,            OPTIONAL
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   );
+
 #endif

@@ -1341,7 +1341,7 @@ PciHostBridgeEnumerator (
   @param  PciIo               PCI IO protocol instance.
   @param  PciDeviceInfo       PCI device information.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
 
@@ -1357,7 +1357,7 @@ ReadConfigData (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,            OPTIONAL
   IN       EFI_PCI_DEVICE_INFO                    *PciDeviceInfo,
   IN       UINT64                                 Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN OUT   VOID                                   *Buffer
   )
 {
@@ -1376,7 +1376,7 @@ ReadConfigData (
     //
     // Check access compatibility at first time
     //
-    Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_READ, Address & 0xff, Width, &PciRegisterAccessData);
+    Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_READ, Offset & 0xff, Width, &PciRegisterAccessData);
 
     if (Status == EFI_SUCCESS) {
       //
@@ -1388,7 +1388,7 @@ ReadConfigData (
         AccessWidth = PciRegisterAccessData->Width;
       }
 
-      AccessAddress = Address & ~((1 << AccessWidth) - 1);
+      AccessAddress = Offset & ~((1 << AccessWidth) - 1);
 
       TempBuffer    = 0;
       Stride        = 0;
@@ -1398,20 +1398,20 @@ ReadConfigData (
 
         if (PciRootBridgeIo != NULL) {
           Status = PciRootBridgeIo->Pci.Read (
-                         PciRootBridgeIo,
-                         (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) AccessWidth,
-                         AccessAddress,
-                         1,
-                         Pointer
-                         );
+                                      PciRootBridgeIo,
+                                      (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) AccessWidth,
+                                      AccessAddress,
+                                      1,
+                                      Pointer
+                                      );
         } else if (PciIo != NULL) {
           Status = PciIo->Pci.Read (
-                         PciIo,
-                         (EFI_PCI_IO_PROTOCOL_WIDTH) AccessWidth,
-                         (UINT32) AccessAddress,
-                         1,
-                         Pointer
-                         );
+                            PciIo,
+                            (EFI_PCI_IO_PROTOCOL_WIDTH) AccessWidth,
+                            (UINT32) AccessAddress,
+                            1,
+                            Pointer
+                            );
         }
 
         if (Status != EFI_SUCCESS) {
@@ -1420,7 +1420,7 @@ ReadConfigData (
 
        Stride = (UINTN)1 << AccessWidth;
         AccessAddress += Stride;
-        if (AccessAddress >= (Address + LShiftU64 (1ULL, (UINTN)Width))) {
+        if (AccessAddress >= (Offset + LShiftU64 (1ULL, (UINTN)Width))) {
           //
           // If all datas have been read, exit
           //
@@ -1470,21 +1470,21 @@ ReadConfigData (
   //
   if (PciRootBridgeIo != NULL) {
     Status = PciRootBridgeIo->Pci.Read (
-                     PciRootBridgeIo,
-                     (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
-                     Address,
-                     1,
-                     Buffer
-                     );
+                                PciRootBridgeIo,
+                                (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
+                                Offset,
+                                1,
+                                Buffer
+                                );
 
   } else {
     Status = PciIo->Pci.Read (
-                     PciIo,
-                     (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
-                     (UINT32) Address,
-                     1,
-                     Buffer
-                     );
+                      PciIo,
+                      (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
+                      (UINT32) Offset,
+                      1,
+                      Buffer
+                      );
   }
 
   return Status;
@@ -1499,7 +1499,7 @@ ReadConfigData (
   @param  PciDeviceInfo       A pointer to EFI_PCI_DEVICE_INFO.
   @param  AccessType          Access type, READ or WRITE.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space.
+  @param  Offset              The offset within the PCI configuration space.
   @param  Buffer              Store the register data.
 
   @retval EFI_SUCCESS         The data has been updated.
@@ -1512,7 +1512,7 @@ UpdateConfigData (
   IN       EFI_PCI_DEVICE_INFO                    *PciDeviceInfo,
   IN       UINT64                                 AccessType,
   IN       UINT64                                 Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN OUT   VOID                                   *Buffer
 )
 {
@@ -1527,11 +1527,11 @@ UpdateConfigData (
   //
   // Check register value incompatibility
   //
-  Status = PciRegisterUpdateCheck (PciDeviceInfo, AccessType, Address & 0xff, &PciRegisterData);
+  Status = PciRegisterUpdateCheck (PciDeviceInfo, AccessType, Offset & 0xff, &PciRegisterData);
   if (Status == EFI_SUCCESS) {
 
-    AndValue = ((UINT32) PciRegisterData->AndValue) >> (((UINT8) Address & 0x3) * 8);
-    OrValue  = ((UINT32) PciRegisterData->OrValue)  >> (((UINT8) Address & 0x3) * 8);
+    AndValue = ((UINT32) PciRegisterData->AndValue) >> (((UINT8) Offset & 0x3) * 8);
+    OrValue  = ((UINT32) PciRegisterData->OrValue)  >> (((UINT8) Offset & 0x3) * 8);
 
     TempValue = * (UINT32 *) Buffer;
     if (PciRegisterData->AndValue != VALUE_NOCARE) {
@@ -1571,7 +1571,7 @@ UpdateConfigData (
   @param  PciIo               PCI IO protocol instance.
   @param  PciDeviceInfo       PCI device information.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
 
@@ -1586,7 +1586,7 @@ WriteConfigData (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,            OPTIONAL
   IN       EFI_PCI_DEVICE_INFO                    *PciDeviceInfo,
   IN       UINT64                                 Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN       VOID                                   *Buffer
   )
 {
@@ -1606,7 +1606,7 @@ WriteConfigData (
     //
     // Check access compatibility at first time
     //
-    Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_WRITE, Address & 0xff, Width, &PciRegisterAccessData);
+    Status = PciRegisterAccessCheck (PciDeviceInfo, PCI_REGISTER_WRITE, Offset & 0xff, Width, &PciRegisterAccessData);
 
     if (Status == EFI_SUCCESS) {
       //
@@ -1618,7 +1618,7 @@ WriteConfigData (
         AccessWidth = PciRegisterAccessData->Width;
       }
 
-      AccessAddress = Address & ~((1 << AccessWidth) - 1);
+      AccessAddress = Offset & ~((1 << AccessWidth) - 1);
 
       Stride        = 0;
       Pointer       = (UINT8 *) &Buffer;
@@ -1640,7 +1640,7 @@ WriteConfigData (
           //
           UpdateConfigData (PciDeviceInfo, PCI_REGISTER_READ, AccessWidth, AccessAddress & 0xff, &Data);
 
-          Shift = (UINTN)(Address - AccessAddress) * 8;
+          Shift = (UINTN)(Offset - AccessAddress) * 8;
           switch (Width) {
           case EfiPciWidthUint8:
             Data = (* (UINT8 *) Buffer) << Shift | (Data & ~(0xff << Shift));
@@ -1659,20 +1659,20 @@ WriteConfigData (
 
         if (PciRootBridgeIo != NULL) {
           Status = PciRootBridgeIo->Pci.Write (
-                         PciRootBridgeIo,
-                         (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) AccessWidth,
-                         AccessAddress,
-                         1,
-                         &Data
-                         );
+                                      PciRootBridgeIo,
+                                      (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) AccessWidth,
+                                      AccessAddress,
+                                      1,
+                                      &Data
+                                      );
         } else {
           Status = PciIo->Pci.Write (
-                         PciIo,
-                         (EFI_PCI_IO_PROTOCOL_WIDTH) AccessWidth,
-                         (UINT32) AccessAddress,
-                         1,
-                         &Data
-                         );
+                            PciIo,
+                            (EFI_PCI_IO_PROTOCOL_WIDTH) AccessWidth,
+                            (UINT32) AccessAddress,
+                            1,
+                            &Data
+                            );
         }
 
         if (Status != EFI_SUCCESS) {
@@ -1683,7 +1683,7 @@ WriteConfigData (
 
         Stride = (UINTN)1 << AccessWidth;
         AccessAddress += Stride;
-        if (AccessAddress >= (Address + LShiftU64 (1ULL, (UINTN)Width))) {
+        if (AccessAddress >= (Offset + LShiftU64 (1ULL, (UINTN)Width))) {
           //
           // If all datas have been written, exit
           //
@@ -1720,20 +1720,20 @@ WriteConfigData (
   //
   if (PciRootBridgeIo != NULL) {
     Status = PciRootBridgeIo->Pci.Write (
-                     PciRootBridgeIo,
-                     (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
-                     Address,
-                     1,
-                     Buffer
-                     );
+                                PciRootBridgeIo,
+                                (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
+                                Offset,
+                                1,
+                                Buffer
+                                );
   } else {
     Status = PciIo->Pci.Write (
-                   PciIo,
-                   (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
-                   (UINT32) Address,
-                   1,
-                   Buffer
-                   );
+                      PciIo,
+                      (EFI_PCI_IO_PROTOCOL_WIDTH) Width,
+                      (UINT32) Offset,
+                      1,
+                      Buffer
+                      );
   }
 
   return Status;
@@ -1745,7 +1745,7 @@ WriteConfigData (
   @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  PciIo               A pointer to EFI_PCI_PROTOCOL.
   @param  Pci                 PCI device configuration space.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  PciDeviceInfo       A pointer to EFI_PCI_DEVICE_INFO.
 
   @retval EFI_SUCCESS         Pci device device information has been abstracted.
@@ -1758,7 +1758,7 @@ GetPciDeviceDeviceInfo (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,  OPTIONAL
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,            OPTIONAL
   IN       PCI_TYPE00                             *Pci,              OPTIONAL
-  IN       UINT64                                 Address,           OPTIONAL
+  IN       UINT64                                 Offset,           OPTIONAL
   OUT      EFI_PCI_DEVICE_INFO                    *PciDeviceInfo
 )
 {
@@ -1783,14 +1783,14 @@ GetPciDeviceDeviceInfo (
     //
     // While PCI_TYPE00 hasn't been gotten, read PCI device device information directly
     //
-    PciAddress = Address & 0xffffffffffffff00ULL;
+    PciAddress = Offset & 0xffffffffffffff00ULL;
     Status = PciRootBridgeIo->Pci.Read (
-                                    PciRootBridgeIo,
-                                    EfiPciWidthUint32,
-                                    PciAddress,
-                                    1,
-                                    &PciConfigData
-                                    );
+                                PciRootBridgeIo,
+                                EfiPciWidthUint32,
+                                PciAddress,
+                                1,
+                                &PciConfigData
+                                );
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1804,12 +1804,12 @@ GetPciDeviceDeviceInfo (
     PciDeviceInfo->DeviceID = PciConfigData >> 16;
 
     Status = PciRootBridgeIo->Pci.Read (
-                                    PciRootBridgeIo,
-                                    EfiPciWidthUint32,
-                                    PciAddress + 8,
-                                    1,
-                                    &PciConfigData
-                                    );
+                                PciRootBridgeIo,
+                                EfiPciWidthUint32,
+                                PciAddress + 8,
+                                1,
+                                &PciConfigData
+                                );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1817,12 +1817,12 @@ GetPciDeviceDeviceInfo (
     PciDeviceInfo->RevisionID = PciConfigData & 0xf;
 
     Status = PciRootBridgeIo->Pci.Read (
-                                    PciRootBridgeIo,
-                                    EfiPciWidthUint32,
-                                    PciAddress + 0x2c,
-                                    1,
-                                    &PciConfigData
-                                    );
+                                PciRootBridgeIo,
+                                EfiPciWidthUint32,
+                                PciAddress + 0x2c,
+                                1,
+                                &PciConfigData
+                                );
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1849,7 +1849,7 @@ GetPciDeviceDeviceInfo (
   @param  PciIo               A pointer to the EFI_PCI_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -1865,7 +1865,7 @@ PciIncompatibilityCheckRead (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,             OPTIONAL
   IN       PCI_TYPE00                             *Pci,               OPTIONAL
   IN       UINTN                                  Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   )
@@ -1882,19 +1882,19 @@ PciIncompatibilityCheckRead (
   //
   // get PCI device device information
   //
-  Status = GetPciDeviceDeviceInfo (PciRootBridgeIo, PciIo, Pci, Address, &PciDeviceInfo);
+  Status = GetPciDeviceDeviceInfo (PciRootBridgeIo, PciIo, Pci, Offset, &PciDeviceInfo);
   if (Status != EFI_SUCCESS) {
     return Status;
   }
 
   Stride = 1 << Width;
 
-  for (; Count > 0; Count--, Address += Stride, Buffer = (UINT8 *)Buffer + Stride) {
+  for (; Count > 0; Count--, Offset += Stride, Buffer = (UINT8 *)Buffer + Stride) {
 
     //
     // read configuration register
     //
-    Status = ReadConfigData (PciRootBridgeIo, PciIo, &PciDeviceInfo, (UINT64) Width, Address, Buffer);
+    Status = ReadConfigData (PciRootBridgeIo, PciIo, &PciDeviceInfo, (UINT64) Width, Offset, Buffer);
 
     if (Status != EFI_SUCCESS) {
       return Status;
@@ -1904,7 +1904,7 @@ PciIncompatibilityCheckRead (
     // update the data read from configuration register
     //
     if ((PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_REGISTER_UPDATE_SUPPORT) != 0) {
-      UpdateConfigData (&PciDeviceInfo, PCI_REGISTER_READ, Width, Address & 0xff, Buffer);
+      UpdateConfigData (&PciDeviceInfo, PCI_REGISTER_READ, Width, Offset & 0xff, Buffer);
     }
   }
 
@@ -1918,7 +1918,7 @@ PciIncompatibilityCheckRead (
   @param  PciIo               A pointer to the EFI_PCI_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be write.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -1936,7 +1936,7 @@ PciIncompatibilityCheckWrite (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,             OPTIONAL
   IN       PCI_TYPE00                             *Pci,               OPTIONAL
   IN       UINTN                                  Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   )
@@ -1954,14 +1954,14 @@ PciIncompatibilityCheckWrite (
   //
   // Get PCI device device information
   //
-  Status = GetPciDeviceDeviceInfo (PciRootBridgeIo, PciIo, Pci, Address, &PciDeviceInfo);
+  Status = GetPciDeviceDeviceInfo (PciRootBridgeIo, PciIo, Pci, Offset, &PciDeviceInfo);
   if (Status != EFI_SUCCESS) {
     return Status;
   }
 
   Stride = 1 << Width;
 
-  for (; Count > 0; Count--, Address += Stride, Buffer = (UINT8 *) Buffer + Stride) {
+  for (; Count > 0; Count--, Offset += Stride, Buffer = (UINT8 *) Buffer + Stride) {
 
     Data = 0;
 
@@ -1985,13 +1985,13 @@ PciIncompatibilityCheckWrite (
     // Update the data writen into configuration register
     //
     if ((PcdGet8 (PcdPciIncompatibleDeviceSupportMask) & PCI_INCOMPATIBLE_REGISTER_UPDATE_SUPPORT) != 0) {
-      UpdateConfigData (&PciDeviceInfo, PCI_REGISTER_WRITE, Width, Address & 0xff, &Data);
+      UpdateConfigData (&PciDeviceInfo, PCI_REGISTER_WRITE, Width, Offset & 0xff, &Data);
     }
 
     //
     // Write configuration register
     //
-    Status = WriteConfigData (PciRootBridgeIo, PciIo, &PciDeviceInfo, Width, Address, &Data);
+    Status = WriteConfigData (PciRootBridgeIo, PciIo, &PciDeviceInfo, Width, Offset, &Data);
 
     if (Status != EFI_SUCCESS) {
       return Status;
@@ -2007,7 +2007,7 @@ PciIncompatibilityCheckWrite (
   @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -2022,7 +2022,7 @@ PciRootBridgeIoRead (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
   IN       PCI_TYPE00                             *Pci,            OPTIONAL
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   )
@@ -2038,7 +2038,7 @@ PciRootBridgeIoRead (
                NULL,
                Pci,
                (UINTN) Width,
-               Address,
+               Offset,
                Count,
                Buffer
                );
@@ -2051,7 +2051,7 @@ PciRootBridgeIoRead (
     return PciRootBridgeIo->Pci.Read (
                               PciRootBridgeIo,
                               Width,
-                              Address,
+                              Offset,
                               Count,
                               Buffer
                               );
@@ -2064,7 +2064,7 @@ PciRootBridgeIoRead (
   @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
   @param  Pci                 A pointer to PCI_TYPE00.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -2079,7 +2079,7 @@ PciRootBridgeIoWrite (
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
   IN       PCI_TYPE00                             *Pci,
   IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN       UINT64                                 Address,
+  IN       UINT64                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   )
@@ -2095,7 +2095,7 @@ PciRootBridgeIoWrite (
                NULL,
                Pci,
                Width,
-               Address,
+               Offset,
                Count,
                Buffer
                );
@@ -2109,7 +2109,7 @@ PciRootBridgeIoWrite (
     return  PciRootBridgeIo->Pci.Write (
                                PciRootBridgeIo,
                                Width,
-                               Address,
+                               Offset,
                                Count,
                                Buffer
                                );
@@ -2121,7 +2121,7 @@ PciRootBridgeIoWrite (
 
   @param  PciIo               A pointer to the EFI_PCI_O_PROTOCOL.
   @param  Width               Signifies the width of the memory operations.
-  @param  Address             The address within the PCI configuration space for the PCI controller.
+  @param  Offset              The offset within the PCI configuration space for the PCI controller.
   @param  Count               The number of unit to be read.
   @param  Buffer              For read operations, the destination buffer to store the results. For
                               write operations, the source buffer to write data from.
@@ -2137,7 +2137,7 @@ EFI_STATUS
 PciIoRead (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
   IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
-  IN       UINT32                                 Address,
+  IN       UINT32                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   )
@@ -2151,7 +2151,7 @@ PciIoRead (
              PciIo,
              NULL,
              (UINTN) Width,
-             Address,
+             Offset,
              Count,
              Buffer
              );
@@ -2159,7 +2159,7 @@ PciIoRead (
     return PciIo->Pci.Read (
                     PciIo,
                     Width,
-                    Address,
+                    Offset,
                     Count,
                     Buffer
                     );
@@ -2189,7 +2189,7 @@ EFI_STATUS
 PciIoWrite (
   IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
   IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
-  IN       UINT32                                 Address,
+  IN       UINT32                                 Offset,
   IN       UINTN                                  Count,
   IN OUT   VOID                                   *Buffer
   )
@@ -2203,7 +2203,7 @@ PciIoWrite (
               PciIo,
               NULL,
               Width,
-              Address,
+              Offset,
               Count,
               Buffer
               );
@@ -2212,7 +2212,7 @@ PciIoWrite (
     return PciIo->Pci.Write (
                     PciIo,
                     Width,
-                    Address,
+                    Offset,
                     Count,
                     Buffer
                     );
