@@ -1024,7 +1024,7 @@ ScsiScanCreateDevice (
                                           );
   }
 
-  if (Status == EFI_OUT_OF_RESOURCES) {
+  if (EFI_ERROR(Status)) {
     FreePool (ScsiIoDevice);
     return Status;
   }
