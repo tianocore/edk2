@@ -824,7 +824,7 @@ SetDriveParameters (
   );
 
 /**
-  Enable Interrupt on IDE controller
+  Enable Interrupt on IDE controller.
 
   @param  IdeDev   Standard IDE device private data structure
 
