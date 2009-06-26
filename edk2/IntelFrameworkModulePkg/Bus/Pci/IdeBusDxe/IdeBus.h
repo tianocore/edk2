@@ -384,11 +384,11 @@ IDEBlkIoReset (
   );
 
 /**
-  Read data from a block IO device
+  Read data from a block IO device.
 
   @param  This       Block IO protocol instance pointer.
   @param  MediaId    The media ID of the device
-  @param  LBA        Starting LBA address to read data
+  @param  Lba        Starting LBA address to read data
   @param  BufferSize The size of data to be read
   @param  Buffer     Caller supplied buffer to save data
 
@@ -411,7 +411,7 @@ IDEBlkIoReadBlocks (
 
   @param  This       Protocol instance pointer.
   @param  MediaId    The media ID of the device
-  @param  LBA        Starting LBA address to write data
+  @param  Lba        Starting LBA address to write data
   @param  BufferSize The size of data to be written
   @param  Buffer     Caller supplied buffer to save data
 
@@ -446,14 +446,14 @@ IDEBlkIoFlushBlocks (
   Return the results of the Inquiry command to a drive in InquiryData.
   Data format of Inquiry data is defined by the Interface GUID.
 
-  @param  This Protocol instance pointer.
-  @param  InquiryData Results of Inquiry command to device
+  @param  This            Protocol instance pointer.
+  @param  InquiryData     Results of Inquiry command to device
   @param  InquiryDataSize Size of InquiryData in bytes.
 
-  @retval  EFI_SUCCESS InquiryData valid
-  @retval  EFI_NOT_FOUND Device does not support this data class
-  @retval  EFI_DEVICE_ERROR Error reading InquiryData from device
-  @retval  EFI_BUFFER_TOO_SMALL IntquiryDataSize not big enough
+  @retval  EFI_SUCCESS          InquiryData valid
+  @retval  EFI_NOT_FOUND        Device does not support this data class
+  @retval  EFI_DEVICE_ERROR     Error reading InquiryData from device
+  @retval  EFI_BUFFER_TOO_SMALL InquiryDataSize not big enough
 
 **/
 EFI_STATUS
@@ -461,7 +461,7 @@ EFIAPI
 IDEDiskInfoInquiry (
   IN EFI_DISK_INFO_PROTOCOL       *This,
   IN OUT VOID                     *InquiryData,
-  IN OUT UINT32                   *IntquiryDataSize
+  IN OUT UINT32                   *InquiryDataSize
   );
 
 /**

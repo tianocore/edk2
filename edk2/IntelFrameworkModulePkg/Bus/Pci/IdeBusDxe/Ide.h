@@ -25,7 +25,7 @@
 // Helper functions Prototype
 //
 /**
-  read a one-byte data from a IDE port
+  read a one-byte data from a IDE port.
 
   @param  PciIo  The PCI IO protocol instance
   @param  Port   the IDE Port number 
@@ -41,7 +41,7 @@ IDEReadPortB (
 /**
   Reads multiple words of data from the IDE data port.
   Call the IO abstraction once to do the complete read,
-  not one word at a time
+  not one word at a time.
 
   @param  PciIo Pointer to the EFI_PCI_IO instance
   @param  Port IO port to read
@@ -58,7 +58,7 @@ IDEReadPortWMultiple (
   );
 
 /**
-  write a 1-byte data to a specific IDE port
+  write a 1-byte data to a specific IDE port.
 
   @param  PciIo  PCI IO protocol instance
   @param  Port   The IDE port to be writen
@@ -72,7 +72,7 @@ IDEWritePortB (
   );
 
 /**
-  write a 1-word data to a specific IDE port
+  write a 1-word data to a specific IDE port.
 
   @param  PciIo  PCI IO protocol instance
   @param  Port   The IDE port to be writen
@@ -88,7 +88,7 @@ IDEWritePortW (
 /**
   Write multiple words of data to the IDE data port.
   Call the IO abstraction once to do the complete read,
-  not one word at a time
+  not one word at a time.
 
   @param  PciIo Pointer to the EFI_PCI_IO instance
   @param  Port IO port to read
@@ -152,7 +152,11 @@ IDEWritePortWMultiple (
 
   @param  PciIo Pointer to the EFI_PCI_IO_PROTOCOL instance
   @param  IdeRegsBaseAddr Pointer to IDE_REGISTERS_BASE_ADDR to
-  receive IDE IO port registers' base addresses
+          receive IDE IO port registers' base addresses
+  
+  @retval EFI_UNSUPPORTED return this value when the BARs is not IO type
+  @retval EFI_SUCCESS     Get the Base address successfully
+  @retval other           read the pci configureation data error
 
 **/
 EFI_STATUS
@@ -169,6 +173,10 @@ GetIdeRegistersBaseAddr (
 
   @param  IdeDev The BLK_IO private data which specifies the IDE device
 
+  @retval EFI_INVALID_PARAMETER return this value when the channel is invalid
+  @retval EFI_SUCCESS           reassign the IDE IO resource successfully
+  @retval other                 get the IDE current base address effor
+
 **/
 EFI_STATUS
 ReassignIdeResources (
@@ -176,9 +184,12 @@ ReassignIdeResources (
   );
 
 /**
-  Detect if there is disk attached to this port
+  Detect if there is disk attached to this port.
 
   @param  IdeDev The BLK_IO private data which specifies the IDE device.
+  
+  @retval EFI_NOT_FOUND   The device or channel is not found
+  @retval EFI_SUCCESS     The device is found
 
 **/
 EFI_STATUS
@@ -317,7 +328,7 @@ WaitForBSYClear (
 
   @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
                               all the information of the IDE device.
-  @paramTimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
+  @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS         BSY bit clear within the time out.
   @retval EFI_TIMEOUT         BSY bit not clear within the time out.
@@ -519,7 +530,7 @@ AtaSoftReset (
 
   @param IdeBlkIoDevice Indicates the calling context.
   @param MediaId        The media id that the read request is for.
-  @param LBA            The starting logical block address to read from on the device.
+  @param Lba            The starting logical block address to read from on the device.
   @param BufferSize     The size of the Buffer in bytes. This must be a  multiple
                         of the intrinsic block size of the device.
 
@@ -555,7 +566,7 @@ AtaBlkIoReadBlocks (
 
   @param IdeBlkIoDevice  Indicates the calling context.
   @param MediaId         The media id that the write request is for.
-  @param LBA             The starting logical block address to write onto the device.
+  @param Lba             The starting logical block address to write onto the device.
   @param BufferSize      The size of the Buffer in bytes. This must be a multiple
                          of the intrinsic block size of the device.
   @param Buffer          A pointer to the source buffer for the data.The caller
@@ -649,7 +660,7 @@ AtapiSoftReset (
 
   @param IdeBlkIoDevice Indicates the calling context.
   @param MediaId        The media id that the read request is for.
-  @param LBA            The starting logical block address to read from on the device.
+  @param Lba            The starting logical block address to read from on the device.
   @param BufferSize     The size of the Buffer in bytes. This must be a multiple
                         of the intrinsic block size of the device.
   @param Buffer         A pointer to the destination buffer for the data. The caller
@@ -680,7 +691,7 @@ AtapiBlkIoReadBlocks (
 
   @param IdeBlkIoDevice  Indicates the calling context.
   @param MediaId         The media id that the write request is for.
-  @param LBA             The starting logical block address to write onto the device.
+  @param Lba             The starting logical block address to write onto the device.
   @param BufferSize      The size of the Buffer in bytes. This must be a multiple
                          of the intrinsic block size of the device.
   @param Buffer          A pointer to the source buffer for the data. The caller
@@ -731,7 +742,7 @@ SetDeviceTransferMode (
   IN ATA_TRANSFER_MODE    *TransferMode
   );
 /**
-  Send ATA command into device with NON_DATA protocol
+  Send ATA command into device with NON_DATA protocol.
 
   @param  IdeDev Standard IDE device private data structure
   @param  AtaCommand The ATA command to be sent
@@ -760,14 +771,14 @@ AtaNonDataCommandIn (
   );
 
 /**
-  Send ATA Ext command into device with NON_DATA protocol
+  Send ATA Ext command into device with NON_DATA protocol.
 
   @param  IdeDev Standard IDE device private data structure
   @param  AtaCommand The ATA command to be sent
   @param  Device The value in Device register
   @param  Feature The value in Feature register
   @param  SectorCount The value in SectorCount register
-  @param  LbaAddress The LBA address in 48-bit mode
+  @param  LbaAddress The Lba address in 48-bit mode
 
   @retval  EFI_SUCCESS Reading succeed
   @retval  EFI_ABORTED Command failed
@@ -799,7 +810,7 @@ AtaEnableLongPhysicalSector (
   );
 
 /**
-  Set drive parameters for devices not support PACKETS command
+  Set drive parameters for devices not support PACKETS command.
 
   @param IdeDev          Standard IDE device private data structure
   @param DriveParameters The device parameters to be set into the disk
