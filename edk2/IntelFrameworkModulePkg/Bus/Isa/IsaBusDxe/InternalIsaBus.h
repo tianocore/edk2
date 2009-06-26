@@ -1,4 +1,4 @@
-/**@file
+/** @file
   The header file for ISA bus driver
   
 Copyright (c) 2006 - 2009, Intel Corporation. <BR>
@@ -178,9 +178,9 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 IsaBusControllerDriverSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 /**
@@ -213,9 +213,9 @@ IsaBusControllerDriverSupported (
 EFI_STATUS
 EFIAPI
 IsaBusControllerDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 /**
@@ -264,7 +264,7 @@ IsaBusControllerDriverStop (
   @param[in] PciIo                  The Pointer to the PCI protocol 
   @param[in] ParentDevicePath       Device path of the ISA bus controller
   @param[in] IsaDeviceResourceList  The resource list of the ISA device
-  @param[in] ChildDevicePath        The pointer to the child device.
+  @param[out] ChildDevicePath       The pointer to the child device.
 
   @retval EFI_SUCCESS               The handle for the child device was created.
   @retval EFI_OUT_OF_RESOURCES      The request could not be completed due to a lack of resources.
@@ -286,7 +286,6 @@ IsaCreateDevice (
   @param[in] IsaIoDevice            The iso device to be initialized.
   @param[in] IsaDeviceResourceList  The resource list.
   
-  @retval None
 **/
 VOID
 InitializeIsaIoInstance (
