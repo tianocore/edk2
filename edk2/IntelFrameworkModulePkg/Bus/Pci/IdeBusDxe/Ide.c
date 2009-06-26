@@ -698,11 +698,8 @@ DiscoverIdeDevice (
 /**
   This interface is used to initialize all state data related to the detection of one
   channel.
-
-  @retval EFI_SUCCESS Completed Successfully.
-
 **/
-EFI_STATUS
+VOID
 InitializeIDEChannelData (
   VOID
   )
@@ -712,7 +709,6 @@ InitializeIDEChannelData (
   MasterDeviceType  = 0xff;
   SlaveDeviceExist  = FALSE;
   SlaveDeviceType   = 0xff;
-  return EFI_SUCCESS;
 }
 /**
   This function is used to poll for the DRQ bit clear in the Status
