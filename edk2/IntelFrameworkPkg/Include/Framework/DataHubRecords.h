@@ -360,106 +360,124 @@ typedef enum {
 /// This data record is 4 bytes in length. 
 ///
 typedef enum {
-  EfiProcessorFamilyOther               = 1,
-  EfiProcessorFamilyUnknown             = 2,
-  EfiProcessorFamily8086                = 3,
-  EfiProcessorFamily80286               = 4,
-  EfiProcessorFamilyIntel386            = 5,
-  EfiProcessorFamilyIntel486            = 6,
-  EfiProcessorFamily8087                = 7,
-  EfiProcessorFamily80287               = 8,
-  EfiProcessorFamily80387               = 9,
-  EfiProcessorFamily80487               = 0x0A,
-  EfiProcessorFamilyPentium             = 0x0B,
-  EfiProcessorFamilyPentiumPro          = 0x0C,
-  EfiProcessorFamilyPentiumII           = 0x0D,
-  EfiProcessorFamilyPentiumMMX          = 0x0E,
-  EfiProcessorFamilyCeleron             = 0x0F,
-  EfiProcessorFamilyPentiumIIXeon       = 0x10,
-  EfiProcessorFamilyPentiumIII          = 0x11,
-  EfiProcessorFamilyM1                  = 0x12,
-  EfiProcessorFamilyM1Reserved1         = 0x13,
-  EfiProcessorFamilyM1Reserved2         = 0x14,
-  EfiProcessorFamilyM1Reserved3         = 0x15,
-  EfiProcessorFamilyM1Reserved4         = 0x16,
-  EfiProcessorFamilyM1Reserved5         = 0x17,
-  EfiProcessorFamilyM1Reserved6         = 0x18,
-  EfiProcessorFamilyK5                  = 0x19,
-  EfiProcessorFamilyK5Reserved1         = 0x1A,
-  EfiProcessorFamilyK5Reserved2         = 0x1B,
-  EfiProcessorFamilyK5Reserved3         = 0x1C,
-  EfiProcessorFamilyK5Reserved4         = 0x1D,
-  EfiProcessorFamilyK5Reserved5         = 0x1E,
-  EfiProcessorFamilyK5Reserved6         = 0x1F,
-  EfiProcessorFamilyPowerPC             = 0x20,
-  EfiProcessorFamilyPowerPC601          = 0x21,
-  EfiProcessorFamilyPowerPC603          = 0x22,
-  EfiProcessorFamilyPowerPC603Plus      = 0x23,
-  EfiProcessorFamilyPowerPC604          = 0x24,
-  EfiProcessorFamilyPowerPC620          = 0x25, 
-  EfiProcessorFamilyPowerPC704          = 0x26, 
-  EfiProcessorFamilyPowerPC750          = 0x27, 
-  EfiProcessorFamilyAlpha2              = 0x30,
-  EfiProcessorFamilyAlpha21064          = 0x31, 
-  EfiProcessorFamilyAlpha21066          = 0x32, 
-  EfiProcessorFamilyAlpha21164          = 0x33, 
-  EfiProcessorFamilyAlpha21164PC        = 0x34, 
-  EfiProcessorFamilyAlpha21164a         = 0x35, 
-  EfiProcessorFamilyAlpha21264          = 0x36, 
-  EfiProcessorFamilyAlpha21364          = 0x37,  
-  EfiProcessorFamilyMips                = 0x40,
-  EfiProcessorFamilyMIPSR4000           = 0x41, 
-  EfiProcessorFamilyMIPSR4200           = 0x42, 
-  EfiProcessorFamilyMIPSR4400           = 0x43, 
-  EfiProcessorFamilyMIPSR4600           = 0x44, 
-  EfiProcessorFamilyMIPSR10000          = 0x45,   
-  EfiProcessorFamilySparc               = 0x50,
-  EfiProcessorFamilySuperSparc          = 0x51, 
-  EfiProcessorFamilymicroSparcII        = 0x52, 
-  EfiProcessorFamilymicroSparcIIep      = 0x53, 
-  EfiProcessorFamilyUltraSparc          = 0x54, 
-  EfiProcessorFamilyUltraSparcII        = 0x55, 
-  EfiProcessorFamilyUltraSparcIIi       = 0x56, 
-  EfiProcessorFamilyUltraSparcIII       = 0x57, 
-  EfiProcessorFamilyUltraSparcIIIi      = 0x58,   
-  EfiProcessorFamily68040               = 0x60,
-  EfiProcessorFamily68xxx               = 0x61,
-  EfiProcessorFamily68000               = 0x62,
-  EfiProcessorFamily68010               = 0x63,
-  EfiProcessorFamily68020               = 0x64,
-  EfiProcessorFamily68030               = 0x65,
-  EfiProcessorFamilyHobbit              = 0x70,
-  EfiProcessorFamilyCrusoeTM5000        = 0x78, 
-  EfiProcessorFamilyCrusoeTM3000        = 0x79,
-  EfiProcessorFamilyWeitek              = 0x80,
-  EfiProcessorFamilyItanium             = 0x82, 
-  EfiProcessorFamilyAmdAthlon64         = 0x83, 
-  EfiProcessorFamilyAmdOpteron          = 0x84,
-  EfiProcessorFamilyPARISC              = 0x90,
-  EfiProcessorFamilyPaRisc8500          = 0x91, 
-  EfiProcessorFamilyPaRisc8000          = 0x92, 
-  EfiProcessorFamilyPaRisc7300LC        = 0x93, 
-  EfiProcessorFamilyPaRisc7200          = 0x94, 
-  EfiProcessorFamilyPaRisc7100LC        = 0x95, 
-  EfiProcessorFamilyPaRisc7100          = 0x96,
-  EfiProcessorFamilyV30                 = 0xA0,
-  EfiProcessorFamilyPentiumIIIXeon      = 0xB0,
-  EfiProcessorFamilyPentiumIIISpeedStep = 0xB1,
-  EfiProcessorFamilyPentium4            = 0xB2,
-  EfiProcessorFamilyIntelXeon           = 0xB3,
-  EfiProcessorFamilyAS400               = 0xB4,
-  EfiProcessorFamilyIntelXeonMP         = 0xB5,
-  EfiProcessorFamilyAMDAthlonXP         = 0xB6,
-  EfiProcessorFamilyAMDAthlonMP         = 0xB7,
-  EfiProcessorFamilyIntelPentiumM       = 0xB9,
-  EfiProcessorFamilyIntelCeleronD       = 0xBA,
-  EfiProcessorFamilyIntelPentiumD       = 0xBB,
-  EfiProcessorFamilyIntelPentiumEx      = 0xBC,
-  EfiProcessorFamilyIBM390              = 0xC8,
-  EfiProcessorFamilyG4                  = 0xC9,
-  EfiProcessorFamilyG5                  = 0xCA,
-  EfiProcessorFamilyi860                = 0xFA,
-  EfiProcessorFamilyi960                = 0xFB
+  EfiProcessorFamilyOther                  = 0x01, 
+  EfiProcessorFamilyUnknown                = 0x02,
+  EfiProcessorFamily8086                   = 0x03, 
+  EfiProcessorFamily80286                  = 0x04,
+  EfiProcessorFamilyIntel386               = 0x05, 
+  EfiProcessorFamilyIntel486               = 0x06,
+  EfiProcessorFamily8087                   = 0x07,
+  EfiProcessorFamily80287                  = 0x08,
+  EfiProcessorFamily80387                  = 0x09, 
+  EfiProcessorFamily80487                  = 0x0A,
+  EfiProcessorFamilyPentium                = 0x0B, 
+  EfiProcessorFamilyPentiumPro             = 0x0C,
+  EfiProcessorFamilyPentiumII              = 0x0D,
+  EfiProcessorFamilyPentiumMMX             = 0x0E,
+  EfiProcessorFamilyCeleron                = 0x0F,
+  EfiProcessorFamilyPentiumIIXeon          = 0x10,
+  EfiProcessorFamilyPentiumIII             = 0x11, 
+  EfiProcessorFamilyM1                     = 0x12,
+  EfiProcessorFamilyM2                     = 0x13,
+  EfiProcessorFamilyM1Reserved2            = 0x14,
+  EfiProcessorFamilyM1Reserved3            = 0x15,
+  EfiProcessorFamilyM1Reserved4            = 0x16,
+  EfiProcessorFamilyM1Reserved5            = 0x17,
+  EfiProcessorFamilyAmdDuron               = 0x18,
+  EfiProcessorFamilyK5                     = 0x19, 
+  EfiProcessorFamilyK6                     = 0x1A,
+  EfiProcessorFamilyK6_2                   = 0x1B,
+  EfiProcessorFamilyK6_3                   = 0x1C,
+  EfiProcessorFamilyAmdAthlon              = 0x1D,
+  EfiProcessorFamilyAmd29000               = 0x1E,
+  EfiProcessorFamilyK6_2Plus               = 0x1F,
+  EfiProcessorFamilyPowerPC                = 0x20,
+  EfiProcessorFamilyPowerPC601             = 0x21,
+  EfiProcessorFamilyPowerPC603             = 0x22,
+  EfiProcessorFamilyPowerPC603Plus         = 0x23,
+  EfiProcessorFamilyPowerPC604             = 0x24,
+  EfiProcessorFamilyPowerPC620             = 0x25,
+  EfiProcessorFamilyPowerPCx704            = 0x26,
+  EfiProcessorFamilyPowerPC750             = 0x27,
+  EfiProcessorFamilyAlpha3                 = 0x30,
+  EfiProcessorFamilyAlpha21064             = 0x31,
+  EfiProcessorFamilyAlpha21066             = 0x32,
+  EfiProcessorFamilyAlpha21164             = 0x33,
+  EfiProcessorFamilyAlpha21164PC           = 0x34,
+  EfiProcessorFamilyAlpha21164a            = 0x35,
+  EfiProcessorFamilyAlpha21264             = 0x36,
+  EfiProcessorFamilyAlpha21364             = 0x37,
+  EfiProcessorFamilyMips                   = 0x40,
+  EfiProcessorFamilyMIPSR4000              = 0x41,
+  EfiProcessorFamilyMIPSR4200              = 0x42,
+  EfiProcessorFamilyMIPSR4400              = 0x43,
+  EfiProcessorFamilyMIPSR4600              = 0x44,
+  EfiProcessorFamilyMIPSR10000             = 0x45,
+  EfiProcessorFamilySparc                  = 0x50,
+  EfiProcessorFamilySuperSparc             = 0x51,
+  EfiProcessorFamilymicroSparcII           = 0x52,
+  EfiProcessorFamilymicroSparcIIep         = 0x53,
+  EfiProcessorFamilyUltraSparc             = 0x54,
+  EfiProcessorFamilyUltraSparcII           = 0x55,
+  EfiProcessorFamilyUltraSparcIIi          = 0x56,
+  EfiProcessorFamilyUltraSparcIII          = 0x57,
+  EfiProcessorFamilyUltraSparcIIIi         = 0x58,
+  EfiProcessorFamily68040                  = 0x60,
+  EfiProcessorFamily68xxx                  = 0x61,
+  EfiProcessorFamily68000                  = 0x62,
+  EfiProcessorFamily68010                  = 0x63,
+  EfiProcessorFamily68020                  = 0x64,
+  EfiProcessorFamily68030                  = 0x65,
+  EfiProcessorFamilyHobbit                 = 0x70,
+  EfiProcessorFamilyCrusoeTM5000           = 0x78,
+  EfiProcessorFamilyCrusoeTM3000           = 0x79,
+  EfiProcessorFamilyEfficeonTM8000         = 0x7A,
+  EfiProcessorFamilyWeitek                 = 0x80,
+  EfiProcessorFamilyItanium                = 0x82,
+  EfiProcessorFamilyAmdAthlon64            = 0x83,
+  EfiProcessorFamilyAmdOpteron             = 0x84,
+  EfiProcessorFamilyAmdSempron             = 0x85,
+  EfiProcessorFamilyAmdTurion64Mobile      = 0x86,
+  EfiProcessorFamilyDualCoreAmdOpteron     = 0x87,
+  EfiProcessorFamilyAmdAthlon64X2DualCore  = 0x88,
+  EfiProcessorFamilyAmdTurion64X2Mobile    = 0x89,
+  EfiProcessorFamilyPARISC                 = 0x90,
+  EfiProcessorFamilyPaRisc8500             = 0x91,
+  EfiProcessorFamilyPaRisc8000             = 0x92,
+  EfiProcessorFamilyPaRisc7300LC           = 0x93,
+  EfiProcessorFamilyPaRisc7200             = 0x94,
+  EfiProcessorFamilyPaRisc7100LC           = 0x95,
+  EfiProcessorFamilyPaRisc7100             = 0x96,
+  EfiProcessorFamilyV30                    = 0xA0,
+  EfiProcessorFamilyPentiumIIIXeon         = 0xB0,
+  EfiProcessorFamilyPentiumIIISpeedStep    = 0xB1,
+  EfiProcessorFamilyPentium4               = 0xB2,
+  EfiProcessorFamilyIntelXeon              = 0xB3,
+  EfiProcessorFamilyAS400                  = 0xB4,
+  EfiProcessorFamilyIntelXeonMP            = 0xB5,
+  EfiProcessorFamilyAMDAthlonXP            = 0xB6,
+  EfiProcessorFamilyAMDAthlonMP            = 0xB7,
+  EfiProcessorFamilyIntelItanium2          = 0xB8,
+  EfiProcessorFamilyIntelPentiumM          = 0xB9,
+  EfiProcessorFamilyIntelCeleronD          = 0xBA,
+  EfiProcessorFamilyIntelPentiumD          = 0xBB,
+  EfiProcessorFamilyIntelPentiumEx         = 0xBC,
+  EfiProcessorFamilyIntelCoreSolo          = 0xBD,  ///< SMBIOS spec 2.6 correct this value
+  EfiProcessorFamilyReserved               = 0xBE,
+  EfiProcessorFamilyIntelCore2             = 0xBF,
+  EfiProcessorFamilyIBM390                 = 0xC8,
+  EfiProcessorFamilyG4                     = 0xC9,
+  EfiProcessorFamilyG5                     = 0xCA,
+  EfiProcessorFamilyG6                     = 0xCB,
+  EfiProcessorFamilyzArchitectur           = 0xCC,
+  EfiProcessorFamilyViaC7M                 = 0xD2,
+  EfiProcessorFamilyViaC7D                 = 0xD3,
+  EfiProcessorFamilyViaC7                  = 0xD4,
+  EfiProcessorFamilyViaEden                = 0xD5,
+  EfiProcessorFamilyi860                   = 0xFA,
+  EfiProcessorFamilyi960                   = 0xFB,
+  EfiProcessorFamilyIndicatorFamily2       = 0xFE,
+  EfiProcessorFamilyReserved1              = 0xFF
 } EFI_PROCESSOR_FAMILY_DATA;
 
 ///
@@ -1226,11 +1244,15 @@ typedef struct {
 
 typedef struct {
   UINT8                             Five    :1;
-  UINT8                             There   :1;
+  UINT8                             Three   :1;
   UINT8                             Two     :1;
   UINT8                             Reserved:5;
 } EFI_MEMORY_MODULE_VOLTAGE_TYPE;
 
+//
+//  EFI_MEMORY_CONTROLLER_INFORMATION is obsolete
+//  Use EFI_MEMORY_CONTROLLER_INFORMATION_DATA instead
+//
 typedef struct {
   EFI_MEMORY_ERROR_DETECT_METHOD_TYPE ErrorDetectingMethod;
   EFI_MEMORY_ERROR_CORRECT_CAPABILITY ErrorCorrectingCapability;
@@ -1244,6 +1266,20 @@ typedef struct {
   EFI_MEMORY_ERROR_CORRECT_CAPABILITY EnabledCorrectingCapability;
   UINT16                              *MemoryModuleConfigHandles;
 } EFI_MEMORY_CONTROLLER_INFORMATION;
+
+typedef struct {
+  EFI_MEMORY_ERROR_DETECT_METHOD_TYPE   ErrorDetectingMethod;
+  EFI_MEMORY_ERROR_CORRECT_CAPABILITY   ErrorCorrectingCapability;
+  EFI_MEMORY_SUPPORT_INTERLEAVE_TYPE    MemorySupportedInterleave;
+  EFI_MEMORY_SUPPORT_INTERLEAVE_TYPE    MemoryCurrentInterleave;
+  UINT8                                 MaxMemoryModuleSize;
+  EFI_MEMORY_SPEED_TYPE                 MemorySpeedType;
+  EFI_MEMORY_SUPPORTED_TYPE             MemorySupportedType;
+  EFI_MEMORY_MODULE_VOLTAGE_TYPE        MemoryModuleVoltage;
+  UINT8                                 NumberofMemorySlot;
+  EFI_MEMORY_ERROR_CORRECT_CAPABILITY   EnabledCorrectingCapability;
+  EFI_INTER_LINK_DATA                   MemoryModuleConfig[1];
+} EFI_MEMORY_CONTROLLER_INFORMATION_DATA;
 
 //
 //  Memory. Error Information - SMBIOS Type 18
@@ -1538,8 +1574,9 @@ typedef enum {
 } EFI_MISC_CHASSIS_SECURITY_STATE;
 
 typedef struct {
-  UINT32                            RecordType:1;
-  UINT32                            Reserved:24;
+  UINT32                            RecordType :1;
+  UINT32                            Type       :7;
+  UINT32                            Reserved   :24;
 } EFI_MISC_ELEMENT_TYPE;
 
 typedef struct {
