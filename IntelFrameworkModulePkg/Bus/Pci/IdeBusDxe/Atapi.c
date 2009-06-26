@@ -1058,7 +1058,7 @@ AtapiReadCapacity (
           (Data.LastLba1 << 8) |
           Data.LastLba0;
 
-		IdeDev->BlkIo.Media->MediaPresent = TRUE;
+	      IdeDev->BlkIo.Media->MediaPresent = TRUE;
 
         IdeDev->BlkIo.Media->ReadOnly = TRUE;
 

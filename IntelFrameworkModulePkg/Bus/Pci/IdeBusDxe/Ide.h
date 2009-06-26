@@ -201,10 +201,8 @@ DiscoverIdeDevice (
   This interface is used to initialize all state data related to the
   detection of one channel.
 
-  @retval EFI_SUCCESS Completed successfully.
-
 **/
-EFI_STATUS
+VOID
 InitializeIDEChannelData (
   VOID
   );
