@@ -1281,7 +1281,7 @@ AtaPioDataInExt (
   return CheckErrorStatus (IdeDev);
 }
 /**
-  Send ATA Ext command into device with NON_DATA protocol
+  Send ATA Ext command into device with NON_DATA protocol.
 
   @param  IdeDev Standard IDE device private data structure
   @param  AtaCommand The ATA command to be sent
@@ -2027,7 +2027,7 @@ AtaReadSectorsExt (
 
   @param IdeBlkIoDevice Indicates the calling context.
   @param MediaId        The media id that the read request is for.
-  @param LBA            The starting logical block address to read from on the device.
+  @param Lba            The starting logical block address to read from on the device.
   @param BufferSize     The size of the Buffer in bytes. This must be a  multiple
                         of the intrinsic block size of the device.
 
@@ -2052,7 +2052,7 @@ EFI_STATUS
 AtaBlkIoReadBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN UINT32           MediaId,
-  IN EFI_LBA          LBA,
+  IN EFI_LBA          Lba,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   )
@@ -2092,11 +2092,11 @@ AtaBlkIoReadBlocks (
     return EFI_NO_MEDIA;
   }
 
-  if (LBA > Media->LastBlock) {
+  if (Lba > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2110,18 +2110,18 @@ AtaBlkIoReadBlocks (
     // For ATA/ATAPI-6 device(capcity > 120GB), use ATA-6 read block mechanism
     //
     if (IdeBlkIoDevice->UdmaMode.Valid) {
-      Status = AtaUdmaReadExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaUdmaReadExt (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     } else {
-      Status = AtaReadSectorsExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaReadSectorsExt (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     }
   } else {
     //
     // For ATA-3 compatible device, use ATA-3 read block mechanism
     //
     if (IdeBlkIoDevice->UdmaMode.Valid) {
-      Status = AtaUdmaRead (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaUdmaRead (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     } else {
-      Status = AtaReadSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaReadSectors (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     }
   }
 
@@ -2419,7 +2419,7 @@ AtaWriteSectorsExt (
 
   @param IdeBlkIoDevice  Indicates the calling context.
   @param MediaId         The media id that the write request is for.
-  @param LBA             The starting logical block address to write onto the device.
+  @param Lba             The starting logical block address to write onto the device.
   @param BufferSize      The size of the Buffer in bytes. This must be a multiple
                          of the intrinsic block size of the device.
   @param Buffer          A pointer to the source buffer for the data.The caller
@@ -2443,7 +2443,7 @@ EFI_STATUS
 AtaBlkIoWriteBlocks (
   IN  IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN  UINT32           MediaId,
-  IN  EFI_LBA          LBA,
+  IN  EFI_LBA          Lba,
   IN  UINTN            BufferSize,
   OUT VOID             *Buffer
   )
@@ -2479,11 +2479,11 @@ AtaBlkIoWriteBlocks (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  if (LBA > Media->LastBlock) {
+  if (Lba > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2497,18 +2497,18 @@ AtaBlkIoWriteBlocks (
     // For ATA/ATAPI-6 device(capcity > 120GB), use ATA-6 write block mechanism
     //
     if (IdeBlkIoDevice->UdmaMode.Valid) {
-      Status = AtaUdmaWriteExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaUdmaWriteExt (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     } else {
-      Status = AtaWriteSectorsExt (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaWriteSectorsExt (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     }
   } else {
     //
     // For ATA-3 compatible device, use ATA-3 write block mechanism
     //
     if (IdeBlkIoDevice->UdmaMode.Valid) {
-      Status = AtaUdmaWrite (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaUdmaWrite (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     } else {
-      Status = AtaWriteSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+      Status = AtaWriteSectors (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
     }
   }
 
@@ -2619,7 +2619,7 @@ AtaNonDataCommandIn (
   }
 
   //
-  // Select device (bit4), set LBA mode(bit6) (use 0xe0 for compatibility)
+  // Select device (bit4), set Lba mode(bit6) (use 0xe0 for compatibility)
   //
   IDEWritePortB (
     IdeDev->PciIo,

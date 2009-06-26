@@ -21,12 +21,12 @@ BOOLEAN MasterDeviceExist     = FALSE;
 UINT8   MasterDeviceType      = INVALID_DEVICE_TYPE;
 
 /**
-  read a one-byte data from a IDE port
+  read a one-byte data from a IDE port.
 
   @param  PciIo  The PCI IO protocol instance
   @param  Port   the IDE Port number 
 
-  return  the one-byte data read from IDE port
+  @return  the one-byte data read from IDE port
 **/
 UINT8
 IDEReadPortB (
@@ -109,7 +109,7 @@ IDEReadPortWMultiple (
 }
 
 /**
-  write a 1-byte data to a specific IDE port
+  write a 1-byte data to a specific IDE port.
 
   @param  PciIo  PCI IO protocol instance
   @param  Port   The IDE port to be writen
@@ -137,7 +137,7 @@ IDEWritePortB (
 }
 
 /**
-  write a 1-word data to a specific IDE port
+  write a 1-word data to a specific IDE port.
 
   @param  PciIo  PCI IO protocol instance
   @param  Port   The IDE port to be writen
@@ -269,7 +269,11 @@ IDEWritePortWMultiple (
 
   @param  PciIo Pointer to the EFI_PCI_IO_PROTOCOL instance
   @param  IdeRegsBaseAddr Pointer to IDE_REGISTERS_BASE_ADDR to
-  receive IDE IO port registers' base addresses
+           receive IDE IO port registers' base addresses
+           
+  @retval EFI_UNSUPPORTED return this value when the BARs is not IO type
+  @retval EFI_SUCCESS     Get the Base address successfully
+  @retval other           read the pci configureation data error
 
 **/
 EFI_STATUS
@@ -347,6 +351,10 @@ GetIdeRegistersBaseAddr (
   succeess.
 
   @param  IdeDev The BLK_IO private data which specifies the IDE device
+  
+  @retval EFI_INVALID_PARAMETER return this value when the channel is invalid
+  @retval EFI_SUCCESS           reassign the IDE IO resource successfully
+  @retval other                 get the IDE current base address effor
 
 **/
 EFI_STATUS
@@ -585,6 +593,9 @@ DetectIDEController (
   Detect if there is disk attached to this port
 
   @param  IdeDev The BLK_IO private data which specifies the IDE device.
+  
+  @retval EFI_NOT_FOUND   The device or channel is not found
+  @retval EFI_SUCCESS     The device is found
 
 **/
 EFI_STATUS
@@ -1007,7 +1018,7 @@ WaitForBSYClear (
 
   @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
                               all the information of the IDE device.
-  @paramTimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
+  @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS         BSY bit clear within the time out.
   @retval EFI_TIMEOUT         BSY bit not clear within the time out.
@@ -1212,7 +1223,7 @@ ReleaseIdeResources (
   return ;
 }
 /**
-  Set the calculated Best transfer mode to a detected device
+  Set the calculated Best transfer mode to a detected device.
 
   @param IdeDev       Standard IDE device private data structure
   @param TransferMode The device transfer mode to be set
@@ -1250,7 +1261,7 @@ SetDeviceTransferMode (
   return Status;
 }
 /**
-  Set drive parameters for devices not support PACKETS command
+  Set drive parameters for devices not support PACKETS command.
 
   @param IdeDev          Standard IDE device private data structure
   @param DriveParameters The device parameters to be set into the disk
@@ -1300,7 +1311,7 @@ SetDriveParameters (
 }
 
 /**
-  Enable Interrupt on IDE controller
+  Enable Interrupt on IDE controller.
 
   @param  IdeDev   Standard IDE device private data structure
 

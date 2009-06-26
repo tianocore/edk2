@@ -1087,7 +1087,7 @@ Done:
 
   @param  This       Block IO protocol instance pointer.
   @param  MediaId    The media ID of the device
-  @param  LBA        Starting LBA address to read data
+  @param  Lba        Starting LBA address to read data
   @param  BufferSize The size of data to be read
   @param  Buffer     Caller supplied buffer to save data
 
@@ -1100,7 +1100,7 @@ EFIAPI
 IDEBlkIoReadBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This,
   IN  UINT32                  MediaId,
-  IN  EFI_LBA                 LBA,
+  IN  EFI_LBA                 Lba,
   IN  UINTN                   BufferSize,
   OUT VOID                    *Buffer
   )
@@ -1126,7 +1126,7 @@ IDEBlkIoReadBlocks (
     Status = AtaBlkIoReadBlocks (
             IdeBlkIoDevice,
             MediaId,
-            LBA,
+            Lba,
             BufferSize,
             Buffer
             );
@@ -1144,7 +1144,7 @@ IDEBlkIoReadBlocks (
   Status = AtapiBlkIoReadBlocks (
           IdeBlkIoDevice,
           MediaId,
-          LBA,
+          Lba,
           BufferSize,
           Buffer
           );
@@ -1156,11 +1156,11 @@ Done:
 }
 
 /**
-  Write data to block io device
+  Write data to block io device.
 
   @param  This       Protocol instance pointer.
   @param  MediaId    The media ID of the device
-  @param  LBA        Starting LBA address to write data
+  @param  Lba        Starting LBA address to write data
   @param  BufferSize The size of data to be written
   @param  Buffer     Caller supplied buffer to save data
 
@@ -1173,7 +1173,7 @@ EFIAPI
 IDEBlkIoWriteBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This,
   IN  UINT32                  MediaId,
-  IN  EFI_LBA                 LBA,
+  IN  EFI_LBA                 Lba,
   IN  UINTN                   BufferSize,
   IN  VOID                    *Buffer
   )
@@ -1199,7 +1199,7 @@ IDEBlkIoWriteBlocks (
     Status = AtaBlkIoWriteBlocks (
             IdeBlkIoDevice,
             MediaId,
-            LBA,
+            Lba,
             BufferSize,
             Buffer
             );
@@ -1217,7 +1217,7 @@ IDEBlkIoWriteBlocks (
   Status = AtapiBlkIoWriteBlocks (
           IdeBlkIoDevice,
           MediaId,
-          LBA,
+          Lba,
           BufferSize,
           Buffer
           );
@@ -1250,13 +1250,13 @@ IDEBlkIoFlushBlocks (
   Return the results of the Inquiry command to a drive in InquiryData.
   Data format of Inquiry data is defined by the Interface GUID.
 
-  @param  This Protocol instance pointer.
-  @param  InquiryData Results of Inquiry command to device
+  @param  This Protocol   Instance pointer.
+  @param  InquiryData     Results of Inquiry command to device
   @param  InquiryDataSize Size of InquiryData in bytes.
 
-  @retval  EFI_SUCCESS InquiryData valid
-  @retval  EFI_NOT_FOUND Device does not support this data class
-  @retval  EFI_DEVICE_ERROR Error reading InquiryData from device
+  @retval  EFI_SUCCESS          InquiryData valid
+  @retval  EFI_NOT_FOUND        Device does not support this data class
+  @retval  EFI_DEVICE_ERROR     Error reading InquiryData from device
   @retval  EFI_BUFFER_TOO_SMALL IntquiryDataSize not big enough
 
 **/

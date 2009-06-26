@@ -1698,7 +1698,7 @@ AtapiSoftReset (
 
   @param IdeBlkIoDevice Indicates the calling context.
   @param MediaId        The media id that the read request is for.
-  @param LBA            The starting logical block address to read from on the device.
+  @param Lba            The starting logical block address to read from on the device.
   @param BufferSize     The size of the Buffer in bytes. This must be a multiple
                         of the intrinsic block size of the device.
   @param Buffer         A pointer to the destination buffer for the data. The caller
@@ -1718,7 +1718,7 @@ EFI_STATUS
 AtapiBlkIoReadBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN UINT32           MediaId,
-  IN EFI_LBA          LBA,
+  IN EFI_LBA          Lba,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   )
@@ -1784,11 +1784,11 @@ AtapiBlkIoReadBlocks (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  if (LBA > Media->LastBlock) {
+  if (Lba > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1800,7 +1800,7 @@ AtapiBlkIoReadBlocks (
   // if all the parameters are valid, then perform read sectors command
   // to transfer data from device to host.
   //
-  Status = AtapiReadSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+  Status = AtapiReadSectors (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
@@ -1812,7 +1812,7 @@ AtapiBlkIoReadBlocks (
   //
   // save the first block to the cache for performance
   //
-  if (LBA == 0 && (IdeBlkIoDevice->Cache == NULL)) {
+  if (Lba == 0 && (IdeBlkIoDevice->Cache == NULL)) {
     IdeBlkIoDevice->Cache = AllocatePool (BlockSize);
     if (IdeBlkIoDevice->Cache!= NULL) {
       CopyMem ((UINT8 *) IdeBlkIoDevice->Cache, (UINT8 *) Buffer, BlockSize);
@@ -1828,7 +1828,7 @@ AtapiBlkIoReadBlocks (
 
   @param IdeBlkIoDevice  Indicates the calling context.
   @param MediaId         The media id that the write request is for.
-  @param LBA             The starting logical block address to write onto the device.
+  @param Lba             The starting logical block address to write onto the device.
   @param BufferSize      The size of the Buffer in bytes. This must be a multiple
                          of the intrinsic block size of the device.
   @param Buffer          A pointer to the source buffer for the data. The caller
@@ -1850,7 +1850,7 @@ EFI_STATUS
 AtapiBlkIoWriteBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
   IN UINT32           MediaId,
-  IN EFI_LBA          LBA,
+  IN EFI_LBA          Lba,
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   )
@@ -1862,7 +1862,7 @@ AtapiBlkIoWriteBlocks (
   EFI_STATUS          Status;
   BOOLEAN             MediaChange;
 
-  if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
+  if (Lba == 0 && IdeBlkIoDevice->Cache != NULL) {
     gBS->FreePool (IdeBlkIoDevice->Cache);
     IdeBlkIoDevice->Cache = NULL;
   }
@@ -1883,7 +1883,7 @@ AtapiBlkIoWriteBlocks (
   Status      = AtapiDetectMedia (IdeBlkIoDevice, &MediaChange);
   if (EFI_ERROR (Status)) {
 
-    if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
+    if (Lba == 0 && IdeBlkIoDevice->Cache != NULL) {
       gBS->FreePool (IdeBlkIoDevice->Cache);
       IdeBlkIoDevice->Cache = NULL;
     }
@@ -1899,7 +1899,7 @@ AtapiBlkIoWriteBlocks (
 
   if (!(Media->MediaPresent)) {
 
-    if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
+    if (Lba == 0 && IdeBlkIoDevice->Cache != NULL) {
       gBS->FreePool (IdeBlkIoDevice->Cache);
       IdeBlkIoDevice->Cache = NULL;
     }
@@ -1908,7 +1908,7 @@ AtapiBlkIoWriteBlocks (
 
   if ((MediaId != Media->MediaId) || MediaChange) {
 
-    if (LBA == 0 && IdeBlkIoDevice->Cache != NULL) {
+    if (Lba == 0 && IdeBlkIoDevice->Cache != NULL) {
       gBS->FreePool (IdeBlkIoDevice->Cache);
       IdeBlkIoDevice->Cache = NULL;
     }
@@ -1923,11 +1923,11 @@ AtapiBlkIoWriteBlocks (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  if (LBA > Media->LastBlock) {
+  if (Lba > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((LBA + NumberOfBlocks - 1) > Media->LastBlock) {
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1939,7 +1939,7 @@ AtapiBlkIoWriteBlocks (
   // if all the parameters are valid,
   // then perform write sectors command to transfer data from host to device.
   //
-  Status = AtapiWriteSectors (IdeBlkIoDevice, Buffer, LBA, NumberOfBlocks);
+  Status = AtapiWriteSectors (IdeBlkIoDevice, Buffer, Lba, NumberOfBlocks);
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
