@@ -115,7 +115,7 @@ PciRegisterUpdateCheck (
 
 /**
   Check the incompatible device list for access width incompatibility and
-  return the configuration
+  return the configuration.
 
   This function searches the incompatible device list for access width
   incompatibility according to request information. If the PCI device
