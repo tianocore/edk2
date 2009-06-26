@@ -1,7 +1,7 @@
-/**@file
+/** @file
+  UEFI Component Name and Name2 protocol for Isa serial driver.
 
-  
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Serial.h"
 
+#define SERIAL_PORT_NAME  "ISA Serial Port # "
 //
 // EFI Component Name Protocol
 //
@@ -227,27 +228,19 @@ IsaSerialComponentNameGetControllerName (
            );
 }
 
+/**
+  Add the ISO639-2 and RFC4646 component name both for the Serial IO device
+
+  @param SerialDevice     A pointer to the SERIAL_DEV instance.
+
+  @param IsaIo            A pointer to the EFI_ISA_IO_PROTOCOL instance.
+
+**/
 VOID
 AddName (
   IN  SERIAL_DEV                               *SerialDevice,
   IN  EFI_ISA_IO_PROTOCOL                      *IsaIo
   )
-/**
-
-  Routine Description:
-  
-    Add the component name for the serial io device
-
-  Arguments:
-  
-    SerialDevice              - A pointer to the SERIAL_DEV instance.
-    IsaIo                     - A pointer to the EFI_ISA_IO_PROTOCOL instance.
-    
-  Returns:
-
-    None
-    
-**/
 {
   CHAR16  SerialPortName[sizeof (SERIAL_PORT_NAME)];
 
