@@ -351,6 +351,7 @@ Interrupt8259SetMode (
     //
     // Write new legacy mode mask/trigger level
     //
+    Interrupt8259SetVectorBase (This, LEGACY_MODE_BASE_VECTOR_MASTER, LEGACY_MODE_BASE_VECTOR_SLAVE);
     Interrupt8259WriteMask (mLegacyModeMask, mLegacyModeEdgeLevel);
 
     return EFI_SUCCESS;
@@ -386,6 +387,7 @@ Interrupt8259SetMode (
     //
     // Write new protected mode mask/trigger level
     //
+    Interrupt8259SetVectorBase (This, PROTECTED_MODE_BASE_VECTOR_MASTER, PROTECTED_MODE_BASE_VECTOR_SLAVE);
     Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
 
     return EFI_SUCCESS;
