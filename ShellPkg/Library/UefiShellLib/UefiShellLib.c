@@ -562,7 +562,7 @@ ShellOpenFileByDevicePath(
 EFI_STATUS
 EFIAPI
 ShellOpenFileByName(
-  IN CHAR16		                  *FileName,
+  IN CONST CHAR16		            *FileName,
   OUT EFI_FILE_HANDLE           *FileHandle,
   IN UINT64                     OpenMode,
   IN UINT64                    	Attributes
@@ -599,7 +599,7 @@ ShellOpenFileByName(
   // since this will use EFI method again that will open it.
   //
   ASSERT(mEfiShellEnvironment2 != NULL);
-  FilePath = mEfiShellEnvironment2->NameToPath (FileName);
+  FilePath = mEfiShellEnvironment2->NameToPath ((CHAR16*)FileName);
   if (FileDevicePath != NULL) {
     return (ShellOpenFileByDevicePath(&FilePath,
                                       &DeviceHandle,
@@ -640,7 +640,7 @@ ShellOpenFileByName(
 EFI_STATUS
 EFIAPI
 ShellCreateDirectory(
-  IN CHAR16                   *DirectoryName,
+  IN CONST CHAR16             *DirectoryName,
   OUT EFI_FILE_HANDLE         *FileHandle
   )
 {
@@ -1220,7 +1220,7 @@ typedef struct {
   the ShellCloseFileMetaArg function.
 
   @param[in] FileList           the EFI shell list type
-  @param[in][out] ListHead      the list to add to
+  @param[in,out] ListHead      the list to add to
 
   @retval the resultant head of the double linked new format list;
 **/
@@ -1923,7 +1923,10 @@ ShellCommandLineGetRawValue (
   //
   // enumerate through the list of parametrs
   //
-  for (Node = GetFirstNode(CheckPackage) ; !IsNull (CheckPackage, Node) ; Node = GetNextNode(CheckPackage, Node) ) {
+  for ( Node = GetFirstNode(CheckPackage) 
+      ; !IsNull (CheckPackage, Node) 
+      ; Node = GetNextNode(CheckPackage, Node) 
+      ){
     //
     // If the position matches, return the value
     //
@@ -1940,7 +1943,7 @@ ShellCommandLineGetRawValue (
   If the string would grow bigger than NewSize it will halt and return error.
 
   @param[in] SourceString             String with source buffer
-  @param[in][out] NewString           String with resultant buffer
+  @param[in,out] NewString           String with resultant buffer
   @param[in] NewSize                  Size in bytes of NewString
   @param[in] FindTarget               String to look for
   @param[in[ ReplaceWith              String to replace FindTarget with

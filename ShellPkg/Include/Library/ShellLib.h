@@ -135,7 +135,7 @@ ShellOpenFileByDevicePath(
 EFI_STATUS
 EFIAPI
 ShellOpenFileByName(
-  IN CHAR16		                  *FilePath,
+  IN CONST CHAR16		            *FilePath,
   OUT EFI_FILE_HANDLE           *FileHandle,
   IN UINT64                     OpenMode,
   IN UINT64                    	Attributes
@@ -171,7 +171,7 @@ ShellOpenFileByName(
 EFI_STATUS
 EFIAPI
 ShellCreateDirectory(
-  IN CHAR16                   *DirectoryName,
+  IN CONST CHAR16             *DirectoryName,
   OUT EFI_FILE_HANDLE         *FileHandle
   );
 

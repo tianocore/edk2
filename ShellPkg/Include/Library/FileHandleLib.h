@@ -349,8 +349,8 @@ FileHandleGetFileName (
   Function to read a single line (up to but not including the \n) from a file.
 
   @param[in]      Handle        FileHandle to read from
-  @param[in][out] Buffer        pointer to buffer to read into
-  @param[in][out] Size          pointer to number of bytes in buffer
+  @param[in,out] Buffer        pointer to buffer to read into
+  @param[in,out] Size          pointer to number of bytes in buffer
   @param[in[      Truncate      if TRUE then allows for truncation of the line to fit.
                                 if FALSE will reset the position to the begining of the 
                                 line if the buffer is not large enough.
