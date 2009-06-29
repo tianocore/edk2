@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/BlockIo.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ScsiPassThruExt.h>
+#include <Protocol/ScsiPassThru.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -785,6 +786,40 @@ ScsiDiskHaveSenseKey (
 VOID
 ReleaseScsiDiskDeviceResources (
   IN  SCSI_DISK_DEV   *ScsiDiskDevice
+  );
+
+/**
+  Determine if Block Io should be produced.
+  
+
+  @param  ChildHandle  Child Handle to retrive Parent information.
+  
+  @retval  TRUE    Should produce Block Io.
+  @retval  FALSE   Should not produce Block Io.
+
+**/  
+BOOLEAN
+DetermineInstallBlockIo (
+  IN  EFI_HANDLE      ChildHandle
+  );
+
+/**
+  Search protocol database and check to see if the protocol
+  specified by ProtocolGuid is present on a ControllerHandle and opened by
+  ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
+  If the ControllerHandle is found, then the protocol specified by ProtocolGuid
+  will be opened on it.  
+  
+
+  @param  ProtocolGuid   ProtocolGuid pointer.
+  @param  ChildHandle    Child Handle to retrieve Parent information.
+  
+**/ 
+VOID *
+EFIAPI
+GetParentProtocol (
+  IN  EFI_GUID                          *ProtocolGuid,
+  IN  EFI_HANDLE                        ChildHandle
   );
 
 #endif
