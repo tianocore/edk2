@@ -403,6 +403,7 @@ FindVariable (
       // traverse the variable info list to look for varible.
       // The IndexTable->Index[Count] records the distance of two neighbouring VAR_ADDED type variables.
       //
+      ASSERT (Count < VARIABLE_INDEX_TABLE_VOLUME);
       Offset   += IndexTable->Index[Count];
       MaxIndex  = (VARIABLE_HEADER *)((CHAR8 *)(IndexTable->StartPtr) + Offset);
       if (CompareWithValidVariable (MaxIndex, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
