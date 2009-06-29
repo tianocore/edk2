@@ -244,45 +244,47 @@ ScsiDiskDriverBindingStart (
   //
   Status = ScsiDiskDetectMedia (ScsiDiskDevice, TRUE, &Temp);
   if (!EFI_ERROR (Status)) {
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &Controller,
-                    &gEfiBlockIoProtocolGuid,
-                    &ScsiDiskDevice->BlkIo,
-                    NULL
-                    );
+    //
+    // Determine if Block IO should be produced on this controller handle
+    //
+    if (DetermineInstallBlockIo(Controller)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &Controller,
+                      &gEfiBlockIoProtocolGuid,
+                      &ScsiDiskDevice->BlkIo,
+                      NULL
+                      );
+      if (!EFI_ERROR(Status)) {
+        ScsiDiskDevice->ControllerNameTable = NULL;
+        AddUnicodeString2 (
+          "eng",
+          gScsiDiskComponentName.SupportedLanguages,
+          &ScsiDiskDevice->ControllerNameTable,
+          L"SCSI Disk Device",
+          TRUE
+          );
+        AddUnicodeString2 (
+          "en",
+          gScsiDiskComponentName2.SupportedLanguages,
+          &ScsiDiskDevice->ControllerNameTable,
+          L"SCSI Disk Device",
+          FALSE
+          );
+        return EFI_SUCCESS;
+      }
+    } 
   }
 
-  if (EFI_ERROR (Status)) {
-    FreePool (ScsiDiskDevice->SenseData);
-    gBS->CloseProtocol (
-           Controller,
-           &gEfiScsiIoProtocolGuid,
-           This->DriverBindingHandle,
-           Controller
-           );
-    FreePool (ScsiDiskDevice);
-    return Status;
-  }
-
-  ScsiDiskDevice->ControllerNameTable = NULL;
-  AddUnicodeString2 (
-    "eng",
-    gScsiDiskComponentName.SupportedLanguages,
-    &ScsiDiskDevice->ControllerNameTable,
-    L"SCSI Disk Device",
-    TRUE
-    );
-  AddUnicodeString2 (
-    "en",
-    gScsiDiskComponentName2.SupportedLanguages,
-    &ScsiDiskDevice->ControllerNameTable,
-    L"SCSI Disk Device",
-    FALSE
-    );
-
-
-  return EFI_SUCCESS;
-
+  gBS->FreePool (ScsiDiskDevice->SenseData);
+  gBS->FreePool (ScsiDiskDevice);
+  gBS->CloseProtocol (
+         Controller,
+         &gEfiScsiIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
+  return Status;
+  
 }
 
 
@@ -2249,3 +2251,105 @@ ReleaseScsiDiskDeviceResources (
 
   ScsiDiskDevice = NULL;
 }
+
+/**
+  Determine if Block Io should be produced.
+  
+
+  @param  ChildHandle  Child Handle to retrive Parent information.
+  
+  @retval  TRUE    Should produce Block Io.
+  @retval  FALSE   Should not produce Block Io.
+
+**/  
+BOOLEAN
+DetermineInstallBlockIo (
+  IN  EFI_HANDLE      ChildHandle
+  )  
+{
+  EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiPassThru;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiPassThru;
+
+  //
+  // Firstly, check if ExtScsiPassThru Protocol parent handle exists. If existence,
+  // check its attribute, logic or physical.
+  //
+  ExtScsiPassThru = (EFI_EXT_SCSI_PASS_THRU_PROTOCOL *)GetParentProtocol (&gEfiExtScsiPassThruProtocolGuid, ChildHandle);
+  if (ExtScsiPassThru != NULL) {
+    if ((ExtScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
+      return TRUE;
+    }
+  }
+
+  //
+  // Secondly, check if ScsiPassThru Protocol parent handle exists. If existence,
+  // check its attribute, logic or physical.
+  //
+  ScsiPassThru = (EFI_SCSI_PASS_THRU_PROTOCOL *)GetParentProtocol (&gEfiScsiPassThruProtocolGuid, ChildHandle);
+  if (ScsiPassThru != NULL) {
+    if ((ScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
+      return TRUE;
+    }
+  }
+  
+  return FALSE;
+}
+
+/**
+  Search protocol database and check to see if the protocol
+  specified by ProtocolGuid is present on a ControllerHandle and opened by
+  ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
+  If the ControllerHandle is found, then the protocol specified by ProtocolGuid
+  will be opened on it.  
+  
+
+  @param  ProtocolGuid   ProtocolGuid pointer.
+  @param  ChildHandle    Child Handle to retrieve Parent information.
+  
+**/ 
+VOID *
+EFIAPI
+GetParentProtocol (
+  IN  EFI_GUID                          *ProtocolGuid,
+  IN  EFI_HANDLE                        ChildHandle
+  ) 
+{
+  UINTN                                 Index;
+  UINTN                                 HandleCount;
+  VOID                                  *Interface;  
+  EFI_STATUS                            Status;
+  EFI_HANDLE                            *HandleBuffer;
+
+  //
+  // Retrieve the list of all handles from the handle database
+  //
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  ProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Iterate to find who is parent handle that is opened with ProtocolGuid by ChildHandle 
+  //
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = EfiTestChildHandle (HandleBuffer[Index], ChildHandle, ProtocolGuid);
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (HandleBuffer[Index], ProtocolGuid, (VOID **)&Interface);
+      if (!EFI_ERROR (Status)) {
+        gBS->FreePool (HandleBuffer);
+        return Interface;
+      }
+    }
+  }
+
+  gBS->FreePool (HandleBuffer);
+  return NULL;
+} 
+
