@@ -274,6 +274,7 @@ PxeBcTryBinl (
   PXEBC_CACHED_DHCP4_PACKET *CachedPacket;
   EFI_DHCP4_PACKET          *Reply;
 
+  ASSERT (Index < PXEBC_MAX_OFFER_NUM);
   ASSERT (Private->Dhcp4Offers[Index].OfferType == DHCP4_PACKET_TYPE_BINL);
 
   Offer = &Private->Dhcp4Offers[Index].Packet.Offer;
@@ -560,6 +561,7 @@ PxeBcCacheDhcpOffer (
   }
 
   OfferType = CachedOffer->OfferType;
+  ASSERT (OfferType < DHCP4_PACKET_TYPE_MAX);
 
   if (OfferType == DHCP4_PACKET_TYPE_BOOTP) {
 
@@ -603,6 +605,7 @@ PxeBcCacheDhcpOffer (
       //
       // It's a dhcp offer with your address.
       //
+      ASSERT (Private->ServerCount[OfferType] < PXEBC_MAX_OFFER_NUM);
       Private->OfferIndex[OfferType][Private->ServerCount[OfferType]] = Private->NumOffers;
       Private->ServerCount[OfferType]++;
     }
@@ -1119,6 +1122,7 @@ PxeBcDiscvBootService (
   EFI_DHCP4_HEADER                    *DhcpHeader;
   UINT32                              Xid;
 
+  ASSERT (IsDiscv && (Layer != NULL));
 
   Mode      = Private->PxeBc.Mode;
   Dhcp4     = Private->Dhcp4;
@@ -1717,15 +1721,21 @@ PxeBcSelectBootMenu (
   MenuSize  = VendorOpt->BootMenuLen;
   MenuItem  = VendorOpt->BootMenu;
 
+  if (MenuSize == 0) {
+    return EFI_NOT_READY;
+  }
+
   while (MenuSize > 0) {
     MenuArray[Index]  = MenuItem;
     MenuSize          = (UINT8) (MenuSize - (MenuItem->DescLen + 3));
     MenuItem          = (PXEBC_BOOT_MENU_ENTRY *) ((UINT8 *) MenuItem + MenuItem->DescLen + 3);
-    Index++;
+    if (Index++ > (PXEBC_MAX_MENU_NUM - 1)) {
+      break;
+    }
   }
 
   if (UseDefaultItem) {
-    CopyMem (Type, &MenuArray[0]->Type, sizeof (UINT16));
+    *Type = MenuArray[0]->Type;
     *Type = NTOHS (*Type);
     return EFI_SUCCESS;
   }

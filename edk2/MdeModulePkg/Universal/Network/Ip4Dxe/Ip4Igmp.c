@@ -1,7 +1,7 @@
 /** @file
   This file implements the RFC2236: IGMP v2.
   
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -192,6 +192,9 @@ Ip4SendIgmpMessage (
   NetbufReserve (Packet, IP4_MAX_HEADLEN);
 
   Igmp = (IGMP_HEAD *) NetbufAllocSpace (Packet, sizeof (IGMP_HEAD), FALSE);
+  if (Igmp == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Igmp->Type        = Type;
   Igmp->MaxRespTime = 0;

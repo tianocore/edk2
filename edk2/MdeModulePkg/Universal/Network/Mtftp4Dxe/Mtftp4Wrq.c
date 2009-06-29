@@ -1,7 +1,7 @@
 /** @file
   Routines to process Wrq (upload).
   
-Copyright (c) 2006, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -52,6 +52,7 @@ Mtftp4WrqSendBlock (
   }
 
   Packet = (EFI_MTFTP4_PACKET *) NetbufAllocSpace (UdpPacket, MTFTP4_DATA_HEAD_LEN, FALSE);
+  ASSERT (Packet != NULL);
 
   Packet->Data.OpCode = HTONS (EFI_MTFTP4_OPCODE_DATA);
   Packet->Data.Block  = HTONS (BlockNum);

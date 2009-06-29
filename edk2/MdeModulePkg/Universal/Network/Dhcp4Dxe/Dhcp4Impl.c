@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
   
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1313,12 +1313,13 @@ PxeDhcpInput (
   //
   Len  = NET_ROUNDUP (sizeof (EFI_DHCP4_PACKET) + UdpPacket->TotalSize - sizeof (EFI_DHCP4_HEADER), 4);
   Wrap = NetbufAlloc (Len);
-
   if (Wrap == NULL) {
     goto RESTART;
   }
 
   Packet         = (EFI_DHCP4_PACKET *) NetbufAllocSpace (Wrap, Len, NET_BUF_TAIL);
+  ASSERT (Packet != NULL);
+
   Packet->Size   = Len;
   Head           = &Packet->Dhcp4.Header;
   Packet->Length = NetbufCopy (UdpPacket, 0, UdpPacket->TotalSize, (UINT8 *) Head);

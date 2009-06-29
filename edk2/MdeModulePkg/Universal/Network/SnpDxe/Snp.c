@@ -1,5 +1,5 @@
 /** @file
-    Implementation of driver entry point and driver binding protocol.
+  Implementation of driver entry point and driver binding protocol.
  
 Copyright (c) 2004 - 2009, Intel Corporation. <BR> 
 All rights reserved. This program and the accompanying materials are licensed 
@@ -860,7 +860,7 @@ AddV2P (
   }
 
   *V2p = AllocatePool (sizeof (V2P));
-  if (*V2p != NULL) {
+  if (*V2p == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 

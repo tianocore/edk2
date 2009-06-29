@@ -1,7 +1,7 @@
 /** @file
   The implementation of the ARP protocol.
   
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -1083,6 +1083,7 @@ ArpSendFrame (
   Packet = AllocatePool (TotalLength);
   if (Packet == NULL) {
     DEBUG ((EFI_D_ERROR, "ArpSendFrame: Allocate memory for Packet failed.\n"));
+    ASSERT (Packet != NULL);
   }
 
   TmpPtr = Packet;
@@ -1451,6 +1452,7 @@ ArpFindCacheEntry (
   UINT32             FoundCount;
   EFI_ARP_FIND_DATA  *FindData;
   LIST_ENTRY         *CacheTable;
+  UINT32             FoundEntryLength;
 
   ArpService = Instance->ArpService;
 
@@ -1567,12 +1569,14 @@ ArpFindCacheEntry (
     goto CLEAN_EXIT;
   }
 
+  //
+  // Found the entry length, make sure its 8 bytes alignment.
+  //
+  FoundEntryLength = (((sizeof (EFI_ARP_FIND_DATA) + Instance->ConfigData.SwAddressLength +
+                       ArpService->SnpMode.HwAddressSize) + 3) & ~(0x3));
+
   if (EntryLength != NULL) {
-    //
-    // Return the entry length, make sure its 8 bytes alignment.
-    //
-    *EntryLength = (((sizeof (EFI_ARP_FIND_DATA) + Instance->ConfigData.SwAddressLength +
-                   ArpService->SnpMode.HwAddressSize) + 3) & ~(0x3));
+    *EntryLength = FoundEntryLength;
   }
 
   if (EntryCount != NULL) {
@@ -1589,7 +1593,7 @@ ArpFindCacheEntry (
   //
   // Allocate buffer to copy the found entries.
   //
-  FindData = AllocatePool (FoundCount * (*EntryLength));
+  FindData = AllocatePool (FoundCount * FoundEntryLength);
   if (FindData == NULL) {
     DEBUG ((EFI_D_ERROR, "ArpFindCacheEntry: Failed to allocate memory.\n"));
     Status = EFI_OUT_OF_RESOURCES;

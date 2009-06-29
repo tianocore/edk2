@@ -1,7 +1,7 @@
 /** @file
   Support routines for Mtftp.
   
-Copyright (c) 2006 - 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -291,6 +291,8 @@ Mtftp4SendRequest (
   }
 
   Packet         = (EFI_MTFTP4_PACKET *) NetbufAllocSpace (Nbuf, Len, FALSE);
+  ASSERT (Packet != NULL);
+
   Packet->OpCode = HTONS (Instance->Operation);
   Cur            = Packet->Rrq.Filename;
   Cur            = (UINT8 *) AsciiStrCpy ((CHAR8 *) Cur, (CHAR8 *) Token->Filename);
@@ -335,12 +337,13 @@ Mtftp4SendError (
 
   Len     = (UINT32) (AsciiStrLen ((CHAR8 *) ErrInfo) + sizeof (EFI_MTFTP4_ERROR_HEADER));
   Packet  = NetbufAlloc (Len);
-
   if (Packet == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   TftpError         = (EFI_MTFTP4_PACKET *) NetbufAllocSpace (Packet, Len, FALSE);
+  ASSERT (TftpError != NULL);
+
   TftpError->OpCode = HTONS (EFI_MTFTP4_OPCODE_ERROR);
   TftpError->Error.ErrorCode = HTONS (ErrCode);
 

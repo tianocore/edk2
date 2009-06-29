@@ -736,6 +736,8 @@ Ip4FormCallback (
   case KEY_SAVE_CHANGES:
     Ip4ConfigInstance = Private->Current->Ip4ConfigInstance;
     NicInfo = AllocateZeroPool (sizeof (NIC_IP4_CONFIG_INFO) + 2 * sizeof (EFI_IP4_ROUTE_TABLE));
+    ASSERT (NicInfo != NULL);
+
     NicInfo->Ip4Info.RouteTable = (EFI_IP4_ROUTE_TABLE *) (NicInfo + 1);
 
     if (!Private->Current->SessionConfigData.Enabled) {

@@ -1432,6 +1432,8 @@ CheckIpByFilter (
     return TRUE;
   }
 
+  ASSERT (PxeBcMode->IpFilter.IpCnt < EFI_PXE_BASE_CODE_MAX_IPCNT);
+
   for (Index = 0; Index < PxeBcMode->IpFilter.IpCnt; Index++) {
     CopyMem (
       &Ip4Address, 
@@ -1755,20 +1757,20 @@ EfiPxeBcSetIpFilter (
   BOOLEAN                   PromiscuousNeed;
 
   if (This == NULL) {
-    DEBUG ((EFI_D_ERROR, "BC *This pointer == NULL.\n"));
+    DEBUG ((EFI_D_ERROR, "This == NULL.\n"));
     return EFI_INVALID_PARAMETER;
   }
 
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode = Private->PxeBc.Mode;
 
-  if (Private == NULL) {
-    DEBUG ((EFI_D_ERROR, "PXEBC_PRIVATE_DATA poiner == NULL.\n"));
+  if (NewFilter == NULL) {
+    DEBUG ((EFI_D_ERROR, "NewFilter == NULL.\n"));
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NewFilter == NULL) {
-    DEBUG ((EFI_D_ERROR, "IP Filter *NewFilter == NULL.\n"));
+  if (NewFilter->IpCnt > EFI_PXE_BASE_CODE_MAX_IPCNT) {
+    DEBUG ((EFI_D_ERROR, "NewFilter->IpCnt > %d.\n", EFI_PXE_BASE_CODE_MAX_IPCNT));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1778,6 +1780,7 @@ EfiPxeBcSetIpFilter (
   }
 
   PromiscuousNeed = FALSE;
+
   for (Index = 0; Index < NewFilter->IpCnt; ++Index) {
     if (IP4_IS_LOCAL_BROADCAST (EFI_IP4 (NewFilter->IpList[Index].v4))) {
       //
