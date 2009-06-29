@@ -491,11 +491,15 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
+  if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
   //
   // Allocate space for the Status Code Header and its buffer
   //
   StatusCodeData = NULL;
-  StatusCodeData = AllocatePool (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize);
+  gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize, (VOID **)&StatusCodeData);
   if (StatusCodeData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -528,7 +532,7 @@ ReportStatusCodeEx (
   //
   // Free the allocated buffer
   //
-  FreePool (StatusCodeData);
+  gBS->FreePool (StatusCodeData);
 
   return Status;
 }
