@@ -2639,7 +2639,7 @@ EfiPxeLoadFile (
 
     if (sizeof (UINTN) < sizeof (UINT64) && (TmpBufSize > 0xFFFFFFFF)) {
       Status = EFI_DEVICE_ERROR;
-    } else if (*BufferSize >= (UINTN) TmpBufSize && Buffer != NULL) {
+    } else if (TmpBufSize > 0 && *BufferSize >= (UINTN) TmpBufSize && Buffer != NULL) {
       *BufferSize = (UINTN) TmpBufSize;
       Status = PxeBc->Mtftp (
                         PxeBc,
@@ -2653,7 +2653,7 @@ EfiPxeLoadFile (
                         NULL,
                         FALSE
                         );
-	} else {
+    } else if (TmpBufSize > 0) {
       *BufferSize = (UINTN) TmpBufSize;
       Status      = EFI_BUFFER_TOO_SMALL;
     }
