@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -576,6 +576,8 @@ Udp4Transmit (
   *((UINTN *) &Packet->ProtoData[0]) = (UINTN) (Udp4Service->IpIo);
 
   Udp4Header = (EFI_UDP4_HEADER *) NetbufAllocSpace (Packet, UDP4_HEADER_SIZE, TRUE);
+  ASSERT (Udp4Header != NULL);
+
   ConfigData = &Instance->ConfigData;
 
   //

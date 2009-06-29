@@ -1,7 +1,7 @@
 /** @file
   TCP output process routines.
     
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -445,7 +445,9 @@ TcpGetSegmentSndQue (
     }
   }
 
-  ASSERT (Cur != Head);
+  ASSERT (Cur  != Head);
+  ASSERT (Node != NULL);
+  ASSERT (Seg  != NULL);
 
   //
   // Return the buffer if it can be returned without
@@ -750,6 +752,7 @@ SEND_AGAIN:
   Len   = TcpDataToSend (Tcb, Force);
   Seq   = Tcb->SndNxt;
 
+  ASSERT ((Tcb->State) < (sizeof (mTcpOutFlag) / sizeof (mTcpOutFlag[0])));
   Flag  = mTcpOutFlag[Tcb->State];
 
   if ((Flag & TCP_FLG_SYN) != 0) {

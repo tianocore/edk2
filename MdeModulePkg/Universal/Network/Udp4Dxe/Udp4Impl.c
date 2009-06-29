@@ -1,7 +1,7 @@
 /** @file
   The implementation of the Udp4 protocol.
   
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1718,6 +1718,7 @@ Udp4SendPortUnreach (
   // Allocate space for the IP4_ICMP_ERROR_HEAD.
   //
   IcmpErrHdr = (IP4_ICMP_ERROR_HEAD *) NetbufAllocSpace (Packet, Len, FALSE);
+  ASSERT (IcmpErrHdr != NULL);
 
   //
   // Set the required fields for the icmp port unreachable message.

@@ -1,7 +1,7 @@
 /** @file
   Routines to process Rrq (download).
   
-Copyright (c) 2006 - 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -99,7 +99,6 @@ Mtftp4RrqSendAck (
   NET_BUF                   *Packet;
 
   Packet = NetbufAlloc (sizeof (EFI_MTFTP4_ACK_HEADER));
-
   if (Packet == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -109,6 +108,7 @@ Mtftp4RrqSendAck (
                                 sizeof (EFI_MTFTP4_ACK_HEADER),
                                 FALSE
                                 );
+  ASSERT (Ack != NULL);
 
   Ack->Ack.OpCode   = HTONS (EFI_MTFTP4_OPCODE_ACK);
   Ack->Ack.Block[0] = HTONS (BlkNo);

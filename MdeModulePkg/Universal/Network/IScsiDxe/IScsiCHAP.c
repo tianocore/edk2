@@ -1,7 +1,7 @@
 /** @file
   This file is for Challenge-Handshake Authentication Protocol (CHAP) Configuration.
  
-Copyright (c) 2004 - 2008, Intel Corporation.<BR>
+Copyright (c) 2004 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -165,8 +165,7 @@ IScsiCHAPOnRspReceived (
   //
   KeyValueList = IScsiBuildKeyValueList ((CHAR8 *) Data, Len);
   if (KeyValueList == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Status = EFI_PROTOCOL_ERROR;

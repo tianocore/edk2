@@ -1286,6 +1286,9 @@ NetLibDefaultAddressIsStatic (
   // Construct config request string header
   //
   ConfigHdr = HiiConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Controller);
+  if (ConfigHdr == NULL) {
+    return TRUE;
+  }
   
   Len = StrLen (ConfigHdr);
   ConfigResp = AllocateZeroPool ((Len + NIC_ITEM_CONFIG_SIZE * 2 + 100) * sizeof (CHAR16));
