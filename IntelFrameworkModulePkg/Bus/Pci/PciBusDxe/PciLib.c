@@ -379,8 +379,9 @@ PciHostBridgeResourceAllocator (
       }
     }
     //
-    // End while
+    // End while, at least one Root Bridge should be found.
     //
+    ASSERT (RootBridgeDev != NULL);
 
     //
     // Notify platform to start to program the resource
