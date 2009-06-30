@@ -15,11 +15,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   strings.  Many of the output functions use a format string to describe how to 
   format the output of variable arguments.  The format string consists of normal 
   text and argument descriptors.  There are no restrictions for how the normal 
-  text and argument descriptors can be mixed.  A normal text character '\n' must 
-  always be converted to '\n\r'.  This does not follow the ANSI C standard for 
-  sprint().  The format of argument descriptors is described below.  The ANSI C 
-  standard for sprint() has been followed for some of the format types, and has 
-  not been followed for others.  The exceptions are noted below.
+  text and argument descriptors can be mixed.  The following end of line(EOL) 
+  translations must be performed on the contents of the format string:
+  
+     - '\\r' is translated to '\\r'
+     - '\\r\\n' is translated to '\\r\\n'
+     - '\\n' is translated to '\\r\\n' 
+     - '\\n\\r' is translated to '\\r\\n'
+  
+  This does not follow the ANSI C standard for sprint().  The format of argument 
+  descriptors is described below.  The ANSI C standard for sprint() has been 
+  followed for some of the format types, and has not been followed for others.  
+  The exceptions are noted below.
 
     %[flags][width][.precision]type
 
