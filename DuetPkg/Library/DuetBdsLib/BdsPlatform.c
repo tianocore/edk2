@@ -147,13 +147,13 @@ UpdateMemoryMap (
   VOID
   )
 {
-  EFI_STATUS                  Status;
-  EFI_PEI_HOB_POINTERS        GuidHob;
-  VOID                        *Table;
-  MEMORY_DESC_HOB             MemoryDescHob;
-  UINTN                       Index;
-  EFI_PHYSICAL_ADDRESS        Memory;
-
+  EFI_STATUS                      Status;
+  EFI_PEI_HOB_POINTERS            GuidHob;
+  VOID                            *Table;
+  MEMORY_DESC_HOB                 MemoryDescHob;
+  UINTN                           Index;
+  EFI_PHYSICAL_ADDRESS            Memory;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
   //
   // Get Hob List
   //
@@ -187,16 +187,62 @@ UpdateMemoryMap (
         (MemoryDescHob.MemDesc[Index].Type == EfiRuntimeServicesCode) ||
         (MemoryDescHob.MemDesc[Index].Type == EfiACPIReclaimMemory) ||
         (MemoryDescHob.MemDesc[Index].Type == EfiACPIMemoryNVS)) {
-      DEBUG ((EFI_D_ERROR, "PhysicalStart - 0x%x, ", MemoryDescHob.MemDesc[Index].PhysicalStart));
-      DEBUG ((EFI_D_ERROR, "PageNumber    - 0x%x, ", MemoryDescHob.MemDesc[Index].NumberOfPages));
-      DEBUG ((EFI_D_ERROR, "Type          - 0x%x\n", MemoryDescHob.MemDesc[Index].Type));
+      DEBUG ((EFI_D_ERROR, "PhysicalStart - 0x%016lx, ", MemoryDescHob.MemDesc[Index].PhysicalStart));
+      DEBUG ((EFI_D_ERROR, "PageNumber    - 0x%016lx, ", MemoryDescHob.MemDesc[Index].NumberOfPages));
+      DEBUG ((EFI_D_ERROR, "Attribute     - 0x%016lx, ", MemoryDescHob.MemDesc[Index].Attribute));
+      DEBUG ((EFI_D_ERROR, "Type          - 0x%08x\n", MemoryDescHob.MemDesc[Index].Type));
       if ((MemoryDescHob.MemDesc[Index].Type == EfiRuntimeServicesData) ||
           (MemoryDescHob.MemDesc[Index].Type == EfiRuntimeServicesCode)) {
         //
-        // Skip RuntimeSevicesData and RuntimeServicesCode, they are BFV
+        // For RuntimeSevicesData and RuntimeServicesCode, they are BFV or DxeCore.
+        // The memory type is assigned in EfiLdr
         //
-        continue;
+        Status = gDS->GetMemorySpaceDescriptor (MemoryDescHob.MemDesc[Index].PhysicalStart, &Descriptor);
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+        if (Descriptor.GcdMemoryType != EfiGcdMemoryTypeReserved) {
+          //
+          // BFV or tested DXE core
+          //
+          continue;
+        }
+        //
+        // Untested DXE Core region, free and remove
+        //
+        Status = gDS->FreeMemorySpace (
+                        MemoryDescHob.MemDesc[Index].PhysicalStart,
+                        LShiftU64 (MemoryDescHob.MemDesc[Index].NumberOfPages, EFI_PAGE_SHIFT)
+                        );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((EFI_D_ERROR, "FreeMemorySpace fail - %r!\n", Status));
+          continue;
+        }
+        Status = gDS->RemoveMemorySpace (
+                        MemoryDescHob.MemDesc[Index].PhysicalStart,
+                        LShiftU64 (MemoryDescHob.MemDesc[Index].NumberOfPages, EFI_PAGE_SHIFT)
+                        );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((EFI_D_ERROR, "RemoveMemorySpace fail - %r!\n", Status));
+          continue;
+        }
+
+        //
+        // Convert Runtime type to BootTime type
+        //
+        if (MemoryDescHob.MemDesc[Index].Type == EfiRuntimeServicesData) {
+          MemoryDescHob.MemDesc[Index].Type = EfiBootServicesData;
+        } else {
+          MemoryDescHob.MemDesc[Index].Type = EfiBootServicesCode;
+        }
+
+        //
+        // PassThrough, let below code add and alloate.
+        //
       }
+      //
+      // ACPI or reserved memory
+      //
       Status = gDS->AddMemorySpace (
                       EfiGcdMemoryTypeSystemMemory,
                       MemoryDescHob.MemDesc[Index].PhysicalStart,
@@ -204,7 +250,7 @@ UpdateMemoryMap (
                       MemoryDescHob.MemDesc[Index].Attribute
                       );
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "AddMemorySpace fail!\n"));
+        DEBUG ((EFI_D_ERROR, "AddMemorySpace fail - %r!\n", Status));
         if ((MemoryDescHob.MemDesc[Index].Type == EfiACPIReclaimMemory) ||
             (MemoryDescHob.MemDesc[Index].Type == EfiACPIMemoryNVS)) {
           //
@@ -224,7 +270,7 @@ UpdateMemoryMap (
                       &Memory
                       );
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "AllocatePages fail!\n"));
+        DEBUG ((EFI_D_ERROR, "AllocatePages fail - %r!\n", Status));
         //
         // For the page added, it must be allocated.
         //
