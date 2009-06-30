@@ -487,8 +487,8 @@ DevPathAtapi (
   CatPrint (
     Str,
     L"Ata(%s,%s)",
-    Atapi->PrimarySecondary ? L"Secondary" : L"Primary",
-    Atapi->SlaveMaster ? L"Slave" : L"Master"
+    (Atapi->PrimarySecondary != 0)? L"Secondary" : L"Primary",
+    (Atapi->SlaveMaster != 0)? L"Slave" : L"Master"
     );
 }
 
@@ -679,7 +679,7 @@ DevPathSata (
   SATA_DEVICE_PATH *Sata;
 
   Sata = DevPath;
-  if (Sata->PortMultiplierPortNumber & SATA_HBA_DIRECT_CONNECT_FLAG) {
+  if ((Sata->PortMultiplierPortNumber & SATA_HBA_DIRECT_CONNECT_FLAG) != 0) {
     CatPrint (
       Str,
       L"Sata(%x,%x)",
@@ -1503,7 +1503,7 @@ DevicePathToStr (
     // Find the handler to dump this device path node
     //
     DumpNode = NULL;
-    for (Index = 0; DevPathTable[Index].Function; Index += 1) {
+    for (Index = 0; DevPathTable[Index].Function != NULL; Index += 1) {
 
       if (DevicePathType (DevPathNode) == DevPathTable[Index].Type &&
           DevicePathSubType (DevPathNode) == DevPathTable[Index].SubType
@@ -1521,7 +1521,7 @@ DevicePathToStr (
     //
     //  Put a path seperator in if needed
     //
-    if (Str.Len && DumpNode != DevPathEndInstance) {
+    if ((Str.Len != 0) && (DumpNode != DevPathEndInstance)) {
       CatPrint (&Str, L"/");
     }
     //
