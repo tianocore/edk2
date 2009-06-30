@@ -165,6 +165,7 @@ IScsiCHAPOnRspReceived (
   //
   KeyValueList = IScsiBuildKeyValueList ((CHAR8 *) Data, Len);
   if (KeyValueList == NULL) {
+    gBS->FreePool (Data);
     return EFI_OUT_OF_RESOURCES;
   }
 

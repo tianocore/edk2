@@ -480,7 +480,7 @@ Tcp4IoReceive (
   }
 
 ON_EXIT:
-
+  Tcp4Io->RxToken.Packet.RxData = NULL;
   gBS->FreePool (Fragment);
 
   return Status;
