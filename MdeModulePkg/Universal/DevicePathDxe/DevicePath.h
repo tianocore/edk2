@@ -135,7 +135,7 @@ typedef struct {
   UINT16                    LoginOption;
   UINT64                    Lun;
   UINT16                    TargetPortalGroupTag;
-  CHAR8                     iSCSITargetName[1];
+  CHAR8                     TargetName[1];
 } ISCSI_DEVICE_PATH_WITH_NAME;
 
 typedef struct {

@@ -1291,7 +1291,7 @@ DevPathToTextiSCSI (
   CatPrint (
     Str,
     L"iSCSI(%a,0x%x,0x%lx,",
-    ISCSIDevPath->iSCSITargetName,
+    ISCSIDevPath->TargetName,
     (UINTN) ISCSIDevPath->TargetPortalGroupTag,
     ISCSIDevPath->Lun
     );

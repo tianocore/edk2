@@ -2319,7 +2319,7 @@ DevPathFromTextiSCSI (
                                                         (UINT16) (sizeof (ISCSI_DEVICE_PATH_WITH_NAME) + StrLen (NameStr))
                                                         );
 
-  AsciiStr = ISCSIDevPath->iSCSITargetName;
+  AsciiStr = ISCSIDevPath->TargetName;
   StrToAscii (NameStr, &AsciiStr);
 
   ISCSIDevPath->TargetPortalGroupTag = (UINT16) Strtoi (PortalGroupStr);
