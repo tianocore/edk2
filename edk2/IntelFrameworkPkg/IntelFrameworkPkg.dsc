@@ -3,7 +3,7 @@
 #
 # This DSC file is used for Package Level build.
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -75,4 +75,5 @@
   IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
   IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
   IntelFrameworkPkg/Library/PeiHobLibFramework/PeiHobLibFramework.inf
+  IntelFrameworkPkg/Library/SmmLibNull/SmmLibNull.inf
 
