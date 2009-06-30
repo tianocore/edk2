@@ -492,6 +492,7 @@ IScsiPrepareLoginReq (
   }
 
   LoginReq = (ISCSI_LOGIN_REQUEST *) NetbufAllocSpace (Nbuf, sizeof (ISCSI_LOGIN_REQUEST), NET_BUF_TAIL);
+  ASSERT (LoginReq != NULL);
   ZeroMem (LoginReq, sizeof (ISCSI_LOGIN_REQUEST));
 
   //
@@ -930,7 +931,7 @@ IScsiReceivePdu (
   NET_BUF         *DataSeg;
   UINT32          PadAndCRC32[2];
 
-  NbufList = AllocatePool (sizeof (LIST_ENTRY    ));
+  NbufList = AllocatePool (sizeof (LIST_ENTRY));
   if (NbufList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -943,11 +944,12 @@ IScsiReceivePdu (
   Len     = sizeof (ISCSI_BASIC_HEADER) + (HeaderDigest ? sizeof (UINT32) : 0);
   PduHdr  = NetbufAlloc (Len);
   if (PduHdr == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
+    gBS->FreePool (NbufList);
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Header = NetbufAllocSpace (PduHdr, Len, NET_BUF_TAIL);
+  ASSERT (Header != NULL);
   InsertTailList (NbufList, &PduHdr->List);
 
   //
@@ -1006,8 +1008,7 @@ IScsiReceivePdu (
       // The first to receive the useful data. The second to receive the padding.
       //
       Fragment[1].Len   = PadLen + (DataDigest ? sizeof (UINT32) : 0);
-      Fragment[1].Bulk  = (UINT8 *) ((UINTN) &PadAndCRC32[1] - PadLen);
-
+      Fragment[1].Bulk  = (UINT8 *)((UINTN) &PadAndCRC32[0] + (4 - PadLen));
       FragmentCount     = 2;
     } else {
       FragmentCount = 1;
@@ -1226,9 +1227,10 @@ IScsiCheckOpParams (
   //
   // FirstBurstLength, result function is Minimum. Irrelevant when InitialR2T=Yes and
   // ImmediateData=No.
+  // This Key/Value is negotiation type.
   //
   Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_FIRST_BURST_LENGTH);
-  if ((Value == NULL) && !(Session->InitialR2T && !Session->ImmediateData)) {
+  if (Value == NULL) {
     goto ON_ERROR;
   }
 
@@ -1455,7 +1457,7 @@ IScsiBuildKeyValueList (
   LIST_ENTRY            *ListHead;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
 
-  ListHead = AllocatePool (sizeof (LIST_ENTRY    ));
+  ListHead = AllocatePool (sizeof (LIST_ENTRY));
   if (ListHead == NULL) {
     return NULL;
   }
@@ -1804,6 +1806,10 @@ IScsiNewScsiCmdPdu (
   }
 
   ScsiCmd = (SCSI_COMMAND *) NetbufAllocSpace (PduHeader, Length, NET_BUF_TAIL);
+  if (ScsiCmd == NULL) {
+    NetbufFree (PduHeader);
+    return NULL;
+  }	
   Header  = (ISCSI_ADDITIONAL_HEADER *) (ScsiCmd + 1);
 
   ZeroMem (ScsiCmd, Length);
@@ -1885,7 +1891,7 @@ IScsiNewScsiCmdPdu (
       goto ON_EXIT;
     }
 
-    NbufList = AllocatePool (sizeof (LIST_ENTRY    ));
+    NbufList = AllocatePool (sizeof (LIST_ENTRY));
     if (NbufList == NULL) {
       NetbufFree (PduHeader);
       NetbufFree (DataSeg);
@@ -1910,7 +1916,7 @@ IScsiNewScsiCmdPdu (
       ) {
     //
     // Unsolicited data out sequence is not allowed,
-    // or FirstBustLength data is already sent out by immediate data
+    // or FirstBurstLength data is already sent out by immediate data
     // or all the OUT data accompany this SCSI packet is sent as
     // immediate data, the final flag should be set on this SCSI Command
     // PDU.
@@ -1951,7 +1957,7 @@ IScsiNewDataOutPdu (
   ISCSI_SCSI_DATA_OUT *DataOutHdr;
   ISCSI_XFER_CONTEXT  *XferContext;
 
-  NbufList = AllocatePool (sizeof (LIST_ENTRY    ));
+  NbufList = AllocatePool (sizeof (LIST_ENTRY));
   if (NbufList == NULL) {
     return NULL;
   }
@@ -1972,6 +1978,7 @@ IScsiNewDataOutPdu (
   InsertTailList (NbufList, &PduHdr->List);
 
   DataOutHdr  = (ISCSI_SCSI_DATA_OUT *) NetbufAllocSpace (PduHdr, sizeof (ISCSI_SCSI_DATA_OUT), NET_BUF_TAIL);
+  ASSERT (DataOutHdr != NULL);
   XferContext = &Tcb->XferContext;
 
   ZeroMem (DataOutHdr, sizeof (ISCSI_SCSI_DATA_OUT));
@@ -2036,7 +2043,7 @@ IScsiGenerateDataOutPduSequence (
   ISCSI_CONNECTION    *Conn;
   ISCSI_XFER_CONTEXT  *XferContext;
 
-  PduList = AllocatePool (sizeof (LIST_ENTRY    ));
+  PduList = AllocatePool (sizeof (LIST_ENTRY));
   if (PduList == NULL) {
     return NULL;
   }
