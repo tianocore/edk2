@@ -964,7 +964,7 @@ DevPathiSCSI (
   CatPrint (
     Str,
     L"iSCSI(%a,%x,%lx,",
-    IScsi->iSCSITargetName,
+    IScsi->TargetName,
     (UINTN) IScsi->TargetPortalGroupTag,
     IScsi->Lun
     );
