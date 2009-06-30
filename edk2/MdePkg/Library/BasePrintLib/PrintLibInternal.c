@@ -702,8 +702,33 @@ BasePrintLibSPrintMarker (
         }
         break;
 
+      case '\r':
+        Format += BytesPerFormatCharacter;
+        FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+        if (FormatCharacter == '\n') {
+          //
+          // Translate '\r\n' to '\r\n'
+          //
+          ArgumentString = "\r\n";
+        } else {
+          //
+          // Translate '\r' to '\r'
+          //
+          ArgumentString = "\r";
+          Format   -= BytesPerFormatCharacter;
+        }
+        break;
+
       case '\n':
-        ArgumentString = "\n\r";
+        //
+        // Translate '\n' to '\r\n' and '\n\r' to '\r\n'
+        //
+        ArgumentString = "\r\n";
+        Format += BytesPerFormatCharacter;
+        FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+        if (FormatCharacter != '\r') {
+          Format   -= BytesPerFormatCharacter;
+        }
         break;
 
       case '%':
@@ -717,8 +742,33 @@ BasePrintLibSPrintMarker (
       }
       break;
  
+    case '\r':
+      Format += BytesPerFormatCharacter;
+      FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+      if (FormatCharacter == '\n') {
+        //
+        // Translate '\r\n' to '\r\n'
+        //
+        ArgumentString = "\r\n";
+      } else {
+        //
+        // Translate '\r' to '\r'
+        //
+        ArgumentString = "\r";
+        Format   -= BytesPerFormatCharacter;
+      }
+      break;
+
     case '\n':
-      ArgumentString = "\n\r";
+      //
+      // Translate '\n' to '\r\n' and '\n\r' to '\r\n'
+      //
+      ArgumentString = "\r\n";
+      Format += BytesPerFormatCharacter;
+      FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+      if (FormatCharacter != '\r') {
+        Format   -= BytesPerFormatCharacter;
+      }
       break;
 
     default:
