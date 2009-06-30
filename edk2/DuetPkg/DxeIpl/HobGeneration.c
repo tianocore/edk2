@@ -190,6 +190,26 @@ HOB_TEMPLATE  gHobTemplate = {
     EFI_DXE_FILE_GUID,
     0x0                                             //  EFI_PHYSICAL_ADDRESS of EntryPoint;
   },
+  { // MemoryDxeCore
+    {
+      EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,             // HobType
+      sizeof (EFI_HOB_RESOURCE_DESCRIPTOR),         // HobLength
+      0                                             // Reserved
+    },
+    {
+      0                                             // Owner Guid
+    },
+    EFI_RESOURCE_SYSTEM_MEMORY,                     // ResourceType
+    (EFI_RESOURCE_ATTRIBUTE_PRESENT                 |
+//     EFI_RESOURCE_ATTRIBUTE_TESTED                  | // Do not mark as TESTED, or DxeCore will find it and use it before check Allocation
+     EFI_RESOURCE_ATTRIBUTE_INITIALIZED             |
+     EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE             | 
+     EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE       | 
+     EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE | 
+     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE),     
+    0x0,                                            // PhysicalStart
+    0                                               // ResourceLength
+  },
   { // Memory Map Hints to reduce fragmentation in the memory map
     {
       {
@@ -453,6 +473,23 @@ HOB_TEMPLATE  gHobTemplate = {
       0
     }
   },
+  { // NV Ftw FV Resource
+    {
+      EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,     // HobType
+      sizeof (EFI_HOB_RESOURCE_DESCRIPTOR), // HobLength
+      0                                     // Reserved
+    },
+    {
+      0                                     // Owner Guid
+    },
+    EFI_RESOURCE_FIRMWARE_DEVICE,           // ResourceType
+    (EFI_RESOURCE_ATTRIBUTE_PRESENT    |
+     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+     EFI_RESOURCE_ATTRIBUTE_TESTED |
+     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE),  // ResourceAttribute
+    0,                                              // PhysicalStart (Fixed later)
+    NV_FTW_FVB_SIZE                                 // ResourceLength
+  },  
   { // FVB holding FTW spaces including Working & Spare space
     {
       {
@@ -703,9 +740,13 @@ PrepareHobDxeCore (
   UINT64                DxeCoreLength
   )
 {
-  gHob->DxeCore.MemoryAllocationHeader.MemoryBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)DxeCoreImageBase;
+  gHob->DxeCore.MemoryAllocationHeader.MemoryBaseAddress = DxeCoreImageBase;
   gHob->DxeCore.MemoryAllocationHeader.MemoryLength = DxeCoreLength;
   gHob->DxeCore.EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)DxeCoreEntryPoint;
+
+
+  gHob->MemoryDxeCore.PhysicalStart   = DxeCoreImageBase;
+  gHob->MemoryDxeCore.ResourceLength  = DxeCoreLength;  
 }
 
 VOID *
@@ -878,7 +919,8 @@ PrepareHobNvStorage (
   // Create the FVB holding FTW spaces
   //
   FtwFvbBase = (EFI_PHYSICAL_ADDRESS)((UINTN) StorageFvbBase + NV_STORAGE_FVB_SIZE);
-  gHob->NvFtwFvb.FvbInfo.Entries[0].Base = FtwFvbBase;
+  gHob->NvFtwFvResource.PhysicalStart =
+    gHob->NvFtwFvb.FvbInfo.Entries[0].Base = FtwFvbBase;
   //
   // Put FTW Working in front
   //
