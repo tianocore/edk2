@@ -770,6 +770,20 @@ InitializeGraphicsMode (
 {
   UINT8 Byte;
   UINTN Index;
+  UINT16 DeviceId;
+
+  //
+  // Read the PCI Configuration Header from the PCI Device
+  //
+  ASSERT_EFI_ERROR (
+    Private->PciIo->Pci.Read (
+                        Private->PciIo,
+                        EfiPciIoWidthUint16,
+                        PCI_DEVICE_ID_OFFSET,
+                        1,
+                        &DeviceId
+                        )
+    );
 
   outw (Private, SEQ_ADDRESS_REGISTER, 0x1206);
   outw (Private, SEQ_ADDRESS_REGISTER, 0x0012);
@@ -778,9 +792,11 @@ InitializeGraphicsMode (
     outw (Private, SEQ_ADDRESS_REGISTER, ModeData->SeqSettings[Index]);
   }
 
-  outb (Private, SEQ_ADDRESS_REGISTER, 0x0f);
-  Byte = (UINT8) ((inb (Private, SEQ_DATA_REGISTER) & 0xc7) ^ 0x30);
-  outb (Private, SEQ_DATA_REGISTER, Byte);
+  if (DeviceId != CIRRUS_LOGIC_5446_DEVICE_ID) {
+    outb (Private, SEQ_ADDRESS_REGISTER, 0x0f);
+    Byte = (UINT8) ((inb (Private, SEQ_DATA_REGISTER) & 0xc7) ^ 0x30);
+    outb (Private, SEQ_DATA_REGISTER, Byte);
+  }
 
   outb (Private, MISC_OUTPUT_REGISTER, ModeData->MiscSetting);
   outw (Private, GRAPH_ADDRESS_REGISTER, 0x0506);
