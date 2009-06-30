@@ -751,27 +751,6 @@ DrawLogo (
   UINTN                           ScreenHeight
   )
 {
-  UINTN Offset;
-  UINTN X;
-  UINTN Y;
-  UINT8 Color;
-
-  Offset        = 0;
-  for (Y = 0; Y < ScreenHeight; Y++) {
-    for (X = 0; X < ScreenWidth; X++) {
-      Color                   = (UINT8) (256 * (X + Y) / (ScreenWidth + ScreenHeight));
-      Private->LineBuffer[X]  = Color;
-    }
-
-    Private->PciIo->Mem.Write (
-                          Private->PciIo,
-                          EfiPciIoWidthUint32,
-                          0,
-                          Offset + (Y * ScreenWidth),
-                          ScreenWidth >> 2,
-                          Private->LineBuffer
-                          );
-  }
 }
 
 /**
