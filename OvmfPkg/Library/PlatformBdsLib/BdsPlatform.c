@@ -16,6 +16,24 @@
 
 
 //
+// Global data
+//
+
+VOID          *mEfiDevPathNotifyReg;
+EFI_EVENT     mEfiDevPathEvent;
+
+
+//
+// Function prototypes
+//
+
+VOID
+InstallDevicePathCallback (
+  VOID
+  );
+
+
+//
 // BDS Platform Functions
 //
 VOID
@@ -39,6 +57,7 @@ Returns:
 --*/
 {
   DEBUG ((EFI_D_INFO, "PlatformBdsInit\n"));
+  InstallDevicePathCallback ();
 }
 
 
@@ -594,42 +613,47 @@ PciInitialization (
   )
 {
   //
-  // Device 0 Function 0
+  // Bus 0, Device 0, Function 0 - Host to PCI Bridge
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0,0,0,0x3c), 0x00);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 0, 0, 0x3c), 0x00);
 
   //
-  // Device 1 Function 0
+  // Bus 0, Device 1, Function 0 - PCI to ISA Bridge
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,0,0x3c), 0x00);
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,0,0x60), 0x8b);
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,0,0x61), 0x89);
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,0,0x62), 0x0a);
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,0,0x63), 0x89);
-  //PciWrite8 (PCI_LIB_ADDRESS (0,1,0,0x82), 0x02);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x3c), 0x00);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x60), 0x0b);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x61), 0x09);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x62), 0x0b);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x63), 0x09);
 
   //
-  // Device 1 Function 1
+  // Bus 0, Device 1, Function 1 - IDE Controller
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,1,0x3c), 0x00);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 1, 0x3c), 0x00);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 1, 0x0d), 0x40);
 
   //
-  // Device 1 Function 3
+  // Bus 0, Device 1, Function 3 - Power Managment Controller
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,3,0x3c), 0x0b);
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,3,0x3d), 0x01);
-  PciWrite8 (PCI_LIB_ADDRESS (0,1,3,0x5f), 0x90);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 3, 0x3c), 0x0b);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 1, 3, 0x3d), 0x01);
 
   //
-  // Device 2 Function 0
+  // Bus 0, Device 2, Function 0 - Video Controller
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0,2,0,0x3c), 0x00);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 2, 0, 0x3c), 0x00);
 
   //
-  // Device 3 Function 0
+  // Bus 0, Device 3, Function 0 - Network Controller
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0,3,0,0x3c), 0x0b);
-  PciWrite8 (PCI_LIB_ADDRESS (0,3,0,0x3d), 0x01);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 3, 0, 0x3c), 0x0b);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 3, 0, 0x3d), 0x01);
+
+  //
+  // Bus 0, Device 4, Function 0 - RAM Memory
+  //
+  PciWrite8 (PCI_LIB_ADDRESS (0, 4, 0, 0x3c), 0x09);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 4, 0, 0x3d), 0x01);
 }
 
 
@@ -679,6 +703,11 @@ Returns:
   BdsLibConnectAll ();
 
   PciInitialization ();
+
+  //
+  // Clear the logo after all devices are connected.
+  //
+  gST->ConOut->ClearScreen (gST->ConOut);
 }
 
 VOID
@@ -1044,3 +1073,105 @@ PlatformBdsLockNonUpdatableFlash (
   DEBUG ((EFI_D_INFO, "PlatformBdsLockNonUpdatableFlash\n"));
   return EFI_SUCCESS;
 }
+
+
+/**
+  This notification function is invoked when an instance of the
+  EFI_DEVICE_PATH_PROTOCOL is produced.
+
+  @param  Event                 The event that occured
+  @param  Context               For EFI compatiblity.  Not used.
+
+**/
+VOID
+EFIAPI
+NotifyDevPath (
+  IN  EFI_EVENT Event,
+  IN  VOID      *Context
+  )
+{
+  EFI_HANDLE                            Handle;
+  EFI_STATUS                            Status;
+  UINTN                                 BufferSize;
+  EFI_DEVICE_PATH_PROTOCOL             *DevPathNode;
+  ATAPI_DEVICE_PATH                    *Atapi;
+
+  //
+  // Examine all new handles
+  //
+  for (;;) {
+    //
+    // Get the next handle
+    //
+    BufferSize = sizeof (Handle);
+    Status = gBS->LocateHandle (
+              ByRegisterNotify,
+              NULL,
+              mEfiDevPathNotifyReg,
+              &BufferSize,
+              &Handle
+              );
+
+    //
+    // If not found, we're done
+    //
+    if (EFI_NOT_FOUND == Status) {
+      break;
+    }
+
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    //
+    // Get the DevicePath protocol on that handle
+    //
+    Status = gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid, (VOID **)&DevPathNode);
+    ASSERT_EFI_ERROR (Status);
+
+    while (!IsDevicePathEnd (DevPathNode)) {
+      //
+      // Find the handler to dump this device path node
+      //
+      if (
+           (DevicePathType(DevPathNode) == MESSAGING_DEVICE_PATH) &&
+           (DevicePathSubType(DevPathNode) == MSG_ATAPI_DP)
+         ) {
+        Atapi = (ATAPI_DEVICE_PATH*) DevPathNode;
+        PciOr16 (
+          PCI_LIB_ADDRESS (
+            0,
+            1,
+            1,
+            (Atapi->PrimarySecondary == 1) ? 0x42: 0x40
+            ),
+          BIT15
+          );
+      }
+
+      //
+      // Next device path node
+      //
+      DevPathNode = NextDevicePathNode (DevPathNode);
+    }
+  }
+
+  return;
+}
+
+
+VOID
+InstallDevicePathCallback (
+  VOID
+  )
+{
+  DEBUG ((EFI_D_INFO, "Registered NotifyDevPath Event\n"));
+  mEfiDevPathEvent = EfiCreateProtocolNotifyEvent (
+                          &gEfiDevicePathProtocolGuid,
+                          TPL_CALLBACK,
+                          NotifyDevPath,
+                          NULL,
+                          &mEfiDevPathNotifyReg
+                          );
+}
+
