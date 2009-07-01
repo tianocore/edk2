@@ -1,15 +1,7 @@
-/**@file
-  ISA Floppy Driver
-  1. Support two types diskette drive
-     1.44M drive and 2.88M drive (and now only support 1.44M)
-  2. Support two diskette drives
-  3. Use DMA channel 2 to transfer data
-  4. Do not use interrupt
-  5. Support diskette change line signal and write protect
-
-  The internal function for the floppy driver
+/** @file
+  Internal floppy disk controller programming functions for the floppy driver.
   
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,13 +15,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IsaFloppy.h"
 
 /**
-
-  Detect the floppy drive is presented or not
+  Detect whether a floppy drive is present or not.
  
-  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  @retval EFI_SUCCESS    Drive is presented
-  @retval EFI_NOT_FOUND  Drive is not presented
+  @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
 
+  @retval EFI_SUCCESS    The floppy disk drive is present
+  @retval EFI_NOT_FOUND  The floppy disk drive is not present
 **/
 EFI_STATUS
 DiscoverFddDevice (
@@ -40,9 +31,6 @@ DiscoverFddDevice (
 
   FdcDev->BlkIo.Media = &FdcDev->BlkMedia;
 
-  //
-  // Call FddIndentify subroutine
-  //
   Status = FddIdentify (FdcDev);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
@@ -59,13 +47,13 @@ DiscoverFddDevice (
 }
 
 /**
-
-  Do recalibrate  and see the drive is presented or not
-  Set the media parameters
+  Do recalibrate and check if the drive is present or not
+  and set the media parameters if the driver is present.
   
-  @param FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  @return the drive is presented or not
+  @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
 
+  @retval EFI_SUCCESS       The floppy disk drive is present
+  @retval EFI_DEVICE_ERROR  The floppy disk drive is not present
 **/
 EFI_STATUS
 FddIdentify (
@@ -94,9 +82,6 @@ FddIdentify (
   //
   FdcDev->BlkIo.Media->RemovableMedia = TRUE;
   FdcDev->BlkIo.Media->MediaPresent   = TRUE;
-  //
-  // investigate
-  //
   FdcDev->BlkIo.Media->MediaId = 0;
 
   //
@@ -137,10 +122,9 @@ FddIdentify (
 }
 
 /**
-
-  Reset the Floppy Logic Drive
+  Reset the Floppy Logic Drive.
   
-  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the FDC_BLK_IO_DEV
   
   @retval EFI_SUCCESS:    The Floppy Logic Drive is reset
   @retval EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly and
@@ -152,7 +136,7 @@ FddReset (
   IN FDC_BLK_IO_DEV  *FdcDev
   )
 {
-  UINT8 data;
+  UINT8 Data;
   UINT8 StatusRegister0;
   UINT8 PresentCylinderNumber;
   UINTN Index;
@@ -179,9 +163,9 @@ FddReset (
   //         use bit0 & bit1 to  select the logic drive
   //         write "0" to bit2
   //
-  data = 0x0;
-  data = (UINT8) (data | (SELECT_DRV & FdcDev->Disk));
-  FdcWritePort (FdcDev, FDC_REGISTER_DOR, data);
+  Data = 0x0;
+  Data = (UINT8) (Data | (SELECT_DRV & FdcDev->Disk));
+  FdcWritePort (FdcDev, FDC_REGISTER_DOR, Data);
 
   //
   // wait some time,at least 120us
@@ -193,8 +177,8 @@ FddReset (
   //   write "1" to bit2
   //   write "1" to bit3 : enable DMA
   //
-  data |= 0x0C;
-  FdcWritePort (FdcDev, FDC_REGISTER_DOR, data);
+  Data |= 0x0C;
+  FdcWritePort (FdcDev, FDC_REGISTER_DOR, Data);
 
   //
   // Experience value
@@ -236,16 +220,13 @@ FddReset (
 }
 
 /**
-
-  Turn the drive's motor on
-  The drive's motor must be on before any command can be executed
+  Turn the floppy disk drive's motor on.
+  The drive's motor must be on before any command can be executed.
   
-  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
+  @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
   
-  @retval  EFI_SUCCESS:       Turn the drive's motor on successfully
-  @retval  EFI_DEVICE_ERROR:    The drive is busy, so can not turn motor on
-  @retval  EFI_INVALID_PARAMETER: Fail to Set timer(Cancel timer)
-
+  @retval  EFI_SUCCESS            The drive's motor was turned on successfully
+  @retval  EFI_DEVICE_ERROR       The drive is busy, so can not turn motor on
 **/
 EFI_STATUS
 MotorOn (
@@ -253,7 +234,7 @@ MotorOn (
   )
 {
   EFI_STATUS  Status;
-  UINT8       data;
+  UINT8       DorData;
 
   //
   // Control of the floppy drive motors is a big pain. If motor is off, you have
@@ -269,17 +250,15 @@ MotorOn (
   // Cancel the timer
   //
   Status = gBS->SetTimer (FdcDev->Event, TimerCancel, 0);
+  ASSERT_EFI_ERROR (Status);
 
-  if (EFI_ERROR (Status)) {
-    return EFI_INVALID_PARAMETER;
-  }
   //
   // Get the motor status
   //
-  data = FdcReadPort (FdcDev, FDC_REGISTER_DOR);
+  DorData = FdcReadPort (FdcDev, FDC_REGISTER_DOR);
 
-  if (((FdcDev->Disk == FDC_DISK0) && ((data & 0x10) == 0x10)) ||
-      ((FdcDev->Disk == FDC_DISK1) && ((data & 0x21) == 0x21))
+  if (((FdcDev->Disk == FdcDisk0) && ((DorData & 0x10) == 0x10)) ||
+      ((FdcDev->Disk == FdcDisk1) && ((DorData & 0x21) == 0x21))
       ) {
     return EFI_SUCCESS;
   }
@@ -293,21 +272,21 @@ MotorOn (
   //
   // for drive A: 1CH, drive B: 2DH
   //
-  data = 0x0C;
-  data = (UINT8) (data | (SELECT_DRV & FdcDev->Disk));
-  if (FdcDev->Disk == FDC_DISK0) {
+  DorData = 0x0C;
+  DorData = (UINT8) (DorData | (SELECT_DRV & FdcDev->Disk));
+  if (FdcDev->Disk == FdcDisk0) {
     //
     // drive A
     //
-    data |= DRVA_MOTOR_ON;
+    DorData |= DRVA_MOTOR_ON;
   } else {
     //
     // drive B
     //
-    data |= DRVB_MOTOR_ON;
+    DorData |= DRVB_MOTOR_ON;
   }
 
-  FdcWritePort (FdcDev, FDC_REGISTER_DOR, data);
+  FdcWritePort (FdcDev, FDC_REGISTER_DOR, DorData);
 
   //
   // Experience value
@@ -318,15 +297,12 @@ MotorOn (
 }
 
 /**
-
-  Set a Timer and when Timer goes off, turn the motor off
+  Set a Timer and when Timer goes off, turn the motor off.
   
+  @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
   
-  @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
-  
-  @retval  EFI_SUCCESS:       Set the Timer successfully
-  @retval  EFI_INVALID_PARAMETER: Fail to Set the timer
-
+  @retval  EFI_SUCCESS            Set the Timer successfully
+  @retval  EFI_INVALID_PARAMETER  Fail to Set the timer
 **/
 EFI_STATUS
 MotorOff (
@@ -340,15 +316,14 @@ MotorOff (
 }
 
 /**
-  Detect the disk in the drive is changed or not
+  Detect whether the disk in the drive is changed or not.
   
+  @param[in] FdcDev  A pointer to FDC_BLK_IO_DEV
   
-  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-  
-  @retval  EFI_SUCCESS:    No disk media change
-  @retval  EFI_DEVICE_ERROR: Fail to do the recalibrate or seek operation
-  @retval  EFI_NO_MEDIA:   No disk in the drive
-  @retval  EFI_MEDIA_CHANGED:  There is a new disk in the drive
+  @retval  EFI_SUCCESS        No disk media change
+  @retval  EFI_DEVICE_ERROR   Fail to do the recalibrate or seek operation
+  @retval  EFI_NO_MEDIA       No disk in the drive
+  @retval  EFI_MEDIA_CHANGED  There is a new disk in the drive
 **/
 EFI_STATUS
 DisketChanged (
@@ -356,19 +331,19 @@ DisketChanged (
   )
 {
   EFI_STATUS  Status;
-  UINT8       data;
+  UINT8       Data;
 
   //
   // Check change line
   //
-  data = FdcReadPort (FdcDev, FDC_REGISTER_DIR);
+  Data = FdcReadPort (FdcDev, FDC_REGISTER_DIR);
 
   //
   // Io delay
   //
   MicroSecondDelay (50);
 
-  if ((data & DIR_DCL) == 0x80) {
+  if ((Data & DIR_DCL) == 0x80) {
     //
     // disk change line is active
     //
@@ -386,14 +361,14 @@ DisketChanged (
       //
     }
 
-    data = FdcReadPort (FdcDev, FDC_REGISTER_DIR);
+    Data = FdcReadPort (FdcDev, FDC_REGISTER_DIR);
 
     //
     // Io delay
     //
     MicroSecondDelay (50);
 
-    if ((data & DIR_DCL) == 0x80) {
+    if ((Data & DIR_DCL) == 0x80) {
       return EFI_NO_MEDIA;
     }
 
@@ -406,13 +381,12 @@ DisketChanged (
 /**
   Do the Specify command, this command sets DMA operation
   and the initial values for each of the three internal
-  times: HUT, SRT and HLT
+  times: HUT, SRT and HLT.
   
-  @param FdcDev    Pointer to instance of FDC_BLK_IO_DEV
+  @param[in] FdcDev  Pointer to instance of FDC_BLK_IO_DEV
   
-  @retval  EFI_SUCCESS:    Execute the Specify command successfully
-  @retval  EFI_DEVICE_ERROR: Fail to execute the command
-
+  @retval EFI_SUCCESS       Execute the Specify command successfully
+  @retval EFI_DEVICE_ERROR  Fail to execute the command
 **/
 EFI_STATUS
 Specify (
@@ -447,9 +421,9 @@ Specify (
 }
 
 /**
-  Set the head of floppy drive to track 0
+  Set the head of floppy drive to track 0.
  
-  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @retval EFI_SUCCESS:    Execute the Recalibrate operation successfully
   @retval EFI_DEVICE_ERROR: Fail to execute the Recalibrate operation
 
@@ -474,7 +448,7 @@ Recalibrate (
     //
     // drive select
     //
-    if (FdcDev->Disk == FDC_DISK0) {
+    if (FdcDev->Disk == FdcDisk0) {
       Command.DiskHeadSel = 0;
       //
       // 0
@@ -521,9 +495,9 @@ Recalibrate (
 }
 
 /**
-  Set the head of floppy drive to the new cylinder
+  Set the head of floppy drive to the new cylinder.
   
-  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param  Lba EFI_LBA     : The logic block address want to seek
   
   @retval  EFI_SUCCESS:    Execute the Seek operation successfully
@@ -573,7 +547,7 @@ Seek (
 
   ZeroMem (&Command, sizeof (FDD_SEEK_CMD));
   Command.CommandCode = SEEK_CMD;
-  if (FdcDev->Disk == FDC_DISK0) {
+  if (FdcDev->Disk == FdcDisk0) {
     Command.DiskHeadSel = 0;
     //
     // 0
@@ -625,9 +599,9 @@ Seek (
 
 /**
   Do the Sense Interrupt Status command, this command
-  resets the interrupt signal
+  resets the interrupt signal.
   
-  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param  StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
   @param  PresentCylinderNumber  UINT8 *: Be used to save present cylinder number
                                     read from FDC
@@ -643,10 +617,10 @@ SenseIntStatus (
   IN OUT UINT8           *PresentCylinderNumber
   )
 {
-  UINT8 command;
+  UINT8 Command;
 
-  command = SENSE_INT_STATUS_CMD;
-  if (EFI_ERROR (DataOutByte (FdcDev, &command))) {
+  Command = SENSE_INT_STATUS_CMD;
+  if (EFI_ERROR (DataOutByte (FdcDev, &Command))) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -662,9 +636,9 @@ SenseIntStatus (
 }
 
 /**
-  Do the Sense Drive Status command
+  Do the Sense Drive Status command.
   
-  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param  Lba EFI_LBA     : Logic block address
   
   @retval  EFI_SUCCESS:    Execute the Sense Drive Status command successfully
@@ -693,7 +667,7 @@ SenseDrvStatus (
   ZeroMem (&Command, sizeof (FDD_COMMAND_PACKET2));
   Command.CommandCode = SENSE_DRV_STATUS_CMD;
 
-  if (FdcDev->Disk == FDC_DISK0) {
+  if (FdcDev->Disk == FdcDisk0) {
     Command.DiskHeadSel = 0;
   } else {
     Command.DiskHeadSel = 1;
@@ -725,10 +699,9 @@ SenseDrvStatus (
 }
 
 /**
-  Update the disk media properties and if necessary
-                        reinstall Block I/O interface
+  Update the disk media properties and if necessary reinstall Block I/O interface.
  
-  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   
   @retval  EFI_SUCCESS:    Do the operation successfully
   @retval  EFI_DEVICE_ERROR: Fail to the operation
@@ -740,13 +713,13 @@ DetectMedia (
   )
 {
   EFI_STATUS  Status;
-  BOOLEAN     bReset;
-  BOOLEAN     bReadOnlyLastTime;
-  BOOLEAN     bMediaPresentLastTime;
+  BOOLEAN     Reset;
+  BOOLEAN     ReadOnlyLastTime;
+  BOOLEAN     MediaPresentLastTime;
 
-  bReset                = FALSE;
-  bReadOnlyLastTime     = FdcDev->BlkIo.Media->ReadOnly;
-  bMediaPresentLastTime = FdcDev->BlkIo.Media->MediaPresent;
+  Reset                = FALSE;
+  ReadOnlyLastTime     = FdcDev->BlkIo.Media->ReadOnly;
+  MediaPresentLastTime = FdcDev->BlkIo.Media->MediaPresent;
 
   //
   // Check disk change
@@ -756,7 +729,7 @@ DetectMedia (
   if (Status == EFI_MEDIA_CHANGED) {
     FdcDev->BlkIo.Media->MediaId++;
     FdcDev->BlkIo.Media->MediaPresent = TRUE;
-    bReset = TRUE;
+    Reset = TRUE;
   } else if (Status == EFI_NO_MEDIA) {
     FdcDev->BlkIo.Media->MediaPresent = FALSE;
   } else if (Status != EFI_SUCCESS) {
@@ -779,15 +752,15 @@ DetectMedia (
     }
   }
 
-  if (FdcDev->BlkIo.Media->MediaPresent && (bReadOnlyLastTime != FdcDev->BlkIo.Media->ReadOnly)) {
-    bReset = TRUE;
+  if (FdcDev->BlkIo.Media->MediaPresent && (ReadOnlyLastTime != FdcDev->BlkIo.Media->ReadOnly)) {
+    Reset = TRUE;
   }
 
-  if (bMediaPresentLastTime != FdcDev->BlkIo.Media->MediaPresent) {
-    bReset = TRUE;
+  if (MediaPresentLastTime != FdcDev->BlkIo.Media->MediaPresent) {
+    Reset = TRUE;
   }
 
-  if (bReset) {
+  if (Reset) {
     Status = gBS->ReinstallProtocolInterface (
                     FdcDev->Handle,
                     &gEfiBlockIoProtocolGuid,
@@ -804,9 +777,9 @@ DetectMedia (
 }
 
 /**
-  Set the data rate and so on
+  Set the data rate and so on.
  
-  @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev  A pointer to FDC_BLK_IO_DEV
 
   @retval EFI_SUCCESS success to set the data rate
 **/
@@ -837,9 +810,9 @@ Setup (
 }
 
 /**
-  Read or Write a number of blocks in the same cylinder
+  Read or Write a number of blocks in the same cylinder.
  
-  @param  FdcDev      A pointer to Data Structure FDC_BLK_IO_DEV
+  @param  FdcDev      A pointer to FDC_BLK_IO_DEV
   @param  HostAddress device address 
   @param  Lba         The starting logic block address to read from on the device
   @param  NumberOfBlocks The number of block wanted to be read or write
@@ -952,7 +925,7 @@ ReadWriteDataSector (
 
     MicroSecondDelay (50);
     Times = Times - 1;
-  } while (Times);
+  } while (Times >= 0);
 
   if (Times == 0) {
     return EFI_TIMEOUT;
@@ -987,7 +960,7 @@ ReadWriteDataSector (
 }
 
 /**
-  Fill in FDD command's parameter
+  Fill in FDD command's parameter.
   
   @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
   @param Lba      The starting logic block address to read from on the device
@@ -1011,7 +984,7 @@ FillPara (
   //
   // Fill the command parameter
   //
-  if (FdcDev->Disk == FDC_DISK0) {
+  if (FdcDev->Disk == FdcDisk0) {
     Command->DiskHeadSel = 0;
   } else {
     Command->DiskHeadSel = 1;
@@ -1028,23 +1001,22 @@ FillPara (
 }
 
 /**
-  Read result byte from Data Register of FDC
+  Read result byte from Data Register of FDC.
   
-  @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
-  @param Pointer UINT8 *: Be used to save result byte read from FDC
+  @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
+  @param Pointer  Buffer to store the byte read from FDC
   
-  
-  @retval  EFI_SUCCESS:    Read result byte from FDC successfully
-  @retval  EFI_DEVICE_ERROR: The FDC is not ready to be read
+  @retval EFI_SUCCESS       Read result byte from FDC successfully
+  @retval EFI_DEVICE_ERROR  The FDC is not ready to be read
 
 **/
 EFI_STATUS
 DataInByte (
-  IN     FDC_BLK_IO_DEV  *FdcDev,
-  IN OUT UINT8           *Pointer
+  IN  FDC_BLK_IO_DEV  *FdcDev,
+  OUT UINT8           *Pointer
   )
 {
-  UINT8 data;
+  UINT8 Data;
 
   //
   // wait for 1ms and detect the FDC is ready to be read
@@ -1056,19 +1028,19 @@ DataInByte (
     //
   }
 
-  data = FdcReadPort (FdcDev, FDC_REGISTER_DTR);
+  Data = FdcReadPort (FdcDev, FDC_REGISTER_DTR);
 
   //
   // Io delay
   //
   MicroSecondDelay (50);
 
-  *Pointer = data;
+  *Pointer = Data;
   return EFI_SUCCESS;
 }
 
 /**
-  Write command byte to Data Register of FDC
+  Write command byte to Data Register of FDC.
   
   @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
   @param Pointer Be used to save command byte written to FDC
@@ -1083,21 +1055,21 @@ DataOutByte (
   IN UINT8           *Pointer
   )
 {
-  UINT8 data;
+  UINT8 Data;
 
   //
   // wait for 1ms and detect the FDC is ready to be written
   //
   if (EFI_ERROR (FddDRQReady (FdcDev, DATA_OUT, 1))) {
+    //
+    // Not ready
+    //
     return EFI_DEVICE_ERROR;
-    //
-    // is not ready
-    //
   }
 
-  data = *Pointer;
+  Data = *Pointer;
 
-  FdcWritePort (FdcDev, FDC_REGISTER_DTR, data);
+  FdcWritePort (FdcDev, FDC_REGISTER_DTR, Data);
 
   //
   // Io delay
@@ -1108,8 +1080,7 @@ DataOutByte (
 }
 
 /**
-  Detect the specified floppy logic drive is busy or
-  not within a period of time
+  Detect the specified floppy logic drive is busy or not within a period of time.
   
   @param FdcDev           Indicate it is drive A or drive B
   @param TimeoutInSeconds the time period for waiting
@@ -1139,7 +1110,7 @@ FddWaitForBSYClear (
   //
   // set mask: for drive A set bit0 & bit4; for drive B set bit1 & bit4
   //
-  Mask  = (UINT8) ((FdcDev->Disk == FDC_DISK0 ? MSR_DAB : MSR_DBB) | MSR_CB);
+  Mask  = (UINT8) ((FdcDev->Disk == FdcDisk0 ? MSR_DAB : MSR_DBB) | MSR_CB);
 
   Delay = ((TimeoutInSeconds * STALL_1_MSECOND) / 50) + 1;
   do {
@@ -1153,7 +1124,7 @@ FddWaitForBSYClear (
 
     MicroSecondDelay (50);
     Delay = Delay - 1;
-  } while (Delay);
+  } while (Delay >= 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
@@ -1164,7 +1135,7 @@ FddWaitForBSYClear (
 
 /**
 
-  Routine Description:  Determine whether FDC is ready to write or read
+  Routine Description:  Determine whether FDC is ready to write or read.
   
   @param  FdcDev Pointer to instance of FDC_BLK_IO_DEV
   @param  Dio BOOLEAN:      Indicate the FDC is waiting to write or read
@@ -1213,7 +1184,7 @@ FddDRQReady (
     // Stall for 50 us
     //
     Delay = Delay - 1;
-  } while (Delay);
+  } while (Delay >= 0);
 
   if (Delay == 0) {
     return EFI_NOT_READY;
@@ -1226,8 +1197,7 @@ FddDRQReady (
 }
 
 /**
-  Set FDC control structure's attribute according to
-  result 
+  Set FDC control structure's attribute according to result. 
 
   @param Result  Point to result structure
   @param FdcDev  FDC control structure
@@ -1261,14 +1231,14 @@ CheckResult (
   //
   // Check Status Register1
   //
-  if (Result->Status1 & (STS1_EN | STS1_DE | STS1_OR | STS1_ND | STS1_NW | STS1_MA)) {
+  if ((Result->Status1 & (STS1_EN | STS1_DE | STS1_OR | STS1_ND | STS1_NW | STS1_MA)) != 0) {
     FdcDev->ControllerState->NeedRecalibrate = TRUE;
     return EFI_DEVICE_ERROR;
   }
   //
   // Check Status Register2
   //
-  if (Result->Status2 & (STS2_CM | STS2_DD | STS2_WC | STS2_BC | STS2_MD)) {
+  if ((Result->Status2 & (STS2_CM | STS2_DD | STS2_WC | STS2_BC | STS2_MD)) != 0) {
     FdcDev->ControllerState->NeedRecalibrate = TRUE;
     return EFI_DEVICE_ERROR;
   }
@@ -1277,7 +1247,7 @@ CheckResult (
 }
 
 /**
-  Check the drive status information
+  Check the drive status information.
   
   @param StatusRegister3  the value of Status Register 3
   
@@ -1290,7 +1260,7 @@ CheckStatus3 (
   IN UINT8 StatusRegister3
   )
 {
-  if (StatusRegister3 & STS3_WP) {
+  if ((StatusRegister3 & STS3_WP) != 0) {
     return EFI_WRITE_PROTECTED;
   }
 
@@ -1298,10 +1268,9 @@ CheckStatus3 (
 }
 
 /**
-  Calculate the number of block in the same cylinder
-  according to LBA
+  Calculate the number of block in the same cylinder according to LBA.
   
-  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
+  @param FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param LBA EFI_LBA:      The starting logic block address
   @param NumberOfBlocks UINTN: The number of blocks
   
@@ -1335,7 +1304,7 @@ GetTransferBlockCount (
 }
 
 /**
-  When the Timer(2s) off, turn the drive's motor off
+  When the Timer(2s) off, turn the drive's motor off.
   
   @param Event EFI_EVENT: Event(the timer) whose notification function is being
                      invoked
@@ -1350,35 +1319,36 @@ FddTimerProc (
   )
 {
   FDC_BLK_IO_DEV  *FdcDev;
-  UINT8           data;
+  UINT8           Data;
 
   FdcDev = (FDC_BLK_IO_DEV *) Context;
 
   //
   // Get the motor status
   //
-  data = FdcReadPort (FdcDev, FDC_REGISTER_DOR);
+  Data = FdcReadPort (FdcDev, FDC_REGISTER_DOR);
 
-  if (((FdcDev->Disk == FDC_DISK0) && ((data & 0x10) != 0x10)) ||
-      ((FdcDev->Disk == FDC_DISK1) && ((data & 0x21) != 0x21))
+  if (((FdcDev->Disk == FdcDisk0) && ((Data & 0x10) != 0x10)) ||
+      ((FdcDev->Disk == FdcDisk1) && ((Data & 0x21) != 0x21))
       ) {
     return ;
   }
   //
   // the motor is on, so need motor off
   //
-  data = 0x0C;
-  data = (UINT8) (data | (SELECT_DRV & FdcDev->Disk));
-  FdcWritePort (FdcDev, FDC_REGISTER_DOR, data);
+  Data = 0x0C;
+  Data = (UINT8) (Data | (SELECT_DRV & FdcDev->Disk));
+  FdcWritePort (FdcDev, FDC_REGISTER_DOR, Data);
   MicroSecondDelay (500);
 }
 
 /**
-  Read I/O port for FDC
+  Read an I/O port of FDC.
  
-  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-  @param Offset The offset address of port
+  @param[in] FdcDev  A pointer to FDC_BLK_IO_DEV.
+  @param[in] Offset  The address offset of the I/O port.
 
+  @retval  8-bit data read from the I/O port.
 **/
 UINT8
 FdcReadPort (
@@ -1386,29 +1356,27 @@ FdcReadPort (
   IN UINT32          Offset
   )
 {
+  EFI_STATUS  Status;
   UINT8       Data;
 
-  //
-  // Call IsaIo
-  //
-  FdcDev->IsaIo->Io.Read (
-                      FdcDev->IsaIo,
-                      EfiIsaIoWidthUint8,
-                      FdcDev->BaseAddress + Offset,
-                      1,
-                      &Data
-                      );
+  Status = FdcDev->IsaIo->Io.Read (
+                            FdcDev->IsaIo,
+                            EfiIsaIoWidthUint8,
+                            FdcDev->BaseAddress + Offset,
+                            1,
+                            &Data
+                            );
+  ASSERT_EFI_ERROR (Status);
 
   return Data;
 }
 
 /**
-  Write I/O port for FDC
+  Write an I/O port of FDC.
  
-  @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-  @param Offset The offset address of port
-  @param Data   Value written to port
-  
+  @param[in] FdcDev  A pointer to FDC_BLK_IO_DEV
+  @param[in] Offset  The address offset of the I/O port
+  @param[in] Data    8-bit Value written to the I/O port
 **/
 VOID
 FdcWritePort (
@@ -1417,16 +1385,15 @@ FdcWritePort (
   IN UINT8           Data
   )
 {
+  EFI_STATUS  Status;
 
-  //
-  // Call IsaIo
-  //
-  FdcDev->IsaIo->Io.Write (
-                      FdcDev->IsaIo,
-                      EfiIsaIoWidthUint8,
-                      FdcDev->BaseAddress + Offset,
-                      1,
-                      &Data
-                      );
+  Status = FdcDev->IsaIo->Io.Write (
+                            FdcDev->IsaIo,
+                            EfiIsaIoWidthUint8,
+                            FdcDev->BaseAddress + Offset,
+                            1,
+                            &Data
+                            );
+  ASSERT_EFI_ERROR (Status);
 }
 

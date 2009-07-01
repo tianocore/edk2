@@ -1,8 +1,7 @@
-/**@file
-  Include for ISA Floppy Driver
-  Define the data structure and so on
+/** @file
+  Include file for ISA Floppy Driver
   
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,15 +12,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _ISA_FLOPPY_H
-#define _ISA_FLOPPY_H
+#ifndef _ISA_FLOPPY_H_
+#define _ISA_FLOPPY_H_
 
-#include <PiDxe.h>
-#include <FrameworkPei.h>
+#include <Uefi.h>
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/IsaIo.h>
 #include <Protocol/DevicePath.h>
+#include <Guid/StatusCodeDataTypeId.h>
 
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
@@ -32,16 +31,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/ReportStatusCodeLib.h>
-//
-// Driver Binding Externs
-//
-extern EFI_DRIVER_BINDING_PROTOCOL  gFdcControllerDriver;
-extern EFI_COMPONENT_NAME_PROTOCOL  gIsaFloppyComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gIsaFloppyComponentName2;
+#include <Library/PcdLib.h>
 
-//
-// define some value
-//
+extern EFI_DRIVER_BINDING_PROTOCOL  gFdcControllerDriver;
+
 #define STALL_1_SECOND  1000000
 #define STALL_1_MSECOND 1000
 
@@ -57,14 +50,14 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gIsaFloppyComponentName2;
 #define FLOPPY_CONTROLLER_CONTEXT_SIGNATURE SIGNATURE_32 ('F', 'D', 'C', 'C')
 
 typedef enum {
-  FDC_DISK0   = 0,
-  FDC_DISK1   = 1,
-  FDC_MAX_DISK= 2
+  FdcDisk0   = 0,
+  FdcDisk1   = 1,
+  FdcMaxDisk = 2
 } EFI_FDC_DISK;
 
 typedef struct {
   UINT32          Signature;
-  LIST_ENTRY  Link;
+  LIST_ENTRY      Link;
   BOOLEAN         FddResetPerformed;
   EFI_STATUS      FddResetStatus;
   BOOLEAN         NeedRecalibrate;
@@ -97,11 +90,11 @@ typedef struct {
 
 #define FDD_BLK_IO_FROM_THIS(a) CR (a, FDC_BLK_IO_DEV, BlkIo, FDC_BLK_IO_DEV_SIGNATURE)
 #define FLOPPY_CONTROLLER_FROM_LIST_ENTRY(a) \
-  CR (a, \
-      FLOPPY_CONTROLLER_CONTEXT, \
-      Link, \
-      FLOPPY_CONTROLLER_CONTEXT_SIGNATURE \
-      )
+          CR (a, \
+              FLOPPY_CONTROLLER_CONTEXT, \
+              Link, \
+              FLOPPY_CONTROLLER_CONTEXT_SIGNATURE \
+              )
 
 #define DISK_1440K_EOT            0x12
 #define DISK_1440K_GPL            0x1b
@@ -154,9 +147,9 @@ typedef struct {
   UINT8 Status0;
   UINT8 Status1;
   UINT8 Status2;
-  UINT8 C;
-  UINT8 H;
-  UINT8 S;
+  UINT8 Cylinder;
+  UINT8 Head;
+  UINT8 Sector;
   UINT8 Number;
 } FDD_RESULT_PACKET;
 
@@ -164,30 +157,29 @@ typedef struct {
 // FDC Registers
 //
 //
-// 0x3F2 Digital Output Register
+// Digital Output Register address offset
 //
 #define FDC_REGISTER_DOR  2
 
 //
-// 0x3F4 Main Status Register
+// Main Status Register address offset
 //
 #define FDC_REGISTER_MSR  4
 
 //
-// 0x3F5 Data Register
+// Data Register address offset
 //
 #define FDC_REGISTER_DTR  5
 
 //
-// 0x3F7 Configuration Control Register(data rate select)
+// Configuration Control Register(data rate select) address offset
 //
 #define FDC_REGISTER_CCR  7
 
 //
-// 0x3F7 Digital Input Register(diskchange)
+// Digital Input Register(diskchange) address offset
 //
 #define FDC_REGISTER_DIR  7
-
 
 
 //
@@ -485,22 +477,20 @@ typedef struct {
 #define IC_ATRC 0xC0
 
 //
-// Global Variables
-//
-extern EFI_DRIVER_BINDING_PROTOCOL   gFdcControllerDriver;
-
-//
 // EFI Driver Binding Protocol Functions
 //
+
 /**
-  Test controller is a Floppy Disk Controller
+  Test controller is a floppy disk drive device
   
-  @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
-  @param Controller           driver's controller
-  @param RemainingDevicePath  children device path
+  @param[in] This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.  
+  @param[in] Controller           The handle of the controller to test.
+  @param[in] RemainingDevicePath  A pointer to the remaining portion of a device path.
   
-  @retval EFI_UNSUPPORTED controller is not floppy disk
-  @retval EFI_SUCCESS     controller is floppy disk
+  @retval EFI_SUCCESS             The device is supported by this driver.
+  @retval EFI_ALREADY_STARTED     The device is already being managed by this driver.
+  @retval EFI_ACCESS_DENIED       The device is already being managed by a different driver 
+                                  or an application that requires exclusive access.
 **/
 EFI_STATUS
 EFIAPI
@@ -511,13 +501,20 @@ FdcControllerDriverSupported (
   );
 
 /**
-  Create floppy control instance on controller.
-  
-  @param This         Pointer of EFI_DRIVER_BINDING_PROTOCOL
-  @param Controller   driver controller handle
-  @param RemainingDevicePath Children's device path
-  
-  @retval whether success to create floppy control instance.
+  Start this driver on Controller.
+
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+                                   This parameter is ignored by device drivers, and is optional for bus drivers.
+
+  @retval EFI_SUCCESS              The device was started.
+  @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.
+                                   Currently not implemented.
+  @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
+  @retval Others                   The driver failded to start the device.
 **/
 EFI_STATUS
 EFIAPI
@@ -528,18 +525,18 @@ FdcControllerDriverStart (
   );
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
-  created by this driver.
+  Stop this driver on ControllerHandle.
 
-  @param  This              Protocol instance pointer.
-  @param  Controller        Handle of device to stop driver on
-  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
-                            children is zero stop the entire bus driver.
-  @param  ChildHandleBuffer List of Child Handles to Stop.
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
+                                support a bus specific I/O protocol for the driver 
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+                                if NumberOfChildren is 0.
 
-  @retval EFI_SUCCESS       This driver is removed ControllerHandle
-  @retval other             This driver was not removed from this device
-
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
 **/
 EFI_STATUS
 EFIAPI
@@ -553,8 +550,9 @@ FdcControllerDriverStop (
 //
 // EFI Block I/O Protocol Functions
 //
+
 /**
-  Reset the Floppy Logic Drive, call the FddReset function   
+  Reset the Floppy Logic Drive, call the FddReset function.   
   
   @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
   @param ExtendedVerification BOOLEAN: Indicate that the driver may perform a more 
@@ -573,7 +571,7 @@ FdcReset (
   );
 
 /**
-  Flush block via fdd controller
+  Flush block via fdd controller.
   
   @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
   @return EFI_SUCCESS
@@ -586,11 +584,11 @@ FddFlushBlocks (
   );
 
 /**
-  Read the requested number of blocks from the device   
+  Read the requested number of blocks from the device.   
   
   @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
   @param MediaId UINT32:    The media id that the read request is for    
-  @param  LBA EFI_LBA:     The starting logic block address to read from on the device
+  @param  Lba EFI_LBA:     The starting logic block address to read from on the device
   @param  BufferSize UINTN:  The size of the Buffer in bytes
   @param  Buffer VOID *:     A pointer to the destination buffer for the data
   
@@ -610,17 +608,17 @@ EFIAPI
 FddReadBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
   IN  UINT32                 MediaId,
-  IN  EFI_LBA                LBA,
+  IN  EFI_LBA                Lba,
   IN  UINTN                  BufferSize,
   OUT VOID                   *Buffer
   );
 
 /**
-  Write a specified number of blocks to the device   
+  Write a specified number of blocks to the device.   
   
   @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
   @param  MediaId UINT32:    The media id that the write request is for   
-  @param  LBA EFI_LBA:     The starting logic block address to be written
+  @param  Lba EFI_LBA:     The starting logic block address to be written
   @param  BufferSize UINTN:  The size in bytes in Buffer
   @param  Buffer VOID *:     A pointer to the source buffer for the data
   
@@ -640,7 +638,7 @@ EFIAPI
 FddWriteBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This,
   IN UINT32                 MediaId,
-  IN EFI_LBA                LBA,
+  IN EFI_LBA                Lba,
   IN UINTN                  BufferSize,
   IN VOID                   *Buffer
   );
@@ -650,7 +648,7 @@ FddWriteBlocks (
 //
 /**
 
-  Detect the floppy drive is presented or not
+  Detect the floppy drive is presented or not.
  
   @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   @retval EFI_SUCCESS    Drive is presented
@@ -664,8 +662,8 @@ DiscoverFddDevice (
 
 /**
 
-  Do recalibrate  and see the drive is presented or not
-  Set the media parameters
+  Do recalibrate  and see the drive is presented or not.
+  Set the media parameters.
   
   @param FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   @return the drive is presented or not
@@ -678,7 +676,7 @@ FddIdentify (
 
 /**
 
-  Reset the Floppy Logic Drive
+  Reset the Floppy Logic Drive.
   
   @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   
@@ -694,8 +692,8 @@ FddReset (
 
 /**
 
-  Turn the drive's motor on
-  The drive's motor must be on before any command can be executed
+  Turn the drive's motor on.
+  The drive's motor must be on before any command can be executed.
   
   @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
   
@@ -711,7 +709,7 @@ MotorOn (
 
 /**
 
-  Set a Timer and when Timer goes off, turn the motor off
+  Set a Timer and when Timer goes off, turn the motor off.
   
   
   @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the Data Structure FDC_BLK_IO_DEV
@@ -726,7 +724,7 @@ MotorOff (
   );
 
 /**
-  Detect the disk in the drive is changed or not
+  Detect the disk in the drive is changed or not.
   
   
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
@@ -744,7 +742,7 @@ DisketChanged (
 /**
   Do the Specify command, this command sets DMA operation
   and the initial values for each of the three internal
-  times: HUT, SRT and HLT
+  times: HUT, SRT and HLT.
   
   @param FdcDev    Pointer to instance of FDC_BLK_IO_DEV
   
@@ -758,7 +756,7 @@ Specify (
   );
 
 /**
-  Set the head of floppy drive to track 0
+  Set the head of floppy drive to track 0.
  
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @retval EFI_SUCCESS:    Execute the Recalibrate operation successfully
@@ -771,7 +769,7 @@ Recalibrate (
   );
 
 /**
-  Set the head of floppy drive to the new cylinder
+  Set the head of floppy drive to the new cylinder.
   
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @param  Lba EFI_LBA     : The logic block address want to seek
@@ -787,8 +785,7 @@ Seek (
   );
 
 /**
-  Do the Sense Interrupt Status command, this command
-  resets the interrupt signal
+  Do the Sense Interrupt Status command, this command resets the interrupt signal.
   
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @param  StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
@@ -807,7 +804,7 @@ SenseIntStatus (
   );
 
 /**
-  Do the Sense Drive Status command
+  Do the Sense Drive Status command.
   
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @param  Lba EFI_LBA     : Logic block address
@@ -824,8 +821,7 @@ SenseDrvStatus (
   );
 
 /**
-  Update the disk media properties and if necessary
-                        reinstall Block I/O interface
+  Update the disk media properties and if necessary reinstall Block I/O interface.
  
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   
@@ -839,7 +835,7 @@ DetectMedia (
   );
 
 /**
-  Set the data rate and so on
+  Set the data rate and so on.
  
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
 
@@ -851,7 +847,7 @@ Setup (
   );
 
 /**
-  Read or Write a number of blocks in the same cylinder
+  Read or Write a number of blocks in the same cylinder.
  
   @param  FdcDev      A pointer to Data Structure FDC_BLK_IO_DEV
   @param  HostAddress device address 
@@ -872,7 +868,7 @@ ReadWriteDataSector (
   );
 
 /**
-  Fill in FDD command's parameter
+  Fill in FDD command's parameter.
   
   @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
   @param Lba      The starting logic block address to read from on the device
@@ -887,24 +883,23 @@ FillPara (
   );
 
 /**
-  Read result byte from Data Register of FDC
+  Read result byte from Data Register of FDC.
   
-  @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
-  @param Pointer UINT8 *: Be used to save result byte read from FDC
+  @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
+  @param Pointer  Buffer to store the byte read from FDC
   
-  
-  @retval  EFI_SUCCESS:    Read result byte from FDC successfully
-  @retval  EFI_DEVICE_ERROR: The FDC is not ready to be read
+  @retval EFI_SUCCESS       Read result byte from FDC successfully
+  @retval EFI_DEVICE_ERROR  The FDC is not ready to be read
 
 **/
 EFI_STATUS
 DataInByte (
-  IN FDC_BLK_IO_DEV  *FdcDev,
-  IN UINT8           *Pointer
+  IN  FDC_BLK_IO_DEV  *FdcDev,
+  OUT UINT8           *Pointer
   );
 
 /**
-  Write command byte to Data Register of FDC
+  Write command byte to Data Register of FDC.
   
   @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
   @param Pointer Be used to save command byte written to FDC
@@ -920,8 +915,7 @@ DataOutByte (
   );
 
 /**
-  Detect the specified floppy logic drive is busy or
-  not within a period of time
+  Detect the specified floppy logic drive is busy or not within a period of time.
   
   @param FdcDev          Indicate it is drive A or drive B
   @param TimeoutInSeconds the time period for waiting
@@ -938,8 +932,7 @@ FddWaitForBSYClear (
   );
 
 /**
-
-  Routine Description:  Determine whether FDC is ready to write or read
+  Determine whether FDC is ready to write or read.
   
   @param  FdcDev Pointer to instance of FDC_BLK_IO_DEV
   @param  Dio BOOLEAN:      Indicate the FDC is waiting to write or read
@@ -957,8 +950,7 @@ FddDRQReady (
   );
 
 /**
-  Set FDC control structure's attribute according to
-  result 
+  Set FDC control structure's attribute according to result.
 
   @param Result  Point to result structure
   @param FdcDev  FDC control structure
@@ -976,7 +968,7 @@ CheckResult (
   );
 
 /**
-  Check the drive status information
+  Check the drive status information.
   
   @param StatusRegister3  the value of Status Register 3
   
@@ -990,26 +982,25 @@ CheckStatus3 (
   );
 
 /**
-  Calculate the number of block in the same cylinder
-  according to LBA
+  Calculate the number of block in the same cylinder according to Lba.
   
   @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
-  @param LBA EFI_LBA:      The starting logic block address
+  @param Lba EFI_LBA:      The starting logic block address
   @param NumberOfBlocks UINTN: The number of blocks
   
   @return The number of blocks in the same cylinder which the starting
-        logic block address is LBA
+        logic block address is Lba
 
 **/
 UINTN
 GetTransferBlockCount (
   IN FDC_BLK_IO_DEV  *FdcDev,
-  IN EFI_LBA         LBA,
+  IN EFI_LBA         Lba,
   IN UINTN           NumberOfBlocks
   );
 
 /**
-  When the Timer(2s) off, turn the drive's motor off
+  When the Timer(2s) off, turn the drive's motor off.
   
   @param Event EFI_EVENT: Event(the timer) whose notification function is being
                      invoked
@@ -1024,7 +1015,7 @@ FddTimerProc (
   );
 
 /**
-  Read I/O port for FDC
+  Read I/O port for FDC.
  
   @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @param Offset The offset address of port
@@ -1037,7 +1028,7 @@ FdcReadPort (
   );
 
 /**
-  Write I/O port for FDC
+  Write I/O port for FDC.
  
   @param FdcDev FDC_BLK_IO_DEV *: A pointer to Data Structure FDC_BLK_IO_DEV
   @param Offset The offset address of port
@@ -1052,11 +1043,11 @@ FdcWritePort (
   );
 
 /**
-  Read or Write a number of blocks to floppy device
+  Read or Write a number of blocks to floppy device.
 
   @param This     Pointer to instance of EFI_BLOCK_IO_PROTOCOL
   @param MediaId  The media id of read/write request
-  @param LBA      The starting logic block address to read from on the device
+  @param Lba      The starting logic block address to read from on the device
   @param BufferSize The size of the Buffer in bytes
   @param Operation   - GC_TODO: add argument description
   @param Buffer      - GC_TODO: add argument description
@@ -1081,14 +1072,14 @@ EFI_STATUS
 FddReadWriteBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
   IN  UINT32                 MediaId,
-  IN  EFI_LBA                LBA,
+  IN  EFI_LBA                Lba,
   IN  UINTN                  BufferSize,
   IN  BOOLEAN                Operation,
   OUT VOID                   *Buffer
   );
 
 /**
-  Common interface for free cache 
+  Common interface for free cache. 
   
   @param FdcDev  Pointer of FDC_BLK_IO_DEV instance
   

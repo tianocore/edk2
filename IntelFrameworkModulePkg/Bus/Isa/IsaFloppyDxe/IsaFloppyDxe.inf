@@ -1,15 +1,14 @@
 #/** @file
 # Component description file for IsaFloppy module.
 #
-# ISA Floppy Driver
-#  1. Support two types diskette drive
-#   1.44M drive and 2.88M drive (and now only support 1.44M)
-#  2. Support two diskette drives
+# ISA Floppy Disk UEFI Driver conforming to the UEFI driver model
+#
+#  1. Support two types diskette drive  
+#     1.44M drive and 2.88M drive (and now only support 1.44M)
+#  2. Support two diskette drives per floppy disk controller
 #  3. Use DMA channel 2 to transfer data
 #  4. Do not use interrupt
 #  5. Support diskette change line signal and write protect
-# 
-#  Conforming to EFI driver model
 #
 # Copyright (c) 2007 - 2009, Intel Corporation
 #
@@ -61,10 +60,13 @@
   UefiDriverEntryPoint
   DebugLib
   TimerLib
+  PcdLib
 
 [Protocols]
   gEfiIsaIoProtocolGuid                         # PROTOCOL TO_START
   gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
-
+[FeaturePcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable        # CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable       # CONSUMES
