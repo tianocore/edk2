@@ -1,15 +1,7 @@
-/**@file
-  ISA Floppy Driver
-  1. Support two types diskette drive  
-     1.44M drive and 2.88M drive (and now only support 1.44M)
-  2. Support two diskette drives
-  3. Use DMA channel 2 to transfer data
-  4. Do not use interrupt
-  5. Support diskette change line signal and write protect
+/** @file 
+  Implementation of the EFI Block IO Protocol for ISA Floppy driver
   
-  Implement the Block IO interface
-  
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,20 +12,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-
 #include "IsaFloppy.h"
 
 /**
-  Reset the Floppy Logic Drive, call the FddReset function   
-  
-  @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-  @param ExtendedVerification BOOLEAN: Indicate that the driver may perform a more 
-                    exhaustive verification operation of the device during 
-                    reset, now this par is ignored in this driver          
-  @retval  EFI_SUCCESS:      The Floppy Logic Drive is reset
-  @retval  EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly 
-                      and can not be reset
+  Reset the Block Device.
 
+  @param  This                 Indicates a pointer to the calling context.
+  @param  ExtendedVerification Driver may perform diagnostics on reset.
+
+  @retval EFI_SUCCESS          The device was reset.
+  @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
+                               not be reset.
 **/
 EFI_STATUS
 EFIAPI
@@ -59,10 +48,13 @@ FdcReset (
 }
 
 /**
-  Flush block via fdd controller
-  
-  @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-  @return EFI_SUCCESS
+  Flush the Block Device.
+
+  @param  This              Indicates a pointer to the calling context.
+
+  @retval EFI_SUCCESS       All outstanding data was written to the device
+  @retval EFI_DEVICE_ERROR  The device reported an error while writting back the data
+  @retval EFI_NO_MEDIA      There is no media in the device.
 
 **/
 EFI_STATUS
@@ -78,10 +70,10 @@ FddFlushBlocks (
 }
 
 /**
-  Common report status code interface
+  Common report status code interface.
   
   @param This  Pointer of FDC_BLK_IO_DEV instance
-  @param Read  Error type: read or write?
+  @param Read  Read or write operation when error occurrs
 **/
 VOID
 FddReportStatus (
@@ -101,23 +93,22 @@ FddReportStatus (
 }
 
 /**
-  Read the requested number of blocks from the device   
-  
-  @param This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-  @param MediaId UINT32:    The media id that the read request is for    
-  @param  LBA EFI_LBA:     The starting logic block address to read from on the device
-  @param  BufferSize UINTN:  The size of the Buffer in bytes
-  @param  Buffer VOID *:     A pointer to the destination buffer for the data
-  
-  @retval  EFI_SUCCESS:     The data was read correctly from the device
-  @retval  EFI_DEVICE_ERROR:The device reported an error while attempting to perform
-                     the read operation
-  @retval  EFI_NO_MEDIA:    There is no media in the device
-  @retval  EFI_MEDIA_CHANGED:   The MediaId is not for the current media
-  @retval  EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
-                         intrinsic block size of the device
-  @retval  EFI_INVALID_PARAMETER:The read request contains LBAs that are not valid, 
-                          or the buffer is not on proper alignment 
+  Read BufferSize bytes from Lba into Buffer.
+
+  @param  This       Indicates a pointer to the calling context.
+  @param  MediaId    Id of the media, changes every time the media is replaced.
+  @param  Lba        The starting Logical Block Address to read from
+  @param  BufferSize Size of Buffer, must be a multiple of device block size.
+  @param  Buffer     A pointer to the destination buffer for the data. The caller is
+                     responsible for either having implicit or explicit ownership of the buffer.
+
+  @retval EFI_SUCCESS           The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
 
 **/
 EFI_STATUS
@@ -125,14 +116,14 @@ EFIAPI
 FddReadBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
   IN  UINT32                 MediaId,
-  IN  EFI_LBA                LBA,
+  IN  EFI_LBA                Lba,
   IN  UINTN                  BufferSize,
   OUT VOID                   *Buffer
   )
 {
   EFI_STATUS  Status;
 
-  Status = FddReadWriteBlocks (This, MediaId, LBA, BufferSize, READ, Buffer);
+  Status = FddReadWriteBlocks (This, MediaId, Lba, BufferSize, READ, Buffer);
 
   if (EFI_ERROR (Status)) {
     FddReportStatus (This, TRUE);
@@ -142,38 +133,38 @@ FddReadBlocks (
 }
 
 /**
-  Write a specified number of blocks to the device   
-  
-  @param  This EFI_BLOCK_IO *: A pointer to the Block I/O protocol interface
-  @param  MediaId UINT32:    The media id that the write request is for   
-  @param  LBA EFI_LBA:     The starting logic block address to be written
-  @param  BufferSize UINTN:  The size in bytes in Buffer
-  @param  Buffer VOID *:     A pointer to the source buffer for the data
-  
-  @retval  EFI_SUCCESS:     The data were written correctly to the device
-  @retval  EFI_WRITE_PROTECTED: The device can not be written to 
-  @retval  EFI_NO_MEDIA:    There is no media in the device
-  @retval  EFI_MEDIA_CHANGED:   The MediaId is not for the current media
-  @retval  EFI_DEVICE_ERROR:  The device reported an error while attempting to perform 
-                       the write operation 
-  @retval  EFI_BAD_BUFFER_SIZE: The BufferSize parameter is not a multiple of the 
-                         intrinsic block size of the device
-  @retval  EFI_INVALID_PARAMETER:The write request contains LBAs that are not valid, 
-                          or the buffer is not on proper alignment 
+  Write BufferSize bytes from Lba into Buffer.
+
+  @param  This       Indicates a pointer to the calling context.
+  @param  MediaId    The media ID that the write request is for.
+  @param  Lba        The starting logical block address to be written. The caller is
+                     responsible for writing to only legitimate locations.
+  @param  BufferSize Size of Buffer, must be a multiple of device block size.
+  @param  Buffer     A pointer to the source buffer for the data.
+
+  @retval EFI_SUCCESS           The data was written correctly to the device.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+
 **/
 EFI_STATUS
 EFIAPI
 FddWriteBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This,
   IN UINT32                 MediaId,
-  IN EFI_LBA                LBA,
+  IN EFI_LBA                Lba,
   IN UINTN                  BufferSize,
   IN VOID                   *Buffer
   )
 {
   EFI_STATUS  Status;
 
-  Status = FddReadWriteBlocks (This, MediaId, LBA, BufferSize, WRITE, Buffer);
+  Status = FddReadWriteBlocks (This, MediaId, Lba, BufferSize, WRITE, Buffer);
 
   if (EFI_ERROR (Status)) {
     FddReportStatus (This, FALSE);
@@ -183,36 +174,31 @@ FddWriteBlocks (
 }
 
 /**
-  Read or Write a number of blocks to floppy device
+  Read or Write a number of blocks to floppy disk
 
-  @param This     Pointer to instance of EFI_BLOCK_IO_PROTOCOL
-  @param MediaId  The media id of read/write request
-  @param LBA      The starting logic block address to read from on the device
-  @param BufferSize The size of the Buffer in bytes
-  @param Operation   - GC_TODO: add argument description
-  @param Buffer      - GC_TODO: add argument description
+  @param  This       Indicates a pointer to the calling context.
+  @param  MediaId    Id of the media, changes every time the media is replaced.
+  @param  Lba        The starting Logical Block Address to read from
+  @param  BufferSize Size of Buffer, must be a multiple of device block size.
+  @param  Operation  Specifies the read or write operation.
+  @param  Buffer     A pointer to the destination buffer for the data. The caller is
+                     responsible for either having implicit or explicit ownership of the buffer.
 
-  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
-  @retval EFI_SUCCESS - GC_TODO: Add description for return value
-  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  @retval EFI_NO_MEDIA - GC_TODO: Add description for return value
-  @retval EFI_MEDIA_CHANGED - GC_TODO: Add description for return value
-  @retval EFI_WRITE_PROTECTED - GC_TODO: Add description for return value
-  @retval EFI_BAD_BUFFER_SIZE - GC_TODO: Add description for return value
-  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
-  @retval EFI_INVALID_PARAMETER - GC_TODO: Add description for return value
-  @retval EFI_SUCCESS - GC_TODO: Add description for return value
-  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  @retval EFI_DEVICE_ERROR - GC_TODO: Add description for return value
-  @retval EFI_SUCCESS - GC_TODO: Add description for return value
+  @retval EFI_SUCCESS           The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
+  @retval EFI_NO_MEDIA          There is no media in the device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
+  @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+                                or the buffer is not on proper alignment.
+  @retval EFI_WRITE_PROTECTED   The device can not be written to.
 
 **/
 EFI_STATUS
 FddReadWriteBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL  *This,
   IN  UINT32                 MediaId,
-  IN  EFI_LBA                LBA,
+  IN  EFI_LBA                Lba,
   IN  UINTN                  BufferSize,
   IN  BOOLEAN                Operation,
   OUT VOID                   *Buffer
@@ -224,10 +210,7 @@ FddReadWriteBlocks (
   UINTN               NumberOfBlocks;
   UINTN               BlockCount;
   EFI_STATUS          Status;
-  //
-  //  EFI_STATUS            CacheStatus;
-  //
-  EFI_LBA             LBA0;
+  EFI_LBA             Lba0;
   UINT8               *Pointer;
 
   //
@@ -238,7 +221,7 @@ FddReadWriteBlocks (
   FdcDev    = FDD_BLK_IO_FROM_THIS (This);
 
   if (Operation == WRITE) {
-    if (LBA == 0) {
+    if (Lba == 0) {
       FdcFreeCache (FdcDev);
     }
   }
@@ -274,13 +257,6 @@ FddReadWriteBlocks (
   if (!(Media->MediaPresent)) {
     MotorOff (FdcDev);
     FdcFreeCache (FdcDev);
-
-    /*
-    if (FdcDev->Cache) {
-      gBS->FreePool (FdcDev->Cache);
-      FdcDev->Cache = NULL;
-    }
-*/
     return EFI_NO_MEDIA;
   }
   //
@@ -306,12 +282,12 @@ FddReadWriteBlocks (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  if (LBA > Media->LastBlock) {
+  if (Lba > Media->LastBlock) {
     MotorOff (FdcDev);
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((BufferSize / BlockSize) + LBA - 1) > Media->LastBlock) {
+  if (((BufferSize / BlockSize) + Lba - 1) > Media->LastBlock) {
     MotorOff (FdcDev);
     return EFI_INVALID_PARAMETER;
   }
@@ -320,8 +296,8 @@ FddReadWriteBlocks (
     //
     // See if the data that is being read is already in the cache
     //
-    if (FdcDev->Cache) {
-      if (LBA == 0 && BufferSize == BlockSize) {
+    if (FdcDev->Cache != NULL) {
+      if (Lba == 0 && BufferSize == BlockSize) {
         MotorOff (FdcDev);
         CopyMem ((UINT8 *) Buffer, (UINT8 *) FdcDev->Cache, BlockSize);
         return EFI_SUCCESS;
@@ -338,26 +314,26 @@ FddReadWriteBlocks (
   }
 
   NumberOfBlocks  = BufferSize / BlockSize;
-  LBA0            = LBA;
+  Lba0            = Lba;
   Pointer         = Buffer;
 
   //
   // read blocks in the same cylinder.
   // in a cylinder , there are 18 * 2 = 36 blocks
   //
-  BlockCount = GetTransferBlockCount (FdcDev, LBA, NumberOfBlocks);
+  BlockCount = GetTransferBlockCount (FdcDev, Lba, NumberOfBlocks);
   while ((BlockCount != 0) && !EFI_ERROR (Status)) {
-    Status = ReadWriteDataSector (FdcDev, Buffer, LBA, BlockCount, Operation);
+    Status = ReadWriteDataSector (FdcDev, Buffer, Lba, BlockCount, Operation);
     if (EFI_ERROR (Status)) {
       MotorOff (FdcDev);
       FddReset (FdcDev);
       return EFI_DEVICE_ERROR;
     }
 
-    LBA += BlockCount;
+    Lba += BlockCount;
     NumberOfBlocks -= BlockCount;
     Buffer      = (VOID *) ((UINTN) Buffer + BlockCount * BlockSize);
-    BlockCount  = GetTransferBlockCount (FdcDev, LBA, NumberOfBlocks);
+    BlockCount  = GetTransferBlockCount (FdcDev, Lba, NumberOfBlocks);
   }
 
   Buffer = Pointer;
@@ -371,7 +347,7 @@ FddReadWriteBlocks (
     //
     // Cache the data read
     //
-    if (LBA0 == 0 && !FdcDev->Cache) {
+    if (Lba0 == 0 && FdcDev->Cache == NULL) {
       FdcDev->Cache = AllocateCopyPool (BlockSize, Buffer);
     }
   }
@@ -381,18 +357,18 @@ FddReadWriteBlocks (
 }
 
 /**
-  Common interface for free cache 
+  Free cache for a floppy disk.
   
-  @param FdcDev  Pointer of FDC_BLK_IO_DEV instance
+  @param FdcDev  A Pointer to FDC_BLK_IO_DEV instance
   
 **/
 VOID
 FdcFreeCache (
-  IN    FDC_BLK_IO_DEV  *FdcDev
+  IN FDC_BLK_IO_DEV  *FdcDev
   )
 {
-  if (FdcDev->Cache) {
-    gBS->FreePool (FdcDev->Cache);
+  if (FdcDev->Cache != NULL) {
+    FreePool (FdcDev->Cache);
     FdcDev->Cache = NULL;
   }
 }
