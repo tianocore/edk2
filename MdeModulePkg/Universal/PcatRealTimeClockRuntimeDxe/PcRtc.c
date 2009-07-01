@@ -158,8 +158,9 @@ PcRtcInit (
   Time.Month  = RtcRead (RTC_ADDRESS_MONTH);
   Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
 
-  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
-
+  Century = RtcRead (RTC_ADDRESS_CENTURY);
+  Time.Year = (UINT16) (Century * 100 + Time.Year);
+  
   //
   // Set RTC configuration after get original time
   // The value of bit AIE should be reserved.
@@ -281,8 +282,9 @@ PcRtcGetTime (
   Time->Month   = RtcRead (RTC_ADDRESS_MONTH);
   Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
 
-  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
-
+  Century = RtcRead (RTC_ADDRESS_CENTURY);
+  Time->Year = (UINT16) (Century * 100 + Time->Year);
+  
   //
   // Release RTC Lock.
   //
@@ -508,8 +510,9 @@ PcRtcGetWakeupTime (
     Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
   }
 
-  Century = BcdToDecimal8 (RtcRead (RTC_ADDRESS_CENTURY));
-
+  Century = RtcRead (RTC_ADDRESS_CENTURY);
+  Time->Year = (UINT16) (Century * 100 + Time->Year);
+  
   //
   // Release RTC Lock.
   //
