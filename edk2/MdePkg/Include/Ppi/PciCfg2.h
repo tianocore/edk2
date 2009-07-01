@@ -21,17 +21,19 @@
 #ifndef __PEI_PCI_CFG2_H__
 #define __PEI_PCI_CFG2_H__
 
+#include <Library/BaseLib.h>
+
 #define EFI_PEI_PCI_CFG2_PPI_GUID \
   { 0x57a449a, 0x1fdc, 0x4c06, { 0xbf, 0xc9, 0xf5, 0x3f, 0x6a, 0x99, 0xbb, 0x92 } }
-
 
 typedef struct _EFI_PEI_PCI_CFG2_PPI   EFI_PEI_PCI_CFG2_PPI;
 
 #define EFI_PEI_PCI_CFG_ADDRESS(bus,dev,func,reg) \
-  (((bus) << 24) | \
-  ((dev) << 16) | \
-  ((func) << 8) | \
-  ((reg) < 256 ? (reg) : ((UINT64)(reg) << 32)));
+  (UINT64) ( \
+  (((UINTN) bus) << 24) | \
+  (((UINTN) dev) << 16) | \
+  (((UINTN) func) << 8) | \
+  (((UINTN) (reg)) < 256 ? ((UINTN) (reg)) : (UINT64) (LShiftU64 ((UINT64) (reg), 32))));
 
 ///
 /// EFI_PEI_PCI_CFG_PPI_WIDTH
