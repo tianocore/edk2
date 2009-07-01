@@ -278,6 +278,7 @@
   MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   MdeModulePkg/Library/BaseMemoryTestLibNull/BaseMemoryTestLibNull.inf
   MdeModulePkg/Library/BaseMemoryTestLib/BaseMemoryTestLib.inf
+  MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
 
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
