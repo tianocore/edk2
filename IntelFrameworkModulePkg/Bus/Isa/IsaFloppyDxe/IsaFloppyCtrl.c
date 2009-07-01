@@ -1184,7 +1184,7 @@ FddDRQReady (
     // Stall for 50 us
     //
     Delay = Delay - 1;
-  } while (Delay >= 0);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_NOT_READY;
