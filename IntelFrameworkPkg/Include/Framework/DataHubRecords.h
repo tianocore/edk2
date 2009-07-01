@@ -802,7 +802,7 @@ typedef struct {
   ///
   UINT16                            EndBusNumber;
   ///
-  /// The type of memory region from the operating system’s point of view. 
+  /// The type of memory region from the operating system's point of view. 
   /// MemoryRegionType values are equivalent to the legacy INT 15 AX = E820 BIOS 
   /// command values. 
   ///

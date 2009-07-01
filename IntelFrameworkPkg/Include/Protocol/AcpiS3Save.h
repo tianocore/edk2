@@ -74,7 +74,7 @@ EFI_STATUS
   - Get the minimum memory length below 1 MB that is required for the S3 resume boot path.
   If LegacyMemoryAddress is NULL, the firmware will be unable to jump into a real-mode
   waking vector. However, it might still be able to jump into a flat-mode waking vector as long as the
-  OS provides a flat-mode waking vector. It is the caller’s responsibility to ensure the
+  OS provides a flat-mode waking vector. It is the caller's responsibility to ensure the
   LegacyMemoryAddress is valid. If the LegacyMemoryAddress is higher than 1 MB,
   EFI_INVALID_PARAMETER will be returned.
 
@@ -97,7 +97,7 @@ EFI_STATUS
 /**
   @par Protocol Description:
   The EFI_ACPI_S3_SAVE_PROTOCOL is responsible for preparing all the information that the
-  Framework needs to restore the platform’s preboot state during an S3 resume boot. This
+  Framework needs to restore the platform's preboot state during an S3 resume boot. This
   information can include the following:
     - The Framework boot script table, containing all necessary operations to initialize the platform
     - ACPI table information, such as RSDT, through which the OS waking vector can be located
