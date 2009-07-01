@@ -98,8 +98,8 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PCI_PLATFORM_PHASE_NOTIFY)(
-  IN EFI_PCI_PLATFORM_PROTOCOL                       *This,
-  IN  EFI_HANDLE                                     HostBridge,
+  IN  EFI_PCI_PLATFORM_PROTOCOL                       *This,
+  IN  EFI_HANDLE                                     							HostBridge,
   IN  EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE  Phase,
   IN  EFI_PCI_CHIPSET_EXECUTION_PHASE                ChipsetPhase
 );
@@ -209,9 +209,23 @@ EFI_STATUS
 /// the unique features of a platform.
 ///
 struct _EFI_PCI_PLATFORM_PROTOCOL {
+	///
+	/// The notification from the PCI bus enumerator to the platform that it is about to 
+	/// enter a certain phase during the enumeration process.
+	///
   EFI_PCI_PLATFORM_PHASE_NOTIFY          PlatformNotify;
+	///
+	/// The notification from the PCI bus enumerator to the platform for each PCI 
+	/// controller at several predefined points during PCI controller initialization.
+	/// 
   EFI_PCI_PLATFORM_PREPROCESS_CONTROLLER PlatformPrepController;
+	/// 
+	/// Retrieves the platform policy regarding enumeration.
+	///
   EFI_PCI_PLATFORM_GET_PLATFORM_POLICY   GetPlatformPolicy;
+	///
+	/// Gets the PCI device’s option ROM from a platform-specific location.
+	///
   EFI_PCI_PLATFORM_GET_PCI_ROM           GetPciRom;
 };
 
