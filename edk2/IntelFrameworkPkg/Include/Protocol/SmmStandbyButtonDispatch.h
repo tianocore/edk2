@@ -131,17 +131,17 @@ EFI_STATUS
 // Interface structure for the SMM Standby Button SMI Dispatch Protocol
 //
 /**
-	This protocol  provices the parent dispatch service for the standby button SMI source generator.
-	Provides the ability to install child handlers for the given event types.
+  This protocol  provices the parent dispatch service for the standby button SMI source generator.
+  Provides the ability to install child handlers for the given event types.
  **/
 struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL {
-	/// 
+  /// 
   /// Installs a child service to be dispatched by this protocol.
   ///
   EFI_SMM_STANDBY_BUTTON_REGISTER   Register;\
-	///
-	/// Removes a child service dispatched by this protocol.
-	///
+  ///
+  /// Removes a child service dispatched by this protocol.
+  ///
   EFI_SMM_STANDBY_BUTTON_UNREGISTER UnRegister;
 };
 
