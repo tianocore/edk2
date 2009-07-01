@@ -215,7 +215,7 @@
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-
+  IntelFrameworkModulePkg/Universal/LegacyRegionDxe/LegacyRegionDxe.inf
 
 [Components.IA32]
   IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
