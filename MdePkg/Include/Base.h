@@ -415,6 +415,15 @@ typedef CHAR8 *VA_LIST;
 typedef UINTN  *BASE_LIST;
 
 /**
+  Returns the size of a data type in sizeof(UINTN) units rounded up to the nearest UINTN boundary.
+
+  @param  TYPE  The date type to determine the size of.
+
+  @return The size of TYPE in sizeof (UINTN) units rounded up to the nearest UINTN boundary.
+**/
+#define _BASE_INT_SIZE_OF(TYPE) ((sizeof (TYPE) + sizeof (UINTN) - 1) / sizeof (UINTN))
+
+/**
   Returns an argument of a specified type from a variable argument list and updates 
   the pointer to the variable argument list to point to the next argument. 
 
@@ -430,7 +439,7 @@ typedef UINTN  *BASE_LIST;
   @return  An argument of the type specified by TYPE.
 
 **/
-#define BASE_ARG(Marker, TYPE) (*(TYPE *)((UINT8 *)(Marker = (BASE_LIST)((UINT8 *)Marker + _INT_SIZE_OF (TYPE))) - _INT_SIZE_OF (TYPE)))
+#define BASE_ARG(Marker, TYPE)   (*(TYPE *) ((Marker += _BASE_INT_SIZE_OF (TYPE)) - _BASE_INT_SIZE_OF (TYPE)))
 
 /**
   Macro that returns the byte offset of a field in a data structure. 
