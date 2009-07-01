@@ -38,7 +38,7 @@ UINT8                     mMasterBase             = 0xff;
 UINT8                     mSlaveBase              = 0xff;
 EFI_8259_MODE             mMode                   = Efi8259ProtectedMode;
 UINT16                    mProtectedModeMask      = 0xffff;
-UINT16                    mLegacyModeMask         = 0x06b8;
+UINT16                    mLegacyModeMask         = 0xffff;
 UINT16                    mProtectedModeEdgeLevel = 0x0000;
 UINT16                    mLegacyModeEdgeLevel    = 0x0000;
 
@@ -351,7 +351,6 @@ Interrupt8259SetMode (
     //
     // Write new legacy mode mask/trigger level
     //
-    Interrupt8259SetVectorBase (This, LEGACY_MODE_BASE_VECTOR_MASTER, LEGACY_MODE_BASE_VECTOR_SLAVE);
     Interrupt8259WriteMask (mLegacyModeMask, mLegacyModeEdgeLevel);
 
     return EFI_SUCCESS;
@@ -387,7 +386,6 @@ Interrupt8259SetMode (
     //
     // Write new protected mode mask/trigger level
     //
-    Interrupt8259SetVectorBase (This, PROTECTED_MODE_BASE_VECTOR_MASTER, PROTECTED_MODE_BASE_VECTOR_SLAVE);
     Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
 
     return EFI_SUCCESS;
