@@ -41,15 +41,15 @@ typedef struct _EFI_SMM_CONTROL_PROTOCOL              EFI_SMM_CONTROL_PROTOCOL;
 // SMM Access specification Data Structures
 //
 typedef struct {
-	/// 
-	///  Describes the I/O location of the particular port that engendered the synchronous
-	///  SMI. For example, this location can include but is not limited to the traditional 
-	///  PCAT* APM port of 0B2h.
-	///
+  /// 
+  ///  Describes the I/O location of the particular port that engendered the synchronous
+  ///  SMI. For example, this location can include but is not limited to the traditional 
+  ///  PCAT* APM port of 0B2h.
+  ///
   UINT8 SmiTriggerRegister;
-	///
-	///  Describes the value that was written to the respective activation port.
-	///
+  ///
+  ///  Describes the value that was written to the respective activation port.
+  ///
   UINT8 SmiDataRegister;
 } EFI_SMM_CONTROL_REGISTER;
 
@@ -108,8 +108,8 @@ EFI_STATUS
   @param  SmiRegister           Pointer to the SMI register description structure
 
   @retval EFI_SUCCESS           The register structure has been returned.
-	@retval	EFI_DEVICE_ERROR	 The source could not be cleared.
-	@retval	EFI_INVALID_PARAMETER The service did not support the Periodic input argument.
+  @retval EFI_DEVICE_ERROR      The source could not be cleared.
+  @retval EFI_INVALID_PARAMETER The service did not support the Periodic input argument.
 
 **/
 typedef
@@ -135,20 +135,20 @@ EFI_STATUS
   @param MinimumTriggerPeriod
   Minimum interval at which the platform can set the period.
 
-	@retval	EFI_SUCCESS The register structure has been returned.
+  @retval EFI_SUCCESS The register structure has been returned.
 **/
 
 //
 // SMM Control Protocol
 //
 /**
-	This protocol is used initiate SMI/PMI activations. 
-	This protocol could be published by either of the following:
-		- A processor driver to abstract the SMI/PMI IPI
-		- The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an Intel® chipset
-	Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this
+  This protocol is used initiate SMI/PMI activations. 
+  This protocol could be published by either of the following:
+    - A processor driver to abstract the SMI/PMI IPI
+    - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an Intel® chipset
+  Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this
   
-	The EFI_SMM_CONTROL_PROTOCOL is used by the platform chipset or processor driver. This
+  The EFI_SMM_CONTROL_PROTOCOL is used by the platform chipset or processor driver. This
   protocol is useable both in boot services and runtime. The runtime aspect is so that an
   implementation of EFI_SMM_BASE_PROTOCOL.Communicate() can layer upon this service
   and provide an SMI callback from a general EFI runtime driver.
@@ -156,24 +156,24 @@ EFI_STATUS
   SMI or PMI. There are often I/O ports that, when accessed, will engender the
 **/
 struct _EFI_SMM_CONTROL_PROTOCOL {
-	///
-	///  Initiates the SMI/PMI activation.
-	///
+  ///
+  ///  Initiates the SMI/PMI activation.
+  ///
   EFI_SMM_ACTIVATE          Trigger;
-	///
-	///  Quiesces the SMI/PMI activation.
-	///
+  ///
+  ///  Quiesces the SMI/PMI activation.
+  ///
   EFI_SMM_DEACTIVATE        Clear;
-	///
-	/// Provides data on the register used as the source of the SMI.
-	///
+  ///
+  /// Provides data on the register used as the source of the SMI.
+  ///
   EFI_SMM_GET_REGISTER_INFO GetRegisterInfo;
-	///
-	/// Minimum interval at which the platform can set the period. A maximum is not
-	/// specified in that the SMM infrastructure code can emulate a maximum interval that is
-	/// greater than the hardware capabilities by using software emulation in the SMM
-	/// infrastructure code.
-	///
+  ///
+  /// Minimum interval at which the platform can set the period. A maximum is not
+  /// specified in that the SMM infrastructure code can emulate a maximum interval that is
+  /// greater than the hardware capabilities by using software emulation in the SMM
+  /// infrastructure code.
+  ///
   UINTN                     MinimumTriggerPeriod;
 };
 
