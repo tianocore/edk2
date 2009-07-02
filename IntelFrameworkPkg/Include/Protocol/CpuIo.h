@@ -2,7 +2,7 @@
   This code abstracts the CPU IO Protocol which installed by some platform or chipset-specific 
   PEIM that abstracts the processor-visible I/O operations.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -10,8 +10,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  CpuIO.h
 
   @par Revision Reference:
   CPU IO Protocol is defined in Framework of EFI CPU IO Protocol Spec
@@ -31,11 +29,9 @@
 
 typedef struct _EFI_CPU_IO_PROTOCOL EFI_CPU_IO_PROTOCOL;
 
-//
-// *******************************************************
-// EFI_CPU_IO_PROTOCOL_WIDTH
-// *******************************************************
-//
+///
+/// Enumeration that defines the width of the I/O operation.
+///
 typedef enum {
   EfiCpuIoWidthUint8,
   EfiCpuIoWidthUint16,
@@ -52,11 +48,6 @@ typedef enum {
   EfiCpuIoWidthMaximum
 } EFI_CPU_IO_PROTOCOL_WIDTH;
 
-//
-// *******************************************************
-// EFI_CPU_IO_PROTOCOL_IO_MEM
-// *******************************************************
-//
 /**
   Enables a driver to access memory-mapped registers in the EFI system memory space.
   Or, Enables a driver to access registers in the EFI CPU I/O space.
@@ -85,40 +76,32 @@ EFI_STATUS
   IN OUT VOID                              *Buffer
   );
 
-//
-// *******************************************************
-// EFI_CPU_IO_PROTOCOL_ACCESS
-// *******************************************************
-//
+///
+/// Servies for read and write accesses.
+///
 typedef struct {
+  ///
+  /// This service provides the various modalities of memory and I/O read.
+  ///
   EFI_CPU_IO_PROTOCOL_IO_MEM  Read;
+  ///
+  /// This service provides the various modalities of memory and I/O write.
+  ///
   EFI_CPU_IO_PROTOCOL_IO_MEM  Write;
 } EFI_CPU_IO_PROTOCOL_ACCESS;
 
-//
-// *******************************************************
-// EFI_CPU_IO_PROTOCOL
-// *******************************************************
-//
-/**
-  Provides the basic memory and I/O interfaces that are used to abstract
-  accesses to devices in a system.
-
-  @param Mem.Read
-  Allows reads from memory-mapped I/O space.
-
-  @param Mem.Write
-  Allows writes to memory-mapped I/O space.
-
-  @param Io.Read
-  Allows reads from I/O space.
-
-  @param Io.Write
-  Allows writes to I/O space.
-
-**/
+///
+/// Provides the basic memory and I/O interfaces that are used to abstract
+/// accesses to devices in a system.
+///
 struct _EFI_CPU_IO_PROTOCOL {
+  ///
+  /// Enables a driver to access memory-mapped registers in the EFI system memory space.
+  ///
   EFI_CPU_IO_PROTOCOL_ACCESS  Mem;
+  ///
+  /// Enables a driver to access registers in the EFI CPU I/O space.
+  ///
   EFI_CPU_IO_PROTOCOL_ACCESS  Io;
 };
 
