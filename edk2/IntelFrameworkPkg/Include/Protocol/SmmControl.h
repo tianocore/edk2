@@ -145,7 +145,7 @@ EFI_STATUS
   This protocol is used initiate SMI/PMI activations. 
   This protocol could be published by either of the following:
     - A processor driver to abstract the SMI/PMI IPI
-    - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an Intel® chipset
+    - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an Intel chipset
   Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this
   
   The EFI_SMM_CONTROL_PROTOCOL is used by the platform chipset or processor driver. This
