@@ -75,15 +75,15 @@ typedef struct {
 /// Functions provided by the CSM binary
 ///
 typedef enum {
-  Legacy16InitializeYourself    = 0x0000,
-  Legacy16UpdateBbs             = 0x0001,
-  Legacy16PrepareToBoot         = 0x0002,
-  Legacy16Boot                  = 0x0003,
-  Legacy16RetrieveLastBootDevice= 0x0004,
-  Legacy16DispatchOprom         = 0x0005,
-  Legacy16GetTableAddress       = 0x0006,
-  Legacy16SetKeyboardLeds       = 0x0007,
-  Legacy16InstallPciHandler     = 0x0008
+  Compatibility16InitializeYourself    = 0x0000,
+  Compatibility16UpdateBbs             = 0x0001,
+  Compatibility16PrepareToBoot         = 0x0002,
+  Compatibility16Boot                  = 0x0003,
+  Compatibility16RetrieveLastBootDevice= 0x0004,
+  Compatibility16DispatchOprom         = 0x0005,
+  Compatibility16GetTableAddress       = 0x0006,
+  Compatibility16SetKeyboardLeds       = 0x0007,
+  Compatibility16InstallPciHandler     = 0x0008
 } EFI_COMPATIBILITY_FUNCTIONS;
 
 
