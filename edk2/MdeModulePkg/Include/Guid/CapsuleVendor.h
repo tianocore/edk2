@@ -39,8 +39,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// Data structure of capsule guid hob entry
 ///
 typedef struct {
-  EFI_PHYSICAL_ADDRESS BaseAddress;  ///> Capsule data start address
-  UINT32 Length;                     ///> Length of capsule data.
+  EFI_PHYSICAL_ADDRESS BaseAddress;  ///< Capsule data start address
+  UINT32 Length;                     ///< Length of capsule data.
 } CAPSULE_HOB_INFO;
 
 extern EFI_GUID gEfiCapsuleVendorGuid;
