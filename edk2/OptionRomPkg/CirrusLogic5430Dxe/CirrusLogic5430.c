@@ -771,19 +771,19 @@ InitializeGraphicsMode (
   UINT8 Byte;
   UINTN Index;
   UINT16 DeviceId;
+  EFI_STATUS Status;
 
+  Status = Private->PciIo->Pci.Read (
+             Private->PciIo,
+             EfiPciIoWidthUint16,
+             PCI_DEVICE_ID_OFFSET,
+             1,
+             &DeviceId
+             );
   //
   // Read the PCI Configuration Header from the PCI Device
   //
-  ASSERT_EFI_ERROR (
-    Private->PciIo->Pci.Read (
-                        Private->PciIo,
-                        EfiPciIoWidthUint16,
-                        PCI_DEVICE_ID_OFFSET,
-                        1,
-                        &DeviceId
-                        )
-    );
+  ASSERT_EFI_ERROR (Status);
 
   outw (Private, SEQ_ADDRESS_REGISTER, 0x1206);
   outw (Private, SEQ_ADDRESS_REGISTER, 0x0012);
