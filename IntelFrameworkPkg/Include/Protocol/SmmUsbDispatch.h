@@ -1,7 +1,7 @@
 /** @file
   Provides the parent dispatch service for the USB SMI source generator.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -10,11 +10,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  SmmUsbDispatch.h
-
   @par Revision Reference:
   This Protocol is defined in Framework of EFI SMM Core Interface Spec
   Version 0.9.
+
 **/
 
 #ifndef _EFI_SMM_USB_DISPATCH_H_
@@ -68,8 +67,6 @@ typedef struct {
                                 by the dispatching driver prior to
                                 invoking this dispatch function.
 
-  @return None
-
 **/
 typedef
 VOID
@@ -79,7 +76,7 @@ VOID
   );
 
 /**
-  Register a child SMI source dispatch function with a parent SMM driver
+  Register a child SMI source dispatch function with a parent SMM driver.
 
   @param  This                  Pointer to the EFI_SMM_USB_DISPATCH_PROTOCOL instance.
   @param  DispatchFunction      Pointer to dispatch function to be invoked 
@@ -111,7 +108,7 @@ EFI_STATUS
   );
 
 /**
-  Unregisters a USB service
+  Unregisters a USB service.
 
   @param  This                  Pointer to the EFI_SMM_USB_DISPATCH_PROTOCOL instance.
   @param  DispatchHandle        Handle of the service to remove.
@@ -120,7 +117,7 @@ EFI_STATUS
                                 unregistered and the SMI source has been disabled
                                 if there are no other registered child dispatch
                                 functions for this SMI source.
-  @retval EFI_INVALID_PARAMETER Handle is invalid.
+  @retval EFI_INVALID_PARAMETER The DispatchHandle was not valid.
 
 **/
 typedef
@@ -130,20 +127,10 @@ EFI_STATUS
   IN  EFI_HANDLE                              DispatchHandle
   );
 
-//
-// Interface structure for the SMM USB SMI Dispatch Protocol
-//
-/**
-  @par Protocol Description:
-  Provides the parent dispatch service for the USB SMI source generator.
-
-  @param Register
-  Installs a child service to be dispatched by this protocol.
-
-  @param UnRegister
-  Removes a child service dispatched by this protocol.
-
-**/
+///
+/// The EFI_SMM_USB_DISPATCH_PROTOCOL provides the ability to install child handlers for the
+/// given event types.
+///
 struct _EFI_SMM_USB_DISPATCH_PROTOCOL {
   EFI_SMM_USB_REGISTER    Register;
   EFI_SMM_USB_UNREGISTER  UnRegister;
