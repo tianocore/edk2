@@ -180,7 +180,7 @@ typedef enum {
 ///
 ///   TableSize Size of data.
 ///
-///   Location Location to place the table. 0x00 ?Either 0xE0000 or 0xF0000 64 KB blocks.
+///   Location Location to place the table. 0x00 or 0xE0000 or 0xF0000 64 KB blocks.
 ///       Bit 0 = 1 0xF0000 64 KB block.
 ///       Bit 1 = 1 0xE0000 64 KB block.
 ///       Multiple bits can be set.
@@ -228,7 +228,7 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///
   EfiGetPlatformBinaryTpmBinary    = 4,
   ///
-  /// The mode finds the Compatibility16 “ROM?image.
+  /// The mode finds the Compatibility16 Rom Image.
   ///
   /// The function parameters associated with this mode are:
   ///
