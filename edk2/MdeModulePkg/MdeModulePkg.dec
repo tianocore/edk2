@@ -59,10 +59,6 @@
   ##  @libraryclass  Library for Deferred Procedure Calls.
   DpcLib|Include/Library/DpcLib.h
 
-  ##  @libraryclass  Provides APIs for system memory test.
-  ##
-  MemoryTestLib|Include/Library/MemoryTestLib.h
-
   ##  @libraryclass    Provides global variables that are pointers 
   ##  to the UEFI HII related protocols. 
   ##
