@@ -146,15 +146,15 @@ typedef struct _VARIABLE_INFO_ENTRY  VARIABLE_INFO_ENTRY;
 /// This is an optional feature to dump all used variables in shell environment. 
 ///
 struct _VARIABLE_INFO_ENTRY {
-  VARIABLE_INFO_ENTRY *Next;       ///> Pointer to next entry
-  EFI_GUID            VendorGuid;  ///> Guid of Variable 
-  CHAR16              *Name;       ///> Name of Variable 
-  UINT32              Attributes;  ///> Attributes of variable defined in UEFI spec
-  UINT32              ReadCount;   ///> Number of times to read this variable
-  UINT32              WriteCount;  ///> Number of times to write this variable
-  UINT32              DeleteCount; ///> Number of times to delete this variable
-  UINT32              CacheCount;  ///> Number of times that cache hits this variable
-  BOOLEAN             Volatile;    ///> TRUE if volatile, FALSE if non-volatile
+  VARIABLE_INFO_ENTRY *Next;       ///< Pointer to next entry
+  EFI_GUID            VendorGuid;  ///< Guid of Variable 
+  CHAR16              *Name;       ///< Name of Variable 
+  UINT32              Attributes;  ///< Attributes of variable defined in UEFI spec
+  UINT32              ReadCount;   ///< Number of times to read this variable
+  UINT32              WriteCount;  ///< Number of times to write this variable
+  UINT32              DeleteCount; ///< Number of times to delete this variable
+  UINT32              CacheCount;  ///< Number of times that cache hits this variable
+  BOOLEAN             Volatile;    ///< TRUE if volatile, FALSE if non-volatile
 };
 
 #endif // _EFI_VARIABLE_H_
