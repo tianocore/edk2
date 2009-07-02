@@ -925,7 +925,7 @@ ReadWriteDataSector (
 
     MicroSecondDelay (50);
     Times = Times - 1;
-  } while (Times >= 0);
+  } while (Times > 0);
 
   if (Times == 0) {
     return EFI_TIMEOUT;
@@ -1124,7 +1124,7 @@ FddWaitForBSYClear (
 
     MicroSecondDelay (50);
     Delay = Delay - 1;
-  } while (Delay >= 0);
+  } while (Delay > 0);
 
   if (Delay == 0) {
     return EFI_TIMEOUT;
