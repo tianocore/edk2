@@ -4,7 +4,7 @@
   the Legacy BIOS protocol is generic and consumes this protocol.
   A driver that matches the Legacy16 produces this protocol
 
-  Copyright (c) 2007,2009  Intel Corporation
+  Copyright (c) 2007 - 2009  Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -166,11 +166,11 @@ typedef enum {
 /// the allocated region in 0xF0000 or 0xE0000 block after the second invocation..
 ///
 /// Note: There are two generic mechanisms by which this mode can be used.
-///  - Mechanism 1: This mode returns the data and the Legacy BIOS Protocol copies
+/// Mechanism 1: This mode returns the data and the Legacy BIOS Protocol copies
 /// the data into the F0000 or E0000 block in the Compatibility16 code. The
 /// EFI_COMPATIBILITY16_TABLE entries Oem32Segment and Oem32Offset can
 /// be viewed as two UINT16 entries.
-/// - Mechanism 2: This mode directly fills in the EFI_COMPATIBILITY16_TABLE with
+/// Mechanism 2: This mode directly fills in the EFI_COMPATIBILITY16_TABLE with
 /// a pointer to the INT15 E820 region containing the 32 bit code. It returns
 /// EFI_UNSUPPORTED. The EFI_COMPATIBILITY16_TABLE entries,
 /// Oem32Segment and Oem32Offset, can be viewed as two UINT16 entries or
@@ -180,7 +180,7 @@ typedef enum {
 ///
 ///   TableSize Size of data.
 ///
-///   Location Location to place the table. 0x00 – Either 0xE0000 or 0xF0000 64 KB blocks.
+///   Location Location to place the table. 0x00 ?Either 0xE0000 or 0xF0000 64 KB blocks.
 ///       Bit 0 = 1 0xF0000 64 KB block.
 ///       Bit 1 = 1 0xE0000 64 KB block.
 ///       Multiple bits can be set.
@@ -228,7 +228,7 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///
   EfiGetPlatformBinaryTpmBinary    = 4,
   ///
-  /// The mode finds the Compatibility16 “ROM” image.
+  /// The mode finds the Compatibility16 “ROM?image.
   ///
   /// The function parameters associated with this mode are:
   ///
@@ -407,11 +407,6 @@ typedef enum {
   EfiPlatformHookAfterRomInit     = 2
 } EFI_GET_PLATFORM_HOOK_MODE;
 
-
-//
-//
-//
-
 ///
 /// This IRQ has not been assigned to PCI.
 ///
@@ -423,11 +418,10 @@ typedef enum {
 ///
 /// This IRQ has been used by an SIO legacy device and cannot be used by PCI.
 ///
+#define LEGACY_USED       0xFE
+
 #pragma pack(1)
 
-//
-//
-//
 typedef struct {
   ///
   /// IRQ for this entry.
