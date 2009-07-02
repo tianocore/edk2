@@ -1,7 +1,7 @@
 /** @file
   This protocol manages the legacy memory regions between 0xc0000 - 0xfffff
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -112,29 +112,15 @@ EFI_STATUS
   );
 
 /**
-  @par Protocol Description:
   Abstracts the hardware control of the physical address region 0xC0000-C0xFFFFF
   for the traditional BIOS.
-
-  @param Decode
-  Specifies a region for the chipset to decode
-
-  @param Lock
-  Makes the specified OpROM region read only or locked.
-
-  @param BootLock
-  Sets a region to read only and ensures tat flash is locked from
-  inadvertent modification.
-
-  @param Unlock
-  Makes the specified OpROM region read-write or unlocked.
-
 **/
 struct _EFI_LEGACY_REGION_PROTOCOL {
-  EFI_LEGACY_REGION_DECODE    Decode;
-  EFI_LEGACY_REGION_LOCK      Lock;
-  EFI_LEGACY_REGION_BOOT_LOCK BootLock;
-  EFI_LEGACY_REGION_UNLOCK    UnLock;
+  EFI_LEGACY_REGION_DECODE    Decode;     ///< Specifies a region for the chipset to decode
+  EFI_LEGACY_REGION_LOCK      Lock;       ///< Makes the specified OpROM region read only or locked.
+  EFI_LEGACY_REGION_BOOT_LOCK BootLock;   ///< Sets a region to read only and ensures tat flash is locked from
+                                          ///< inadvertent modification.
+  EFI_LEGACY_REGION_UNLOCK    UnLock;     ///< Makes the specified OpROM region read-write or unlocked.
 };
 
 extern EFI_GUID gEfiLegacyRegionProtocolGuid;

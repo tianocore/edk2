@@ -6,7 +6,7 @@
   type of control. Because of the protected, distinguished class of memory for IA-32 
   systems, the expectation is that this protocol would be supported only on IA-32 systems.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -128,35 +128,15 @@ EFI_STATUS
   );
 
 /**
-  @par Protocol Description:
   This protocol is used to control the visibility of the SMRAM on the platform.
-
-  @param Open
-  Opens the SMRAM.
-
-  @param Close
-  Closes the SMRAM.
-
-  @param Lock
-  Locks the SMRAM.
-
-  @param GetCapabilities
-  Gets information on possible SMRAM regions.
-
-  @param LockState
-  Indicates the current state of the SMRAM. Set to TRUE if any region is locked.
-
-  @param OpenState
-  Indicates the current state of the SMRAM. Set to TRUE if any region is open.
-
 **/
 struct _EFI_SMM_ACCESS_PROTOCOL {
-  EFI_SMM_OPEN          Open;
-  EFI_SMM_CLOSE         Close;
-  EFI_SMM_LOCK          Lock;
-  EFI_SMM_CAPABILITIES  GetCapabilities;
-  BOOLEAN               LockState;
-  BOOLEAN               OpenState;
+  EFI_SMM_OPEN          Open;             ///< Opens the SMRAM.
+  EFI_SMM_CLOSE         Close;            ///< Closes the SMRAM.
+  EFI_SMM_LOCK          Lock;             ///< Locks the SMRAM.
+  EFI_SMM_CAPABILITIES  GetCapabilities;  ///< Gets information on possible SMRAM regions.
+  BOOLEAN               LockState;        ///< Indicates the current state of the SMRAM. Set to TRUE if any region is locked.
+  BOOLEAN               OpenState;        ///< Indicates the current state of the SMRAM. Set to TRUE if any region is open.
 };
 
 extern EFI_GUID gEfiSmmAccessProtocolGuid;

@@ -4,7 +4,7 @@
   This interface provides a means of decoding a set of sections into a linked list of
   leaf sections.  This provides for an extensible and flexible file format.
 
-  Copyright (c) 2006 - 2007, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying
   materials are licensed and made available under the terms and
   conditions of the BSD License which accompanies this
@@ -140,18 +140,20 @@ EFI_STATUS
 // Protocol definition
 //
 struct _EFI_SECTION_EXTRACTION_PROTOCOL {
-///
-///  Takes a bounded stream of sections and returns a section stream handle.
-///
+  ///
+  ///  Takes a bounded stream of sections and returns a section stream handle.
+  ///
   EFI_OPEN_SECTION_STREAM   OpenSectionStream;
-///
-///  Given a section stream handle, retrieves the requested section and
-///  meta-data from the section stream.
-///
+
+  ///
+  ///  Given a section stream handle, retrieves the requested section and
+  ///  meta-data from the section stream.
+  ///
   EFI_GET_SECTION           GetSection;
-///
-///  Given a section stream handle, closes the section stream.
-///
+
+  ///
+  ///  Given a section stream handle, closes the section stream.
+  ///
   EFI_CLOSE_SECTION_STREAM  CloseSectionStream;
 };
 

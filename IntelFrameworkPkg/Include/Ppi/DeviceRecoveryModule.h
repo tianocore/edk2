@@ -8,7 +8,7 @@
   module determines the internal search order, with capsule number 1 as the highest load priority and
   number N as the lowest priority.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -112,24 +112,24 @@ EFI_STATUS
   OUT VOID                                        *Buffer
   );
 
-/**
-  @par Ppi Description:
-  Presents a standard interface to EFI_PEI_DEVICE_RECOVERY_MODULE_PPI,
-  regardless of the underlying device(s).
-
-  @param GetNumberRecoveryCapsules
-  Returns the number of DXE capsules that were found.
-
-  @param GetRecoveryCapsuleInfo
-  Returns the capsule image type and the size of a given image.
-
-  @param LoadRecoveryCapsule
-  Loads a DXE capsule into memory
-
-**/
+///
+/// Presents a standard interface to EFI_PEI_DEVICE_RECOVERY_MODULE_PPI,
+/// regardless of the underlying device(s).
+///
 struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI {
+  ///
+  /// Returns the number of DXE capsules that were found.
+  ///
   EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE  GetNumberRecoveryCapsules;
+  
+  ///
+  /// Returns the capsule image type and the size of a given image.
+  ///
   EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO    GetRecoveryCapsuleInfo;
+  
+  ///
+  /// Loads a DXE capsule into memory
+  ///
   EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE        LoadRecoveryCapsule;
 };
 

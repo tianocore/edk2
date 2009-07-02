@@ -95,7 +95,6 @@ EFI_STATUS
 );
 
 /**
-  @par Protocol Description:
   The EFI_ACPI_S3_SAVE_PROTOCOL is responsible for preparing all the information that the
   Framework needs to restore the platform's preboot state during an S3 resume boot. This
   information can include the following:
@@ -114,16 +113,16 @@ EFI_STATUS
   that the target platform supports an S3 resume and then call EFI_ACPI_S3_SAVE_PROTOCOL
   to save the S3 resume information. The entire Framework boot script table will then be generated,
   assuming the platform currently is in the preboot state.
-
-  @param GetLegacyMemorySize
-  Gets the size of legacy memory below 1 MB that is required for S3 resume.
-
-  @param S3Save
-  Prepare all information for an S3 resume.
-  
 **/
 struct _EFI_ACPI_S3_SAVE_PROTOCOL {
+  ///
+  /// Gets the size of legacy memory below 1 MB that is required for S3 resume.
+  ///
   EFI_ACPI_GET_LEGACY_MEMORY_SIZE   GetLegacyMemorySize;
+  
+  ///
+  /// Prepare all information for an S3 resume.
+  ///
   EFI_ACPI_S3_SAVE                  S3Save;
 };
 

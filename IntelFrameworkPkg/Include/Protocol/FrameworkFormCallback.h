@@ -5,7 +5,7 @@
   specific drivers which want to export access to custom hardware storage or
   publish IFR which has a requirement to call back the original driver.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -183,27 +183,16 @@ EFI_STATUS
   );
 
 /**
-  @par Protocol Description:
   The EFI_FORM_CALLBACK_PROTOCOL is the defined interface for access to
   custom NVS devices as well as communication of user selections in a more
   interactive environment. This protocol should be published by hardware-specific
   drivers that want to export access to custom hardware storage or publish IFR
   that has a requirement to call back the original driver.
-
-  @param NvRead
-  The read operation to access the NV data serviced by a hardware-specific driver.
-
-  @param NvWrite
-  The write operation to access the NV data serviced by a hardware-specific driver.
-
-  @param Callback
-  The function that is called from the configuration browser to communicate key value pairs.
-
 **/
 struct _EFI_FORM_CALLBACK_PROTOCOL {
-  EFI_NV_READ       NvRead;
-  EFI_NV_WRITE      NvWrite;
-  EFI_FORM_CALLBACK Callback;
+  EFI_NV_READ       NvRead;     ///< The read operation to access the NV data serviced by a hardware-specific driver.
+  EFI_NV_WRITE      NvWrite;    ///< The write operation to access the NV data serviced by a hardware-specific driver.
+  EFI_FORM_CALLBACK Callback;   ///< The function that is called from the configuration browser to communicate key value pairs.
 };
 
 extern EFI_GUID gEfiFormCallbackProtocolGuid;

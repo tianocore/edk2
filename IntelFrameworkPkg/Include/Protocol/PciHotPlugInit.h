@@ -3,7 +3,7 @@
   This protocol provides the necessary functionality to initialize the Hot Plug Controllers (HPCs) and
   the buses that they control. This protocol also provides information regarding resource padding.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -143,24 +143,24 @@ EFI_STATUS
 //
 
 /**
-  @par Protocol Description:
   This protocol provides the necessary functionality to initialize the
   Hot Plug Controllers (HPCs) and the buses that they control. This protocol
   also provides information regarding resource padding.
-
-  @param GetRootHpcList
-  Returns a list of root HPCs and the buses that they control.
-
-  @param InitializeRootHpc
-  Initializes the specified root HPC.
-
-  @param GetResourcePadding
-  Returns the resource padding that is required by the HPC.
-
 **/
 struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL {
+  ///
+  /// Returns a list of root HPCs and the buses that they control.
+  ///
   EFI_GET_ROOT_HPC_LIST                                  GetRootHpcList;
+  
+  ///
+  /// Initializes the specified root HPC.
+  ///
   EFI_INITIALIZE_ROOT_HPC                                InitializeRootHpc;
+  
+  ///
+  /// Returns the resource padding that is required by the HPC.
+  ///
   EFI_GET_PCI_HOT_PLUG_PADDING                           GetResourcePadding;
 };
 

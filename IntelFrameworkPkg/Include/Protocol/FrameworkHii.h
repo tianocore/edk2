@@ -751,87 +751,98 @@ EFI_STATUS
   );
 
 /**
-  @par Protocol Description:
   The HII Protocol manages the HII database, which is a repository for data
   having to do with fonts, strings, forms, keyboards, and other future human
   interface items.
-
-  @param NewPack
-  Extracts the various packs from a package list.
-
-  @param RemovePack
-  Removes a package from the HII database.
-
-  @param FindHandles
-  Determines the handles that are currently active in the database.
-
-  @param ExportDatabase
-  Export the entire contents of the database to a buffer.
-
-  @param TestString
-  Tests if all of the characters in a string have corresponding font characters.
-
-  @param GetGlyph
-  Translates a Unicode character into the corresponding font glyph.
-
-  @param GlyphToBlt
-  Converts a glyph value into a format that is ready for a UGA BLT command.
-
-  @param NewString
-  Allows a new string to be added to an already existing string package.
-
-  @param GetPrimaryLanguages
-  Allows a program to determine the primary languages that are supported
-  on a given handle.
-
-  @param GetSecondaryLanguages
-  Allows a program to determine which secondary languages are supported
-  on a given handle for a given primary language.
-
-  @param GetString
-  Extracts a string from a package that is already registered with the
-  EFI HII database.
-
-  @param ResetString
-  Remove any new strings that were added after the initial string export
-  for this handle.
-
-  @param GetLine
-  Allows a program to extract a part of a string of not more than a given width.
-
-  @param GetForms
-  Allows a program to extract a form or form package that has been previously registered.
-
-  @param GetDefaultImage
-  Allows a program to extract the nonvolatile image that represents the default storage image.
-
-  @param UpdateForm
-  Allows a program to update a previously registered form.
-
-  @param GetKeyboardLayout
-  Allows a program to extract the current keyboard layout.
-
 **/
 struct _EFI_HII_PROTOCOL {
+  ///
+  /// Extracts the various packs from a package list.
+  ///
   FRAMEWORK_EFI_HII_NEW_PACK            NewPack;
+  
+  ///
+  /// Removes a package from the HII database.
+  ///
   FRAMEWORK_EFI_HII_REMOVE_PACK         RemovePack;
+  
+  ///
+  /// Determines the handles that are currently active in the database.
+  /// 
   FRAMEWORK_EFI_HII_FIND_HANDLES        FindHandles;
+  
+  ///
+  /// Export the entire contents of the database to a buffer.
+  ///
   FRAMEWORK_EFI_HII_EXPORT              ExportDatabase;
 
+  ///
+  /// Tests if all of the characters in a string have corresponding font characters.
+  ///
   FRAMEWORK_EFI_HII_TEST_STRING         TestString;
+  
+  ///
+  /// Translates a Unicode character into the corresponding font glyph.
+  ///
   FRAMEWORK_EFI_HII_GET_GLYPH           GetGlyph;
+  
+  ///
+  /// Converts a glyph value into a format that is ready for a UGA BLT command.
+  ///
   FRAMEWORK_EFI_HII_GLYPH_TO_BLT        GlyphToBlt;
 
+  ///
+  /// Allows a new string to be added to an already existing string package.
+  ///
   FRAMEWORK_EFI_HII_NEW_STRING          NewString;
+  
+  ///
+  /// Allows a program to determine the primary languages that are supported
+  /// on a given handle.  
+  ///
   FRAMEWORK_EFI_HII_GET_PRI_LANGUAGES   GetPrimaryLanguages;
+  
+  ///
+  /// Allows a program to determine which secondary languages are supported
+  /// on a given handle for a given primary language.  
+  ///
   FRAMEWORK_EFI_HII_GET_SEC_LANGUAGES   GetSecondaryLanguages;
+  
+  ///
+  /// Extracts a string from a package that is already registered with the
+  /// EFI HII database.  
+  ///
   FRAMEWORK_EFI_HII_GET_STRING          GetString;
+  
+  ///
+  /// Remove any new strings that were added after the initial string export
+  /// for this handle.  
+  ///
   FRAMEWORK_EFI_HII_RESET_STRINGS       ResetStrings;
+  
+  ///
+  /// Allows a program to extract a part of a string of not more than a given width.
+  ///
   FRAMEWORK_EFI_HII_GET_LINE            GetLine;
+  
+  ///
+  /// Allows a program to extract a form or form package that has been previously registered.
+  ///
   FRAMEWORK_EFI_HII_GET_FORMS           GetForms;
+  
+  ///
+  /// Allows a program to extract the nonvolatile image that represents the default storage image.
+  ///
   FRAMEWORK_EFI_HII_GET_DEFAULT_IMAGE   GetDefaultImage;
+  
+  ///
+  /// Allows a program to update a previously registered form.
+  ///
   FRAMEWORK_EFI_HII_UPDATE_FORM         UpdateForm;
 
+  ///
+  /// Allows a program to extract the current keyboard layout.
+  ///
   FRAMEWORK_EFI_HII_GET_KEYBOARD_LAYOUT GetKeyboardLayout;
 };
 

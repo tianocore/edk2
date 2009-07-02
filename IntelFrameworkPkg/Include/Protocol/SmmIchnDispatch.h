@@ -3,7 +3,7 @@
   The EFI_SMM_ICHN_DISPATCH_PROTOCOL provides the ability to install child handlers for
   the given event types.
 
-  Copyright (c) 2008, Intel Corporation
+  Copyright (c) 2008 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -180,19 +180,11 @@ EFI_STATUS
 // Interface structure for the SMM ICHN specific SMI Dispatch Protocol
 //
 /**
-  @par Protocol Description:
   Provides the parent dispatch service for a given SMI source generator.
-
-  @param Register
-  Installs a child service to be dispatched by this protocol.
-
-  @param UnRegister
-  Removes a child service dispatched by this protocol.
-
 **/
 struct _EFI_SMM_ICHN_DISPATCH_PROTOCOL {
-  EFI_SMM_ICHN_REGISTER   Register;
-  EFI_SMM_ICHN_UNREGISTER UnRegister;
+  EFI_SMM_ICHN_REGISTER   Register;     ///< Installs a child service to be dispatched by this protocol.
+  EFI_SMM_ICHN_UNREGISTER UnRegister;   ///< Removes a child service dispatched by this protocol.
 };
 
 extern EFI_GUID gEfiSmmIchnDispatchProtocolGuid;

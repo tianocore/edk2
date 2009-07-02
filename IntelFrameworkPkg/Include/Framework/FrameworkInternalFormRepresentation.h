@@ -3,7 +3,7 @@
   Framework IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-  Copyright (c) 2007, Intel Corporation                                                         
+  Copyright (c) 2007 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -31,7 +31,7 @@
 #define FRAMEWORK_EFI_IFR_CHECKBOX_OP             0x06
 #define FRAMEWORK_EFI_IFR_NUMERIC_OP              0x07
 #define FRAMEWORK_EFI_IFR_PASSWORD_OP             0x08
-#define FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP        0x09  // ONEOF OPTION field
+#define FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP        0x09  ///< ONEOF OPTION field
 #define FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP          0x0A
 #define FRAMEWORK_EFI_IFR_END_FORM_OP             0x0B
 #define FRAMEWORK_EFI_IFR_HIDDEN_OP               0x0C
@@ -47,7 +47,7 @@
 #define FRAMEWORK_EFI_IFR_AND_OP                  0x15
 #define FRAMEWORK_EFI_IFR_OR_OP                   0x16
 #define FRAMEWORK_EFI_IFR_NOT_OP                  0x17
-#define FRAMEWORK_EFI_IFR_END_IF_OP               0x18  // for endif of inconsistentif, suppressif, grayoutif
+#define FRAMEWORK_EFI_IFR_END_IF_OP               0x18  ///< for endif of inconsistentif, suppressif, grayoutif
 #define FRAMEWORK_EFI_IFR_GRAYOUT_IF_OP           0x19
 #define FRAMEWORK_EFI_IFR_DATE_OP                 0x1A
 #define FRAMEWORK_EFI_IFR_TIME_OP                 0x1B
@@ -77,7 +77,7 @@
 #define FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED     0x10
 #define FRAMEWORK_EFI_IFR_FLAG_LATE_CHECK         0x20
 
-#define EFI_NON_DEVICE_CLASS              0x00  // Useful when you do not want something in the Device Manager
+#define EFI_NON_DEVICE_CLASS              0x00  ///< Useful when you do not want something in the Device Manager
 #define EFI_DISK_DEVICE_CLASS             0x01
 #define EFI_VIDEO_DEVICE_CLASS            0x02
 #define EFI_NETWORK_DEVICE_CLASS          0x04
@@ -88,16 +88,16 @@
 #define EFI_SETUP_APPLICATION_SUBCLASS    0x00
 #define EFI_GENERAL_APPLICATION_SUBCLASS  0x01
 #define EFI_FRONT_PAGE_SUBCLASS           0x02
-#define EFI_SINGLE_USE_SUBCLASS           0x03  // Used to display a single entity and then exit
+#define EFI_SINGLE_USE_SUBCLASS           0x03  ///< Used to display a single entity and then exit
 
-//
-// Used to flag dynamically created op-codes. This is meaningful to the IFR Library set
-// and the browser since we need to distinguish between compiled NV map data and created data.
-// We do not allow new entries to be created in the NV map dynamically however we still need
-// to display this information correctly.  To dynamically create op-codes and assume that their
-// data will be saved, ensure that the NV starting location they refer to is pre-defined in the
-// NV map.
-//
+///
+/// Used to flag dynamically created op-codes. This is meaningful to the IFR Library set
+/// and the browser since we need to distinguish between compiled NV map data and created data.
+/// We do not allow new entries to be created in the NV map dynamically however we still need
+/// to display this information correctly.  To dynamically create op-codes and assume that their
+/// data will be saved, ensure that the NV starting location they refer to is pre-defined in the
+/// NV map.
+///
 #define FRAMEWORK_EFI_IFR_FLAG_CREATED  128
 
 
@@ -118,7 +118,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS              CallbackHandle;
   UINT16                            Class;
   UINT16                            SubClass;
-  UINT16                            NvDataSize; // set once, size of the NV data as defined in the script
+  UINT16                            NvDataSize; ///< set once, size of the NV data as defined in the script
 } FRAMEWORK_EFI_IFR_FORM_SET;
 
 typedef struct {
@@ -142,8 +142,8 @@ typedef struct {
   STRING_REF                        Help;
   STRING_REF                        Text;
   STRING_REF                        TextTwo;
-  UINT8                             Flags;  // This is included solely for purposes of interactive/dynamic support.
-  UINT16                            Key;    // Value to be passed to caller to identify this particular op-code
+  UINT8                             Flags;  ///< This is included solely for purposes of interactive/dynamic support.
+  UINT16                            Key;    ///< Value to be passed to caller to identify this particular op-code
 } FRAMEWORK_EFI_IFR_TEXT;
 
 //
@@ -153,9 +153,9 @@ typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
   UINT16                            FormId;
   STRING_REF                        Prompt;
-  STRING_REF                        Help;   // The string Token for the context-help
-  UINT8                             Flags;  // This is included solely for purposes of interactive/dynamic support.
-  UINT16                            Key;    // Value to be passed to caller to identify this particular op-code
+  STRING_REF                        Help;   ///< The string Token for the context-help
+  UINT8                             Flags;  ///< This is included solely for purposes of interactive/dynamic support.
+  UINT16                            Key;    ///< Value to be passed to caller to identify this particular op-code
 } FRAMEWORK_EFI_IFR_REF;
 
 typedef struct {
@@ -172,49 +172,49 @@ typedef struct {
 //
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId; // The ID designating what the question is about...
-  UINT8                             Width;      // The Size of the Data being saved
-  STRING_REF                        Prompt;     // The String Token for the Prompt
-  STRING_REF                        Help;       // The string Token for the context-help
+  UINT16                            QuestionId; ///< The ID designating what the question is about...
+  UINT8                             Width;      ///< The Size of the Data being saved
+  STRING_REF                        Prompt;     ///< The String Token for the Prompt
+  STRING_REF                        Help;       ///< The string Token for the context-help
 } FRAMEWORK_EFI_IFR_ONE_OF;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId; // The offset in NV for storage of the data
-  UINT8                             MaxEntries; // The maximum number of options in the ordered list (=size of NVStore)
-  STRING_REF                        Prompt;     // The string token for the prompt
-  STRING_REF                        Help;       // The string token for the context-help
+  UINT16                            QuestionId; ///< The offset in NV for storage of the data
+  UINT8                             MaxEntries; ///< The maximum number of options in the ordered list (=size of NVStore)
+  STRING_REF                        Prompt;     ///< The string token for the prompt
+  STRING_REF                        Help;       ///< The string token for the context-help
 } FRAMEWORK_EFI_IFR_ORDERED_LIST;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId; // The ID designating what the question is about...
-  UINT8                             Width;      // The Size of the Data being saved
-  STRING_REF                        Prompt;     // The String Token for the Prompt
-  STRING_REF                        Help;       // The string Token for the context-help
-  UINT8                             Flags;      // If non-zero, means that it is the default option
-  UINT16                            Key;        // Value to be passed to caller to identify this particular op-code
+  UINT16                            QuestionId; ///< The ID designating what the question is about...
+  UINT8                             Width;      ///< The Size of the Data being saved
+  STRING_REF                        Prompt;     ///< The String Token for the Prompt
+  STRING_REF                        Help;       ///< The string Token for the context-help
+  UINT8                             Flags;      ///< If non-zero, means that it is the default option
+  UINT16                            Key;        ///< Value to be passed to caller to identify this particular op-code
 } FRAMEWORK_EFI_IFR_CHECKBOX, FRAMEWORK_EFI_IFR_CHECK_BOX;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  STRING_REF                        Option; // The string token describing the option
-  UINT16                            Value;  // The value associated with this option that is stored in the NVRAM
-  UINT8                             Flags;  // If non-zero, means that it is the default option
-  UINT16                            Key;    // Value to be passed to caller to identify this particular op-code
+  STRING_REF                        Option;     ///< The string token describing the option
+  UINT16                            Value;      ///< The value associated with this option that is stored in the NVRAM
+  UINT8                             Flags;      ///< If non-zero, means that it is the default option
+  UINT16                            Key;        ///< Value to be passed to caller to identify this particular op-code
 } FRAMEWORK_EFI_IFR_ONE_OF_OPTION;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId; // The ID designating what the question is about...
-  UINT8                             Width;      // The Size of the Data being saved
-  STRING_REF                        Prompt;     // The String Token for the Prompt
-  STRING_REF                        Help;       // The string Token for the context-help
-  UINT8                             Flags;      // This is included solely for purposes of interactive/dynamic support.
-  UINT16                            Key;        // Value to be passed to caller to identify this particular op-code
+  UINT16                            QuestionId; ///< The ID designating what the question is about...
+  UINT8                             Width;      ///< The Size of the Data being saved
+  STRING_REF                        Prompt;     ///< The String Token for the Prompt
+  STRING_REF                        Help;       ///< The string Token for the context-help
+  UINT8                             Flags;      ///< This is included solely for purposes of interactive/dynamic support.
+  UINT16                            Key;        ///< Value to be passed to caller to identify this particular op-code
   UINT16                            Minimum;
   UINT16                            Maximum;
-  UINT16                            Step;       // Zero means manual input, otherwise, arrow selection is called for
+  UINT16                            Step;       ///< Zero means manual input, otherwise, arrow selection is called for
   UINT16                            Default;
 } FRAMEWORK_EFI_IFR_NUMERIC;
 
@@ -240,27 +240,27 @@ typedef struct {
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId;// The ID designating what the question is about...
-  UINT8                             Width;     // The Size of the Data being saved
-  STRING_REF                        Prompt;    // The String Token for the Prompt
-  STRING_REF                        Help;      // The string Token for the context-help
-  UINT8                             Flags;     // This is included solely for purposes of interactive/dynamic support.
-  UINT16                            Key;       // Value to be passed to caller to identify this particular op-code
-  UINT8                             MinSize;   // Minimum allowable sized password
-  UINT8                             MaxSize;   // Maximum allowable sized password
+  UINT16                            QuestionId;///< The ID designating what the question is about...
+  UINT8                             Width;     ///< The Size of the Data being saved
+  STRING_REF                        Prompt;    ///< The String Token for the Prompt
+  STRING_REF                        Help;      ///< The string Token for the context-help
+  UINT8                             Flags;     ///< This is included solely for purposes of interactive/dynamic support.
+  UINT16                            Key;       ///< Value to be passed to caller to identify this particular op-code
+  UINT8                             MinSize;   ///< Minimum allowable sized password
+  UINT8                             MaxSize;   ///< Maximum allowable sized password
   UINT16                            Encoding;
 } FRAMEWORK_EFI_IFR_PASSWORD;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId; // The ID designating what the question is about...
-  UINT8                             Width;      // The Size of the Data being saved 
-  STRING_REF                        Prompt;     // The String Token for the Prompt
-  STRING_REF                        Help;       // The string Token for the context-help
-  UINT8                             Flags;      // This is included solely for purposes of interactive/dynamic support.
-  UINT16                            Key;        // Value to be passed to caller to identify this particular op-code
-  UINT8                             MinSize;    // Minimum allowable sized password
-  UINT8                             MaxSize;    // Maximum allowable sized password
+  UINT16                            QuestionId; ///< The ID designating what the question is about...
+  UINT8                             Width;      ///< The Size of the Data being saved 
+  STRING_REF                        Prompt;     ///< The String Token for the Prompt
+  STRING_REF                        Help;       ///< The string Token for the context-help
+  UINT8                             Flags;      ///< This is included solely for purposes of interactive/dynamic support.
+  UINT16                            Key;        ///< Value to be passed to caller to identify this particular op-code
+  UINT8                             MinSize;    ///< Minimum allowable sized password
+  UINT8                             MaxSize;    ///< Maximum allowable sized password
 } FRAMEWORK_EFI_IFR_STRING;
 
 typedef struct {
@@ -291,30 +291,30 @@ typedef struct {
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId;   // offset into variable storage
-  UINT8                             Width;        // size of variable storage
-  UINT16                            Value;        // value to compare against
+  UINT16                            QuestionId;   ///< offset into variable storage
+  UINT8                             Width;        ///< size of variable storage
+  UINT16                            Value;        ///< value to compare against
 } FRAMEWORK_EFI_IFR_EQ_ID_VAL;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId;   // offset into variable storage
-  UINT8                             Width;        // size of variable storage
+  UINT16                            QuestionId;   ///< offset into variable storage
+  UINT8                             Width;        ///< size of variable storage
   UINT16                            ListLength;
   UINT16                            ValueList[1];
 } FRAMEWORK_EFI_IFR_EQ_ID_LIST;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            QuestionId1;  // offset into variable storage for first value to compare
-  UINT8                             Width;        // size of variable storage (must be same for both)
-  UINT16                            QuestionId2;  // offset into variable storage for second value to compare
+  UINT16                            QuestionId1;  ///< offset into variable storage for first value to compare
+  UINT8                             Width;        ///< size of variable storage (must be same for both)
+  UINT16                            QuestionId2;  ///< offset into variable storage for second value to compare
 } FRAMEWORK_EFI_IFR_EQ_ID_ID;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            VariableId;   // offset into variable storage
-  UINT16                            Value;        // value to compare against
+  UINT16                            VariableId;   ///< offset into variable storage
+  UINT16                            Value;        ///< value to compare against
 } FRAMEWORK_EFI_IFR_EQ_VAR_VAL;
 
 typedef struct {
@@ -346,43 +346,43 @@ typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
   STRING_REF                        Help;
   STRING_REF                        Text;
-  STRING_REF                        TextTwo; // optional text
+  STRING_REF                        TextTwo;    ///< optional text
 } FRAMEWORK_EFI_IFR_INVENTORY;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  EFI_GUID                          Guid;    // GUID for the variable
-  UINT16                            VarId;   // variable store ID, as referenced elsewhere in the form
-  UINT16                            Size;    // size of the variable storage
+  EFI_GUID                          Guid;       ///< GUID for the variable
+  UINT16                            VarId;      ///< variable store ID, as referenced elsewhere in the form
+  UINT16                            Size;       ///< size of the variable storage
 } FRAMEWORK_EFI_IFR_VARSTORE;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            VarId;   // variable store ID, as referenced elsewhere in the form
+  UINT16                            VarId;      ///< variable store ID, as referenced elsewhere in the form
 } FRAMEWORK_EFI_IFR_VARSTORE_SELECT;
 
-//
-// Used for the ideqid VFR statement where two variable stores may be referenced in the
-// same VFR statement.
-// A browser should treat this as an FRAMEWORK_EFI_IFR_VARSTORE_SELECT statement and assume that all following
-// IFR opcodes use the VarId as defined here.
-//
+///
+/// Used for the ideqid VFR statement where two variable stores may be referenced in the
+/// same VFR statement.
+/// A browser should treat this as an FRAMEWORK_EFI_IFR_VARSTORE_SELECT statement and assume that all following
+/// IFR opcodes use the VarId as defined here.
+///
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  UINT16                            VarId;          // variable store ID, as referenced elsewhere in the form
-  UINT16                            SecondaryVarId; // variable store ID, as referenced elsewhere in the form
+  UINT16                            VarId;          ///< variable store ID, as referenced elsewhere in the form
+  UINT16                            SecondaryVarId; ///< variable store ID, as referenced elsewhere in the form
 } FRAMEWORK_EFI_IFR_VARSTORE_SELECT_PAIR;
 
-//
-// Save defaults and restore defaults have same structure
-//
+///
+/// Save defaults and restore defaults have same structure
+///
 #define FRAMEWORK_EFI_IFR_RESTORE_DEFAULTS  FRAMEWORK_EFI_IFR_SAVE_DEFAULTS
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
-  STRING_REF                        Title;        // The string token for the banner title
-  UINT16                            LineNumber;   // 1-based line number
-  UINT8                             Alignment;    // left, center, or right-aligned
+  STRING_REF                        Title;        ///< The string token for the banner title
+  UINT16                            LineNumber;   ///< 1-based line number
+  UINT8                             Alignment;    ///< left, center, or right-aligned
 } FRAMEWORK_EFI_IFR_BANNER;
 
 #define FRAMEWORK_EFI_IFR_BANNER_ALIGN_LEFT   0

@@ -6,7 +6,7 @@
   storage; as such, a write command to certain technologies would alter the contents of the entire part,
   thus making the in situ PEIM execution not follow the required flow.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -106,20 +106,12 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   This PPI provides a lightweight, read-only variant of the full EFI
   variable services.
-
-  @param GetVariable
-  A service to ascertain a given variable name.
-
-  @param GetNextVariableName
-  A service to ascertain a variable based upon a given, known variable
-
 **/
 struct _EFI_PEI_READ_ONLY_VARIABLE_PPI {
-  EFI_PEI_GET_VARIABLE            PeiGetVariable;
-  EFI_PEI_GET_NEXT_VARIABLE_NAME  PeiGetNextVariableName;
+  EFI_PEI_GET_VARIABLE            PeiGetVariable;         ///< A service to ascertain a given variable name.
+  EFI_PEI_GET_NEXT_VARIABLE_NAME  PeiGetNextVariableName; ///< A service to ascertain a variable based upon a given, known variable
 };
 
 extern EFI_GUID gEfiPeiReadOnlyVariablePpiGuid;

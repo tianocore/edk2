@@ -5,7 +5,7 @@
   in packet of data.  This will also allow the caller to post messages
   into the configuration drivers internal mailbox.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -143,22 +143,21 @@ EFI_STATUS
   );
 
 /**
-  @par Protocol Description:
   The EFI_FORM_BROWSER_PROTOCOL is the interface to call for drivers to
   leverage the EFI configuration driver interface.
-
-  @param SendForm
-  Provides direction to the configuration driver whether to use the HII
-  database or to use a passed-in set of data. This functions also establishes
-  a pointer to the calling driver's callback interface.
-
-  @param CreatePopUp
-  Routine used to abstract a generic dialog interface and return the
-  selected key or string.
-
 **/
 struct _EFI_FORM_BROWSER_PROTOCOL {
+  ///
+  /// Provides direction to the configuration driver whether to use the HII
+  /// database or to use a passed-in set of data. This functions also establishes
+  /// a pointer to the calling driver's callback interface.
+  ///
   EFI_SEND_FORM     SendForm;
+  
+  ///
+  /// Routine used to abstract a generic dialog interface and return the
+  /// selected key or string.  
+  ///
   EFI_CREATE_POP_UP CreatePopUp;
 };
 

@@ -156,22 +156,22 @@ EFI_STATUS
 // Interface structure for the SMM Periodic Timer Dispatch Protocol
 //
 /**
-  @par Protocol Description:
   Provides the parent dispatch service for the periodical timer SMI source generator.
-
-  @param Register
-  Installs a child service to be dispatched by this protocol.
-
-  @param UnRegister
-  Removes a child service dispatched by this protocol.
-
-  @param GetNextShorterInterval
-  Returns the next SMI tick period that is supported by the chipset.
-
 **/
 struct _EFI_SMM_PERIODIC_TIMER_DISPATCH_PROTOCOL {
+  ///
+  /// Installs a child service to be dispatched by this protocol.
+  ///
   EFI_SMM_PERIODIC_TIMER_REGISTER   Register;
+  
+  ///
+  /// Removes a child service dispatched by this protocol.
+  ///
   EFI_SMM_PERIODIC_TIMER_UNREGISTER UnRegister;
+  
+  ///
+  /// Returns the next SMI tick period that is supported by the chipset.
+  ///
   EFI_SMM_PERIODIC_TIMER_INTERVAL   GetNextShorterInterval;
 };
 

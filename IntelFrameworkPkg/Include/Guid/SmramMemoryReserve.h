@@ -1,7 +1,7 @@
 /** @file
   GUID for use in reserving SMRAM regions.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -33,8 +33,8 @@
 // *******************************************************
 //
 typedef struct {
-  EFI_PHYSICAL_ADDRESS  PhysicalStart;  // Phsyical location in DRAM
-  EFI_PHYSICAL_ADDRESS  CpuStart;       // Address CPU uses to access the SMI handler
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;  ///< Phsyical location in DRAM
+  EFI_PHYSICAL_ADDRESS  CpuStart;       ///< Address CPU uses to access the SMI handler
   // May or may not match PhysicalStart
   //
   UINT64                PhysicalSize;

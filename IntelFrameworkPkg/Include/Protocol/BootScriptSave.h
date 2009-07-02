@@ -2,7 +2,7 @@
   This protocol is used to store or record various boot scripts into boot 
   script tables.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -85,20 +85,12 @@ EFI_STATUS
 // S3 Save Protocol data structure
 //
 /**
-  @par Protocol Description:
   The EFI_BOOT_SCRIPT_SAVE_PROTOCOL publishes the Framework boot script abstractions
   to store or record various boot scripts into boot script tables.
-
-  @param Write
-  Writes various boot scripts to a boot script table.
-
-  @param CloseTable
-  Retrieves and closes a script table.
-
 **/
 struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL {
-  EFI_BOOT_SCRIPT_WRITE       Write;
-  EFI_BOOT_SCRIPT_CLOSE_TABLE CloseTable;
+  EFI_BOOT_SCRIPT_WRITE       Write;      ///< Writes various boot scripts to a boot script table.
+  EFI_BOOT_SCRIPT_CLOSE_TABLE CloseTable; ///< Retrieves and closes a script table.
 };
 
 extern EFI_GUID gEfiBootScriptSaveProtocolGuid;

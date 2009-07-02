@@ -1,7 +1,7 @@
 /** @file
   This protocol abstracts the PIRQ programming from the generic EFI Compatibility Support Modules (CSMs).
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -103,21 +103,24 @@ EFI_STATUS
   );
 
 struct _EFI_LEGACY_INTERRUPT_PROTOCOL {
-///
-///   Gets the number of PIRQs supported.
-///
+  ///
+  ///   Gets the number of PIRQs supported.
+  ///
   EFI_LEGACY_INTERRUPT_GET_NUMBER_PIRQS GetNumberPirqs;
-///
-/// Gets the PCI bus, device, and function that associated with this protocol.
-///
+
+  ///
+  /// Gets the PCI bus, device, and function that associated with this protocol.
+  ///
   EFI_LEGACY_INTERRUPT_GET_LOCATION     GetLocation;
-///
-/// Reads the indicated PIRQ register.
-///
+
+  ///
+  /// Reads the indicated PIRQ register.
+  ///
   EFI_LEGACY_INTERRUPT_READ_PIRQ        ReadPirq;
-///
-/// Writes to the indicated PIRQ register.
-///
+
+  ///
+  /// Writes to the indicated PIRQ register.
+  ///
   EFI_LEGACY_INTERRUPT_WRITE_PIRQ       WritePirq;
 };
 
