@@ -1,7 +1,7 @@
 /** @file
   Provides the parent dispatch service for the periodical timer SMI source generator.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -36,39 +36,25 @@ typedef struct _EFI_SMM_PERIODIC_TIMER_DISPATCH_PROTOCOL  EFI_SMM_PERIODIC_TIMER
 //
 // Related Definitions
 //
-//
-// Period is the minimum period of time in 100 nanosecond units that child gets called.
-// The child will be called back after a time greater than the time Period.
-//
-// SmiTickInterval is the period of time interval between SMIs.  Children of this interface
-// should use this field when registering for periodic timer intervals when a finer
-// granularity periodic SMI is desired.  Valid values for this field are those returned
-// by GetNextInterval.  A value of 0 indicates the parent is allowed to use any SMI
-// interval period to satisfy the requested period.
-//    Example: A chipset supports periodic SMIs on every 64ms or 2 seconds.
-//      A child wishes schedule a period SMI to fire on a period of 3 seconds, there
-//      are several ways to approach the problem:
-//      1. The child may accept a 4 second periodic rate, in which case it registers with
-//           Period = 40000
-//           SmiTickInterval = 20000
-//         The resulting SMI will occur every 2 seconds with the child called back on
-//         every 2nd SMI.
-//         NOTE: the same result would occur if the child set SmiTickInterval = 0.
-//      2. The child may choose the finer granularity SMI (64ms):
-//           Period = 30000
-//           SmiTickInterval = 640
-//         The resulting SMI will occur every 64ms with the child called back on
-//         every 47th SMI.
-//         NOTE: the child driver should be aware that this will result in more
-//           SMIs occuring during system runtime which can negatively impact system
-//           performance.
-//
-// ElapsedTime is the actual time in 100 nanosecond units elapsed since last called, a
-// value of 0 indicates an unknown amount of time.
-//
+
 typedef struct {
+  ///
+  /// The minimum period of time in 100 nanosecond units that child gets called.
+  /// The child will be called back after a time greater than the time Period.
+  ///
   UINT64  Period;
+  ///
+  /// The period of time interval between SMIs.  Children of this interface
+  /// should use this field when registering for periodic timer intervals when a finer
+  /// granularity periodic SMI is desired.  Valid values for this field are those returned
+  /// by GetNextInterval.  A value of 0 indicates the parent is allowed to use any SMI
+  /// interval period to satisfy the requested period.
+  ///
   UINT64  SmiTickInterval;
+  ///
+  /// The actual time in 100 nanosecond units elapsed since last called, a
+  /// value of 0 indicates an unknown amount of time.
+  ///
   UINT64  ElapsedTime;
 } EFI_SMM_PERIODIC_TIMER_DISPATCH_CONTEXT;
 
