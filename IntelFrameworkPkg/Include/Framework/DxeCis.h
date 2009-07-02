@@ -1,11 +1,8 @@
 /** @file
-  Include file that supportes Framework extension to the UEFI 2.0 spec.
+  Include file for definitions in the Intel Platform Innovation Framework for EFI
+  Driver Execution Environment Core Interface Specification (DXE CIS) Version 0.9.
 
-  This include file must only contain things defined in the Framework
-  specifications. If a code construct is defined in the Framework specification
-  it must be included by this include file.
-
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,17 +11,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:    FrameworkDxeCis.h
-
-  @par Revision Reference:
-  This Protocol is defined in Framework for EFI Driver Execution Environment 
-  Core Interface Specification. 
-  Version 0.9.
-
 **/
 
-#ifndef _FRAMEWORK_DXE_CIS_H_
-#define _FRAMEWORK_DXE_CIS_H_
+#ifndef _DXE_CIS_H_
+#define _DXE_CIS_H_
 
 #include <PiDxe.h>
 #include <Framework/StatusCode.h>
@@ -40,7 +30,13 @@ VOID
   IN  VOID                          *Buffer
   );
 
+//
+// Framework EFI Runtime Services Table as extension to EFI 1.10 Runtime Services Table
+//
 typedef struct {
+  //
+  // Table header for the Framework EFI Runtime Services Table
+  //
   EFI_TABLE_HEADER                  Hdr;
   //
   // Time services
@@ -66,7 +62,7 @@ typedef struct {
   EFI_GET_NEXT_HIGH_MONO_COUNT      GetNextHighMonotonicCount;
   EFI_RESET_SYSTEM                  ResetSystem;
   //
-  // Framework extension to UEFI 2.0 runtime table
+  // Framework extension to EFI 1.10 runtime table
   // It was moved to a protocol to not conflict with UEFI 2.0
   //
   EFI_REPORT_STATUS_CODE            ReportStatusCode;
@@ -77,16 +73,5 @@ typedef struct {
 #define EFI_EVENT_SIGNAL_READY_TO_BOOT  0x00000203
 #define EFI_EVENT_SIGNAL_LEGACY_BOOT    0x00000204
 
-typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL          Header;
-  EFI_GUID                          TianoSpecificDevicePath;
-  UINT32                            Type;
-} TIANO_DEVICE_PATH;
-
-#define TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE    0x01
-typedef struct {
-  TIANO_DEVICE_PATH                 Tiano;
-  EFI_GUID                          NameGuid;
-} FRAMEWORK_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
-
 #endif
+
