@@ -99,7 +99,7 @@ EFI_STATUS
   authenticate the file encapsulation of other domain-specific wrapping.
 **/
 struct _EFI_PEI_SECTION_EXTRACTION_PPI {
-  EFI_PEI_GET_SECTION PeiGetSection;  ///< Retrieves a section from within a section file.
+  EFI_PEI_GET_SECTION GetSection;  ///< Retrieves a section from within a section file.
 };
 
 extern EFI_GUID gEfiPeiSectionExtractionPpiGuid;
