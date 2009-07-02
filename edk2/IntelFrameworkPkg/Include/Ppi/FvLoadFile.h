@@ -1,7 +1,7 @@
 /** @file
   Load image file from fv to memory.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -53,16 +53,15 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   This PPI is a pointer to the Load File service. This service will be
   published by a PEIM.The PEI Foundation will use this service to
-  launch the known non-XIP PE/COFF PEIM images.  This service may
+  launch the known non-XIP PE/COFF PEIM images. This service may
   depend upon the presence of the EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI.
 **/
 struct _EFI_PEI_FV_FILE_LOADER_PPI {
-///
-/// Loads a PEIM into memory for subsequent execution
-///
+  ///
+  /// Loads a PEIM into memory for subsequent execution
+  ///
   EFI_PEI_FV_LOAD_FILE  FvLoadFile;
 };
 

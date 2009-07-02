@@ -1,7 +1,7 @@
 /** @file
   This file declares FindFv PPI used to locate FVs that contain PEIMs in PEI
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -55,17 +55,12 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   Hardware mechanisms for locating FVs in a platform vary widely.
   EFI_PEI_FIND_FV_PPI serves to abstract this variation so that the
   PEI Foundation can remain standard across a wide variety of platforms.
-
-  @param FindFv
-  Service that abstracts the location of additional firmware volumes.
-
 **/
 struct _EFI_PEI_FIND_FV_PPI {
-  EFI_PEI_FIND_FV_FINDFV  FindFv;
+  EFI_PEI_FIND_FV_FINDFV  FindFv;   ///< Service that abstracts the location of additional firmware volumes.
 };
 
 extern EFI_GUID gEfiFindFvPpiGuid;

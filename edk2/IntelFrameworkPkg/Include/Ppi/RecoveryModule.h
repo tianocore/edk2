@@ -2,7 +2,7 @@
   This file declares Recovery Module PPI. 
   This PPI is used to find and load the recovery files.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -51,15 +51,10 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   Finds and loads the recovery files.
-
-  @param LoadRecoveryCapsule
-  Loads a DXE binary capsule into memory.
-
 **/
 struct _EFI_PEI_RECOVERY_MODULE_PPI {
-  EFI_PEI_LOAD_RECOVERY_CAPSULE LoadRecoveryCapsule;
+  EFI_PEI_LOAD_RECOVERY_CAPSULE LoadRecoveryCapsule;  ///< Loads a DXE binary capsule into memory.
 };
 
 extern EFI_GUID gEfiPeiRecoveryModulePpiGuid;

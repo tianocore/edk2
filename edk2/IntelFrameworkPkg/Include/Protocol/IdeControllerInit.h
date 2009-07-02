@@ -9,7 +9,7 @@
   retrieve the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance that is associated with the
   controller to be managed.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,15 +31,15 @@
 
 #include <PiDxe.h>
 
-//
-// Global ID for the EFI Platform IDE Protocol GUID
-//
+///
+/// Global ID for the EFI Platform IDE Protocol GUID
+///
 #define EFI_IDE_CONTROLLER_INIT_PROTOCOL_GUID \
   { 0xa1e37052, 0x80d9, 0x4e65, {0xa3, 0x17, 0x3e, 0x9a, 0x55, 0xc4, 0x3e, 0xc9 } }
 
-//
-// Forward reference for pure ANSI compatability
-//
+///
+/// Forward reference for pure ANSI compatability
+///
 typedef struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL  EFI_IDE_CONTROLLER_INIT_PROTOCOL;
 
 //
@@ -133,19 +133,19 @@ typedef struct {
 #pragma pack(1)
 
 typedef struct {
-  UINT16  config;             // General Configuration
-  UINT16  cylinders;          // Number of Cylinders
+  UINT16  config;                 ///< General Configuration
+  UINT16  cylinders;              ///< Number of Cylinders
   UINT16  reserved_2;
-  UINT16  heads;              //Number of logical heads
+  UINT16  heads;                  ///< Number of logical heads
   UINT16  vendor_data1;
   UINT16  vendor_data2;
   UINT16  sectors_per_track;
   UINT16  vendor_specific_7_9[3];
-  CHAR8   SerialNo[20];       // ASCII
+  CHAR8   SerialNo[20];           ///< ASCII
   UINT16  vendor_specific_20_21[2];
   UINT16  ecc_bytes_available;
-  CHAR8   FirmwareVer[8];     // ASCII
-  CHAR8   ModelName[40];      // ASCII
+  CHAR8   FirmwareVer[8];         ///< ASCII
+  CHAR8   ModelName[40];          ///< ASCII
   UINT16  multi_sector_cmd_max_sct_cnt;
   UINT16  reserved_48;
   UINT16  capabilities;
@@ -171,23 +171,23 @@ typedef struct {
   UINT16  reserved_69_79[11];
   UINT16  major_version_no;
   UINT16  minor_version_no;
-  UINT16  command_set_supported_82; // word 82
-  UINT16  command_set_supported_83; // word 83
-  UINT16  command_set_feature_extn; // word 84
-  UINT16  command_set_feature_enb_85; // word 85
-  UINT16  command_set_feature_enb_86; // word 86
-  UINT16  command_set_feature_default; // word 87
-  UINT16  ultra_dma_mode; // word 88
+  UINT16  command_set_supported_82;   ///< word 82
+  UINT16  command_set_supported_83;   ///< word 83
+  UINT16  command_set_feature_extn;   ///< word 84
+  UINT16  command_set_feature_enb_85; ///< word 85
+  UINT16  command_set_feature_enb_86; ///< word 86
+  UINT16  command_set_feature_default; ///< word 87
+  UINT16  ultra_dma_mode;             ///< word 88
   UINT16  reserved_89_105[17];
-  UINT16  phy_logic_sector_support; // word 106
+  UINT16  phy_logic_sector_support;   ///< word 106
   UINT16  reserved_107_116[10];
-  UINT16  logic_sector_size_lo; // word 117
-  UINT16  logic_sector_size_hi; // word 118
+  UINT16  logic_sector_size_lo;       ///< word 117
+  UINT16  logic_sector_size_hi;       ///< word 118
   UINT16  reserved_119_127[9];
   UINT16  security_status;
   UINT16  vendor_data_129_159[31];
   UINT16  reserved_160_208[49];
-  UINT16  alignment_logic_in_phy_blocks; // word 209
+  UINT16  alignment_logic_in_phy_blocks; ///< word 209
   UINT16  reserved_210_255[46];
 } EFI_ATA_IDENTIFY_DATA;
 
@@ -199,7 +199,7 @@ typedef struct {
 //
 #pragma pack(1)
 typedef struct {
-    UINT16  config;             // General Configuration
+    UINT16  config;             ///< General Configuration
     UINT16  obsolete_1;
     UINT16  specific_config;
     UINT16  obsolete_3;
@@ -207,11 +207,11 @@ typedef struct {
     UINT16  obsolete_6;
     UINT16  cfa_reserved_7_8[2];
     UINT16  retired_9;
-    CHAR8   SerialNo[20];       // ASCII
+    CHAR8   SerialNo[20];       ///< ASCII
     UINT16  retired_20_21[2];
     UINT16  obsolete_22;
-    CHAR8   FirmwareVer[8];     // ASCII
-    CHAR8   ModelName[40];      // ASCII
+    CHAR8   FirmwareVer[8];     ///< ASCII
+    CHAR8   ModelName[40];      ///< ASCII
     UINT16  multi_sector_cmd_max_sct_cnt;
     UINT16  reserved_48;
     UINT16  capabilities_49;
@@ -425,46 +425,51 @@ EFI_STATUS
 // EFI_IDE_CONTROLLER_INIT_PROTOCOL instances.
 //
 /**
-  @par Protocol Description:
   Provides the basic interfaces to abstract an IDE controller.
-
-  @param GetChannelInfo
-  Returns the information about a specific channel.
-
-  @param NotifyPhase
-  The notification that the IDE bus driver is about to enter the
-  specified phase during the enumeration process.
-
-  @param SubmitData
-  Submits the Drive Identify data that was returned by the device.
-
-  @param DisqualifyMode
-  Submits information about modes that should be disqualified.
-
-  @param CalculateMode
-  Calculates and returns the optimum mode for a particular IDE device.
-
-  @param SetTiming
-  Programs the IDE controller hardware to the default timing or per the modes
-  that were returned by the last call to CalculateMode().
-
-  @param EnumAll
-  Set to TRUE if the enumeration group includes all the channels that are
-  produced by this controller. FALSE if an enumeration group consists of
-  only one channel.
-
-  @param ChannelCount
-  The number of channels that are produced by this controller.
-
 **/
 struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
+  ///
+  /// Returns the information about a specific channel.
+  ///
   EFI_IDE_CONTROLLER_GET_CHANNEL_INFO    GetChannelInfo;
+  
+  ///
+  /// The notification that the IDE bus driver is about to enter the
+  /// specified phase during the enumeration process.  
+  ///
   EFI_IDE_CONTROLLER_NOTIFY_PHASE        NotifyPhase;
+  
+  ///
+  /// Submits the Drive Identify data that was returned by the device.
+  ///
   EFI_IDE_CONTROLLER_SUBMIT_DATA         SubmitData;
+  
+  ///
+  /// Submits information about modes that should be disqualified.
+  ///
   EFI_IDE_CONTROLLER_DISQUALIFY_MODE     DisqualifyMode;
+  
+  ///
+  /// Calculates and returns the optimum mode for a particular IDE device.
+  ///
   EFI_IDE_CONTROLLER_CALCULATE_MODE      CalculateMode;
+  
+  ///
+  /// Programs the IDE controller hardware to the default timing or per the modes
+  /// that were returned by the last call to CalculateMode().  
+  ///
   EFI_IDE_CONTROLLER_SET_TIMING          SetTiming;
+  
+  ///
+  /// Set to TRUE if the enumeration group includes all the channels that are
+  /// produced by this controller. FALSE if an enumeration group consists of
+  /// only one channel.  
+  ///
   BOOLEAN                                EnumAll;
+  
+  ///
+  /// The number of channels that are produced by this controller.
+  ///
   UINT8                                  ChannelCount;
 };
 

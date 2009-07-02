@@ -1,7 +1,7 @@
 /** @file
   GUIDs used for EFI Capsule
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -52,10 +52,10 @@
 // a capsule update.
 //
 typedef struct {
-  UINT64                Length;     // length of the data block
-  EFI_PHYSICAL_ADDRESS  Data;       // physical address of the data block
-  UINT32                Signature;  // CBDS
-  UINT32                CheckSum;   // to sum this structure to 0
+  UINT64                Length;     ///< length of the data block
+  EFI_PHYSICAL_ADDRESS  Data;       ///< physical address of the data block
+  UINT32                Signature;  ///< CBDS
+  UINT32                CheckSum;   ///< to sum this structure to 0
 } FRAMEWORK_EFI_CAPSULE_BLOCK_DESCRIPTOR;
 
 typedef struct {

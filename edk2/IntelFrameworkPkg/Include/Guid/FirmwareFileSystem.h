@@ -2,7 +2,7 @@
   Guid used to define the Firmware File System.  See the Framework Firmware
   File System Specification for more details.
 
-  Copyright (c) 2006, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -23,9 +23,9 @@
 
 #include <PiPei.h>
 
-//
-// GUIDs defined by the FFS specification.
-//
+///
+/// GUIDs defined by the FFS specification.
+///
 #define EFI_FIRMWARE_FILE_SYSTEM_GUID \
   { 0x7A9354D9, 0x0468, 0x444a, {0x81, 0xCE, 0x0B, 0xF6, 0x17, 0xD8, 0x90, 0xDF }}
 

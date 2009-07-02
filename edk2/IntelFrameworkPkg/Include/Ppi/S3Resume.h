@@ -64,15 +64,14 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   EFI_PEI_S3_RESUME_PPI accomplishes the firmware S3 resume boot
   path and transfers control to OS.
 **/
 struct _EFI_PEI_S3_RESUME_PPI {
-///
-/// Restores the platform to its preboot configuration for an S3 resume and
-/// jumps to the OS waking vector.
-///
+  ///
+  /// Restores the platform to its preboot configuration for an S3 resume and
+  /// jumps to the OS waking vector.
+  ///
   EFI_PEI_S3_RESUME_PPI_RESTORE_CONFIG  S3RestoreConfig;
 };
 

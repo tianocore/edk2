@@ -2,7 +2,7 @@
   This file declares Smbus PPI which provides the basic I/O interfaces that a PEIM 
   uses to access its SMBus controller and the slave devices attached to it.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -183,29 +183,30 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   Provides the basic I/O interfaces that a PEIM uses to access
   its SMBus controller and the slave devices attached to it.
-
-  @param Execute
-  Executes the SMBus operation to an SMBus slave device.
-
-  @param ArpDevice
-  Allows an SMBus 2.0 device(s) to be Address Resolution Protocol (ARP)
-
-  @param GetArpMap
-  Allows a PEIM to retrieve the address that was allocated by the SMBus
-  host controller during enumeration/ARP.
-
-  @param Notify
-  Allows a driver to register for a callback to the SMBus host
-  controller driver when the bus issues a notification to the bus controller PEIM.
-
 **/
 struct _EFI_PEI_SMBUS_PPI {
+  ///
+  /// Executes the SMBus operation to an SMBus slave device.
+  ///
   EFI_PEI_SMBUS_PPI_EXECUTE_OPERATION Execute;
+  
+  ///
+  /// Allows an SMBus 2.0 device(s) to be Address Resolution Protocol (ARP)
+  ///
   EFI_PEI_SMBUS_PPI_ARP_DEVICE        ArpDevice;
+  
+  ///
+  /// Allows a PEIM to retrieve the address that was allocated by the SMBus
+  /// host controller during enumeration/ARP.  
+  ///
   EFI_PEI_SMBUS_PPI_GET_ARP_MAP       GetArpMap;
+  
+  ///
+  /// Allows a driver to register for a callback to the SMBus host
+  /// controller driver when the bus issues a notification to the bus controller PEIM.  
+  ///
   EFI_PEI_SMBUS_PPI_NOTIFY            Notify;
 };
 

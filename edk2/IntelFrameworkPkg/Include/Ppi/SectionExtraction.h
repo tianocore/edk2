@@ -95,16 +95,11 @@ EFI_STATUS
   );
 
 /**
-  @par Ppi Description:
   This PPI supports encapsulating sections, such as GUIDed sections used to
   authenticate the file encapsulation of other domain-specific wrapping.
-
-  @param GetSection
-  Retrieves a section from within a section file.
-
 **/
 struct _EFI_PEI_SECTION_EXTRACTION_PPI {
-  EFI_PEI_GET_SECTION PeiGetSection;
+  EFI_PEI_GET_SECTION PeiGetSection;  ///< Retrieves a section from within a section file.
 };
 
 extern EFI_GUID gEfiPeiSectionExtractionPpiGuid;

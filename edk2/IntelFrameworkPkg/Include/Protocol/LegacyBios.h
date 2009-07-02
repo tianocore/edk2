@@ -12,7 +12,7 @@
   You most likely should not use this protocol! Find the EFI way to solve the
   problem to make your code portable
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -470,62 +470,71 @@ EFI_STATUS
   );
 
 /**
-  @par Protocol Description:
   Abstracts the traditional BIOS from the rest of EFI. The LegacyBoot()
   member function allows the BDS to support booting a traditional OS.
   EFI thunks drivers that make EFI bindings for BIOS INT services use
   all the other member functions.
-
-  @param Int86
-  Performs traditional software INT. See the Int86() function description.
-
-  @param FarCall86
-  Performs a far call into Compatibility16 or traditional OpROM code.
-
-  @param CheckPciRom
-  Checks if a traditional OpROM exists for this device.
-
-  @param InstallPciRom
-  Loads a traditional OpROM in traditional OpROM address space.
-
-  @param LegacyBoot
-  Boots a traditional OS.
-
-  @param UpdateKeyboardLedStatus
-  Updates BDA to reflect the current EFI keyboard LED status.
-
-  @param GetBbsInfo
-  Allows an external agent, such as BIOS Setup, to get the BBS data.
-
-  @param ShadowAllLegacyOproms
-  Causes all legacy OpROMs to be shadowed.
-
-  @param PrepareToBootEfi
-  Performs all actions prior to boot. Used when booting an EFI-aware OS
-  rather than a legacy OS.
-
-  @param GetLegacyRegion
-  Allows EFI to reserve an area in the 0xE0000 or 0xF0000 block.
-
-  @param CopyLegacyRegion
-  Allows EFI to copy data to the area specified by GetLegacyRegion.
-
-  @param BootUnconventionalDevice
-  Allows the user to boot off an unconventional device such as a PARTIES partition.
-
 **/
 struct _EFI_LEGACY_BIOS_PROTOCOL {
+  ///
+  /// Performs traditional software INT. See the Int86() function description.
+  ///
   EFI_LEGACY_BIOS_INT86                       Int86;
+  
+  ///
+  /// Performs a far call into Compatibility16 or traditional OpROM code.
+  ///
   EFI_LEGACY_BIOS_FARCALL86                   FarCall86;
+  
+  ///
+  /// Checks if a traditional OpROM exists for this device.
+  ///
   EFI_LEGACY_BIOS_CHECK_ROM                   CheckPciRom;
+  
+  ///
+  /// Loads a traditional OpROM in traditional OpROM address space.
+  ///
   EFI_LEGACY_BIOS_INSTALL_ROM                 InstallPciRom;
+  
+  ///
+  /// Boots a traditional OS.
+  ///
   EFI_LEGACY_BIOS_BOOT                        LegacyBoot;
+  
+  ///
+  /// Updates BDA to reflect the current EFI keyboard LED status.
+  ///
   EFI_LEGACY_BIOS_UPDATE_KEYBOARD_LED_STATUS  UpdateKeyboardLedStatus;
+  
+  ///
+  /// Allows an external agent, such as BIOS Setup, to get the BBS data.
+  ///
   EFI_LEGACY_BIOS_GET_BBS_INFO                GetBbsInfo;
+  
+  ///
+  /// Causes all legacy OpROMs to be shadowed.
+  ///
   EFI_LEGACY_BIOS_SHADOW_ALL_LEGACY_OPROMS    ShadowAllLegacyOproms;
+  
+  ///
+  /// Performs all actions prior to boot. Used when booting an EFI-aware OS
+  /// rather than a legacy OS.  
+  ///
   EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI         PrepareToBootEfi;
+  
+  ///
+  /// Allows EFI to reserve an area in the 0xE0000 or 0xF0000 block.
+  ///
   EFI_LEGACY_BIOS_GET_LEGACY_REGION           GetLegacyRegion;
+  
+  ///
+  /// Allows EFI to copy data to the area specified by GetLegacyRegion.
+  ///
   EFI_LEGACY_BIOS_COPY_LEGACY_REGION          CopyLegacyRegion;
+  
+  ///
+  /// Allows the user to boot off an unconventional device such as a PARTIES partition.
+  ///
   EFI_LEGACY_BIOS_BOOT_UNCONVENTIONAL_DEVICE  BootUnconventionalDevice;
 };
 

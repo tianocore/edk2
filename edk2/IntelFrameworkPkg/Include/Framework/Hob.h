@@ -1,7 +1,7 @@
 /** @file
   This file defines the data structures per HOB specification v0.9.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,9 +22,9 @@
 
 #include <PiPei.h>
 
-//
-// Capsule volume HOB -- identical to a firmware volume
-//
+///
+/// Capsule volume HOB -- identical to a firmware volume
+///
 #define EFI_HOB_TYPE_CV           0x0008
 
 typedef struct {

@@ -8,7 +8,7 @@
   execution, the PEIM looks for a relevant PPI that is available to execute it, rather than executing it
   by issuing the native IA-32 instruction.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -110,16 +110,11 @@ EFI_STATUS
   IN     EFI_GUID                                *FvFile OPTIONAL
   );
 
-/**
-  @par Ppi Description:
-  This PPI produces functions to interpret and execute the Framework boot script table.
-
-  @param Execute
-  Executes a boot script table.
-
-**/
+///
+/// This PPI produces functions to interpret and execute the Framework boot script table.
+///
 struct _EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI {
-  EFI_PEI_BOOT_SCRIPT_EXECUTE Execute;
+  EFI_PEI_BOOT_SCRIPT_EXECUTE Execute;  ///< Executes a boot script table.
 };
 
 extern EFI_GUID gEfiPeiBootScriptExecuterPpiGuid;

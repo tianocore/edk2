@@ -7,7 +7,7 @@
   Volume Protocol also provides mechanisms for determining and modifying some
   attributes of the firmware volume.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -288,38 +288,45 @@ EFI_STATUS
 // Protocol interface structure
 //
 struct _EFI_FIRMWARE_VOLUME_PROTOCOL {
-///
-/// Retrieves volume capabilities and current settings.
-///
+  ///
+  /// Retrieves volume capabilities and current settings.
+  ///
   FRAMEWORK_EFI_FV_GET_ATTRIBUTES GetVolumeAttributes;
-///
-/// Modifies the current settings of the firmware volume.
-///
+
+  ///
+  /// Modifies the current settings of the firmware volume.
+  ///
   FRAMEWORK_EFI_FV_SET_ATTRIBUTES SetVolumeAttributes;
-///
-/// Reads an entire file from the firmware volume.
-///
+
+  ///
+  /// Reads an entire file from the firmware volume.
+  ///
   FRAMEWORK_EFI_FV_READ_FILE      ReadFile;
-///
-/// Reads a single section from a file into a buffer.
-///
+
+  ///
+  /// Reads a single section from a file into a buffer.
+  ///
   FRAMEWORK_EFI_FV_READ_SECTION   ReadSection;
-///
-/// Writes an entire file into the firmware volume.
-///
+
+  ///
+  /// Writes an entire file into the firmware volume.
+  ///
   FRAMEWORK_EFI_FV_WRITE_FILE     WriteFile;
-///
-/// Provides service to allow searching the firmware volume.
-///
+
+  ///
+  /// Provides service to allow searching the firmware volume.
+  ///
   FRAMEWORK_EFI_FV_GET_NEXT_FILE  GetNextFile;
-///
-///  Data field that indicates the size in bytes of the Key input buffer for
-///  the GetNextFile() API.
-///
-UINT32                KeySize;
-///
-///  Handle of the parent firmware volume.
-///
+
+  ///
+  ///  Data field that indicates the size in bytes of the Key input buffer for
+  ///  the GetNextFile() API.
+  ///
+  UINT32                KeySize;
+
+  ///
+  ///  Handle of the parent firmware volume.
+  ///
   EFI_HANDLE            ParentHandle;
 };
 

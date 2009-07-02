@@ -1,7 +1,7 @@
 /** @file
   Provides the parent dispatch service for a given Sx-state source generator.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -140,19 +140,11 @@ EFI_STATUS
 // Interface structure for the SMM Child Dispatch Protocol
 //
 /**
-  @par Protocol Description:
   Provides the parent dispatch service for a given Sx-state source generator.
-
-  @param Register
-  Installs a child service to be dispatched by this protocol.
-
-  @param UnRegister
-  Removes a child service dispatched by this protocol.
-
 **/
 struct _EFI_SMM_SX_DISPATCH_PROTOCOL {
-  EFI_SMM_SX_REGISTER   Register;
-  EFI_SMM_SX_UNREGISTER UnRegister;
+  EFI_SMM_SX_REGISTER   Register;     ///< Installs a child service to be dispatched by this protocol.
+  EFI_SMM_SX_UNREGISTER UnRegister;   ///< Removes a child service dispatched by this protocol.
 };
 
 extern EFI_GUID gEfiSmmSxDispatchProtocolGuid;

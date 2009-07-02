@@ -1,7 +1,7 @@
 /** @file
   This file declares BlockIo PPI used to access block-oriented storage devices
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -132,24 +132,24 @@ EFI_STATUS
   OUT VOID                                     *Buffer
   );
 
-/**
-  @par Ppi Description:
-  EFI_PEI_RECOVERY_BLOCK_IO_PPI provides the services that are required
-  to access a block I/O device during PEI recovery boot mode.
-
-  @param GetNumberOfBlockDevices
-  Gets the number of block I/O devices that the specific block driver manages.
-
-  @param GetBlockDeviceMediaInfo
-  Gets the specified media information.
-
-  @param ReadBlocks
-  Reads the requested number of blocks from the specified block device.
-
-**/
+///
+///  EFI_PEI_RECOVERY_BLOCK_IO_PPI provides the services that are required
+///  to access a block I/O device during PEI recovery boot mode.
+///
 struct _EFI_PEI_RECOVERY_BLOCK_IO_PPI {
+  ///
+  /// Gets the number of block I/O devices that the specific block driver manages.
+  ///
   EFI_PEI_GET_NUMBER_BLOCK_DEVICES      GetNumberOfBlockDevices;
+  
+  ///
+  /// Gets the specified media information.
+  ///
   EFI_PEI_GET_DEVICE_MEDIA_INFORMATION  GetBlockDeviceMediaInfo;
+  
+  ///
+  /// Reads the requested number of blocks from the specified block device.
+  ///
   EFI_PEI_READ_BLOCKS                   ReadBlocks;
 };
 

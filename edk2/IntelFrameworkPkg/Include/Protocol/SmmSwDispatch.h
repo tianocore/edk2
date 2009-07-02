@@ -1,7 +1,7 @@
 /** @file
   Provides the parent dispatch service for a given SMI source generator.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -123,23 +123,24 @@ EFI_STATUS
 // Interface structure for the SMM Software SMI Dispatch Protocol
 //
 /**
-  @par Protocol Description:
   Provides the parent dispatch service for a given SMI source generator.
 **/
 struct _EFI_SMM_SW_DISPATCH_PROTOCOL {
-///
-/// Installs a child service to be dispatched by this protocol.
-///
+  ///
+  /// Installs a child service to be dispatched by this protocol.
+  ///
   EFI_SMM_SW_REGISTER   Register;
-///
-/// Removes a child service dispatched by this protocol.
-///
+
+  ///
+  /// Removes a child service dispatched by this protocol.
+  ///
   EFI_SMM_SW_UNREGISTER UnRegister;
-///
-/// A read-only field that describes the maximum value that can be used
-/// in the EFI_SMM_SW_DISPATCH_PROTOCOL.Register() service.
-///
-UINTN                 MaximumSwiValue;
+
+  ///
+  /// A read-only field that describes the maximum value that can be used
+  /// in the EFI_SMM_SW_DISPATCH_PROTOCOL.Register() service.
+  ///
+  UINTN                 MaximumSwiValue;
 };
 
 extern EFI_GUID gEfiSmmSwDispatchProtocolGuid;

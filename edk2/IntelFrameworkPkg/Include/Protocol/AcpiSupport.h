@@ -149,17 +149,19 @@ EFI_STATUS
   to publish a set of tables.
 **/
 struct _EFI_ACPI_SUPPORT_PROTOCOL {
-///
-/// Returns a table specified by an index if it exists.
-///
+  ///
+  /// Returns a table specified by an index if it exists.
+  ///
   EFI_ACPI_GET_ACPI_TABLE GetAcpiTable;
-///
-/// Adds, removes, or updates ACPI tables
-///
+
+  ///
+  /// Adds, removes, or updates ACPI tables
+  ///
   EFI_ACPI_SET_ACPI_TABLE SetAcpiTable;
-///
-/// Publishes the ACPI tables.
-///
+
+  ///
+  /// Publishes the ACPI tables.
+  ///
   EFI_ACPI_PUBLISH_TABLES PublishTables;
 };
 

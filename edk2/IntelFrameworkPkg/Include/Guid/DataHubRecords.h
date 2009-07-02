@@ -1,7 +1,7 @@
 /** @file
   DataHubRecord.h include all data hub sub class GUID defitions.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -33,10 +33,10 @@ extern  EFI_GUID gEfiProcessorSubClassGuid;
 
 extern  EFI_GUID gEfiCacheSubClassGuid;
 
-//
-// The memory subclass belongs to the data class and is identified as the memory 
-// subclass by the GUID.
-//
+///
+/// The memory subclass belongs to the data class and is identified as the memory 
+/// subclass by the GUID.
+///
 #define EFI_MEMORY_SUBCLASS_GUID \
   {0x4E8F4EBB, 0x64B9, 0x4e05, {0x9B, 0x18, 0x4C, 0xFE, 0x49, 0x23, 0x50, 0x97} }
 

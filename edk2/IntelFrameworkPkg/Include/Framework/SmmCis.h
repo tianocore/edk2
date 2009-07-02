@@ -73,8 +73,8 @@ EFI_STATUS
   );
 
 typedef struct {
-  EFI_SMM_CPU_IO  Read;  ///> This service provides the various modalities of memory and I/O read.
-  EFI_SMM_CPU_IO  Write; ///> This service provides the various modalities of memory and I/O write.
+  EFI_SMM_CPU_IO  Read;  ///< This service provides the various modalities of memory and I/O read.
+  EFI_SMM_CPU_IO  Write; ///< This service provides the various modalities of memory and I/O write.
 } EFI_SMM_IO_ACCESS;
 
 ///

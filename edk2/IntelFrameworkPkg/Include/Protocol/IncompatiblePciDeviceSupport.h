@@ -15,7 +15,7 @@
   (DXE) driver and must be made available before the Boot Device Selection (BDS) phase. The PCI
   bus driver will look for the presence of this protocol before it begins PCI enumeration.
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,15 +71,15 @@ EFI_STATUS
 );
 
 
-//
-// Interface structure for the Incompatible PCI Device Support Protocol
-//
+///
+/// Interface structure for the Incompatible PCI Device Support Protocol
+///
 struct _EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL {
-///
-///  Returns a list of ACPI resource descriptors that detail any special
-///  resource configuration requirements if the specified device is a recognized
-///  incompatible PCI device.
-///
+  ///
+  ///  Returns a list of ACPI resource descriptors that detail any special
+  ///  resource configuration requirements if the specified device is a recognized
+  ///  incompatible PCI device.
+  ///
   EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_CHECK_DEVICE      CheckDevice;
 };
 
