@@ -543,6 +543,7 @@ Returns:
   WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE *Private;
   WIN_NT_EFI_FILE_PRIVATE           *PrivateFile;
   EFI_TPL                           OldTpl;
+  CHAR16                            *TempFileName;
 
   if (This == NULL || Root == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -589,10 +590,47 @@ Returns:
   PrivateFile->EfiFile.GetInfo      = WinNtSimpleFileSystemGetInfo;
   PrivateFile->EfiFile.SetInfo      = WinNtSimpleFileSystemSetInfo;
   PrivateFile->EfiFile.Flush        = WinNtSimpleFileSystemFlush;
-  PrivateFile->LHandle              = INVALID_HANDLE_VALUE;
-  PrivateFile->DirHandle            = INVALID_HANDLE_VALUE;
   PrivateFile->IsValidFindBuf       = FALSE;
 
+  //
+  // Set DirHandle
+  //
+  PrivateFile->DirHandle = PrivateFile->WinNtThunk->CreateFile (
+                                                      PrivateFile->FilePath,
+                                                      GENERIC_READ,
+                                                      FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                                      NULL,
+                                                      OPEN_EXISTING,
+                                                      FILE_FLAG_BACKUP_SEMANTICS,
+                                                      NULL
+                                                      );
+
+  if (PrivateFile->DirHandle == INVALID_HANDLE_VALUE) {
+    Status = EFI_NOT_FOUND;
+    goto Done;
+  }
+
+  //
+  // Find the first file under it
+  //
+  Status = gBS->AllocatePool (
+                  EfiBootServicesData,
+                  StrSize (PrivateFile->FilePath) + StrSize (L"\\*"),
+                  &TempFileName
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+  StrCpy (TempFileName, PrivateFile->FilePath);
+  StrCat (TempFileName, L"\\*");
+
+  PrivateFile->LHandle = PrivateFile->WinNtThunk->FindFirstFile (TempFileName, &PrivateFile->FindBuf);
+
+  if (PrivateFile->LHandle == INVALID_HANDLE_VALUE) {
+    PrivateFile->IsValidFindBuf = FALSE;
+  } else {
+    PrivateFile->IsValidFindBuf = TRUE;
+  }
   *Root = &PrivateFile->EfiFile;
 
   Status = EFI_SUCCESS;
@@ -822,7 +860,6 @@ Returns:
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
-  EFI_FILE                          *Root;
   WIN_NT_EFI_FILE_PRIVATE           *PrivateFile;
   WIN_NT_EFI_FILE_PRIVATE           *NewPrivateFile;
   WIN_NT_SIMPLE_FILE_SYSTEM_PRIVATE *PrivateRoot;
@@ -883,20 +920,6 @@ Returns:
   }
   StrCpy (TempFileName, FileName);
   FileName = TempFileName;
-
-  //
-  // BUGBUG: assume an open of root
-  // if current location, return current data
-  //
-  if (StrCmp (FileName, L"\\") == 0 || (StrCmp (FileName, L".") == 0 && PrivateFile->IsRootDirectory)) {
-    //
-    // BUGBUG: assume an open root
-    //
-OpenRoot:
-    Status          = WinNtSimpleFileSystemOpenVolume (PrivateFile->SimpleFileSystem, &Root);
-    NewPrivateFile  = WIN_NT_EFI_FILE_PRIVATE_DATA_FROM_THIS (Root);
-    goto Done;
-  }
 
   if (FileName[StrLen (FileName) - 1] == L'\\') {
     FileName[StrLen (FileName) - 1]  = 0;
@@ -1037,22 +1060,17 @@ OpenRoot:
     }
   }
 
-  if (StrCmp (NewPrivateFile->FileName, PrivateRoot->FilePath) == 0) {
-    NewPrivateFile->IsRootDirectory = TRUE;
-    FreePool (NewPrivateFile->FilePath);
-    FreePool (NewPrivateFile->FileName);
-    FreePool (NewPrivateFile);
-    goto OpenRoot;
-  }
-
   RealFileName = NewPrivateFile->FileName;
   while (EfiStrChr (RealFileName, L'\\') != NULL) {
     RealFileName = EfiStrChr (RealFileName, L'\\') + 1;
   }
 
-  TempChar            = *(RealFileName - 1);
-  *(RealFileName - 1) = 0;
-
+  TempChar = 0;
+  if (RealFileName != NewPrivateFile->FileName) {
+    TempChar            = *(RealFileName - 1);
+    *(RealFileName - 1) = 0;
+    }
+  
   FreePool (NewPrivateFile->FilePath);
   NewPrivateFile->FilePath = NULL;
   NewPrivateFile->FilePath = AllocatePool (StrSize (NewPrivateFile->FileName));
@@ -1062,8 +1080,9 @@ OpenRoot:
   }
 
   StrCpy (NewPrivateFile->FilePath, NewPrivateFile->FileName);
-
-  *(RealFileName - 1)             = TempChar;
+  if (TempChar != 0) {
+    *(RealFileName - 1)             = TempChar;
+  }
 
   NewPrivateFile->IsRootDirectory = FALSE;
 
@@ -1279,6 +1298,9 @@ Done:
     }
   } else {
     *NewHandle = &NewPrivateFile->EfiFile;
+    if (StrCmp (NewPrivateFile->FileName, PrivateRoot->FilePath) == 0) {
+     NewPrivateFile->IsRootDirectory = TRUE;
+    }   
   }
 
   return Status;
