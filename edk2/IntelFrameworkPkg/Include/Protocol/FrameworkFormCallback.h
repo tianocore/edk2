@@ -14,8 +14,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  FrameworkFormCallback.h
-
   @par Revision Reference:
   This protocol is defined in HII spec 0.92.
 
@@ -39,32 +37,26 @@
 //
 typedef struct _EFI_FORM_CALLBACK_PROTOCOL  EFI_FORM_CALLBACK_PROTOCOL;
 
-
-#define RESET_REQUIRED  1 // Flags setting to signify that the callback operation resulted in an eventual
-// reset to be done upon exit of the browser
-//
-#define EXIT_REQUIRED   2   // Flags setting to signify that after the processing of the callback results - exit the browser
-#define SAVE_REQUIRED   4   // Flags setting to signify that after the processing of the callback results - save the NV data
-#define NV_CHANGED      8   // Flags setting to signify that after the processing of the callback results - turn the NV flag on
-#define NV_NOT_CHANGED  16  // Flags setting to signify that after the processing of the callback results - turn the NV flag off
 #pragma pack(1)
 typedef struct {
-  UINT8   OpCode;           // Likely a string, numeric, or one-of
-  UINT8   Length;           // Length of the FRAMEWORK_EFI_IFR_DATA_ENTRY packet
-  UINT16  Flags;            // Flags settings to determine what behavior is desired from the browser after the callback
-  VOID    *Data;            // The data in the form based on the op-code type - this is not a pointer to the data, the data follows immediately
-  // If the OpCode is a OneOf or Numeric type - Data is a UINT16 value
-  // If the OpCode is a String type - Data is a CHAR16[x] type
-  // If the OpCode is a Checkbox type - Data is a UINT8 value
-  // If the OpCode is a NV Access type - Data is a FRAMEWORK_EFI_IFR_NV_DATA structure
-  //
+  UINT8   OpCode;           ///< Likely a string, numeric, or one-of
+  UINT8   Length;           ///< Length of the FRAMEWORK_EFI_IFR_DATA_ENTRY packet
+  UINT16  Flags;            ///< Flags settings to determine what behavior is desired from the browser after the callback
+  VOID    *Data;            ///< The data in the form based on the op-code type - this is not a pointer to the data, the data follows immediately
+  ///
+  /// If the OpCode is a OneOf or Numeric type - Data is a UINT16 value
+  /// If the OpCode is a String type - Data is a CHAR16[x] type
+  /// If the OpCode is a Checkbox type - Data is a UINT8 value
+  /// If the OpCode is a NV Access type - Data is a FRAMEWORK_EFI_IFR_NV_DATA structure
+  ///
 } FRAMEWORK_EFI_IFR_DATA_ENTRY;
 
 typedef struct {
-  VOID                *NvRamMap;  // If the flag of the op-code specified retrieval of a copy of the NVRAM map,
+  VOID                *NvRamMap;  ///< If the flag of the op-code specified retrieval of a copy of the NVRAM map,
+  //
   // this is a pointer to a buffer copy
   //
-  UINT32              EntryCount; // How many FRAMEWORK_EFI_IFR_DATA_ENTRY entries
+  UINT32              EntryCount; ///< How many FRAMEWORK_EFI_IFR_DATA_ENTRY entries
   //
   // FRAMEWORK_EFI_IFR_DATA_ENTRY  Data[1];    // The in-line Data entries.
   //
@@ -72,15 +64,15 @@ typedef struct {
 
 
 typedef union {
-  FRAMEWORK_EFI_IFR_DATA_ARRAY  DataArray;  // Primarily used by those who call back to their drivers and use HII as a repository
-  FRAMEWORK_EFI_IFR_PACKET      DataPacket; // Primarily used by those which do not use HII as a repository
-  CHAR16                        String[1];  // If returning an error - fill the string with null-terminated contents
-} EFI_HII_CALLBACK_PACKET;
+  FRAMEWORK_EFI_IFR_DATA_ARRAY  DataArray;  ///< Primarily used by those who call back to their drivers and use HII as a repository
+  FRAMEWORK_EFI_IFR_PACKET      DataPacket; ///< Primarily used by those which do not use HII as a repository
+  CHAR16                        String[1];  ///< If returning an error - fill the string with null-terminated contents
+} FRAMEWORK_EFI_HII_CALLBACK_PACKET;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER Header;
-  UINT16            QuestionId;   // Offset into the map
-  UINT8             StorageWidth; // Width of the value
+  UINT16            QuestionId;   ///< Offset into the map
+  UINT8             StorageWidth; ///< Width of the value
   //
   // CHAR8             Data[1];      // The Data itself
   //
@@ -179,7 +171,7 @@ EFI_STATUS
   IN     EFI_FORM_CALLBACK_PROTOCOL    *This,
   IN     UINT16                        KeyValue,
   IN     FRAMEWORK_EFI_IFR_DATA_ARRAY  *Data,
-  OUT    EFI_HII_CALLBACK_PACKET       **Packet
+  OUT    FRAMEWORK_EFI_HII_CALLBACK_PACKET       **Packet
   );
 
 /**
