@@ -55,6 +55,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 ################################################################################
 #
@@ -101,4 +102,5 @@
 [Components.common]
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
+  OptionRomPkg/UndiRuntimeDxe/UndiRuntimeDxe.inf
 
