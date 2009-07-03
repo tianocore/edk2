@@ -67,7 +67,7 @@ typedef union {
   FRAMEWORK_EFI_IFR_DATA_ARRAY  DataArray;  ///< Primarily used by those who call back to their drivers and use HII as a repository
   FRAMEWORK_EFI_IFR_PACKET      DataPacket; ///< Primarily used by those which do not use HII as a repository
   CHAR16                        String[1];  ///< If returning an error - fill the string with null-terminated contents
-} FRAMEWORK_EFI_HII_CALLBACK_PACKET;
+} EFI_HII_CALLBACK_PACKET;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER Header;
@@ -171,7 +171,7 @@ EFI_STATUS
   IN     EFI_FORM_CALLBACK_PROTOCOL    *This,
   IN     UINT16                        KeyValue,
   IN     FRAMEWORK_EFI_IFR_DATA_ARRAY  *Data,
-  OUT    FRAMEWORK_EFI_HII_CALLBACK_PACKET       **Packet
+  OUT    EFI_HII_CALLBACK_PACKET       **Packet
   );
 
 /**
