@@ -309,9 +309,9 @@ typedef enum {
   /// Input:
   ///   AX = Compatibility16SetKeyboardLeds
   ///   CL = LED status.
-  ///     Bit 0 – Scroll Lock 0 = Off
-  ///     Bit 1 – NumLock
-  ///     Bit 2 – Caps Lock
+  ///     Bit 0  Scroll Lock 0 = Off
+  ///     Bit 1  NumLock
+  ///     Bit 2  Caps Lock
   /// Output:
   ///     AX = Returned status codes
   ///
