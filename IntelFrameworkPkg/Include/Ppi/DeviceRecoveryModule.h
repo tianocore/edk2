@@ -17,8 +17,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  DeviceRecoveryModule.h
-
   @par Revision Reference:
   This PPI is defined in Framework of EFI Recovery spec.
   Version 0.9
@@ -38,10 +36,9 @@
 typedef struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI EFI_PEI_DEVICE_RECOVERY_MODULE_PPI;
 
 /**
-  This function, by whatever mechanism, searches for DXE capsules from the
-  associated device and returns the number and maximum size in bytes of
-  the capsules discovered. Entry 1 is assumed to be the highest load priority
-  and entry N is assumed to be the lowest priority.
+  This function searches for DXE capsules from the associated device and returns the number
+  and maximum size in bytes of the capsules discovered. Entry 1 is assumed to be the
+  highest load priority and entry N is assumed to be the lowest priority.
 
   @param  PeiServices            General-purpose services that are available to every PEIM
   @param  This                   Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
@@ -57,9 +54,9 @@ typedef struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI EFI_PEI_DEVICE_RECOVERY_MODUL
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE)(
-  IN EFI_PEI_SERVICES                               **PeiServices,
-  IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI             *This,
-  OUT UINTN                                         *NumberRecoveryCapsules
+  IN     EFI_PEI_SERVICES                               **PeiServices,
+  IN     EFI_PEI_DEVICE_RECOVERY_MODULE_PPI             *This,
+     OUT UINTN                                          *NumberRecoveryCapsules
   );
 
 /**
@@ -81,16 +78,16 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO)(
-  IN  EFI_PEI_SERVICES                              **PeiServices,
-  IN  EFI_PEI_DEVICE_RECOVERY_MODULE_PPI            *This,
-  IN  UINTN                                         CapsuleInstance,
-  OUT UINTN                                         *Size,
-  OUT EFI_GUID                                      *CapsuleType
+  IN     EFI_PEI_SERVICES                              **PeiServices,
+  IN     EFI_PEI_DEVICE_RECOVERY_MODULE_PPI            *This,
+  IN     UINTN                                         CapsuleInstance,
+     OUT UINTN                                         *Size,
+     OUT EFI_GUID                                      *CapsuleType
   );
 
 /**
-  This function, by whatever mechanism, retrieves a DXE capsule from some device
-  and loads it into memory. Note that the published interface is device neutral.
+  This function retrieves a DXE capsule from some device and loads it into memory.
+  Note that the published interface is device neutral.
 
   @param  PeiServices     General-purpose services that are available to every PEIM
   @param  This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
@@ -107,9 +104,9 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE)(
   IN OUT EFI_PEI_SERVICES                         **PeiServices,
-  IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI           *This,
-  IN UINTN                                        CapsuleInstance,
-  OUT VOID                                        *Buffer
+  IN     EFI_PEI_DEVICE_RECOVERY_MODULE_PPI       *This,
+  IN     UINTN                                    CapsuleInstance,
+     OUT VOID                                     *Buffer
   );
 
 ///
@@ -135,4 +132,4 @@ struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI {
 
 extern EFI_GUID gEfiPeiDeviceRecoveryModulePpiGuid;
 
-#endif
+#endif  /* _PEI_DEVICE_RECOVERY_MODULE_PPI_H_ */
