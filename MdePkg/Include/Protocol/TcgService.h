@@ -153,8 +153,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TCG_PASS_THROUGH_TO_TPM)(
   IN      EFI_TCG_PROTOCOL          *This,
-  IN      UINT32                    TpmInputParamterBlockSize,
-  IN      UINT8                     *TpmInputParamterBlock,
+  IN      UINT32                    TpmInputParameterBlockSize,
+  IN      UINT8                     *TpmInputParameterBlock,
   IN      UINT32                    TpmOutputParameterBlockSize,
   IN      UINT8                     *TpmOutputParameterBlock
   );
