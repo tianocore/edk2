@@ -160,14 +160,14 @@ typedef struct {
   UINT32                            MpTableLength;
   
   ///
-  /// The segment of the OEM-specific INT 15 table/code.
+  /// The segment of the OEM-specific INT table/code.
   /// 
-  UINT16                            OemInt15Segment;
+  UINT16                            OemIntSegment;
   
   ///
-  /// The offset of the OEM-specific INT 15 table/code.
+  /// The offset of the OEM-specific INT table/code.
   ///
-  UINT16                            OemInt15Offset;
+  UINT16                            OemIntOffset;
   
   ///
   /// The segment of the OEM-specific 32-bit table/code.
@@ -178,16 +178,45 @@ typedef struct {
   /// The offset of the OEM-specific 32-bit table/code.
   ///
   UINT16                            Oem32Offset;
+  
+  ///
+  /// The segment of the OEM-specific 16-bit table/code.
+  ///
   UINT16                            Oem16Segment;
+  
+  ///
+  /// The offset of the OEM-specific 16-bit table/code.
+  ///
   UINT16                            Oem16Offset;
+  
+  ///
+  /// The segment of the TPM binary passed to 16-bit CSM.
+  ///
   UINT16                            TpmSegment;
+  
+  ///
+  /// The offset of the TPM binary passed to 16-bit CSM.
+  ///
   UINT16                            TpmOffset;
   
   ///
   /// A pointer to a string identifying the independent BIOS vendor.
   ///
   UINT32                            IbvPointer;
+  
+  ///
+  /// This field is NULL for all systems not supporting PCI Express. This field is the base
+  /// value of the start of the PCI Express memory-mapped configuration registers and
+  /// must be filled in prior to EfiCompatibility code issuing the Compatibility16 function
+  /// Compatibility16InitializeYourself().
+  /// Compatibility16InitializeYourself() is defined in Compatability16
+  /// Functions.
+  ///
   UINT32                            PciExpressBase;
+  
+  ///
+  /// Maximum PCI bus number assigned.
+  ///
   UINT8                             LastPciBus;
 } EFI_COMPATIBILITY16_TABLE;
 
@@ -313,8 +342,9 @@ typedef struct {
   UINT8   NumberBbsEntries;             ///< The number of valid BBS table entries upon entry and exit. The IBV code may
                                         ///< increase this number, if BBS-compliant devices also hook INTs in order to force the
                                         ///< OpROM BIOS Setup to be executed.
-  VOID    *BbsTable;                    ///< Pointer to the BBS table.
-  UINT16  RuntimeSegment;
+  VOID    *BbsTablePointer;             ///< Pointer to the BBS table.
+  UINT16  OpromDestinationSegment;      ///< The segment where the OpROM can be relocated to. If this value is 0x0000, this
+                                        ///< means that the relocation of this run time code is not supported.
 } EFI_DISPATCH_OPROM_TABLE;
 
 ///
@@ -365,7 +395,15 @@ typedef struct {
   /// The size of the thunk code.
   ///
   UINT32                            ThunkSizeInBytes;
+  
+  ///
+  /// Starting address of memory under 1 MB.
+  ///
   UINT32                            LowPmmMemory;
+  
+  ///
+  /// Length of low Memory block.
+  ///
   UINT32                            LowPmmMemorySizeInBytes;
 } EFI_TO_COMPATIBILITY16_INIT_TABLE;
 
