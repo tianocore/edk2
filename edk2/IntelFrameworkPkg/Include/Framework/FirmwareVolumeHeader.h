@@ -22,8 +22,7 @@
 
 ///
 /// Firmware Volume Block Attributes bit definitions
-
-//@{
+///@{
 #define EFI_FVB_READ_DISABLED_CAP   0x00000001
 #define EFI_FVB_READ_ENABLED_CAP    0x00000002
 #define EFI_FVB_READ_STATUS         0x00000004
@@ -56,7 +55,7 @@
 #define EFI_FVB_ALIGNMENT_16K       0x20000000
 #define EFI_FVB_ALIGNMENT_32K       0x40000000
 #define EFI_FVB_ALIGNMENT_64K       0x80000000
-//@}
+///@}
 
 /// This is a simple macro defined as the set of all FV Block Attributes signifying capabilities.
 #define EFI_FVB_CAPABILITIES  ( EFI_FVB_READ_DISABLED_CAP  | \
