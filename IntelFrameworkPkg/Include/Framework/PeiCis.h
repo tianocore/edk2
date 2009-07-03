@@ -1,7 +1,8 @@
 /** @file
-  PI PEI master include file. This file should match the PI spec.
+  Include file for definitions in the Intel Platform Innovation Framework for EFI
+  Pre-EFI Initialization Core Interface Specification (PEI CIS) Version 0.91.
 
-  Copyright (c) 2006 - 2007, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -9,9 +10,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-  @par Revision Reference: 
-  PeiCis Version 0.91.
 
 **/
 
@@ -111,7 +109,19 @@ EFI_STATUS
   IN EFI_FFS_FILE_HEADER            *FfsFileHeader,
   IN OUT VOID                       **SectionData
   );
-        
+
+///
+///  FRAMEWORK_EFI_PEI_SERVICES is a collection of functions whose implementation is provided by the PEI
+///  Foundation. The table is located in the temporary or permanent memory, depending upon the capabilities 
+///  and phase of execution of PEI.
+///  
+///  These services fall into various classes, including the following:
+///  - Managing the boot mode
+///  - Allocating both early and permanent memory
+///  - Supporting the Firmware File System (FFS)
+///  - Abstracting the PPI database abstraction
+///  - Creating Hand-Off Blocks (HOBs)
+///        
 struct _FRAMEWORK_EFI_PEI_SERVICES {
   EFI_TABLE_HEADER                  Hdr;
   //
@@ -161,12 +171,6 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
   EFI_PEI_CPU_IO_PPI                *CpuIo;
   EFI_PEI_PCI_CFG_PPI               *PciCfg;
 };
-
-typedef struct {
-  UINTN                             BootFirmwareVolume;
-  UINTN                             SizeOfCacheAsRam;
-  EFI_PEI_PPI_DESCRIPTOR            *DispatchTable;
-} EFI_PEI_STARTUP_DESCRIPTOR;
 
 #endif  
 
