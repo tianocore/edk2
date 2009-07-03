@@ -1,5 +1,5 @@
 /** @file
-  This file declares EFI PCI Hot Plug Init Protocol
+  This file declares EFI PCI Hot Plug Init Protocol.
   This protocol provides the necessary functionality to initialize the Hot Plug Controllers (HPCs) and
   the buses that they control. This protocol also provides information regarding resource padding.
 
@@ -12,8 +12,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  PciHotPlugInit.h
-
   @par Revision Reference:
   This protocol is defined in Framework of EFI Hot Plug Pci Initialization Protocol Spec
   Version 0.9
@@ -25,23 +23,46 @@
 
 #include <PiDxe.h>
 
-//
-// Global ID for the PCI Hot Plug Protocol
-//
+///
+/// Global ID for the PCI Hot Plug Protocol
+///
 #define EFI_PCI_HOT_PLUG_INIT_PROTOCOL_GUID \
   { 0xaa0e8bc1, 0xdabc, 0x46b0, {0xa8, 0x44, 0x37, 0xb8, 0x16, 0x9b, 0x2b, 0xea } }
 
 
 typedef struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL EFI_PCI_HOT_PLUG_INIT_PROTOCOL;
 
-#define  EFI_HPC_STATE_INITIALIZED    0x01
-#define  EFI_HPC_STATE_ENABLED        0x02
-
+///
+/// Current state of an HPC
+///
 typedef UINT16 EFI_HPC_STATE;
 
+///
+/// The HPC initialization function was called and the HPC completed 
+/// initialization, but it was not enabled for some reason. The HPC may be 
+/// disabled in hardware, or it may be disabled due to user preferences, 
+/// hardware failure, or other reasons. No resource padding is required.
+///
+#define  EFI_HPC_STATE_INITIALIZED    0x01
 
+///
+/// The HPC initialization function was called, the HPC completed 
+/// initialization, and it was enabled. Resource padding is required.
+///
+#define  EFI_HPC_STATE_ENABLED        0x02
+
+///
+/// Location definition for PCI Hot Plug Controller
+///
 typedef struct{
+  ///
+  /// The device path to the Root HPC
+  ///
   EFI_DEVICE_PATH_PROTOCOL  *HpcDevicePath;
+  ///
+  /// The device path to the Hot Plug Bus (HPB) that is controlled by 
+  /// the root HPC.
+  ///
   EFI_DEVICE_PATH_PROTOCOL  *HpbDevicePath;
 } EFI_HPC_LOCATION;
 
@@ -142,11 +163,11 @@ EFI_STATUS
 // Prototypes for the PCI Hot Plug Init Protocol
 //
 
-/**
-  This protocol provides the necessary functionality to initialize the
-  Hot Plug Controllers (HPCs) and the buses that they control. This protocol
-  also provides information regarding resource padding.
-**/
+///
+/// This protocol provides the necessary functionality to initialize the
+/// Hot Plug Controllers (HPCs) and the buses that they control. This protocol
+/// also provides information regarding resource padding.
+///
 struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL {
   ///
   /// Returns a list of root HPCs and the buses that they control.

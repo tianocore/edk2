@@ -11,8 +11,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  Smbus.h
-
   @par Revision Reference:
   This PPI is defined in Framework of EFI SmBus PPI spec.
   Version 0.9
@@ -51,7 +49,7 @@ typedef struct _EFI_PEI_SMBUS_PPI EFI_PEI_SMBUS_PPI;
 
   @retval EFI_SUCCESS           The last data that was returned from the access
                                 matched the poll exit criteria.
-  @retval EFI_CRC_ERROR         The checksum is not correct (PEC is incorrect)
+  @retval EFI_CRC_ERROR         The checksum is not correct (PEC is incorrect).
   @retval EFI_TIMEOUT           Timeout expired before the operation was completed.
                                 Timeout is determined by the SMBus host controller device.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed
@@ -59,7 +57,7 @@ typedef struct _EFI_PEI_SMBUS_PPI EFI_PEI_SMBUS_PPI;
   @retval EFI_DEVICE_ERROR      The request was not completed because
                                 a failure reflected in the Host Status Register bit.
   @retval EFI_INVALID_PARAMETER Operation is not defined in EFI_SMBUS_OPERATION.
-                                Or Length/Buffer is NULL for operations except for EfiSmbusQuickRead and
+  @retval EFI_INVALID_PARAMETER Length/Buffer is NULL for operations except for EfiSmbusQuickRead and
                                 EfiSmbusQuickWrite. Length is outside the range of valid values.
   @retval EFI_UNSUPPORTED       The SMBus operation or PEC is not supported.
   @retval EFI_BUFFER_TOO_SMALL  Buffer is not sufficient for this operation.
@@ -88,7 +86,7 @@ EFI_STATUS
   @param  Data           Data of the SMBus host notify command that
                          the caller wants to be called.
 
-  @return Status Code
+  @return Status Code returned by callback function.
 
 **/
 typedef
@@ -144,7 +142,7 @@ EFI_STATUS
   @param  SmbusDeviceMap The pointer to the device map as enumerated
                          by the SMBus controller driver.
 
-  @retval EFI_SUCCESS    The device map was returned correctly in the buffer.
+  @retval EFI_SUCCESS   The device map was returned correctly in the buffer.
 
 **/
 typedef
@@ -157,6 +155,9 @@ EFI_STATUS
   );
 
 /**
+  Allows a device driver to register for a callback when the bus driver detects a state that it needs to 
+  propagate to other PEIMs that are registered for a callback.
+
   The Notify() function registers all the callback functions to allow the
   bus driver to call these functions when the SlaveAddress/Data pair happens.
 
@@ -169,23 +170,23 @@ EFI_STATUS
   @param  NotifyFunction The function to call when the bus driver
                          detects the SlaveAddress and Data pair.
 
-  @retval EFI_SUCCESS    NotifyFunction has been registered.
+  @retval EFI_SUCCESS      NotifyFunction has been registered.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS_PPI_NOTIFY)(
-  IN      EFI_PEI_SERVICES          **PeiServices,
-  IN      EFI_PEI_SMBUS_PPI         *This,
-  IN      EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
-  IN      UINTN                     Data,
+  IN      EFI_PEI_SERVICES              **PeiServices,
+  IN      EFI_PEI_SMBUS_PPI             *This,
+  IN      EFI_SMBUS_DEVICE_ADDRESS      SlaveAddress,
+  IN      UINTN                         Data,
   IN      EFI_PEI_SMBUS_NOTIFY_FUNCTION NotifyFunction
   );
 
-/**
-  Provides the basic I/O interfaces that a PEIM uses to access
-  its SMBus controller and the slave devices attached to it.
-**/
+///
+/// Provides the basic I/O interfaces that a PEIM uses to access
+/// its SMBus controller and the slave devices attached to it.
+///
 struct _EFI_PEI_SMBUS_PPI {
   ///
   /// Executes the SMBus operation to an SMBus slave device.
