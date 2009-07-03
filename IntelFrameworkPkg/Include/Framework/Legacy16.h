@@ -408,7 +408,7 @@ typedef struct {
 } EFI_TO_COMPATIBILITY16_INIT_TABLE;
 
 ///
-/// DEVICE_PRODUCER_SERIAL & its modes
+/// DEVICE_PRODUCER_SERIAL
 ///
 typedef struct {
   UINT16                            Address;    ///< I/O address assigned to the serial port
@@ -416,14 +416,18 @@ typedef struct {
   SERIAL_MODE                       Mode;       ///< Mode of serial port. Values are defined below.
 } DEVICE_PRODUCER_SERIAL;
 
+///
+/// DEVICE_PRODUCER_SERIAL's modes
+///@{
 #define DEVICE_SERIAL_MODE_NORMAL               0x00
 #define DEVICE_SERIAL_MODE_IRDA                 0x01
 #define DEVICE_SERIAL_MODE_ASK_IR               0x02
 #define DEVICE_SERIAL_MODE_DUPLEX_HALF          0x00
 #define DEVICE_SERIAL_MODE_DUPLEX_FULL          0x10
+///@)
 
 ///
-/// DEVICE_PRODUCER_PARALLEL & its modes
+/// DEVICE_PRODUCER_PARALLEL
 ///
 typedef struct {
   UINT16                            Address;  ///< I/O address assigned to the parallel port
@@ -432,10 +436,14 @@ typedef struct {
   PARALLEL_MODE                     Mode;     ///< Mode of the parallel port. Values are defined below.
 } DEVICE_PRODUCER_PARALLEL;
 
+///
+/// DEVICE_PRODUCER_PARALLEL's modes
+///@{
 #define DEVICE_PARALLEL_MODE_MODE_OUTPUT_ONLY   0x00
 #define DEVICE_PARALLEL_MODE_MODE_BIDIRECTIONAL 0x01
 #define DEVICE_PARALLEL_MODE_MODE_EPP           0x02
 #define DEVICE_PARALLEL_MODE_MODE_ECP           0x03
+///@}
 
 ///
 /// DEVICE_PRODUCER_FLOPPY
@@ -475,7 +483,7 @@ typedef struct {
 } ATAPI_IDENTIFY;
 
 ///
-/// HDD_INFO & its status
+/// HDD_INFO
 ///
 typedef struct {
   ///
@@ -523,6 +531,9 @@ typedef struct {
   ATAPI_IDENTIFY                    IdentifyDrive[2];
 } HDD_INFO;
 
+///
+/// HDD_INFO status bits
+///
 #define HDD_PRIMARY               0x01
 #define HDD_SECONDARY             0x02
 #define HDD_MASTER_ATAPI_CDROM    0x04
@@ -668,6 +679,9 @@ typedef struct {
   UINT32                            IBV2;
 } BBS_TABLE;
 
+///
+/// BBS device type values
+///@{
 #define BBS_FLOPPY              0x01
 #define BBS_HARDDISK            0x02
 #define BBS_CDROM               0x03
@@ -676,14 +690,19 @@ typedef struct {
 #define BBS_EMBED_NETWORK       0x06
 #define BBS_BEV_DEVICE          0x80
 #define BBS_UNKNOWN             0xff
+///@}
 
+///
+/// BBS boot priority values
+///@{
 #define BBS_DO_NOT_BOOT_FROM    0xFFFC
 #define BBS_LOWEST_PRIORITY     0xFFFD
 #define BBS_UNPRIORITIZED_ENTRY 0xFFFE
 #define BBS_IGNORE_ENTRY        0xFFFF
+///@}
 
 ///
-/// SMM_ATTRIBUTES & relating type, port and data size constants
+/// SMM_ATTRIBUTES
 ///
 typedef struct {
   ///
@@ -708,18 +727,30 @@ typedef struct {
   UINT16                            Reserved : 7;
 } SMM_ATTRIBUTES;
 
+///
+/// SMM_ATTRIBUTES type values
+///@{
 #define STANDARD_IO       0x00
 #define STANDARD_MEMORY   0x01
+///@}
 
+///
+/// SMM_ATTRIBUTES port size constants
+///@{
 #define PORT_SIZE_8       0x00
 #define PORT_SIZE_16      0x01
 #define PORT_SIZE_32      0x02
 #define PORT_SIZE_64      0x03
+///@}
 
+///
+/// SMM_ATTRIBUTES data size constants
+///@{
 #define DATA_SIZE_8       0x00
 #define DATA_SIZE_16      0x01
 #define DATA_SIZE_32      0x02
 #define DATA_SIZE_64      0x03
+///@}
 
 ///
 /// SMM_FUNCTION & relating constants
@@ -729,12 +760,20 @@ typedef struct {
   UINT16                            Owner : 1;
 } SMM_FUNCTION;
 
+///
+/// SMM_FUNCTION Function constants
+///@{
 #define INT15_D042        0x0000
 #define GET_USB_BOOT_INFO 0x0001
 #define DMI_PNP_50_57     0x0002
+///@}
 
+///
+/// SMM_FUNCTION Owner constants
+///@{
 #define STANDARD_OWNER    0x0
 #define OEM_OWNER         0x1
+///@}
 
 /**
   * SMM_ENTRY
