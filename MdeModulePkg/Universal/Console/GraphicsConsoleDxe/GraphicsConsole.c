@@ -1648,7 +1648,7 @@ DrawUnicodeWeightAtCursorN (
 
     Status = mHiiFont->StringToImage (
                          mHiiFont,
-                         EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN,
+                         EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_DIRECT_TO_SCREEN | EFI_HII_IGNORE_LINE_BREAK,
                          String,
                          FontInfo,
                          &Blt,
@@ -1682,7 +1682,7 @@ DrawUnicodeWeightAtCursorN (
     //
     Status = mHiiFont->StringToImage (
                           mHiiFont,
-                          EFI_HII_IGNORE_IF_NO_GLYPH,
+                          EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_IGNORE_LINE_BREAK,
                           String,
                           FontInfo,
                           &Blt,
