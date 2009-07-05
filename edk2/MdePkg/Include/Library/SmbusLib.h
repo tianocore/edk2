@@ -430,7 +430,7 @@ SmBusReadBlock (
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
   @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
-                        MBUS Command, SMBUS Data Length, and PEC.
+                        SMBUS Command, SMBUS Data Length, and PEC.
   @param  Buffer        Pointer to the buffer to store the bytes read from the SMBUS.
   @param  Status        Return status for the executed command.
                         This is an optional parameter and may be NULL.
