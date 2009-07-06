@@ -95,4 +95,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 [Guids]
   gEfiEventExitBootServicesGuid
-  gEfiIfrTianoGuid                              ## CONSUMES ## Guid
+  gEfiIfrTianoGuid                              ## CONSUMES ## GUID
+  gEfiAcpiTableGuid                             ## CONSUMES ## GUID
+  gEfiAcpi10TableGuid                           ## CONSUMES ## GUID
+  gEfiAcpi20TableGuid                           ## CONSUMES ## GUID

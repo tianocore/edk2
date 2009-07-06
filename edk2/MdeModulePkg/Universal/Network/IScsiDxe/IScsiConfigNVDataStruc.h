@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Vfr has a limit on the size, it's 255 bytes.
 //
-#define ISCSI_NAME_IFR_MAX_SIZE   126
+#define ISCSI_NAME_IFR_MAX_SIZE   223
 
 #define IP_MIN_SIZE               7
 #define IP_MAX_SIZE               15

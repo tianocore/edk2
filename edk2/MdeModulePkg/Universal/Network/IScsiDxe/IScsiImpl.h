@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Guid/EventGroup.h>
+#include <Guid/Acpi.h>
 
 #include "IScsiCommon.h"
 #include "IScsiDriver.h"
