@@ -159,7 +159,6 @@ PcRtcInit (
   Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
 
   Century = RtcRead (RTC_ADDRESS_CENTURY);
-  Time.Year = (UINT16) (Century * 100 + Time.Year);
   
   //
   // Set RTC configuration after get original time
@@ -283,7 +282,6 @@ PcRtcGetTime (
   Time->Year    = RtcRead (RTC_ADDRESS_YEAR);
 
   Century = RtcRead (RTC_ADDRESS_CENTURY);
-  Time->Year = (UINT16) (Century * 100 + Time->Year);
   
   //
   // Release RTC Lock.
@@ -511,7 +509,6 @@ PcRtcGetWakeupTime (
   }
 
   Century = RtcRead (RTC_ADDRESS_CENTURY);
-  Time->Year = (UINT16) (Century * 100 + Time->Year);
   
   //
   // Release RTC Lock.
@@ -717,8 +714,8 @@ ConvertRtcTimeToEfiTime (
     Time->Hour    = CheckAndConvertBcd8ToDecimal8 (Time->Hour);
     Time->Minute  = CheckAndConvertBcd8ToDecimal8 (Time->Minute);
     Time->Second  = CheckAndConvertBcd8ToDecimal8 (Time->Second);
-    Century       = CheckAndConvertBcd8ToDecimal8 (Century);
   }
+  Century       = CheckAndConvertBcd8ToDecimal8 (Century);
 
   if (Time->Year == 0xff || Time->Month == 0xff || Time->Day == 0xff ||
       Time->Hour == 0xff || Time->Minute == 0xff || Time->Second == 0xff ||
