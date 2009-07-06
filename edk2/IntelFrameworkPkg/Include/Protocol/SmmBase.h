@@ -140,6 +140,8 @@ EFI_STATUS
   @param[in]      ImageHandle           The handle of the registered driver.
   @param[in,out]  CommunicationBuffer   Pointer to the buffer to convey into SMRAM.
   @param[in,out]  SourceSize            The size of the data buffer being passed in.
+                                        On exit, the size of data being returned.
+                                        Zero if the handler does not wish to reply with any data.
 
   @retval         EFI_SUCCESS           The message was successfully posted
   @retval         EFI_INVALID_PARAMETER The buffer was NULL
@@ -202,7 +204,6 @@ EFI_STATUS
 
   @retval      EFI_SUCCESS           The requested number of bytes was allocated.
   @retval      EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
-  @retval      EFI_INVALID_PARAMETER PoolType was invalid.
   @retval      EFI_UNSUPPORTED       In runtime.
 
 **/
@@ -241,7 +242,7 @@ EFI_STATUS
   @param[in]   This                   Protocol instance pointer.
   @param[out]  InSmm                  Whether the caller is inside SMM for IA-32
                                       or servicing a PMI for the Itanium processor
-	     			 family.
+                                      family.
 
   @retval      EFI_SUCCESS            The operation was successful
   @retval      EFI_INVALID_PARAMETER  InSmm was NULL.
@@ -275,51 +276,18 @@ EFI_STATUS
   IN OUT EFI_SMM_SYSTEM_TABLE       **Smst
   );
 
-/**
-  @par Protocol Description:
-  This protocol is used to install SMM handlers for support of subsequent SMI/PMI
-  activations. This protocol is available on both IA-32 and Itanium-based systems.
-
-**/
+///
+/// This protocol is used to install SMM handlers for support of subsequent SMI/PMI
+/// activations. This protocol is available on both IA-32 and Itanium-based systems.
+///
 struct _EFI_SMM_BASE_PROTOCOL {
-  ///
-  ///  Registers a handler to run in System Management RAM (SMRAM).
-  ///
   EFI_SMM_REGISTER_HANDLER    Register;
-
-  ///
-  ///  Removes a handler from execution in SMRAM.
-  ///
   EFI_SMM_UNREGISTER_HANDLER  UnRegister;
-
-  ///
-  ///  Sends/receives a message for a registered handler.
-  ///
   EFI_SMM_COMMUNICATE         Communicate;
-
-  ///
-  ///  Registers a callback from the constructor.
-  ///
   EFI_SMM_CALLBACK_SERVICE    RegisterCallback;
-
-  ///
-  ///  Detects whether the caller is inside or outside of SMM. SName
-  ///
   EFI_SMM_INSIDE_OUT          InSmm;
-
-  ///
-  ///  Allocates SMRAM.
-  ///
   EFI_SMM_ALLOCATE_POOL       SmmAllocatePool;
-
-  ///
-  ///  Deallocates SMRAM.
-  ///
   EFI_SMM_FREE_POOL           SmmFreePool;
-
-  ///
-  ///  Retrieves the location of the System Management System Table (SMST).
-  ///
   EFI_SMM_GET_SMST_LOCATION   GetSmstLocation;
 };
 
