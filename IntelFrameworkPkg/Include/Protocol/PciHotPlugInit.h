@@ -27,8 +27,9 @@
 /// Global ID for the PCI Hot Plug Protocol
 ///
 #define EFI_PCI_HOT_PLUG_INIT_PROTOCOL_GUID \
-  { 0xaa0e8bc1, 0xdabc, 0x46b0, {0xa8, 0x44, 0x37, 0xb8, 0x16, 0x9b, 0x2b, 0xea } }
-
+  { \
+    0xaa0e8bc1, 0xdabc, 0x46b0, {0xa8, 0x44, 0x37, 0xb8, 0x16, 0x9b, 0x2b, 0xea } \
+  }
 
 typedef struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL EFI_PCI_HOT_PLUG_INIT_PROTOCOL;
 
@@ -67,6 +68,9 @@ typedef struct{
 } EFI_HPC_LOCATION;
 
 
+///
+/// Describes how resource padding should be applied
+///
 typedef enum{
   EfiPaddingPciBus,
   EfiPaddingPciRootBridge
@@ -75,6 +79,15 @@ typedef enum{
 /**
   Returns a list of root Hot Plug Controllers (HPCs) that require initialization
   during the boot process.
+
+  This procedure returns a list of root HPCs. The PCI bus driver must initialize these controllers 
+  during the boot process. The PCI bus driver may or may not be able to detect these HPCs. If the 
+  platform includes a PCI-to-CardBus bridge, it can be included in this list if it requires initialization. 
+  The HpcList must be self consistent. An HPC cannot control any of its parent buses. Only one HPC 
+  can control a PCI bus. Because this list includes only root HPCs, no HPC in the list can be a child of 
+  another HPC. This policy must be enforced by the EFI_PCI_HOT_PLUG_INIT_PROTOCOL. 
+  The PCI bus driver may not check for such invalid conditions. 
+  The callee allocates the buffer HpcList
 
   @param  This                  Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
   @param  HpcCount              The number of root HPCs that were returned.
@@ -97,13 +110,19 @@ EFI_STATUS
 /**
   Initializes one root Hot Plug Controller (HPC). This process may causes
   initialization of its subordinate buses.
+  
+  This function initializes the specified HPC. At the end of initialization, the hot-plug slots or sockets 
+  (controlled by this HPC) are powered and are connected to the bus. All the necessary registers in the 
+  HPC are set up. For a Standard (PCI) Hot Plug Controller (SHPC), the registers that must be set up 
+  are defined in the PCI Standard Hot Plug Controller and Subsystem Specification.
 
   @param  This                  Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
   @param  HpcDevicePath         The device path to the HPC that is being initialized.
   @param  HpcPciAddress         The address of the HPC function on the PCI bus.
   @param  Event                 The event that should be signaled when the HPC initialization
                                 is complete.
-  @param  HpcState              The state of the HPC hardware.
+  @param  HpcState              The state of the HPC hardware. The state is EFI_HPC_STATE_INITIALIZED
+                                or EFI_HPC_STATE_ENABLED.
 
   @retval EFI_SUCCESS           If Event is NULL, the specific HPC was successfully
                                 initialized. If Event is not NULL, Event will be signaled at a later time
@@ -129,6 +148,12 @@ EFI_STATUS
   Returns the resource padding that is required by the PCI bus that is controlled
   by the specified Hot Plug Controller (HPC).
 
+  This function returns the resource padding that is required by the PCI bus that is controlled by the 
+  specified HPC. This member function is called for all the root HPCs and nonroot HPCs that are 
+  detected by the PCI bus enumerator. This function will be called before PCI resource allocation is 
+  completed. This function must be called after all the root HPCs, with the possible exception of a 
+  PCI-to-CardBus bridge, have completed initialization.
+
   @param  This                  Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
   @param  HpcDevicePath         The device path to the HPC.
   @param  HpcPciAddress         The address of the HPC function on the PCI bus.
@@ -149,7 +174,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_PCI_HOT_PLUG_PADDING)(
+(EFIAPI *EFI_GET_HOT_PLUG_PADDING)(
   IN EFI_PCI_HOT_PLUG_INIT_PROTOCOL     *This,
   IN  EFI_DEVICE_PATH_PROTOCOL          *HpcDevicePath,
   IN  UINT64                            HpcPciAddress,
@@ -182,7 +207,7 @@ struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL {
   ///
   /// Returns the resource padding that is required by the HPC.
   ///
-  EFI_GET_PCI_HOT_PLUG_PADDING                           GetResourcePadding;
+  EFI_GET_HOT_PLUG_PADDING                               GetResourcePadding;
 };
 
 extern EFI_GUID gEfiPciHotPlugInitProtocolGuid;
