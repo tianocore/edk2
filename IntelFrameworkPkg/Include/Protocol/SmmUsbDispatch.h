@@ -101,7 +101,7 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SMM_USB_REGISTER)(
-  IN EFI_SMM_USB_DISPATCH_PROTOCOL            *This,
+  IN  EFI_SMM_USB_DISPATCH_PROTOCOL           *This,
   IN  EFI_SMM_USB_DISPATCH                    DispatchFunction,
   IN  EFI_SMM_USB_DISPATCH_CONTEXT            *DispatchContext,
   OUT EFI_HANDLE                              *DispatchHandle
