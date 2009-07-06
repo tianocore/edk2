@@ -36,15 +36,17 @@
 typedef struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI EFI_PEI_DEVICE_RECOVERY_MODULE_PPI;
 
 /**
+  Returns the number of DXE capsules residing on the device.
+
   This function searches for DXE capsules from the associated device and returns the number
   and maximum size in bytes of the capsules discovered. Entry 1 is assumed to be the
   highest load priority and entry N is assumed to be the lowest priority.
 
-  @param  PeiServices            General-purpose services that are available to every PEIM
-  @param  This                   Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
-  @param  NumberRecoveryCapsules Pointer to a caller-allocated UINTN. On output,
-                                 *NumberRecoveryCapsules contains the number of recovery capsule
-                                 images available for retrieval from this PEIM instance.
+  @param[in]  PeiServices            General-purpose services that are available to every PEIM
+  @param[in]  This                   Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
+  @param[out] NumberRecoveryCapsules Pointer to a caller-allocated UINTN. On output,
+                                     *NumberRecoveryCapsules contains the number of recovery capsule
+                                     images available for retrieval from this PEIM instance.
 
   @retval EFI_SUCCESS           One or more capsules were discovered.
   @retval EFI_DEVICE_ERROR      A device error occurred.
@@ -60,15 +62,19 @@ EFI_STATUS
   );
 
 /**
+  Returns the size and type of the requested recovery capsule.
+
   This function gets the size and type of the requested recovery capsule.
 
-  @param  PeiServices     General-purpose services that are available to every PEIM
-  @param  This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
-  @param  CapsuleInstance Specifies for which capsule instance to retrieve the information.
-  @param  Size            A pointer to a caller-allocated UINTN in which the size of
-                          the requested recovery module is returned.
-  @param  CapsuleType     A pointer to a caller-allocated EFI_GUID in
-                          which the type of the requested recovery capsule is returned.
+  @param[in]  PeiServices     General-purpose services that are available to every PEIM
+  @param[in]  This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
+  @param[in]  CapsuleInstance Specifies for which capsule instance to retrieve the information.
+                              This parameter must be between one and the value returned by
+                              GetNumberRecoveryCapsules() in NumberRecoveryCapsules.
+  @param[out] Size            A pointer to a caller-allocated UINTN in which the size of
+                              the requested recovery module is returned.
+  @param[out] CapsuleType     A pointer to a caller-allocated EFI_GUID in
+                              which the type of the requested recovery capsule is returned.
 
   @retval EFI_SUCCESS           One or more capsules were discovered.
   @retval EFI_DEVICE_ERROR      A device error occurred.
@@ -86,14 +92,16 @@ EFI_STATUS
   );
 
 /**
+  Loads a DXE capsule from some media into memory.
+
   This function retrieves a DXE capsule from some device and loads it into memory.
   Note that the published interface is device neutral.
 
-  @param  PeiServices     General-purpose services that are available to every PEIM
-  @param  This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
-  @param  CapsuleInstance Specifies which capsule instance to retrieve.
-  @param  Buffer          Specifies a caller-allocated buffer in which the requested
-                          recovery capsule will be returned.
+  @param[in, out] PeiServices     General-purpose services that are available to every PEIM
+  @param[in]      This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
+  @param[in]      CapsuleInstance Specifies which capsule instance to retrieve.
+  @param[out]     Buffer          Specifies a caller-allocated buffer in which the requested
+                                  recovery capsule will be returned.
 
   @retval EFI_SUCCESS           One or more capsules were discovered.
   @retval EFI_DEVICE_ERROR      A device error occurred.
@@ -114,19 +122,8 @@ EFI_STATUS
 /// regardless of the underlying device(s).
 ///
 struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI {
-  ///
-  /// Returns the number of DXE capsules that were found.
-  ///
   EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE  GetNumberRecoveryCapsules;
-  
-  ///
-  /// Returns the capsule image type and the size of a given image.
-  ///
   EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO    GetRecoveryCapsuleInfo;
-  
-  ///
-  /// Loads a DXE capsule into memory
-  ///
   EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE        LoadRecoveryCapsule;
 };
 
