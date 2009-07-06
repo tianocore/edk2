@@ -52,12 +52,12 @@ typedef enum {
   Enables a driver to access memory-mapped registers in the EFI system memory space.
   Or, Enables a driver to access registers in the EFI CPU I/O space.
 
-  @param  This                  A pointer to the EFI_CPU_IO_PROTOCOL instance.
-  @param  Width                 Signifies the width of the I/O or Memory operation.
-  @param  Address               The base address of the I/O or Memoryoperation.
-  @param  Count                 The number of I/O or Memory operations to perform.
+  @param[in]       This         A pointer to the EFI_CPU_IO_PROTOCOL instance.
+  @param[in]       Width        Signifies the width of the I/O or Memory operation.
+  @param[in]       Address      The base address of the I/O or Memoryoperation.
+  @param[in]       Count        The number of I/O or Memory operations to perform.
                                 The number of bytes moved is Width size * Count, starting at Address.
-  @param  Buffer                For read operations, the destination buffer to store the results.
+  @param[in, out]  Buffer       For read operations, the destination buffer to store the results.
                                 For write operations, the source buffer from which to write data.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
