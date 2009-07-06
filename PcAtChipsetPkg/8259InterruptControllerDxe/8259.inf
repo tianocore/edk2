@@ -46,6 +46,7 @@
 
 [Pcd]
   gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0xFFFF
+  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000
   
 [Depex]
   TRUE
