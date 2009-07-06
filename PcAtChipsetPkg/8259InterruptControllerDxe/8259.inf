@@ -27,13 +27,15 @@
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+  
 [LibraryClasses]
   UefiBootServicesTableLib
   DebugLib
   UefiDriverEntryPoint
   IoLib
-
+  PcdLib
+  
 [Sources.common]
   8259.c
   8259.h
@@ -42,6 +44,9 @@
   gEfiLegacy8259ProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
   gEfiPciIoProtocolGuid
 
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0xFFFF
+  
 [Depex]
   TRUE
 

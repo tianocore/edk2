@@ -38,7 +38,7 @@ UINT8                     mMasterBase             = 0xff;
 UINT8                     mSlaveBase              = 0xff;
 EFI_8259_MODE             mMode                   = Efi8259ProtectedMode;
 UINT16                    mProtectedModeMask      = 0xffff;
-UINT16                    mLegacyModeMask         = 0xffff;
+UINT16                    mLegacyModeMask         = FixedPcdGet16(Pcd8259LegacyModeMask);
 UINT16                    mProtectedModeEdgeLevel = 0x0000;
 UINT16                    mLegacyModeEdgeLevel    = 0x0000;
 
