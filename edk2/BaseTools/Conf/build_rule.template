@@ -207,7 +207,7 @@
         "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} @$(OBJECT_FILES_LIST)
 
     <Command.GCC>
-        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) @$(OBJECT_FILES_LIST)
+        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) @"$(OBJECT_FILES_LIST)"
 
 [Static-Library-File]
     <InputFile>
@@ -223,7 +223,7 @@
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.GCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @"$(STATIC_LIBRARY_FILES_LIST)" -\) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
 [Static-Library-File.USER_DEFINED]
