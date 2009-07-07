@@ -1086,14 +1086,14 @@ UpdatePciInfo (
       // If it is , then get its special requirement in the ACPI table
       //
       Status = gEfiIncompatiblePciDeviceSupport->CheckDevice (
-                                                  gEfiIncompatiblePciDeviceSupport,
-                                                  PciIoDevice->Pci.Hdr.VendorId,
-                                                  PciIoDevice->Pci.Hdr.DeviceId,
-                                                  PciIoDevice->Pci.Hdr.RevisionID,
-                                                  PciIoDevice->Pci.Device.SubsystemVendorID,
-                                                  PciIoDevice->Pci.Device.SubsystemID,
-                                                  &Configuration
-                                                  );
+                                                   gEfiIncompatiblePciDeviceSupport,
+                                                   PciIoDevice->Pci.Hdr.VendorId,
+                                                   PciIoDevice->Pci.Hdr.DeviceId,
+                                                   PciIoDevice->Pci.Hdr.RevisionID,
+                                                   PciIoDevice->Pci.Device.SubsystemVendorID,
+                                                   PciIoDevice->Pci.Device.SubsystemID,
+                                                   &Configuration
+                                                   );
 
   }
 
