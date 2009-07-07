@@ -757,7 +757,6 @@ UpdateConModePage (
   CHAR16                        RowString[50];
   CHAR16                        ModeString[50];
   CHAR16                        *pStr;
-  UINTN                         TempStringLen;
   UINTN                         MaxMode;
   UINTN                         ValidMode;
   EFI_STRING_ID                 *ModeToken;
@@ -812,10 +811,10 @@ UpdateConModePage (
     //
     // Build mode string Column x Row
     //
-    TempStringLen = UnicodeValueToString (ModeString, 0, Col, 0);
+    UnicodeValueToString (ModeString, 0, Col, 0);
     pStr = &ModeString[0];
     StrnCat (pStr, L" x ", StrLen(L" x "));
-    TempStringLen = UnicodeValueToString (RowString, 0, Row, 0);
+    UnicodeValueToString (RowString, 0, Row, 0);
     pStr = &ModeString[0];
     StrnCat (pStr, RowString, StrLen(RowString));
 
