@@ -15,14 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_PCI_LIB_H_
 #define _EFI_PCI_LIB_H_
 
-//
-// Mask definistions for PCD PcdPciIncompatibleDeviceSupportMask
-//
-#define PCI_INCOMPATIBLE_ACPI_RESOURCE_SUPPORT         0x01
-#define PCI_INCOMPATIBLE_READ_SUPPORT                  0x02
-#define PCI_INCOMPATIBLE_WRITE_SUPPORT                 0x04
-#define PCI_INCOMPATIBLE_REGISTER_UPDATE_SUPPORT       0x08
-#define PCI_INCOMPATIBLE_ACCESS_WIDTH_SUPPORT          0x10
 
 typedef struct {
   EFI_HANDLE            Handle;
@@ -146,113 +138,7 @@ PciHostBridgeP2CProcess (
 **/
 EFI_STATUS
 PciHostBridgeEnumerator (
-  EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc
-  );
-
-/**
-  Read PCI configuration space through EFI_PCI_IO_PROTOCOL.
-
-  @param  PciIo               A pointer to the EFI_PCI_O_PROTOCOL.
-  @param  Width               Signifies the width of the memory operations.
-  @param  Offset              The offset within the PCI configuration space for the PCI controller.
-  @param  Count               The number of unit to be read.
-  @param  Buffer              For read operations, the destination buffer to store the results. For
-                              write operations, the source buffer to write data from.
-
-  @retval EFI_SUCCESS           The data was read from or written to the PCI controller.
-  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
-                                valid for the PCI configuration header of the PCI controller.
-  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-  @retval EFI_INVALID_PARAMETER Buffer is NULL or Width is invalid.
-
-**/
-EFI_STATUS
-PciIoRead (
-  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
-  IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
-  IN       UINT32                                 Offset,
-  IN       UINTN                                  Count,
-  IN OUT   VOID                                   *Buffer
-  );
-
-/**
-  Write PCI configuration space through EFI_PCI_IO_PROTOCOL.
-
-  If PCI incompatibility check is enabled, do incompatibility check.
-
-  @param  PciIo                 A pointer to the EFI_PCI_IO_PROTOCOL instance.
-  @param  Width                 Signifies the width of the memory operations.
-  @param  Offset                The offset within the PCI configuration space for the PCI controller.
-  @param  Count                 The number of PCI configuration operations to perform.
-  @param  Buffer                For read operations, the destination buffer to store the results. For write
-                                operations, the source buffer to write data from.
-
-  @retval EFI_SUCCESS           The data was read from or written to the PCI controller.
-  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
-                                valid for the PCI configuration header of the PCI controller.
-  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-  @retval EFI_INVALID_PARAMETER Buffer is NULL or Width is invalid.
-
-**/
-EFI_STATUS
-PciIoWrite (
-  IN       EFI_PCI_IO_PROTOCOL                    *PciIo,
-  IN       EFI_PCI_IO_PROTOCOL_WIDTH              Width,
-  IN       UINT32                                 Offset,
-  IN       UINTN                                  Count,
-  IN OUT   VOID                                   *Buffer
-  );
-
-/**
-  Write PCI configuration space through EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-
-  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param  Pci                 A pointer to PCI_TYPE00.
-  @param  Width               Signifies the width of the memory operations.
-  @param  Offset              The offset within the PCI configuration space for the PCI controller.
-  @param  Count               The number of unit to be read.
-  @param  Buffer              For read operations, the destination buffer to store the results. For
-                              write operations, the source buffer to write data from.
-
-  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.
-  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-
-**/
-EFI_STATUS
-PciRootBridgeIoWrite (
-  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
-  IN       PCI_TYPE00                             *Pci,
-  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN       UINT64                                 Offset,
-  IN       UINTN                                  Count,
-  IN OUT   VOID                                   *Buffer
-  );
-
-/**
-  Read PCI configuration space through EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-
-  @param  PciRootBridgeIo     A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param  Pci                 A pointer to PCI_TYPE00.
-  @param  Width               Signifies the width of the memory operations.
-  @param  Offset              The offset within the PCI configuration space for the PCI controller.
-  @param  Count               The number of unit to be read.
-  @param  Buffer              For read operations, the destination buffer to store the results. For
-                              write operations, the source buffer to write data from.
-
-  @retval EFI_SUCCESS           The data was read from or written to the PCI root bridge.
-  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-
-**/
-EFI_STATUS
-PciRootBridgeIoRead (
-  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *PciRootBridgeIo,
-  IN       PCI_TYPE00                             *Pci,            OPTIONAL
-  IN       EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
-  IN       UINT64                                 Offset,
-  IN       UINTN                                  Count,
-  IN OUT   VOID                                   *Buffer
+  IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc
   );
 
 #endif

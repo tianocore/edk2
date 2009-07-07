@@ -73,7 +73,6 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
-  PciIncompatibleDeviceSupportLib
   PcdLib
   DevicePathLib
   UefiBootServicesTableLib
@@ -102,9 +101,6 @@
 
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
-
-[Pcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask
 
 # [Event]
 #   ##

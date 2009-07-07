@@ -628,12 +628,12 @@ PciIoConfigRead (
   }
 
   Status = PciIoDevice->PciRootBridgeIo->Pci.Read (
-                                              PciIoDevice->PciRootBridgeIo,
-                                              (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
-                                              Address,
-                                              Count,
-                                              Buffer
-                                              );
+                                               PciIoDevice->PciRootBridgeIo,
+                                               (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
+                                               Address,
+                                               Count,
+                                               Buffer
+                                               );
 
   if (EFI_ERROR (Status)) {
     ReportErrorStatusCode (PciIoDevice, EFI_IO_BUS_PCI | EFI_IOB_EC_READ_ERROR);
@@ -1628,15 +1628,10 @@ PciIoGetBarAttributes (
       NumConfig = 1;
     }
 
-    Configuration = AllocatePool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
+    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
     if (Configuration == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-
-    ZeroMem (
-      Configuration,
-      sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
-      );
 
     Ptr = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
 

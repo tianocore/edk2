@@ -250,7 +250,7 @@ RegisterPciDevice (
   //
   PciIo = &(PciIoDevice->PciIo);
   Data8 = PCI_INT_LINE_UNKNOWN;
-  PciIoWrite (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
 
   //
   // Process OpRom

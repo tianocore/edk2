@@ -76,8 +76,8 @@ SkipIsaAliasAperture (
 **/
 VOID
 InsertResourceNode (
-  IN PCI_RESOURCE_NODE   *Bridge,
-  IN PCI_RESOURCE_NODE   *ResNode
+  IN OUT PCI_RESOURCE_NODE   *Bridge,
+  IN     PCI_RESOURCE_NODE   *ResNode
   );
 
 /**
@@ -142,12 +142,12 @@ CalculateResourceAperture (
 **/
 VOID
 GetResourceFromDevice (
-  IN PCI_IO_DEVICE     *PciDev,
-  IN PCI_RESOURCE_NODE *IoNode,
-  IN PCI_RESOURCE_NODE *Mem32Node,
-  IN PCI_RESOURCE_NODE *PMem32Node,
-  IN PCI_RESOURCE_NODE *Mem64Node,
-  IN PCI_RESOURCE_NODE *PMem64Node
+  IN     PCI_IO_DEVICE     *PciDev,
+  IN OUT PCI_RESOURCE_NODE *IoNode,
+  IN OUT PCI_RESOURCE_NODE *Mem32Node,
+  IN OUT PCI_RESOURCE_NODE *PMem32Node,
+  IN OUT PCI_RESOURCE_NODE *Mem64Node,
+  IN OUT PCI_RESOURCE_NODE *PMem64Node
   );
 
 /**
@@ -188,12 +188,12 @@ CreateResourceNode (
 **/
 VOID
 CreateResourceMap (
-  IN PCI_IO_DEVICE     *Bridge,
-  IN PCI_RESOURCE_NODE *IoNode,
-  IN PCI_RESOURCE_NODE *Mem32Node,
-  IN PCI_RESOURCE_NODE *PMem32Node,
-  IN PCI_RESOURCE_NODE *Mem64Node,
-  IN PCI_RESOURCE_NODE *PMem64Node
+  IN     PCI_IO_DEVICE     *Bridge,
+  IN OUT PCI_RESOURCE_NODE *IoNode,
+  IN OUT PCI_RESOURCE_NODE *Mem32Node,
+  IN OUT PCI_RESOURCE_NODE *PMem32Node,
+  IN OUT PCI_RESOURCE_NODE *Mem64Node,
+  IN OUT PCI_RESOURCE_NODE *PMem64Node
   );
 
 /**

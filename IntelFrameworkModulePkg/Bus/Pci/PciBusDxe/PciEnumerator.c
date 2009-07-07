@@ -341,9 +341,8 @@ PciAssignBusNumber (
 
         Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
 
-        Status = PciRootBridgeIoWrite (
+        Status = PciRootBridgeIo->Pci.Write (
                                         PciRootBridgeIo,
-                                        &Pci,
                                         EfiPciWidthUint16,
                                         Address,
                                         1,
@@ -354,9 +353,8 @@ PciAssignBusNumber (
         // Initialize SubBusNumber to SecondBus
         //
         Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
-        Status = PciRootBridgeIoWrite (
+        Status = PciRootBridgeIo->Pci.Write (
                                         PciRootBridgeIo,
-                                        &Pci,
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
@@ -368,9 +366,8 @@ PciAssignBusNumber (
         if (IS_PCI_BRIDGE (&Pci)) {
 
           Register8 = 0xFF;
-          Status = PciRootBridgeIoWrite (
+          Status = PciRootBridgeIo->Pci.Write (
                                           PciRootBridgeIo,
-                                          &Pci,
                                           EfiPciWidthUint8,
                                           Address,
                                           1,
@@ -393,9 +390,8 @@ PciAssignBusNumber (
         //
         Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
 
-        Status = PciRootBridgeIoWrite (
+        Status = PciRootBridgeIo->Pci.Write (
                                         PciRootBridgeIo,
-                                        &Pci,
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
@@ -1083,15 +1079,10 @@ ConstructAcpiResourceRequestor (
     // If there is at least one type of resource request,
     // allocate a acpi resource node
     //
-    Configuration = AllocatePool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
+    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
     if (Configuration == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-
-    ZeroMem (
-      Configuration,
-      sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
-      );
 
     Ptr = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
 
@@ -1221,12 +1212,10 @@ ConstructAcpiResourceRequestor (
     //
     // If there is no resource request
     //
-    Configuration = AllocatePool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
+    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
     if (Configuration == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-
-    ZeroMem (Configuration, sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
 
     Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) (Configuration);
     Ptr->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
@@ -1356,7 +1345,7 @@ PciBridgeEnumerator (
   SubBusNumber    = 0;
   StartBusNumber  = 0;
   PciIo           = &(BridgeDev->PciIo);
-  Status          = PciIoRead (PciIo, EfiPciIoWidthUint8, 0x19, 1, &StartBusNumber);
+  Status          = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x19, 1, &StartBusNumber);
 
   if (EFI_ERROR (Status)) {
     return Status;
