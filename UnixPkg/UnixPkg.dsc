@@ -406,7 +406,7 @@
   }
 
   UnixPkg/MetronomeDxe/Metronome.inf
-  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  UnixPkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
   UnixPkg/ResetRuntimeDxe/Reset.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   UnixPkg/FvbServicesRuntimeDxe/UnixFwh.inf
