@@ -35,25 +35,64 @@
 #pragma pack(1)
 
 typedef enum {
+  ///
+  /// A NULL-terminated ASCII string.
+  ///
   EfiStringAscii,
+  ///
+  /// A double NULL-terminated Unicode string.
+  ///
   EfiStringUnicode,
+  ///
+  /// An EFI_STATUS_CODE_STRING_TOKEN representing the string. The actual string
+  /// can be obtained by querying the HII Database.
+  ///
   EfiStringToken
 } EFI_STRING_TYPE;
 
 typedef struct {
+  ///
+  /// The HII handle of the string pack, which can be used to retrieve the string. 
+  /// It is a dynamic value that may not be the same for different boots.
+  ///
   FRAMEWORK_EFI_HII_HANDLE  Handle;
+  ///
+  /// When combined with the HII handle, the string token can be used to retrieve the
+  /// string. 
+  ///
   STRING_REF      Token;
 } EFI_STATUS_CODE_STRING_TOKEN;
 
 typedef union {
+  ///
+  /// ASCII formatted string.
+  ///
   CHAR8                         *Ascii;
+  ///
+  /// Unicode formatted string.
+  ///
   CHAR16                        *Unicode;
+  ///
+  /// HII handle/token pair.
+  ///
   EFI_STATUS_CODE_STRING_TOKEN  Hii;
 } EFI_STATUS_CODE_STRING;
 
 typedef struct {
+  ///
+  /// The data header identifying the data. The HeaderSize should be sizeof
+  /// (EFI_STATUS_CODE_DATA).
+  /// The Size should be sizeof(EFI_STATUS_CODE_STRING_DATA) - HeaderSize.
+  /// The Type should be EFI_STATUS_CODE_DATA_TYPE_STRING_GUID.
+  ///
   EFI_STATUS_CODE_DATA                          DataHeader;
+  ///
+  /// Specifies if the string is ASCII or Unicode.
+  ///
   EFI_STRING_TYPE                               StringType;
+  ///
+  /// A pointer to a null-terminated ASCII or Unicode string.
+  ///
   EFI_STATUS_CODE_STRING                        String;
 } EFI_STATUS_CODE_STRING_DATA;
 #pragma pack()
@@ -78,12 +117,18 @@ typedef struct {
   EFI_HANDLE            Handle;
 } EFI_DEVICE_HANDLE_EXTENDED_DATA;
 
-
+///
+/// Extended data about the device path, which is used for many errors and 
+/// progress codes to point to the device.
+///
 typedef struct {
   EFI_STATUS_CODE_DATA                 DataHeader;
   UINT8                                *DevicePath;
 } EFI_DEVICE_PATH_EXTENDED_DATA;
 
+///
+/// This structure defines extended data describing a PCI resource allocation error.
+///
 typedef struct {
   EFI_STATUS_CODE_DATA               DataHeader;
   UINT32                             Bar;
