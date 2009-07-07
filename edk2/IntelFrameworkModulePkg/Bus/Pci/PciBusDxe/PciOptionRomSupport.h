@@ -78,9 +78,10 @@ ContainEfiImage (
 
 
 /**
-  Get Pci device's oprom infor bits.
+  Get Pci device's oprom information.
 
-  @param PciIoDevice    Pci device instance.
+  @param PciIoDevice    Input Pci device instance.
+                        Output Pci device instance with updated OptionRom size.
 
   @retval EFI_NOT_FOUND Pci device has not Option Rom.
   @retval EFI_SUCCESS   Pci device has Option Rom.
@@ -88,7 +89,7 @@ ContainEfiImage (
 **/
 EFI_STATUS
 GetOpRomInfo (
-  IN PCI_IO_DEVICE    *PciIoDevice
+  IN OUT PCI_IO_DEVICE    *PciIoDevice
   );
 
 /**

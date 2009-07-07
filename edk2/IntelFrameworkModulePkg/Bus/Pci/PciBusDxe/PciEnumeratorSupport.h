@@ -246,29 +246,29 @@ DetermineDeviceAttribute (
 /**
   This routine is used to update the bar information for those incompatible PCI device.
 
-  @param PciIoDevice      Pci device instance.
+  @param PciIoDevice      Input Pci device instance. Output Pci device instance with updated
+                          Bar information.
 
   @retval EFI_SUCCESS     Successfully updated bar information.
   @retval EFI_UNSUPPORTED Given PCI device doesn't belong to incompatible PCI device list.
-  @retval other           Failed to check incompatibility device.
 
 **/
 EFI_STATUS
 UpdatePciInfo (
-  IN PCI_IO_DEVICE  *PciIoDevice
+  IN OUT PCI_IO_DEVICE    *PciIoDevice
   );
 
 /**
   This routine will update the alignment with the new alignment.
 
-  @param Alignment    Old alignment.
+  @param Alignment    Input Old alignment. Output updated alignment.
   @param NewAlignment New alignment.
 
 **/
 VOID
 SetNewAlign (
-  IN UINT64     *Alignment,
-  IN UINT64     NewAlignment
+  IN OUT UINT64     *Alignment,
+  IN     UINT64     NewAlignment
   );
 
 /**

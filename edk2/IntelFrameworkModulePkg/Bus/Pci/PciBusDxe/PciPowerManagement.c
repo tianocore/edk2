@@ -55,13 +55,13 @@ ResetPowerManagementFeature (
   //
   // Write PMCSR
   //
-  PciIoWrite (
-               &PciIoDevice->PciIo,
-               EfiPciIoWidthUint16,
-               PowerManagementRegBlock + 4,
-               1,
-               &PowerManagementCSR
-             );
+  PciIoDevice->PciIo.Pci.Write (
+                           &PciIoDevice->PciIo,
+                           EfiPciIoWidthUint16,
+                           PowerManagementRegBlock + 4,
+                           1,
+                           &PowerManagementCSR
+                           );
 
   return EFI_SUCCESS;
 }

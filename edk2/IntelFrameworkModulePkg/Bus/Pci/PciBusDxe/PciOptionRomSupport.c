@@ -216,9 +216,10 @@ LoadFile2 (
 }
 
 /**
-  Get Pci device's oprom infor bits.
+  Get Pci device's oprom information.
 
-  @param PciIoDevice    Pci device instance.
+  @param PciIoDevice    Input Pci device instance.
+                        Output Pci device instance with updated OptionRom size.
 
   @retval EFI_NOT_FOUND Pci device has not Option Rom.
   @retval EFI_SUCCESS   Pci device has Option Rom.
@@ -226,7 +227,7 @@ LoadFile2 (
 **/
 EFI_STATUS
 GetOpRomInfo (
-  IN PCI_IO_DEVICE    *PciIoDevice
+  IN OUT PCI_IO_DEVICE    *PciIoDevice
   )
 {
   UINT8                           RomBarIndex;
@@ -255,11 +256,7 @@ GetOpRomInfo (
 
   if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
     //
-    // If is ppb
-    //
-
-    //
-    // 0x38
+    // If is ppb, 0x38
     //
     RomBarIndex = PCI_BRIDGE_ROMBAR;
   }
@@ -269,9 +266,8 @@ GetOpRomInfo (
   AllOnes = 0xfffffffe;
   Address = EFI_PCI_ADDRESS (Bus, Device, Function, RomBarIndex);
 
-  Status = PciRootBridgeIoWrite (
+  Status = PciRootBridgeIo->Pci.Write (
                                   PciRootBridgeIo,
-                                  &PciIoDevice->Pci,
                                   EfiPciWidthUint32,
                                   Address,
                                   1,
@@ -284,9 +280,8 @@ GetOpRomInfo (
   //
   // Read back
   //
-  Status = PciRootBridgeIoRead (
+  Status = PciRootBridgeIo->Pci.Read(
                                   PciRootBridgeIo,
-                                  &PciIoDevice->Pci,
                                   EfiPciWidthUint32,
                                   Address,
                                   1,
@@ -295,6 +290,7 @@ GetOpRomInfo (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
+
   //
   // Bits [1, 10] are reserved
   //
@@ -558,7 +554,7 @@ RomDecode (
     // Clear all bars
     //
     for (Offset = 0x10; Offset <= 0x24; Offset += sizeof (UINT32)) {
-      PciIoWrite (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllZero);
+      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllZero);
     }
 
     //
@@ -566,13 +562,13 @@ RomDecode (
     // enable its decoder
     //
     Value32 = RomBar | 0x1;
-    PciIoWrite (
-                PciIo,
-                (EFI_PCI_IO_PROTOCOL_WIDTH) EfiPciWidthUint32,
-                RomBarIndex,
-                1,
-                &Value32
-                );
+    PciIo->Pci.Write (
+                 PciIo,
+                 (EFI_PCI_IO_PROTOCOL_WIDTH) EfiPciWidthUint32,
+                 RomBarIndex,
+                 1,
+                 &Value32
+                 );
 
     //
     // Programe all upstream bridge
@@ -600,13 +596,13 @@ RomDecode (
     // disable rom decode
     //
     Value32 = 0xFFFFFFFE;
-    PciIoWrite (
-                PciIo,
-                (EFI_PCI_IO_PROTOCOL_WIDTH) EfiPciWidthUint32,
-                RomBarIndex,
-                1,
-                &Value32
-                );
+    PciIo->Pci.Write (
+                 PciIo,
+                 (EFI_PCI_IO_PROTOCOL_WIDTH) EfiPciWidthUint32,
+                 RomBarIndex,
+                 1,
+                 &Value32
+                 );
 
   }
 }

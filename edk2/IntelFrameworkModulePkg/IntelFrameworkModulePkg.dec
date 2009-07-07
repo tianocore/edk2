@@ -24,9 +24,6 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
-  ##  @libraryclass  This libary is used to support the incompatible PCI devices.
-  PciIncompatibleDeviceSupportLib|Include/Library/PciIncompatibleDeviceSupportLib.h
-
   ##  @libraryclass  OEM status code libary is used to report status code to OEM device.
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
 
@@ -138,11 +135,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportDma|TRUE|BOOLEAN|0x00010040
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma|FALSE|BOOLEAN|0x00010041
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory|TRUE|BOOLEAN|0x00010042
-
-[PcdsFixedAtBuild]
-  ## PCD marks PCI support incompatible operations: AcpiResource, Read, Write, RegisterUpdate, AccessWidth.
-  #  BIT0:AcpiResource, BIT1:Read, BIT2:Write, BIT3:RegisterUpdate, BIT4:AccessWidth
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask|0|UINT8|0x0001003f
 
 [PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
   ## PcdStatusCodeMemorySize is used when PcdStatusCodeUseMemory is set to true

@@ -3,7 +3,7 @@
 #
 # This file is used to build all modules in IntelFrameworkModulePkg.
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2009, Intel Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -90,7 +90,6 @@
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   IoLib|IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
@@ -118,7 +117,6 @@
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
-  PciIncompatibleDeviceSupportLib|IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   IoLib|IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
 
 ################################################################################
@@ -149,7 +147,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciIncompatibleDeviceSupportMask|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0xFFFB0000
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
@@ -189,7 +186,6 @@
   IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   IntelFrameworkModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
-  IntelFrameworkModulePkg/Library/PciIncompatibleDeviceSupportLib/PciIncompatibleDeviceSupportLib.inf
   IntelFrameworkModulePkg/Library/PeiS3Lib/PeiS3Lib.inf
   IntelFrameworkModulePkg/Library/PeiRecoveryLib/PeiRecoveryLib.inf
   IntelFrameworkModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf

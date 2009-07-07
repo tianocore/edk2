@@ -43,13 +43,13 @@ PciOperateRegister (
   PciIo       = &PciIoDevice->PciIo;
 
   if (Operation != EFI_SET_REGISTER) {
-    Status = PciIoRead (
-               PciIo,
-               EfiPciIoWidthUint16,
-               Offset,
-               1,
-               &OldCommand
-               );
+    Status = PciIo->Pci.Read (
+                          PciIo,
+                          EfiPciIoWidthUint16,
+                          Offset,
+                          1,
+                          &OldCommand
+                          );
 
     if (Operation == EFI_GET_REGISTER) {
       *PtrCommand = OldCommand;
@@ -65,13 +65,13 @@ PciOperateRegister (
     OldCommand = Command;
   }
 
-  return PciIoWrite (
-           PciIo,
-           EfiPciIoWidthUint16,
-           Offset,
-           1,
-           &OldCommand
-           );
+  return PciIo->Pci.Write (
+                      PciIo,
+                      EfiPciIoWidthUint16,
+                      Offset,
+                      1,
+                      &OldCommand
+                      );
 }
 
 /**
@@ -134,33 +134,33 @@ LocateCapabilityRegBlock (
     CapabilityPtr = 0;
     if (IS_CARDBUS_BRIDGE (&PciIoDevice->Pci)) {
 
-      PciIoRead (
-        &PciIoDevice->PciIo,
-        EfiPciIoWidthUint8,
-        EFI_PCI_CARDBUS_BRIDGE_CAPABILITY_PTR,
-        1,
-        &CapabilityPtr
-        );
+      PciIoDevice->PciIo.Pci.Read (
+                               &PciIoDevice->PciIo,
+                               EfiPciIoWidthUint8,
+                               EFI_PCI_CARDBUS_BRIDGE_CAPABILITY_PTR,
+                               1,
+                               &CapabilityPtr
+                               );
     } else {
 
-      PciIoRead (
-        &PciIoDevice->PciIo,
-        EfiPciIoWidthUint8,
-        PCI_CAPBILITY_POINTER_OFFSET,
-        1,
-        &CapabilityPtr
-        );
+      PciIoDevice->PciIo.Pci.Read (
+                               &PciIoDevice->PciIo,
+                               EfiPciIoWidthUint8,
+                               PCI_CAPBILITY_POINTER_OFFSET,
+                               1,
+                               &CapabilityPtr
+                               );
     }
   }
 
   while ((CapabilityPtr >= 0x40) && ((CapabilityPtr & 0x03) == 0x00)) {
-    PciIoRead (
-      &PciIoDevice->PciIo,
-      EfiPciIoWidthUint16,
-      CapabilityPtr,
-      1,
-      &CapabilityEntry
-      );
+    PciIoDevice->PciIo.Pci.Read (
+                             &PciIoDevice->PciIo,
+                             EfiPciIoWidthUint16,
+                             CapabilityPtr,
+                             1,
+                             &CapabilityEntry
+                             );
 
     CapabilityID = (UINT8) CapabilityEntry;
 
