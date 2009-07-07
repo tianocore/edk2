@@ -273,7 +273,6 @@ CallBootManager (
     if (StrStr (Option->Description, DESCRIPTION_FLOPPY) != NULL) {
       BootStringNumber = Option->Description + StrLen (DESCRIPTION_FLOPPY) + 1;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY));
-      
     } else if (StrStr (Option->Description, DESCRIPTION_DVD) != NULL) {
       BootStringNumber = Option->Description + StrLen (DESCRIPTION_DVD) + 1;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_DVD));
@@ -299,6 +298,7 @@ CallBootManager (
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NON_BLOCK));
     }
     
+    ASSERT (Option->Description != NULL);
     if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
       StrCat (Option->Description, L" ");
       StrCat (Option->Description, BootStringNumber);

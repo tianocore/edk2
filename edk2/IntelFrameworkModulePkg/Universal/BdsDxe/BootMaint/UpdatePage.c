@@ -490,6 +490,7 @@ UpdateConsolePage (
     NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, Index2);
     NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
 
+    ASSERT (Index < MAX_MENU_NUMBER);
     if (((NewTerminalContext->IsConIn != 0) && (UpdatePageId == FORM_CON_IN_ID)) ||
         ((NewTerminalContext->IsConOut != 0) && (UpdatePageId == FORM_CON_OUT_ID)) ||
         ((NewTerminalContext->IsStdErr != 0) && (UpdatePageId == FORM_CON_ERR_ID))
@@ -755,6 +756,7 @@ UpdateConModePage (
   UINTN                         Row;
   CHAR16                        RowString[50];
   CHAR16                        ModeString[50];
+  CHAR16                        *pStr;
   UINTN                         TempStringLen;
   UINTN                         MaxMode;
   UINTN                         ValidMode;
@@ -811,11 +813,11 @@ UpdateConModePage (
     // Build mode string Column x Row
     //
     TempStringLen = UnicodeValueToString (ModeString, 0, Col, 0);
-    ASSERT ((TempStringLen + StrLen (L" x ")) < (sizeof (ModeString) / sizeof (ModeString[0])));
-    StrCat (ModeString, L" x ");
+    pStr = &ModeString[0];
+    StrnCat (pStr, L" x ", StrLen(L" x "));
     TempStringLen = UnicodeValueToString (RowString, 0, Row, 0);
-    ASSERT ((StrLen (ModeString)  + TempStringLen) < (sizeof (ModeString) / sizeof (ModeString[0])));
-    StrCat (ModeString, RowString);
+    pStr = &ModeString[0];
+    StrnCat (pStr, RowString, StrLen(RowString));
 
     ModeToken[Index] = HiiSetString (CallbackData->BmmHiiHandle, 0, ModeString, NULL);
 
