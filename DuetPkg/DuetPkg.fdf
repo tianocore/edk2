@@ -87,7 +87,7 @@ INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 INF  PcAtChipsetPkg/KbcResetDxe/Reset.inf
 INF  DuetPkg/LegacyMetronome/Metronome.inf
 INF  PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
-INF  PcAtChipsetPkg/PcRtc/RealTimeClock.inf
+INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 INF  DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
 INF  DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
 INF  IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
