@@ -35,65 +35,31 @@
 #pragma pack(1)
 
 typedef enum {
-  ///
-  /// A NULL-terminated ASCII string.
-  ///
-  EfiStringAscii,
-  ///
-  /// A double NULL-terminated Unicode string.
-  ///
-  EfiStringUnicode,
-  ///
-  /// An EFI_STATUS_CODE_STRING_TOKEN representing the string. The actual string
-  /// can be obtained by querying the HII Database.
-  ///
-  EfiStringToken
+  EfiStringAscii,    ///< A NULL-terminated ASCII string.
+  EfiStringUnicode,  ///< A double NULL-terminated Unicode string.
+  EfiStringToken     ///< An EFI_STATUS_CODE_STRING_TOKEN representing the string. 
+                     ///< The actual string can be obtained by querying the HII Database.
 } EFI_STRING_TYPE;
 
 typedef struct {
-  ///
-  /// The HII handle of the string pack, which can be used to retrieve the string. 
-  /// It is a dynamic value that may not be the same for different boots.
-  ///
-  FRAMEWORK_EFI_HII_HANDLE  Handle;
-  ///
-  /// When combined with the HII handle, the string token can be used to retrieve the
-  /// string. 
-  ///
-  STRING_REF      Token;
+  FRAMEWORK_EFI_HII_HANDLE  Handle;  ///< The HII handle of the string pack, which can be
+                                     ///< used to retrieve the string. It is a dynamic value
+                                     ///< that may not be the same for different boots.
+  STRING_REF      Token;             ///< When combined with the HII handle, the string 
+                                     ///< token can be used to retrieve the string.
+
 } EFI_STATUS_CODE_STRING_TOKEN;
 
 typedef union {
-  ///
-  /// ASCII formatted string.
-  ///
-  CHAR8                         *Ascii;
-  ///
-  /// Unicode formatted string.
-  ///
-  CHAR16                        *Unicode;
-  ///
-  /// HII handle/token pair.
-  ///
-  EFI_STATUS_CODE_STRING_TOKEN  Hii;
+  CHAR8                         *Ascii;   ///< ASCII formatted string.
+  CHAR16                        *Unicode; ///< Unicode formatted string.
+  EFI_STATUS_CODE_STRING_TOKEN  Hii;      ///< HII handle/token pair.
 } EFI_STATUS_CODE_STRING;
 
 typedef struct {
-  ///
-  /// The data header identifying the data. The HeaderSize should be sizeof
-  /// (EFI_STATUS_CODE_DATA).
-  /// The Size should be sizeof(EFI_STATUS_CODE_STRING_DATA) - HeaderSize.
-  /// The Type should be EFI_STATUS_CODE_DATA_TYPE_STRING_GUID.
-  ///
-  EFI_STATUS_CODE_DATA                          DataHeader;
-  ///
-  /// Specifies if the string is ASCII or Unicode.
-  ///
-  EFI_STRING_TYPE                               StringType;
-  ///
-  /// A pointer to a null-terminated ASCII or Unicode string.
-  ///
-  EFI_STATUS_CODE_STRING                        String;
+  EFI_STATUS_CODE_DATA           DataHeader; ///< The data header identifying the data.
+  EFI_STRING_TYPE                StringType; ///< Specifies if the string is ASCII or Unicode.
+  EFI_STATUS_CODE_STRING         String;     ///< A pointer to a null-terminated ASCII or Unicode string.
 } EFI_STATUS_CODE_STRING_DATA;
 #pragma pack()
 
