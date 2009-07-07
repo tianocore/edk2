@@ -243,7 +243,10 @@ BOOLEAN
   @param  PciHandle             The PCI PC-AT OPROM from this devices ROM BAR will be loaded
   @param  RomImage              Return the legacy PCI ROM for this device
   @param  RomSize               Size of ROM Image
-  @param  Flags                 Indicates if ROM found and if PC-AT.
+  @param  Flags                 Indicates if ROM found and if PC-AT. Multiple bits can be set as follows:
+                                00 = No ROM
+                                01 = ROM Found
+                                02 = ROM is a valid legacy ROM
 
   @retval EFI_SUCCESS           Legacy Option ROM availible for this device
   @retval EFI_UNSUPPORTED       Legacy Option ROM not supported.
@@ -272,7 +275,10 @@ EFI_STATUS
                                 no hardware associated with the ROM and thus no PciHandle,
                                 otherwise is must be NULL.
                                 Example is PXE base code.
-  @param  Flags                 Return Status if ROM was found and if was Legacy OPROM.
+  @param  Flags                 The type of ROM discovered. Multiple bits can be set, as follows:
+                                00 = No ROM.
+                                01 = ROM found.
+                                02 = ROM is a valid legacy ROM.
   @param  DiskStart             Disk number of first device hooked by the ROM. If DiskStart
                                 is the same as DiskEnd no disked were hooked.
   @param  DiskEnd               Disk number of the last device hooked by the ROM.
@@ -297,15 +303,38 @@ EFI_STATUS
   );
 
 /**
-  Attempt to legacy boot the BootOption. If the EFI contexted has been
-  compromised this function will not return.
+  This function attempts to traditionally boot the specified BootOption. If the EFI context has
+  been compromised, this function will not return. This procedure is not used for loading an EFIaware
+  OS off a traditional device. The following actions occur:
+  - Get EFI SMBIOS data structures, convert them to a traditional format, and copy to
+    Compatibility16.
+  - Get a pointer to ACPI data structures and copy the Compatibility16 RSD PTR to F0000 block.
+  - Find the traditional SMI handler from a firmware volume and register the traditional SMI
+    handler with the EFI SMI handler.
+  - Build onboard IDE information and pass this information to the Compatibility16 code.
+  - Make sure all PCI Interrupt Line registers are programmed to match 8259.
+  - Reconfigure SIO devices from EFI mode (polled) into traditional mode (interrupt driven).
+  - Shadow all PCI ROMs.
+  - Set up BDA and EBDA standard areas before the legacy boot.
+  - Construct the Compatibility16 boot memory map and pass it to the Compatibility16 code.
+  - Invoke the Compatibility16 table function Compatibility16PrepareToBoot(). This
+    invocation causes a thunk into the Compatibility16 code, which sets all appropriate internal
+    data structures. The boot device list is a parameter.
+  - Invoke the Compatibility16 Table function Compatibility16Boot(). This invocation
+    causes a thunk into the Compatibility16 code, which does an INT19.
+  - If the Compatibility16Boot() function returns, then the boot failed in a graceful
+    manner—i.e., EFI code is still valid. An ungraceful boot failure causes a reset because the state
+    of EFI code is unknown.
 
   @param  This                  Protocol instance pointer.
   @param  BootOption            EFI Device Path from BootXXXX variable.
   @param  LoadOptionSize        Size of LoadOption in size.
   @param  LoadOption            LoadOption from BootXXXX variable
 
-  @retval EFI_SUCCESS           Removable media not present
+  @retval EFI_DEVICE_ERROR      Failed to boot from any boot device and memory is uncorrupted.
+                                Note: This function normally never returns. It will either boot the
+                                OS or reset the system if memory has been "corrupted" by loading
+                                a boot sector and passing control to it.
 
 **/
 typedef
@@ -318,7 +347,11 @@ EFI_STATUS
   );
 
 /**
-  Update BDA with current Scroll, Num & Cap lock LEDS
+  This function takes the Leds input parameter and sets/resets the BDA accordingly. 
+  Leds is also passed to Compatibility16 code, in case any special processing is required. 
+  This function is normally called from EFI Setup drivers that handle userselectable
+  keyboard options such as boot with NUM LOCK on/off. This function does not
+  touch the keyboard or keyboard LEDs but only the BDA.
 
   @param  This                  Protocol instance pointer.
   @param  Leds                  Status of current Scroll, Num & Cap lock LEDS
@@ -326,7 +359,7 @@ EFI_STATUS
                                 Bit 1 is Num Lock
                                 Bit 2 is Caps Lock
 
-  @retval EFI_SUCCESS           Removable media not present
+  @retval EFI_SUCCESS           The BDA was updated successfully.
 
 **/
 typedef
@@ -343,7 +376,7 @@ EFI_STATUS
   @param  HddCount              Number of HDD_INFO structures
   @param  HddInfo               Onboard IDE controller information
   @param  BbsCount              Number of BBS_TABLE structures
-  @param  BbsTable              List BBS entries
+  @param  BbsTable              Point to List of BBS_TABLE
 
   @retval EFI_SUCCESS           Tables returned
 
@@ -390,7 +423,7 @@ EFI_STATUS
                                 caller must provide a pointer to the specific Service
                                 Area and not the start all Service Areas.
 
-  EFI_INVALID_PARAMETER if error. Does NOT return if no error.
+  @retval EFI_INVALID_PARAMETER if error. Does NOT return if no error.
 
 **/
 typedef
@@ -432,6 +465,7 @@ EFI_STATUS
   @param  LegacyMemoryAddress   Region Assigned
 
   @retval EFI_SUCCESS           Region assigned
+  @retval EFI_ACCESS_DENIED     The function was previously invoked.
   @retval Other                 Region not assigned
 
 **/
@@ -454,7 +488,7 @@ EFI_STATUS
                                 Note: must be in region assigned by
                                 LegacyBiosGetLegacyRegion
   @param  LegacyMemorySourceAddress
-                                Source of data
+                                Source of the data to copy.
 
   @retval EFI_SUCCESS           Region assigned
   @retval EFI_ACCESS_DENIED     Destination outside assigned region
