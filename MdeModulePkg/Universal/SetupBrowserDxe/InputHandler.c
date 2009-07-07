@@ -92,7 +92,7 @@ ReadString (
   //
   // Display prompt for string
   //
-  CreatePopUp (ScreenSize, 4, &NullCharacter, Prompt, Space, &NullCharacter);
+  CreateMultiStringPopUp (ScreenSize, 4, &NullCharacter, Prompt, Space, &NullCharacter);
 
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_BLACK, EFI_LIGHTGRAY));
 
