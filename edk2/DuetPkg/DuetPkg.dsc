@@ -150,7 +150,7 @@
   PcAtChipsetPkg/KbcResetDxe/Reset.inf
   DuetPkg/LegacyMetronome/Metronome.inf
 
-  PcAtChipsetPkg/PcRtc/RealTimeClock.inf
+  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
   DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
   DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
