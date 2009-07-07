@@ -55,5 +55,5 @@
   PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
   PcAtChipsetPkg/KbcResetDxe/Reset.inf
   PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
-  PcAtChipsetPkg/PcRtc/RealTimeClock.inf
+  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
