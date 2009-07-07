@@ -116,7 +116,7 @@ INF  IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 INF  PcAtChipsetPkg/KbcResetDxe/Reset.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  PcAtChipsetPkg\PcatRealTimeClockRuntimeDxe\PcatRealTimeClockRuntimeDxe.inf
-Use PcAtChipsetPkg\PcatRealTimeClockRuntimeDxe\PcatRealTimeClockRuntimeDxe.inf instead of original PcAtChipsetPkg\PcRtc\RealTimeClock.inf
+
 INF  MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
