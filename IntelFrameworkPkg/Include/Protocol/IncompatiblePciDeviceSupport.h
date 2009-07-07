@@ -24,8 +24,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  IncompatiblePciDeviceSupport.h
-
   @par Revision Reference:
   This protocol is defined in Framework of EFI PCI Platform Support Specification.
   Version 0.9.
@@ -65,8 +63,8 @@ EFI_STATUS
   IN  UINTN                                         VendorId,
   IN  UINTN                                         DeviceId,
   IN  UINTN                                         Revision,
-  IN  UINTN                                         SubVendorId,OPTIONAL
-  IN  UINTN                                         SubDeviceId,OPTIONAL
+  IN  UINTN                                         SubVendorId,
+  IN  UINTN                                         SubDeviceId,
   OUT VOID                                          **Configuration
 );
 
