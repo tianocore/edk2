@@ -1,5 +1,6 @@
 /** @file
-  This file declares Read-only Variable Service PPI
+  This file declares Read-only Variable Service PPI, which is required PPI by framework spec.
+
   These services provide a lightweight, read-only variant of the full EFI variable services. The
   reason that these services are read-only is to reduce the complexity of flash management. Also,
   some implementation of the PEI may use the same physical flash part for variable and PEIM
@@ -14,12 +15,6 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-  Module Name:  ReadOnlyVariable.h
-
-  @par Revision Reference:
-  This PPI is defined in PEI CIS
-  Version 0.91.
 
 **/
 
@@ -41,7 +36,6 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 #define EFI_VARIABLE_NON_VOLATILE       0x00000001
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
-#define EFI_VARIABLE_READ_ONLY          0x00000008
 
 /**
   Get Variable value by Name and GUID pair
@@ -105,10 +99,10 @@ EFI_STATUS
   IN OUT EFI_GUID                 *VendorGuid
   );
 
-/**
-  This PPI provides a lightweight, read-only variant of the full EFI
-  variable services.
-**/
+///
+/// This PPI provides a lightweight, read-only variant of the full EFI
+/// variable services.  
+///
 struct _EFI_PEI_READ_ONLY_VARIABLE_PPI {
   EFI_PEI_GET_VARIABLE            PeiGetVariable;         ///< A service to ascertain a given variable name.
   EFI_PEI_GET_NEXT_VARIABLE_NAME  PeiGetNextVariableName; ///< A service to ascertain a variable based upon a given, known variable
