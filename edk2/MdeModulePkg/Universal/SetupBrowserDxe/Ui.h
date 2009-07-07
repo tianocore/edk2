@@ -363,7 +363,7 @@ UiWaitForSingleEvent (
 
 **/
 VOID
-CreatePopUp (
+CreateMultiStringPopUp (
   IN  UINTN                       ScreenWidth,
   IN  UINTN                       NumberOfLines,
   ...

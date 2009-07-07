@@ -919,7 +919,7 @@ CreateSharedPopUp (
 
 **/
 VOID
-CreatePopUp (
+CreateMultiStringPopUp (
   IN  UINTN                       RequestedWidth,
   IN  UINTN                       NumberOfLines,
   ...
