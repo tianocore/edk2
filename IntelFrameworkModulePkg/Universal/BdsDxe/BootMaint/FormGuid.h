@@ -86,6 +86,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // End Label
 //
 #define LABEL_END   0xffff
+#define MAX_MENU_NUMBER 100
 
 ///
 /// This is the structure that will be used to store the
@@ -124,8 +125,8 @@ typedef struct {
   //
   // Driver Option Add Handle page storage
   //
-  UINT16  DriverAddHandleDesc[100];
-  UINT16  DriverAddHandleOptionalData[100];
+  UINT16  DriverAddHandleDesc[MAX_MENU_NUMBER];
+  UINT16  DriverAddHandleOptionalData[MAX_MENU_NUMBER];
   UINT8   DriverAddActive;
   UINT8   DriverAddForceReconnect;
 
@@ -142,19 +143,19 @@ typedef struct {
   //
   // At most 100 input/output/errorout device for console storage
   //
-  UINT8   ConsoleCheck[100];
+  UINT8   ConsoleCheck[MAX_MENU_NUMBER];
 
   //
   // Boot or Driver Option Order storage
   //
-  UINT8   OptionOrder[100];
-  UINT8   DriverOptionToBeDeleted[100];
+  UINT8   OptionOrder[MAX_MENU_NUMBER];
+  UINT8   DriverOptionToBeDeleted[MAX_MENU_NUMBER];
 
   //
   // Boot Option Delete storage
   //
-  UINT8   BootOptionDel[100];
-  UINT8   DriverOptionDel[100];
+  UINT8   BootOptionDel[MAX_MENU_NUMBER];
+  UINT8   DriverOptionDel[MAX_MENU_NUMBER];
 
   //
   // This is the Terminal Attributes value storage
@@ -168,11 +169,11 @@ typedef struct {
   //
   // Legacy Device Order Selection Storage
   //
-  UINT8   LegacyFD[100];
-  UINT8   LegacyHD[100];
-  UINT8   LegacyCD[100];
-  UINT8   LegacyNET[100];
-  UINT8   LegacyBEV[100];
+  UINT8   LegacyFD[MAX_MENU_NUMBER];
+  UINT8   LegacyHD[MAX_MENU_NUMBER];
+  UINT8   LegacyCD[MAX_MENU_NUMBER];
+  UINT8   LegacyNET[MAX_MENU_NUMBER];
+  UINT8   LegacyBEV[MAX_MENU_NUMBER];
 
   //
   // We use DisableMap array to record the enable/disable state of each boot device

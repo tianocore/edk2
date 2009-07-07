@@ -702,19 +702,17 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_IN_ID:
-    for (Index = 0; 
-         ((Index < ConsoleInpMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)))); 
-         Index++) {
+    for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
+	  ASSERT (Index < MAX_MENU_NUMBER);
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
-    for (Index = 0; 
-         ((Index < TerminalMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8) - ConsoleInpMenu.MenuNumber))); 
-         Index++) {
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+	  ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
       NewTerminalContext->IsConIn = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleInpMenu.MenuNumber];
     }
 
@@ -722,19 +720,17 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_OUT_ID:
-    for (Index = 0; 
-         ((Index < ConsoleOutMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)))); 
-         Index++) {
+    for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
+	  ASSERT (Index < MAX_MENU_NUMBER);
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
-    for (Index = 0; 
-         ((Index < TerminalMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8) - ConsoleOutMenu.MenuNumber))); 
-         Index++) {
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
       NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+	  ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
       NewTerminalContext->IsConOut  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleOutMenu.MenuNumber];
     }
 
@@ -742,20 +738,17 @@ ApplyChangeHandler (
     break;
 
   case FORM_CON_ERR_ID:
-    ASSERT ((ConsoleErrMenu.MenuNumber + TerminalMenu.MenuNumber) <= (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)));
-    for (Index = 0; 
-         ((Index < ConsoleErrMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8)))); 
-         Index++) {
+    for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++) {
       NewMenuEntry                = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
       NewConsoleContext           = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
+	  ASSERT (Index < MAX_MENU_NUMBER);
       NewConsoleContext->IsActive = CurrentFakeNVMap->ConsoleCheck[Index];
     }
 
-    for (Index = 0; 
-         ((Index < TerminalMenu.MenuNumber) && (Index < (sizeof (CurrentFakeNVMap->ConsoleCheck) / sizeof (UINT8) - ConsoleErrMenu.MenuNumber))); 
-         Index++) {
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
       NewMenuEntry                  = BOpt_GetMenuEntry (&TerminalMenu, Index);
       NewTerminalContext            = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+	  ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
       NewTerminalContext->IsStdErr  = CurrentFakeNVMap->ConsoleCheck[Index + ConsoleErrMenu.MenuNumber];
     }
 
