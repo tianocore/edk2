@@ -734,7 +734,7 @@ typedef struct {
 #define EFI_CACHE_SUBCLASS_VERSION    0x00010000
 
 typedef EFI_EXP_BASE2_DATA          EFI_CACHE_SIZE_DATA;
-typedef EFI_EXP_BASE2_DATA          EFI_MAXIMUM_CACHE_SIZE_DATA;
+typedef EFI_EXP_BASE2_DATA          EFI_CACHE_MAXIMUM_SIZE_DATA;
 typedef EFI_EXP_BASE10_DATA         EFI_CACHE_SPEED_DATA;
 typedef STRING_REF                  EFI_CACHE_SOCKET_DATA;
 
@@ -837,7 +837,7 @@ typedef enum {
 
 typedef union {
   EFI_CACHE_SIZE_DATA                         CacheSize;
-  EFI_MAXIMUM_CACHE_SIZE_DATA                 MaximumCacheSize;
+  EFI_CACHE_MAXIMUM_SIZE_DATA                 MaximumCacheSize;
   EFI_CACHE_SPEED_DATA                        CacheSpeed;
   EFI_CACHE_SOCKET_DATA                       CacheSocket;
   EFI_CACHE_SRAM_TYPE_DATA                    CacheSramType;
