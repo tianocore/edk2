@@ -50,7 +50,7 @@ ShellCEntryLib (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  INT32                         ReturnFromMain;
+  INTN                           ReturnFromMain;
   EFI_SHELL_PARAMETERS_PROTOCOL *EfiShellParametersProtocol;
   EFI_SHELL_INTERFACE           *EfiShellInterface;
   EFI_STATUS                    Status;
