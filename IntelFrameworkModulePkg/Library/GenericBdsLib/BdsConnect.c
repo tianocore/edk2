@@ -191,12 +191,14 @@ BdsLibConnectDevicePath (
 
 
 /**
-  This function will connect all current system handles recursively. The
-  connection will finish until every handle's child handle created if it have.
+  This function will connect all current system handles recursively. 
+  
+  gBS->ConnectController() service is invoked for each handle exist in system handler buffer.
+  If the handle is bus type handler, all childrens also will be connected recursively
+  by gBS->ConnectController().
 
-  @retval EFI_SUCCESS           All handles and it's child handle have been
-                                connected
-  @retval EFI_STATUS            Return the status of gBS->LocateHandleBuffer().
+  @retval EFI_SUCCESS           All handles and it's child handle have been connected
+  @retval EFI_STATUS            Error status returned by of gBS->LocateHandleBuffer().
 
 **/
 EFI_STATUS
@@ -232,13 +234,15 @@ BdsLibConnectAllEfi (
   return EFI_SUCCESS;
 }
 
-
 /**
-  This function will disconnect all current system handles. The disconnection
-  will finish until every handle have been disconnected.
+  This function will disconnect all current system handles. 
+  
+  gBS->DisconnectController() is invoked for each handle exists in system handle buffer.
+  If handle is a bus type handle, all childrens also are disconnected recursively by
+  gBS->DisconnectController().
 
   @retval EFI_SUCCESS           All handles have been disconnected
-  @retval EFI_STATUS            Return the status of gBS->LocateHandleBuffer().
+  @retval EFI_STATUS            Error status returned by of gBS->LocateHandleBuffer().
 
 **/
 EFI_STATUS
