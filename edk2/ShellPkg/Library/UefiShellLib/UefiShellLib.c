@@ -79,9 +79,7 @@ ShellFindSE2 (
   //
   // look for the mEfiShellEnvironment2 protocol at a higher level
   //
-  if (EFI_ERROR (Status) || !(CompareGuid (&mEfiShellEnvironment2->SESGuid, &gEfiShellEnvironment2ExtGuid) != FALSE &&
-     (mEfiShellEnvironment2->MajorVersion > EFI_SHELL_MAJOR_VER ||
-     (mEfiShellEnvironment2->MajorVersion == EFI_SHELL_MAJOR_VER && mEfiShellEnvironment2->MinorVersion >= EFI_SHELL_MINOR_VER)))) {
+  if (EFI_ERROR (Status) || !(CompareGuid (&mEfiShellEnvironment2->SESGuid, &gEfiShellEnvironment2ExtGuid) != FALSE)){
     //
     // figure out how big of a buffer we need.
     //
@@ -113,9 +111,7 @@ ShellFindSE2 (
                                    NULL,
                                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
                                    );
-         if (CompareGuid (&mEfiShellEnvironment2->SESGuid, &gEfiShellEnvironment2ExtGuid) != FALSE &&
-          (mEfiShellEnvironment2->MajorVersion > EFI_SHELL_MAJOR_VER ||
-          (mEfiShellEnvironment2->MajorVersion == EFI_SHELL_MAJOR_VER && mEfiShellEnvironment2->MinorVersion >= EFI_SHELL_MINOR_VER))) {
+         if (CompareGuid (&mEfiShellEnvironment2->SESGuid, &gEfiShellEnvironment2ExtGuid) != FALSE) {
           mEfiShellEnvironment2Handle = Buffer[HandleIndex];
           Status = EFI_SUCCESS;
           break;
@@ -1484,9 +1480,13 @@ InternalIsOnCheckList (
   //
   for (TempListItem = (SHELL_PARAM_ITEM*)CheckList ; TempListItem->Name != NULL ; TempListItem++) {
     //
-    // If the Name matches set the type and return TRUE
+    // If the Type is TypeStart only check the first characters of the passed in param
+    // If it matches set the type and return TRUE
     //
-    if (StrCmp(Name, TempListItem->Name) == 0) {
+    if (TempListItem->Type == TypeStart && StrnCmp(Name, TempListItem->Name, StrLen(TempListItem->Name)) == 0) {
+      *Type = TempListItem->Type;
+      return (TRUE);
+    } else if (StrCmp(Name, TempListItem->Name) == 0) {
       *Type = TempListItem->Type;
       return (TRUE);
     }
@@ -1767,7 +1767,10 @@ ShellCommandLineFreeVarList (
   //
   // for each node in the list
   //
-  for (Node = GetFirstNode(CheckPackage); Node != CheckPackage ; Node = GetFirstNode(CheckPackage)) {
+  for ( Node = GetFirstNode(CheckPackage)
+      ; Node != CheckPackage 
+      ; Node = GetFirstNode(CheckPackage)
+      ){
     //
     // Remove it from the list
     //
@@ -1835,12 +1838,22 @@ ShellCommandLineGetFlag (
   //
   // enumerate through the list of parametrs
   //
-  for (Node = GetFirstNode(CheckPackage) ; !IsNull (CheckPackage, Node) ; Node = GetNextNode(CheckPackage, Node) ) {
+  for ( Node = GetFirstNode(CheckPackage) 
+      ; !IsNull (CheckPackage, Node) 
+      ; Node = GetNextNode(CheckPackage, Node) 
+      ){
     //
     // If the Name matches, return TRUE (and there may be NULL name)
     //
     if (((SHELL_PARAM_PACKAGE*)Node)->Name != NULL) {
-      if (StrCmp(KeyString, ((SHELL_PARAM_PACKAGE*)Node)->Name) == 0) {
+      //
+      // If Type is TypeStart then only compare the begining of the strings
+      //
+      if ( ((SHELL_PARAM_PACKAGE*)Node)->Type == TypeStart 
+        && StrnCmp(KeyString, ((SHELL_PARAM_PACKAGE*)Node)->Name, StrLen(KeyString)) == 0
+        ){
+        return (TRUE);
+      } else if (StrCmp(KeyString, ((SHELL_PARAM_PACKAGE*)Node)->Name) == 0) {
         return (TRUE);
       }
     }
@@ -1879,12 +1892,28 @@ ShellCommandLineGetValue (
   //
   // enumerate through the list of parametrs
   //
-  for (Node = GetFirstNode(CheckPackage) ; !IsNull (CheckPackage, Node) ; Node = GetNextNode(CheckPackage, Node) ) {
+  for ( Node = GetFirstNode(CheckPackage) 
+      ; !IsNull (CheckPackage, Node) 
+      ; Node = GetNextNode(CheckPackage, Node) 
+      ){
     //
     // If the Name matches, return the value (name can be NULL)
     //
     if (((SHELL_PARAM_PACKAGE*)Node)->Name != NULL) {
-      if (StrCmp(KeyString, ((SHELL_PARAM_PACKAGE*)Node)->Name) == 0) {
+      //
+      // If Type is TypeStart then only compare the begining of the strings
+      //
+      if ( ((SHELL_PARAM_PACKAGE*)Node)->Type == TypeStart 
+        && StrnCmp(KeyString, ((SHELL_PARAM_PACKAGE*)Node)->Name, StrLen(KeyString)) == 0
+        ){
+        //
+        // return the string part after the flag
+        //
+        return (((SHELL_PARAM_PACKAGE*)Node)->Name + StrLen(KeyString));
+      } else if (StrCmp(KeyString, ((SHELL_PARAM_PACKAGE*)Node)->Name) == 0) {
+        //
+        // return the value
+        //
         return (((SHELL_PARAM_PACKAGE*)Node)->Value);
       }
     }
@@ -1981,7 +2010,7 @@ CopyReplace(
   while (*SourceString != L'\0') {
     if (StrnCmp(SourceString, FindTarget, StrLen(FindTarget)) == 0) {
       SourceString += StrLen(FindTarget);
-      if (StrSize(NewString) + (StrLen(ReplaceWith)*sizeof(CHAR16)) > NewSize) {
+      if ((StrSize(NewString) + (StrLen(ReplaceWith)*sizeof(CHAR16))) > NewSize) {
         return (EFI_BUFFER_TOO_SMALL);
       }
       StrCat(NewString, ReplaceWith);

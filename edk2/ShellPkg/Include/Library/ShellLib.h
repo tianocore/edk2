@@ -47,7 +47,7 @@ ShellGetFileInfo (
 
   @param  FileInfo              The infotmation to set.
 
-  @retval EFI_SUCCESS		        The information was set.
+  @retval EFI_SUCCESS	          The information was set.
   @retval EFI_UNSUPPORTED       The InformationType is not known.
   @retval EFI_NO_MEDIA		      The device has no medium.
   @retval EFI_DEVICE_ERROR	    The device reported an error.
@@ -115,22 +115,22 @@ ShellOpenFileByDevicePath(
   @param  OpenMode		  the mode to open the file with.
   @param  Attributes		the file's file attributes.
 
-  @retval EFI_SUCCESS		The information was set.
+  @retval EFI_SUCCESS		        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	Could not open the file path.	
+  @retval EFI_UNSUPPORTED	      Could not open the file path.	
   @retval EFI_NOT_FOUND	        The specified file could not be found on the 
                                 device or the file system could not be found 
                                 on the device.
-  @retval EFI_NO_MEDIA		The device has no medium.
-  @retval EFI_MEDIA_CHANGED	The device has a different medium in it or the 
+  @retval EFI_NO_MEDIA		      The device has no medium.
+  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the 
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	The device reported an error.
+  @retval EFI_DEVICE_ERROR	    The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	The file was opened read only.
+  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED	    The file was opened read only.
   @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the 
                                 file.
-  @retval EFI_VOLUME_FULL	The volume is full.
+  @retval EFI_VOLUME_FULL	      The volume is full.
 **/
 EFI_STATUS
 EFIAPI
@@ -157,16 +157,16 @@ ShellOpenFileByName(
   @retval EFI_NOT_FOUND	        The specified file could not be found on the 
                                 device or the file system could not be found 
                                 on the device.
-  @retval EFI_NO_MEDIA		The device has no medium.
-  @retval EFI_MEDIA_CHANGED	The device has a different medium in it or the 
+  @retval EFI_NO_MEDIA		      The device has no medium.
+  @retval EFI_MEDIA_CHANGED	    The device has a different medium in it or the 
                                 medium is no longer supported.
-  @retval EFI_DEVICE_ERROR	The device reported an error.
+  @retval EFI_DEVICE_ERROR	    The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED	The file was opened read only.
+  @retval EFI_WRITE_PROTECTED	  The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED	    The file was opened read only.
   @retval EFI_OUT_OF_RESOURCES	Not enough resources were available to open the 
                                 file.
-  @retval EFI_VOLUME_FULL	The volume is full.
+  @retval EFI_VOLUME_FULL	      The volume is full.
 **/
 EFI_STATUS
 EFIAPI
@@ -198,11 +198,11 @@ ShellCreateDirectory(
 
   @param Buffer                 the buffer to put read data into.
 
- @retval EFI_SUCCESS	        Data was read.
- @retval EFI_NO_MEDIA	        The device has no media.
- @retval EFI_DEVICE_ERROR	The device reported an error.
- @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
- @retval EFI_BUFFER_TO_SMALL	Buffer is too small. ReadSize contains required 
+ @retval EFI_SUCCESS	          Data was read.
+ @retval EFI_NO_MEDIA	          The device has no media.
+ @retval EFI_DEVICE_ERROR	      The device reported an error.
+ @retval EFI_VOLUME_CORRUPTED	  The file system structures are corrupted.
+ @retval EFI_BUFFER_TO_SMALL	  Buffer is too small. ReadSize contains required 
                                 size.
 
 **/
@@ -232,13 +232,13 @@ ShellReadFile(
   @param Buffer                 the buffer containing data to write is stored.
 
  @retval EFI_SUCCESS	        Data was written.
- @retval EFI_UNSUPPORTED	Writes to an open directory are not supported.
+ @retval EFI_UNSUPPORTED	    Writes to an open directory are not supported.
  @retval EFI_NO_MEDIA	        The device has no media.
- @retval EFI_DEVICE_ERROR	The device reported an error.
+ @retval EFI_DEVICE_ERROR	    The device reported an error.
  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
  @retval EFI_WRITE_PROTECTED	The device is write-protected.
- @retval EFI_ACCESS_DENIED	The file was open for read only.
- @retval EFI_VOLUME_FULL	The volume is full.
+ @retval EFI_ACCESS_DENIED	  The file was open for read only.
+ @retval EFI_VOLUME_FULL	    The volume is full.
 **/
 EFI_STATUS
 EFIAPI
@@ -606,6 +606,7 @@ typedef enum {
   TypeFlag  = 0,
   TypeValue,
   TypePosition,
+  TypeStart,
   TypeMax,
 } ParamType;
 
