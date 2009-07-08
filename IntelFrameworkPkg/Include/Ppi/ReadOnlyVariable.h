@@ -37,6 +37,7 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
 
+
 /**
   Get Variable value by Name and GUID pair
 
@@ -104,8 +105,8 @@ EFI_STATUS
 /// variable services.  
 ///
 struct _EFI_PEI_READ_ONLY_VARIABLE_PPI {
-  EFI_PEI_GET_VARIABLE            PeiGetVariable;         ///< A service to ascertain a given variable name.
-  EFI_PEI_GET_NEXT_VARIABLE_NAME  PeiGetNextVariableName; ///< A service to ascertain a variable based upon a given, known variable
+  EFI_PEI_GET_VARIABLE            GetVariable;         ///< A service to ascertain a given variable name.
+  EFI_PEI_GET_NEXT_VARIABLE_NAME  GetNextVariableName; ///< A service to ascertain a variable based upon a given, known variable
 };
 
 extern EFI_GUID gEfiPeiReadOnlyVariablePpiGuid;
