@@ -18,6 +18,24 @@
 
 #include <PiPei.h>
 #include <Ppi/PciCfg.h>
+//
+// Framework PEI Specification Revision information
+//
+#define FRAMEWORK_PEI_SPECIFICATION_MAJOR_REVISION    0
+#define FRAMEWORK_PEI_SPECIFICATION_MINOR_REVISION    91
+
+///
+/// Inconsistent with specification here: 
+/// In Framework Spec, PeiCis0.91, FRAMEWORK_PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 
+/// to pass multiple tool chain, it is append a ULL.
+///
+//
+// PEI services signature and Revision defined in Framework PEI spec
+//
+#define FRAMEWORK_PEI_SERVICES_SIGNATURE               0x5652455320494550ULL
+#define FRAMEWORK_PEI_SERVICES_REVISION               ((FRAMEWORK_PEI_SPECIFICATION_MAJOR_REVISION<<16) | (FRAMEWORK_PEI_SPECIFICATION_MINOR_REVISION))
+
+
 
 typedef struct _FRAMEWORK_EFI_PEI_SERVICES FRAMEWORK_EFI_PEI_SERVICES;
 
@@ -156,6 +174,7 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
   EFI_PEI_COPY_MEM                  CopyMem;
   EFI_PEI_SET_MEM                   SetMem;
   //
+  // (the following interfaces are installed by publishing PEIM)
   // Status Code
   //
   EFI_PEI_REPORT_STATUS_CODE        ReportStatusCode;
@@ -164,13 +183,29 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
   //
   EFI_PEI_RESET_SYSTEM              ResetSystem;
   //
-  // (the following interfaces are installed by publishing PEIM)
-  //
   // I/O Abstractions
   //
   EFI_PEI_CPU_IO_PPI                *CpuIo;
   EFI_PEI_PCI_CFG_PPI               *PciCfg;
 };
+///
+/// Enumeration of reset types defined in Framework Spec PeiCis
+///
+typedef enum {
+  ///
+  /// Used to induce a system-wide reset. This sets all circuitry within the 
+  /// system to its initial state.  This type of reset is asynchronous to system
+  /// operation and operates withgout regard to cycle boundaries.  EfiColdReset 
+  /// is tantamount to a system power cycle.
+  ///
+  EfiPeiResetCold,
+  ///
+  /// Used to induce a system-wide initialization. The processors are set to their
+  /// initial state, and pending cycles are not corrupted.  If the system does 
+  /// not support this reset type, then an EfiResetCold must be performed.
+  ///
+  EfiPeiResetWarm,
+} EFI_PEI_RESET_TYPE;
 
 #endif  
 
