@@ -997,6 +997,10 @@ typedef enum _EFI_MEMORY_FORM_FACTOR {
   EfiMemoryFormFactorRimm                     = 0x0C,
   EfiMemoryFormFactorSodimm                   = 0x0D,
   EfiMemoryFormFactorSrimm                    = 0x0E,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiMemoryFormFactorFbDimm                   = 0x0F
 } EFI_MEMORY_FORM_FACTOR;
 
@@ -1019,7 +1023,15 @@ typedef enum _EFI_MEMORY_ARRAY_TYPE {
   EfiMemoryTypeSgram                          = 0x10,
   EfiMemoryTypeRdram                          = 0x11,
   EfiMemoryTypeDdr                            = 0x12,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiMemoryTypeDdr2                           = 0x13,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiMemoryTypeDdr2FbDimm                     = 0x14
 } EFI_MEMORY_ARRAY_TYPE;
 
@@ -1047,6 +1059,10 @@ typedef enum {
   EfiMemoryStateError        = 3,
   EfiMemoryStateAbsent       = 4,
   EfiMemoryStateDisabled     = 5,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiMemoryStatePartial      = 6
 } EFI_MEMORY_STATE;
 
@@ -1126,7 +1142,7 @@ typedef struct {
   /// The memory speed in megahertz (MHz). A value of 0x00 denotes that 
   /// the speed is unknown.
   ///
-  EFI_EXP_BASE10_DATA               MemorySpeed;
+  EFI_EXP_BASE10_DATA               MemoryTypeSpeed;
   ///
   /// The memory state. 
   ///
