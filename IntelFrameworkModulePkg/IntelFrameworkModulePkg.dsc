@@ -153,7 +153,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
-
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE
+  
 [PcdsDynamicDefault.PEIM.DEFAULT]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
 

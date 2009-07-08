@@ -109,6 +109,7 @@ typedef struct {
   BOOLEAN                                HardwareFlowControl;
   EFI_UART_TYPE                          Type;
   EFI_UNICODE_STRING_TABLE               *ControllerNameTable;
+  BOOLEAN                                UseHalfHandshake;
 } SERIAL_DEV;
 
 #define SERIAL_DEV_FROM_THIS(a) CR (a, SERIAL_DEV, SerialIo, SERIAL_DEV_SIGNATURE)
