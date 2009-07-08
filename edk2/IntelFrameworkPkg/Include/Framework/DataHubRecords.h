@@ -28,7 +28,7 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/FrameworkHii.h>
 
-#define EFI_PROCESSOR_SUBCLASS_VERSION    0x00010000
+#define EFI_PROCESSOR_SUBCLASS_VERSION    0x0100
 
 #pragma pack(1)
 
@@ -131,12 +131,6 @@ typedef union _EFI_MISC_PORT_DEVICE_PATH {
 } EFI_MISC_PORT_DEVICE_PATH;
 
 #pragma pack()
-
-//
-// String Token Definition
-//
-#define EFI_STRING_TOKEN          UINT16
-
 ///
 /// Each data record that is a member of some subclass starts with a standard 
 /// header of type EFI_SUBCLASS_TYPE1_HEADER.
@@ -229,11 +223,11 @@ typedef struct {
   ///
   /// The INT16 number by which to multiply the base-2 representation.
   ///
-  UINT16                            Value;
+  INT16                            Value;
   ///
   /// The INT16 number by which to raise the base-2 calculation. 
   ///
-  UINT16                            Exponent;
+  INT16                            Exponent;
 } EFI_EXP_BASE10_DATA;
 
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_MAX_CORE_FREQUENCY_DATA;
@@ -277,10 +271,10 @@ typedef struct {
 } EFI_PROCESSOR_SIGNATURE;
 
 typedef struct {
-  UINT32                            ProcessorBrandIndex :8;
-  UINT32                            ProcessorClflush    :8;
-  UINT32                            ProcessorReserved   :8;
-  UINT32                            ProcessorDfltApicId :8;
+  UINT32                            ProcessorBrandIndex    :8;
+  UINT32                            ProcessorClflush       :8;
+  UINT32                            LogicalProcessorCount  :8;
+  UINT32                            ProcessorDfltApicId    :8;
 } EFI_PROCESSOR_MISC_INFO;
 
 typedef struct {
@@ -421,6 +415,10 @@ typedef enum {
   EfiProcessorFamilyUltraSparcII           = 0x55,
   EfiProcessorFamilyUltraSparcIIi          = 0x56,
   EfiProcessorFamilyUltraSparcIII          = 0x57,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field in ProcSubClass spec0.9 is defined as EfiProcessorFamilyUltraSparcIIi, it's a typo.
+  ///
   EfiProcessorFamilyUltraSparcIIIi         = 0x58,
   EfiProcessorFamily68040                  = 0x60,
   EfiProcessorFamily68xxx                  = 0x61,
@@ -458,25 +456,85 @@ typedef enum {
   EfiProcessorFamilyAMDAthlonXP            = 0xB6,
   EfiProcessorFamilyAMDAthlonMP            = 0xB7,
   EfiProcessorFamilyIntelItanium2          = 0xB8,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyIntelPentiumM          = 0xB9,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyIntelCeleronD          = 0xBA,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyIntelPentiumD          = 0xBB,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyIntelPentiumEx         = 0xBC,
-  EfiProcessorFamilyIntelCoreSolo          = 0xBD,  ///< SMBIOS spec 2.6 correct this value
-  EfiProcessorFamilyReserved               = 0xBE,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
+  EfiProcessorFamilyIntelCoreSolo          = 0xBD,  
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
+  EfiProcessorFamilyReserved               = 0xBE,  
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyIntelCore2             = 0xBF,
   EfiProcessorFamilyIBM390                 = 0xC8,
   EfiProcessorFamilyG4                     = 0xC9,
   EfiProcessorFamilyG5                     = 0xCA,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyG6                     = 0xCB,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyzArchitectur           = 0xCC,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyViaC7M                 = 0xD2,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyViaC7D                 = 0xD3,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyViaC7                  = 0xD4,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyViaEden                = 0xD5,
   EfiProcessorFamilyi860                   = 0xFA,
   EfiProcessorFamilyi960                   = 0xFB,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyIndicatorFamily2       = 0xFE,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorFamilyReserved1              = 0xFF
 } EFI_PROCESSOR_FAMILY_DATA;
 
@@ -565,15 +623,31 @@ typedef enum {
   EfiProcessorSocket478              = 0xF,
   EfiProcessorSocket754              = 0x10,
   EfiProcessorSocket940              = 0x11,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorSocket939              = 0x12,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorSocketmPGA604          = 0x13,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorSocketLGA771           = 0x14,
+  ///
+  /// Inconsistent with specification here:  
+  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  ///
   EfiProcessorSocketLGA775           = 0x15
 
 } EFI_PROCESSOR_SOCKET_TYPE_DATA;
 
 typedef STRING_REF                  EFI_PROCESSOR_SOCKET_NAME_DATA;
-typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
+typedef EFI_INTER_LINK_DATA         EFI_PROCESSOR_CACHE_ASSOCIATION_DATA;
 
 ///
 /// This data record refers to the health status of the processor. 
@@ -582,7 +656,7 @@ typedef enum {
   EfiProcessorHealthy        = 1,
   EfiProcessorPerfRestricted = 2,
   EfiProcessorFuncRestricted = 3 
-} EFI_PROCESSOR_HEALTH_STATUS;
+} EFI_PROCESSOR_HEALTH_STATUS_DATA;
 
 ///
 /// This data record refers to the package number of this processor. Multiple logical processors can 
@@ -640,7 +714,7 @@ typedef union {
   EFI_PROCESSOR_SOCKET_TYPE_DATA          ProcessorSocketType;
   EFI_PROCESSOR_SOCKET_NAME_DATA          ProcessorSocketName;
   EFI_PROCESSOR_ASSET_TAG_DATA            ProcessorAssetTag;
-  EFI_PROCESSOR_HEALTH_STATUS             ProcessorHealthStatus;
+  EFI_PROCESSOR_HEALTH_STATUS_DATA        ProcessorHealthStatus;
   EFI_PROCESSOR_PACKAGE_NUMBER_DATA       ProcessorPackageNumber;
 } EFI_CPU_VARIABLE_RECORD;
 
@@ -750,17 +824,17 @@ typedef enum {
 
 
 typedef union {
-  EFI_CACHE_SIZE_DATA               CacheSize;
-  EFI_MAXIMUM_CACHE_SIZE_DATA       MaximumCacheSize;
-  EFI_CACHE_SPEED_DATA              CacheSpeed;
-  EFI_CACHE_SOCKET_DATA             CacheSocket;
-  EFI_CACHE_SRAM_TYPE_DATA          CacheSramType;
-  EFI_CACHE_SRAM_TYPE_DATA          CacheInstalledSramType;
-  EFI_CACHE_ERROR_TYPE_DATA         CacheErrorType;
-  EFI_CACHE_TYPE_DATA               CacheType;
-  EFI_CACHE_ASSOCIATIVITY_DATA      CacheAssociativity;
-  EFI_CACHE_CONFIGURATION_DATA      CacheConfig;
-  EFI_CACHE_ASSOCIATION_DATA        CacheAssociation;
+  EFI_CACHE_SIZE_DATA                         CacheSize;
+  EFI_MAXIMUM_CACHE_SIZE_DATA                 MaximumCacheSize;
+  EFI_CACHE_SPEED_DATA                        CacheSpeed;
+  EFI_CACHE_SOCKET_DATA                       CacheSocket;
+  EFI_CACHE_SRAM_TYPE_DATA                    CacheSramType;
+  EFI_CACHE_SRAM_TYPE_DATA                    CacheInstalledSramType;
+  EFI_CACHE_ERROR_TYPE_DATA                   CacheErrorType;
+  EFI_CACHE_TYPE_DATA                         CacheType;
+  EFI_CACHE_ASSOCIATIVITY_DATA                CacheAssociativity;
+  EFI_CACHE_CONFIGURATION_DATA                CacheConfig;
+  EFI_PROCESSOR_CACHE_ASSOCIATION_DATA        CacheAssociation;
 } EFI_CACHE_VARIABLE_RECORD;
 
 typedef struct {
