@@ -84,7 +84,7 @@ InstallProcessorDataHub (
   //
   // Record Type 1
   //
-  DataRecord.DataRecordHeader.RecordType = ProcessorCoreFrequencyRecordType;
+  DataRecord.DataRecordHeader.RecordType = EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER;
   DataRecord.VariableRecord.ProcessorCoreFrequency.Value = SmbiosTable.Type4->CurrentSpeed;
   DataRecord.VariableRecord.ProcessorCoreFrequency.Exponent = 6;
 
@@ -112,7 +112,7 @@ InstallProcessorDataHub (
   }
   gBS->FreePool (UString);
 
-  DataRecord.DataRecordHeader.RecordType = ProcessorVersionRecordType;
+  DataRecord.DataRecordHeader.RecordType = EFI_PROCESSOR_VERSION_RECORD_NUMBER;
   DataRecord.VariableRecord.ProcessorVersion  = Token;
 
   Status = gDataHub->LogData (
