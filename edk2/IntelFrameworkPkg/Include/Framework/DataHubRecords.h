@@ -1636,6 +1636,11 @@ typedef enum {
 } EFI_MISC_CHASSIS_TYPE;
 
 typedef struct {
+  ///
+  /// Inconsistent with specification here:  
+  /// It's a typo of MiscSubclass 0.9 spec. It should be a variable
+  /// name "ChassisType" rather than a type "EFI_MISC_CHASSIS_TYPE".
+  ///
   UINT32                            ChassisType       :16;
   UINT32                            ChassisLockPresent:1;
   UINT32                            Reserved          :15;
