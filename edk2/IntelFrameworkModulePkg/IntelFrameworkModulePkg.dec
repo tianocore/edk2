@@ -143,6 +143,9 @@
   #  The default value in DxePhase is 128 KBytes.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
 
+  ## This PCD specifies whether Serial device use half hand shake.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010043
+
 [PcdsDynamic]
   ## PCD is used to mark if the machine has complete one boot cycle before.
   #  After the complete boot, the variable BootState will be set to TRUE. 
