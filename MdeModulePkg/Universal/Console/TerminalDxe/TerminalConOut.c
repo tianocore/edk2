@@ -82,6 +82,7 @@ CHAR16 mSetModeString[]            = { ESC, '[', '=', '3', 'h', 0 };
 CHAR16 mSetAttributeString[]       = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
 CHAR16 mClearScreenString[]        = { ESC, '[', '2', 'J', 0 };
 CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
+CHAR16 mCrLfString[]               = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
 //
 // Body of the ConOut functions
@@ -309,6 +310,15 @@ TerminalConOutOutputString (
         Mode->CursorColumn = 0;
         if (Mode->CursorRow < (INT32) (MaxRow - 1)) {
           Mode->CursorRow++;
+        } else {
+          //
+          // Cursor has reached at MaxRow and MaxColumn,
+          // output carriage return and line feed to scroll screen
+          // when string is not control string.
+          //
+          if (!TerminalDevice->OutputEscChar) {
+            This->OutputString (This, mCrLfString);
+          }
         }
 
       }
