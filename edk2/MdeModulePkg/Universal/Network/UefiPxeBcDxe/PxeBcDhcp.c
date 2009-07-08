@@ -37,8 +37,6 @@ UINT8 mInterestedDhcp4Tags[PXEBC_DHCP4_TAG_INDEX_MAX] = {
   @param  Seed    Pointer to the message instance of the DHCP4 packet.
   @param  Udp4    Pointer to the EFI_UDP4_PROTOCOL instance.
 
-  @return none.
-
 **/
 VOID
 PxeBcInitSeedPacket (
@@ -73,8 +71,6 @@ PxeBcInitSeedPacket (
   @param  Dst   Pointer to the EFI_DHCP4_PROTOCOL instance.
   @param  Src   Pointer to the EFI_DHCP4_PROTOCOL instance.
 
-  @return None.
-
 **/
 VOID
 PxeBcCopyEfiDhcp4Packet (
@@ -96,8 +92,6 @@ PxeBcCopyEfiDhcp4Packet (
   @param  OfferIndex    Index of cached packets as complements of pxe mode data,
                         the index is maximum offer number.
 
-  @return None.
-
 **/
 VOID
 PxeBcCopyProxyOffer (
@@ -109,6 +103,7 @@ PxeBcCopyProxyOffer (
   EFI_DHCP4_PACKET        *Offer;
 
   ASSERT (OfferIndex < Private->NumOffers);
+  ASSERT (OfferIndex < PXEBC_MAX_OFFER_NUM);
 
   Mode  = Private->PxeBc.Mode;
   Offer = &Private->Dhcp4Offers[OfferIndex].Packet.Offer;
@@ -532,8 +527,6 @@ PxeBcCheckSelectedOffer (
   @param  Private    Pointer to PxeBc private data.
   @param  RcvdOffer  Pointer to the received Dhcp proxy offer packet.
 
-  @return None.
-
 **/
 VOID
 PxeBcCacheDhcpOffer (
@@ -623,8 +616,6 @@ PxeBcCacheDhcpOffer (
   If the proxy does not exist, try offers with bootfile.
   
   @param  Private   Pointer to PxeBc private data.
-
-  @return None
 
 **/
 VOID
@@ -1464,8 +1455,6 @@ PxeBcParseVendorOptions (
    
   @param  Str     Pointer to a string (boot item string).
   @param  Len     The length of string.
-
-  @return None.
 
 **/
 VOID
