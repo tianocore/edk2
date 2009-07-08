@@ -355,8 +355,12 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The modes were accepted without any errors.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
-                                Or Device is invalid, 
-                                Or IdentifyData is NULL.
+                                Or Device is invalid.
+                                
+  @note: Inconsistent with specification here:  
+         Framework Spec IdeCont defined another case to return EFI_INVALID_PARAMETER when
+         IdentifyData is NULL. However in the function there is no parameter named IdentifyData.
+         So that should be a typo error in spec.
 
 **/
 typedef
