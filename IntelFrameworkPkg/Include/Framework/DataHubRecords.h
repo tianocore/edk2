@@ -1549,8 +1549,6 @@ typedef struct {
 
 #define EFI_MISC_SUBCLASS_VERSION     0x0100
 
-#pragma pack(1)
-
 //
 // Last PCI Bus Number
 //
@@ -2694,8 +2692,6 @@ typedef struct {
   EFI_SUBCLASS_TYPE1_HEADER         Header;
   EFI_MISC_SUBCLASS_RECORDS         Record;
 } EFI_MISC_SUBCLASS_DRIVER_DATA;
-
-#pragma pack()
 
 ///
 /// Inconsistent with specification here:  
