@@ -247,6 +247,9 @@ typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_CORE_FREQUENCY_DATA;
 /// The list is terminated by -1 in the Value field of the last element. A Value field of zero means 
 /// that the processor/driver supports automatic frequency selection. 
 ///
+/// Inconsistent with specification here:  
+/// It's a typo of MiscSubclass 0.9 spec. It should be a pointer since it refers to a list of frequencies.
+///
 typedef EFI_EXP_BASE10_DATA        *EFI_PROCESSOR_CORE_FREQUENCY_LIST_DATA;
 
 ///
