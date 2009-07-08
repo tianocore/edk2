@@ -452,19 +452,19 @@ RouteConfig (
   DRIVER_SAMPLE_PRIVATE_DATA       *PrivateData;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
 
-  if (Configuration == NULL) {
+  if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
   HiiConfigRouting = PrivateData->HiiConfigRouting;
+  *Progress = Configuration;
 
   //
   // Check routing data in <ConfigHdr>.
   // Note: if only one Storage is used, then this checking could be skipped.
   //
   if (!HiiIsConfigHdrMatch (Configuration, &mFormSetGuid, VariableName)) {
-    *Progress = Configuration;
     return EFI_NOT_FOUND;
   }
 
