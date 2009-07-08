@@ -118,6 +118,11 @@ typedef struct _FLOOPY_CONN_DEVICE_PATH {
   EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
 } FLOOPY_CONN_DEVICE_PATH;
 
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec0.9, this data structure and corrsponding fields are NOT defined.
+/// It's implementation-specific to simplify the code logic.
+///
 typedef union _EFI_MISC_PORT_DEVICE_PATH {
   USB_PORT_DEVICE_PATH              UsbDevicePath;
   IDE_DEVICE_PATH                   IdeDevicePath;
