@@ -50,6 +50,11 @@ typedef enum {
   MaxDeviceType
 } EFI_PEI_BLOCK_DEVICE_TYPE;
 
+///
+/// Inconsistent with specification here: 
+/// PEI_BLOCK_IO_MEDIA has been changed to EFI_PEI_BLOCK_IO_MEDIA, because
+/// "EFI_" prefix is missing in spec due to typo.
+///
 typedef struct {
   EFI_PEI_BLOCK_DEVICE_TYPE  DeviceType;
   BOOLEAN                    MediaPresent;
