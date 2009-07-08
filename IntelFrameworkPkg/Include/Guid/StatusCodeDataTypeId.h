@@ -274,6 +274,8 @@ typedef struct {
   ///
   /// The error syndrome, vendor-specific ECC syndrome, or CRC data associated with 
   /// the error.  If unknown, should be initialized to 0.
+  /// Inconsistent with specification here:  
+  /// This field in StatusCodes spec0.9 is defined as UINT32, keep code unchanged.
   ///
   UINTN                         Syndrome;
   ///
