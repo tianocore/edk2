@@ -23,6 +23,10 @@
 
 #include <PiPei.h>
 
+///
+///  Inconsistent with specification here: 
+///  GUID value format has been changed to the standard guid format.
+///
 #define EFI_PEI_FIND_FV_PPI_GUID \
   { \
     0x36164812, 0xa023, 0x44e5, {0xbd, 0x85, 0x5, 0xbf, 0x3c, 0x77, 0x0, 0xaa } \

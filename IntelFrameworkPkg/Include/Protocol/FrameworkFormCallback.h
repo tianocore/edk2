@@ -37,6 +37,34 @@
 //
 typedef struct _EFI_FORM_CALLBACK_PROTOCOL  EFI_FORM_CALLBACK_PROTOCOL;
 
+///
+///  Inconsistent with specification here: 
+///  EFI_IFR_DATA_ENTRY RESET_REQUIRED, EXIT_REQUIRED, SAVE_REQUIRED, NV_CHANGED 
+//// and NV_NOT_CHANGED are not defined in HII specification. These Flags of EFI_IFR_DATA_ENTRY 
+///  should be defined to describe the standard behavior of the browser after the callback.
+///
+
+///
+/// If this flag is set, the browser will exit and reset after processing callback results
+///
+#define RESET_REQUIRED  1 
+///
+/// If this flag is set, the browser will exit after processing callback results
+///
+#define EXIT_REQUIRED   2
+///
+/// If this flag is set, the browser will save the NV data after processing callback results
+///
+#define SAVE_REQUIRED   4
+///
+/// If this flag is set, the browser will turn the NV flag on after processing callback results
+///
+#define NV_CHANGED      8
+///
+/// If this flag is set, the browser will turn the NV flag off after processing callback results
+///
+#define NV_NOT_CHANGED  16
+
 #pragma pack(1)
 typedef struct {
   UINT8   OpCode;           ///< Likely a string, numeric, or one-of
@@ -122,6 +150,9 @@ EFI_STATUS
                                 name of the vendor's variable. Each VariableName is unique for each VendorGuid.
   @param  VendorGuid            A unique identifier for the vendor.
   @param  Attributes            Attributes bit-mask to set for the variable.
+                                Inconsistent with specification here: 
+                                Attributes data type has been changed from UINT32 * to UINT32,
+                                because the input paramter is not necessary to use pointer date type.
   @param  DataSize              The size in bytes of the Buffer. A size of zero causes
                                 the variable to be deleted.
   @param  Buffer                The buffer containing the contents of the variable.
@@ -177,7 +208,7 @@ EFI_STATUS
 /**
   The EFI_FORM_CALLBACK_PROTOCOL is the defined interface for access to
   custom NVS devices as well as communication of user selections in a more
-  interactive environment. This protocol should be published by hardware-specific
+  interactive environment. This protocol should be published by platform-specific
   drivers that want to export access to custom hardware storage or publish IFR
   that has a requirement to call back the original driver.
 **/
