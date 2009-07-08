@@ -779,6 +779,10 @@ typedef enum {
   EfiCacheAssociativity16Way        = 8
 } EFI_CACHE_ASSOCIATIVITY_DATA;
 
+///
+/// Inconsistent with specification here:  
+/// It's a typo of CacheSubclass 0.9 spec. It should be UINT32 type since it refers to a 32bit width data.
+///
 typedef struct {
   UINT32                            Level           :3;
   UINT32                            Socketed        :1;
