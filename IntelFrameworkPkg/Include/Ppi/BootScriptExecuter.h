@@ -80,7 +80,11 @@
 //
 // Extensions to boot script definitions 
 //
-
+///
+/// Inconsistent with specification here: 
+/// Follow OPCODEs are not defined in Framework Spec BootScript_0.91, but in
+/// PI1.0 Spec. And OPCODEs which are needed in the implementation
+///
 ///
 /// The opcode is to add a record for memory reads of the memory location and continues when the 
 /// exit criteria is satisfied or after a defined duration.
@@ -106,6 +110,7 @@
 /// boot script table.
 ///
 #define EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE             0x0D
+
 ///
 /// The opcode indicate the start of the boot script table.
 ///
