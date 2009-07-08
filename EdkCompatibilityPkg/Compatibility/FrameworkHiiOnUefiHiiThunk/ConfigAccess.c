@@ -17,17 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "HiiDatabase.h"
 #include "UefiIfrParser.h"
 
-//
-// Defintions required for EFI_FORM_CALLBACK_PROTOCOL, but they are not defined in the Framwork HII 0.92 Specification
-//
-#define RESET_REQUIRED  1   // Flags setting to signify that the callback operation resulted in an eventual
-                            // reset to be done upon exit of the browser
-#define EXIT_REQUIRED   2   // Flags setting to signify that after the processing of the callback results - exit the browser
-#define SAVE_REQUIRED   4   // Flags setting to signify that after the processing of the callback results - save the NV data
-#define NV_CHANGED      8   // Flags setting to signify that after the processing of the callback results - turn the NV flag on
-#define NV_NOT_CHANGED  16  // Flags setting to signify that after the processing of the callback results - turn the NV flag off
-
-
 BOOLEAN            mHiiPackageListUpdated = FALSE;
 
 HII_VENDOR_DEVICE_PATH  mUefiHiiVendorDevicePath = {
