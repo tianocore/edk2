@@ -824,6 +824,7 @@ DhcpBuild (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
+  ASSERT (SeedOptions != NULL);
 
   for (Index = 0; Index < (UINT32) Count; Index++) {
     Mark[SeedOptions[Index].Tag] = SeedOptions[Index];

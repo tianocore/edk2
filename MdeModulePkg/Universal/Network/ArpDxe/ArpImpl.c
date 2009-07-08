@@ -1617,7 +1617,7 @@ ArpFindCacheEntry (
     //
     // Set the fields in FindData.
     //
-    FindData->Size            = *EntryLength;
+    FindData->Size            = FoundEntryLength;
     FindData->DenyFlag        = (BOOLEAN)(CacheTable == &ArpService->DeniedCacheTable);
     FindData->StaticFlag      = (BOOLEAN)(CacheEntry->DefaultDecayTime == 0);
     FindData->HwAddressType   = ArpService->SnpMode.IfType;
@@ -1646,7 +1646,7 @@ ArpFindCacheEntry (
     //
     // Slip to the next FindData.
     //
-    FindData = (EFI_ARP_FIND_DATA *)((UINT8 *)FindData + *EntryLength);
+    FindData = (EFI_ARP_FIND_DATA *)((UINT8 *)FindData + FoundEntryLength);
   }
 
 CLEAN_EXIT:

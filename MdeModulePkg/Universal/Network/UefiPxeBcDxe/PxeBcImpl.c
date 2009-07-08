@@ -84,8 +84,6 @@ UpdateArpCache (
 
   @param  Event              Pointer to EFI_PXE_BC_PROTOCOL
   @param  Context            Context of the timer event
-  
-  @return None.
 
 **/
 VOID
@@ -138,8 +136,6 @@ FindInArpCache (
   the received ICMP packets.
 
   @param  Context               The PXEBC private data.
-
-  @return None.
 
 **/
 VOID
@@ -232,8 +228,6 @@ Resume:
 
   @param  Event                 The event signaled.
   @param  Context               The context passed in by the event notifier.
-
-  @return None.
 
 **/
 VOID

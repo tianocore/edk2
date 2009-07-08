@@ -305,8 +305,6 @@ typedef struct {
   @param  Seed    Pointer to the message instance of the DHCP4 packet.
   @param  Udp4    Pointer to the EFI_UDP4_PROTOCOL instance.
 
-  @return none.
-
 **/
 VOID
 PxeBcInitSeedPacket (
@@ -446,8 +444,6 @@ PxeBcBuildDhcpOptions (
   @param  Type       the type of option
   @param  Layer      the layer of the boot options 
   @param  OptLen     length of opotion
-
-  @return None.
 
 **/
 VOID

@@ -142,8 +142,6 @@ GetSmbiosSystemGuidAndSerialNumber (
   @param  Event     The event signaled.
   @param  Context   The context.
 
-  @return None
-
 **/
 VOID
 EFIAPI
