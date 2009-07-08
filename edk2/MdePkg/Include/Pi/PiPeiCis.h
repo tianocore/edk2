@@ -702,11 +702,21 @@ EFI_STATUS
 //
 #define PEI_SPECIFICATION_MAJOR_REVISION  1
 #define PEI_SPECIFICATION_MINOR_REVISION  0
-
+///
+/// Inconsistent with specification here: 
+/// In PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 
+/// to pass multiple tool chain, it is append a ULL.
+///
 //
 // PEI Services Table
 //
 #define PEI_SERVICES_SIGNATURE  0x5652455320494550ULL
+///
+/// Inconsistent with specification here: 
+/// In PI1.0 spec, There is a typo error in PEI_SERVICES_REVISION. In the spec. the defintion is 
+/// #define ((PEI_SPECIFICATION_MAJOR_REVISION<<16) |(PEI_SPECIFICATION_MINOR_REVISION))
+/// and it should be as follow:
+///
 #define PEI_SERVICES_REVISION   ((PEI_SPECIFICATION_MAJOR_REVISION<<16) | (PEI_SPECIFICATION_MINOR_REVISION))
 
 /// 
