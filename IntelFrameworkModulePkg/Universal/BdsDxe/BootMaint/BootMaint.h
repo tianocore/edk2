@@ -55,12 +55,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define VAR_FLAG  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE
 
-//
-// Define Maxmim characters that will be accepted
-//
-#define MAX_CHAR      480
-#define MAX_CHAR_SIZE (MAX_CHAR * 2)
-
 extern EFI_GUID mBootMaintGuid;
 extern EFI_GUID mFileExplorerGuid;
 extern CHAR16   mFileExplorerStorageName[];

@@ -131,7 +131,7 @@
   ## This PCD specifies whether PciBus supports the hot plug device.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE|BOOLEAN|0x0001003d
   
-  ## ISA bus related PCD can be merged into one.
+  ## ISA bus related PCDs to support DMA, SlaveDMA and Memory feature.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportDma|TRUE|BOOLEAN|0x00010040
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusOnlySupportSlaveDma|FALSE|BOOLEAN|0x00010041
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportIsaMemory|TRUE|BOOLEAN|0x00010042

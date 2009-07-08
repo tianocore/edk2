@@ -675,12 +675,13 @@ BdsCreateOneLegacyBootOption (
 }
 
 /**
-
   Add the legacy boot options from BBS table if they do not exist.
 
-  @retval EFI_SUCCESS       The boot options are added successfully 
-                            or they are already in boot options.
-
+  @retval EFI_SUCCESS          The boot options are added successfully 
+                               or they are already in boot options.
+  @retval EFI_NOT_FOUND        No legacy boot options is found.
+  @retval EFI_OUT_OF_RESOURCE  No enough memory.
+  @return Other value          LegacyBoot options are not added.
 **/
 EFI_STATUS
 EFIAPI
@@ -826,12 +827,12 @@ BdsFillDevOrderBuf (
   @param BbsTable        The BBS table.
   @param BbsCount        The BBS Count.
 
-  @retval EFI_SUCCES     The buffer is created and the EFI variable named 
-                         VAR_LEGACY_DEV_ORDER and EfiLegacyDevOrderGuid is
-                         set correctly.
-  @return Other value if the set of EFI variable fails. Check gRT->SetVariable
-          for detailed information.
-
+  @retval EFI_SUCCES             The buffer is created and the EFI variable named 
+                                 VAR_LEGACY_DEV_ORDER and EfiLegacyDevOrderGuid is
+                                 set correctly.
+  @retval EFI_OUT_OF_RESOURCES   Memmory or storage is not enough.
+  @retval EFI_DEVICE_ERROR       Fail to add the device order into EFI variable fail
+                                 because of hardware error.
 **/
 EFI_STATUS
 BdsCreateDevOrder (
@@ -968,12 +969,14 @@ BdsCreateDevOrder (
 }
 
 /**
-
   Add the legacy boot devices from BBS table into 
   the legacy device boot order.
 
-  @retval EFI_SUCCESS       The boot devices are added successfully.
-
+  @retval EFI_SUCCESS           The boot devices are added successfully.
+  @retval EFI_NOT_FOUND         The legacy boot devices are not found.
+  @retval EFI_OUT_OF_RESOURCES  Memmory or storage is not enough.
+  @retval EFI_DEVICE_ERROR      Fail to add the legacy device boot order into EFI variable
+                                because of hardware error.
 **/
 EFI_STATUS
 EFIAPI
@@ -1414,8 +1417,9 @@ BdsUpdateLegacyDevOrder (
   @param LocalBbsTable   The BBS table.
   @param Priority        The prority table.
 
-  @retval EFI_SUCCESS    The function completes successfully.
-  @retval EFI_NOT_FOUND  Failed to find device.
+  @retval EFI_SUCCESS           The function completes successfully.
+  @retval EFI_NOT_FOUND         Failed to find device.
+  @retval EFI_OUT_OF_RESOURCES  Failed to get the efi variable of device order.
 
 **/
 EFI_STATUS
@@ -1526,13 +1530,13 @@ PrintBbsTable (
 }
 
 /**
-
   Set the boot priority for BBS entries based on boot option entry and boot order.
 
   @param  Entry             The boot option is to be checked for refresh BBS table.
   
-  @retval EFI_SUCCESS       The boot priority for BBS entries is refreshed successfully.
-  @return status of BdsSetBootPriority4SameTypeDev()
+  @retval EFI_SUCCESS           The boot priority for BBS entries is refreshed successfully.
+  @retval EFI_NOT_FOUND         BBS entries can't be found.
+  @retval EFI_OUT_OF_RESOURCES  Failed to get the legacy device boot order.
 **/
 EFI_STATUS
 EFIAPI
