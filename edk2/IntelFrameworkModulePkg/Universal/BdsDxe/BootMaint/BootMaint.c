@@ -1397,9 +1397,9 @@ FormSetDispatcher (
   @param BootOrder       The Boot Order array.
   @param BootOrderSize   The size of the Boot Order Array.
 
-  @return Other value if the Boot Option specified by OptionNumber is not deleteed succesfully.
-  @retval EFI_SUCCESS    If function return successfully.
-
+  @retval  EFI_SUCCESS           The Boot Option Variable was found and removed
+  @retval  EFI_UNSUPPORTED       The Boot Option Variable store was inaccessible
+  @retval  EFI_NOT_FOUND         The Boot Option Variable was not found
 **/
 EFI_STATUS
 EFIAPI

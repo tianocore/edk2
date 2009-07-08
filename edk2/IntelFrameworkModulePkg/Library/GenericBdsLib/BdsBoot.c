@@ -912,6 +912,7 @@ BdsDeleteAllInvalidEfiBootOption (
   @retval EFI_SUCCESS            Finished all the boot device enumerate and create
                                  the boot option base on that boot device
 
+  @retval EFI_OUT_OF_RESOURCES   Failed to enumerate the boot device and create the boot option list
 **/
 EFI_STATUS
 EFIAPI
@@ -961,8 +962,8 @@ BdsLibEnumerateAllBootOption (
   // device from the boot order variable
   //
   if (mEnumBootDevice) {
-    BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");
-    return EFI_SUCCESS;
+    Status = BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");
+    return Status;
   }
   
   //
@@ -1172,10 +1173,10 @@ BdsLibEnumerateAllBootOption (
   // Make sure every boot only have one time
   // boot device enumerate
   //
-  BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");
+  Status = BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");
   mEnumBootDevice = TRUE;
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -1302,9 +1303,9 @@ BdsLibBootNext (
   Second, check whether the device path point to a device which support SimpleFileSystemProtocol,
   Third, detect the the default boot file in the Media, and return the removable Media handle.
 
-  @param  DevicePath             Device Path to a  bootable device
+  @param  DevicePath  Device Path to a  bootable device
 
-  @retval NULL                   The media on the DevicePath is not bootable
+  @return  The bootable media handle. If the media on the DevicePath is not bootable, NULL will return.
 
 **/
 EFI_HANDLE

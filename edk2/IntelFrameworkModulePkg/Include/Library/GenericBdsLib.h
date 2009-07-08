@@ -20,28 +20,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_HANDLE mBdsImageHandle;
 
-//
-// Constants which are variable names used to access variables
-//
+///
+/// Constants which are variable names used to access variables
+///
 #define VAR_LEGACY_DEV_ORDER L"LegacyDevOrder"
 
-//
-// Data structures and defines
-//
+///
+/// Data structures and defines
+///
 #define FRONT_PAGE_QUESTION_ID  0x0000
 #define FRONT_PAGE_DATA_WIDTH   0x01
 
-//
-// ConnectType
-//
+///
+/// ConnectType
+///
 #define CONSOLE_OUT 0x00000001
 #define STD_ERROR   0x00000002
 #define CONSOLE_IN  0x00000004
 #define CONSOLE_ALL (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
 
-//
-// Load Option Attributes defined in EFI Specification
-//
+///
+/// Load Option Attributes
+///
 #define LOAD_OPTION_ACTIVE              0x00000001
 #define LOAD_OPTION_FORCE_RECONNECT     0x00000002
 
@@ -56,22 +56,19 @@ extern EFI_HANDLE mBdsImageHandle;
 
 #define IS_LOAD_OPTION_TYPE(_c, _Mask)  (BOOLEAN) (((_c) & (_Mask)) != 0)
 
-//
-// Define Maxmim characters that will be accepted
-//
+///
+/// Define Maxmim characters that will be accepted
+///
 #define MAX_CHAR            480
 #define MAX_CHAR_SIZE       (MAX_CHAR * 2)
 
-#define MIN_ALIGNMENT_SIZE  4
-#define ALIGN_SIZE(a)       ((a % MIN_ALIGNMENT_SIZE) ? MIN_ALIGNMENT_SIZE - (a % MIN_ALIGNMENT_SIZE) : 0)
-
-//
-// Define maximum characters for boot option variable "BootXXXX"
-//
+///
+/// Define maximum characters for boot option variable "BootXXXX"
+///
 #define BOOT_OPTION_MAX_CHAR 10
 
 //
-// This data structure is the part of BDS_CONNECT_ENTRY that we can hard code.
+// This data structure is the part of BDS_CONNECT_ENTRY
 //
 #define BDS_LOAD_OPTION_SIGNATURE SIGNATURE_32 ('B', 'd', 'C', 'O')
 
@@ -97,10 +94,6 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   UINTN                     ConnectType;
 } BDS_CONSOLE_CONNECT_ENTRY;
-
-//
-// Lib Functions
-//
 
 //
 // Bds boot related lib functions
@@ -182,6 +175,7 @@ BdsLibBootViaBootOption (
   @retval EFI_SUCCESS            Finished all the boot device enumerate and create
                                  the boot option base on that boot device
 
+  @retval EFI_OUT_OF_RESOURCES   Failed to enumerate the boot device and create the boot option list
 **/
 EFI_STATUS
 EFIAPI
@@ -260,15 +254,11 @@ BdsLibLoadDrivers (
   Process BootOrder, or DriverOrder variables, by calling
   BdsLibVariableToOption () for each UINT16 in the variables.
 
-  @param  BdsCommonOptionList   The header of the option list base on variable
-                                VariableName
-  @param  VariableName          EFI Variable name indicate the BootOrder or
-                                DriverOrder
+  @param  BdsCommonOptionList   The header of the option list base on variable VariableName.
+  @param  VariableName          EFI Variable name indicate the BootOrder or DriverOrder.
 
-  @retval EFI_SUCCESS           Success create the boot option or driver option
-                                list
-  @retval EFI_OUT_OF_RESOURCES  Failed to get the boot option or driver option list
-
+  @retval EFI_SUCCESS           Success create the boot option or driver option list.
+  @retval EFI_OUT_OF_RESOURCES  Failed to get the boot option or driver option list.
 **/
 EFI_STATUS
 EFIAPI
@@ -666,12 +656,13 @@ BdsDeleteAllInvalidLegacyBootOptions (
   );
 
 /**
-
   Add the legacy boot options from BBS table if they do not exist.
 
-  @retval EFI_SUCCESS       The boot options are added successfully 
-                            or they are already in boot options.
-
+  @retval EFI_SUCCESS          The boot options are added successfully 
+                               or they are already in boot options.
+  @retval EFI_NOT_FOUND        No legacy boot options is found.
+  @retval EFI_OUT_OF_RESOURCE  No enough memory.
+  @return Other value          LegacyBoot options are not added.
 **/
 EFI_STATUS
 EFIAPI
@@ -680,12 +671,14 @@ BdsAddNonExistingLegacyBootOptions (
   );
 
 /**
-
   Add the legacy boot devices from BBS table into 
   the legacy device boot order.
 
-  @retval EFI_SUCCESS       The boot devices are added successfully.
-
+  @retval EFI_SUCCESS           The boot devices are added successfully.
+  @retval EFI_NOT_FOUND         The legacy boot devices are not found.
+  @retval EFI_OUT_OF_RESOURCES  Memmory or storage is not enough.
+  @retval EFI_DEVICE_ERROR      Fail to add the legacy device boot order into EFI variable
+                                because of hardware error.
 **/
 EFI_STATUS
 EFIAPI
@@ -694,13 +687,13 @@ BdsUpdateLegacyDevOrder (
   );
 
 /**
-
   Set the boot priority for BBS entries based on boot option entry and boot order.
 
   @param  Entry             The boot option is to be checked for refresh BBS table.
   
-  @retval EFI_SUCCESS       The boot priority for BBS entries is refreshed successfully.
-
+  @retval EFI_SUCCESS           The boot priority for BBS entries is refreshed successfully.
+  @retval EFI_NOT_FOUND         BBS entries can't be found.
+  @retval EFI_OUT_OF_RESOURCES  Failed to get the legacy device boot order.
 **/
 EFI_STATUS
 EFIAPI
@@ -709,15 +702,16 @@ BdsRefreshBbsTableForBoot (
   );
 
 /**
+  Deletete the Boot Option from EFI Variable. The Boot Order Arrray
+  is also updated.
 
-  Delete boot option specified by OptionNumber and adjust the boot order.
+  @param OptionNumber    The number of Boot option want to be deleted.
+  @param BootOrder       The Boot Order array.
+  @param BootOrderSize   The size of the Boot Order Array.
 
-  @param  OptionNumber      The boot option to be deleted.
-  @param  BootOrder         Boot order list to be adjusted by remove this boot option.
-  @param  BootOrderSize     The size of Boot order list will be modified.
-  
-  @retval EFI_SUCCESS       The boot option is deleted successfully.
-
+  @retval  EFI_SUCCESS           The Boot Option Variable was found and removed
+  @retval  EFI_UNSUPPORTED       The Boot Option Variable store was inaccessible
+  @retval  EFI_NOT_FOUND         The Boot Option Variable was not found
 **/
 EFI_STATUS
 EFIAPI
@@ -808,10 +802,9 @@ SetupResetReminder (
   );
 
 
-//
-// Define the boot option default description 
-// NOTE: This is not defined in UEFI spec.
-//
+///
+/// Define the boot option default description 
+///
 #define DESCRIPTION_FLOPPY        L"EFI Floppy"
 #define DESCRIPTION_FLOPPY_NUM    L"EFI Floppy %d"
 #define DESCRIPTION_DVD           L"EFI DVD/CDROM"
@@ -827,42 +820,43 @@ SetupResetReminder (
 #define DESCRIPTION_NON_BLOCK     L"EFI Non-Block Boot Device"
 #define DESCRIPTION_NON_BLOCK_NUM L"EFI Non-Block Boot Device %d"
 
-//
-// Define the boot type which to classify the boot option type
-// Different boot option type could have different boot behavior
-// Use their device path node (Type + SubType) as type value
-// The boot type here can be added according to requirement
-//
-//
-// ACPI boot type. For ACPI device, cannot use sub-type to distinguish device, so hardcode their value
-//
+///
+/// Define the boot type which to classify the boot option type
+/// Different boot option type could have different boot behavior
+/// Use their device path node (Type + SubType) as type value
+/// The boot type here can be added according to requirement
+///
+
+///
+/// ACPI boot type. For ACPI device, cannot use sub-type to distinguish device, so hardcode their value
+///
 #define  BDS_EFI_ACPI_FLOPPY_BOOT         0x0201
-//
-// Message boot type
-// If a device path of boot option only point to a message node, the boot option is message boot type
-//
+///
+/// Message boot type
+/// If a device path of boot option only point to a message node, the boot option is message boot type
+///
 #define  BDS_EFI_MESSAGE_ATAPI_BOOT       0x0301 // Type 03; Sub-Type 01
 #define  BDS_EFI_MESSAGE_SCSI_BOOT        0x0302 // Type 03; Sub-Type 02
 #define  BDS_EFI_MESSAGE_USB_DEVICE_BOOT  0x0305 // Type 03; Sub-Type 05
 #define  BDS_EFI_MESSAGE_SATA_BOOT        0x0318 // Type 03; Sub-Type 18
 #define  BDS_EFI_MESSAGE_MISC_BOOT        0x03FF
-//
-// Media boot type
-// If a device path of boot option contain a media node, the boot option is media boot type
-//
+///
+/// Media boot type
+/// If a device path of boot option contain a media node, the boot option is media boot type
+///
 #define  BDS_EFI_MEDIA_HD_BOOT            0x0401 // Type 04; Sub-Type 01
 #define  BDS_EFI_MEDIA_CDROM_BOOT         0x0402 // Type 04; Sub-Type 02
-//
-// BBS boot type
-// If a device path of boot option contain a BBS node, the boot option is BBS boot type
-//
+///
+/// BBS boot type
+/// If a device path of boot option contain a BBS node, the boot option is BBS boot type
+///
 #define  BDS_LEGACY_BBS_BOOT              0x0501 //  Type 05; Sub-Type 01
 
 #define  BDS_EFI_UNSUPPORT                0xFFFF
 
-//
-// USB host controller Programming Interface.
-//
+///
+/// USB host controller Programming Interface.
+///
 #define  PCI_CLASSC_PI_UHCI               0x00
 #define  PCI_CLASSC_PI_EHCI               0x20
 
@@ -914,7 +908,7 @@ BdsExpandPartitionPartialDevicePathToFull (
 
   @param  DevicePath             Device Path to a  bootable device
 
-  @retval NULL                   The media on the DevicePath is not bootable
+  @return  The bootable media handle. If the media on the DevicePath is not bootable, NULL will return.
 
 **/
 EFI_HANDLE
