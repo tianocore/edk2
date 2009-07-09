@@ -24,7 +24,6 @@ Abstract:
 
 #define IS_PCI_ISA_PDECODE(_p)        IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE, 0)
 
-CHAR16  mFirmwareVendor[] = L"TianoCore.org";
 extern BOOLEAN  gConnectAllHappened;
 extern USB_CLASS_FORMAT_DEVICE_PATH gUsbClassKeyboardDevicePath;
 
@@ -414,22 +413,6 @@ Returns:
 
 --*/
 {
-  //
-  // set firmwarevendor, here can be IBV/OEM customize
-  //
-  gST->FirmwareVendor = AllocateRuntimeCopyPool (
-                          sizeof (mFirmwareVendor),
-                          &mFirmwareVendor
-                          );
-  ASSERT (gST->FirmwareVendor != NULL);
-
-  gST->FirmwareRevision = 0;
-
-  //
-  // Fixup Tasble CRC after we updated Firmware Vendor and Revision
-  //
-  gBS->CalculateCrc32 ((VOID *) gST, sizeof (EFI_SYSTEM_TABLE), &gST->Hdr.CRC32);
-
   GetSystemTablesFromHob ();
 
   UpdateMemoryMap ();

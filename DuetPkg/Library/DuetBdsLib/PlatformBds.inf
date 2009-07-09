@@ -54,7 +54,6 @@
   DevicePathLib
 
 [Guids]
-  gEfiDefaultBmpLogoGuid
   gEfiGlobalVariableGuid
   gEfiPciExpressBaseAddressGuid
   gEfiAcpi20TableGuid
