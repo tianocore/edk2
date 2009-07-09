@@ -24,11 +24,7 @@
 #define FRAMEWORK_PEI_SPECIFICATION_MAJOR_REVISION    0
 #define FRAMEWORK_PEI_SPECIFICATION_MINOR_REVISION    91
 
-///
-/// Inconsistent with specification here: 
-/// In Framework Spec, PeiCis0.91, FRAMEWORK_PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 
-/// to pass multiple tool chain, it is append a ULL.
-///
+
 //
 // PEI services signature and Revision defined in Framework PEI spec
 //
@@ -182,6 +178,11 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
   // Reset
   //
   EFI_PEI_RESET_SYSTEM              ResetSystem;
+  ///
+  /// Inconsistent with specification here: 
+  /// In Framework Spec, PeiCis0.91, CpuIo and PciCfg is NOT pointers. it should be  
+  /// a typo error in spec..
+  ///
   //
   // I/O Abstractions
   //
