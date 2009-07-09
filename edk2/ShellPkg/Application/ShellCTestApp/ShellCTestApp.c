@@ -1,5 +1,6 @@
 /** @file
-  This is THE shell (application)
+  This is a test application that demonstrates how to use the C-style entry point 
+  for a shell application.
 
   Copyright (c) 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -13,7 +14,6 @@
 **/
 
 #include <Uefi.h>
-
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ShellCEntryLib.h>
