@@ -341,3 +341,16 @@
   ## Indicate the max size of the non-populated capsule image that the platform can support.
   #  The default max size is 10MB (0xa00000) for the casule image without populated flag setting.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0xa00000|UINT32|0x0001001f
+
+  ## Null-terminated Unicode string of the firmware vendor name that is default name filled into the EFI System Table
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor|L"EDK II"|VOID*|0xx00010050
+  
+  ## Firmware revision that is default value filled into the EFI System Table
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision|0x00010000|UINT32|0x00010051
+
+  ## Null-terminated Unicode string that described the firmware version
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L""|VOID*|0x00010052    
+  
+  ## Null-terminated Unicode string that contains the date the formware was released
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString|L""|VOID*|0x00010053
+
