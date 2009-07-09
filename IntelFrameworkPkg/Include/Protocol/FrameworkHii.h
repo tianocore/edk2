@@ -29,16 +29,7 @@
 // is defined in MdePkg/Protocol/GraphicsOutput.h
 //
 #include <Protocol/GraphicsOutput.h>
-//
-// In UEFI2.1 spec, there is a same data type named EFI_GRAPHICS_OUTPUT_BLT_PIXEL.
-// To define this data type only for backward compatibility. 
-//
-typedef struct {
-   UINT8  Blue;
-   UINT8  Green;
-   UINT8  Red;
-   UINT8  Reserved;
-} EFI_UGA_PIXEL
+
 //
 // In both EDK and EDK II, incompatbile change is done to Framework HII protocol. 
 // This change should cause a change of GUID in both of code and HII spec. But we 
