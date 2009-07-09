@@ -119,12 +119,17 @@ EFI_STATUS
   IN EFI_HANDLE                            DispatchHandle
   );
 
+
 //
 // Interface structure for the SMM Software SMI Dispatch Protocol
 //
 /**
   Provides the parent dispatch service for a given SMI source generator.
 **/
+///
+/// Inconsistent with specification here:
+/// In framework spec SmmCis, this definition is named as _EFI_SMM_ICHN_DISPATCH_PROTOCOL by mistake.
+///
 struct _EFI_SMM_SW_DISPATCH_PROTOCOL {
   ///
   /// Installs a child service to be dispatched by this protocol.
