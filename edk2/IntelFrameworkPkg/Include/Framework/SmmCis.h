@@ -104,7 +104,7 @@ struct _EFI_SMM_CPU_IO_INTERFACE {
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
   @retval EFI_UNSUPPORTED       In runtime.
-  @Note: Inconsistent with specification here:
+  @note: Inconsistent with specification here:
          In Framework Spec, This definition is naming EFI_SMM_ALLOCATE_POOL. However, 
          To avoid the naming conflict, the definition is renamed.
 **/
@@ -124,7 +124,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The memory was returned to the system.
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
   @retval EFI_UNSUPPORTED       In runtime.
-  @Note: Inconsistent with specification here:
+  @note: Inconsistent with specification here:
          In Framework Spec, This definition is naming EFI_SMM_FREE_POOL However, 
          To avoid the naming conflict, the definition is renamed.
 **/
@@ -149,7 +149,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         The requested pages could not be found.
   @retval EFI_INVALID_PARAMETER Type is not AllocateAnyPages or AllocateMaxAddress
                                 or AllocateAddress. Or MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
-  @Note: Inconsistent with specification here:
+  @note: Inconsistent with specification here:
          In Framework Spec, This definition is naming EFI_SMM_ALLOCATE_PAGES However, 
          To avoid the naming conflict, the definition is renamed.
 **/
@@ -172,7 +172,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or NumberOfPages is invalid.
   @retval EFI_NOT_FOUND         The requested memory pages were not allocated with SmmAllocatePages().
   
-  @Note: Inconsistent with specification here:
+  @note: Inconsistent with specification here:
          In Framework Spec, This definition is naming EFI_SMM_FREE_PAGES However, 
          To avoid the naming conflict, the definition is renamed.
 **/
@@ -197,7 +197,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER The CPU requested is not available on this SMI invocation.
   @retval EFI_INVALID_PARAMETER The CPU cannot support an additional service invocation.
   
-  @Note: Inconsistent with specification here:
+  @note: Inconsistent with specification here:
          In Framework Spec, No this definition. This method is introduced in PI1.0 spec for 
          implementation needed.
          

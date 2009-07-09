@@ -29,7 +29,16 @@
 // is defined in MdePkg/Protocol/GraphicsOutput.h
 //
 #include <Protocol/GraphicsOutput.h>
-
+//
+// In UEFI2.1 spec, there is a same data type named EFI_GRAPHICS_OUTPUT_BLT_PIXEL.
+// To define this data type only for backward compatibility. 
+//
+typedef struct {
+   UINT8  Blue;
+   UINT8  Green;
+   UINT8  Red;
+   UINT8  Reserved;
+} EFI_UGA_PIXEL
 //
 // In both EDK and EDK II, incompatbile change is done to Framework HII protocol. 
 // This change should cause a change of GUID in both of code and HII spec. But we 
@@ -46,19 +55,6 @@
     0x5542cce1, 0xdf5c, 0x4d1b, { 0xab, 0xca, 0x36, 0x4f, 0x77, 0xd3, 0x99, 0xfb } \
   }
 
-// BugBug:
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// If UGA goes away we need to put this some place. I'm not sure where?
-//
-//typedef struct {
-//  UINT8 Blue;
-//  UINT8 Green;
-//  UINT8 Red;
-//  UINT8 Reserved;
-//} EFI_UGA_PIXEL;
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
 
 typedef UINT16                    STRING_REF;
 typedef UINT32                    RELOFST;
@@ -489,7 +485,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           It worked.
   @retval EFI_NOT_FOUND         A glyph for a character was not found.
-
+  @note: Inconsistent with specification here:
+         In Framework Spec,HII spec 0.92. The type of 3rd, 4th and 8th parameter is EFI_UGA_PIXEL.
+         Here the definition use the EFI_GRAPHICS_OUTPUT_BLT_PIXEL which defined in UEFI2.1 spec
 **/
 typedef
 EFI_STATUS
