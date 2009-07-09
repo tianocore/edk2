@@ -273,6 +273,11 @@ typedef struct {
   UINT16                            Key;
 } FRAMEWORK_EFI_IFR_HIDDEN;
 
+///
+/// Inconsistent with specification here:
+/// Following defintion may not comply with Framework Specification HII 0.92. To 
+/// keep the inconsistant is for implementation needed.
+///
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
   UINT8                             Flags;
