@@ -52,8 +52,11 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here: 
-/// PEI_BLOCK_IO_MEDIA has been changed to EFI_PEI_BLOCK_IO_MEDIA, because
-/// "EFI_" prefix is missing in spec due to typo.
+/// PEI_BLOCK_IO_MEDIA has been changed to EFI_PEI_BLOCK_IO_MEDIA.
+/// Inconsistency exists in Framework Recovery Specification, where all referrences to this
+/// structure name are with the "EFI_" prefix, except for the definition which is without "EFI_".
+/// So the name of PEI_BLOCK_IO_MEDIA is taken as the exception caused by mistake, and
+/// EFI_PEI_BLOCK_IO_MEDIA is used to comply with most part of the specification.
 ///
 typedef struct {
   EFI_PEI_BLOCK_DEVICE_TYPE  DeviceType;
