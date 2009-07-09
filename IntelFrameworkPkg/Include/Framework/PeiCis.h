@@ -180,9 +180,9 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
   EFI_PEI_RESET_SYSTEM              ResetSystem;
   ///
   /// Inconsistent with specification here: 
-  /// In Framework Spec, PeiCis0.91, CpuIo and PciCfg is NOT pointers. it should be  
-  /// a typo error in spec..
+  /// In Framework Spec, PeiCis0.91, CpuIo and PciCfg is NOT pointers. 
   ///
+  
   //
   // I/O Abstractions
   //
