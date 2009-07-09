@@ -54,7 +54,7 @@ typedef enum {
 /// Attributes for the EFI_ISA_IO_PROTOCOL common DMA buffer allocations
 ///
 #define EFI_ISA_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE  0x080    ///< Map a memory range so write are combined
-#define EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED         0x800    ///< Map a memory range so all r/w accesses are cached
+#define EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED         0x800    ///< Map a memory range so all read and write accesses are cached
 #define EFI_ISA_IO_ATTRIBUTE_MEMORY_DISABLE        0x1000   ///< Disable a memory range 
 
 ///
@@ -67,7 +67,7 @@ typedef enum {
 #define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8           0x010   ///< Request 8-bit DMA transfers.  Only available on channels 0..3
 #define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_16          0x020   ///< Request 16-bit DMA transfers.  Only available on channels 4..7
 #define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE       0x040   ///< Request a single DMA transfer
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE       0x080   ///< Request multiple DMA transfers until TC(Terminal Count) or EOP(End of Process)
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE       0x080   ///< Request multiple DMA transfers until TC (Terminal Count) or EOP (End of Process)
 #define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_AUTO_INITIALIZE   0x100   ///< Automatically reload base and count at the end of the DMA transfer
 
 ///
@@ -111,7 +111,7 @@ typedef enum {
                            the results. For write operations, the source buffer to 
                            write data from. 
                                  
-  @retval EFI_SUCCESS             The data was read from / written to the device sucessfully.
+  @retval EFI_SUCCESS             The data was successfully read from or written to the device.
   @retval EFI_UNSUPPORTED         The Offset is not valid for this device.
   @retval EFI_INVALID_PARAMETER   Width or Count, or both, were invalid.
   @retval EFI_OUT_OF_RESOURCES    The request could not be completed due to a lack of resources.
@@ -170,23 +170,25 @@ EFI_STATUS
 /**
   Maps a memory region for DMA.
 
-  This function returns the device specific addresses required to access system memory.
+  This function returns the device-specific addresses required to access system memory.
   This function is used to map system memory for ISA DMA operations.  All ISA DMA 
-  operations must be performed through their mapped addresses and such mappings must 
-  be freed with EFI_ISA_IO_PROTOCOL.Unmap() after the DMA operation is completed.  
+  operations must be performed through their mapped addresses, and such mappings must 
+  be freed with EFI_ISA_IO_PROTOCOL.Unmap() after the DMA operation is completed.
+    
   If the DMA operation is a single read or write data transfer through an ISA bus 
   master, then EfiIsaIoOperationBusMasterRead or EfiIsaIoOperationBusMasterWrite 
   is used and the range is unmapped to complete the operation. If the DMA operation
   is a single read or write data transfer through an ISA slave controller, then 
   EfiIsaIoOperationSlaveRead or EfiIsaIoOperationSlaveWrite is used and the range 
-  is unmapped to complete the operation.  If performing a DMA read operation, all 
-  the data must be present in system memory before the Map() is performed.  Similarly, 
+  is unmapped to complete the operation.  
+  
+  If performing a DMA read operation, all the data must be present in system memory before the Map() is performed.  Similarly, 
   if performing a DMA write operation, the data must not be accessed in system 
   memory until EFI_ISA_IO_PROTOCOL.Unmap() is performed.  Bus master operations that 
   require both read and write access or require multiple host device interactions 
   within the same mapped region must use EfiIsaIoOperationBusMasterCommonBuffer.  
   However, only memory allocated via the EFI_ISA_IO_PROTOCOL.AllocateBuffer() interface 
-  are guaranteed to be able to be mapped for this operation type.  In all mapping 
+  is guaranteed to be able to be mapped for this operation type.  In all mapping 
   requests the NumberOfBytes returned may be less than originally requested.  It is
   the caller's responsibility to make additional requests to complete the entire
   transfer.
@@ -308,7 +310,7 @@ EFI_STATUS
   );
 
 /**
-  Flushes a DMA buffer.  This forces all DMA posted write transactions to complete.
+  Flushes a DMA buffer, which forces all DMA posted write transactions to complete.
 
   @param[in] This   A pointer to the EFI_ISA_IO_PROTOCOL instance.
 
@@ -327,7 +329,7 @@ EFI_STATUS
 /// used to abstract accesses to ISA controllers.  There is one EFI_ISA_IO_PROTOCOL 
 /// instance for each ISA controller on a ISA bus. A device driver that wishes 
 /// to manage an ISA controller in a system will have to retrieve the 
-/// ISA_PCI_IO_PROTOCOL instance that is associated with the ISA controller.
+/// ISA_PCI_IO_PROTOCOL instance associated with the ISA controller.
 ///
 struct _EFI_ISA_IO_PROTOCOL {
   EFI_ISA_IO_PROTOCOL_ACCESS           Mem;
