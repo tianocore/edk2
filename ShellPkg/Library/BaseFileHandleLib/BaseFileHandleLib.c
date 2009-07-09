@@ -668,6 +668,7 @@ StrnCatGrowLeft (
   ){
   UINTN DestinationStartSize;
   UINTN NewSize;
+  UINTN CopySize;
 
   //
   // ASSERTs
@@ -714,7 +715,8 @@ StrnCatGrowLeft (
     *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
   }
 
-  *Destination = CopyMem((*Destination)+StrLen(Source), *Destination, StrSize(*Destination));
+  CopySize = StrSize(*Destination);
+  *Destination = CopyMem((*Destination)+StrLen(Source), *Destination, CopySize);
   *Destination = CopyMem(*Destination, Source, StrLen(Source));
   return (*Destination);
 }
