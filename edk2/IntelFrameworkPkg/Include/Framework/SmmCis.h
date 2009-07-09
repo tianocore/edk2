@@ -104,7 +104,9 @@ struct _EFI_SMM_CPU_IO_INTERFACE {
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
   @retval EFI_UNSUPPORTED       In runtime.
-
+  @Note: Inconsistent with specification here:
+         In Framework Spec, This definition is naming EFI_SMM_ALLOCATE_POOL. However, 
+         To avoid the naming conflict, the definition is renamed.
 **/
 typedef
 EFI_STATUS
@@ -122,7 +124,9 @@ EFI_STATUS
   @retval EFI_SUCCESS           The memory was returned to the system.
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
   @retval EFI_UNSUPPORTED       In runtime.
-
+  @Note: Inconsistent with specification here:
+         In Framework Spec, This definition is naming EFI_SMM_FREE_POOL However, 
+         To avoid the naming conflict, the definition is renamed.
 **/
 typedef
 EFI_STATUS
@@ -145,7 +149,9 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         The requested pages could not be found.
   @retval EFI_INVALID_PARAMETER Type is not AllocateAnyPages or AllocateMaxAddress
                                 or AllocateAddress. Or MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
-
+  @Note: Inconsistent with specification here:
+         In Framework Spec, This definition is naming EFI_SMM_ALLOCATE_PAGES However, 
+         To avoid the naming conflict, the definition is renamed.
 **/
 typedef
 EFI_STATUS
@@ -165,7 +171,10 @@ EFI_STATUS
   @retval EFI_SUCCESS           The requested memory pages were freed.
   @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or NumberOfPages is invalid.
   @retval EFI_NOT_FOUND         The requested memory pages were not allocated with SmmAllocatePages().
-
+  
+  @Note: Inconsistent with specification here:
+         In Framework Spec, This definition is naming EFI_SMM_FREE_PAGES However, 
+         To avoid the naming conflict, the definition is renamed.
 **/
 typedef
 EFI_STATUS
@@ -173,7 +182,26 @@ EFI_STATUS
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   );
+/**
+  Frees memory pages for the system.
 
+  @param  Procedure         A pointer to the code stream to be run on the designated AP of the system.
+  @param  CpuNumber         The zero-based index of the processor number of the AP on which the code stream is
+                            supposed to run. If the processor number points to the current processor or a disabled
+                            processor, then it will not run the supplied code.
+  @param  ProcArguments     Allows the caller to pass a list of parameters to the code that is run by
+                            the AP. It is an optional common mailbox between APs and the BSP to share information.
+
+  @retval EFI_SUCCESS           The call was successful and the return parameters are valid.
+  @retval EFI_INVALID_PARAMETER The input arguments are out of range.
+  @retval EFI_INVALID_PARAMETER The CPU requested is not available on this SMI invocation.
+  @retval EFI_INVALID_PARAMETER The CPU cannot support an additional service invocation.
+  
+  @Note: Inconsistent with specification here:
+         In Framework Spec, No this definition. This method is introduced in PI1.0 spec for 
+         implementation needed.
+         
+**/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SMM_STARTUP_THIS_AP)(
@@ -542,6 +570,7 @@ struct _EFI_SMM_SYSTEM_TABLE {
   // Runtime memory service
   //
   ///
+  ///
   /// Allocates pool memory from SMRAM for IA-32 or runtime memory for the
   /// Itanium processor family.
   ///
@@ -562,6 +591,10 @@ struct _EFI_SMM_SYSTEM_TABLE {
   //
   // MP service
   //
+  
+  ///Inconsistent with specification here:
+  ///  In Framework Spec, No this definition. This method is introduced in PI1.0 spec for 
+  ///  implementation needed.
   EFI_SMM_STARTUP_THIS_AP             SmmStartupThisAp;
 
   //
