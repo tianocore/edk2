@@ -30,10 +30,10 @@
 #define EFI_STATUS_CODE_DATA_MAX_SIZE 200
 
 ///
-/// This structure contains the ErrorLevel passed into the DEBUG() macro followed 
+/// This structure contains the ErrorLevel passed into the DEBUG() macro, followed 
 /// by a 96-byte buffer that contains the variable argument list passed to the 
 //  DEBUG() macro that has been converted to a BASE_LIST.  The 96-byte buffer is 
-/// followed by a Null terminated ASCII string that is the Format string passed 
+/// followed by a Null-terminated ASCII string that is the Format string passed 
 /// to the DEBUG() macro.  The maximum size of this structure is defined by 
 /// EFI_STATUS_CODE_DATA_MAX_SIZE.
 ///

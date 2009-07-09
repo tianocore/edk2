@@ -17,7 +17,7 @@
 
 ///
 /// Global ID used to identify GUIDed HOBs that start with a structure of type 
-/// MEMORY_STATUSCODE_PACKET_HEADER followed by an arry of structures of type 
+/// MEMORY_STATUSCODE_PACKET_HEADER followed by an array of structures of type 
 /// MEMORY_STATUSCODE_RECORD.  These GUIDed HOBs record all the information 
 /// passed into the ReportStatusCode() service of PEI Services Table.
 ///
@@ -66,8 +66,8 @@ typedef struct {
   EFI_STATUS_CODE_TYPE   CodeType;
 
   ///
-  /// Valu information about the class and subclass is used to
-  /// classify the hardware and software entity as well as an operation.
+  /// An operation, plus value information about the class and subclass, used to
+  /// classify the hardware and software entity.
   ///
   EFI_STATUS_CODE_VALUE  Value;
 

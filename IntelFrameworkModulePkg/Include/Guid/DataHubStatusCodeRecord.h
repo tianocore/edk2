@@ -34,8 +34,8 @@ typedef struct {
   EFI_STATUS_CODE_TYPE   CodeType;
 
   ///
-  /// Value information about the class and subclass is used to
-  /// classify the hardware and software entity as well as an operation.
+  /// An operation, plus value information about the class and subclass, used to
+  /// classify the hardware and software entity.
   ///
   EFI_STATUS_CODE_VALUE  Value;
 
