@@ -24,6 +24,8 @@
 
 ///
 /// Capsule volume HOB -- identical to a firmware volume
+/// This macro is defined  to comply with hob Framework Spec. And the marco has been
+/// retired in PI1.0 spec.  
 ///
 #define EFI_HOB_TYPE_CV           0x0008
 
