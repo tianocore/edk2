@@ -116,7 +116,9 @@ EFI_STATUS
                                 data records exist in the system.
   @retval EFI_OUT_OF_RESOURCES  Record was not returned due to lack
                                 of system resources.
-
+  @note: Inconsistent with specification here: 
+         In Framework for EFI Data Hub Specification,Version 0.9, This definition is named as
+         EFI_DATA_HUB_GET_NEXT_DATA_RECORD. The inconsistance is remained for backward compatibility 
 **/
 typedef
 EFI_STATUS
@@ -146,7 +148,9 @@ EFI_STATUS
   @retval EFI_ALREADY_STARTED   FilterEvent was previously registered and cannot be registered again.
   @retval EFI_OUT_OF_RESOURCES  The filter driver event was not registered
                                 due to lack of system resources.
-
+  @note: Inconsistent with specification here: 
+         In Framework for EFI Data Hub Specification,Version 0.9, This definition is named as
+         EFI_DATA_HUB_REGISTER_DATA_FILTER_DRIVER. The inconsistance is remained for backward compatibility 
 **/
 typedef
 EFI_STATUS
@@ -167,7 +171,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The filter driver represented by FilterEvent was shut off.
   @retval EFI_NOT_FOUND         FilterEvent did not exist.
-
+  @note: Inconsistent with specification here: 
+         In Framework for EFI Data Hub Specification,Version 0.9, This definition is named as
+         EFI_DATA_HUB_UNREGISTER_DATA_FILTER_DRIVER. The inconsistance is remained for backward compatibility 
 **/
 typedef
 EFI_STATUS
