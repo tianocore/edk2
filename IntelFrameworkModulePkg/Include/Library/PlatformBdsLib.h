@@ -1,6 +1,6 @@
 /** @file
-  Platform BDS library definition. Platform can implement an
-  instances to support the platform specific behavior.
+  Platform BDS library definition. A platform can implement 
+  instances to support platform-specific behavior.
 
 Copyright (c) 2008 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/GenericBdsLib.h>
 
 /**
-  Platform Bds init. Include the platform firmware vendor, revision
+  Platform Bds initialization. Includes the platform firmware vendor, revision
   and so crc check.
 
 **/
@@ -69,9 +69,9 @@ PlatformBdsBootFail (
   Hook point after a boot attempt succeeds. We don't expect a boot option to
   return, so the UEFI 2.0 specification defines that you will default to an
   interactive mode and stop processing the BootOrder list in this case. This
-  is alos a platform implementation and can be customized by IBV/OEM.
+  is also a platform implementation, and can be customized by an IBV/OEM.
 
-  @param  Option                  Pointer to Boot Option that succeeded to boot.
+  @param  Option                  Pointer to Boot Option that successfully booted.
 
 **/
 VOID
