@@ -1715,10 +1715,10 @@ PxeBcSelectBootMenu (
   }
 
   while (MenuSize > 0) {
-    MenuArray[Index]  = MenuItem;
+    MenuArray[Index++]  = MenuItem;
     MenuSize          = (UINT8) (MenuSize - (MenuItem->DescLen + 3));
     MenuItem          = (PXEBC_BOOT_MENU_ENTRY *) ((UINT8 *) MenuItem + MenuItem->DescLen + 3);
-    if (Index++ > (PXEBC_MAX_MENU_NUM - 1)) {
+    if (Index >= PXEBC_MAX_MENU_NUM) {
       break;
     }
   }
@@ -1738,6 +1738,7 @@ PxeBcSelectBootMenu (
   TopRow  = gST->ConOut->Mode->CursorRow - MenuNum;
 
   do {
+    ASSERT (Select < PXEBC_MAX_MENU_NUM);
     //
     // highlight selected row
     //

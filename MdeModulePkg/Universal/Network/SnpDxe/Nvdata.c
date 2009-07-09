@@ -88,9 +88,9 @@ PxeNvDataRead (
     return EFI_DEVICE_ERROR;
   }
 
-  ASSERT ((Offset + BufferSize) <= sizeof (Db->Data));
+  ASSERT (Offset < sizeof (Db->Data));
 
-  CopyMem (Buffer, Db->Data.Byte + Offset, BufferSize);
+  CopyMem (Buffer, &Db->Data.Byte[Offset], BufferSize);
 
   return EFI_SUCCESS;
 }

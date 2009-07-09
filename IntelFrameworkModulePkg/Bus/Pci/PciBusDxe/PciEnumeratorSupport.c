@@ -1126,7 +1126,7 @@ UpdatePciInfo (
       BarEndIndex = PCI_MAX_BAR - 1;
     }
 
-    if (BarIndex >= PCI_MAX_BAR) {
+    if (BarIndex > PCI_MAX_BAR) {
       Ptr++;
       continue;
     }

@@ -77,7 +77,7 @@ NetbufAllocStruct (
 
 FreeNbuf:
 
-  gBS->FreePool (Nbuf);
+  FreePool (Nbuf);
   return NULL;
 }
 
@@ -132,7 +132,7 @@ NetbufAlloc (
   return Nbuf;
 
 FreeNBuf:
-  gBS->FreePool (Nbuf);
+  FreePool (Nbuf);
   return NULL;
 }
 
@@ -153,6 +153,7 @@ NetbufFreeVector (
 {
   UINT32                    Index;
 
+  ASSERT (Vector != NULL);
   NET_CHECK_SIGNATURE (Vector, NET_VECTOR_SIGNATURE);
   ASSERT (Vector->RefCnt > 0);
 
@@ -183,7 +184,7 @@ NetbufFreeVector (
     }
   }
 
-  gBS->FreePool (Vector);
+  FreePool (Vector);
 }
 
 
@@ -205,6 +206,7 @@ NetbufFree (
   IN NET_BUF                *Nbuf
   )
 {
+  ASSERT (Nbuf != NULL);
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
   ASSERT (Nbuf->RefCnt > 0);
 
@@ -216,7 +218,7 @@ NetbufFree (
     // all the sharing of Nbuf increse Vector's RefCnt by one
     //
     NetbufFreeVector (Nbuf->Vector);
-    gBS->FreePool (Nbuf);
+    FreePool (Nbuf);
   }
 }
 
@@ -685,7 +687,7 @@ NetbufGetFragment (
 
 FreeChild:
 
-  gBS->FreePool (Child);
+  FreePool (Child);
   return NULL;
 }
 
@@ -867,7 +869,9 @@ NetbufFromExt (
   return Nbuf;
 
 FreeFirstBlock:
-  gBS->FreePool (FirstBlock);
+  if (FirstBlock != NULL) {
+    FreePool (FirstBlock);
+  }
   return NULL;
 }
 
@@ -987,7 +991,7 @@ NetbufFromBufList (
   }
 
   Nbuf = NetbufFromExt (Fragment, Current, HeadSpace, HeaderLen, ExtFree, Arg);
-  gBS->FreePool (Fragment);
+  FreePool (Fragment);
 
   return Nbuf;
 }
@@ -1379,13 +1383,14 @@ NetbufQueFree (
   IN NET_BUF_QUEUE          *NbufQue
   )
 {
+  ASSERT (NbufQue != NULL);
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
 
   NbufQue->RefCnt--;
 
   if (NbufQue->RefCnt == 0) {
     NetbufQueFlush (NbufQue);
-    gBS->FreePool (NbufQue);
+    FreePool (NbufQue);
   }
 }
 

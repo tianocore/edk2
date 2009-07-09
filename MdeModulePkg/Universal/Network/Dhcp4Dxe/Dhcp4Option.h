@@ -280,6 +280,7 @@ DhcpValidateOptions (
   @param[out] OptionPoint            The array that contains the DHCP options. Caller
                                      should free it.
 
+  @retval EFI_NOT_FOUND          Cannot find any option.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
   @retval EFI_INVALID_PARAMETER  The options are mal-formated
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
