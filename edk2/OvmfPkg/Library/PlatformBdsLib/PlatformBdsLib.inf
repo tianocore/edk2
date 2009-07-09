@@ -48,11 +48,9 @@
   GenericBdsLib
   PciLib
 
-[Guids]
-  gEfiDefaultBmpLogoGuid
-
 [Pcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock

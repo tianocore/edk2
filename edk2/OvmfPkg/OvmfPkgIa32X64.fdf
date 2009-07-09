@@ -154,11 +154,11 @@ FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
     SECTION PE32 = FatBinPkg/EnhancedFatDxe/X64/Fat.efi
   }
 
-FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
+FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
     SECTION PE32 = EdkShellBinPkg/FullShell/X64/Shell_full.efi
   }
 
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE { # LzmaCompress
       SECTION RAW = MdeModulePkg/Logo/Logo.bmp
     }

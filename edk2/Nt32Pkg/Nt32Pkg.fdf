@@ -210,8 +210,8 @@ INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
 INF  RuleOverride = TIANOCOMPRESSED MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
-INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
+INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
 INF  Nt32Pkg/WinNtBusDriverDxe/WinNtBusDriverDxe.inf
 INF  Nt32Pkg/WinNtBlockIoDxe/WinNtBlockIoDxe.inf
@@ -240,19 +240,15 @@ INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
 # for binary shell, binary fat and logo module.
 #
 ################################################################################
-FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
-    SECTION COMPRESS PI_STD {
-      SECTION GUIDED {
-        SECTION PE32 = EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
-      }
-    }
+FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
+    SECTION PE32 = EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
   }
 
 FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
     SECTION PE32 = FatBinPkg/EnhancedFatDxe/Ia32/Fat.efi
   }
 
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
 

@@ -50,14 +50,11 @@ Abstract:
 #include <Protocol/PciIo.h>
 #include <Protocol/FirmwareVolume2.h>
 
-#include <Guid/Logo.h>
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
 #include <Guid/Mps.h>
 #include <Guid/HobList.h>
-//#include <Guid/PciExpressBaseAddress.h>
 #include <Guid/GlobalVariable.h>
-#include <Guid/ShellFile.h>
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];

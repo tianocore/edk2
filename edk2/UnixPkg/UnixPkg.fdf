@@ -247,13 +247,14 @@ INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 # for binary shell, binary fat and logo module.
 #  
 ################################################################################
-FILE APPLICATION = c57ad6b7-0515-40a8-9d21-551652854e37 {
+FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
         SECTION PE32 = EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
       }
     }
   }
+
 FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
@@ -261,7 +262,8 @@ FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
       }
     }
   }
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+
+FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
         SECTION RAW = MdeModulePkg/Logo/Logo.bmp
