@@ -278,6 +278,7 @@ BdsEntry (
   LIST_ENTRY                      DriverOptionList;
   LIST_ENTRY                      BootOptionList;
   UINTN                           BootNextSize;
+  CHAR16                          *FirmwareVendor;
 
   //
   // Insert the performance probe
@@ -295,6 +296,19 @@ BdsEntry (
   // Initialize hotkey service
   //
   InitializeHotkeyService ();
+
+  //
+  // Fill in FirmwareVendor and FirmwareRevision from PCDs
+  //
+  FirmwareVendor = (CHAR16 *)PcdGetPtr (PcdFirmwareVendor);
+  gST->FirmwareVendor = AllocateRuntimeCopyPool (StrSize (FirmwareVendor), FirmwareVendor);
+  ASSERT (gST->FirmwareVendor != NULL);
+  gST->FirmwareRevision = PcdGet32 (PcdFirmwareRevision);
+
+  //
+  // Fixup Tasble CRC after we updated Firmware Vendor and Revision
+  //
+  gBS->CalculateCrc32 ((VOID *)gST, sizeof(EFI_SYSTEM_TABLE), &gST->Hdr.CRC32);
 
   //
   // Do the platform init, can be customized by OEM/IBV
