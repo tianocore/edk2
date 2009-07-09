@@ -37,7 +37,7 @@ typedef struct _EFI_DISK_INFO_PROTOCOL  EFI_DISK_INFO_PROTOCOL;
   @retval EFI_SUCCESS           The command was accepted without any errors.
   @retval EFI_NOT_FOUND         Device does not support this data class 
   @retval EFI_DEVICE_ERROR      Error reading InquiryData from device 
-  @retval EFI_BUFFER_TOO_SMALL  IntquiryDataSize not big enough 
+  @retval EFI_BUFFER_TOO_SMALL  InquiryDataSize not big enough 
 
 **/
 typedef

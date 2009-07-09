@@ -1,6 +1,6 @@
 /** @file
-  Provides services to notify PCI bus driver that some events have happened in a hot-plug controller
-  (for example, PC Card socket, or PHPC), and ask PCI bus driver to create or destroy handles for the
+  Provides services to notify the PCI bus driver that some events have happened in a hot-plug controller
+  (such as a PC Card socket, or PHPC), and to ask the PCI bus driver to create or destroy handles for 
   PCI-like devices.
 
 Copyright (c) 2006 - 2009, Intel Corporation                                                         
@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef enum {
   ///
   /// The PCI bus driver is requested to create handles for the specified devices. An array of
-  /// EFI_HANDLE is returned, a NULL element marks the end of the array.
+  /// EFI_HANDLE is returned, with a NULL element marking the end of the array.
   ///
   EfiPciHotPlugRequestAdd,
 
@@ -38,18 +38,16 @@ typedef enum {
 typedef struct _EFI_PCI_HOTPLUG_REQUEST_PROTOCOL  EFI_PCI_HOTPLUG_REQUEST_PROTOCOL;
 
 /**
-  This function allows the PCI bus driver to be notified to act as requested when a hot-plug event has
-  happened on the hot-plug controller. Currently, the operations include add operation and remove operation.
-  
+  This function allows the PCI bus driver to be notified to act as requested when a hot-plug event has  happened on the hot-plug controller. Currently, the operations include add operation and remove operation.  
   @param This                    A pointer to the hot plug request protocol.
   @param Operation               The operation the PCI bus driver is requested to make.
   @param Controller              The handle of the hot-plug controller.
   @param RemainingDevicePath     The remaining device path for the PCI-like hot-plug device.
-  @param NumberOfChildren        The number of child handles. For a add operation, it is an output parameter. 
+  @param NumberOfChildren        The number of child handles. For an add operation, it is an output parameter. 
                                  For a remove operation, it's an input parameter. When it contains a non-zero
                                  value, children handles specified in ChildHandleBuffer are destroyed. Otherwise,
                                  PCI bus driver is notified to stop managing the controller handle.
-  @param ChildHandleBuffer       The buffer which contains the child handles. For a add operation, it is an output 
+  @param ChildHandleBuffer       The buffer which contains the child handles. For an add operation, it is an output 
                                  parameter and contains all newly created child handles. For a remove operation, it 
                                  contains child handles to be destroyed when NumberOfChildren contains a non-
                                  zero value. It can be NULL when NumberOfChildren is 0. It's the caller's 
