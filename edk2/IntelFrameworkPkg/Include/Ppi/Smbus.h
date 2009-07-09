@@ -79,6 +79,8 @@ EFI_STATUS
 /**
   CallBack function can be registered in EFI_PEI_SMBUS_PPI_NOTIFY.
 
+  This function is user-defined and will called when the SlaveAddress/Data pair happens.
+
   @param[in]  PeiServices    A pointer to the system PEI Services Table.
   @param[in]  This           A pointer to the EFI_PEI_SMBUS_PPI instance.
   @param[in]  SlaveAddress   The SMBUS hardware address to which the SMBUS
@@ -113,6 +115,7 @@ EFI_STATUS
                                 The UDID may not exist for SMBus devices with fixed addresses.
   @param[in, out] SlaveAddress  The new SMBus address for the slave device for
                                 which the operation is targeted.
+                                This address may be NULL.
 
   @retval EFI_SUCCESS           The SMBus slave device address was set.
   @retval EFI_INVALID_PARAMETER SlaveAddress is NULL.
@@ -120,6 +123,9 @@ EFI_STATUS
                                 due to a lack of resources.
   @retval EFI_TIMEOUT           The SMBus slave device did not respond.
   @retval EFI_DEVICE_ERROR      The request was not completed because the transaction failed.
+  @retval EFI_UNSUPPORTED       ArpDevice() are not implemented by this PEIM. 
+                                This return value is not defined in Framwork Specification.
+                                This return value had been intruduced in PI Specification.
 
 **/
 typedef
@@ -142,7 +148,10 @@ EFI_STATUS
   @param[in, out] SmbusDeviceMap The pointer to the device map as enumerated
                                  by the SMBus controller driver.
 
-  @retval EFI_SUCCESS   The device map was returned correctly in the buffer.
+  @retval EFI_SUCCESS       The device map was returned correctly in the buffer.
+  @retval EFI_UNSUPPORTED   GetArpMap() are not implemented by this PEIM. 
+                            This return value was not defined in Framwork Specification.
+                            This return value had been intruduced in PI Specification.
 
 **/
 typedef
@@ -160,6 +169,8 @@ EFI_STATUS
 
   The Notify() function registers all the callback functions to allow the
   bus driver to call these functions when the SlaveAddress/Data pair happens.
+  All functions to be registered with EFI_PEI_SMBUS_PPI_NOTIFY must be of type
+  EFI_PEI_SMBUS_NOTIFY_FUNCTION.
 
   @param[in] PeiServices    A pointer to the system PEI Services Table.
   @param[in] This           A pointer to the EFI_PEI_SMBUS_PPI instance.
@@ -171,6 +182,9 @@ EFI_STATUS
                             detects the SlaveAddress and Data pair.
 
   @retval EFI_SUCCESS       NotifyFunction has been registered.
+  @retval EFI_UNSUPPORTED   Notify() are not implemented by this PEIM. 
+                            This return value is not defined in Framwork Specification.
+                            This return value had been intruduced in PI Specification.
 
 **/
 typedef
