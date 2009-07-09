@@ -542,6 +542,7 @@ DhcpFillOption (
   @param[out] OptionPoint            The array that contains the DHCP options. Caller
                                      should free it.
 
+  @retval EFI_NOT_FOUND          Cannot find any option.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
   @retval EFI_INVALID_PARAMETER  The options are mal-formated
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
@@ -603,6 +604,7 @@ DhcpParseOption (
   *OptionPoint  = NULL;
 
   if (OptNum == 0) {
+    Status = EFI_NOT_FOUND;
     goto ON_EXIT;
   }
 
@@ -673,13 +675,12 @@ DhcpValidateOptions (
   if (EFI_ERROR (Status) || (Count == 0)) {
     return Status;
   }
-
+  
   Updated = FALSE;
   ZeroMem (&Parameter, sizeof (Parameter));
 
   for (Index = 0; Index < Count; Index++) {
     Option = &AllOption[Index];
-    ASSERT (Option != NULL);
 
     //
     // Find the format of the option then validate it.
