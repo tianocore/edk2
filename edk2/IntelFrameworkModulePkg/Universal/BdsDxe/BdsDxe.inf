@@ -169,6 +169,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
 
 [Depex]
   TRUE
