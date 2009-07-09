@@ -30,7 +30,7 @@ typedef struct _EFI_DISK_INFO_PROTOCOL  EFI_DISK_INFO_PROTOCOL;
   This function is used by the IDE bus driver to get inquiry data. 
   Data format of Identify data is defined by the Interface GUID.
 
-  @param  This                  Protocol instance pointer. 
+  @param  This                  Pointer to the EFI_DISK_INFO_PROTOCOL instance.
   @param  InquiryData           Pointer to a buffer for the inquiry data.
   @param  InquiryDataSize       Pointer to the value for the inquiry data size.
 
@@ -43,7 +43,7 @@ typedef struct _EFI_DISK_INFO_PROTOCOL  EFI_DISK_INFO_PROTOCOL;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_INQUIRY)(
-  IN EFI_DISK_INFO_PROTOCOL           * This,
+  IN EFI_DISK_INFO_PROTOCOL           *This,
   IN OUT VOID                         *InquiryData,
   IN OUT UINT32                       *InquiryDataSize
   );
@@ -53,7 +53,7 @@ EFI_STATUS
   This function is used by the IDE bus driver to get identify data. 
   Data format of Identify data is defined by the Interface GUID.
 
-  @param  This                  Protocol instance pointer. 
+  @param  This                  Pointer to the EFI_DISK_INFO_PROTOCOL instance.
   @param  IdentifyData          Pointer to a buffer for the identify data.
   @param  IdentifyDataSize      Pointer to the value for the identify data size.
 
@@ -66,7 +66,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_IDENTIFY)(
-  IN EFI_DISK_INFO_PROTOCOL           * This,
+  IN EFI_DISK_INFO_PROTOCOL           *This,
   IN OUT VOID                         *IdentifyData,
   IN OUT UINT32                       *IdentifyDataSize
   );
@@ -76,7 +76,7 @@ EFI_STATUS
   This function is used by the IDE bus driver to get sense data. 
   Data format of Sense data is defined by the Interface GUID.
 
-  @param  This                  Protocol instance pointer. 
+  @param  This                  Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
   @param  SenseData             Pointer to the SenseData. 
   @param  SenseDataSize         Size of SenseData in bytes. 
   @param  SenseDataNumber       Pointer to the value for the identify data size.
@@ -90,7 +90,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_SENSE_DATA)(
-  IN EFI_DISK_INFO_PROTOCOL           * This,
+  IN EFI_DISK_INFO_PROTOCOL           *This,
   IN OUT VOID                         *SenseData,
   IN OUT UINT32                       *SenseDataSize,
   OUT UINT8                           *SenseDataNumber
@@ -99,7 +99,7 @@ EFI_STATUS
 /**
   This function is used by the IDE bus driver to get controller information.
 
-  @param  This                  Protocol instance pointer. 
+  @param  This                  Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
   @param  IdeChannel            Pointer to the Ide Channel number. Primary or secondary.
   @param  IdeDevice             Pointer to the Ide Device number. Master or slave.
 
@@ -110,7 +110,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DISK_INFO_WHICH_IDE)(
-  IN EFI_DISK_INFO_PROTOCOL           * This,
+  IN EFI_DISK_INFO_PROTOCOL           *This,
   OUT UINT32                          *IdeChannel,
   OUT UINT32                          *IdeDevice
   );
