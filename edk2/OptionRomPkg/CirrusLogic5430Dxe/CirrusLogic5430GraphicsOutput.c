@@ -20,6 +20,51 @@ Abstract:
 
 **/
 #include "CirrusLogic5430.h"
+#include <IndustryStandard/Acpi.h>
+
+
+STATIC
+VOID
+CirrusLogic5430CompleteModeInfo (
+  OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info
+  )
+{
+  Info->Version = 0;
+  Info->PixelFormat = PixelBitMask;
+  Info->PixelInformation.RedMask = PIXEL_RED_MASK;
+  Info->PixelInformation.GreenMask = PIXEL_GREEN_MASK;
+  Info->PixelInformation.BlueMask = PIXEL_BLUE_MASK;
+  Info->PixelInformation.ReservedMask = 0;
+  Info->PixelsPerScanLine = Info->HorizontalResolution;
+}
+
+
+STATIC
+EFI_STATUS
+CirrusLogic5430CompleteModeData (
+  IN  CIRRUS_LOGIC_5430_PRIVATE_DATA    *Private,
+  OUT EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE *Mode
+  )
+{
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR     *FrameBufDesc;
+
+  Info = Mode->Info;
+  CirrusLogic5430CompleteModeInfo (Info);
+
+  Private->PciIo->GetBarAttributes (
+                        Private->PciIo,
+                        0,
+                        NULL,
+                        (VOID**) &FrameBufDesc
+                        );
+
+  Mode->FrameBufferBase = FrameBufDesc->AddrRangeMin;
+  Mode->FrameBufferSize = Info->HorizontalResolution * Info->VerticalResolution;
+
+  return EFI_SUCCESS;
+}
+
 
 //
 // Graphics Output Protocol Member Functions
@@ -72,11 +117,9 @@ Routine Description:
 
   *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
 
-  (*Info)->Version = 0;
   (*Info)->HorizontalResolution = Private->ModeData[ModeNumber].HorizontalResolution;
   (*Info)->VerticalResolution   = Private->ModeData[ModeNumber].VerticalResolution;
-  (*Info)->PixelFormat = PixelBltOnly;
-  (*Info)->PixelsPerScanLine = (*Info)->HorizontalResolution;
+  CirrusLogic5430CompleteModeInfo (*Info);
 
   return EFI_SUCCESS;
 }
@@ -104,8 +147,8 @@ Routine Description:
 
 --*/
 {
-  CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
-  CIRRUS_LOGIC_5430_MODE_DATA     *ModeData;
+  CIRRUS_LOGIC_5430_PRIVATE_DATA    *Private;
+  CIRRUS_LOGIC_5430_MODE_DATA       *ModeData;
 
   Private = CIRRUS_LOGIC_5430_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS (This);
 
@@ -130,12 +173,9 @@ Routine Description:
   This->Mode->Mode = ModeNumber;
   This->Mode->Info->HorizontalResolution = ModeData->HorizontalResolution;
   This->Mode->Info->VerticalResolution = ModeData->VerticalResolution;
-  This->Mode->Info->PixelFormat = PixelBltOnly;
-  This->Mode->Info->PixelsPerScanLine =  ModeData->HorizontalResolution;
   This->Mode->SizeOfInfo = sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
 
-  This->Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS)(UINTN)NULL;
-  This->Mode->FrameBufferSize = 0;
+  CirrusLogic5430CompleteModeData (Private, This->Mode);
 
   Private->HardwareNeedsStarting  = FALSE;
 
@@ -289,9 +329,9 @@ Returns:
       for (X = 0; X < Width; X++) {
         Blt         = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltBuffer + (DstY * Delta) + (DestinationX + X) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
 
-        Blt->Red    = (UINT8) (Private->LineBuffer[X] & 0xe0);
-        Blt->Green  = (UINT8) ((Private->LineBuffer[X] & 0x1c) << 3);
-        Blt->Blue   = (UINT8) ((Private->LineBuffer[X] & 0x03) << 6);
+        Blt->Red    = PIXEL_TO_RED_BYTE (Private->LineBuffer[X]);
+        Blt->Green  = PIXEL_TO_GREEN_BYTE (Private->LineBuffer[X]);
+        Blt->Blue   = PIXEL_TO_BLUE_BYTE (Private->LineBuffer[X]);
       }
     }
     break;
@@ -344,7 +384,7 @@ Returns:
 
   case EfiBltVideoFill:
     Blt       = BltBuffer;
-    Pixel     = (UINT8) ((Blt->Red & 0xe0) | ((Blt->Green >> 3) & 0x1c) | ((Blt->Blue >> 6) & 0x03));
+    Pixel     = RGB_BYTES_TO_PIXEL (Blt->Red, Blt->Green, Blt->Blue);
     WidePixel = (Pixel << 8) | Pixel;
     WidePixel = (WidePixel << 16) | WidePixel;
 
@@ -399,8 +439,14 @@ Returns:
     for (SrcY = SourceY, DstY = DestinationY; SrcY < (Height + SourceY); SrcY++, DstY++) {
 
       for (X = 0; X < Width; X++) {
-        Blt                     = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltBuffer + (SrcY * Delta) + (SourceX + X) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-        Private->LineBuffer[X]  = (UINT8) ((Blt->Red & 0xe0) | ((Blt->Green >> 3) & 0x1c) | ((Blt->Blue >> 6) & 0x03));
+        Blt =
+          (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) (
+              (UINT8 *) BltBuffer +
+              (SrcY * Delta) +
+              ((SourceX + X) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))
+            );
+        Private->LineBuffer[X]  =
+          RGB_BYTES_TO_PIXEL (Blt->Red, Blt->Green, Blt->Blue);
       }
 
       Offset = (DstY * Private->ModeData[CurrentMode].HorizontalResolution) + DestinationX;
