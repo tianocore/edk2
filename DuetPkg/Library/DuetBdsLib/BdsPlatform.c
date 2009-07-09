@@ -1139,7 +1139,7 @@ Returns:
   // from the graphic lib
   //
   if (QuietBoot) {
-    Status = EnableQuietBoot (&gEfiDefaultBmpLogoGuid);
+    Status = EnableQuietBoot (PcdGetPtr(PcdLogoFile));
     if (EFI_ERROR (Status)) {
       DisableQuietBoot ();
       return;

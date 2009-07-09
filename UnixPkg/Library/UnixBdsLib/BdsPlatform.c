@@ -281,7 +281,7 @@ Returns:
   // from the graphic lib
   //
   if (QuietBoot) {
-    EnableQuietBoot (&gEfiDefaultBmpLogoGuid);
+    EnableQuietBoot (PcdGetPtr(PcdLogoFile));
     //
     // Perform system diagnostic
     //

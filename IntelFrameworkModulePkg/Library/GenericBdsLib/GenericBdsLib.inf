@@ -74,7 +74,6 @@
   gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID (The identifier of memory type information type in system table)
                                                 ## CONSUMES ## GUID HOB (The hob holding memory type information)
   gEfiVTUTF8Guid                                ## CONSUMES ## GUID (The type of terminal)
-  gEfiShellFileGuid                             ## CONSUMES ## GUID (Identify the shell file)
   gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootCurrent" (The boot option of current boot)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"BootXX" (Boot option variable)
                                                 ## CONSUMES           ## Variable:L"Timeout" (The time out value in second of showing progress bar)
@@ -110,6 +109,8 @@
   gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
   gEfiSecurityArchProtocolGuid                  # PROTOCOL CONSUMES
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile

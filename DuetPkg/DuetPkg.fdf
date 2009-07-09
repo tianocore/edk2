@@ -117,7 +117,7 @@ INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
   # Binary INF file to support toggle among different CPU architectures.
 INF  FatBinPkg/EnhancedFatDxe/Fat.inf
 
-FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
 

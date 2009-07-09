@@ -220,7 +220,7 @@ BdsLibBootViaBootOption (
   //
   // If the boot option point to Internal FV shell, make sure it is valid
   //
-  Status = BdsLibUpdateFvFileDevicePath (&DevicePath, &gEfiShellFileGuid);
+  Status = BdsLibUpdateFvFileDevicePath (&DevicePath, PcdGetPtr(PcdShellFile));
   if (!EFI_ERROR(Status)) {
     if (Option->DevicePath != NULL) {
       FreePool(Option->DevicePath);
@@ -1147,7 +1147,7 @@ BdsLibEnumerateAllBootOption (
 
     Status = Fv->ReadFile (
                   Fv,
-                  &gEfiShellFileGuid,
+                  PcdGetPtr(PcdShellFile),
                   NULL,
                   &Size,
                   &Type,
@@ -1232,7 +1232,7 @@ BdsLibBuildOptionFromShell (
   //
   // Build the shell device path
   //
-  EfiInitializeFwVolDevicepathNode (&ShellNode, &gEfiShellFileGuid);
+  EfiInitializeFwVolDevicepathNode (&ShellNode, PcdGetPtr(PcdShellFile));
 
   DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *) &ShellNode);
 
@@ -1767,7 +1767,7 @@ BdsLibIsValidEFIBootOptDevicePathExt (
     // If the boot option point to Internal FV shell, make sure it is valid
     //
     TempDevicePath = DevPath; 
-    Status = BdsLibUpdateFvFileDevicePath (&TempDevicePath, &gEfiShellFileGuid);
+    Status = BdsLibUpdateFvFileDevicePath (&TempDevicePath, PcdGetPtr(PcdShellFile));
     if (Status == EFI_ALREADY_STARTED) {
       return TRUE;
     } else {

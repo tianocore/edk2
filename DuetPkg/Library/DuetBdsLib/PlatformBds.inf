@@ -64,3 +64,5 @@
   
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut  
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile  
+  

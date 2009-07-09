@@ -45,7 +45,6 @@ Abstract:
 
 #include <Protocol/PciIo.h>
 
-#include <Guid/Logo.h>
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
 #include <Guid/Mps.h>

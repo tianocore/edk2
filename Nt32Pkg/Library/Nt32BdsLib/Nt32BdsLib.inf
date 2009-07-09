@@ -54,13 +54,13 @@
   GenericBdsLib
 
 [Guids]
-  gEfiDefaultBmpLogoGuid
   gEfiWinNtSystemConfigGuid
 
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
-  
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
+
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
