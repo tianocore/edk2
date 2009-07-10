@@ -18,6 +18,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalIsaBus.h"
 
 //
+// Bits definition of PcdIsaBusSupportedFeatures
+//
+#define PCD_ISA_BUS_SUPPORT_DMA                  BIT0
+#define PCD_ISA_BUS_ONLY_SUPPORT_SLAVE_DMA       BIT1
+#define PCD_ISA_BUS_SUPPORT_ISA_MEMORY           BIT2
+
+//
 // ISA I/O Support Function Prototypes
 //
 
