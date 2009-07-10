@@ -629,14 +629,15 @@ ConvertBmpToGopBlt (
   //
   // Calculate the BltBuffer needed size.
   //
-  BltBufferSize = BmpHeader->PixelWidth * BmpHeader->PixelHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
-  if (BltBufferSize >= SIZE_4GB) {
-    //
-    // If the BMP resolution is too large
-    //
-    return EFI_UNSUPPORTED;
-  }
-  
+  BltBufferSize = MultU64x32 ((UINT64) BmpHeader->PixelWidth, BmpHeader->PixelHeight);
+  //
+  // Ensure the BltBufferSize * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) doesn't overflow
+  //
+  if (BltBufferSize > DivU64x32 ((UINTN) ~0, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) {
+      return EFI_UNSUPPORTED;
+   }
+  BltBufferSize = MultU64x32 (BltBufferSize, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+
   IsAllocated   = FALSE;
   if (*GopBlt == NULL) {
     //
