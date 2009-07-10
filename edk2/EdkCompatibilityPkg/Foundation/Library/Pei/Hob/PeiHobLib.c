@@ -273,6 +273,7 @@ Returns:
 
   Hob.Header->HobType = EFI_HOB_TYPE_GUID_EXTENSION;
   Length              = sizeof(EFI_HOB_GUID_TYPE) + BufferSize;
+  Length              = (Length + 0x7) & (~0x7);
   Hob.Header->HobLength  = (UINT16)Length;
   CopyMem(&Hob.Guid->Name, Guid, sizeof(EFI_GUID));
   CopyMem(Hob.Raw + sizeof(EFI_HOB_GUID_TYPE), Buffer, BufferSize);
