@@ -34,8 +34,6 @@
 #ifndef _FRAMEWORK_STATUS_CODE_H_
 #define _FRAMEWORK_STATUS_CODE_H_
 
-#include <PiPei.h>
-
 //
 // Section 1
 // Class definitions

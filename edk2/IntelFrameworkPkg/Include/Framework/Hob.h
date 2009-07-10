@@ -20,8 +20,6 @@
 #ifndef _FRAMEWORK_HOB_H_
 #define _FRAMEWORK_HOB_H_
 
-#include <PiPei.h>
-
 ///
 /// Capsule volume HOB -- identical to a firmware volume
 /// This macro is defined  to comply with hob Framework Spec. And the marco has been

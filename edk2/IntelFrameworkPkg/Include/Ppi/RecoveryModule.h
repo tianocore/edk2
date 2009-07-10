@@ -22,8 +22,6 @@
 #ifndef __PEI_RECOVERY_MODULE_PPI_H__
 #define __PEI_RECOVERY_MODULE_PPI_H__
 
-#include <PiPei.h>
-
 ///
 ///  Inconsistent with specification here: 
 ///  GUID marco name has been changed to the consistent PPI GUID macro name.

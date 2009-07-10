@@ -18,8 +18,6 @@
 #ifndef __SECTION_EXTRACTION_H__
 #define __SECTION_EXTRACTION_H__
 
-#include <PiPei.h>
-
 #define EFI_PEI_SECTION_EXTRACTION_PPI_GUID \
   { \
     0x4F89E208, 0xE144, 0x4804, {0x9E, 0xC8, 0x0F, 0x89, 0x4F, 0x7E, 0x36, 0xD7 } \

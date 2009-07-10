@@ -20,8 +20,6 @@
 #ifndef _ACPI_S3_SAVE_PROTOCOL_H_
 #define _ACPI_S3_SAVE_PROTOCOL_H_
 
-#include <PiDxe.h>
-
 //
 // Forward reference for pure ANSI compatability
 //

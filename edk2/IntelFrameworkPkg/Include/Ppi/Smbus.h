@@ -20,7 +20,6 @@
 #ifndef _PEI_SMBUS_PPI_H_
 #define _PEI_SMBUS_PPI_H_
 
-#include <PiPei.h>
 #include <Ppi/Smbus2.h>
 
 #define EFI_PEI_SMBUS_PPI_GUID \

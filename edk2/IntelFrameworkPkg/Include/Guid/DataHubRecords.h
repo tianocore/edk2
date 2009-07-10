@@ -17,7 +17,7 @@
 #ifndef _DATAHUB_RECORDS_GUID_H_
 #define _DATAHUB_RECORDS_GUID_H_
 
-#include <PiPei.h>
+#include <Framework/DataHubRecords.h>
 
 #define EFI_PROCESSOR_SUBCLASS_GUID \
   { 0x26fdeb7e, 0xb8af, 0x4ccf, {0xaa, 0x97, 0x02, 0x63, 0x3c, 0xe4, 0x8c, 0xa7 } }

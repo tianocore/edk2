@@ -20,7 +20,6 @@
 #ifndef _SMM_GPI_DISPATCH_H_
 #define _SMM_GPI_DISPATCH_H_
 
-#include <PiDxe.h>
 
 //
 // Global ID for the GPI SMI Protocol

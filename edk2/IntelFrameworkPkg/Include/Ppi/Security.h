@@ -25,8 +25,6 @@
 #ifndef __SECURITY_PPI_H__
 #define __SECURITY_PPI_H__
 
-#include <PiPei.h>
-
 #define EFI_PEI_SECURITY_PPI_GUID \
   { \
     0x1388066e, 0x3a57, 0x4efa, {0x98, 0xf3, 0xc1, 0x2f, 0x3a, 0x95, 0x8a, 0x29 } \

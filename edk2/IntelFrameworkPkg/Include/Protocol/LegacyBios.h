@@ -32,7 +32,7 @@
 #ifndef _EFI_LEGACY_BIOS_H_
 #define _EFI_LEGACY_BIOS_H_
 
-#include <FrameworkDxe.h>
+#include <Framework/Legacy16.h>
 
 #define EFI_LEGACY_BIOS_PROTOCOL_GUID \
   { \

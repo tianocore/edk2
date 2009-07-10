@@ -21,8 +21,6 @@
 #ifndef __FIRMWARE_FILE_SYSTEM_GUID_H__
 #define __FIRMWARE_FILE_SYSTEM_GUID_H__
 
-#include <PiPei.h>
-
 ///
 /// GUIDs defined by the FFS specification.
 ///

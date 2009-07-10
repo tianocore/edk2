@@ -24,9 +24,7 @@
 #ifndef _DATAHUB_RECORDS_H_
 #define _DATAHUB_RECORDS_H_
 
-#include <PiPei.h>
-#include <Protocol/DevicePath.h>
-#include <Protocol/FrameworkHii.h>
+#include <Framework/FrameworkInternalFormRepresentation.h>
 
 #define EFI_PROCESSOR_SUBCLASS_VERSION    0x0100
 

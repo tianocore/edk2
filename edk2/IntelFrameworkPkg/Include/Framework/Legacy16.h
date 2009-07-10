@@ -25,8 +25,6 @@
 #ifndef _FRAMEWORK_LEGACY_16_H_
 #define _FRAMEWORK_LEGACY_16_H_
 
-#include <Base.h>
-
 #pragma pack(1)
 
 typedef UINT8                       SERIAL_MODE;

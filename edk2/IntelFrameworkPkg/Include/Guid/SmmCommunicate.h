@@ -21,8 +21,6 @@
 #ifndef _SMM_COMMUNICATE_GUID_H_
 #define _SMM_COMMUNICATE_GUID_H_
 
-#include <PiPei.h>
-
 ///
 /// Inconsistent with specification here: 
 /// GUID definition format has been changed, because the GUID format in Framework spec is incorrect.

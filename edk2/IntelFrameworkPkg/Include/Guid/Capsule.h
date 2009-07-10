@@ -17,8 +17,6 @@
 #ifndef _CAPSULE_GUID_H__
 #define _CAPSULE_GUID_H__
 
-#include <PiPei.h>
-
 //
 // This is the GUID of the capsule header of the image on disk.
 //

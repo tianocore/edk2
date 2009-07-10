@@ -16,7 +16,6 @@
 #ifndef __PEICIS_H__
 #define __PEICIS_H__
 
-#include <PiPei.h>
 #include <Ppi/PciCfg.h>
 //
 // Framework PEI Specification Revision information

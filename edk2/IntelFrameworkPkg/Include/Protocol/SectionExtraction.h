@@ -25,9 +25,6 @@
 #ifndef _SECTION_EXTRACTION_PROTOCOL_H_
 #define _SECTION_EXTRACTION_PROTOCOL_H_
 
-#include <PiDxe.h>
-#include <Framework/FirmwareVolumeImageFormat.h>
-
 //
 // Protocol GUID definition
 //

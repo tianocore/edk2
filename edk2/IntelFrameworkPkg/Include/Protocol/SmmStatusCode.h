@@ -23,9 +23,6 @@
 #ifndef _EFI_SMM_ICHN_DISPATCH_H_
 #define _EFI_SMM_ICHN_DISPATCH_H_
 
-#include <PiDxe.h>
-#include <Pi/PiStatusCode.h>
-
 //
 // Global ID for the Smm Status code Protocol
 //

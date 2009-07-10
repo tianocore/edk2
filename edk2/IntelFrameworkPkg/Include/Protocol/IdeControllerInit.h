@@ -29,7 +29,6 @@
 #ifndef _EFI_IDE_CONTROLLER_INIT_PROTOCOL_H_
 #define _EFI_IDE_CONTROLLER_INIT_PROTOCOL_H_
 
-#include <PiDxe.h>
 
 ///
 /// Global ID for the EFI Platform IDE Protocol GUID

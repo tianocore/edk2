@@ -21,7 +21,6 @@
 #ifndef _EFI_LEGACY_REGION_H_
 #define _EFI_LEGACY_REGION_H_
 
-#include <PiDxe.h>
 
 #define EFI_LEGACY_REGION_PROTOCOL_GUID \
   { \

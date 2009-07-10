@@ -19,7 +19,6 @@
 #ifndef _EFI_LEGACY_INTERRUPT_H_
 #define _EFI_LEGACY_INTERRUPT_H_
 
-#include <PiDxe.h>
 
 #define EFI_LEGACY_INTERRUPT_PROTOCOL_GUID \
   { \

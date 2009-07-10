@@ -19,10 +19,15 @@
 #ifndef _FRAMEWORK_DXE_H_
 #define _FRAMEWORK_DXE_H_
 
-#include <FrameworkPei.h>
-
-#include <Framework/DxeCis.h>
+#include <PiDxe.h>
 
 #include <Framework/FrameworkInternalFormRepresentation.h>
+#include <Framework/DataHubRecords.h>
+#include <Framework/FirmwareVolumeImageFormat.h>
+#include <Framework/FirmwareVolumeHeader.h>
+#include <Framework/Hob.h>
+#include <Framework/Legacy16.h>
+#include <Framework/StatusCode.h>
+#include <Framework/DxeCis.h>
 
 #endif
