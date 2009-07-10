@@ -26,7 +26,12 @@
 
 #include <Framework/FrameworkInternalFormRepresentation.h>
 
-#define EFI_PROCESSOR_SUBCLASS_VERSION    0x0100
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the value is 0x0100.
+/// Keep it unchanged from the perspective of binary consistency.
+///
+#define EFI_PROCESSOR_SUBCLASS_VERSION    0x00010000
 
 #pragma pack(1)
 
@@ -118,7 +123,7 @@ typedef struct _FLOOPY_CONN_DEVICE_PATH {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec0.9, this data structure and corrsponding fields are NOT defined.
+/// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
 /// It's implementation-specific to simplify the code logic.
 ///
 typedef union _EFI_MISC_PORT_DEVICE_PATH {
@@ -134,6 +139,16 @@ typedef union _EFI_MISC_PORT_DEVICE_PATH {
 } EFI_MISC_PORT_DEVICE_PATH;
 
 #pragma pack()
+
+///
+/// String Token Definition
+///
+/// Inconsistent with specification here:  
+/// The macro isn't defined by any spec.
+/// Keep it unchanged for backward compatibility.
+///
+#define EFI_STRING_TOKEN          UINT16
+
 ///
 /// Each data record that is a member of some subclass starts with a standard 
 /// header of type EFI_SUBCLASS_TYPE1_HEADER.
@@ -246,7 +261,7 @@ typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_CORE_FREQUENCY_DATA;
 /// that the processor/driver supports automatic frequency selection. 
 ///
 /// Inconsistent with specification here:  
-/// It's a typo of MiscSubclass 0.9 spec. It should be a pointer since it refers to a list of frequencies.
+/// According to MiscSubclass 0.9 spec, it should be a pointer since it refers to a list of frequencies.
 ///
 typedef EFI_EXP_BASE10_DATA        *EFI_PROCESSOR_CORE_FREQUENCY_LIST_DATA;
 
@@ -276,10 +291,16 @@ typedef struct {
   UINT32                            ProcessorReserved2: 4;
 } EFI_PROCESSOR_SIGNATURE;
 
+
+///
+/// Inconsistent with specification here:  
+/// The name of third field in ProcSubClass spec0.9 is LogicalProcessorCount.
+/// Keep it unchanged for backward compatibility.
+///
 typedef struct {
   UINT32                            ProcessorBrandIndex    :8;
   UINT32                            ProcessorClflush       :8;
-  UINT32                            LogicalProcessorCount  :8;
+  UINT32                            ProcessorReserved      :8;
   UINT32                            ProcessorDfltApicId    :8;
 } EFI_PROCESSOR_MISC_INFO;
 
@@ -423,7 +444,8 @@ typedef enum {
   EfiProcessorFamilyUltraSparcIII          = 0x57,
   ///
   /// Inconsistent with specification here:  
-  /// This field in ProcSubClass spec0.9 is defined as EfiProcessorFamilyUltraSparcIIi, it's a typo.
+  /// This field in ProcSubClass spec 0.9 is defined as EfiProcessorFamilyUltraSparcIIi.
+  /// Change it to EfiProcessorFamilyUltraSparcIIIi to avoid build break.
   ///
   EfiProcessorFamilyUltraSparcIIIi         = 0x58,
   EfiProcessorFamily68040                  = 0x60,
@@ -653,16 +675,26 @@ typedef enum {
 } EFI_PROCESSOR_SOCKET_TYPE_DATA;
 
 typedef STRING_REF                  EFI_PROCESSOR_SOCKET_NAME_DATA;
-typedef EFI_INTER_LINK_DATA         EFI_PROCESSOR_CACHE_ASSOCIATION_DATA;
+
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the naming is EFI_PROCESSOR_CACHE_ASSOCIATION_DATA.
+/// Keep it unchanged for backward compatibilty.
+///
+typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
 
 ///
 /// This data record refers to the health status of the processor. 
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the naming is EFI_PROCESSOR_HEALTH_STATUS_DATA.
+/// Keep it unchanged for backward compatibilty.
 ///
 typedef enum {
   EfiProcessorHealthy        = 1,
   EfiProcessorPerfRestricted = 2,
   EfiProcessorFuncRestricted = 3 
-} EFI_PROCESSOR_HEALTH_STATUS_DATA;
+} EFI_PROCESSOR_HEALTH_STATUS;
 
 ///
 /// This data record refers to the package number of this processor. Multiple logical processors can 
@@ -671,30 +703,62 @@ typedef enum {
 ///
 typedef UINTN                       EFI_PROCESSOR_PACKAGE_NUMBER_DATA;
 
-#define EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER           0x00000001
-#define EFI_PROCESSOR_BUS_FREQUENCY_RECORD_NUMBER       0x00000002
-#define EFI_PROCESSOR_VERSION_RECORD_NUMBER             0x00000003
-#define EFI_PROCESSOR_MANUFACTURER_RECORD_NUMBER        0x00000004
-#define EFI_PROCESSOR_SERIAL_NUMBER_RECORD_NUMBER       0x00000005
-#define EFI_PROCESSOR_ID_RECORD_NUMBER                  0x00000006
-#define EFI_PROCESSOR_TYPE_RECORD_NUMBER                0x00000007
-#define EFI_PROCESSOR_FAMILY_RECORD_NUMBER              0x00000008
-#define EFI_PROCESSOR_VOLTAGE_RECORD_NUMBER             0x00000009
-#define EFI_PROCESSOR_APIC_BASE_ADDRESS_RECORD_NUMBER   0x0000000A
-#define EFI_PROCESSOR_APIC_ID_RECORD_NUMBER             0x0000000B
-#define EFI_PROCESSOR_APIC_VER_NUMBER_RECORD_NUMBER     0x0000000C
-#define EFI_PROCESSOR_MICROCODE_REVISION_RECORD_NUMBER  0x0000000D
-#define EFI_PROCESSOR_STATUS_RECORD_NUMBER              0x0000000E
-#define EFI_PROCESSOR_SOCKET_TYPE_RECORD_NUMBER         0x0000000F
-#define EFI_PROCESSOR_SOCKET_NAME_RECORD_NUMBER         0x00000010
-#define EFI_PROCESSOR_CACHE_ASSOCIATION_RECORD_NUMBER   0x00000011
-#define EFI_PROCESSOR_MAX_FREQUENCY_RECORD_NUMBER       0x00000012
-#define EFI_PROCESSOR_ASSET_TAG_RECORD_NUMBER           0x00000013
-#define EFI_PROCESSOR_MAX_FSB_FREQUENCY_RECORD_NUMBER   0x00000014
-#define EFI_PROCESSOR_PACKAGE_NUMBER_RECORD_NUMBER      0x00000015
-#define EFI_PROCESSOR_FREQUENCY_LIST_RECORD_NUMBER      0x00000016
-#define EFI_PROCESSOR_FSB_FREQUENCY_LIST_RECORD_NUMBER  0x00000017
-#define EFI_PROCESSOR_HEALTH_STATUS_RECORD_NUMBER       0x00000018
+///
+/// Inconsistent with specification here:
+/// In ProcSubclass spec 0.9, the enumeration type data structure is NOT defined.
+/// The equivalent in spec is 
+///      #define EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER           0x00000001
+///      #define EFI_PROCESSOR_BUS_FREQUENCY_RECORD_NUMBER       0x00000002
+///      #define EFI_PROCESSOR_VERSION_RECORD_NUMBER             0x00000003
+///      #define EFI_PROCESSOR_MANUFACTURER_RECORD_NUMBER        0x00000004
+///      #define EFI_PROCESSOR_SERIAL_NUMBER_RECORD_NUMBER       0x00000005
+///      #define EFI_PROCESSOR_ID_RECORD_NUMBER                  0x00000006
+///      #define EFI_PROCESSOR_TYPE_RECORD_NUMBER                0x00000007
+///      #define EFI_PROCESSOR_FAMILY_RECORD_NUMBER              0x00000008
+///      #define EFI_PROCESSOR_VOLTAGE_RECORD_NUMBER             0x00000009
+///      #define EFI_PROCESSOR_APIC_BASE_ADDRESS_RECORD_NUMBER   0x0000000A
+///      #define EFI_PROCESSOR_APIC_ID_RECORD_NUMBER             0x0000000B
+///      #define EFI_PROCESSOR_APIC_VER_NUMBER_RECORD_NUMBER     0x0000000C
+///      #define EFI_PROCESSOR_MICROCODE_REVISION_RECORD_NUMBER  0x0000000D
+///      #define EFI_PROCESSOR_STATUS_RECORD_NUMBER              0x0000000E
+///      #define EFI_PROCESSOR_SOCKET_TYPE_RECORD_NUMBER         0x0000000F
+///      #define EFI_PROCESSOR_SOCKET_NAME_RECORD_NUMBER         0x00000010
+///      #define EFI_PROCESSOR_CACHE_ASSOCIATION_RECORD_NUMBER   0x00000011
+///      #define EFI_PROCESSOR_MAX_FREQUENCY_RECORD_NUMBER       0x00000012
+///      #define EFI_PROCESSOR_ASSET_TAG_RECORD_NUMBER           0x00000013
+///      #define EFI_PROCESSOR_MAX_FSB_FREQUENCY_RECORD_NUMBER   0x00000014
+///      #define EFI_PROCESSOR_PACKAGE_NUMBER_RECORD_NUMBER      0x00000015
+///      #define EFI_PROCESSOR_FREQUENCY_LIST_RECORD_NUMBER      0x00000016
+///      #define EFI_PROCESSOR_FSB_FREQUENCY_LIST_RECORD_NUMBER  0x00000017
+///      #define EFI_PROCESSOR_HEALTH_STATUS_RECORD_NUMBER       0x00000018
+///
+/// Keep the definition unchanged for backward compatibility.
+typedef enum {
+  ProcessorCoreFrequencyRecordType     = 1,
+  ProcessorFsbFrequencyRecordType      = 2,
+  ProcessorVersionRecordType           = 3,
+  ProcessorManufacturerRecordType      = 4,
+  ProcessorSerialNumberRecordType      = 5,
+  ProcessorIdRecordType                = 6,
+  ProcessorTypeRecordType              = 7,
+  ProcessorFamilyRecordType            = 8,
+  ProcessorVoltageRecordType           = 9,
+  ProcessorApicBaseAddressRecordType   = 10,
+  ProcessorApicIdRecordType            = 11,
+  ProcessorApicVersionNumberRecordType = 12,
+  CpuUcodeRevisionDataRecordType       = 13,
+  ProcessorStatusRecordType            = 14,
+  ProcessorSocketTypeRecordType        = 15,
+  ProcessorSocketNameRecordType        = 16,
+  CacheAssociationRecordType           = 17,
+  ProcessorMaxCoreFrequencyRecordType  = 18,
+  ProcessorAssetTagRecordType          = 19,
+  ProcessorMaxFsbFrequencyRecordType   = 20,
+  ProcessorPackageNumberRecordType     = 21,
+  ProcessorCoreFrequencyListRecordType = 22,
+  ProcessorFsbFrequencyListRecordType  = 23,
+  ProcessorHealthStatusRecordType      = 24
+} EFI_CPU_VARIABLE_RECORD_TYPE;
 
 ///
 /// Inconsistent with specification here:  
@@ -723,7 +787,7 @@ typedef union {
   EFI_PROCESSOR_SOCKET_TYPE_DATA          ProcessorSocketType;
   EFI_PROCESSOR_SOCKET_NAME_DATA          ProcessorSocketName;
   EFI_PROCESSOR_ASSET_TAG_DATA            ProcessorAssetTag;
-  EFI_PROCESSOR_HEALTH_STATUS_DATA        ProcessorHealthStatus;
+  EFI_PROCESSOR_HEALTH_STATUS             ProcessorHealthStatus;
   EFI_PROCESSOR_PACKAGE_NUMBER_DATA       ProcessorPackageNumber;
 } EFI_CPU_VARIABLE_RECORD;
 
@@ -735,7 +799,12 @@ typedef struct {
 #define EFI_CACHE_SUBCLASS_VERSION    0x00010000
 
 typedef EFI_EXP_BASE2_DATA          EFI_CACHE_SIZE_DATA;
-typedef EFI_EXP_BASE2_DATA          EFI_CACHE_MAXIMUM_SIZE_DATA;
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the naming is EFI_CACHE_MAXIMUM_SIZE_DATA.
+/// Keep it unchanged for backward compatibilty.
+///
+typedef EFI_EXP_BASE2_DATA          EFI_MAXIMUM_CACHE_SIZE_DATA;
 typedef EFI_EXP_BASE10_DATA         EFI_CACHE_SPEED_DATA;
 typedef STRING_REF                  EFI_CACHE_SOCKET_DATA;
 
@@ -782,7 +851,8 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:  
-/// It's a typo of CacheSubclass 0.9 spec. It should be UINT32 type since it refers to a 32bit width data.
+/// In CacheSubclass 0.9 spec. It defines the field type as UINT16.
+/// In fact, it should be UINT32 type since it refers to a 32bit width data.
 ///
 typedef struct {
   UINT32                            Level           :3;
@@ -842,7 +912,7 @@ typedef enum {
 ///
 typedef union {
   EFI_CACHE_SIZE_DATA                         CacheSize;
-  EFI_CACHE_MAXIMUM_SIZE_DATA                 MaximumCacheSize;
+  EFI_MAXIMUM_CACHE_SIZE_DATA                 MaximumCacheSize;
   EFI_CACHE_SPEED_DATA                        CacheSpeed;
   EFI_CACHE_SOCKET_DATA                       CacheSocket;
   EFI_CACHE_SRAM_TYPE_DATA                    CacheSramType;
@@ -851,7 +921,7 @@ typedef union {
   EFI_CACHE_TYPE_DATA                         CacheType;
   EFI_CACHE_ASSOCIATIVITY_DATA                CacheAssociativity;
   EFI_CACHE_CONFIGURATION_DATA                CacheConfig;
-  EFI_PROCESSOR_CACHE_ASSOCIATION_DATA        CacheAssociation;
+  EFI_CACHE_ASSOCIATION_DATA                  CacheAssociation;
 } EFI_CACHE_VARIABLE_RECORD;
 
 typedef struct {
@@ -1146,8 +1216,11 @@ typedef struct {
   ///
   /// The memory speed in megahertz (MHz). A value of 0x00 denotes that 
   /// the speed is unknown.
-  ///
-  EFI_EXP_BASE10_DATA               MemoryTypeSpeed;
+	/// Inconsistent with specification here:  
+	/// In MemSubclass spec 0.9, the naming is MemoryTypeSpeed.
+	/// Keep it unchanged for backward compatibilty.
+	///
+  EFI_EXP_BASE10_DATA               MemorySpeed;
   ///
   /// The memory state. 
   ///
@@ -1547,6 +1620,8 @@ typedef struct {
 
 #define EFI_MISC_SUBCLASS_VERSION     0x0100
 
+#pragma pack(1)
+
 //
 // Last PCI Bus Number
 //
@@ -1765,8 +1840,8 @@ typedef enum {
 typedef struct {
   ///
   /// Inconsistent with specification here:  
-  /// It's a typo of MiscSubclass 0.9 spec. It should be a variable
-  /// name "ChassisType" rather than a type "EFI_MISC_CHASSIS_TYPE".
+  /// In MiscSubclass 0.9 spec. It have a wrong field name "EFI_MISC_CHASSIS_TYPE".
+  /// Change it to "ChassisType" to pass build.
   ///
   UINT32                            ChassisType       :16;
   UINT32                            ChassisLockPresent:1;
@@ -1940,18 +2015,13 @@ typedef enum {
   EfiSlotTypeAgp                          = 0x0F,
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, there is a typo on this field.
-  /// Its naming should be EfiSlotTypeAgp2X rather than EfiSlotTypeApg2X.
+  /// In MiscSubclass spec 0.9, its naming should be EfiSlotTypeAgp2X
+  /// rather than EfiSlotTypeApg2X.
   ///
   EfiSlotTypeAgp2X                        = 0x10,
   EfiSlotTypeAgp4X                        = 0x11,
   EfiSlotTypePciX                         = 0x12,
-  ///
-  /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, there is a typo on this field.
-  /// Its naming should be EfiSlotTypeAgp8X rather than EfiSlotTypeAgp8x.
-  ///
-  EfiSlotTypeAgp8X                        = 0x13,
+  EfiSlotTypeAgp8x                        = 0x13,
   EfiSlotTypePC98C20                      = 0xA0,
   EfiSlotTypePC98C24                      = 0xA1,
   EfiSlotTypePC98E                        = 0xA2,
@@ -2038,7 +2108,12 @@ typedef struct {
 
 typedef struct {
   STRING_REF                        OnBoardDeviceDescription;
-  EFI_MISC_ONBOARD_DEVICE_STATUS    OnBoardDeviceType;
+  ///
+  /// Inconsistent with specification here:  
+  /// In MiscSubclass spec 0.9, the naming is OnBoardDeviceType.
+  /// Keep it unchanged for backward compatibilty.
+  ///
+  EFI_MISC_ONBOARD_DEVICE_STATUS    OnBoardDeviceStatus;
   EFI_DEVICE_PATH_PROTOCOL          OnBoardDevicePath;
 } EFI_MISC_ONBOARD_DEVICE_DATA;
 
@@ -2150,43 +2225,57 @@ typedef struct {
 //
 // Portable Battery - SMBIOS Type 22
 //
-#define EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER    0x00000010
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the naming is EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER.
+/// Keep it unchanged for backward compatibilty.
+///
+#define EFI_MISC_PORTABLE_BATTERY_RECORD_NUMBER   0x00000010
 
-typedef enum {
-  EfiBatteryDeviceChemistryTypeOther = 1, 
-  EfiBatteryDeviceChemistryTypeUnknown = 2, 
-  EfiBatteryDeviceChemistryTypeLeadAcid = 3, 
-  EfiBatteryDeviceChemistryTypeNickelCadmium = 4, 
-  EfiBatteryDeviceChemistryTypeNickelMetalHydride = 5, 
-  EfiBatteryDeviceChemistryTypeLithiumIon = 6, 
-  EfiBatteryDeviceChemistryTypeZincAir = 7, 
-  EfiBatteryDeviceChemistryTypeLithiumPolymer = 8
-} EFI_MISC_BATTERY_DEVICE_CHEMISTRY;
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_BATTERY_DEVICE_CHEMISTRY.
+/// And all field namings are also different with spec.
+/// Keep it unchanged for backward compatibilty.
+///
+typedef enum {  
+  EfiPortableBatteryDeviceChemistryOther = 1,
+  EfiPortableBatteryDeviceChemistryUnknown = 2,
+  EfiPortableBatteryDeviceChemistryLeadAcid = 3,
+  EfiPortableBatteryDeviceChemistryNickelCadmium = 4,
+  EfiPortableBatteryDeviceChemistryNickelMetalHydride = 5,
+  EfiPortableBatteryDeviceChemistryLithiumIon = 6,
+  EfiPortableBatteryDeviceChemistryZincAir = 7,
+  EfiPortableBatteryDeviceChemistryLithiumPolymer = 8
+} EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY;
 
-typedef struct  { 
-  UINT32 Date              :5; 
-  UINT32 Month             :4; 
-  UINT32 Year              :7; 
-  UINT32 Reserved          :16; 
-} EFI_MISC_BATTERY_SBDS_MANUFACTURE_DATE;
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_BATTERY_LOCATION_DATA.
+/// And the name and the order of the fields are also different with spec.
+/// Keep it unchanged for backward compatibilty.
+///
+typedef struct {
+  STRING_REF                        Location;
+  STRING_REF                        Manufacturer;
+  STRING_REF                        ManufactureDate;
+  STRING_REF                        SerialNumber;
+  STRING_REF                        DeviceName;
+  EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY  
+                                    DeviceChemistry;
+  UINT16                            DesignCapacity;
+  UINT16                            DesignVoltage;
+  STRING_REF                        SBDSVersionNumber;
+  UINT8                             MaximumError;
+  UINT16                            SBDSSerialNumber;
+  UINT16                            SBDSManufactureDate;
+  STRING_REF                        SBDSDeviceChemistry;
+  UINT8                             DesignCapacityMultiplier;
+  UINT32                            OEMSpecific;  
+  UINT8                             BatteryNumber; // Temporary   
+  BOOLEAN                           Valid; // Is entry valid - Temporary
+} EFI_MISC_PORTABLE_BATTERY;
 
-typedef struct { 
-  STRING_REF                         BatteryLocation; 
-  STRING_REF                         BatteryManufacturer; 
-  STRING_REF                         BatteryManufactureDate; 
-  STRING_REF                         BatterySerialNumber; 
-  STRING_REF                         BatteryDeviceName; 
-  STRING_REF                         BatterySbdsVersionNumber; 
-  STRING_REF                         BatterySbdsDeviceChemistry; 
-  EFI_MISC_BATTERY_DEVICE_CHEMISTRY  BatteryDeviceChemistry; 
-  EFI_EXP_BASE10_DATA                BatteryDesignCapacity; 
-  EFI_EXP_BASE10_DATA                BatteryDesignVoltage; 
-  UINT16                             BatteryMaximumError; 
-  UINT16                             BatterySbdsSerialNumber; 
-  EFI_MISC_BATTERY_SBDS_MANUFACTURE_DATE 
-                                     BatterySbdsManufacturingDate; 
-  UINT32                             BatteryOemSpecific; 
-} EFI_MISC_BATTERY_LOCATION_DATA;
 
 //
 // Misc. Reset Capabilities - SMBIOS Type 23
@@ -2224,7 +2313,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec0.9, it only mention the possible value of each field in
+/// In MiscSubclass spec 0.9, it only mention the possible value of each field in
 /// EFI_MISC_HARDWARE_SECURITY_SETTINGS. 
 /// It's implementation-specific to simplify the code logic.
 ///
@@ -2400,6 +2489,11 @@ typedef struct {
 //
 #define EFI_MISC_BOOT_INFORMATION_STATUS_RECORD_NUMBER    0x0000001A
 
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
+/// Keep it unchanged for backward compatibilty.
+///
 typedef enum {
   EfiBootInformationStatusNoError                  = 0x00,
   EfiBootInformationStatusNoBootableMedia          = 0x01,
@@ -2413,10 +2507,15 @@ typedef enum {
   EfiBootInformationStatusStartReserved            = 0x09,
   EfiBootInformationStatusStartOemSpecific         = 0x80,
   EfiBootInformationStatusStartProductSpecific     = 0xC0
-} EFI_MISC_BOOT_INFORMATION_STATUS_TYPE;
+} EFI_MISC_BOOT_INFORMATION_STATUS_DATA_TYPE;
 
 typedef struct {
-  EFI_MISC_BOOT_INFORMATION_STATUS_TYPE      BootInformationStatus;
+  ///
+  /// Inconsistent with specification here:  
+  /// In MiscSubclass spec 0.9, the field name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
+  /// Keep it unchanged for backward compatibilty.
+  ///
+  EFI_MISC_BOOT_INFORMATION_STATUS_DATA_TYPE BootInformationStatus;
   UINT8                                      BootInformationData[9];
 } EFI_MISC_BOOT_INFORMATION_STATUS_DATA;
 
@@ -2469,7 +2568,7 @@ typedef struct {
   EFI_INTER_LINK_DATA               ManagementDeviceComponentLink;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec0.9, this field is NOT defined.
+  /// In MiscSubclass spec 0.9, this field is NOT defined.
   /// It's introduced for SmBios 2.6 spec type 35.
   ///
   EFI_INTER_LINK_DATA               ManagementDeviceThresholdLink;
@@ -2503,19 +2602,28 @@ typedef struct {
 
 #define EFI_MISC_IPMI_INTERFACE_TYPE_RECORD_NUMBER    0x0000001D
 
-//
-//System Power supply Record - SMBIOS Type 39
-//
+///
+/// System Power supply Record - SMBIOS Type 39
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the type of all fields are UINT32.
+/// Keep it unchanged for backward compatibilty.
+///
 typedef struct {
-  UINT32                            PowerSupplyHotReplaceable:1;
-  UINT32                            PowerSupplyPresent       :1;
-  UINT32                            PowerSupplyUnplugged     :1;
-  UINT32                            InputVoltageRangeSwitch  :4;
-  UINT32                            PowerSupplyStatus        :3;
-  UINT32                            PowerSupplyType          :4;
-  UINT32                            Reserved                 :18;
+  UINT16                            PowerSupplyHotReplaceable:1;
+  UINT16                            PowerSupplyPresent       :1;
+  UINT16                            PowerSupplyUnplugged     :1;
+  UINT16                            InputVoltageRangeSwitch  :4;
+  UINT16                            PowerSupplyStatus        :3;
+  UINT16                            PowerSupplyType          :4;
+  UINT16                            Reserved                 :2;
 } EFI_MISC_POWER_SUPPLY_CHARACTERISTICS;
 
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the field name is EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA.
+/// Keep it unchanged for backward compatibilty.
+///
 typedef struct {
   UINT16                                 PowerUnitGroup;
   STRING_REF                             PowerSupplyLocation;
@@ -2530,21 +2638,31 @@ typedef struct {
   EFI_INTER_LINK_DATA                    PowerSupplyInputVoltageProbeLink;
   EFI_INTER_LINK_DATA                    PowerSupplyCoolingDeviceLink;
   EFI_INTER_LINK_DATA                    PowerSupplyInputCurrentProbeLink;
-} EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA;
+} EFI_MISC_SYSTEM_POWER_SUPPLY_DATA;
 
 #define EFI_MISC_SYSTEM_POWER_SUPPLY_RECORD_NUMBER    0x0000001E
 
-//
-// OEM Data Record - SMBIOS Type 0x80-0xFF
-//
+///
+/// OEM Data Record - SMBIOS Type 0x80-0xFF
+///
+/// Inconsistent with specification here:  
+/// In MiscSubclass spec 0.9, the structure name is EFI_SMBIOS_STRUCTURE_HDR.
+/// Due to this structure is commonly used by vendor to construct SmBios type 0x80~0xFF table,
+/// Keep it unchanged for backward compatibilty.
+///
 typedef struct {
   UINT8                             Type;
   UINT8                             Length;
   UINT16                            Handle;
-} EFI_SMBIOS_STRUCTURE_HDR;
+} SMBIOS_STRUCTURE_HDR;
 
 typedef struct {
-  EFI_SMBIOS_STRUCTURE_HDR          Header;
+  ///
+  /// Inconsistent with specification here:  
+  /// In MiscSubclass spec 0.9, the field name is EFI_SMBIOS_STRUCTURE_HDR.
+  /// Keep it unchanged for backward compatibilty.
+  ///
+  SMBIOS_STRUCTURE_HDR              Header;
   UINT8                             RawData[1];
 } EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA;
 
@@ -2554,14 +2672,14 @@ typedef struct {
 /// Misc. System Event Log  - SMBIOS Type 15
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec0.9, the following data structures are NOT defined.
+/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 spec type 15.
 ///
 #define EFI_MISC_SYSTEM_EVENT_LOG_RECORD_NUMBER    0x00000020
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec0.9, the following data structures are NOT defined.
+/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 spec type 15.
 ///
 typedef struct {
@@ -2593,13 +2711,13 @@ typedef struct {
 /// Management Device Threshold Data Record - SMBIOS Type 36
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec0.9, the following data structures are NOT defined.
+/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 spec type 36.
 ///
 #define EFI_MISC_MANAGEMENT_DEVICE_THRESHOLD_RECORD_NUMBER    0x00000021
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec0.9, the following data structures are NOT defined.
+/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 spec type 36.
 ///
 typedef struct {
@@ -2630,7 +2748,7 @@ typedef EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA              EFI_MISC_SYSTEM_LANGUA
 typedef EFI_MISC_SYSTEM_EVENT_LOG_DATA                    EFI_MISC_SYSTEM_EVENT_LOG;
 typedef EFI_MISC_BIS_ENTRY_POINT_DATA                     EFI_MISC_BIS_ENTRY_POINT;
 typedef EFI_MISC_BOOT_INFORMATION_STATUS_DATA             EFI_MISC_BOOT_INFORMATION_STATUS;
-typedef EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA             EFI_MISC_SYSTEM_POWER_SUPPLY;
+typedef EFI_MISC_SYSTEM_POWER_SUPPLY_DATA                 EFI_MISC_SYSTEM_POWER_SUPPLY;
 typedef EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA         EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION;
 typedef EFI_MISC_SCHEDULED_POWER_ON_MONTH_DATA            EFI_MISC_SCHEDULED_POWER_ON_MONTH;
 typedef EFI_MISC_VOLTAGE_PROBE_DESCRIPTION_DATA           EFI_MISC_VOLTAGE_PROBE_DESCRIPTION;
@@ -2678,18 +2796,21 @@ typedef union {
   EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA
                                                      MiscmangementDeviceComponentDescriptionData;
   EFI_MISC_IPMI_INTERFACE_TYPE_DATA                  MiscIpmiInterfaceTypeData;
-  EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA              MiscPowerSupplyInfo;
+  EFI_MISC_SYSTEM_POWER_SUPPLY_DATA                  MiscPowerSupplyInfo;
   EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA          MiscSmbiosStructEncapsulation;
   EFI_MISC_MANAGEMENT_DEVICE_THRESHOLD               MiscManagementDeviceThreshold;
 } EFI_MISC_SUBCLASS_RECORDS;
 
 ///
-/// Sub Class Header type1
+/// Inconsistent with specification here:  
+/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// It is implementation-specific to simplify the code logic.
 ///
 typedef struct {
   EFI_SUBCLASS_TYPE1_HEADER         Header;
   EFI_MISC_SUBCLASS_RECORDS         Record;
 } EFI_MISC_SUBCLASS_DRIVER_DATA;
+#pragma pack()
 
 ///
 /// Inconsistent with specification here:  
