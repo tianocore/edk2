@@ -1064,14 +1064,14 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
+VOID
 EFIAPI
 PlatformBdsLockNonUpdatableFlash (
   VOID
   )
 {
   DEBUG ((EFI_D_INFO, "PlatformBdsLockNonUpdatableFlash\n"));
-  return EFI_SUCCESS;
+  return;
 }
 
 
@@ -1175,3 +1175,22 @@ InstallDevicePathCallback (
                           );
 }
 
+/**
+  Lock the ConsoleIn device in system table. All key
+  presses will be ignored until the Password is typed in. The only way to
+  disable the password is to type it in to a ConIn device.
+
+  @param  Password        Password used to lock ConIn device.
+
+  @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
+  @retval EFI_UNSUPPORTED Password not found
+
+**/
+EFI_STATUS
+EFIAPI
+LockKeyboards (
+  IN  CHAR16    *Password
+  )
+{
+    return EFI_UNSUPPORTED;
+}

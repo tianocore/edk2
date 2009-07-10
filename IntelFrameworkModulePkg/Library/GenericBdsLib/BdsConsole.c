@@ -747,32 +747,9 @@ ConvertBmpToGopBlt (
   return EFI_SUCCESS;
 }
 
-
 /**
-  Use Console Control Protocol to lock the Console In Spliter virtual handle.
-  This is the ConInHandle and ConIn handle in the EFI system table. All key
-  presses will be ignored until the Password is typed in. The only way to
-  disable the password is to type it in to a ConIn device.
-
-  @param  Password        Password used to lock ConIn device.
-
-  @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
-  @retval EFI_UNSUPPORTED Password not found
-
-**/
-EFI_STATUS
-EFIAPI
-LockKeyboards (
-  IN  CHAR16    *Password
-  )
-{
-    return EFI_UNSUPPORTED;
-}
-
-
-/**
-  Use Console Control to turn off UGA based Simple Text Out consoles from going
-  to the UGA device. Put up LogoFile on every UGA device that is a console
+  Use SystemTable Conout to stop video based Simple Text Out consoles from going
+  to the video device. Put up LogoFile on every video device that is a console.
 
   @param[in]  LogoFile   File name of logo to display on the center of the screen.
 
@@ -1012,8 +989,8 @@ EnableQuietBoot (
 }
 
 /**
-  Use Console Control to turn on UGA based Simple Text Out consoles. The UGA
-  Simple Text Out screens will now be synced up with all non UGA output devices
+  Use SystemTable Conout to turn on video based Simple Text Out consoles. The 
+  Simple Text Out screens will now be synced up with all non video output devices
 
   @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
 
