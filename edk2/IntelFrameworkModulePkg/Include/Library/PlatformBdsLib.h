@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __PLATFORM_BDS_LIB_H_
 #define __PLATFORM_BDS_LIB_H_
 
-#include <Protocol/Bds.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Library/GenericBdsLib.h>
 
@@ -77,7 +76,7 @@ PlatformBdsBootFail (
 VOID
 EFIAPI
 PlatformBdsBootSuccess (
-  IN  BDS_COMMON_OPTION *Option
+  IN  BDS_COMMON_OPTION  *Option
   );
 
 
