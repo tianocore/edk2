@@ -576,7 +576,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_TEST_STRING) (
+(EFIAPI *EFI_HII_TEST_STRING)(
   IN     EFI_HII_PROTOCOL  *This,
   IN     CHAR16            *StringToTest,
   IN OUT UINT32            *FirstMissing,
