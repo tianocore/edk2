@@ -253,7 +253,7 @@ Dhcp4CreateService (
 
 ON_ERROR:
   Dhcp4CloseService (DhcpSb);
-  gBS->FreePool (DhcpSb);
+  FreePool (DhcpSb);
 
   return Status;
 }
@@ -334,7 +334,7 @@ Dhcp4DriverBindingStart (
 
 ON_ERROR:
   Dhcp4CloseService (DhcpSb);
-  gBS->FreePool (DhcpSb);
+  FreePool (DhcpSb);
   return Status;
 }
 
@@ -417,7 +417,7 @@ Dhcp4DriverBindingStop (
 
     Dhcp4CloseService (DhcpSb);
 
-    gBS->FreePool (DhcpSb);
+    FreePool (DhcpSb);
   } else {
     //
     // Don't use NET_LIST_FOR_EACH_SAFE here, Dhcp4ServiceBindingDestoryChild
@@ -522,7 +522,7 @@ Dhcp4ServiceBindingCreateChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Instance);
+    FreePool (Instance);
     return Status;
   }
 
@@ -547,7 +547,7 @@ Dhcp4ServiceBindingCreateChild (
            NULL
            );
 
-    gBS->FreePool (Instance);
+    FreePool (Instance);
     return Status;
   }
 
@@ -668,6 +668,6 @@ Dhcp4ServiceBindingDestroyChild (
 
   gBS->RestoreTPL (OldTpl);
 
-  gBS->FreePool (Instance);
+  FreePool (Instance);
   return EFI_SUCCESS;
 }

@@ -427,21 +427,21 @@ DhcpCleanConfigure (
   UINT32                    Index;
 
   if (Config->DiscoverTimeout != NULL) {
-    gBS->FreePool (Config->DiscoverTimeout);
+    FreePool (Config->DiscoverTimeout);
   }
 
   if (Config->RequestTimeout != NULL) {
-    gBS->FreePool (Config->RequestTimeout);
+    FreePool (Config->RequestTimeout);
   }
 
   if (Config->OptionList != NULL) {
     for (Index = 0; Index < Config->OptionCount; Index++) {
       if (Config->OptionList[Index] != NULL) {
-        gBS->FreePool (Config->OptionList[Index]);
+        FreePool (Config->OptionList[Index]);
       }
     }
 
-    gBS->FreePool (Config->OptionList);
+    FreePool (Config->OptionList);
   }
 
   ZeroMem (Config, sizeof (EFI_DHCP4_CONFIG_DATA));
@@ -564,14 +564,14 @@ DhcpYieldControl (
   DhcpSb->ActiveChild   = NULL;
 
   if (Config->DiscoverTimeout != NULL) {
-    gBS->FreePool (Config->DiscoverTimeout);
+    FreePool (Config->DiscoverTimeout);
 
     Config->DiscoverTryCount  = 0;
     Config->DiscoverTimeout   = NULL;
   }
 
   if (Config->RequestTimeout != NULL) {
-    gBS->FreePool (Config->RequestTimeout);
+    FreePool (Config->RequestTimeout);
 
     Config->RequestTryCount = 0;
     Config->RequestTimeout  = NULL;

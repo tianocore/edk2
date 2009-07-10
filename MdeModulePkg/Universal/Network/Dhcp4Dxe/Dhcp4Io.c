@@ -446,17 +446,17 @@ DhcpCleanLease (
   DhcpSb->ServerAddr  = 0;
 
   if (DhcpSb->LastOffer != NULL) {
-    gBS->FreePool (DhcpSb->LastOffer);
+    FreePool (DhcpSb->LastOffer);
     DhcpSb->LastOffer = NULL;
   }
 
   if (DhcpSb->Selected != NULL) {
-    gBS->FreePool (DhcpSb->Selected);
+    FreePool (DhcpSb->Selected);
     DhcpSb->Selected = NULL;
   }
 
   if (DhcpSb->Para != NULL) {
-    gBS->FreePool (DhcpSb->Para);
+    FreePool (DhcpSb->Para);
     DhcpSb->Para = NULL;
   }
 
@@ -636,7 +636,7 @@ DhcpHandleSelect (
 
   if (Status == EFI_SUCCESS) {
     if (DhcpSb->LastOffer != NULL) {
-      gBS->FreePool (DhcpSb->LastOffer);
+      FreePool (DhcpSb->LastOffer);
     }
 
     DhcpSb->LastOffer = Packet;
@@ -645,7 +645,7 @@ DhcpHandleSelect (
 
   } else if (Status == EFI_NOT_READY) {
     if (DhcpSb->LastOffer != NULL) {
-      gBS->FreePool (DhcpSb->LastOffer);
+      FreePool (DhcpSb->LastOffer);
     }
 
     DhcpSb->LastOffer = Packet;
@@ -907,18 +907,14 @@ DhcpHandleReboot (
   //
   // OK, get the parameter from server, record the lease
   //
-  DhcpSb->Para = AllocatePool (sizeof (DHCP_PARAMETER));
-
+  DhcpSb->Para = AllocateCopyPool (sizeof (DHCP_PARAMETER), Para);
   if (DhcpSb->Para == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
   DhcpSb->Selected  = Packet;
-  CopyMem (DhcpSb->Para, Para, sizeof (*DhcpSb->Para));
-
   Status            = DhcpLeaseAcquired (DhcpSb);
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1063,7 +1059,7 @@ DhcpInput (
   }
 
   if (Para != NULL) {
-    gBS->FreePool (Para);
+    FreePool (Para);
   }
 
   Packet = NULL;
