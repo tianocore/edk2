@@ -24,6 +24,7 @@
 #ifndef _DATAHUB_RECORDS_H_
 #define _DATAHUB_RECORDS_H_
 
+#include <Protocol/FrameworkHii.h>
 #include <Framework/FrameworkInternalFormRepresentation.h>
 
 ///
