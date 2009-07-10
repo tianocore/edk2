@@ -448,7 +448,7 @@ Returns:
   CopyMem (RecordBuffer.Raw, &mCpuDataRecordHeader, HeaderSize);
 
 
-  RecordBuffer.DataRecord->DataRecordHeader.RecordType      = EFI_PROCESSOR_VERSION_RECORD_NUMBER;
+  RecordBuffer.DataRecord->DataRecordHeader.RecordType      = ProcessorVersionRecordType;
   RecordBuffer.DataRecord->VariableRecord.ProcessorVersion  = STRING_TOKEN (STR_PROCESSOR_VERSION);
   TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_VERSION_DATA);
 
@@ -464,7 +464,7 @@ Returns:
   //
   // Store CPU frequency data record to data hub - It's an emulator so make up a value
   //
-  RecordBuffer.DataRecord->DataRecordHeader.RecordType                    = EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER;
+  RecordBuffer.DataRecord->DataRecordHeader.RecordType                    = ProcessorCoreFrequencyRecordType;
   RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Value    = 1234;
   RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Exponent = 6;
   TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_CORE_FREQUENCY_DATA);
