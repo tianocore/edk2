@@ -1,8 +1,5 @@
 /** @file
-  DataHubRecord.h include all data hub sub class GUID defitions.
-
-  These GUID are from Cache subclass spec 0.9, DataHub SubClass spec 0.9, Memory SubClass Spec 0.9,
-  Processor Subclass spec 0.9, Misc SubClass spec 0.9.
+  DataHubRecord.h includes all data hub sub class GUID definitions.
 
   Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -13,6 +10,9 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+  @par Revision Reference:
+  These GUID are from Cache subclass spec 0.9, DataHub SubClass spec 0.9, Memory SubClass Spec 0.9,
+  Processor Subclass spec 0.9, Misc SubClass spec 0.9.
 **/
 #ifndef _DATAHUB_RECORDS_GUID_H_
 #define _DATAHUB_RECORDS_GUID_H_
