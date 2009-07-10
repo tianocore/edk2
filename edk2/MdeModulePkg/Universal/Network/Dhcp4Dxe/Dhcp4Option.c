@@ -604,7 +604,6 @@ DhcpParseOption (
   *OptionPoint  = NULL;
 
   if (OptNum == 0) {
-    Status = EFI_NOT_FOUND;
     goto ON_EXIT;
   }
 
@@ -626,14 +625,14 @@ DhcpParseOption (
   Status          = DhcpIterateOptions (Packet, DhcpFillOption, &Context);
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Options);
+    FreePool (Options);
     goto ON_EXIT;
   }
 
   *OptionPoint = Options;
 
 ON_EXIT:
-  gBS->FreePool (OptCount);
+  FreePool (OptCount);
   return Status;
 }
 
@@ -675,7 +674,8 @@ DhcpValidateOptions (
   if (EFI_ERROR (Status) || (Count == 0)) {
     return Status;
   }
-  
+  ASSERT (AllOption != NULL);
+
   Updated = FALSE;
   ZeroMem (&Parameter, sizeof (Parameter));
 
@@ -710,16 +710,15 @@ DhcpValidateOptions (
   }
 
   if (Updated && (Para != NULL)) {
-    if ((*Para = AllocatePool (sizeof (DHCP_PARAMETER))) == NULL) {
+    *Para = AllocateCopyPool (sizeof (DHCP_PARAMETER), &Parameter);
+    if (*Para == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
-
-    CopyMem (*Para, &Parameter, sizeof (**Para));
   }
 
 ON_EXIT:
-  gBS->FreePool (AllOption);
+  FreePool (AllOption);
   return Status;
 }
 
@@ -825,10 +824,11 @@ DhcpBuild (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  ASSERT (SeedOptions != NULL);
 
-  for (Index = 0; Index < (UINT32) Count; Index++) {
-    Mark[SeedOptions[Index].Tag] = SeedOptions[Index];
+  if (SeedOptions != NULL) {
+    for (Index = 0; Index < (UINT32) Count; Index++) {
+      Mark[SeedOptions[Index].Tag] = SeedOptions[Index];
+    }
   }
 
   //
@@ -888,9 +888,9 @@ DhcpBuild (
 
 ON_ERROR:
   if (SeedOptions != NULL) {
-    gBS->FreePool (SeedOptions);
+    FreePool (SeedOptions);
   }
 
-  gBS->FreePool (Mark);
+  FreePool (Mark);
   return Status;
 }

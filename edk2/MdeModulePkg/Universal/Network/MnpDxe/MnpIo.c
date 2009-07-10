@@ -962,11 +962,6 @@ MnpReceivePacket (
   //
   MnpDeliverPacket (MnpServiceData);
 
-  //
-  // Dispatch the DPC queued by the NotifyFunction of rx token's events.
-  //
-  NetLibDispatchDpc ();
-
 EXIT:
 
   ASSERT (Nbuf->TotalSize == MnpServiceData->BufferLength);
@@ -1066,5 +1061,8 @@ MnpSystemPoll (
   //
   MnpReceivePacket (MnpServiceData);
 
+  //
+  // Dispatch the DPC queued by the NotifyFunction of rx token's events.
+  //
   NetLibDispatchDpc ();
 }

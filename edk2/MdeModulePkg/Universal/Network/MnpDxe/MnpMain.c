@@ -771,6 +771,9 @@ MnpPoll (
   //
   Status = MnpReceivePacket (Instance->MnpServiceData);
 
+  //
+  // Dispatch the DPC queued by the NotifyFunction of rx token's events.
+  //
   NetLibDispatchDpc ();
 
 ON_EXIT:
