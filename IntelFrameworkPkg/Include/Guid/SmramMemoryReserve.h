@@ -53,6 +53,12 @@ typedef struct {
 #define EFI_ALLOCATED                 0x00000010
 
 ///
+/// Inconsistent with specification here: 
+/// EFI_HOB_SMRAM_DESCRIPTOR_BLOCK has been changed to EFI_SMRAM_HOB_DESCRIPTOR_BLOCK.
+/// This inconsistency is kept in code in order for backward compatibility.
+///
+
+///
 /// GUID specific data structure of HOB for reserving SMRAM regions.
 ///
 typedef struct {
@@ -66,7 +72,7 @@ typedef struct {
   /// regions for SMRAM that are supported by this platform. 
   ///
   EFI_SMRAM_DESCRIPTOR  Descriptor[1];
-} EFI_HOB_SMRAM_DESCRIPTOR_BLOCK;
+} EFI_SMRAM_HOB_DESCRIPTOR_BLOCK;
 
 extern EFI_GUID gEfiSmmPeiSmramMemoryReserveGuid;
 
