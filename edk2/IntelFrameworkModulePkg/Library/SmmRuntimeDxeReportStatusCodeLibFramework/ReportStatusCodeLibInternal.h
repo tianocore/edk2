@@ -15,7 +15,7 @@
 #ifndef __REPORT_STATUS_CODE_LIB_INTERNAL__H__
 #define __REPORT_STATUS_CODE_LIB_INTERNAL__H__
 
-#include <FrameworkDxe.h>
+#include <FrameworkSmm.h>
 
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
