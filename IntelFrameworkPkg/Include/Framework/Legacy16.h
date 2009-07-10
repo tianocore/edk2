@@ -16,6 +16,10 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+  @par Revision Reference:
+  These definitions are from Compatibility Support Module Spec
+  Version 0.97.
+
 **/
 
 #ifndef _FRAMEWORK_LEGACY_16_H_
@@ -224,6 +228,10 @@ typedef struct {
 /// Functions provided by the CSM binary which communicate between the EfiCompatibility 
 /// and Compatability16 code.
 ///
+/// Inconsistent with specification here: 
+/// The member's name started with "Compatibility16" [defined in Intel Framework Compatibility Support Module Specification / 0.97 version] 
+/// has been changed to "Legacy16" since keeping backward compatible.
+///
 typedef enum {
   ///
   /// Causes the Compatibility16 code to do any internal initialization required.
@@ -233,7 +241,7 @@ typedef enum {
   /// Return:
   ///   AX = Return Status codes
   ///
-  Compatibility16InitializeYourself    = 0x0000,
+  Legacy16InitializeYourself    = 0x0000,
   
   ///
   /// Causes the Compatibility16 BIOS to perform any drive number translations to match the boot sequence.
@@ -243,7 +251,7 @@ typedef enum {
   /// Return:
   ///   AX = Returned status codes
   ///
-  Compatibility16UpdateBbs             = 0x0001,
+  Legacy16UpdateBbs             = 0x0001,
   
   ///
   /// Allows the Compatibility16 code to perform any final actions before booting. The Compatibility16
@@ -254,7 +262,7 @@ typedef enum {
   /// Return:
   ///   AX = Returned status codes
   ///
-  Compatibility16PrepareToBoot         = 0x0002,
+  Legacy16PrepareToBoot         = 0x0002,
   
   ///
   /// Causes the Compatibility16 BIOS to boot. The Compatibility16 code is Read/Only.
@@ -263,7 +271,7 @@ typedef enum {
   /// Output:
   ///   AX = Returned status codes
   ///
-  Compatibility16Boot                  = 0x0003,
+  Legacy16Boot                  = 0x0003,
   
   ///
   /// Allows the Compatibility16 code to get the last device from which a boot was attempted. This is
@@ -274,7 +282,7 @@ typedef enum {
   ///   AX = Returned status codes
   ///   BX = Priority number of the boot device.
   ///
-  Compatibility16RetrieveLastBootDevice= 0x0004,
+  Legacy16RetrieveLastBootDevice = 0x0004,
   
   ///
   /// Allows the Compatibility16 code rehook INT13, INT18, and/or INT19 after dispatching a legacy OpROM.
@@ -285,7 +293,7 @@ typedef enum {
   ///   AX = Returned status codes
   ///   BX = Number of non-BBS-compliant devices found. Equals 0 if BBS compliant.
   ///
-  Compatibility16DispatchOprom         = 0x0005,
+  Legacy16DispatchOprom         = 0x0005,
   
   ///
   /// Finds a free area in the 0xFxxxx or 0xExxxx region of the specified length and returns the address
@@ -302,7 +310,7 @@ typedef enum {
   ///   AX = Returned status codes
   ///   DS:BX = Address of the region
   ///
-  Compatibility16GetTableAddress       = 0x0006,
+  Legacy16GetTableAddress       = 0x0006,
   
   ///
   /// Enables the EfiCompatibility module to do any nonstandard processing of keyboard LEDs or state.
@@ -315,7 +323,7 @@ typedef enum {
   /// Output:
   ///     AX = Returned status codes
   ///
-  Compatibility16SetKeyboardLeds       = 0x0007,
+  Legacy16SetKeyboardLeds       = 0x0007,
   
   ///
   /// Enables the EfiCompatibility module to install an interrupt handler for PCI mass media devices that
@@ -326,7 +334,7 @@ typedef enum {
   /// Output:
   ///   AX = Returned status codes
   ///
-  Compatibility16InstallPciHandler     = 0x0008
+  Legacy16InstallPciHandler     = 0x0008
 } EFI_COMPATIBILITY_FUNCTIONS;
 
 
@@ -343,8 +351,12 @@ typedef struct {
                                         ///< increase this number, if BBS-compliant devices also hook INTs in order to force the
                                         ///< OpROM BIOS Setup to be executed.
   VOID    *BbsTablePointer;             ///< Pointer to the BBS table.
-  UINT16  OpromDestinationSegment;      ///< The segment where the OpROM can be relocated to. If this value is 0x0000, this
+  UINT16  RuntimeSegment;               ///< The segment where the OpROM can be relocated to. If this value is 0x0000, this
                                         ///< means that the relocation of this run time code is not supported.
+                                        ///< Inconsistent with specification here: 
+                                        ///< The member's name "OpromDestinationSegment" [defined in Intel Framework Compatibility Support Module Specification / 0.97 version] 
+                                        ///< has been changed to "RuntimeSegment" since keeping backward compatible.
+
 } EFI_DISPATCH_OPROM_TABLE;
 
 ///
