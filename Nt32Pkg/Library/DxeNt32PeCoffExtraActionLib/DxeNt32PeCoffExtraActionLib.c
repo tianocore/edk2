@@ -33,7 +33,6 @@ Abstract:
 #include <Protocol/WinNtThunk.h>
 
 #include <Library/PeCoffLib.h>
-#include <Library/PeiServicesLib.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
