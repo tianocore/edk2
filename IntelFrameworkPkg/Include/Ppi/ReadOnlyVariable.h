@@ -34,7 +34,12 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 #define EFI_VARIABLE_NON_VOLATILE       0x00000001
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
-
+	///
+  /// Inconsistent with specification here: 
+  /// In Framework Spec, PeiCis0.91, there is no this field defined.
+  /// Keeping this inconsistance is for backward compatibility.
+	/// 
+#define EFI_VARIABLE_READ_ONLY          0x00000008
 
 /**
   Get Variable value by Name and GUID pair
@@ -103,8 +108,13 @@ EFI_STATUS
 /// variable services.  
 ///
 struct _EFI_PEI_READ_ONLY_VARIABLE_PPI {
-  EFI_PEI_GET_VARIABLE            GetVariable;         ///< A service to ascertain a given variable name.
-  EFI_PEI_GET_NEXT_VARIABLE_NAME  GetNextVariableName; ///< A service to ascertain a variable based upon a given, known variable
+	///
+  /// Inconsistent with specification here: 
+  /// In Framework Spec, PeiCis0.91, the field is named as GetVariable and GetNextVariableName.
+  /// Keeping this inconsistance is for backward compatibility.
+	/// 
+  EFI_PEI_GET_VARIABLE            PeiGetVariable;         ///< A service to ascertain a given variable name.
+  EFI_PEI_GET_NEXT_VARIABLE_NAME  PeiGetNextVariableName; ///< A service to ascertain a variable based upon a given, known variable
 };
 
 extern EFI_GUID gEfiPeiReadOnlyVariablePpiGuid;
