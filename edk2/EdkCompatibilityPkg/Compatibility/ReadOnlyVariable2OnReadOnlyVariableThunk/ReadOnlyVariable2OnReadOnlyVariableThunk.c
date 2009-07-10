@@ -139,7 +139,7 @@ PeiGetVariable (
              );
   ASSERT_EFI_ERROR (Status);
 
-  return ReadOnlyVariable->GetVariable (
+  return ReadOnlyVariable->PeiGetVariable (
                              (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
                              (CHAR16 *)VariableName,
                              (EFI_GUID *)VariableGuid,
@@ -184,7 +184,7 @@ PeiGetNextVariableName (
              );
   ASSERT_EFI_ERROR (Status);
 
-  return ReadOnlyVariable->GetNextVariableName (
+  return ReadOnlyVariable->PeiGetNextVariableName (
                              (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
                              VariableNameSize,
                              VariableName,
