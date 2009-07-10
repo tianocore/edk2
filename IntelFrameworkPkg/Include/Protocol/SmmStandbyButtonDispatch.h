@@ -23,8 +23,6 @@
 #ifndef _EFI_SMM_STANDBY_BUTTON_DISPATCH_H_
 #define _EFI_SMM_STANDBY_BUTTON_DISPATCH_H_
 
-#include <FrameworkSmm.h>
-
 //
 // Global ID for the Standby Button SMI Protocol
 //

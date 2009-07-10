@@ -20,7 +20,6 @@
 #ifndef _CPUIO_H_
 #define _CPUIO_H_
 
-#include <PiDxe.h>
 
 #define EFI_CPU_IO_PROTOCOL_GUID \
   { \

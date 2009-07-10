@@ -25,7 +25,6 @@
 #ifndef _FIRMWARE_VOLUME_H_
 #define _FIRMWARE_VOLUME_H_
 
-#include <PiDxe.h>
 
 //
 // Firmware Volume Protocol GUID definition

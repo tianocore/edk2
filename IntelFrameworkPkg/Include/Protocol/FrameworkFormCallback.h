@@ -22,8 +22,6 @@
 #ifndef __FORM_CALLBACK_H__
 #define __FORM_CALLBACK_H__
 
-#include <FrameworkDxe.h>
-
 #include <Protocol/FrameworkHii.h>
 #include <Protocol/FrameworkFormBrowser.h>
 

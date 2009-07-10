@@ -21,7 +21,6 @@
 #ifndef _EFI_SMM_SX_DISPATCH_H_
 #define _EFI_SMM_SX_DISPATCH_H_
 
-#include <PiDxe.h>
 
 //
 // Global ID for the Sx SMI Protocol

@@ -21,8 +21,6 @@
 #ifndef _FIND_FV_H_
 #define _FIND_FV_H_
 
-#include <PiPei.h>
-
 ///
 ///  Inconsistent with specification here: 
 ///  GUID value format has been changed to the standard guid format.

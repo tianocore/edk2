@@ -22,7 +22,6 @@
 #ifndef _EFI_LEGACY_8259_H_
 #define _EFI_LEGACY_8259_H_
 
-#include <PiDxe.h>
 
 #define EFI_LEGACY_8259_PROTOCOL_GUID \
   { \

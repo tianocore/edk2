@@ -21,8 +21,6 @@
 #ifndef __PEI_READ_ONLY_VARIABLE_PPI_H__
 #define __PEI_READ_ONLY_VARIABLE_PPI_H__
 
-#include <PiPei.h>
-
 #define EFI_PEI_READ_ONLY_VARIABLE_ACCESS_PPI_GUID \
   { \
     0x3cdc90c6, 0x13fb, 0x4a75, {0x9e, 0x79, 0x59, 0xe9, 0xdd, 0x78, 0xb9, 0xfa } \

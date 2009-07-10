@@ -16,8 +16,6 @@
 #ifndef _FRAMEWORK_SMM_CIS_H_
 #define _FRAMEWORK_SMM_CIS_H_
 
-#include <Framework/DxeCis.h>
-
 #define EFI_SMM_CPU_IO_GUID \
   { \
     0x5f439a0b, 0x45d8, 0x4682, {0xa4, 0xf4, 0xf0, 0x57, 0x6b, 0x51, 0x34, 0x41 } \

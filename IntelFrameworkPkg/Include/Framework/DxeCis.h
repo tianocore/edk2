@@ -16,8 +16,6 @@
 #ifndef _DXE_CIS_H_
 #define _DXE_CIS_H_
 
-#include <PiDxe.h>
-#include <Framework/StatusCode.h>
 #include <Protocol/StatusCode.h>
 
 //

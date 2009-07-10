@@ -19,7 +19,6 @@
 #ifndef _BOOT_SCRIPT_SAVE_PROTOCOL_H_
 #define _BOOT_SCRIPT_SAVE_PROTOCOL_H_
 
-#include <PiDxe.h>
 //
 // To get the multiple phase definitions defined in Boot Script Specification
 //

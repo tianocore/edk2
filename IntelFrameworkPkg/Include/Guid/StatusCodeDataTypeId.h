@@ -20,9 +20,7 @@
 #ifndef __STATUS_CODE_DATA_TYPE_ID_GUID_H__
 #define __STATUS_CODE_DATA_TYPE_ID_GUID_H__
 
-#include <PiPei.h>
 #include <Framework/StatusCode.h>
-#include <Framework/DataHubRecords.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/FrameworkHii.h>
 

@@ -21,7 +21,6 @@
 #ifndef _EFI_SMM_PERIODIC_TIMER_DISPATCH_H_
 #define _EFI_SMM_PERIODIC_TIMER_DISPATCH_H_
 
-#include <PiDxe.h>
 
 //
 // Global ID for the Periodic Timer SMI Protocol

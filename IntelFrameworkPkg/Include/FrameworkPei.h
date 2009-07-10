@@ -22,12 +22,10 @@
 
 #include <PiPei.h>
 
-#include <Framework/PeiCis.h>
-#include <Framework/DataHubRecords.h>
 #include <Framework/FirmwareVolumeImageFormat.h>
 #include <Framework/FirmwareVolumeHeader.h>
 #include <Framework/Hob.h>
-#include <Framework/Legacy16.h>
 #include <Framework/StatusCode.h>
+#include <Framework/PeiCis.h>
 
 #endif

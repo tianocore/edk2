@@ -19,8 +19,7 @@
 #ifndef _FRAMEWORK_HII_H_
 #define _FRAMEWORK_HII_H_
 
-#include <PiDxe.h>
-
+#include <FrameworkDxe.h>
 //
 // To get EFI_GRAPHICS_OUTPUT_BLT_PIXEL,
 // is defined in MdePkg/Protocol/GraphicsOutput.h
@@ -48,7 +47,6 @@
     0x5542cce1, 0xdf5c, 0x4d1b, { 0xab, 0xca, 0x36, 0x4f, 0x77, 0xd3, 0x99, 0xfb } \
   }
 
-typedef UINT16                    STRING_REF;
 typedef UINT32                    RELOFST;
 
 typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
