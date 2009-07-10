@@ -894,7 +894,10 @@ ParseFormSet (
 
   CopyGuid (&FormSetGuid, &gZeroGuid);
   Status = InitializeFormSet (UefiHiiHandle, &FormSetGuid, FormSet);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    FreePool (FormSet);
+    return NULL;
+  }
 
   return FormSet;
 }

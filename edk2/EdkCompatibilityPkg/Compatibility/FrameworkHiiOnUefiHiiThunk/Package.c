@@ -802,7 +802,6 @@ NewOrAddPackNotify (
     // Reparse the FormSet.
     //
     ThunkContext->FormSet = ParseFormSet (ThunkContext->UefiHiiHandle);
-    ASSERT (ThunkContext->FormSet != NULL);
   }
 
   return Status;  
