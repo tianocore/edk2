@@ -1302,7 +1302,8 @@ InternalShellConvertFileListType (
   and will process '?' and '*' as such.  the list must be freed with a call to 
   ShellCloseFileMetaArg().
 
-  If you are NOT appending to an existing list *ListHead must be NULL.
+  If you are NOT appending to an existing list *ListHead must be NULL.  If 
+  *ListHead is NULL then it must be callee freed.
 
   @param Arg                    pointer to path string
   @param OpenMode               mode to open files with
@@ -1337,6 +1338,13 @@ ShellOpenFileMetaArg (
   // Check for UEFI Shell 2.0 protocols
   //
   if (mEfiShellProtocol != NULL) {
+    if (*ListHead == NULL) {
+      *ListHead = (EFI_SHELL_FILE_INFO*)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+      if (*ListHead == NULL) {
+        return (EFI_OUT_OF_RESOURCES);
+      }
+      InitializeListHead(&((*ListHead)->Link));
+    }    
     return (mEfiShellProtocol->OpenFileList(Arg, 
                                            OpenMode, 
                                            ListHead));
