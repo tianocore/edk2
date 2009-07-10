@@ -1,12 +1,14 @@
 /** @file
-  This file declares Device Recovery Module PPI.
+  This file declares the Device Recovery Module PPI.
+
   The interface of this PPI does the following:
     - Reports the number of recovery DXE capsules that exist on the associated device(s)
     - Finds the requested firmware binary capsule
     - Loads that capsule into memory
-  A device can be either a group of devices, such as a block device, or an individual device.T he
-  module determines the internal search order, with capsule number 1 as the highest load priority and
-  number N as the lowest priority.
+
+  A device can be either a group of devices, such as a block device, or an individual device.
+  The module determines the internal search order, with capsule number 1 as the highest load
+  priority and number N as the lowest priority.
 
   Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -18,7 +20,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  This PPI is defined in Framework of EFI Recovery spec.
+  This PPI is defined in the "EFI Recovery" Framework spec.
   Version 0.9
 
 **/
@@ -122,9 +124,9 @@ EFI_STATUS
 /// regardless of the underlying device(s).
 ///
 struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI {
-  EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE  GetNumberRecoveryCapsules;
-  EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO    GetRecoveryCapsuleInfo;
-  EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE        LoadRecoveryCapsule;
+  EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE  GetNumberRecoveryCapsules;    ///< Returns the number of DXE capsules residing on the device.
+  EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO    GetRecoveryCapsuleInfo;       ///< Returns the size and type of the requested recovery capsule.
+  EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE        LoadRecoveryCapsule;          ///< Loads a DXE capsule from some media into memory.
 };
 
 extern EFI_GUID gEfiPeiDeviceRecoveryModulePpiGuid;
