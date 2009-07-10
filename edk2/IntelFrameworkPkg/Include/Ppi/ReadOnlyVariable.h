@@ -31,30 +31,32 @@
 
 typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 
-//
-// Variable attributes
-//
+///
+/// Variable attributes
+///@{
 #define EFI_VARIABLE_NON_VOLATILE       0x00000001
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
-	///
+  /**
   /// Inconsistent with specification here: 
-  /// In Framework Spec, PeiCis0.91, there is no this field defined.
-  /// Keeping this inconsistance is for backward compatibility.
-	/// 
+  /// In Framework Spec, PeiCis0.91, neither the macro or its value is defined.
+  /// Keeping this inconsistancy for backward compatibility.
+  **/ 
 #define EFI_VARIABLE_READ_ONLY          0x00000008
+///@}
 
 /**
   Get Variable value by Name and GUID pair
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  VariableName   A NULL-terminated Unicode string that is the name of the vendor's variable.
-  @param  VendorGuid     A unique identifier for the vendor.
-  @param  Attributes     If not NULL, a pointer to the memory location to return
-                         the attributes bitmask for the variable.
-  @param  DataSize       On input, the size in bytes of the return Data buffer.
-                         On output, the size of data returned in Data.
-  @param  Data           The buffer to return the contents of the variable.
+  @param[in]  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param[in]  VariableName   A NULL-terminated Unicode string that is the name of the vendor's variable.
+  @param[in]  VendorGuid     A unique identifier for the vendor.
+  @param[out] Attributes     This OPTIONAL parameter may be either NULL or
+                             a pointer to the location in which to return
+                             the attributes bitmask for the variable.
+  @param[in,out]  DataSize   On input, the size in bytes of the return Data buffer.
+                             On output, the size of data returned in Data.
+  @param[out] Data           The buffer to return the contents of the variable.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The variable was not found.
@@ -66,12 +68,12 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PEI_GET_VARIABLE)(
-  IN EFI_PEI_SERVICES             **PeiServices,
-  IN CHAR16                       *VariableName,
-  IN EFI_GUID                     *VendorGuid,
-  OUT UINT32                      *Attributes OPTIONAL,
-  IN OUT UINTN                    *DataSize,
-  OUT VOID                        *Data
+  IN     EFI_PEI_SERVICES   **PeiServices,
+  IN     CHAR16             *VariableName,
+  IN     EFI_GUID           *VendorGuid,
+     OUT UINT32             *Attributes OPTIONAL,
+  IN OUT UINTN              *DataSize,
+     OUT VOID               *Data
   );
 
 /**
@@ -81,14 +83,14 @@ EFI_STATUS
   and on output the interface returns the next variable name data.  When the
   entire variable list has been returned, the error EFI_NOT_FOUND is returned.
 
-  @param  PeiServices      An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  VariableNameSize The size of the VariableName buffer.
-  @param  VariableName     On input, supplies the last VariableName that was
-                           returned by GetNextVariableName(). On output, returns the Null-terminated
-                           Unicode string of the current variable.
-  @param  VendorGuid       On input, supplies the last VendorGuid that was
-                           returned by GetNextVariableName(). On output, returns the VendorGuid
-                           of the current variable.
+  @param[in]  PeiServices       An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param[in]  VariableNameSize  The size of the VariableName buffer.
+  @param[in]  VariableName      On input, supplies the last VariableName that was
+                                returned by GetNextVariableName(). On output, returns the Null-terminated
+                                Unicode string of the current variable.
+  @param[in]  VendorGuid        On input, supplies the last VendorGuid that was
+                                returned by GetNextVariableName(). On output, returns the VendorGuid
+                                of the current variable.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
@@ -122,4 +124,5 @@ struct _EFI_PEI_READ_ONLY_VARIABLE_PPI {
 
 extern EFI_GUID gEfiPeiReadOnlyVariablePpiGuid;
 
-#endif
+#endif	/* __PEI_READ_ONLY_VARIABLE_PPI_H__ */
+
