@@ -746,7 +746,7 @@ UpdateFrontPageStrings (
       }
 
       if (CompareGuid (&Record->DataRecordGuid, &gEfiProcessorSubClassGuid) &&
-          (DataHeader->RecordType == EFI_PROCESSOR_VERSION_RECORD_NUMBER)
+          (DataHeader->RecordType == ProcessorVersionRecordType)
           ) {
         ProcessorVersion = (EFI_PROCESSOR_VERSION_DATA *) (DataHeader + 1);
         GetProducerString (&Record->ProducerName, *ProcessorVersion, &NewString);
@@ -757,7 +757,7 @@ UpdateFrontPageStrings (
       }
 
       if (CompareGuid (&Record->DataRecordGuid, &gEfiProcessorSubClassGuid) &&
-          (DataHeader->RecordType == EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER)
+          (DataHeader->RecordType == ProcessorCoreFrequencyRecordType)
           ) {
         ProcessorFrequency = (EFI_PROCESSOR_CORE_FREQUENCY_DATA *) (DataHeader + 1);
         ConvertProcessorToString (ProcessorFrequency, &NewString);
