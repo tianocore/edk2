@@ -852,7 +852,6 @@ IsaSerialReceiveTransmit (
             WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
           }
 
-          IsaSerialFifoAdd (&SerialDevice->Receive, Data);
 
           continue;
         } else {
