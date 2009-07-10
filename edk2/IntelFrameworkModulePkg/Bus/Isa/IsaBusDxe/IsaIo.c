@@ -353,9 +353,9 @@ IsaIoUnmap (
   ISA_MAP_INFO  *IsaMapInfo;
 
   //
-  // Unset Feature Flag PcdIsaBusSupportDma to disable support for ISA DMA.
+  // Check if DMA is supported.
   //
-  if (!FeaturePcdGet (PcdIsaBusSupportDma)) {
+  if ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_SUPPORT_DMA) == 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -512,10 +512,9 @@ IsaIoMemRead (
   ISA_IO_DEVICE *IsaIoDevice;
 
   //
-  // Set Feature Flag PcdIsaBusSupportIsaMemory to FALSE to disable support for
-  // ISA bus memory read/write operations.
+  // Check if ISA memory is supported.
   //
-  if (!FeaturePcdGet (PcdIsaBusSupportIsaMemory)) {
+  if ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_SUPPORT_ISA_MEMORY) == 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -579,10 +578,9 @@ IsaIoMemWrite (
   ISA_IO_DEVICE *IsaIoDevice;
 
   //
-  // Set Feature Flag PcdIsaBusSupportIsaMemory to FALSE to disable support for
-  // ISA bus memory read/write operations.
+  // Check if ISA memory is supported.
   //
-  if (!FeaturePcdGet (PcdIsaBusSupportIsaMemory)) {
+  if ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_SUPPORT_ISA_MEMORY) == 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -646,10 +644,9 @@ IsaIoCopyMem (
   ISA_IO_DEVICE *IsaIoDevice;
 
   //
-  // Set Feature Flag PcdIsaBusSupportIsaMemory to FALSE to disable support for
-  // ISA bus memory read/write operations.
+  // Check if ISA memory is supported.
   //
-  if (!FeaturePcdGet (PcdIsaBusSupportIsaMemory)) {
+  if ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_SUPPORT_ISA_MEMORY) == 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1297,9 +1294,9 @@ IsaIoMap (
   )
 {
   //
-  // Set Feature Flag PcdIsaBusSupportDma to FALSE to disable support for ISA DMA.
+  // Check if DMA is supported.
   //
-  if (!FeaturePcdGet (PcdIsaBusSupportDma)) {
+  if ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_SUPPORT_DMA) == 0) {
     return EFI_UNSUPPORTED;
   }
   //
@@ -1308,7 +1305,7 @@ IsaIoMap (
   //
   // So we just return EFI_UNSUPPORTED for these functions.
   //
-  if (FeaturePcdGet (PcdIsaBusOnlySupportSlaveDma)) {
+  if ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_ONLY_SUPPORT_SLAVE_DMA) != 0) {
     return IsaIoMapOnlySupportSlaveReadWrite (
              This,
              Operation,
@@ -1369,7 +1366,8 @@ IsaIoAllocateBuffer (
   // ISA Bus Master.
   // Or unset Feature Flag PcdIsaBusSupportDma to disable support for ISA DMA.
   //
-  if (!FeaturePcdGet (PcdIsaBusSupportDma) || FeaturePcdGet (PcdIsaBusOnlySupportSlaveDma)) {
+  if (((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_SUPPORT_DMA) == 0) ||
+      ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_ONLY_SUPPORT_SLAVE_DMA) != 0)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1439,7 +1437,8 @@ IsaIoFreeBuffer (
   // ISA Bus Master.
   // Or unset Feature Flag PcdIsaBusSupportDma to disable support for ISA DMA.
   //
-  if (!FeaturePcdGet (PcdIsaBusSupportDma) || FeaturePcdGet (PcdIsaBusOnlySupportSlaveDma)) {
+  if (((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_SUPPORT_DMA) == 0) ||
+      ((PcdGet8 (PcdIsaBusSupportedFeatures) & PCD_ISA_BUS_ONLY_SUPPORT_SLAVE_DMA) != 0)) {
     return EFI_UNSUPPORTED;
   }
 
