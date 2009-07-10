@@ -2005,6 +2005,7 @@ CopyReplace(
   IN CONST CHAR16                     *FindTarget,
   IN CONST CHAR16                     *ReplaceWith
   ){
+  UINTN Size;
   if ( (SourceString == NULL)
     || (NewString    == NULL)
     || (FindTarget   == NULL)
@@ -2018,12 +2019,14 @@ CopyReplace(
   while (*SourceString != L'\0') {
     if (StrnCmp(SourceString, FindTarget, StrLen(FindTarget)) == 0) {
       SourceString += StrLen(FindTarget);
-      if ((StrSize(NewString) + (StrLen(ReplaceWith)*sizeof(CHAR16))) > NewSize) {
+      Size = StrSize(NewString);
+      if ((Size + (StrLen(ReplaceWith)*sizeof(CHAR16))) > NewSize) {
         return (EFI_BUFFER_TOO_SMALL);
       }
       StrCat(NewString, ReplaceWith);
     } else {
-      if (StrSize(NewString) + sizeof(CHAR16) > NewSize) {
+      Size = StrSize(NewString);
+      if (Size + sizeof(CHAR16) > NewSize) {
         return (EFI_BUFFER_TOO_SMALL);
       }
       StrnCat(NewString, SourceString, 1);
