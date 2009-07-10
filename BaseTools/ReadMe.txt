@@ -27,7 +27,7 @@ Notes:
 	 or modules because the AutoGen.* files have been be removed. The "makefile" itself
 	 cannot generate AutoGen.* files. Only "build" command can.
 3) All .exe binary file including C and python tools are generated from:
-    r1645 <buildtools_project>\BaseTools\Source\
+    r1654 <buildtools_project>\BaseTools\Source\
 	
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
