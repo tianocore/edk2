@@ -99,7 +99,7 @@ EFI_STATUS
 
   @param[in, out] PeiServices     General-purpose services that are available to every PEIM
   @param[in]      This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
-  @param[in]      CapsuleInstance Specifies for which capsule instance to retrieve the information.
+  @param[in]      CapsuleInstance Specifies which capsule instance to retrieve.
                                   This parameter must be between one and the value returned by
                                   GetNumberRecoveryCapsules() in NumberRecoveryCapsules.
   @param[out]     Buffer          Specifies a caller-allocated buffer in which the requested
