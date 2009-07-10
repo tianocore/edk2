@@ -14,55 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Bds.h"
 
 /**
-  This function locks the block 
-
-  @param CpuIo           A instance of EFI_CPU_IO_PROTOCOL. 
-  @param Base            The base address flash region to be locked.
-
-**/
-VOID
-BdsLockFv (
-  IN EFI_CPU_IO_PROTOCOL          *CpuIo,
-  IN EFI_PHYSICAL_ADDRESS         Base
-  )
-{
-  EFI_FV_BLOCK_MAP_ENTRY      *BlockMap;
-  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
-  EFI_PHYSICAL_ADDRESS        BaseAddress;
-  UINT8                       Data;
-  UINT32                      BlockLength;
-  UINTN                       Index;
-
-  BaseAddress = Base - 0x400000 + 2;
-  FvHeader    = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) (Base));
-  BlockMap    = &(FvHeader->BlockMap[0]);
-
-  while ((BlockMap->NumBlocks != 0) && (BlockMap->Length != 0)) {
-    BlockLength = BlockMap->Length;
-    for (Index = 0; Index < BlockMap->NumBlocks; Index++) {
-      CpuIo->Mem.Read (
-                  CpuIo,
-                  EfiCpuIoWidthUint8,
-                  BaseAddress,
-                  1,
-                  &Data
-                  );
-      Data = (UINT8) (Data | 0x3);
-      CpuIo->Mem.Write (
-                  CpuIo,
-                  EfiCpuIoWidthUint8,
-                  BaseAddress,
-                  1,
-                  &Data
-                  );
-      BaseAddress += BlockLength;
-    }
-
-    BlockMap++;
-  }
-}
-
-/**
 
   This routine is called to see if there are any capsules we need to process.
   If the boot mode is not UPDATE, then we do nothing. Otherwise find the
