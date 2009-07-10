@@ -41,24 +41,23 @@ typedef struct {
   UINT64                RegionState;    ///< Describes the accessibility attributes of the SMRAM.
 } EFI_SMRAM_DESCRIPTOR;
 
-//
-// Definition of SMRAM states, used as value for EFI_SMRAM_DESCRIPTOR.RegionState.
-//
+///
+/// Definition of SMRAM states, used as value for EFI_SMRAM_DESCRIPTOR.RegionState.
+///@{
 #define EFI_SMRAM_OPEN                0x00000001
 #define EFI_SMRAM_CLOSED              0x00000002
 #define EFI_SMRAM_LOCKED              0x00000004
 #define EFI_CACHEABLE                 0x00000008
 #define EFI_ALLOCATED                 0x00000010
+///@}
 
-///
-/// Inconsistent with specification here: 
-/// EFI_HOB_SMRAM_DESCRIPTOR_BLOCK has been changed to EFI_SMRAM_HOB_DESCRIPTOR_BLOCK.
-/// This inconsistency is kept in code in order for backward compatibility.
-///
-
-///
-/// GUID specific data structure of HOB for reserving SMRAM regions.
-///
+/**
+* GUID specific data structure of HOB for reserving SMRAM regions.
+*
+* Inconsistent with specification here: 
+* EFI_HOB_SMRAM_DESCRIPTOR_BLOCK has been changed to EFI_SMRAM_HOB_DESCRIPTOR_BLOCK.
+* This inconsistency is kept in code in order for backward compatibility.
+**/
 typedef struct {
   ///
   /// Designates the number of possible regions in the system
@@ -75,3 +74,4 @@ typedef struct {
 extern EFI_GUID gEfiSmmPeiSmramMemoryReserveGuid;
 
 #endif
+
