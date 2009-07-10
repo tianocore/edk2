@@ -80,6 +80,21 @@
 #define EFI_CU_PC_INIT_END    0x00000001
 
 //
+// The reason that the processor was disabled.
+//
+#define EFI_CPU_CAUSE_NOT_DISABLED              0x0000
+#define EFI_CPU_CAUSE_INTERNAL_ERROR            0x0001
+#define EFI_CPU_CAUSE_THERMAL_ERROR             0x0002
+#define EFI_CPU_CAUSE_SELFTEST_FAILURE          0x0004
+#define EFI_CPU_CAUSE_PREBOOT_TIMEOUT           0x0008
+#define EFI_CPU_CAUSE_FAILED_TO_START           0x0010
+#define EFI_CPU_CAUSE_CONFIG_ERROR              0x0020
+#define EFI_CPU_CAUSE_USER_SELECTION            0x0080
+#define EFI_CPU_CAUSE_BY_ASSOCIATION            0x0100
+#define EFI_CPU_CAUSE_UNSPECIFIED               0x8000
+
+typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
+//
 // Computing Unit Unspecified Subclass Progress Code definitions.
 //
 //
@@ -547,8 +562,19 @@
 #define EFI_SW_DXE_BS_PC_LEGACY_BOOT_EVENT            (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_DXE_BS_PC_EXIT_BOOT_SERVICES_EVENT     (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 #define EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT (EFI_SUBCLASS_SPECIFIC | 0x00000004)
+///
+/// Inconsistent with specification here: 
+/// In Framework Spec, Status0.92, no following two macro. And it is expectable that
+/// to add the definitions to Framework Spec.
+///
 #define EFI_SW_DXE_BS_PC_BEGIN_CONNECTING_DRIVERS     (EFI_SUBCLASS_SPECIFIC | 0x00000005)
 #define EFI_SW_DXE_BS_PC_VERIFYING_PASSWORD           (EFI_SUBCLASS_SPECIFIC | 0x00000006)
+
+///
+/// Inconsistent with specification here: 
+/// In Framework Spec, Status0.92, no following two macro. And it is expectable that
+/// to add the definitions to Framework Spec.
+///
 
 //
 // Software Class DXE RT Driver Subclass Progress Code definitions.
@@ -802,6 +828,12 @@
 #define EFI_SW_EC_IA32_ALIGNMENT_CHECK  EXCEPT_IA32_ALIGNMENT_CHECK
 #define EFI_SW_EC_IA32_MACHINE_CHECK    EXCEPT_IA32_MACHINE_CHECK
 #define EFI_SW_EC_IA32_SIMD             EXCEPT_IA32_SIMD
+
+///
+/// Inconsistent with specification here: 
+/// In Framework Spec, Status0.92, no following two macro. And it is expectable that
+/// to add the definitions to Framework Spec.
+///
 
 //
 // Software Class X64 Exception Subclass Error Code definitions.
