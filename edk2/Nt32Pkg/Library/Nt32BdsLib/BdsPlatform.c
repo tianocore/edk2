@@ -22,7 +22,6 @@ Abstract:
 
 #include "BdsPlatform.h"
 
-CHAR16  mFirmwareVendor[] = L"TianoCore.org";
 WIN_NT_SYSTEM_CONFIGURATION mSystemConfigData;
 
 VOID
@@ -85,22 +84,6 @@ Returns:
 
 --*/
 {
-  //
-  // set firmwarevendor, here can be IBV/OEM customize
-  //
-  gST->FirmwareVendor = AllocateRuntimeCopyPool (
-                          sizeof (mFirmwareVendor),
-                          &mFirmwareVendor
-                          );
-  ASSERT (gST->FirmwareVendor != NULL);
-
-  gST->FirmwareRevision = 0;
-
-  //
-  // Fixup Tasble CRC after we updated Firmware Vendor and Revision
-  //
-  gBS->CalculateCrc32 ((VOID *) gST, sizeof (EFI_SYSTEM_TABLE), &gST->Hdr.CRC32);
-
   SetupVariableInit ();
 }
 
