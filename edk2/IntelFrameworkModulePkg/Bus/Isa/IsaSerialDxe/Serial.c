@@ -83,8 +83,7 @@ SERIAL_DEV  gSerialDevTempate = {
   FALSE,
   FALSE,
   Uart16550A,
-  NULL,
-  FixedPcdGetBool (PcdIsaBusSerialUseHalfHandshake)   //UseHalfHandshake
+  NULL
 };
 
 /**
@@ -807,7 +806,7 @@ IsaSerialReceiveTransmit (
     // if receive buffer is available.
     //
     if (SerialDevice->HardwareFlowControl &&
-        !SerialDevice->UseHalfHandshake   &&
+        !FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake)&&
         !ReceiveFifoFull
         ) {
       Mcr.Data     = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
@@ -844,7 +843,7 @@ IsaSerialReceiveTransmit (
           // tell the peer to stop sending data.
           //
           if (SerialDevice->HardwareFlowControl &&
-              !SerialDevice->UseHalfHandshake   &&
+              !FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake)   &&
               IsaSerialFifoFull (&SerialDevice->Receive)
               ) {
             Mcr.Data     = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
@@ -873,7 +872,7 @@ IsaSerialReceiveTransmit (
           //
           // For half handshake flow control assert RTS before sending.
           //
-          if (SerialDevice->UseHalfHandshake) {
+          if (FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake)) {
             Mcr.Data     = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
             Mcr.Bits.Rts= 0;
             WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);
@@ -883,7 +882,7 @@ IsaSerialReceiveTransmit (
           //
           TimeOut   = 0;
           Msr.Data  = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-          while (Msr.Bits.Dcd == 1 && (!Msr.Bits.Cts ^ SerialDevice->UseHalfHandshake)) {
+          while (Msr.Bits.Dcd == 1 && (!Msr.Bits.Cts ^ FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
             gBS->Stall (TIMEOUT_STALL_INTERVAL);
             TimeOut++;
             if (TimeOut > 5) {
@@ -893,7 +892,7 @@ IsaSerialReceiveTransmit (
             Msr.Data = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
           }
 
-          if (Msr.Bits.Dcd== 0 || (Msr.Bits.Cts ^ SerialDevice->UseHalfHandshake)) {
+          if (Msr.Bits.Dcd== 0 || (Msr.Bits.Cts ^ FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
             IsaSerialFifoRemove (&SerialDevice->Transmit, &Data);
             WRITE_THR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Data);
           }
@@ -901,7 +900,7 @@ IsaSerialReceiveTransmit (
           //
           // For half handshake flow control, tell DCE we are done.
           //
-          if (SerialDevice->UseHalfHandshake) {
+          if (FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake)) {
             Mcr.Data = READ_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
             Mcr.Bits.Rts = 1;
             WRITE_MCR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Mcr.Data);

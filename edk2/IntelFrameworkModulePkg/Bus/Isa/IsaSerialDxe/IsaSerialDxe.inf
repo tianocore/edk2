@@ -65,4 +65,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
+
+[FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE

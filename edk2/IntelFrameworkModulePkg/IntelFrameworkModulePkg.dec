@@ -123,6 +123,9 @@
   ## This PCD specifies whether PciBus supports the hot plug device.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE|BOOLEAN|0x0001003d
   
+  ## This PCD specifies whether Serial device use half hand shake.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010043
+
 [PcdsFixedAtBuild]
   ## FFS filename to find the default BMP Logo file.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile |{ 0x99, 0x8b, 0xB2, 0x7B, 0xBB, 0x61, 0xD5, 0x11, 0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }|VOID*|16
@@ -142,9 +145,6 @@
   #  The default value in PeiPhase is 1 KBytes.
   #  The default value in DxePhase is 128 KBytes.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010025
-
-  ## This PCD specifies whether Serial device use half hand shake.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010043
 
 [PcdsDynamic]
   ## PCD is used to mark if the machine has complete one boot cycle before.
