@@ -845,9 +845,9 @@ F2UCreateBannerOpCode (
 **/
 EFI_STATUS 
 FwUpdateDataToUefiUpdateData (
-  IN       HII_THUNK_CONTEXT                *ThunkContext,
-  IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *FwUpdateData,
-  IN       VOID                             *UefiOpCodeHandle
+  IN       HII_THUNK_CONTEXT    *ThunkContext,
+  IN CONST EFI_HII_UPDATE_DATA  *FwUpdateData,
+  IN       VOID                 *UefiOpCodeHandle
   )
 {
   FRAMEWORK_EFI_IFR_OP_HEADER          *FwOpCode;

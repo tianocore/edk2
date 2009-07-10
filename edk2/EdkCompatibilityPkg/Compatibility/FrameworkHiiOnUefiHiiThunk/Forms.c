@@ -488,7 +488,7 @@ HiiThunkUpdateForm (
   IN FRAMEWORK_EFI_HII_HANDLE          Handle,
   IN EFI_FORM_LABEL                    Label,
   IN BOOLEAN                           AddData,
-  IN FRAMEWORK_EFI_HII_UPDATE_DATA     *Data
+  IN EFI_HII_UPDATE_DATA               *Data
   )
 {
   EFI_STATUS                                Status;

@@ -385,11 +385,11 @@ HiiGetDefaultImage (
 EFI_STATUS
 EFIAPI
 HiiThunkUpdateForm (
-  IN EFI_HII_PROTOCOL                   *This,
-  IN FRAMEWORK_EFI_HII_HANDLE           Handle,
-  IN EFI_FORM_LABEL                     Label,
-  IN BOOLEAN                            AddData,
-  IN FRAMEWORK_EFI_HII_UPDATE_DATA      *Data
+  IN EFI_HII_PROTOCOL          *This,
+  IN FRAMEWORK_EFI_HII_HANDLE  Handle,
+  IN EFI_FORM_LABEL            Label,
+  IN BOOLEAN                   AddData,
+  IN EFI_HII_UPDATE_DATA       *Data
   );
 
 EFI_STATUS
@@ -459,9 +459,9 @@ NewOrAddPackNotify (
 **/
 EFI_STATUS
 FwUpdateDataToUefiUpdateData (
-  IN       HII_THUNK_CONTEXT                *ThunkContext,
-  IN CONST FRAMEWORK_EFI_HII_UPDATE_DATA    *FwUpdateData,
-  IN       VOID                             *UefiOpCodeHandle
+  IN       HII_THUNK_CONTEXT    *ThunkContext,
+  IN CONST EFI_HII_UPDATE_DATA  *FwUpdateData,
+  IN       VOID                 *UefiOpCodeHandle
   )
 ;
 
