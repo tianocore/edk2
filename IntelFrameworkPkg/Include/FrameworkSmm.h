@@ -13,15 +13,12 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:    FrameworkSmm.h
-
 **/
 
 #ifndef _FRAMEWORK_SMM_H_
 #define _FRAMEWORK_SMM_H_
 
 #include <FrameworkDxe.h>
-
 #include <Framework/SmmCis.h>
 
 #endif

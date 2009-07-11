@@ -12,8 +12,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  DataHubRecords.h
-
   @par Revision Reference:
   DataHubRecord.h include all data hub sub class defitions from Cache subclass
   spec 0.9, DataHub SubClass spec 0.9, Memory SubClass Spec 0.9, Processor

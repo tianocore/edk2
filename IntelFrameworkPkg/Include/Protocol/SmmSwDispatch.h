@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  SmmSwDispatch.h
-
   @par Revision Reference:
   This Protocol is defined in Framework for EFI SMM Core Interface Spec
   Version 0.9.

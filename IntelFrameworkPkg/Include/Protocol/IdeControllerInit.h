@@ -18,8 +18,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  IdeControllerInit.h
-
   @par Revision Reference:
   This Protocol is defined in IDE Controller Initialization Protocol Specification
   Version 0.9.

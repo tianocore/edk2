@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  FrameworkFirmwareFileSystem.h
-
   @par Revision Reference:
   These definitions are from HOB Spec 0.9 but not adopted by PI specs.
 

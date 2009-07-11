@@ -14,8 +14,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  FrameworkFormBrowser.h
-
   @par Revision Reference:
   This protocol is defined in HII spec 0.92.
 
