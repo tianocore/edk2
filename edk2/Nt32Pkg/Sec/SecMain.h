@@ -19,9 +19,7 @@ Abstract:
 **/
 
 #include <stdio.h>
-#include <Base.h>
 #include <PiPei.h>
-#include <PiDxe.h>
 #include <WinNtPeim.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <Library/BaseLib.h>
