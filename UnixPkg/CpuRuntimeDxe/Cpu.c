@@ -21,7 +21,7 @@ Abstract:
   in this driver.
 
 --*/
-#include "PiDxe.h"
+#include <FrameworkDxe.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/DataHub.h>
 #include <Guid/DataHubRecords.h>
@@ -36,7 +36,6 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Framework/DataHubRecords.h>
 #include "CpuDriver.h"
 #include "UnixDxe.h"
 #include <Protocol/UnixIo.h>

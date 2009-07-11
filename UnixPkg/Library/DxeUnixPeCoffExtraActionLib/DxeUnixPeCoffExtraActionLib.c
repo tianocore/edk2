@@ -22,7 +22,7 @@ Abstract:
 
 **/
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <UnixDxe.h>
 #include <Library/PeCoffLib.h>

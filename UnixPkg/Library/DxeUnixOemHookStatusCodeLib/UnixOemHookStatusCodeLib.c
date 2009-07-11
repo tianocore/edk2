@@ -13,7 +13,7 @@
   Module Name:  UnixOemHookStatusCodeLib.c
 
 **/
-#include "PiDxe.h"
+#include <FrameworkDxe.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include "UnixDxe.h"
