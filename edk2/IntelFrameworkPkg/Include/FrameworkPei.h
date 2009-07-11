@@ -13,8 +13,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:    FrameworkPei.h
-
 **/
 
 #ifndef _FRAMEWORK_PEI_H_
@@ -26,6 +24,7 @@
 #include <Framework/FirmwareVolumeHeader.h>
 #include <Framework/Hob.h>
 #include <Framework/StatusCode.h>
+#include <Framework/BootScript.h>
 #include <Framework/PeiCis.h>
 
 #endif

@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _INTERNAL_SMBUS_LIB_H_
 
 
-#include <PiPei.h>
 #include <FrameworkPei.h>
 
 #include <Ppi/Smbus.h>

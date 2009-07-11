@@ -13,8 +13,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  LegacyBiosPlatform.h
-
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
   Version 0.97.
@@ -24,7 +22,11 @@
 #ifndef _EFI_LEGACY_BIOS_PLATFORM_H_
 #define _EFI_LEGACY_BIOS_PLATFORM_H_
 
-#include <Framework/Legacy16.h>
+///
+/// Legacy BIOS Platform depends on HDD_INFO and EFI_COMPATIBILITY16_TABLE that
+/// are defined with the Legacy BIOS Protocol
+///
+#include <Protocol/LegacyBios.h>
 
 #define EFI_LEGACY_BIOS_PLATFORM_PROTOCOL_GUID \
   { \

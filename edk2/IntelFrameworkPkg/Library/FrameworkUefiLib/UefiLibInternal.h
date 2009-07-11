@@ -14,7 +14,6 @@
 #define __UEFI_LIB_INTERNAL_H_
 
 
-#include <Uefi.h>
 #include <FrameworkDxe.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ComponentName.h>

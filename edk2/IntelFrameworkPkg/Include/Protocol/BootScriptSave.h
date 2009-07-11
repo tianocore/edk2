@@ -19,14 +19,9 @@
 #ifndef _BOOT_SCRIPT_SAVE_PROTOCOL_H_
 #define _BOOT_SCRIPT_SAVE_PROTOCOL_H_
 
-//
-// To get the multiple phase definitions defined in Boot Script Specification
-//
-#include <Ppi/BootScriptExecuter.h>
-
-//
-// S3 Save Protocol GUID
-//
+///
+/// S3 Save Protocol GUID
+///
 #define EFI_BOOT_SCRIPT_SAVE_PROTOCOL_GUID \
   { \
     0x470e1529, 0xb79e, 0x4e32, {0xa0, 0xfe, 0x6a, 0x15, 0x6d, 0x29, 0xf9, 0xb2 } \
@@ -34,9 +29,6 @@
 
 typedef struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL EFI_BOOT_SCRIPT_SAVE_PROTOCOL;
 
-//
-// Protocol Member_Function
-//
 /**
   Adds a record into a specified Framework boot script table.
 
@@ -80,19 +72,15 @@ EFI_STATUS
   OUT EFI_PHYSICAL_ADDRESS                    *Address
   );
 
-//
-// S3 Save Protocol data structure
-//
-/**
-  The EFI_BOOT_SCRIPT_SAVE_PROTOCOL publishes the Framework boot script abstractions
-  to store or record various boot scripts into boot script tables.
-**/
+///
+/// The EFI_BOOT_SCRIPT_SAVE_PROTOCOL publishes the Framework boot script abstractions
+/// to store or record various boot scripts into boot script tables.
+///
 struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL {
-  EFI_BOOT_SCRIPT_WRITE       Write;      ///< Writes various boot scripts to a boot script table.
-  EFI_BOOT_SCRIPT_CLOSE_TABLE CloseTable; ///< Retrieves and closes a script table.
+  EFI_BOOT_SCRIPT_WRITE        Write;      ///< Writes various boot scripts to a boot script table.
+  EFI_BOOT_SCRIPT_CLOSE_TABLE  CloseTable; ///< Retrieves and closes a script table.
 };
 
 extern EFI_GUID gEfiBootScriptSaveProtocolGuid;
 
 #endif
-

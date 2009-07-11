@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiPei.h>
 #include <FrameworkPei.h>
 
 #include <Guid/MemoryAllocationHob.h>
