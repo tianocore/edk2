@@ -18,7 +18,7 @@ Abstract:
 #ifndef _CPU_DXE_H
 #define _CPU_DXE_H
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 
 #include <Protocol/Cpu.h>
 #include <Protocol/Legacy8259.h>
