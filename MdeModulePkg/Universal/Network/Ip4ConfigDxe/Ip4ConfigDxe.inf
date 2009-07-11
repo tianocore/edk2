@@ -60,7 +60,7 @@
   NetLib
   HiiLib
   PrintLib
-
+  DpcLib
 
 [Protocols]
   gEfiDhcp4ServiceBindingProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
@@ -74,4 +74,3 @@
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES ## Guid
   gEfiNicIp4ConfigVariableGuid                  ## CONSUMES ## Guid
-   

@@ -52,11 +52,10 @@
   UefiDriverEntryPoint
   DebugLib
   NetLib
-
+  DpcLib
 
 [Protocols]
   gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
   gEfiArpServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
   gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiArpProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-

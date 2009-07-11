@@ -668,7 +668,7 @@ SIGNAL_USER:
     //
     // Dispatch the DPC queued by the NotifyFunction of ResolvedEvent.
     //
-    NetLibDispatchDpc ();
+    DispatchDpc ();
   }
 
   return Status;
@@ -737,7 +737,7 @@ ArpCancel (
   // Dispatch the DPCs queued by the NotifyFunction of the events signaled
   // by ArpCancleRequest.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
   gBS->RestoreTPL (OldTpl);
 

@@ -54,10 +54,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   UefiDriverEntryPoint
   DebugLib
   NetLib
-
+  DpcLib
 
 [Protocols]
   gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
   gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
-

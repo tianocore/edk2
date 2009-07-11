@@ -577,6 +577,6 @@ TcpTicking (
   IN VOID      *Context
   )
 {
-  NetLibQueueDpc (TPL_CALLBACK, TcpTickingDpc, Context);
+  QueueDpc (TPL_CALLBACK, TcpTickingDpc, Context);
 }
 

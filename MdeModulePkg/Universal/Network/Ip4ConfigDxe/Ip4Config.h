@@ -37,6 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
+#include <Library/DpcLib.h>
 
 #include "NicIp4Variable.h"
 

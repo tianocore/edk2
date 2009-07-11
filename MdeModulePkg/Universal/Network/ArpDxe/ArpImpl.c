@@ -325,7 +325,7 @@ ArpOnFrameRcvd (
   //
   // Request ArpOnFrameRcvdDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, ArpOnFrameRcvdDpc, Context);
+  QueueDpc (TPL_CALLBACK, ArpOnFrameRcvdDpc, Context);
 }
 
 /**
@@ -386,7 +386,7 @@ ArpOnFrameSent (
   //
   // Request ArpOnFrameSentDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, ArpOnFrameSentDpc, Context);
+  QueueDpc (TPL_CALLBACK, ArpOnFrameSentDpc, Context);
 }
 
 
@@ -812,7 +812,7 @@ ArpAddressResolved (
   //
   // Dispatch the DPCs queued by the NotifyFunction of the Context->UserRequestEvent.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
   return Count;
 }

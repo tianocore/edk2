@@ -632,7 +632,7 @@ MnpReceive (
     //
     // Dispatch the DPC queued by the NotifyFunction of Token->Event.
     //
-    NetLibDispatchDpc ();
+    DispatchDpc ();
   }
 
 ON_EXIT:
@@ -709,7 +709,7 @@ MnpCancel (
   //
   // Dispatch the DPC queued by the NotifyFunction of the cancled token's events.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);
@@ -774,7 +774,7 @@ MnpPoll (
   //
   // Dispatch the DPC queued by the NotifyFunction of rx token's events.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);

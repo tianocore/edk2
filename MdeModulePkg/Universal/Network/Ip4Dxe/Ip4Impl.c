@@ -703,7 +703,7 @@ Ip4AutoConfigCallBack (
   //
   // Request Ip4AutoConfigCallBackDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, Ip4AutoConfigCallBackDpc, Context);
+  QueueDpc (TPL_CALLBACK, Ip4AutoConfigCallBackDpc, Context);
 }
 
 
@@ -1780,7 +1780,7 @@ Ip4FreeTxToken (
     //
     // Dispatch the DPC queued by the NotifyFunction of Token->Event.
     //
-    NetLibDispatchDpc ();
+    DispatchDpc ();
   }
 
   gBS->FreePool (Wrap);
@@ -2110,7 +2110,7 @@ EfiIp4Receive (
   // Dispatch the DPC queued by the NotifyFunction of this instane's receive
   // event.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);
@@ -2266,7 +2266,7 @@ Ip4Cancel (
   // Dispatch the DPCs queued by the NotifyFunction of the canceled rx token's
   // events.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
   if (EFI_ERROR (Status)) {
     if ((Token != NULL) && (Status == EFI_ABORTED)) {
       return EFI_SUCCESS;

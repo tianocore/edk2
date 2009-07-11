@@ -70,7 +70,7 @@
   UefiRuntimeServicesTableLib
   DebugLib
   NetLib
-
+  DpcLib
 
 [Protocols]
   gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
@@ -80,4 +80,3 @@
   gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
   gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiArpProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
-

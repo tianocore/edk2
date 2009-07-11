@@ -783,7 +783,7 @@ Udp4Receive (
   //
   // Dispatch the DPC queued by the NotifyFunction of Token->Event.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
 ON_EXIT:
 
@@ -856,7 +856,7 @@ Udp4Cancel (
   //
   // Dispatch the DPC queued by the NotifyFunction of the cancelled token's events.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
   gBS->RestoreTPL (OldTpl);
 

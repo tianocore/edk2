@@ -219,7 +219,7 @@ EfiNicIp4ConfigSetInfo (
   //
   if (Reconfig && (Instance->ReconfigEvent != NULL)) {
     Status = gBS->SignalEvent (Instance->ReconfigEvent);
-    NetLibDispatchDpc ();
+    DispatchDpc ();
   }
 
   return Status;
@@ -335,7 +335,7 @@ ON_EXIT:
   gBS->SignalEvent (Instance->DoneEvent);
   Ip4ConfigCleanDhcp4 (Instance);
 
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
   return ;
 }
@@ -538,7 +538,7 @@ ON_ERROR:
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);
 
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
   return Status;
 }

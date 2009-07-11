@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
-#include <Protocol/Dpc.h>
 
 #include <Guid/NicIp4ConfigNvData.h>
 
@@ -33,8 +32,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
-
-EFI_DPC_PROTOCOL *mDpc = NULL;
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mNetLibHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
@@ -1457,77 +1454,4 @@ NetLibGetNicHandle (
 
   gBS->FreePool (OpenBuffer);
   return Handle;
-}
-
-/**
-  Add a Deferred Procedure Call to the end of the DPC queue.
-
-  @param[in]  DpcTpl           The EFI_TPL that the DPC should be invoked.
-  @param[in]  DpcProcedure     Pointer to the DPC's function.
-  @param[in]  DpcContext       Pointer to the DPC's context.  Passed to DpcProcedure
-                               when DpcProcedure is invoked.
-
-  @retval  EFI_SUCCESS              The DPC was queued.
-  @retval  EFI_INVALID_PARAMETER    DpcTpl is not a valid EFI_TPL, or DpcProcedure
-                                    is NULL.
-  @retval  EFI_OUT_OF_RESOURCES     There are not enough resources available to
-                                    add the DPC to the queue.
-
-**/
-EFI_STATUS
-EFIAPI
-NetLibQueueDpc (
-  IN EFI_TPL            DpcTpl,
-  IN EFI_DPC_PROCEDURE  DpcProcedure,
-  IN VOID               *DpcContext    OPTIONAL
-  )
-{
-  return mDpc->QueueDpc (mDpc, DpcTpl, DpcProcedure, DpcContext);
-}
-
-/**
-  Dispatch the queue of DPCs. ALL DPCs that have been queued with a DpcTpl
-  value greater than or equal to the current TPL are invoked in the order that
-  they were queued.  DPCs with higher DpcTpl values are invoked before DPCs with
-  lower DpcTpl values.
-
-  @retval  EFI_SUCCESS              One or more DPCs were invoked.
-  @retval  EFI_NOT_FOUND            No DPCs were invoked.
-
-**/
-EFI_STATUS
-EFIAPI
-NetLibDispatchDpc (
-  VOID
-  )
-{
-  return mDpc->DispatchDpc(mDpc);
-}
-
-/**
-  The constructor function caches the pointer to DPC protocol.
-
-  The constructor function locates DPC protocol from protocol database.
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
-
-  @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
-  @param[in]  SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-
-**/
-EFI_STATUS
-EFIAPI
-NetLibConstructor (
-  IN EFI_HANDLE                ImageHandle,
-  IN EFI_SYSTEM_TABLE          *SystemTable
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = gBS->LocateProtocol (&gEfiDpcProtocolGuid, NULL, (VOID**) &mDpc);
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (mDpc != NULL);
-
-  return Status;
 }

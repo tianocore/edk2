@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DpcLib.h>
 
 
 /**
@@ -96,7 +97,7 @@ UdpIoOnDgramSent (
   //
   // Request UdpIoOnDgramSentDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, UdpIoOnDgramSentDpc, Context);
+  QueueDpc (TPL_CALLBACK, UdpIoOnDgramSentDpc, Context);
 }
 
 /**
@@ -214,7 +215,7 @@ UdpIoOnDgramRcvd (
   //
   // Request UdpIoOnDgramRcvdDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, UdpIoOnDgramRcvdDpc, Context);
+  QueueDpc (TPL_CALLBACK, UdpIoOnDgramRcvdDpc, Context);
 }
 
 /**

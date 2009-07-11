@@ -871,7 +871,7 @@ Ip4OnArpResolved (
   //
   // Request Ip4OnArpResolvedDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, Ip4OnArpResolvedDpc, Context);
+  QueueDpc (TPL_CALLBACK, Ip4OnArpResolvedDpc, Context);
 }
 
 
@@ -924,7 +924,7 @@ Ip4OnFrameSent (
   //
   // Request Ip4OnFrameSentDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, Ip4OnFrameSentDpc, Context);
+  QueueDpc (TPL_CALLBACK, Ip4OnFrameSentDpc, Context);
 }
 
 
@@ -1187,7 +1187,7 @@ Ip4OnFrameReceived (
   //
   // Request Ip4OnFrameReceivedDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, Ip4OnFrameReceivedDpc, Context);
+  QueueDpc (TPL_CALLBACK, Ip4OnFrameReceivedDpc, Context);
 }
 
 

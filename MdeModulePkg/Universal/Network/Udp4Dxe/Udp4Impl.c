@@ -1007,7 +1007,7 @@ Udp4DgramSent (
     //
     Token->Status = Status;
     gBS->SignalEvent (Token->Event);
-    NetLibDispatchDpc ();
+    DispatchDpc ();
   }
 }
 
@@ -1054,7 +1054,7 @@ Udp4DgramRcvd (
   // Dispatch the DPC queued by the NotifyFunction of the rx token's events
   // which are signaled with received data.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 }
 
 
