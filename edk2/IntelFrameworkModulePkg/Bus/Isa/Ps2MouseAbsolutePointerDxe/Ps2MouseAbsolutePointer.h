@@ -15,8 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __PS2MOUSEABSOLUTEPOINTER_H__
 #define __PS2MOUSEABSOLUTEPOINTER_H__
 
-#include <PiDxe.h>
-#include <Framework/StatusCode.h>
+#include <FrameworkDxe.h>
 
 #include <Protocol/AbsolutePointer.h>
 #include <Protocol/IsaIo.h>

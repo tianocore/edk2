@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _BDS_MODULE_H_
 #define _BDS_MODULE_H_
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 #include <IndustryStandard/PeImage.h>
 #include <Guid/MdeModuleHii.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>

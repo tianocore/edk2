@@ -16,8 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _SERIAL_H_
 
 
-#include <PiDxe.h>
-#include <FrameworkPei.h>
+#include <FrameworkDxe.h>
 
 #include <Protocol/IsaIo.h>
 #include <Protocol/SerialIo.h>
