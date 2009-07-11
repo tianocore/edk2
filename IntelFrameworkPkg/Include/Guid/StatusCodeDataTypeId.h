@@ -18,9 +18,10 @@
 #ifndef __STATUS_CODE_DATA_TYPE_ID_GUID_H__
 #define __STATUS_CODE_DATA_TYPE_ID_GUID_H__
 
-#include <Framework/StatusCode.h>
+#include <FrameworkDxe.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/FrameworkHii.h>
+#include <Guid/DataHubRecords.h>
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // String Data Type defintion. This is part of Status Code Specification
