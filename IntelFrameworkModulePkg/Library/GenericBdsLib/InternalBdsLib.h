@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _INTERNAL_BDS_LIB_H_
 #define _INTERNAL_BDS_LIB_H_
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/PeImage.h>

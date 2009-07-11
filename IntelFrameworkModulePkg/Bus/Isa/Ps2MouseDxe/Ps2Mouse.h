@@ -15,8 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _PS2MOUSE_H_
 #define _PS2MOUSE_H_
 
-#include <PiDxe.h>
-#include <Framework/StatusCode.h>
+#include <FrameworkDxe.h>
 
 #include <Protocol/SimplePointer.h>
 #include <Protocol/IsaIo.h>

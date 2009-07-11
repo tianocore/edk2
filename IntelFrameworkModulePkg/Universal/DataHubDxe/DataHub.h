@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _DATA_HUB_H_
 
 
-#include <PiDxe.h>
+#include <FrameworkDxe.h>
 
 #include <Protocol/DataHub.h>
 

@@ -15,9 +15,8 @@
 #ifndef __PEI_STATUS_CODE_H__
 #define __PEI_STATUS_CODE_H__
 
-
-
 #include <FrameworkPei.h>
+
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
