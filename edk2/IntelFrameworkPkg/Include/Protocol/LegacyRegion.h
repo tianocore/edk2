@@ -10,8 +10,6 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  LegacyRegion.h
-
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
   Version 0.97.
