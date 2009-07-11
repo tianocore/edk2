@@ -17,7 +17,7 @@
 //
 // The package level header files this module uses
 //
-#include <PiPei.h>
+#include <FrameworkPei.h>
 #include <WinNtPeim.h>
 
 //
