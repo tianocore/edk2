@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/DpcLib.h>
 
 
 LIST_ENTRY  mActiveIpIoList = {
@@ -564,7 +565,7 @@ IpIoTransmitHandler (
   //
   // Request IpIoTransmitHandlerDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, IpIoTransmitHandlerDpc, Context);
+  QueueDpc (TPL_CALLBACK, IpIoTransmitHandlerDpc, Context);
 }
 
 
@@ -618,7 +619,7 @@ IpIoDummyHandler (
   //
   // Request IpIoDummyHandlerDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, IpIoDummyHandlerDpc, Context);
+  QueueDpc (TPL_CALLBACK, IpIoDummyHandlerDpc, Context);
 }
 
 
@@ -738,7 +739,7 @@ IpIoListenHandler (
   //
   // Request IpIoListenHandlerDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, IpIoListenHandlerDpc, Context);
+  QueueDpc (TPL_CALLBACK, IpIoListenHandlerDpc, Context);
 }
 
 

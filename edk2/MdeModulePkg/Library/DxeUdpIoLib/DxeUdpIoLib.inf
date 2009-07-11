@@ -45,6 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   UefiBootServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
+  DpcLib
 
 [Protocols]
   gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED

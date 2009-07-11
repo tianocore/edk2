@@ -240,7 +240,7 @@ IcmpErrorListenHandler (
   //
   // Request IpIoListenHandlerDpc as a DPC at TPL_CALLBACK
   //
-  NetLibQueueDpc (TPL_CALLBACK, IcmpErrorListenHandlerDpc, Context);
+  QueueDpc (TPL_CALLBACK, IcmpErrorListenHandlerDpc, Context);
 }
 
 /**                                                                 
@@ -473,7 +473,7 @@ EfiPxeBcStop (
   // Dispatch the DPCs queued by the NotifyFunction of the canceled rx token's
   // events.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
   Private->Ip4->Configure (Private->Ip4, NULL);
 

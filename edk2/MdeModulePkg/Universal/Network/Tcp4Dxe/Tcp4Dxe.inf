@@ -70,10 +70,10 @@
   NetLib
   IpIoLib
   DevicePathLib
+  DpcLib
 
 [Protocols]
   gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
   gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
   gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
   gEfiTcp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
-

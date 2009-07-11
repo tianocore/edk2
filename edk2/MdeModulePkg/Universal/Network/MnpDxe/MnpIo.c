@@ -282,7 +282,7 @@ SIGNAL_TOKEN:
   //
   // Dispatch the DPC queued by the NotifyFunction of Token->Event.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 
   return EFI_SUCCESS;
 }
@@ -1064,5 +1064,5 @@ MnpSystemPoll (
   //
   // Dispatch the DPC queued by the NotifyFunction of rx token's events.
   //
-  NetLibDispatchDpc ();
+  DispatchDpc ();
 }

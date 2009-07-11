@@ -45,3 +45,4 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   UefiBootServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
+  DpcLib
