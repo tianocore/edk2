@@ -35,7 +35,6 @@ Abstract:
 #include "SecMain.h"
 #include <sys/mman.h>
 #include <Ppi/UnixPeiLoadFile.h>
-#include <Framework/StatusCode.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <dlfcn.h>
 //

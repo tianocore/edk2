@@ -17,11 +17,9 @@ Abstract:
   Include file for host API based SEC
 
 --*/
-#include "PiPei.h"
-#include "Uefi/UefiSpec.h"
+#include <FrameworkPei.h>
 
 #include <Protocol/UnixThunk.h>
-#include <Pi/PiFirmwareVolume.h>
 #include <Ppi/StatusCode.h>
 
 #include <Library/PeCoffLib.h>
