@@ -39,7 +39,7 @@ ShellAppMain (
   IN CHAR16 **Argv
   )
 {
-  INTN Index;
+  UINTN  Index;
 
   Print(L"ShellCTestApp.c:ShellAppMain called with %d parameters\n", Argc);
   for (Index = 0; Index < Argc; Index++) {
