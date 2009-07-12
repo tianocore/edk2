@@ -21,13 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/ShellCEntryLib.h>
 #include <Library/DebugLib.h>
 
-INTN
-EFIAPI 
-ShellAppMain (
-  IN INTN Argc, 
-  IN CHAR16 **Argv
-  );
-
 /**
   UEFI entry point for an application that will in turn call the
   ShellAppMain function which has parameters similar to a standard C
