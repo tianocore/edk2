@@ -13,7 +13,7 @@
 **/
 
 #ifndef __UEFI_TCG_PLATFORM_H__
-#define __UEFI_TCG_PLATFOMR_H__
+#define __UEFI_TCG_PLATFORM_H__
 
 #include <IndustryStandard/Tpm12.h>
 #include <Uefi.h>
