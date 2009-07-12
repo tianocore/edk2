@@ -45,7 +45,7 @@ typedef struct _EFI_PEI_SECURITY_PPI  EFI_PEI_SECURITY_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_SECURITY_AUTHENTICATION_STATE)(
+(EFIAPI *FRAMEWORK_EFI_PEI_SECURITY_AUTHENTICATION_STATE)(
   IN EFI_PEI_SERVICES             **PeiServices,
   IN EFI_PEI_SECURITY_PPI         *This,
   IN UINT32                       AuthenticationStatus,
@@ -57,7 +57,7 @@ EFI_STATUS
 // PPI interface structure of Security PPI
 //
 struct _EFI_PEI_SECURITY_PPI {
-  EFI_PEI_SECURITY_AUTHENTICATION_STATE  AuthenticationState;
+  FRAMEWORK_EFI_PEI_SECURITY_AUTHENTICATION_STATE  AuthenticationState;
 };
 
 extern EFI_GUID gEfiPeiSecurityPpiGuid;
