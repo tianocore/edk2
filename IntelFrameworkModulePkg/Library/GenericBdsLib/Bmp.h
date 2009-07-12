@@ -33,10 +33,10 @@ typedef struct {
   UINT32        HeaderSize;
   UINT32        PixelWidth;
   UINT32        PixelHeight;
-  UINT16        Planes;          ///> Must be 1
-  UINT16        BitPerPixel;     ///> 1, 4, 8, or 24
+  UINT16        Planes;          ///< Must be 1
+  UINT16        BitPerPixel;     ///< 1, 4, 8, or 24
   UINT32        CompressionType;
-  UINT32        ImageSize;       ///> Compressed image size in bytes
+  UINT32        ImageSize;       ///< Compressed image size in bytes
   UINT32        XPixelsPerMeter;
   UINT32        YPixelsPerMeter;
   UINT32        NumberOfColors;
