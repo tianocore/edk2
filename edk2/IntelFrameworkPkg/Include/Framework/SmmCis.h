@@ -180,6 +180,7 @@ EFI_STATUS
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   );
+
 /**
   Frees memory pages for the system.
 
@@ -203,7 +204,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SMM_STARTUP_THIS_AP)(
-  IN  EFI_AP_PROCEDURE                    Procedure,
+  IN  FRAMEWORK_EFI_AP_PROCEDURE          Procedure,
   IN  UINTN                               CpuNumber,
   IN  OUT VOID                            *ProcArguments OPTIONAL
   );
