@@ -980,7 +980,7 @@ typedef struct _EFI_LEGACY_BIOS_PROTOCOL EFI_LEGACY_BIOS_PROTOCOL;
 #define NO_ROM            0x00
 #define ROM_FOUND         0x01
 #define VALID_LEGACY_ROM  0x02
-#define ROM_WITH_CONFIG   0x04     ///> Not defined in the Framework CSM Specification
+#define ROM_WITH_CONFIG   0x04     ///< Not defined in the Framework CSM Specification
 
 ///
 /// The following macros do not appear in the Framework CSM Specification and 
