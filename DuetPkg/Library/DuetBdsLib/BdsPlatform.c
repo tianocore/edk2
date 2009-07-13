@@ -1092,7 +1092,8 @@ Returns:
 VOID
 PlatformBdsDiagnostics (
   IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
-  IN BOOLEAN                     QuietBoot
+  IN BOOLEAN                     QuietBoot,
+  IN BASEM_MEMORY_TEST           BaseMemoryTest
   )
 /*++
 
@@ -1106,6 +1107,8 @@ Arguments:
   MemoryTestLevel  - The memory test intensive level
   
   QuietBoot        - Indicate if need to enable the quiet boot
+
+  BaseMemoryTest   - A pointer to BdsMemoryTest()
  
 Returns:
 
@@ -1131,7 +1134,7 @@ Returns:
     //
     // Perform system diagnostic
     //
-    Status = BdsMemoryTest (MemoryTestLevel);
+    Status = BaseMemoryTest (MemoryTestLevel);
     if (EFI_ERROR (Status)) {
       DisableQuietBoot ();
     }
@@ -1141,14 +1144,16 @@ Returns:
   //
   // Perform system diagnostic
   //
-  Status = BdsMemoryTest (MemoryTestLevel);
+  Status = BaseMemoryTest (MemoryTestLevel);
 }
 
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
   IN OUT LIST_ENTRY              *DriverOptionList,
-  IN OUT LIST_ENTRY              *BootOptionList
+  IN OUT LIST_ENTRY              *BootOptionList,
+  IN PROCESS_CAPSULES            ProcessCapsules,
+  IN BASEM_MEMORY_TEST           BaseMemoryTest
   )
 /*++
 
@@ -1173,7 +1178,7 @@ Returns:
   EFI_STATUS                         Status;
   UINT16                             Timeout;
   EFI_EVENT                          UserInputDurationTime;
-  LIST_ENTRY                     *Link;
+  LIST_ENTRY                         *Link;
   BDS_COMMON_OPTION                  *BootOption;
   UINTN                              Index;
   EFI_INPUT_KEY                      Key;
@@ -1227,7 +1232,7 @@ Returns:
   //
   // Memory test and Logo show
   //
-  PlatformBdsDiagnostics (IGNORE, TRUE);
+  PlatformBdsDiagnostics (IGNORE, TRUE, BaseMemoryTest);
 
   //
   // Perform some platform specific connect sequence
