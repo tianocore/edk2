@@ -37,8 +37,13 @@
   ##
   FileHandleLib|Include/Library/FileHandleLib.h
   
-  ## Allows for a shell application to have a C style entry point
+  ## @libraryclass   Allows for a shell application to have a C style entry point
+  ##
   ShellCEntryLib|Include/Library/ShellCEntryLib.h
+
+  ## @libraryclass   Provides sorting functions
+  ##
+  SortLib|Include/Library/Sortlib.h
 
 
 [Guids.common]
