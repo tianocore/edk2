@@ -235,7 +235,8 @@ Returns:
 VOID
 PlatformBdsDiagnostics (
   IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
-  IN BOOLEAN                     QuietBoot
+  IN BOOLEAN                     QuietBoot,
+  IN BASEM_MEMORY_TEST           BaseMemoryTest  
   )
 /*++
 
@@ -249,7 +250,9 @@ Arguments:
   MemoryTestLevel  - The memory test intensive level
   
   QuietBoot        - Indicate if need to enable the quiet boot
- 
+
+  BaseMemoryTest   - A pointer to BdsMemoryTest() 
+
 Returns:
 
   None.
@@ -269,7 +272,7 @@ Returns:
     //
     // Perform system diagnostic
     //
-    Status = BdsMemoryTest (MemoryTestLevel);
+    Status = BaseMemoryTest (MemoryTestLevel);
     if (EFI_ERROR (Status)) {
       DisableQuietBoot ();
     }
@@ -279,34 +282,28 @@ Returns:
   //
   // Perform system diagnostic
   //
-  Status = BdsMemoryTest (MemoryTestLevel);
+  Status = BaseMemoryTest (MemoryTestLevel);
 }
 
+/**
+  The function will excute with as the platform policy, current policy
+  is driven by boot mode. IBV/OEM can customize this code for their specific
+  policy action.
+
+  @param  DriverOptionList        The header of the driver option link list
+  @param  BootOptionList          The header of the boot option link list
+  @param  ProcessCapsules         A pointer to ProcessCapsules()
+  @param  BaseMemoryTest          A pointer to BaseMemoryTest()
+
+**/
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
   IN OUT LIST_ENTRY                  *DriverOptionList,
-  IN OUT LIST_ENTRY                  *BootOptionList
+  IN OUT LIST_ENTRY                  *BootOptionList,
+  IN PROCESS_CAPSULES                ProcessCapsules,
+  IN BASEM_MEMORY_TEST               BaseMemoryTest
   )
-/*++
-
-Routine Description:
-
-  The function will excute with as the platform policy, current policy
-  is driven by boot mode. IBV/OEM can customize this code for their specific
-  policy action.
-  
-Arguments:
-
-  DriverOptionList - The header of the driver option link list
-  
-  BootOptionList   - The header of the boot option link list
- 
-Returns:
-
-  None.
-  
---*/
 {
   EFI_STATUS     Status;
   UINT16         Timeout;
@@ -340,7 +337,7 @@ Returns:
     // console directly.
     //
     BdsLibConnectAllDefaultConsoles ();
-    PlatformBdsDiagnostics ((EXTENDMEM_COVERAGE_LEVEL)IGNORE, TRUE);
+    PlatformBdsDiagnostics ((EXTENDMEM_COVERAGE_LEVEL)IGNORE, TRUE, BaseMemoryTest);
 
     //
     // Perform some platform specific connect sequence
@@ -364,7 +361,7 @@ Returns:
     // Boot with the specific configuration
     //
     PlatformBdsConnectConsole (gPlatformConsole);
-    PlatformBdsDiagnostics (EXTENSIVE, FALSE);
+    PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
     BdsLibConnectAll ();
     ProcessCapsules (BOOT_ON_FLASH_UPDATE);
     break;
@@ -375,7 +372,7 @@ Returns:
     // and show up the front page
     //
     PlatformBdsConnectConsole (gPlatformConsole);
-    PlatformBdsDiagnostics (EXTENSIVE, FALSE);
+    PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
 
     //
     // In recovery boot mode, we still enter to the
@@ -399,7 +396,7 @@ Returns:
       PlatformBdsNoConsoleAction ();
     }
 
-    PlatformBdsDiagnostics ((EXTENDMEM_COVERAGE_LEVEL)IGNORE, TRUE);
+    PlatformBdsDiagnostics ((EXTENDMEM_COVERAGE_LEVEL)IGNORE, TRUE, BaseMemoryTest);
 
     //
     // Perform some platform specific connect sequence
