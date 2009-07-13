@@ -191,7 +191,7 @@ typedef struct {
   ///
   /// @par IPF:
   ///   Bit format of this field is the same as the definition of self-test state 
-  ///   parameter, in Intel® Itanium® Architecture Software Developer’s Manual, 
+  ///   parameter, in Intel?Itanium?Architecture Software Developer’s Manual, 
   ///   Volume 2: System Architecture.
   ///
   EFI_MP_HEALTH        Health;
@@ -259,7 +259,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *FRAMEWORK_EFI_MP_SERVICES_GET_GENERAL_MP_INFO)(
+(EFIAPI *EFI_MP_SERVICES_GET_GENERAL_MP_INFO)(
   IN  FRAMEWORK_EFI_MP_SERVICES_PROTOCOL  *This,
   OUT UINTN                               *NumberOfCPUs          OPTIONAL,
   OUT UINTN                               *MaximumNumberOfCPUs   OPTIONAL,
@@ -312,7 +312,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *FRAMEWORK_EFI_MP_SERVICES_GET_PROCESSOR_CONTEXT)(
+(EFIAPI *EFI_MP_SERVICES_GET_PROCESSOR_CONTEXT)(
   IN     FRAMEWORK_EFI_MP_SERVICES_PROTOCOL  *This,
   IN     UINTN                               ProcessorNumber,
   IN OUT UINTN                               *BufferLength,
@@ -377,7 +377,7 @@ EFI_STATUS
                                       If the value is not zero, the BSP waits 
                                       until all APs finish or timeout expires. 
                                       If timeout expires, EFI_TIMEOUT is returned,
-                                      and the BSP will then check APs’ status 
+                                      and the BSP will then check APs?status 
                                       periodically, with time interval of 16 
                                       microseconds.
                                       - IPF:
@@ -575,7 +575,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *FRAMEWORK_EFI_MP_SERVICES_SEND_IPI)(
+(EFIAPI *EFI_MP_SERVICES_SEND_IPI)(
   IN FRAMEWORK_EFI_MP_SERVICES_PROTOCOL  *This,
   IN UINTN                               ProcessorNumber,
   IN UINTN                               VectorNumber,
@@ -645,12 +645,12 @@ EFI_STATUS
 /// Framework MP Services Protocol structure
 ///
 typedef struct _FRAMEWORK_EFI_MP_SERVICES_PROTOCOL {
-  FRAMEWORK_EFI_MP_SERVICES_GET_GENERAL_MP_INFO    GetGeneralMPInfo;
-  FRAMEWORK_EFI_MP_SERVICES_GET_PROCESSOR_CONTEXT  GetProcessorContext;
+  EFI_MP_SERVICES_GET_GENERAL_MP_INFO              GetGeneralMPInfo;
+  EFI_MP_SERVICES_GET_PROCESSOR_CONTEXT            GetProcessorContext;
   FRAMEWORK_EFI_MP_SERVICES_STARTUP_ALL_APS        StartupAllAPs;
   FRAMEWORK_EFI_MP_SERVICES_STARTUP_THIS_AP        StartupThisAP;
   FRAMEWORK_EFI_MP_SERVICES_SWITCH_BSP             SwitchBSP;
-  FRAMEWORK_EFI_MP_SERVICES_SEND_IPI               SendIPI;
+  EFI_MP_SERVICES_SEND_IPI                         SendIPI;
   FRAMEWORK_EFI_MP_SERVICES_ENABLEDISABLEAP        EnableDisableAP;
   FRAMEWORK_EFI_MP_SERVICES_WHOAMI                 WhoAmI;
 };

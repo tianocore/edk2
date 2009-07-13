@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _DXE_CIS_H_
-#define _DXE_CIS_H_
+#ifndef _DXECIS_H_
+#define _DXECIS_H_
 
 #include <Protocol/StatusCode.h>
 

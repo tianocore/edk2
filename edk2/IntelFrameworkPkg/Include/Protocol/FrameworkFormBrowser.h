@@ -14,6 +14,8 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+  Module Name:  FrameworkFormBrowser.h
+
   @par Revision Reference:
   This protocol is defined in HII spec 0.92.
 
@@ -46,7 +48,7 @@ typedef struct {
 typedef struct {
   EFI_HII_IFR_PACK    *IfrData;
   EFI_HII_STRING_PACK *StringData;
-} FRAMEWORK_EFI_IFR_PACKET;
+} EFI_IFR_PACKET;
 
 typedef struct {
   UINTN LeftColumn;
@@ -99,7 +101,7 @@ EFI_STATUS
   IN  BOOLEAN                         UseDatabase,
   IN  FRAMEWORK_EFI_HII_HANDLE        *Handle,
   IN  UINTN                           HandleCount,
-  IN  FRAMEWORK_EFI_IFR_PACKET        *Packet, OPTIONAL
+  IN  EFI_IFR_PACKET                  *Packet, OPTIONAL
   IN  EFI_HANDLE                      CallbackHandle, OPTIONAL
   IN  UINT8                           *NvMapOverride, OPTIONAL
   IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR *ScreenDimensions, OPTIONAL

@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _FRAMEWORK_BOOT_SCRIPT_H_
-#define _FRAMEWORK_BOOT_SCRIPT_H_
+#ifndef _BOOT_SCRIPT_H_
+#define _BOOT_SCRIPT_H_
 
 ///
 /// S3 Boot Script Table identifier

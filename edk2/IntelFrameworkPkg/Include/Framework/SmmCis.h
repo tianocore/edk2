@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _FRAMEWORK_SMM_CIS_H_
-#define _FRAMEWORK_SMM_CIS_H_
+#ifndef _SMM_CIS_H_
+#define _SMM_CIS_H_
 
 #define EFI_SMM_CPU_IO_GUID \
   { \
