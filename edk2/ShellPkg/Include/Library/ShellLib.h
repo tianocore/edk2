@@ -566,7 +566,8 @@ ShellSetPageBreakMode (
   and will process '?' and '*' as such.  the list must be freed with a call to 
   ShellCloseFileMetaArg().
 
-  If you are NOT appending to an existing list *ListHead must be NULL.
+  If you are NOT appending to an existing list *ListHead must be NULL.  If 
+  *ListHead is NULL then it must be callee freed.
 
   @param Arg                    pointer to path string
   @param OpenMode               mode to open files with
