@@ -41,6 +41,8 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
   ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+  SortLib|ShellPkg/Library/BaseSortLib/BaseSortLib.inf
+
 [PcdsFixedAtBuild.common]
 
 [Components.common]
@@ -49,4 +51,6 @@
   ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf
   ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+  ShellPkg/Library/BaseSortLib/BaseSortLib.inf
   ShellPkg/Application/ShellCTestApp/ShellCTestApp.inf
+  ShellPkg/Application/ShellSortTestApp/ShellSortTestApp.inf
