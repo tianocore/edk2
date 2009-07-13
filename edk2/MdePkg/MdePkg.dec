@@ -26,7 +26,7 @@
   PACKAGE_VERSION                = 1.00
 
 
-[Includes.common]
+[Includes]
   Include
 
 [Includes.Ia32]
@@ -41,7 +41,7 @@
 [Includes.EBC]
   Include/Ebc
 
-[LibraryClasses.common]
+[LibraryClasses]
   ##  @libraryclass  Provides most usb APIs to support the Hid requests defined in Usb Hid 1.1 spec
   #                  and the standard requests defined in Usb 1.1 spec.
   ##
@@ -195,7 +195,7 @@
   ##  @libraryclass  Provides library services to make PAL Calls.
   PalLib|Include/Library/PalLib.h
 
-[Guids.common]
+[Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
   #
@@ -352,7 +352,7 @@
   ## Include/Guid/HardwareErrorVariable.h
   gEfiHardwareErrorVariableGuid  = { 0x414E6BDD, 0xE47B, 0x47cc, { 0xB2, 0x44, 0xBB, 0x61, 0x02, 0x0C, 0xF5, 0x16 }}
   
-[Ppis.common]
+[Ppis]
   ## Include/Ppi/MasterBootMode.h
   gEfiPeiMasterBootModePpiGuid = { 0x7408d748, 0xfc8c, 0x4ee6, {0x92, 0x88, 0xc4, 0xbe, 0xc0, 0x92, 0xa4, 0x10 } }
   
@@ -413,8 +413,23 @@
   ## Include/Ppi/Pcd.h
   gPcdPpiGuid = { 0x6e81c58, 0x4ad7, 0x44bc, { 0x83, 0x90, 0xf1, 0x2, 0x65, 0xf7, 0x24, 0x80 } }
 
+  #
+  # PPIs defined in PI 1.2.
+  #
 
-[Protocols.common]
+  ## Include/Ppi/RecoveryModule.h
+  gEfiPeiRecoveryModulePpiGuid       = { 0xFB6D9542, 0x612D, 0x4f45, { 0x87, 0x2f, 0x5c, 0xff, 0x52, 0xe9, 0x3d, 0xcf }}
+
+  ## Include/Ppi/DeviceRecoveryModule.h
+  gEfiPeiDeviceRecoveryModulePpiGuid = { 0x0DE2CE25, 0x446A, 0x45a7, { 0xBF, 0xC9, 0x37, 0xDA, 0x26, 0x34, 0x4B, 0x37 }}
+
+  ## Include/Ppi/BlockIo.h
+  gEfiPeiVirtualBlockIoPpiGuid       = { 0x695d8aa1, 0x42ee, 0x4c46, { 0x80, 0x5c, 0x6e, 0xa6, 0xbc, 0xe7, 0x99, 0xe3 }}
+
+  ## Include/Ppi/S3Resume.h
+  gEfiPeiS3ResumePpiGuid             = { 0x4426CCB2, 0xE684, 0x4a8a, { 0xae, 0x40, 0x20, 0xd4, 0xb0, 0x25, 0xb7, 0x10 }}
+  
+[Protocols]
   #
   # Protocols defined in PI1.0.
   #
