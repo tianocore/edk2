@@ -29,9 +29,10 @@
 
 **/
 
-#ifndef _FRAMEWORK_STATUS_CODE_H_
-#define _FRAMEWORK_STATUS_CODE_H_
+#ifndef _STATUS_CODE_H_
+#define _STATUS_CODE_H_
 
+#include <Protocol/DebugSupport.h>
 //
 // Section 1
 // Class definitions

@@ -15,8 +15,8 @@
 
 **/
 
-#ifndef _FRAMEWORK_HOB_H_
-#define _FRAMEWORK_HOB_H_
+#ifndef _HOB_H_
+#define _HOB_H_
 
 ///
 /// Capsule volume HOB -- identical to a firmware volume
