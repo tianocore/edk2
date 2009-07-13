@@ -392,7 +392,6 @@ Returns:
   UINT8   CapabilityPtr;
   UINT16  CapabilityEntry;
   UINT8   CapabilityID;
-  UINT32  Temp;
 
   //
   // To check the capability of this device supports
@@ -419,17 +418,11 @@ Returns:
 
       PciIoDevice->PciIo.Pci.Read (
                                &PciIoDevice->PciIo,
-                               EfiPciIoWidthUint32,
+                               EfiPciIoWidthUint8,
                                PCI_CAPBILITY_POINTER_OFFSET,
                                1,
-                               &Temp
+                               &CapabilityPtr
                                );
-      //
-      // Do not get byte read directly, because some PCI card will return 0xFF
-      // when perform PCI-Express byte read, while return correct 0x00 
-      // when perform PCI-Express dword read, or PCI dword read.
-      //
-      CapabilityPtr = (UINT8)Temp;
     }
   }
 
