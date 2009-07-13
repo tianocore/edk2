@@ -18,19 +18,23 @@
 
 #include <Protocol/StatusCode.h>
 
-//
-// Function prototype for invoking a function on an Application Processor
-// Used by both the SMM infrastructure and the MP Services Protocol
-//
+/**
+  Functions of this type are used with the Framework MP Services Protocol and
+  the  SMM Services Table to execute a procedure on enabled APs.  The context 
+  the AP should use durng execution is specified by Buffer.
+  
+  @param[in]  Buffer   Pointer to the procedure's argument.
+
+**/
 typedef
 VOID
-(EFIAPI *EFI_AP_PROCEDURE)(
-  IN  VOID                          *Buffer
+(EFIAPI *FRAMEWORK_EFI_AP_PROCEDURE)(
+  IN  VOID  *Buffer
   );
 
-//
-// Framework EFI Runtime Services Table as extension to EFI 1.10 Runtime Services Table
-//
+///
+/// Framework EFI Runtime Services Table as extension to EFI 1.10 Runtime Services Table
+///
 typedef struct {
   //
   // Table header for the Framework EFI Runtime Services Table
@@ -59,10 +63,10 @@ typedef struct {
   //
   EFI_GET_NEXT_HIGH_MONO_COUNT      GetNextHighMonotonicCount;
   EFI_RESET_SYSTEM                  ResetSystem;
-  //
-  // Framework extension to EFI 1.10 runtime table
-  // It was moved to a protocol to not conflict with UEFI 2.0
-  //
+  ///
+  /// Framework extension to EFI 1.10 runtime table
+  /// It was moved to a protocol to not conflict with UEFI 2.0
+  ///
   EFI_REPORT_STATUS_CODE            ReportStatusCode;
 } FRAMEWORK_EFI_RUNTIME_SERVICES;
 
