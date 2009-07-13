@@ -20,10 +20,10 @@
   PACKAGE_GUID                   = 88894582-7553-4822-B484-624E24B6DECF
   PACKAGE_VERSION                = 0.1
 
-[Includes.common]
+[Includes]
   Include                        # Root include for the package
 
-[LibraryClasses.common]
+[LibraryClasses]
   ##  @libraryclass  OEM status code libary is used to report status code to OEM device.
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
 
@@ -33,7 +33,7 @@
   ##  @libraryclass  Generic BDS library definition, include the data structure and function.
   GenericBdsLib|Include/Library/GenericBdsLib.h
 
-[Guids.common]
+[Guids]
   ## IntelFrameworkModule package token space guid
   ## Include/Guid/IntelFrameworkModulePkgTokenSpace.h
   gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
@@ -58,27 +58,7 @@
   ## Include/Guid/StatusCodeDataTypeDebug.h
   gEfiStatusCodeDataTypeDebugGuid  = { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 }}
 
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Usb interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoUsbInterfaceGuid   = { 0xCB871572, 0xC11A, 0x47B5, { 0xB4, 0x92, 0x67, 0x5E, 0xAF, 0xA7, 0x77, 0x27 }}
-  
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Scsi interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoScsiInterfaceGuid  = { 0x08F74BAA, 0xEA36, 0x41D9, { 0x95, 0x21, 0x21, 0xA7, 0x0F, 0x87, 0x80, 0xBC }}
-  
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ide interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoIdeInterfaceGuid   = { 0x5E948FE3, 0x26D3, 0x42B5, { 0xAF, 0x17, 0x61, 0x02, 0x87, 0x18, 0x8D, 0xEC }}
-  
-  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ahci interface.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoAhciInterfaceGuid  = { 0x9e498932, 0x4abc, 0x45af, { 0xa3, 0x4d, 0x02, 0x47, 0x78, 0x7b, 0xe7, 0xc6 }}
-
-[Protocols.common]
-  ## This protocol is used to add or remove all PCI child devices on the PCI root bridge.
-  ## Include/Protocol/PciHotPlugRequest.h
-  gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
-
+[Protocols]
   ## Vga Mini port binding for a VGA controller
   ## Include/Protocol/VgaMiniPort.h
   gEfiVgaMiniPortProtocolGuid    = { 0xc7735a2f, 0x88f5, 0x4882, { 0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3 }}
@@ -94,10 +74,6 @@
   ## PS/2 policy protocol abstracts the specific platform initialization and setting.
   ## Include/Protocol/Ps2Policy.h
   gEfiPs2PolicyProtocolGuid      = { 0x4DF19259, 0xDC71, 0x4D46, { 0xBE, 0xF1, 0x35, 0x7B, 0xB5, 0x78, 0xC4, 0x18 }}
-
-  ## Disk Info protocol is used to export Inquiry Data for a drive.
-  ## Include/Protocol/DiskInfo.h
-  gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
 
   ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
   ## Include/Protocol/OEMBadging.h
