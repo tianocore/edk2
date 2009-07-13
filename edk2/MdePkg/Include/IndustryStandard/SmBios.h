@@ -16,6 +16,32 @@
 #define __SMBIOS_STANDARD_H__
 
 ///
+/// Reference SMBIOS 2.6, chapter 3.1.2.
+/// For v2.1 and later, handle values in the range 0FF00h to 0FFFFh are reserved for
+/// use by this specification.
+///
+#define SMBIOS_HANDLE_RESERVED_BEGIN 0xFF00
+
+///
+/// Reference SMBIOS 2.6, chapter 3.1.3
+/// Each text string is limited to 64 significant characters due to system MIF limitations
+///
+#define SMBIOS_STRING_MAX_LENGTH     64
+
+///
+/// Inactive type is added from SMBIOS 2.2. Reference SMBIOS 2.6, chapter 3.3.43.
+/// Upper-level software that interprets the SMBIOS structure-table should bypass an 
+/// Inactive structure just like a structure type that the software does not recognize.
+///
+#define SMBIOS_TYPE_INACTIVE         0x007E    
+
+///
+/// End-of-table type is added from SMBIOS 2.2. Reference SMBIOS 2.6, chapter 3.3.44.
+/// The end-of-table indicator is used in the last physical structure in a table
+///
+#define SMBIOS_TYPE_END_OF_TABLE     0x007F
+
+///
 /// Smbios Table Entry Point Structure
 ///
 #pragma pack(1)
