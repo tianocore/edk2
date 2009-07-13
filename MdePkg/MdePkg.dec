@@ -351,6 +351,26 @@
   
   ## Include/Guid/HardwareErrorVariable.h
   gEfiHardwareErrorVariableGuid  = { 0x414E6BDD, 0xE47B, 0x47cc, { 0xB2, 0x44, 0xBB, 0x61, 0x02, 0x0C, 0xF5, 0x16 }}
+
+  #
+  # GUID defined in PI1.2
+  #
+  
+  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ide interface.
+  ## Include/Protocol/DiskInfo.h
+  gEfiDiskInfoIdeInterfaceGuid   = { 0x5E948FE3, 0x26D3, 0x42B5, { 0xAF, 0x17, 0x61, 0x02, 0x87, 0x18, 0x8D, 0xEC }}
+  
+  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Scsi interface.
+  ## Include/Protocol/DiskInfo.h
+  gEfiDiskInfoScsiInterfaceGuid  = { 0x08F74BAA, 0xEA36, 0x41D9, { 0x95, 0x21, 0x21, 0xA7, 0x0F, 0x87, 0x80, 0xBC }}
+
+  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Usb interface.
+  ## Include/Protocol/DiskInfo.h
+  gEfiDiskInfoUsbInterfaceGuid   = { 0xCB871572, 0xC11A, 0x47B5, { 0xB4, 0x92, 0x67, 0x5E, 0xAF, 0xA7, 0x77, 0x27 }}
+    
+  ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ahci interface.
+  ## Include/Protocol/DiskInfo.h
+  gEfiDiskInfoAhciInterfaceGuid  = { 0x9e498932, 0x4abc, 0x45af, { 0xa3, 0x4d, 0x02, 0x47, 0x78, 0x7b, 0xe7, 0xc6 }}
   
 [Ppis]
   ## Include/Ppi/MasterBootMode.h
@@ -494,6 +514,14 @@
   
   ## Include/Protocol/MpService.h
   gEfiMpServiceProtocolGuid = { 0x3fdda605, 0xa76e, 0x4f46, { 0xad, 0x29, 0x12, 0xf4, 0x53, 0x1b, 0x3d, 0x08 }}
+
+  ## This protocol is used to add or remove all PCI child devices on the PCI root bridge.
+  ## Include/Protocol/PciHotPlugRequest.h
+  gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
+
+  ## Disk Info protocol is used to export Inquiry Data for a drive.
+  ## Include/Protocol/DiskInfo.h
+  gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
   
   #
   # Protocols defined in UEFI2.1/UEFI2.0/EFI1.1
