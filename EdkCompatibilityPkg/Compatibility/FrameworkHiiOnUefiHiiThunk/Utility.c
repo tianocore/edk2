@@ -663,7 +663,6 @@ GetFormsetDefaultVarstoreId (
     
   }
 
-  DEBUG_CODE_BEGIN ();
   if (FormSet->DefaultVarStoreId == 0) {
     DEBUG ((EFI_D_INFO, "FormSet %g: No Varstore Found\n", &FormSet->Guid));
   } else {
@@ -679,7 +678,6 @@ GetFormsetDefaultVarstoreId (
       DefaultStorage->Name = AllocateCopyPool (StrSize (FrameworkReservedVarstoreName), FrameworkReservedVarstoreName);
     }
   }
-  DEBUG_CODE_END ();
   
   return;
 }
