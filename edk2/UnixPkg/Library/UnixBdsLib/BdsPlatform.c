@@ -234,7 +234,8 @@ Returns:
 VOID
 PlatformBdsDiagnostics (
   IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
-  IN BOOLEAN                     QuietBoot
+  IN BOOLEAN                     QuietBoot,
+  IN BASEM_MEMORY_TEST           BaseMemoryTest
   )
 /*++
 
@@ -248,6 +249,8 @@ Arguments:
   MemoryTestLevel  - The memory test intensive level
   
   QuietBoot        - Indicate if need to enable the quiet boot
+
+  BaseMemoryTest   - A pointer to BdsMemoryTest()
  
 Returns:
 
@@ -268,7 +271,7 @@ Returns:
     //
     // Perform system diagnostic
     //
-    Status = BdsMemoryTest (MemoryTestLevel);
+    Status = BaseMemoryTest (MemoryTestLevel);
     if (EFI_ERROR (Status)) {
       DisableQuietBoot ();
     }
@@ -278,14 +281,16 @@ Returns:
   //
   // Perform system diagnostic
   //
-  Status = BdsMemoryTest (MemoryTestLevel);
+  Status = BaseMemoryTest (MemoryTestLevel);
 }
 
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
   IN OUT LIST_ENTRY                  *DriverOptionList,
-  IN OUT LIST_ENTRY                  *BootOptionList
+  IN OUT LIST_ENTRY                  *BootOptionList,
+  IN PROCESS_CAPSULES                ProcessCapsules,
+  IN BASEM_MEMORY_TEST               BaseMemoryTest
   )
 /*++
 
@@ -300,7 +305,11 @@ Arguments:
   DriverOptionList - The header of the driver option link list
   
   BootOptionList   - The header of the boot option link list
- 
+
+  ProcessCapsules  - A pointer to ProcessCapsules()
+
+  BaseMemoryTest   - A pointer to BaseMemoryTest()
+
 Returns:
 
   None.
@@ -339,7 +348,7 @@ Returns:
     // console directly.
     //
     BdsLibConnectAllDefaultConsoles ();
-    PlatformBdsDiagnostics (IGNORE, TRUE);
+    PlatformBdsDiagnostics (IGNORE, TRUE, BaseMemoryTest);
 
     //
     // Perform some platform specific connect sequence
@@ -363,7 +372,7 @@ Returns:
     // Boot with the specific configuration
     //
     PlatformBdsConnectConsole (gPlatformConsole);
-    PlatformBdsDiagnostics (EXTENSIVE, FALSE);
+    PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
     BdsLibConnectAll ();
     ProcessCapsules (BOOT_ON_FLASH_UPDATE);
     break;
@@ -374,7 +383,7 @@ Returns:
     // and show up the front page
     //
     PlatformBdsConnectConsole (gPlatformConsole);
-    PlatformBdsDiagnostics (EXTENSIVE, FALSE);
+    PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
 
     //
     // In recovery boot mode, we still enter to the
@@ -398,7 +407,7 @@ Returns:
       PlatformBdsNoConsoleAction ();
     }
 
-    PlatformBdsDiagnostics (IGNORE, TRUE);
+    PlatformBdsDiagnostics (IGNORE, TRUE, BaseMemoryTest);
 
     //
     // Perform some platform specific connect sequence
