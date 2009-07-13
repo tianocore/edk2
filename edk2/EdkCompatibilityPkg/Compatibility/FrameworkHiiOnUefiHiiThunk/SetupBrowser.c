@@ -412,7 +412,7 @@ ThunkSendForm (
   IN  BOOLEAN                           UseDatabase,
   IN  FRAMEWORK_EFI_HII_HANDLE          *Handle,
   IN  UINTN                             HandleCount,
-  IN  FRAMEWORK_EFI_IFR_PACKET          *Packet, OPTIONAL
+  IN  EFI_IFR_PACKET                    *Packet, OPTIONAL
   IN  EFI_HANDLE                        CallbackHandle, OPTIONAL
   IN  UINT8                             *NvMapOverride, OPTIONAL
   IN  FRAMEWORK_EFI_SCREEN_DESCRIPTOR   *ScreenDimensions, OPTIONAL

@@ -58,7 +58,7 @@ QuestionOpFwToUefi (
     }
   }
 
-  *UefiOp = (UINT8) (FRAMEWORK_EFI_IFR_LAST_OPCODE + 1);
+  *UefiOp = (UINT8) (EFI_IFR_LAST_OPCODE + 1);
   return EFI_NOT_FOUND;
 }
 
@@ -184,7 +184,7 @@ F2UCreateTextOpCode (
 {
   EFI_IFR_TEXT      UTextOpCode;
 
-  if ((FwOpcode->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) == 0) {
+  if ((FwOpcode->Flags & EFI_IFR_FLAG_INTERACTIVE) == 0) {
     ZeroMem (&UTextOpCode, sizeof(UTextOpCode));
     
     UTextOpCode.Header.OpCode = EFI_IFR_TEXT_OP;
@@ -234,10 +234,10 @@ F2UCreateReferenceOpCode (
   UOpcode.FormId = FwOpcode->FormId;
 
   //
-  // We only map FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE and FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED to 
+  // We only map EFI_IFR_FLAG_INTERACTIVE and EFI_IFR_FLAG_RESET_REQUIRED to 
   // UEFI IFR Opcode flags. The rest flags are obsolete.
   //
-  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_RESET_REQUIRED));
   
   return HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
@@ -271,12 +271,12 @@ F2UCreateOneOfOptionOpCode (
   CopyMem (&UOpcode.Value.u8, &FwOpcode->Value, Width);
 
   //
-  // #define FRAMEWORK_EFI_IFR_FLAG_DEFAULT           0x01
-  // #define FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING     0x02
+  // #define EFI_IFR_FLAG_DEFAULT           0x01
+  // #define EFI_IFR_FLAG_MANUFACTURING     0x02
   // #define EFI_IFR_OPTION_DEFAULT                   0x10
   // #define EFI_IFR_OPTION_DEFAULT_MFG               0x20
   //
-  UOpcode.Flags = (UINT8) (UOpcode.Flags  | (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING)) << 4);
+  UOpcode.Flags = (UINT8) (UOpcode.Flags  | (FwOpcode->Flags & (EFI_IFR_FLAG_DEFAULT | EFI_IFR_FLAG_MANUFACTURING)) << 4);
 
   switch (Width) {
     case 1:
@@ -339,7 +339,7 @@ CreateGuidOptionKeyOpCode (
   @param ThunkContext             The HII Thunk Context.
   @param FwOpcode                 The input Framework Opcode.
   @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
-  @param NextFwOpcode             Returns the position of the next Framework Opcode after FRAMEWORK_EFI_IFR_END_ONE_OF_OP of
+  @param NextFwOpcode             Returns the position of the next Framework Opcode after EFI_IFR_END_ONE_OF_OP of
                                   the "One Of Option".
   @param OpcodeCount              The number of Opcode for the complete Framework "One Of" Opcode.
                       
@@ -382,11 +382,11 @@ F2UCreateOneOfOpCode (
   // Go over the Framework IFR binary to get the QuestionId for generated UEFI One Of Option opcode
   //
   FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpcode + FwOpcode->Header.Length);
-  while (FwOpHeader->OpCode != FRAMEWORK_EFI_IFR_END_ONE_OF_OP) {
+  while (FwOpHeader->OpCode != EFI_IFR_END_ONE_OF_OP) {
     ASSERT (FwOpHeader->OpCode == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP);
     
     FwOneOfOp = (FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader;
-    if ((FwOneOfOp->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) != 0) {
+    if ((FwOneOfOp->Flags & EFI_IFR_FLAG_INTERACTIVE) != 0) {
       UOpcode.Question.Flags |= EFI_IFR_FLAG_CALLBACK;
       
       if (UOpcode.Question.QuestionId == 0) {
@@ -398,7 +398,7 @@ F2UCreateOneOfOpCode (
 
     }
 
-    if (FwOneOfOp->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED) {
+    if (FwOneOfOp->Flags & EFI_IFR_FLAG_RESET_REQUIRED) {
       UOpcode.Question.Flags |= EFI_IFR_FLAG_RESET_REQUIRED;
     }
 
@@ -426,7 +426,7 @@ F2UCreateOneOfOpCode (
   // Go over again the Framework IFR binary to build the UEFI One Of Option opcodes.
   //
   FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpcode + FwOpcode->Header.Length);
-  while (FwOpHeader->OpCode != FRAMEWORK_EFI_IFR_END_ONE_OF_OP) {
+  while (FwOpHeader->OpCode != EFI_IFR_END_ONE_OF_OP) {
 
     FwOneOfOp = (FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader;
       
@@ -459,7 +459,7 @@ F2UCreateOneOfOpCode (
   @param ThunkContext         The HII Thunk Context.
   @param FwOpcode             The input Framework Opcode.
   @param UefiUpdateDataHandle The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
-  @param NextFwOpcode         Returns the position of the next Framework Opcode after FRAMEWORK_EFI_IFR_END_ONE_OF_OP of
+  @param NextFwOpcode         Returns the position of the next Framework Opcode after EFI_IFR_END_ONE_OF_OP of
                               the "Ordered List".
   @param OpcodeCount          The number of Opcode for the complete Framework "Ordered List" Opcode.
                       
@@ -501,11 +501,11 @@ F2UCreateOrderedListOpCode (
   // Go over the Framework IFR binary to get the QuestionId for generated UEFI One Of Option opcode
   //
   FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpcode + FwOpcode->Header.Length);
-  while (FwOpHeader->OpCode != FRAMEWORK_EFI_IFR_END_ONE_OF_OP) {
+  while (FwOpHeader->OpCode != EFI_IFR_END_ONE_OF_OP) {
     ASSERT (FwOpHeader->OpCode == FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP);
     
     FwOneOfOp = (FRAMEWORK_EFI_IFR_ONE_OF_OPTION *) FwOpHeader;
-    if ((FwOneOfOp->Flags & FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE) != 0) {
+    if ((FwOneOfOp->Flags & EFI_IFR_FLAG_INTERACTIVE) != 0) {
       UOpcode.Question.Flags |= EFI_IFR_FLAG_CALLBACK;
       
       if (UOpcode.Question.QuestionId == 0) {
@@ -517,7 +517,7 @@ F2UCreateOrderedListOpCode (
       }
     }
 
-    if (FwOneOfOp->Flags & FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED) {
+    if (FwOneOfOp->Flags & EFI_IFR_FLAG_RESET_REQUIRED) {
       UOpcode.Question.Flags |= EFI_IFR_FLAG_RESET_REQUIRED;
     }
 
@@ -538,7 +538,7 @@ F2UCreateOrderedListOpCode (
   *OpcodeCount += 1;
 
   FwOpHeader = (FRAMEWORK_EFI_IFR_OP_HEADER *) ((UINT8 *) FwOpcode + FwOpcode->Header.Length);
-  while (FwOpHeader->OpCode != FRAMEWORK_EFI_IFR_END_ONE_OF_OP) {
+  while (FwOpHeader->OpCode != EFI_IFR_END_ONE_OF_OP) {
     //
     // Each entry of Order List in Framework HII is always 1 byte in size
     //
@@ -602,11 +602,11 @@ F2UCreateCheckBoxOpCode (
 
   //
   // We map 2 flags:
-  //      FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE, 
-  //      FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED,
+  //      EFI_IFR_FLAG_INTERACTIVE, 
+  //      EFI_IFR_FLAG_RESET_REQUIRED,
   // to UEFI IFR Opcode Question flags. The rest flags are obsolete.
   //
-  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_RESET_REQUIRED));
 
 
   UOpcode.Question.VarStoreId    = ThunkContext->FormSet->DefaultVarStoreId;
@@ -614,11 +614,11 @@ F2UCreateCheckBoxOpCode (
 
   //
   // We also map these 2 flags:
-  //      FRAMEWORK_EFI_IFR_FLAG_DEFAULT, 
-  //      FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING,
+  //      EFI_IFR_FLAG_DEFAULT, 
+  //      EFI_IFR_FLAG_MANUFACTURING,
   // to UEFI IFR CheckBox Opcode default flags.
   //
-  UOpcode.Flags           = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_DEFAULT | FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING));
+  UOpcode.Flags           = (UINT8) (FwOpcode->Flags & (EFI_IFR_FLAG_DEFAULT | EFI_IFR_FLAG_MANUFACTURING));
 
   return HiiCreateRawOpCodes (UefiUpdateDataHandle, (UINT8 *) &UOpcode, sizeof(UOpcode));
 }
@@ -676,7 +676,7 @@ F2UCreateNumericOpCode (
   UOpcode.Question.VarStoreId    = ThunkContext->FormSet->DefaultVarStoreId;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
 
-  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_RESET_REQUIRED));
 
   //
   // Framework Numeric values are all in UINT16 and displayed as decimal.
@@ -787,7 +787,7 @@ F2UCreateStringOpCode (
   UOpcode.Question.Header.Prompt = FwOpcode->Prompt;
   UOpcode.Question.Header.Help = FwOpcode->Help;
 
-  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (FRAMEWORK_EFI_IFR_FLAG_INTERACTIVE | FRAMEWORK_EFI_IFR_FLAG_RESET_REQUIRED));
+  UOpcode.Question.Flags  = (UINT8) (FwOpcode->Flags & (EFI_IFR_FLAG_INTERACTIVE | EFI_IFR_FLAG_RESET_REQUIRED));
 
   UOpcode.Question.VarStoreId    = ThunkContext->FormSet->DefaultVarStoreId;
   UOpcode.Question.VarStoreInfo.VarOffset = FwOpcode->QuestionId;
@@ -811,8 +811,8 @@ F2UCreateStringOpCode (
 **/
 UINT8 *
 F2UCreateBannerOpCode (
-  IN OUT   VOID                        *UefiUpdateDataHandle,
-  IN CONST FRAMEWORK_EFI_IFR_BANNER    *FwOpcode
+  IN OUT   VOID              *UefiUpdateDataHandle,
+  IN CONST EFI_IFR_BANNER    *FwOpcode
   )
 {
   EFI_IFR_GUID_BANNER *UOpcode;
@@ -907,12 +907,12 @@ FwUpdateDataToUefiUpdateData (
         DataCount = 1;
         break;
 
-      case FRAMEWORK_EFI_IFR_BANNER_OP:
-        OpCodeBuffer = F2UCreateBannerOpCode (UefiOpCodeHandle, (FRAMEWORK_EFI_IFR_BANNER *) FwOpCode);  
+      case EFI_IFR_BANNER_OP:
+        OpCodeBuffer = F2UCreateBannerOpCode (UefiOpCodeHandle, (EFI_IFR_BANNER *) FwOpCode);  
         DataCount = 1;
         break;
 
-      case FRAMEWORK_EFI_IFR_END_ONE_OF_OP:
+      case EFI_IFR_END_ONE_OF_OP:
         OpCodeBuffer = HiiCreateEndOpCode (UefiOpCodeHandle);
         DataCount = 1;
         break;

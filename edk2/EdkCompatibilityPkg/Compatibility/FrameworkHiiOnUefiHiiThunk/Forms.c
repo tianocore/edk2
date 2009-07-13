@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct {
   EFI_HII_PACK_HEADER            PackageHeader;
   FRAMEWORK_EFI_IFR_FORM_SET     FormSet;
-  FRAMEWORK_EFI_IFR_END_FORM_SET EndFormSet;
+  EFI_IFR_END_FORM_SET           EndFormSet;
 } FW_HII_FORMSET_TEMPLATE;
 #pragma pack()
 
@@ -47,8 +47,8 @@ FW_HII_FORMSET_TEMPLATE FormSetTemplate = {
   },
   {
     {
-      FRAMEWORK_EFI_IFR_END_FORM_SET_OP,
-      sizeof (FRAMEWORK_EFI_IFR_END_FORM_SET)
+      EFI_IFR_END_FORM_SET_OP,
+      sizeof (EFI_IFR_END_FORM_SET)
     }
   }
 };
