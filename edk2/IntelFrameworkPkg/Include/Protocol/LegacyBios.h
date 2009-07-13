@@ -794,12 +794,10 @@ typedef struct {
 #define OEM_OWNER         0x1
 ///@}
 
-/**
-  * SMM_ENTRY
-  *
-  * This structure assumes both port and data sizes are 1. SmmAttribute must be
-  * properly to reflect that assumption.
-**/
+///
+/// This structure assumes both port and data sizes are 1. SmmAttribute must be
+/// properly to reflect that assumption.
+///
 typedef struct {
   ///
   /// Describes the access mechanism, SmmPort, and SmmData sizes. Type
@@ -976,32 +974,29 @@ typedef struct {
 
 typedef struct _EFI_LEGACY_BIOS_PROTOCOL EFI_LEGACY_BIOS_PROTOCOL;
 
-//
-// Flags returned by CheckPciRom()
-//
+///
+/// Flags returned by CheckPciRom()
+///
 #define NO_ROM            0x00
 #define ROM_FOUND         0x01
 #define VALID_LEGACY_ROM  0x02
-#define ROM_WITH_CONFIG   0x04     // Not defined in CSM Specification0.96
+#define ROM_WITH_CONFIG   0x04     ///> Not defined in the Framework CSM Specification
 
-//
-/// @bug These macros appear in no specifications and are kept for backward
-//        compatibility only.
-// Convert from 32-bit address (_Adr) to Segment:Offset 16-bit form
-//
+///
+/// The following macros do not appear in the Framework CSM Specification and 
+/// are kept for backward compatibility only.  They convert 32-bit address (_Adr) 
+/// to Segment:Offset 16-bit form.
+///
+/// @{
 #define EFI_SEGMENT(_Adr)     (UINT16) ((UINT16) (((UINTN) (_Adr)) >> 4) & 0xf000)
 #define EFI_OFFSET(_Adr)      (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xffff)
-#define BYTE_GRANULARITY      0x01
-#define WORD_GRANULARITY      0x02
-#define DWORD_GRANULARITY     0x04
-#define QWORD_GRANULARITY     0x08
-#define PARAGRAPH_GRANULARITY 0x10
+/// @}
 
 #define CARRY_FLAG            0x01
 
-//*********************************************************
-// EFI_EFLAGS_REG
-//*********************************************************
+///
+/// EFI_EFLAGS_REG
+///
 typedef struct {
   UINT32 CF:1;
   UINT32 Reserved1:1;
@@ -1022,10 +1017,9 @@ typedef struct {
   UINT32 Reserved5:14;
 } EFI_EFLAGS_REG;
 
-//*********************************************************
-// EFI_DWORD_REGS
-//*********************************************************
-
+///
+/// EFI_DWORD_REGS
+///
 typedef struct {
     UINT32           EAX;
     UINT32           EBX;
@@ -1044,9 +1038,9 @@ typedef struct {
     UINT32           ESP;
 } EFI_DWORD_REGS;
 
-//*******************************************
-// EFI_FLAGS_REG
-//*******************************************
+///
+/// EFI_FLAGS_REG
+///
 typedef struct {
   UINT16     CF:1;
   UINT16     Reserved1:1;
@@ -1065,11 +1059,9 @@ typedef struct {
   UINT16     Reserved4:1;
 } EFI_FLAGS_REG;
 
-
-//*********************************************************
-// EFI_WORD_REGS
-//*********************************************************
-
+///
+/// EFI_WORD_REGS
+///
 typedef struct {
     UINT16           AX;
     UINT16           ReservedAX;
@@ -1097,10 +1089,9 @@ typedef struct {
     UINT16           ReservedSP;
 } EFI_WORD_REGS;
 
-//*********************************************************
-// EFI_BYTE_REGS
-//*********************************************************
-
+///
+/// EFI_BYTE_REGS
+///
 typedef struct {
     UINT8   AL, AH;
     UINT16  ReservedAX;
@@ -1112,6 +1103,9 @@ typedef struct {
     UINT16  ReservedDX;
 } EFI_BYTE_REGS;
 
+///
+/// EFI_IA32_REGISTER_SET
+///
 typedef union {
   EFI_DWORD_REGS  E;
   EFI_WORD_REGS   X;
@@ -1123,22 +1117,22 @@ typedef union {
   of BiosInt. Regs will contain the 16-bit register context on entry and
   exit.
 
-  @param  This                  Protocol instance pointer.
-  @param  BiosInt               Processor interrupt vector to invoke
-  @param  Reg                   Register contexted passed into (and returned) from thunk to
-                                16-bit mode
+  @param[in]     This      Protocol instance pointer.
+  @param[in]     BiosInt   Processor interrupt vector to invoke
+  @param[in,out] Reg       Register contexted passed into (and returned) from thunk to
+                           16-bit mode
 
-  @retval FALSE                 Thunk completed, and there were no BIOS errors in the target code.
-                                See Regs for status.
-  @retval TRUE                  There was a BIOS erro in the target code.
+  @retval FALSE   Thunk completed, and there were no BIOS errors in the target code.
+                  See Regs for status.
+  @retval TRUE    There was a BIOS erro in the target code.
 
 **/
 typedef
 BOOLEAN
 (EFIAPI *EFI_LEGACY_BIOS_INT86)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN  UINT8                           BiosInt,
-  IN OUT  EFI_IA32_REGISTER_SET       *Regs
+  IN     EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN     UINT8                     BiosInt,
+  IN OUT EFI_IA32_REGISTER_SET     *Regs
   );
 
 /**
@@ -1146,55 +1140,55 @@ BOOLEAN
   16-bit register context on entry and exit. Arguments can be passed on
   the Stack argument
 
-  @param  This                  Protocol instance pointer.
-  @param  Segment               Segemnt of 16-bit mode call
-  @param  Offset                Offset of 16-bit mdoe call
-  @param  Reg                   Register contexted passed into (and returned) from thunk to
-                                16-bit mode
-  @param  Stack                 Caller allocated stack used to pass arguments
-  @param  StackSize             Size of Stack in bytes
+  @param[in] This        Protocol instance pointer.
+  @param[in] Segment     Segemnt of 16-bit mode call
+  @param[in] Offset      Offset of 16-bit mdoe call
+  @param[in] Reg         Register contexted passed into (and returned) from thunk to
+                         16-bit mode
+  @param[in] Stack       Caller allocated stack used to pass arguments
+  @param[in] StackSize   Size of Stack in bytes
 
-  @retval FALSE                 Thunk completed, and there were no BIOS errors in the target code.
-                                See Regs for status.
-  @retval TRUE                  There was a BIOS erro in the target code.
+  @retval FALSE   Thunk completed, and there were no BIOS errors in the target code.
+                  See Regs for status.
+  @retval TRUE    There was a BIOS erro in the target code.
 
 **/
 typedef
 BOOLEAN
 (EFIAPI *EFI_LEGACY_BIOS_FARCALL86)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN  UINT16                          Segment,
-  IN  UINT16                          Offset,
-  IN  EFI_IA32_REGISTER_SET           *Regs,
-  IN  VOID                            *Stack,
-  IN  UINTN                           StackSize
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN UINT16                    Segment,
+  IN UINT16                    Offset,
+  IN EFI_IA32_REGISTER_SET     *Regs,
+  IN VOID                      *Stack,
+  IN UINTN                     StackSize
   );
 
 /**
   Test to see if a legacy PCI ROM exists for this device. Optionally return
   the Legacy ROM instance for this PCI device.
 
-  @param  This                  Protocol instance pointer.
-  @param  PciHandle             The PCI PC-AT OPROM from this devices ROM BAR will be loaded
-  @param  RomImage              Return the legacy PCI ROM for this device
-  @param  RomSize               Size of ROM Image
-  @param  Flags                 Indicates if ROM found and if PC-AT. Multiple bits can be set as follows:
-                                00 = No ROM
-                                01 = ROM Found
-                                02 = ROM is a valid legacy ROM
+  @param[in]  This        Protocol instance pointer.
+  @param[in]  PciHandle   The PCI PC-AT OPROM from this devices ROM BAR will be loaded
+  @param[out] RomImage    Return the legacy PCI ROM for this device
+  @param[out] RomSize     Size of ROM Image
+  @param[out] Flags       Indicates if ROM found and if PC-AT. Multiple bits can be set as follows:
+                            - 00 = No ROM
+                            - 01 = ROM Found
+                            - 02 = ROM is a valid legacy ROM
 
-  @retval EFI_SUCCESS           Legacy Option ROM availible for this device
-  @retval EFI_UNSUPPORTED       Legacy Option ROM not supported.
+  @retval EFI_SUCCESS       Legacy Option ROM availible for this device
+  @retval EFI_UNSUPPORTED   Legacy Option ROM not supported.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_CHECK_ROM)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN  EFI_HANDLE                      PciHandle,
-  OUT VOID                            **RomImage, OPTIONAL
-  OUT UINTN                           *RomSize, OPTIONAL
-  OUT UINTN                           *Flags
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  EFI_HANDLE                PciHandle,
+  OUT VOID                      **RomImage, OPTIONAL
+  OUT UINTN                     *RomSize, OPTIONAL
+  OUT UINTN                     *Flags
   );
 
 /**
@@ -1202,39 +1196,39 @@ EFI_STATUS
   about how many disks were added by the OPROM and the shadow address and
   size. DiskStart & DiskEnd are INT 13h drive letters. Thus 0x80 is C:
 
-  @param  This                  Protocol instance pointer.
-  @param  PciHandle             The PCI PC-AT OPROM from this devices ROM BAR will be loaded.
-                                This value is NULL if RomImage is non-NULL. This is the normal
-                                case.
-  @param  RomImage              A PCI PC-AT ROM image. This argument is non-NULL if there is
-                                no hardware associated with the ROM and thus no PciHandle,
-                                otherwise is must be NULL.
-                                Example is PXE base code.
-  @param  Flags                 The type of ROM discovered. Multiple bits can be set, as follows:
-                                00 = No ROM.
-                                01 = ROM found.
-                                02 = ROM is a valid legacy ROM.
-  @param  DiskStart             Disk number of first device hooked by the ROM. If DiskStart
-                                is the same as DiskEnd no disked were hooked.
-  @param  DiskEnd               Disk number of the last device hooked by the ROM.
-  @param  RomShadowAddress      Shadow address of PC-AT ROM
-  @param  RomShadowSize         Size of RomShadowAddress in bytes
+  @param[in]  This               Protocol instance pointer.
+  @param[in]  PciHandle          The PCI PC-AT OPROM from this devices ROM BAR will be loaded.
+                                 This value is NULL if RomImage is non-NULL. This is the normal
+                                 case.
+  @param[in]  RomImage           A PCI PC-AT ROM image. This argument is non-NULL if there is
+                                 no hardware associated with the ROM and thus no PciHandle,
+                                 otherwise is must be NULL.
+                                 Example is PXE base code.
+  @param[out] Flags              The type of ROM discovered. Multiple bits can be set, as follows:
+                                   - 00 = No ROM.
+                                   - 01 = ROM found.
+                                   - 02 = ROM is a valid legacy ROM.
+  @param[out] DiskStart          Disk number of first device hooked by the ROM. If DiskStart
+                                 is the same as DiskEnd no disked were hooked.
+  @param[out] DiskEnd            disk number of the last device hooked by the ROM.
+  @param[out] RomShadowAddress   Shadow address of PC-AT ROM
+  @param[out] RomShadowSize      Size of RomShadowAddress in bytes
 
-  @retval EFI_SUCCESS           Thunk completed, see Regs for status.
-  @retval EFI_INVALID_PARAMETER PciHandle not found
+  @retval EFI_SUCCESS             Thunk completed, see Regs for status.
+  @retval EFI_INVALID_PARAMETER   PciHandle not found
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_INSTALL_ROM)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN  EFI_HANDLE                      PciHandle,
-  IN  VOID                            **RomImage,
-  OUT UINTN                           *Flags,
-  OUT UINT8                           *DiskStart, OPTIONAL
-  OUT UINT8                           *DiskEnd, OPTIONAL
-  OUT VOID                            **RomShadowAddress, OPTIONAL
-  OUT UINT32                          *ShadowedRomSize OPTIONAL
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  EFI_HANDLE                PciHandle,
+  IN  VOID                      **RomImage,
+  OUT UINTN                     *Flags,
+  OUT UINT8                     *DiskStart, OPTIONAL
+  OUT UINT8                     *DiskEnd, OPTIONAL
+  OUT VOID                      **RomShadowAddress, OPTIONAL
+  OUT UINT32                    *ShadowedRomSize OPTIONAL
   );
 
 /**
@@ -1261,24 +1255,24 @@ EFI_STATUS
     manner—i.e., EFI code is still valid. An ungraceful boot failure causes a reset because the state
     of EFI code is unknown.
 
-  @param  This                  Protocol instance pointer.
-  @param  BootOption            EFI Device Path from BootXXXX variable.
-  @param  LoadOptionSize        Size of LoadOption in size.
-  @param  LoadOption            LoadOption from BootXXXX variable
+  @param[in] This             Protocol instance pointer.
+  @param[in] BootOption       EFI Device Path from BootXXXX variable.
+  @param[in] LoadOptionSize   Size of LoadOption in size.
+  @param[in] LoadOption       LoadOption from BootXXXX variable
 
-  @retval EFI_DEVICE_ERROR      Failed to boot from any boot device and memory is uncorrupted.
-                                Note: This function normally never returns. It will either boot the
-                                OS or reset the system if memory has been "corrupted" by loading
-                                a boot sector and passing control to it.
+  @retval EFI_DEVICE_ERROR   Failed to boot from any boot device and memory is uncorrupted.
+                             Note: This function normally never returns. It will either boot the
+                             OS or reset the system if memory has been "corrupted" by loading
+                             a boot sector and passing control to it.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_BOOT)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN  BBS_BBS_DEVICE_PATH             *BootOption,
-  IN  UINT32                          LoadOptionsSize,
-  IN  VOID                            *LoadOptions
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN BBS_BBS_DEVICE_PATH       *BootOption,
+  IN UINT32                    LoadOptionsSize,
+  IN VOID                      *LoadOptions
   );
 
 /**
@@ -1288,87 +1282,87 @@ EFI_STATUS
   keyboard options such as boot with NUM LOCK on/off. This function does not
   touch the keyboard or keyboard LEDs but only the BDA.
 
-  @param  This                  Protocol instance pointer.
-  @param  Leds                  Status of current Scroll, Num & Cap lock LEDS
-                                Bit 0 is Scroll Lock 0 = Not locked
-                                Bit 1 is Num Lock
-                                Bit 2 is Caps Lock
+  @param[in] This   Protocol instance pointer.
+  @param[in] Leds   Status of current Scroll, Num & Cap lock LEDS
+                      - Bit 0 is Scroll Lock 0 = Not locked
+                      - Bit 1 is Num Lock
+                      - Bit 2 is Caps Lock
 
-  @retval EFI_SUCCESS           The BDA was updated successfully.
+  @retval EFI_SUCCESS   The BDA was updated successfully.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_UPDATE_KEYBOARD_LED_STATUS)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN  UINT8                           Leds
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN UINT8                     Leds
   );
 
 /**
   Retrieve legacy BBS info and assign boot priority.
 
-  @param  This                  Protocol instance pointer.
-  @param  HddCount              Number of HDD_INFO structures
-  @param  HddInfo               Onboard IDE controller information
-  @param  BbsCount              Number of BBS_TABLE structures
-  @param  BbsTable              Point to List of BBS_TABLE
+  @param[in]     This       Protocol instance pointer.
+  @param[out]    HddCount   Number of HDD_INFO structures
+  @param[out]    HddInfo    Onboard IDE controller information
+  @param[out]    BbsCount   Number of BBS_TABLE structures
+  @param[in,out] BbsTable   Point to List of BBS_TABLE
 
-  @retval EFI_SUCCESS           Tables returned
+  @retval EFI_SUCCESS   Tables returned
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_GET_BBS_INFO)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  OUT UINT16                          *HddCount,
-  OUT HDD_INFO                        **HddInfo,
-  OUT UINT16                          *BbsCount,
-  IN OUT BBS_TABLE                    **BbsTable
+  IN     EFI_LEGACY_BIOS_PROTOCOL  *This,
+  OUT    UINT16                    *HddCount,
+  OUT    HDD_INFO                  **HddInfo,
+  OUT    UINT16                    *BbsCount,
+  IN OUT BBS_TABLE                 **BbsTable
   );
 
 /**
   Assign drive number to legacy HDD drives prior to booting an EFI
   aware OS so the OS can access drives without an EFI driver.
 
-  @param  This                  Protocol instance pointer.
-  @param  BbsCount              Number of BBS_TABLE structures
-  @param  BbsTable              List BBS entries
+  @param[in]  This       Protocol instance pointer.
+  @param[out] BbsCount   Number of BBS_TABLE structures
+  @param[out] BbsTable   List BBS entries
 
-  @retval EFI_SUCCESS           Drive numbers assigned
+  @retval EFI_SUCCESS   Drive numbers assigned
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  OUT UINT16                          *BbsCount,
-  OUT BBS_TABLE                       **BbsTable
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  OUT UINT16                    *BbsCount,
+  OUT BBS_TABLE                 **BbsTable
   );
 
 /**
   To boot from an unconventional device like parties and/or execute
   HDD diagnostics.
 
-  @param  This                  Protocol instance pointer.
-  @param  Attributes            How to interpret the other input parameters
-  @param  BbsEntry              The 0-based index into the BbsTable for the parent
+  @param[in]  This              Protocol instance pointer.
+  @param[in]  Attributes        How to interpret the other input parameters
+  @param[in]  BbsEntry          The 0-based index into the BbsTable for the parent
                                 device.
-  @param  BeerData              Pointer to the 128 bytes of ram BEER data.
-  @param  ServiceAreaData       Pointer to the 64 bytes of raw Service Area data. The
+  @param[in]  BeerData          Pointer to the 128 bytes of ram BEER data.
+  @param[in]  ServiceAreaData   Pointer to the 64 bytes of raw Service Area data. The
                                 caller must provide a pointer to the specific Service
                                 Area and not the start all Service Areas.
 
-  @retval EFI_INVALID_PARAMETER if error. Does NOT return if no error.
+  @retval EFI_INVALID_PARAMETER   If error. Does NOT return if no error.
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_BOOT_UNCONVENTIONAL_DEVICE)(
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN UDC_ATTRIBUTES                   Attributes,
-  IN UINTN                            BbsEntry,
-  IN VOID                             *BeerData,
-  IN VOID                             *ServiceAreaData
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN UDC_ATTRIBUTES            Attributes,
+  IN UINTN                     BbsEntry,
+  IN VOID                      *BeerData,
+  IN VOID                      *ServiceAreaData
   );
 
 /**
@@ -1376,28 +1370,30 @@ EFI_STATUS
   Warning: Use this with caution. This routine disconnects all EFI
   drivers. If used externally then caller must re-connect EFI
   drivers.
-
-  @retval EFI_SUCCESS           OPROMs shadowed
+  
+  @param[in]  This   Protocol instance pointer.
+  
+  @retval EFI_SUCCESS   OPROMs shadowed
 
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_SHADOW_ALL_LEGACY_OPROMS)(
-  IN EFI_LEGACY_BIOS_PROTOCOL *This
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This
   );
 
 /**
   Get a region from the LegacyBios for S3 usage.
 
-  @param  This                  Protocol instance pointer.
-  @param  LegacyMemorySize      Size of required region
-  @param  Region                Region to use.
-                                00 = Either 0xE0000 or 0xF0000 block
-                                Bit0 = 1 0xF0000 block
-                                Bit1 = 1 0xE0000 block
-  @param  Alignment             Address alignment. Bit mapped. First non-zero
-                                bit from right is alignment.
-  @param  LegacyMemoryAddress   Region Assigned
+  @param[in]  This                  Protocol instance pointer.
+  @param[in]  LegacyMemorySize      Size of required region
+  @param[in]  Region                Region to use.
+                                    00 = Either 0xE0000 or 0xF0000 block
+                                      - Bit0 = 1 0xF0000 block
+                                      - Bit1 = 1 0xE0000 block
+  @param[in]  Alignment             Address alignment. Bit mapped. First non-zero
+                                    bit from right is alignment.
+  @param[out] LegacyMemoryAddress   Region Assigned
 
   @retval EFI_SUCCESS           Region assigned
   @retval EFI_ACCESS_DENIED     The function was previously invoked.
@@ -1407,23 +1403,22 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_GET_LEGACY_REGION)(
-  IN EFI_LEGACY_BIOS_PROTOCOL *This,
-  IN    UINTN                 LegacyMemorySize,
-  IN    UINTN                 Region,
-  IN    UINTN                 Alignment,
-  OUT   VOID                  **LegacyMemoryAddress
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  UINTN                     LegacyMemorySize,
+  IN  UINTN                     Region,
+  IN  UINTN                     Alignment,
+  OUT VOID                      **LegacyMemoryAddress
   );
 
 /**
   Get a region from the LegacyBios for Tiano usage. Can only be invoked once.
 
-  @param  This                  Protocol instance pointer.
-  @param  LegacyMemorySize      Size of data to copy
-  @param  LegacyMemoryAddress   Legacy Region destination address
-                                Note: must be in region assigned by
-                                LegacyBiosGetLegacyRegion
-  @param  LegacyMemorySourceAddress
-                                Source of the data to copy.
+  @param[in]  This                        Protocol instance pointer.
+  @param[in]  LegacyMemorySize            Size of data to copy
+  @param[in]  LegacyMemoryAddress         Legacy Region destination address
+                                          Note: must be in region assigned by
+                                          LegacyBiosGetLegacyRegion
+  @param[in]  LegacyMemorySourceAddress   Source of the data to copy.
 
   @retval EFI_SUCCESS           Region assigned
   @retval EFI_ACCESS_DENIED     Destination outside assigned region
@@ -1432,18 +1427,18 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_COPY_LEGACY_REGION)(
-  IN EFI_LEGACY_BIOS_PROTOCOL *This,
-  IN    UINTN                 LegacyMemorySize,
-  IN    VOID                  *LegacyMemoryAddress,
-  IN    VOID                  *LegacyMemorySourceAddress
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN UINTN                     LegacyMemorySize,
+  IN VOID                      *LegacyMemoryAddress,
+  IN VOID                      *LegacyMemorySourceAddress
   );
 
-/**
-  Abstracts the traditional BIOS from the rest of EFI. The LegacyBoot()
-  member function allows the BDS to support booting a traditional OS.
-  EFI thunks drivers that make EFI bindings for BIOS INT services use
-  all the other member functions.
-**/
+///
+/// Abstracts the traditional BIOS from the rest of EFI. The LegacyBoot()
+/// member function allows the BDS to support booting a traditional OS.
+/// EFI thunks drivers that make EFI bindings for BIOS INT services use
+/// all the other member functions.
+///
 struct _EFI_LEGACY_BIOS_PROTOCOL {
   ///
   /// Performs traditional software INT. See the Int86() function description.
