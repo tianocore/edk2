@@ -30,9 +30,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct {
   UINT64  VendorId;
   UINT64  DeviceId;
-  UINT64  Revision;
-  UINT64  SubVendorId;
-  UINT64  SubDeviceId;
+  UINT64  RevisionId;
+  UINT64  SubsystemVendorId;
+  UINT64  SubsystemDeviceId;
 } EFI_PCI_DEVICE_HEADER_INFO;
 
 typedef struct {
@@ -62,9 +62,9 @@ typedef struct {
   resource configuration requirements for an incompatible PCI device.
 
   @param  This                  Pointer to the EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL instance.
-  @param  VendorID              A unique ID to identify the manufacturer of the PCI device.
-  @param  DeviceID              A unique ID to identify the particular PCI device.
-  @param  RevisionID            A PCI device-specific revision identifier.
+  @param  VendorId              A unique ID to identify the manufacturer of the PCI device.
+  @param  DeviceId              A unique ID to identify the particular PCI device.
+  @param  RevisionId            A PCI device-specific revision identifier.
   @param  SubsystemVendorId     Specifies the subsystem vendor ID.
   @param  SubsystemDeviceId     Specifies the subsystem device ID.
   @param  Configuration         A list of ACPI resource descriptors returned that detail
@@ -82,7 +82,7 @@ PCheckDevice (
   IN  EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *This,
   IN  UINTN                                         VendorId,
   IN  UINTN                                         DeviceId,
-  IN  UINTN                                         Revision,
+  IN  UINTN                                         RevisionId,
   IN  UINTN                                         SubVendorId,
   IN  UINTN                                         SubDeviceId,
   OUT VOID                                          **Configuration
@@ -227,9 +227,9 @@ IncompatiblePciDeviceSupportEntryPoint (
   resource configuration requirements for an incompatible PCI device.
 
   @param  This                  Pointer to the EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL instance.
-  @param  VendorID              A unique ID to identify the manufacturer of the PCI device.
-  @param  DeviceID              A unique ID to identify the particular PCI device.
-  @param  RevisionID            A PCI device-specific revision identifier.
+  @param  VendorId              A unique ID to identify the manufacturer of the PCI device.
+  @param  DeviceId              A unique ID to identify the particular PCI device.
+  @param  RevisionId            A PCI device-specific revision identifier.
   @param  SubsystemVendorId     Specifies the subsystem vendor ID.
   @param  SubsystemDeviceId     Specifies the subsystem device ID.
   @param  Configuration         A list of ACPI resource descriptors returned that detail
@@ -247,9 +247,9 @@ PCheckDevice (
   IN  EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *This,
   IN  UINTN                                         VendorId,
   IN  UINTN                                         DeviceId,
-  IN  UINTN                                         Revision,
-  IN  UINTN                                         SubVendorId,
-  IN  UINTN                                         SubDeviceId,
+  IN  UINTN                                         RevisionId,
+  IN  UINTN                                         SubsystemVendorId,
+  IN  UINTN                                         SubsystemDeviceId,
   OUT VOID                                          **Configuration
   )
 {
@@ -298,20 +298,20 @@ PCheckDevice (
         }
       }
 
-      if (Header->Revision != DEVICE_ID_NOCARE) {
-        if (Revision != Header->Revision) {
+      if (Header->RevisionId != DEVICE_ID_NOCARE) {
+        if (RevisionId != Header->RevisionId) {
           continue;
         }
       }
 
-      if (Header->SubVendorId != DEVICE_ID_NOCARE) {
-        if (SubVendorId != Header->SubVendorId) {
+      if (Header->SubsystemVendorId != DEVICE_ID_NOCARE) {
+        if (SubsystemVendorId != Header->SubsystemVendorId) {
           continue;
         }
       }
 
-      if (Header->SubDeviceId != DEVICE_ID_NOCARE) {
-        if (SubDeviceId != Header->SubDeviceId) {
+      if (Header->SubsystemDeviceId != DEVICE_ID_NOCARE) {
+        if (SubsystemDeviceId != Header->SubsystemDeviceId) {
           continue;
         }
       }
