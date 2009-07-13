@@ -202,6 +202,7 @@ CallBootManager (
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
   CHAR16                      *BootStringNumber;
+  UINTN                       DevicePathType;
 
   gOption = NULL;
   InitializeListHead (&BdsBootOptionList);
@@ -267,43 +268,51 @@ CallBootManager (
     //
     // Replace description string with UNI file string.
     //
-    BootStringNumber = AllocateZeroPool (StrSize (Option->Description));
-    ASSERT (BootStringNumber != NULL);
+    BootStringNumber = NULL;
     
-    if (StrStr (Option->Description, DESCRIPTION_FLOPPY) != NULL) {
-      BootStringNumber = Option->Description + StrLen (DESCRIPTION_FLOPPY) + 1;
+    DevicePathType = BdsGetBootTypeFromDevicePath (Option->DevicePath);
+    
+    //
+    // store number string of boot option temporary.
+    //
+    
+    switch (DevicePathType) {
+    case BDS_EFI_ACPI_FLOPPY_BOOT:
+      BootStringNumber = Option->Description;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY));
-    } else if (StrStr (Option->Description, DESCRIPTION_DVD) != NULL) {
-      BootStringNumber = Option->Description + StrLen (DESCRIPTION_DVD) + 1;
+      break;
+    case BDS_EFI_MEDIA_CDROM_BOOT:
+      BootStringNumber = Option->Description;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_DVD));
-      
-    } else if (StrStr (Option->Description, DESCRIPTION_USB) != NULL) {
-      BootStringNumber = Option->Description + StrLen (DESCRIPTION_USB) + 1;
+      break;
+    case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
+      BootStringNumber = Option->Description;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_USB));
-      
-    } else if (StrStr (Option->Description, DESCRIPTION_SCSI) != NULL) {
-       BootStringNumber = Option->Description + StrLen (DESCRIPTION_SCSI) + 1;
+      break;
+    case BDS_EFI_MESSAGE_SCSI_BOOT:
+      BootStringNumber = Option->Description;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI));
-      
-    } else if (StrStr (Option->Description, DESCRIPTION_MISC) != NULL) {
-      BootStringNumber = Option->Description + StrLen (DESCRIPTION_MISC) + 1;
+      break;
+    case BDS_EFI_MESSAGE_MISC_BOOT:
+      BootStringNumber = Option->Description;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC));
-      
-    } else if (StrStr (Option->Description, DESCRIPTION_NETWORK) != NULL) {
-      BootStringNumber = Option->Description + StrLen (DESCRIPTION_NETWORK) + 1;
+      break;
+    case BDS_EFI_MESSAGE_MAC_BOOT:
+      BootStringNumber = Option->Description;
       Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK));
-      
-    } else if (StrStr (Option->Description, DESCRIPTION_NON_BLOCK) != NULL) {
-      BootStringNumber = Option->Description + StrLen (DESCRIPTION_NON_BLOCK) + 1;
-      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NON_BLOCK));
+      break;
     }
     
     ASSERT (Option->Description != NULL);
-    if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
-      StrCat (Option->Description, L" ");
-      StrCat (Option->Description, BootStringNumber);
+    if (BootStringNumber != NULL) {
+      if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
+        StrCat (Option->Description, L" ");
+        StrCat (Option->Description, BootStringNumber);
+      }
+      
+      FreePool (BootStringNumber);
     }
-  
+    
     Token = HiiSetString (HiiHandle, 0, Option->Description, NULL);
 
     TempStr = DevicePathToStr (Option->DevicePath);
