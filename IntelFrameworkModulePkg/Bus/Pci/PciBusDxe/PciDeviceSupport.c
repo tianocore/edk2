@@ -767,7 +767,6 @@ StartPciDevices (
   IN EFI_HANDLE                         Controller
   )
 {
-  EFI_STATUS        Status;
   PCI_IO_DEVICE     *RootBridge;
   EFI_HANDLE        ThisHostBridge;
   LIST_ENTRY        *CurrentLink;
@@ -785,16 +784,13 @@ StartPciDevices (
     // Locate the right root bridge to start
     //
     if (RootBridge->PciRootBridgeIo->ParentHandle == ThisHostBridge) {
-      Status = StartPciDevicesOnBridge (
-                  RootBridge->Handle,
-                  RootBridge,
-                  NULL,
-                  NULL,
-                  NULL
-                  );
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
+      StartPciDevicesOnBridge (
+         RootBridge->Handle,
+         RootBridge,
+         NULL,
+         NULL,
+         NULL
+         );
     }
 
     CurrentLink = CurrentLink->ForwardLink;
