@@ -81,12 +81,14 @@ PlatformBdsGetDriverOption (
 
   @param MemoryTestLevel  The memory test intensive level
   @param QuietBoot        Indicate if need to enable the quiet boot
+  @param BaseMemoryTest   A pointer to BdsMemoryTest()
 
 **/
 VOID
 PlatformBdsDiagnostics (
   IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
-  IN BOOLEAN                     QuietBoot
+  IN BOOLEAN                     QuietBoot,
+  IN BASEM_MEMORY_TEST           BaseMemoryTest
   )
 {
 }
@@ -98,13 +100,17 @@ PlatformBdsDiagnostics (
 
   @param  DriverOptionList        The header of the driver option link list
   @param  BootOptionList          The header of the boot option link list
+  @param  ProcessCapsules         A pointer to ProcessCapsules()
+  @param  BaseMemoryTest          A pointer to BaseMemoryTest()
 
 **/
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
   IN LIST_ENTRY                      *DriverOptionList,
-  IN LIST_ENTRY                      *BootOptionList
+  IN LIST_ENTRY                      *BootOptionList,
+  IN PROCESS_CAPSULES                ProcessCapsules,
+  IN BASEM_MEMORY_TEST               BaseMemoryTest
   )
 {
 }

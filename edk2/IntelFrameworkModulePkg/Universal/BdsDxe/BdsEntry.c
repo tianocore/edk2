@@ -40,6 +40,9 @@ UINT16                          *mBootNext = NULL;
 
 EFI_HANDLE                      mBdsImageHandle;
 
+extern EFI_STATUS BdsMemoryTest (EXTENDMEM_COVERAGE_LEVEL Level);
+extern EFI_STATUS ProcessCapsules (EFI_BOOT_MODE BootMode);
+
 /**
 
   Install Boot Device Selection Protocol
@@ -347,7 +350,7 @@ BdsEntry (
   //
   // Setup some platform policy here
   //
-  PlatformBdsPolicyBehavior (&DriverOptionList, &BootOptionList);
+  PlatformBdsPolicyBehavior (&DriverOptionList, &BootOptionList, ProcessCapsules, BdsMemoryTest);
   PERF_END (0, "PlatformBds", "BDS", 0);
 
   //
