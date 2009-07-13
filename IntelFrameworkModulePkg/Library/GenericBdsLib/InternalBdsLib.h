@@ -111,21 +111,4 @@ BdsLibGetImageHeader (
   OUT EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr
   );
 
-/** 
-  Check whether the descriptionis is conflict with the description reserved for
-  auto-created boot options.
-
-  @param  Description  The Description in a boot option
-  
-  @retval TRUE    The description is conflict with the description reserved for
-                  auto-created boot options.
-  @retval FALSE   The description is not conflict with the description reserved.
-  
-**/
-BOOLEAN
-EFIAPI
-CheckDescritptionConflict (
-  IN CHAR16                       *Description
-  );
-
 #endif // _BDS_LIB_H_
