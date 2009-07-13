@@ -633,13 +633,13 @@ typedef struct {
 /// This data record refers to the status of the processor.
 ///
 typedef struct {
-  UINT32       CpuStatus                 :3; ///> Indicates the status of the processor. 
-  UINT32       Reserved1                 :3; ///> Reserved for future use. Should be set to zero.  
-  UINT32       SocketPopulated           :1; ///> Indicates if the processor is socketed or not. 
-  UINT32       Reserved2                 :1; ///> Reserved for future use. Should be set to zero. 
-  UINT32       ApicEnable                :1; ///> Indicates if the APIC is enabled or not. 
-  UINT32       BootApplicationProcessor  :1; ///> Indicates if this processor is the boot processor. 
-  UINT32       Reserved3                 :22;///> Reserved for future use. Should be set to zero. 
+  UINT32       CpuStatus                 :3; ///< Indicates the status of the processor. 
+  UINT32       Reserved1                 :3; ///< Reserved for future use. Should be set to zero.  
+  UINT32       SocketPopulated           :1; ///< Indicates if the processor is socketed or not. 
+  UINT32       Reserved2                 :1; ///< Reserved for future use. Should be set to zero. 
+  UINT32       ApicEnable                :1; ///< Indicates if the APIC is enabled or not. 
+  UINT32       BootApplicationProcessor  :1; ///< Indicates if this processor is the boot processor. 
+  UINT32       Reserved3                 :22;///< Reserved for future use. Should be set to zero. 
 } EFI_PROCESSOR_STATUS_DATA;
 
 typedef enum {
