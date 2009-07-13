@@ -388,16 +388,16 @@ UefiIfrGetBufferTypeDefaults (
                                               which contains the default values retrived from
                                               a UEFI form set.
   @param  DefaultMask            The default mask.
-                                             The valid values are FRAMEWORK_EFI_IFR_FLAG_DEFAULT
-                                             and FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING.
-                                            UEFI spec only map FRAMEWORK_EFI_IFR_FLAG_DEFAULT and FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING 
+                                             The valid values are EFI_IFR_FLAG_DEFAULT
+                                             and EFI_IFR_FLAG_MANUFACTURING.
+                                            UEFI spec only map EFI_IFR_FLAG_DEFAULT and EFI_IFR_FLAG_MANUFACTURING 
                                             from specification to valid default class.
   @param  VariablePackList     The output default value in a format defined in Framework.
                                              
 
   @retval   EFI_SUCCESS                       Successful.
-  @retval   EFI_INVALID_PARAMETER      The default mask is not FRAMEWORK_EFI_IFR_FLAG_DEFAULT or 
-                                                           FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING.
+  @retval   EFI_INVALID_PARAMETER      The default mask is not EFI_IFR_FLAG_DEFAULT or 
+                                                           EFI_IFR_FLAG_MANUFACTURING.
 **/
 EFI_STATUS
 UefiDefaultsToFwDefaults (
@@ -416,13 +416,13 @@ UefiDefaultsToFwDefaults (
   EFI_HII_VARIABLE_PACK_LIST        *PackList;
   UINTN                             Index;
 
-  if (DefaultMask == FRAMEWORK_EFI_IFR_FLAG_DEFAULT) {
+  if (DefaultMask == EFI_IFR_FLAG_DEFAULT) {
     DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
-  } else if (DefaultMask == FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING) {
+  } else if (DefaultMask == EFI_IFR_FLAG_MANUFACTURING) {
     DefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
   } else {
     //
-    // UEFI spec only map FRAMEWORK_EFI_IFR_FLAG_DEFAULT and FRAMEWORK_EFI_IFR_FLAG_MANUFACTURING 
+    // UEFI spec only map EFI_IFR_FLAG_DEFAULT and EFI_IFR_FLAG_MANUFACTURING 
     // from specification to valid default class.
     //
     ASSERT (FALSE);
