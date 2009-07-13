@@ -193,15 +193,13 @@ PlatformBdsShowProgress (
 }
 
 /**
-
   Perform the memory test base on the memory test intensive level,
   and update the memory resource.
 
+  @param  Level         The memory test intensive level.
 
-  @param Level           The memory test intensive level.
-
-  @retval  EFI_STATUS       Success test all the system memory and update
-                            the memory resource
+  @retval EFI_STATUS    Success test all the system memory and update
+                        the memory resource
 
 **/
 EFI_STATUS

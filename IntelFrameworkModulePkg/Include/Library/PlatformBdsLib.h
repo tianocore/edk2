@@ -20,6 +20,47 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/GenericBdsLib.h>
 
 /**
+  Perform the memory test base on the memory test intensive level,
+  and update the memory resource.
+
+  @param  Level         The memory test intensive level.
+
+  @retval EFI_STATUS    Success test all the system memory and update
+                        the memory resource
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *BASEM_MEMORY_TEST)(
+  IN EXTENDMEM_COVERAGE_LEVEL Level
+  );
+
+/**
+  This routine is called to see if there are any capsules we need to process.
+  If the boot mode is not UPDATE, then we do nothing. Otherwise find the
+  capsule HOBS and produce firmware volumes for them via the DXE service.
+  Then call the dispatcher to dispatch drivers from them. Finally, check
+  the status of the updates.
+
+  This function should be called by BDS in case we need to do some
+  sort of processing even if there is no capsule to process. We
+  need to do this if an earlier update went away and we need to
+  clear the capsule variable so on the next reset PEI does not see it and
+  think there is a capsule available.
+
+  @param BootMode                 the current boot mode
+
+  @retval EFI_INVALID_PARAMETER   boot mode is not correct for an update
+  @retval EFI_SUCCESS             There is no error when processing capsule
+
+**/
+typedef 
+EFI_STATUS
+(EFIAPI *PROCESS_CAPSULES)(
+  IN EFI_BOOT_MODE BootMode
+  );
+
+/**
   Platform Bds initialization. Includes the platform firmware vendor, revision
   and so crc check.
 
@@ -37,13 +78,17 @@ PlatformBdsInit (
 
   @param  DriverOptionList        The header of the driver option link list
   @param  BootOptionList          The header of the boot option link list
+  @param  ProcessCapsules         A pointer to ProcessCapsules()
+  @param  BaseMemoryTest          A pointer to BaseMemoryTest()
 
 **/
 VOID
 EFIAPI
 PlatformBdsPolicyBehavior (
   IN LIST_ENTRY                      *DriverOptionList,
-  IN LIST_ENTRY                      *BootOptionList
+  IN LIST_ENTRY                      *BootOptionList,
+  IN PROCESS_CAPSULES                ProcessCapsules,
+  IN BASEM_MEMORY_TEST               BaseMemoryTest
   );
 
 /**
