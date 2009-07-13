@@ -28,19 +28,19 @@ typedef UINT16  STRING_REF;
 #define FRAMEWORK_EFI_IFR_FORM_OP                 0x01
 #define FRAMEWORK_EFI_IFR_SUBTITLE_OP             0x02
 #define FRAMEWORK_EFI_IFR_TEXT_OP                 0x03
-#define EFI_IFR_GRAPHIC_OP              0x04
+#define EFI_IFR_GRAPHIC_OP                        0x04
 #define FRAMEWORK_EFI_IFR_ONE_OF_OP               0x05
 #define FRAMEWORK_EFI_IFR_CHECKBOX_OP             0x06
 #define FRAMEWORK_EFI_IFR_NUMERIC_OP              0x07
 #define FRAMEWORK_EFI_IFR_PASSWORD_OP             0x08
 #define FRAMEWORK_EFI_IFR_ONE_OF_OPTION_OP        0x09  ///< ONEOF OPTION field
 #define FRAMEWORK_EFI_IFR_SUPPRESS_IF_OP          0x0A
-#define EFI_IFR_END_FORM_OP             0x0B
-#define EFI_IFR_HIDDEN_OP               0x0C
-#define EFI_IFR_END_FORM_SET_OP         0x0D
+#define EFI_IFR_END_FORM_OP                       0x0B
+#define EFI_IFR_HIDDEN_OP                         0x0C
+#define EFI_IFR_END_FORM_SET_OP                   0x0D
 #define FRAMEWORK_EFI_IFR_FORM_SET_OP             0x0E
 #define FRAMEWORK_EFI_IFR_REF_OP                  0x0F
-#define EFI_IFR_END_ONE_OF_OP           0x10
+#define EFI_IFR_END_ONE_OF_OP                     0x10
 #define FRAMEWORK_EFI_IFR_END_OP                  EFI_IFR_END_ONE_OF_OP
 #define FRAMEWORK_EFI_IFR_INCONSISTENT_IF_OP      0x11
 #define FRAMEWORK_EFI_IFR_EQ_ID_VAL_OP            0x12
@@ -49,24 +49,24 @@ typedef UINT16  STRING_REF;
 #define FRAMEWORK_EFI_IFR_AND_OP                  0x15
 #define FRAMEWORK_EFI_IFR_OR_OP                   0x16
 #define FRAMEWORK_EFI_IFR_NOT_OP                  0x17
-#define EFI_IFR_END_IF_OP               0x18  ///< for endif of inconsistentif, suppressif, grayoutif
-#define EFI_IFR_GRAYOUT_IF_OP           0x19
+#define EFI_IFR_END_IF_OP                         0x18  ///< for endif of inconsistentif, suppressif, grayoutif
+#define EFI_IFR_GRAYOUT_IF_OP                     0x19
 #define FRAMEWORK_EFI_IFR_DATE_OP                 0x1A
 #define FRAMEWORK_EFI_IFR_TIME_OP                 0x1B
 #define FRAMEWORK_EFI_IFR_STRING_OP               0x1C
-#define EFI_IFR_LABEL_OP                0x1D
-#define EFI_IFR_SAVE_DEFAULTS_OP        0x1E
-#define EFI_IFR_RESTORE_DEFAULTS_OP     0x1F
-#define EFI_IFR_BANNER_OP               0x20
-#define EFI_IFR_INVENTORY_OP            0x21
-#define EFI_IFR_EQ_VAR_VAL_OP           0x22
+#define EFI_IFR_LABEL_OP                          0x1D
+#define EFI_IFR_SAVE_DEFAULTS_OP                  0x1E
+#define EFI_IFR_RESTORE_DEFAULTS_OP               0x1F
+#define EFI_IFR_BANNER_OP                         0x20
+#define EFI_IFR_INVENTORY_OP                      0x21
+#define EFI_IFR_EQ_VAR_VAL_OP                     0x22
 #define FRAMEWORK_EFI_IFR_ORDERED_LIST_OP         0x23
 #define FRAMEWORK_EFI_IFR_VARSTORE_OP             0x24
-#define EFI_IFR_VARSTORE_SELECT_OP      0x25
-#define EFI_IFR_VARSTORE_SELECT_PAIR_OP 0x26
-#define EFI_IFR_LAST_OPCODE             EFI_IFR_VARSTORE_SELECT_PAIR_OP
-#define EFI_IFR_OEM_OP                  0xFE
-#define EFI_IFR_NV_ACCESS_COMMAND       0xFF
+#define EFI_IFR_VARSTORE_SELECT_OP                0x25
+#define EFI_IFR_VARSTORE_SELECT_PAIR_OP           0x26
+#define EFI_IFR_LAST_OPCODE                       EFI_IFR_VARSTORE_SELECT_PAIR_OP
+#define EFI_IFR_OEM_OP                            0xFE
+#define EFI_IFR_NV_ACCESS_COMMAND                 0xFF
 
 //
 // Define values for the flags fields in some VFR opcodes. These are
