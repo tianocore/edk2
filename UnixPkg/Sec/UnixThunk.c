@@ -32,6 +32,7 @@ Abstract:
 --*/
 
 #include "SecMain.h"
+#include "Uefi.h"
 #include "Library/UnixLib.h"
 
 int settimer_initialized;
