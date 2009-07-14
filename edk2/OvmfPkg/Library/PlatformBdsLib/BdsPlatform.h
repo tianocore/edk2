@@ -29,7 +29,7 @@ Abstract:
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/SmBios.h>
-//#include <IndustryStandard/LegacyBiosMpTable.h>
+#include <IndustryStandard/PeImage.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -47,6 +47,7 @@ Abstract:
 #include <Library/DevicePathLib.h>
 #include <Library/IoLib.h>
 
+#include <Protocol/Decompress.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/FirmwareVolume2.h>
 

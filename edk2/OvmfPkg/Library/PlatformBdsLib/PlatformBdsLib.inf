@@ -55,3 +55,6 @@
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock
 
+[Protocols]
+  gEfiDecompressProtocolGuid
+
