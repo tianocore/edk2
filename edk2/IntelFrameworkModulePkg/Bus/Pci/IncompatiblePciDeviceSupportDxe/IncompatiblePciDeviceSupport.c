@@ -83,8 +83,8 @@ PCheckDevice (
   IN  UINTN                                         VendorId,
   IN  UINTN                                         DeviceId,
   IN  UINTN                                         RevisionId,
-  IN  UINTN                                         SubVendorId,
-  IN  UINTN                                         SubDeviceId,
+  IN  UINTN                                         SubsystemVendorId,
+  IN  UINTN                                         SubsystemDeviceId,
   OUT VOID                                          **Configuration
   );
 
