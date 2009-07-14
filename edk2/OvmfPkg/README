@@ -38,20 +38,31 @@ Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
 * OvmfPkg/OvmfPkgIa32X64.dsc   IA32       X64            X64
 * OvmfPkg/OvmfPkgX64.dsc       X64        X64            X64
 
-Following the edk2 build process, you will find OVMF.fd at:
-$WORKSPACE/Build/*/*/FV/OVMF.fd
+Update Conf/target.txt TARGET_ARCH based on the .dsc file:
+                             TARGET_ARCH
+* OvmfPkg/OvmfPkgIa32.dsc     IA32
+* OvmfPkg/OvmfPkgIa32X64.dsc  IA32 X64
+* OvmfPkg/OvmfPkgX64.dsc      X64
+
+Following the edk2 build process, you will find the OVMF binaries
+under the $WORKSPACE/Build/*/*/FV directory.  The actual path will
+depend on how your build is configured.  You can expect to find
+these binary outputs:
+* OVMF.fd 
+* CirrusLogic5446.rom
+
+More information on building OVMF can be found at:
+* https://edk2.tianocore.org/build-ovmf.html
 
 === RUNNING OVMF on QEMU ===
 
 * QEMU 0.9.1 or later is required.
 * Either copy, rename or symlink OVMF.fd => bios.bin
+* Either copy, rename or symlink CirrusLogic5446.rom => vgabios-cirrus.bin
 * Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
-* Use the QEMU -L parameter to specify the directory where bios.bin
-  is located.
-* If QEMU returns an error about not finding a video bios, you can
-  try creating an empty copy of the video bios file, or copy the
-  video bios from QEMU's BIOS directory.
+* Use the QEMU -L parameter to specify the directory where the bios.bin
+  and vgabios-cirrus.bin files are located.
 * Optionally you can use the QEMU -serial command to capture the
   OVMF debug messages.  For example: -serial file:serial.log
 * The EFI shell is built into OVMF builds at this time, so it should
