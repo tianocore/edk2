@@ -138,8 +138,6 @@ INF  PcAtChipsetPkg/Bus/Pci/IdeControllerDxe/IdeControllerDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 
-INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
-
 INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
@@ -307,5 +305,10 @@ INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/Bin/ResetVector.inf
 [Rule.Common.SEC.RESET_VECTOR]
   FILE RAW = $(NAMED_GUID) {
     RAW RAW                |.raw
+  }
+
+[OptionRom.CirrusLogic5446]
+INF  OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf {
+    PCI_DEVICE_ID  = 0x00B8
   }
 
