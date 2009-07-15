@@ -72,13 +72,13 @@ typedef struct _EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_PLATFORM_PROTOCOL;
 ///       device that requests the legacy ISA range will get all the legacy ISA
 ///       range plus its aliased addresses forwarded to it.
 ///   - EFI_RESERVE_ISA_IO_NO_ALIAS | EFI_RESERVE_VGA_IO_ALIAS:<BR>
-///       Sets aside the ISA I/O range (0x100–0x3FF) during PCI enumeration
+///       Sets aside the ISA I/O range (0x100 - 0x3FF) during PCI enumeration
 ///       and the aliases of the VGA I/O ranges. By using this selection, the
 ///       platform indicates that it will support VGA devices that require VGA
 ///       ranges, including those that require VGA aliases. The platform further
-///       wants to support non-VGA devices that ask for the ISA range (0x100–
+///       wants to support non-VGA devices that ask for the ISA range (0x100 -
 ///       3FF), but not if it also asks for the ISA aliases. The PCI bus driver will
-///       not allocate I/O addresses out of the legacy ISA I/O range (0x100–
+///       not allocate I/O addresses out of the legacy ISA I/O range (0x100 -
 ///       0x3FF) range or the aliases of the VGA I/O range. If a PCI device
 ///       driver asks for the ISA I/O ranges, including aliases, the request will be
 ///       turned down. The first device that requests the legacy VGA range will
@@ -95,13 +95,13 @@ typedef struct _EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_PLATFORM_PROTOCOL;
 ///       and Windows Server 2003. The PCI enumeration process must be
 ///       cognizant of this restriction.
 ///   - EFI_RESERVE_ISA_IO_NO_ALIAS | EFI_RESERVE_VGA_IO_NO_ALIAS:<BR>
-///       Sets aside the ISA I/O range (0x100–0x3FF) during PCI enumeration.
+///       Sets aside the ISA I/O range (0x100 - 0x3FF) during PCI enumeration.
 ///       VGA I/O ranges are included in the ISA range. By using this selection,
 ///       the platform indicates that it wants to support PCI devices that require
 ///       the ISA range and legacy VGA range, but it does not want to support
 ///       devices that require ISA alias ranges or VGA alias ranges. The PCI
 ///       bus driver will not allocate I/O addresses out of the legacy ISA I/O
-///       range (0x100–0x3FF). If a PCI device driver asks for the ISA I/O
+///       range (0x100-0x3FF). If a PCI device driver asks for the ISA I/O
 ///       ranges, including aliases, the request will be turned down. By using
 ///       this selection, the platform indicates that it will support VGA devices
 ///       that require VGA ranges, but it will not support VGA devices that
