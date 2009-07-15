@@ -42,7 +42,7 @@ EFI_DRIVER_BINDING_PROTOCOL gIDEBusDriverBinding = {
   @param  Handle Handle of device to deregister driver on
 
   @retval EFI_SUCCESS  Deregiter a specific IDE device successfully
-  
+
 
 **/
 EFI_STATUS
@@ -608,9 +608,9 @@ IDEBusDriverBindingStart (
       //
       // Discover device, now!
       //
-      PERF_START (0, "DiscoverIdeDevice", "IDE", 0);
+      PERF_START (NULL, "DiscoverIdeDevice", "IDE", 0);
       Status = DiscoverIdeDevice (IdeBlkIoDevicePtr);
-      PERF_END (0, "DiscoverIdeDevice", "IDE", 0);
+      PERF_END (NULL, "DiscoverIdeDevice", "IDE", 0);
 
       IdeBusDriverPrivateData->HaveScannedDevice[IdeChannel * 2 + IdeDevice]  = TRUE;
       IdeBusDriverPrivateData->DeviceProcessed[IdeChannel * 2 + IdeDevice]    = FALSE;
@@ -849,8 +849,8 @@ IDEBusDriverBindingStart (
     gBS->FreePool (SupportedModes);
   }
 
-  PERF_START (0, "Finish IDE detection", "IDE", 1);
-  PERF_END (0, "Finish IDE detection", "IDE", 0);
+  PERF_START (NULL, "Finish IDE detection", "IDE", 1);
+  PERF_END (NULL, "Finish IDE detection", "IDE", 0);
 
   return EFI_SUCCESS;
 
@@ -1229,7 +1229,7 @@ Done:
 /**
   Flushes all modified data to a physical block devices
 
-  @param  This  Indicates a pointer to the calling context which to sepcify a 
+  @param  This  Indicates a pointer to the calling context which to sepcify a
                 sepcific block device
 
   @retval EFI_SUCCESS   Always return success.
@@ -1384,7 +1384,7 @@ IDEDiskInfoWhichIde (
 }
 
 /**
-  The is an event(generally the event is exitBootService event) call back function. 
+  The is an event(generally the event is exitBootService event) call back function.
   Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
 
   @param  Event   Pointer to this event
@@ -1483,9 +1483,9 @@ ClearInterrupt (
 /**
   The user Entry Point for module IdeBus. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
