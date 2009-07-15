@@ -282,6 +282,7 @@ IScsiExtScsiPassThruGetTargetLun (
   Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
   ConfigNvData  = &Private->Session.ConfigData.NvData;
 
+  SetMem (*Target, TARGET_MAX_BYTES, 0xFF);
   (*Target)[0] = 0;
 
   if (AsciiStrCmp (ConfigNvData->TargetName, (CHAR8 *) DevicePath + sizeof (ISCSI_DEVICE_PATH)) != 0) {
