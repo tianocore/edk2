@@ -271,7 +271,7 @@ EFI_STATUS
  
   @param[in] This  Pointer to the EFI_ISA_ACPI_PROTOCOL instance.
 
-  @retval EFI_SUCCESS   Successfully initialized the ISA interface.
+  @retval EFI_SUCCESS   Successfully initialized all required hardware states.
   @retval Other         The ISA interface could not be initialized.
 
 **/

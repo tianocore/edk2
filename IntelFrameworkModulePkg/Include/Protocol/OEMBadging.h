@@ -53,7 +53,7 @@ typedef enum {
   @param This              Pointer to this protocol instance.
   @param Instance          The visible image instance is found.
   @param Format            Format of the image. Examples: BMP, JPEG.
-  @param ImageData         Image data returned.
+  @param ImageData         Image data for the badge file. Currently only supports the .bmp file format. 
   @param ImageSize         Size of the image returned.
   @param Attribute         Display attributes of the image returned.
   @param CoordinateX       X coordinate of the image.

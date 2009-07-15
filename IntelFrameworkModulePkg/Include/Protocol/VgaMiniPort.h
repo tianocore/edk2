@@ -61,7 +61,7 @@ struct _EFI_VGA_MINI_PORT_PROTOCOL {
   ///
   UINT64                      VgaMemoryOffset;
   ///
-  /// I/O Port address for the VGA CRTC address register  Typically set to 0x3D4.
+  /// I/O Port address for the VGA CRTC address register. Typically set to 0x3D4.
   ///
   UINT64                      CrtcAddressRegisterOffset;
   ///

@@ -109,8 +109,7 @@ BdsLibBootNext (
   );
 
 /**
-  Process the boot option follow the UEFI specification and
-  special treat the legacy boot option with BBS_DEVICE_PATH.
+  Process the boot option according to the UEFI specification. The legacy boot option device path includes BBS_DEVICE_PATH.
 
   @param  Option                 The boot option to be processed
   @param  DevicePath             The device path describing where to load the
@@ -255,7 +254,8 @@ BdsLibLoadDrivers (
 
 
 /**
-  Process BootOrder, or DriverOrder variables, by calling
+  This function processes BootOrder or DriverOrder variables, by calling
+
   BdsLibVariableToOption () for each UINT16 in the variables.
 
   @param  BdsCommonOptionList   The header of the option list base on variable
@@ -384,7 +384,7 @@ BdsLibConnectAll (
   );
 
 /**
-  This function creates all handles associated with every device
+  This function creates all handles associated with the given device
   path node. If the handle associated with one device path node can not
   be created, then it tries to execute the dispatch to load the missing drivers.  
 
@@ -430,7 +430,7 @@ BdsLibDisconnectAllEfi (
 //
 /**
   This function will search every simpletxt device in the current system,
-  and make every simpletxt device as pertantial console device.
+  and make every simpletxt device a potential console device.
 
 **/
 VOID
@@ -671,7 +671,7 @@ BdsUpdateLegacyDevOrder (
   );
 
 /**
-  Set the boot priority for BBS entries based on boot option entry and boot order.
+  Refresh the boot priority for BBS entries based on boot option entry and boot order.
 
   @param  Entry             The boot option is to be checked for refresh BBS table.
   
@@ -686,7 +686,7 @@ BdsRefreshBbsTableForBoot (
   );
 
 /**
-  Deletete the Boot Option from EFI Variable. The Boot Order Arrray
+  Delete the Boot Option from EFI Variable. The Boot Order Arrray
   is also updated.
 
   @param OptionNumber    The number of Boot option want to be deleted.
@@ -849,11 +849,11 @@ MatchPartitionDevicePathNode (
 
 /**
   Expand a device path that starts with a hard drive media device path node to be a
-  full device path that includes the full hardware path to the device. We need
-  to do this so it can be booted. As an optimizaiton the front match (the part point
-  to the partition node. E.g. ACPI() /PCI()/ATA()/Partition() ) is saved in a variable
-  so a connect all is not required on every boot. All successful history device path
-  which point to partition node (the front part) will be saved.
+  full device path that includes the full hardware path to the device. This function enables the device to boot. 
+  To avoid requiring a connect on every boot, the front match is saved in a variable (the part point
+  to the partition node. E.g. ACPI() /PCI()/ATA()/Partition() ).
+  All successful history device paths
+  that point to the front part of the partition node will be saved.
 
   @param  HardDriveDevicePath    EFI Device Path to boot, if it starts with a hard
                                  drive media device path.

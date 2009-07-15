@@ -33,14 +33,13 @@ OemHookStatusCodeInitialize (
 /**
   Report status code to OEM device.
  
-  @param  CodeType      Indicates the type of status code being reported.  Type EFI_STATUS_CODE_TYPE is defined in "Related Definitions" below.
+  @param  CodeType      Indicates the type of status code being reported.  
  
   @param  Value         Describes the current status of a hardware or software entity.  
                         This includes both an operation and classification information about the class and subclass.
                         For progress codes, the operation is the current activity. 
                         For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-                        Type EFI_STATUS_CODE_VALUE is defined in "Related Definitions" below.  
-                        Specific values are discussed in the Intel? Platform Innovation Framework for EFI Status Code Specification.
+                        Specific values are discussed in the Intel Platform Innovation Framework for EFI Status Code Specification.
  
   @param  Instance      The enumeration of a hardware or software entity within the system.  
                         A system may contain multiple entities that match a class/subclass pairing. 
