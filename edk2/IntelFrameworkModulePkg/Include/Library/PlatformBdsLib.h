@@ -92,7 +92,7 @@ PlatformBdsPolicyBehavior (
   );
 
 /**
-  Hook point after a boot attempt fails.
+  Hook point for a user-provided function, for after a boot attempt fails. 
 
   @param  Option                  Pointer to Boot Option that failed to boot.
   @param  Status                  Status returned from failed boot.
