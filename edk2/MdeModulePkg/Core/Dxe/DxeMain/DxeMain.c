@@ -258,8 +258,8 @@ DxeMain (
   // Call constructor for all libraries
   //
   ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
-  PERF_END   (0,"PEI", NULL, 0) ;
-  PERF_START (0,"DXE", NULL, 0) ;
+  PERF_END   (NULL,"PEI", NULL, 0) ;
+  PERF_START (NULL,"DXE", NULL, 0) ;
 
   //
   // Initialize the Global Coherency Domain Services
@@ -360,16 +360,16 @@ DxeMain (
   //
   // Initialize the DXE Dispatcher
   //
-  PERF_START (0,"CoreInitializeDispatcher", "DxeMain", 0) ;
+  PERF_START (NULL,"CoreInitializeDispatcher", "DxeMain", 0) ;
   CoreInitializeDispatcher ();
-  PERF_END (0,"CoreInitializeDispatcher", "DxeMain", 0) ;
+  PERF_END (NULL,"CoreInitializeDispatcher", "DxeMain", 0) ;
 
   //
   // Invoke the DXE Dispatcher
   //
-  PERF_START (0, "CoreDispatcher", "DxeMain", 0);
+  PERF_START (NULL, "CoreDispatcher", "DxeMain", 0);
   CoreDispatcher ();
-  PERF_END (0, "CoreDispatcher", "DxeMain", 0);
+  PERF_END (NULL, "CoreDispatcher", "DxeMain", 0);
 
   //
   // Display Architectural protocols that were not loaded if this is DEBUG build
