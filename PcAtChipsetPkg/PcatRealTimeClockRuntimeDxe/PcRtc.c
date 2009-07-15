@@ -108,7 +108,6 @@ PcRtcInit (
   //
   // Acquire RTC Lock to make access to RTC atomic
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiAcquireLock (&Global->RtcLock);
   }
@@ -142,7 +141,6 @@ PcRtcInit (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-    //Code here doesn't consider the runtime environment.
     if (!EfiAtRuntime ()) {
       EfiReleaseLock (&Global->RtcLock);
     }
@@ -169,11 +167,30 @@ PcRtcInit (
   //
   // Release RTC Lock.
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
   }
  
+  //
+  // Get the data of Daylight saving and time zone, if they have been
+  // stored in NV variable during previous boot.
+  //
+  DataSize = sizeof (UINT32);
+  Status = EfiGetVariable (
+             L"RTC",
+             &gEfiCallerIdGuid,
+             NULL,
+             &DataSize,
+             (VOID *) &TimerVar
+             );
+  if (!EFI_ERROR (Status)) {
+    Time.TimeZone = (INT16) TimerVar;
+    Time.Daylight = (UINT8) (TimerVar >> 16);
+  } else {
+    Time.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
+    Time.Daylight = 0;  
+  }
+
   //
   // Validate time fields
   //
@@ -189,25 +206,7 @@ PcRtcInit (
     Time.Month  = RTC_INIT_MONTH;
     Time.Year   = RTC_INIT_YEAR;
   }
-  //
-  // Get the data of Daylight saving and time zone, if they have been
-  // stored in NV variable during previous boot.
-  //
-  DataSize = sizeof (UINT32);
-  Status = EfiGetVariable (
-             L"RTC",
-             &gEfiCallerIdGuid,
-             NULL,
-             &DataSize,
-             (VOID *) &TimerVar
-             );
-  if (!EFI_ERROR (Status)) {
-    Global->SavedTimeZone = (INT16) TimerVar;
-    Global->Daylight      = (UINT8) (TimerVar >> 16);
 
-    Time.TimeZone = Global->SavedTimeZone;
-    Time.Daylight = Global->Daylight;
-  }
   //
   // Reset time value according to new RTC configuration
   //
@@ -251,7 +250,6 @@ PcRtcGetTime (
   //
   // Acquire RTC Lock to make access to RTC atomic
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiAcquireLock (&Global->RtcLock);
   }
@@ -260,7 +258,6 @@ PcRtcGetTime (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-      //Code here doesn't consider the runtime environment.
       if (!EfiAtRuntime ()) {
         EfiReleaseLock (&Global->RtcLock);
       }
@@ -286,10 +283,10 @@ PcRtcGetTime (
   //
   // Release RTC Lock.
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
   }
+
   //
   // Get the variable that contains the TimeZone and Daylight fields
   //
@@ -306,6 +303,7 @@ PcRtcGetTime (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
+
   //
   //  Fill in Capabilities if it was passed in
   //
@@ -363,7 +361,6 @@ PcRtcSetTime (
   //
   // Acquire RTC Lock to make access to RTC atomic
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiAcquireLock (&Global->RtcLock);
   }
@@ -372,7 +369,6 @@ PcRtcSetTime (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-     //Code here doesn't consider the runtime environment.
      if (!EfiAtRuntime ()) {
        EfiReleaseLock (&Global->RtcLock);
      }
@@ -404,7 +400,6 @@ PcRtcSetTime (
   //
   // Release RTC Lock.
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
   }
@@ -467,7 +462,6 @@ PcRtcGetWakeupTime (
   //
   // Acquire RTC Lock to make access to RTC atomic
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiAcquireLock (&Global->RtcLock);
   }
@@ -476,7 +470,6 @@ PcRtcGetWakeupTime (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-    //Code here doesn't consider the runtime environment.
     if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
     }
@@ -513,10 +506,16 @@ PcRtcGetWakeupTime (
   //
   // Release RTC Lock.
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
   }
+
+  //
+  // Get the variable that contains the TimeZone and Daylight fields
+  //
+  Time->TimeZone  = Global->SavedTimeZone;
+  Time->Daylight  = Global->Daylight;
+
   //
   // Make sure all field values are in correct range
   //
@@ -593,7 +592,6 @@ PcRtcSetWakeupTime (
   //
   // Acquire RTC Lock to make access to RTC atomic
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiAcquireLock (&Global->RtcLock);
   }
@@ -602,7 +600,6 @@ PcRtcSetWakeupTime (
   //
   Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
   if (EFI_ERROR (Status)) {
-    //Code here doesn't consider the runtime environment.
     if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
     }
@@ -640,7 +637,6 @@ PcRtcSetWakeupTime (
   //
   // Release RTC Lock.
   //
-  //Code here doesn't consider the runtime environment.
   if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
   }
@@ -739,8 +735,6 @@ ConvertRtcTimeToEfiTime (
   }
 
   Time->Nanosecond  = 0;
-  Time->TimeZone    = EFI_UNSPECIFIED_TIMEZONE;
-  Time->Daylight    = 0;
 
   return EFI_SUCCESS;
 }
@@ -806,16 +800,14 @@ RtcTimeFieldsValid (
       Time->Year > 2099 ||
       Time->Month < 1 ||
       Time->Month > 12 ||
+      (!DayValid (Time)) ||
       Time->Hour > 23 ||
       Time->Minute > 59 ||
       Time->Second > 59 ||
       Time->Nanosecond > 999999999 ||
       (!(Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE || (Time->TimeZone >= -1440 && Time->TimeZone <= 1440))) ||
-      ((Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT))) != 0)
-      ) {
-    if (!DayValid (Time)) {
-      return EFI_INVALID_PARAMETER;
-    }
+      ((Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT))) != 0)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   return EFI_SUCCESS;
