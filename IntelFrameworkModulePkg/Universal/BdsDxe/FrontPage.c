@@ -56,7 +56,7 @@ HII_VENDOR_DEVICE_PATH  mFrontPageHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -205,7 +205,7 @@ FrontPageCallback (
     //
     Lang = AllocatePool (AsciiStrSize (LanguageString));
     ASSERT (Lang != NULL);
-    
+
     Index = 0;
     LangCode = LanguageString;
     while (*LangCode != 0) {
@@ -226,7 +226,7 @@ FrontPageCallback (
                                      );
       ASSERT (PlatformSupportedLanguages != NULL);
     }
-    
+
     //
     // Select the best language in platform supported Language.
     //
@@ -437,7 +437,7 @@ InitializeFrontPage (
   OptionCount = 0;
   LangCode    = LanguageString;
   FirstFlag   = FALSE;
-  
+
   if (gFrontPagePrivate.LanguageToken == NULL) {
     while (*LangCode != 0) {
       GetNextLanguage (&LangCode, Lang);
@@ -877,7 +877,7 @@ ShowProgress (
   }
 
   DEBUG ((EFI_D_INFO, "\n\nStart showing progress bar... Press any key to stop it! ...Zzz....\n"));
-  
+
   SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
   SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
   SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
@@ -893,7 +893,7 @@ ShowProgress (
   TimeoutRemain = TimeoutDefault;
   while (TimeoutRemain != 0) {
     DEBUG ((EFI_D_INFO, "Showing progress bar...Remaining %d second!\n", TimeoutRemain));
-    
+
     Status = WaitForSingleEvent (gST->ConIn->WaitForKey, ONE_SECOND);
     if (Status != EFI_TIMEOUT) {
       break;
@@ -961,7 +961,7 @@ PlatformBdsEnterFrontPage (
 {
   EFI_STATUS                    Status;
 
-  PERF_START (0, "BdsTimeOut", "BDS", 0);
+  PERF_START (NULL, "BdsTimeOut", "BDS", 0);
   //
   // Indicate if we need connect all in the platform setup
   //
@@ -1072,5 +1072,5 @@ Exit:
   // Note: The following lines of code only execute when Auto boot
   // takes affect
   //
-  PERF_END (0, "BdsTimeOut", "BDS", 0);
+  PERF_END (NULL, "BdsTimeOut", "BDS", 0);
 }
