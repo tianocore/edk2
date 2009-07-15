@@ -343,11 +343,11 @@ CallFormCallBack (
     }
 
     *Data = AllocateZeroPool (*DataSize);
-    if (Data == NULL) {
+    if (*Data == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    FwFormCallBack->NvRead (
+    Status = FwFormCallBack->NvRead (
                   FwFormCallBack,  
                   BufferStorage->Name,
                   &BufferStorage->Guid,
@@ -403,7 +403,7 @@ GetUefiVariable (
     }
 
     *Data = AllocateZeroPool (*DataSize);
-    if (Data == NULL) {
+    if (*Data == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -611,7 +611,7 @@ ThunkRouteConfig (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-
+  
   if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
     if (ConfigAccess->FormCallbackProtocol == NULL ||
         ConfigAccess->FormCallbackProtocol->NvWrite == NULL) {

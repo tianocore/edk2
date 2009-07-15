@@ -665,19 +665,7 @@ GetFormsetDefaultVarstoreId (
 
   if (FormSet->DefaultVarStoreId == 0) {
     DEBUG ((EFI_D_INFO, "FormSet %g: No Varstore Found\n", &FormSet->Guid));
-  } else {
-    //    The name of default VARSTORE with a Explicit declaration statement will be updated to L"Setup" to make sure
-    //    the Framework HII Setup module will run correctly. Framework HII Setup module always assumed that default
-    //    VARSTORE to have L"Setup" as name, Formset GUID as GUID. 
-
-    DEBUG ((EFI_D_INFO, "FormSet %g: Default Varstore ID (0x%x) N(%s) G(%g)\n", &FormSet->Guid, FormSet->DefaultVarStoreId, DefaultStorage->Name, &DefaultStorage->Guid));
-
-    if (StrCmp (DefaultStorage->Name, FrameworkReservedVarstoreName) != 0) {
-      DEBUG ((EFI_D_INFO, "          : Name is updated from %s to %s.\n", DefaultStorage->Name, FrameworkReservedVarstoreName));
-      FormSet->OriginalDefaultVarStoreName = DefaultStorage->Name;
-      DefaultStorage->Name = AllocateCopyPool (StrSize (FrameworkReservedVarstoreName), FrameworkReservedVarstoreName);
-    }
-  }
+  } 
   
   return;
 }
