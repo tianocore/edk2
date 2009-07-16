@@ -201,6 +201,7 @@ CallBootManager (
   VOID                        *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
+  CHAR16                      *HiiString;
   CHAR16                      *BootStringNumber;
   UINTN                       DevicePathType;
 
@@ -271,47 +272,58 @@ CallBootManager (
     BootStringNumber = NULL;
     
     DevicePathType = BdsGetBootTypeFromDevicePath (Option->DevicePath);
-    
+
     //
     // store number string of boot option temporary.
     //
-    
+    HiiString = NULL;
     switch (DevicePathType) {
     case BDS_EFI_ACPI_FLOPPY_BOOT:
-      BootStringNumber = Option->Description;
-      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY));
+      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY));
       break;
     case BDS_EFI_MEDIA_CDROM_BOOT:
-      BootStringNumber = Option->Description;
-      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_DVD));
+    case BDS_EFI_MESSAGE_SATA_BOOT:
+    case BDS_EFI_MESSAGE_ATAPI_BOOT:
+      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_DVD));
       break;
     case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
-      BootStringNumber = Option->Description;
-      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_USB));
+      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_USB));
       break;
     case BDS_EFI_MESSAGE_SCSI_BOOT:
-      BootStringNumber = Option->Description;
-      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI));
+      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI));
       break;
     case BDS_EFI_MESSAGE_MISC_BOOT:
-      BootStringNumber = Option->Description;
-      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC));
+      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC));
       break;
     case BDS_EFI_MESSAGE_MAC_BOOT:
-      BootStringNumber = Option->Description;
-      Option->Description = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK));
+      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK));
       break;
+    case BBS_DEVICE_PATH:
+      //
+      // Do nothing for legacy boot option.
+      //
+      break;
+    default:
+      DEBUG((EFI_D_INFO, "Can not find HiiString for given device path type 0x%x\n", DevicePathType));
     }
-    
-    ASSERT (Option->Description != NULL);
-    if (BootStringNumber != NULL) {
+
+    //
+    // If found Hii description string then cat Hii string with original description.
+    //
+    if (HiiString != NULL) {
+      BootStringNumber = Option->Description;
+      Option->Description = AllocateZeroPool(StrSize(BootStringNumber) + StrSize(HiiString));
+      StrCpy (Option->Description, HiiString);
       if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
         StrCat (Option->Description, L" ");
         StrCat (Option->Description, BootStringNumber);
-      }
+      } 
       
+      FreePool (HiiString);
       FreePool (BootStringNumber);
     }
+    
+    ASSERT (Option->Description != NULL);
     
     Token = HiiSetString (HiiHandle, 0, Option->Description, NULL);
 
