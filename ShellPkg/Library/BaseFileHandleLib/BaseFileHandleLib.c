@@ -541,14 +541,6 @@ FileHandleFindNextFile(
   ASSERT (DirHandle != NULL);
   ASSERT (Buffer    != NULL);
   ASSERT (NoFile    != NULL);
-  
-  //
-  // verify that DirHandle is a directory
-  //
-  Status = FileHandleIsDirectory(DirHandle);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  } 
 
   //
   // This BufferSize MUST stay equal to the originally allocated one in GetFirstFile
@@ -698,7 +690,7 @@ StrnCatGrowLeft (
   // Append all of Source?
   //
   if (Count == 0) {
-    Count = StrLen(Source);
+    Count = StrSize(Source);
   }
 
   //
@@ -706,18 +698,18 @@ StrnCatGrowLeft (
   //
   if (CurrentSize != NULL) {
     NewSize = *CurrentSize;
-    while (NewSize < (DestinationStartSize + (Count*sizeof(CHAR16)))) {
-      NewSize += 2 * Count * sizeof(CHAR16);
+    while (NewSize < (DestinationStartSize + Count)) {
+      NewSize += 2 * Count;
     }
     *Destination = ReallocatePool(*CurrentSize, NewSize, *Destination);
     *CurrentSize = NewSize;
   } else {
-    *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
+    *Destination = AllocateZeroPool(Count+sizeof(CHAR16));
   }
 
   CopySize = StrSize(*Destination);
-  *Destination = CopyMem((*Destination)+StrLen(Source), *Destination, CopySize);
-  *Destination = CopyMem(*Destination, Source, StrLen(Source));
+  *Destination = CopyMem(*Destination+Count-sizeof(CHAR16), *Destination, CopySize);
+  *Destination = CopyMem(*Destination, Source, Count);
   return (*Destination);
 }
 
@@ -749,7 +741,6 @@ FileHandleGetFileName (
   EFI_FILE_INFO   *FileInfo;
 
   Size = 0;
-  *FullFileName = NULL;
 
   //
   // Check our parameters
@@ -757,6 +748,8 @@ FileHandleGetFileName (
   if (FullFileName == NULL || Handle == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
+
+  *FullFileName = NULL;
 
   Status = Handle->Open(Handle, &CurrentHandle, L".", EFI_FILE_MODE_READ, 0);
   if (!EFI_ERROR(Status)) {
@@ -773,12 +766,12 @@ FileHandleGetFileName (
         // We got info... do we have a name? if yes preceed the current path with it...
         //
         if (StrLen (FileInfo->FileName) == 0) {
-          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
+          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"/", 0);
           FreePool(FileInfo);
           break;
         } else {
           *FullFileName = StrnCatGrowLeft(FullFileName, &Size, FileInfo->FileName, 0);
-          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
+          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"/", 0);
           FreePool(FileInfo);
         }
       }
