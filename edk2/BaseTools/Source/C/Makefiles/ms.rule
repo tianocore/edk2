@@ -1,0 +1,13 @@
+#DEPFILES = $(OBJECTS:%.o=%.d)
+
+.c.obj :
+	$(CC) -c $(CFLAGS) $(INC) $< -Fo$@
+
+.S.obj :
+	$(AS) -c $(ASFLAGS) $< -Fo$@
+
+.cpp.obj :
+	$(CXX) -c $(CPPFLAGS) $(INC) $< -Fo$@
+
+#-include $(DEPFILES)
+
