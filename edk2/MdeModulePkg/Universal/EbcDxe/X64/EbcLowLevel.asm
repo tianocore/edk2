@@ -92,6 +92,7 @@ EbcLLCALLEXNative    ENDP
 ;     The contents of the register in which the entry point is passed.
 ;
 EbcLLGetEbcEntryPoint        PROC    PUBLIC
+    mov  rax, r10
     ret
 EbcLLGetEbcEntryPoint    ENDP
 

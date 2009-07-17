@@ -412,14 +412,14 @@ EbcCreateThunks (
 
   //
   // Add code bytes to load up a processor register with the EBC entry point.
-  // mov rax, 123456789abcdef0h  => 48 B8 F0 DE BC 9A 78 56 34 12
+  // mov r10, 123456789abcdef0h  => 48 B8 F0 DE BC 9A 78 56 34 12
   // The first 8 bytes of the thunk entry is the address of the EBC
   // entry point.
   //
-  *Ptr = 0x48;
+  *Ptr = 0x49;
   Ptr++;
   Size--;
-  *Ptr = 0xB8;
+  *Ptr = 0xBA;
   Ptr++;
   Size--;
   Addr = (UINT64) EbcEntryPoint;
