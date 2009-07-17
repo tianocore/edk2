@@ -1113,8 +1113,6 @@ PxeBcDiscvBootService (
   EFI_DHCP4_HEADER                    *DhcpHeader;
   UINT32                              Xid;
 
-  ASSERT (IsDiscv && (Layer != NULL));
-
   Mode      = Private->PxeBc.Mode;
   Dhcp4     = Private->Dhcp4;
   Status    = EFI_SUCCESS;
@@ -1136,6 +1134,7 @@ PxeBcDiscvBootService (
   OptCount = PxeBcBuildDhcpOptions (Private, OptList, FALSE);
 
   if (IsDiscv) {
+    ASSERT (Layer != NULL);
     //
     // Add vendor option of PXE_BOOT_ITEM
     //
