@@ -623,14 +623,12 @@ vfrStatementVarStoreLinear :
                                                                                   TypeName,
                                                                                   VarStoreId
                                                                                   ), LineNum);
-                                                    >>
-                                                    <<
                                                        VSObj.SetGuid (&Guid);
                                                        _PCATCH(mCVfrDataStorage.GetVarStoreId(StoreName, &VarStoreId), SN);
                                                        VSObj.SetVarStoreId (VarStoreId);
                                                        _PCATCH(gCVfrVarDataTypeDB.GetDataTypeSize(TypeName, &Size), LineNum);
                                                        VSObj.SetSize (Size);
-                                                       VSObj.SetName (StoreName);
+                                                       VSObj.SetName (SN->getText());
                                                     >>
   ";"
   ;
