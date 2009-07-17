@@ -622,12 +622,10 @@ GetFormsetDefaultVarstoreId (
 {
   LIST_ENTRY             *StorageList;
   FORMSET_STORAGE        *Storage;
-  FORMSET_STORAGE        *DefaultStorage;
 
   //
   // VarStoreId 0 is invalid in UEFI IFR.
   //
-  DefaultStorage= NULL;
   FormSet->DefaultVarStoreId = 0;
   StorageList = GetFirstNode (&FormSet->StorageListHead);
 
@@ -641,7 +639,6 @@ GetFormsetDefaultVarstoreId (
       // 1) If VarStore ID of FRAMEWORK_RESERVED_VARSTORE_ID (0x01) is found, Var Store ID is used.
       //
       FormSet->DefaultVarStoreId = FRAMEWORK_RESERVED_VARSTORE_ID;
-      DefaultStorage = Storage;
       break;
     }
 
@@ -658,7 +655,6 @@ GetFormsetDefaultVarstoreId (
     if (!IsNull (&FormSet->StorageListHead, StorageList)) {
       Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
       FormSet->DefaultVarStoreId = Storage->VarStoreId;
-      DefaultStorage = Storage;
     }
     
   }
