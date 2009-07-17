@@ -1,0 +1,20 @@
+!INCLUDE ..\Makefiles\ms.common
+
+LIBRARY = $(LIB_PATH)\$(LIBNAME).lib
+
+all: $(LIBRARY)
+
+$(LIBRARY) : $(OBJECTS)
+	-@if not exist $(LIB_PATH) mkdir $(LIB_PATH)
+	$(AR) /nologo /out:$@ $**
+
+.PHONY:clean
+clean:
+	del /f /q $(OBJECTS) *.pdb > nul
+
+.PHONY:cleanall
+cleanall:
+	del /f /q $(OBJECTS) $(LIBRARY) *.pdb > nul
+
+!INCLUDE ..\Makefiles\ms.rule
+

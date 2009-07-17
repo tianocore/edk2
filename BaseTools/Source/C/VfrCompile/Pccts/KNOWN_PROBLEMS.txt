@@ -1,0 +1,241 @@
+
+    =======================================================
+    Known Problems In PCCTS - Last revised 14 November 1998
+    =======================================================
+
+#17. The dlg fix for handling characters up to 255 is incorrect.
+
+    See item #207.
+
+    Reported by Frank Hartmann.
+        
+#16. A note about "&&" predicates (Mike Dimmick)
+
+    Mike Dimmick has pointed out a potential pitfall in the use of the
+    "&&" style predicate.  Consider:
+    
+         r0: (g)? => <<P>>?  r1
+             | ...
+             ;
+         r1: A | B;
+         
+    If the context guard g is not a subset of the lookahead context for r1
+    (in other words g is neither A nor B) then the code may execute r1 
+    even when the lookahead context is not satisfied.  This is an error
+    by the person coding the grammer, and the error should be reported to
+    the user, but it isn't. expect.  Some examples I've run seem to
+    indicate that such an error actually results in the rule becoming
+    unreachable.
+    
+    When g is properly coded the code is correct, the problem is when g
+    is not properly coded.
+    
+    A second problem reported by Mike Dimmick is that the test for a
+    failed validation predicate is equivalent to a test on the predicate
+    along.  In other words, if the "&&" has not been hoisted then it may
+    falsely report a validation error.
+
+#15. (Changed in MR23) Warning for LT(i), LATEXT(i) in token match actions
+
+    An bug (or at least an oddity) is that a reference to LT(1), LA(1),
+    or LATEXT(1) in an action which immediately follows a token match
+    in a rule refers to the token matched, not the token which is in
+    the lookahead buffer.  Consider:
+
+        r : abc <<action alpha>> D <<action beta>> E;
+
+    In this case LT(1) in action alpha will refer to the next token in
+    the lookahead buffer ("D"), but LT(1) in action beta will refer to
+    the token matched by D - the preceding token.
+
+    A warning has been added which warns users about this when an action
+    following a token match contains a reference to LT(1), LA(1), or LATEXT(1).
+
+    This behavior should be changed, but it appears in too many programs
+    now.  Another problem, perhaps more significant, is that the obvious
+    fix (moving the consume() call to before the action) could change the 
+    order in which input is requested and output appears in existing programs.
+
+    This problem was reported, along with a fix by Benjamin Mandel
+    (beny@sd.co.il).  However, I felt that changing the behavior was too
+    dangerous for existing code.
+
+#14. Parsing bug in dlg
+
+    THM: I have been unable to reproduce this problem.
+
+    Reported by Rick Howard Mijenix Corporation (rickh@mijenix.com).
+
+    The regular expression parser (in rexpr.c) fails while
+    trying to parse the following regular expression:
+
+            {[a-zA-Z]:}(\\\\[a-zA-Z0-9]*)+
+
+    See my comment in the following excerpt from rexpr.c:
+
+    /*
+     * <regExpr>        ::= <andExpr> ( '|' {<andExpr>} )*
+     *
+     * Return -1 if syntax error
+     * Return  0 if none found
+     * Return  1 if a regExrp was found
+     */
+	static
+	regExpr(g)
+	GraphPtr g;
+	{
+	    Graph g1, g2;
+	
+	    if ( andExpr(&g1) == -1 )
+	    {
+	        return -1;
+	    }
+	
+	    while ( token == '|' )
+	    {
+	        int a;
+	        next();
+	        a = andExpr(&g2);
+	        if ( a == -1 ) return -1;   /* syntax error below */
+	        else if ( !a ) return 1;    /* empty alternative */
+	        g1 = BuildNFA_AorB(g1, g2);
+	    }
+	
+	    if ( token!='\0' ) return -1;
+	*****
+	***** It appears to fail here becuause token is 125 - the closing '}'
+	***** If I change it to:
+	*****    if ( token!='\0' && token!='}' && token!= ')' ) return -1;
+	*****
+	***** It succeeds, but I'm not sure this is the corrrect approach.
+	*****
+	    *g = g1;
+	    return 1;
+	}
+
+#13. dlg reports an invalid range for: [\0x00-\0xff]
+
+    Diagnosed by Piotr Eljasiak (eljasiak@no-spam.zt.gdansk.tpsa.pl):
+
+    Fixed in MR16.
+
+#12. Strings containing comment actions
+
+     Sequences that looked like C style comments appearing in string
+     literals are improperly parsed by antlr/dlg.
+
+        << fprintf(out," /* obsolete */ ");
+
+     For this case use:
+
+        << fprintf(out," \/\* obsolete \*\/ ");
+
+     Reported by K.J. Cummings (cummings@peritus.com).
+
+#11. User hook for deallocation of variables on guess fail
+
+     The mechanism outlined in Item #108 works only for
+     heap allocated variables.
+
+#10. Label re-initialization in ( X {y:Y} )*
+
+     If a label assignment is optional and appears in a
+     (...)* or (...)+ block it will not be reset to NULL
+     when it is skipped by a subsequent iteration.
+
+     Consider the example:
+
+            ( X { y:Y })* Z
+
+     with input:
+
+            X Y X Z
+
+     The first time through the block Y will be matched and
+     y will be set to point to the token.  On the second
+     iteration of the (...)* block there is no match for Y.
+     But y will not be reset to NULL, as the user might
+     expect, it will contain a reference to the Y that was
+     matched in the first iteration.
+
+     The work-around is to manually reset y:
+
+            ( X << y = NULL; >> { y:Y } )* Z
+
+        or
+
+            ( X ( y:Y | << y = NULL; >> /* epsilon */ ) )* Z
+
+     Reported by Jeff Vincent (JVincent@novell.com).
+
+#9. PCCTAST.h PCCTSAST::setType() is a noop
+
+#8. #tokdefs with ~Token and .
+
+    THM: I have been unable to reproduce this problem.
+
+    When antlr uses #tokdefs to define tokens the fields of
+    #errclass and #tokclass do not get properly defined.
+    When it subsequently attempts to take the complement of
+    the set of tokens (using ~Token or .) it can refer to
+    tokens which don't have names, generating a fatal error.
+
+#7. DLG crashes on some invalid inputs
+
+    THM:  In MR20 have fixed the most common cases.
+
+    The following token defintion will cause DLG to crash.
+
+        #token "()"
+
+    Reported by  Mengue Olivier (dolmen@bigfoot.com).
+
+#6. On MS systems \n\r is treated as two new lines
+
+    Fixed.
+
+#5. Token expressions in #tokclass
+
+    #errclass does not support TOK1..TOK2 or ~TOK syntax.
+    #tokclass does not support ~TOKEN syntax
+
+    A workaround for #errclass TOK1..TOK2 is to use a
+    #tokclass.
+
+    Reported by Dave Watola (dwatola@amtsun.jpl.nasa.gov)
+
+#4. A #tokdef must appear "early" in the grammar file.
+
+    The "early" section of the grammar file is the only
+    place where the following directives may appear:
+
+        #header
+        #first
+        #tokdefs
+        #parser
+
+    Any other kind of statement signifiies the end of the
+    "early" section.
+
+#3. Use of PURIFY macro for C++ mode
+
+    Item #93 of the CHANGES_FROM_1.33 describes the use of
+    the PURIFY macro to zero arguments to be passed by
+    upward inheritance.
+
+        #define PURIFY(r, s) memset((char *) &(r), '\0', (s));
+
+    This may not be the right thing to do for C++ objects that
+    have constructors.  Reported by Bonny Rais (bonny@werple.net.au).
+
+    For those cases one should #define PURIFY to be an empty macro
+    in the #header or #first actions.
+
+#2. Fixed in 1.33MR10 - See CHANGES_FROM_1.33 Item #80.
+
+#1. The quality of support for systems with 8.3 file names leaves
+    much to be desired.  Since the kit is distributed using the
+    long file names and the make file uses long file names it requires
+    some effort to generate.  This will probably not be changed due
+    to the large number of systems already written using the long
+    file names.
