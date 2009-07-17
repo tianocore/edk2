@@ -1669,21 +1669,21 @@ CVfrDataStorage::GetVarStoreType (
   }
 
   for (pNode = mBufferVarStoreList; pNode != NULL; pNode = pNode->mNext) {
-    if (strcmp (pNode->mVarStoreName, StoreName) == NULL) {
+    if (strcmp (pNode->mVarStoreName, StoreName) == 0) {
       VarStoreType = pNode->mVarStoreType;
       return VFR_RETURN_SUCCESS;
     }
   }
 
   for (pNode = mEfiVarStoreList; pNode != NULL; pNode = pNode->mNext) {
-    if (strcmp (pNode->mVarStoreName, StoreName) == NULL) {
+    if (strcmp (pNode->mVarStoreName, StoreName) == 0) {
       VarStoreType = pNode->mVarStoreType;
       return VFR_RETURN_SUCCESS;
     }
   }
 
   for (pNode = mNameVarStoreList; pNode != NULL; pNode = pNode->mNext) {
-    if (strcmp (pNode->mVarStoreName, StoreName) == NULL) {
+    if (strcmp (pNode->mVarStoreName, StoreName) == 0) {
       VarStoreType = pNode->mVarStoreType;
       return VFR_RETURN_SUCCESS;
     }
