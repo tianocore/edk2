@@ -33,34 +33,36 @@
 #define _STATUS_CODE_H_
 
 #include <Protocol/DebugSupport.h>
-//
-// Section 1
-// Class definitions
-// Values of 4-127 are reserved for future use by this
-// specification.
-// Values in the range 127-255 are reserved for OEM use.
-//
+///
+/// Section 1
+/// Class definitions
+/// Values of 4-127 are reserved for future use by this
+/// specification.
+/// Values in the range 127-255 are reserved for OEM use.
+///@{
 #define EFI_COMPUTING_UNIT  0x00000000
 #define EFI_PERIPHERAL      0x01000000
 #define EFI_IO_BUS          0x02000000
 #define EFI_SOFTWARE        0x03000000
+///@}
 
-//
-// General partitioning scheme for Progress and Error Codes are
-// 0x0000-0x0FFF  - Shared by all sub-classes in a given class
-// 0x1000-0x7FFF  - Subclass Specific
-// 0x8000-0xFFFF  - OEM specific
-//
+///
+/// General partitioning scheme for Progress and Error Codes are
+/// 0x0000-0x0FFF  - Shared by all sub-classes in a given class
+/// 0x1000-0x7FFF  - Subclass Specific
+/// 0x8000-0xFFFF  - OEM specific
+///@{
 #define EFI_SUBCLASS_SPECIFIC 0x1000
 #define EFI_OEM_SPECIFIC      0x8000
+///@}
 
-// 
-// Section 2
-// Computing Unit Subclass definitions.
-// Values of 8-127 are reserved for future use by this
-// specification.
-// Values of 128-255 are reserved for OEM use.
-//
+/// 
+/// Section 2
+/// Computing Unit Subclass definitions.
+/// Values of 8-127 are reserved for future use by this
+/// specification.
+/// Values of 128-255 are reserved for OEM use.
+///@{
 #define EFI_COMPUTING_UNIT_UNSPECIFIED        (EFI_COMPUTING_UNIT | 0x00000000)
 #define EFI_COMPUTING_UNIT_HOST_PROCESSOR     (EFI_COMPUTING_UNIT | 0x00010000)
 #define EFI_COMPUTING_UNIT_FIRMWARE_PROCESSOR (EFI_COMPUTING_UNIT | 0x00020000)
@@ -68,17 +70,19 @@
 #define EFI_COMPUTING_UNIT_CACHE              (EFI_COMPUTING_UNIT | 0x00040000)
 #define EFI_COMPUTING_UNIT_MEMORY             (EFI_COMPUTING_UNIT | 0x00050000)
 #define EFI_COMPUTING_UNIT_CHIPSET            (EFI_COMPUTING_UNIT | 0x00060000)
+///@}
 
-//
-// Computing Unit Class Progress Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// Computing Unit Class Progress Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_CU_PC_INIT_BEGIN  0x00000000
 #define EFI_CU_PC_INIT_END    0x00000001
+///@}
 
-//
-// The reason that the processor was disabled.
-//
+///
+/// The reason that the processor was disabled.
+///@{
 #define EFI_CPU_CAUSE_NOT_DISABLED              0x0000
 #define EFI_CPU_CAUSE_INTERNAL_ERROR            0x0001
 #define EFI_CPU_CAUSE_THERMAL_ERROR             0x0002
@@ -89,14 +93,15 @@
 #define EFI_CPU_CAUSE_USER_SELECTION            0x0080
 #define EFI_CPU_CAUSE_BY_ASSOCIATION            0x0100
 #define EFI_CPU_CAUSE_UNSPECIFIED               0x8000
+///@}
 
 typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // Computing Unit Unspecified Subclass Progress Code definitions.
 //
-//
-// Computing Unit Host Processor Subclass Progress Code definitions.
-//
+///
+/// Computing Unit Host Processor Subclass Progress Code definitions.
+///@{
 #define EFI_CU_HP_PC_POWER_ON_INIT          (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_CU_HP_PC_CACHE_INIT             (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_CU_HP_PC_RAM_INIT               (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -106,6 +111,7 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_CU_HP_PC_BSP_RESELECT           (EFI_SUBCLASS_SPECIFIC | 0x00000006)
 #define EFI_CU_HP_PC_AP_INIT                (EFI_SUBCLASS_SPECIFIC | 0x00000007)
 #define EFI_CU_HP_PC_SMM_INIT               (EFI_SUBCLASS_SPECIFIC | 0x00000008)
+///@}
 
 //
 // Computing Unit Firmware Processor Subclass Progress Code definitions.
@@ -113,15 +119,16 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // Computing Unit IO Processor Subclass Progress Code definitions.
 //
-//
-// Computing Unit Cache Subclass Progress Code definitions.
-//
+///
+/// Computing Unit Cache Subclass Progress Code definitions.
+///@{
 #define EFI_CU_CACHE_PC_PRESENCE_DETECT (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_CU_CACHE_PC_CONFIGURATION   (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
-//
-// Computing Unit Memory Subclass Progress Code definitions.
-//
+///
+/// Computing Unit Memory Subclass Progress Code definitions.
+///@{
 #define EFI_CU_MEMORY_PC_SPD_READ         (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_CU_MEMORY_PC_PRESENCE_DETECT  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_CU_MEMORY_PC_TIMING           (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -129,26 +136,28 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_CU_MEMORY_PC_OPTIMIZING       (EFI_SUBCLASS_SPECIFIC | 0x00000004)
 #define EFI_CU_MEMORY_PC_INIT             (EFI_SUBCLASS_SPECIFIC | 0x00000005)
 #define EFI_CU_MEMORY_PC_TEST             (EFI_SUBCLASS_SPECIFIC | 0x00000006)
+///@}
 
 //
 // Computing Unit Chipset Subclass Progress Code definitions.
 //
-//
-// Computing Unit Class Error Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// Computing Unit Class Error Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_CU_EC_NON_SPECIFIC    0x00000000
 #define EFI_CU_EC_DISABLED        0x00000001
 #define EFI_CU_EC_NOT_SUPPORTED   0x00000002
 #define EFI_CU_EC_NOT_DETECTED    0x00000003
 #define EFI_CU_EC_NOT_CONFIGURED  0x00000004
+///@}
 
 //
 // Computing Unit Unspecified Subclass Error Code definitions.
 //
-//
-// Computing Unit Host Processor Subclass Error Code definitions.
-//
+///
+/// Computing Unit Host Processor Subclass Error Code definitions.
+///@{
 #define EFI_CU_HP_EC_INVALID_TYPE         (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_CU_HP_EC_INVALID_SPEED        (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_CU_HP_EC_MISMATCH             (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -163,28 +172,31 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_CU_HP_EC_CORRECTABLE          (EFI_SUBCLASS_SPECIFIC | 0x0000000B)
 #define EFI_CU_HP_EC_UNCORRECTABLE        (EFI_SUBCLASS_SPECIFIC | 0x0000000C)
 #define EFI_CU_HP_EC_NO_MICROCODE_UPDATE  (EFI_SUBCLASS_SPECIFIC | 0x0000000D)
+///@}
 
-//
-// Computing Unit Firmware Processor Subclass Error Code definitions.
-//
+///
+/// Computing Unit Firmware Processor Subclass Error Code definitions.
+///@{
 #define EFI_CU_FP_EC_HARD_FAIL  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_CU_FP_EC_SOFT_FAIL  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_CU_FP_EC_COMM_ERROR (EFI_SUBCLASS_SPECIFIC | 0x00000002)
+///@}
 
 //
 // Computing Unit IO Processor Subclass Error Code definitions.
 //
-//
-// Computing Unit Cache Subclass Error Code definitions.
-//
+///
+/// Computing Unit Cache Subclass Error Code definitions.
+///@{
 #define EFI_CU_CACHE_EC_INVALID_TYPE  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_CU_CACHE_EC_INVALID_SPEED (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_CU_CACHE_EC_INVALID_SIZE  (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_CU_CACHE_EC_MISMATCH      (EFI_SUBCLASS_SPECIFIC | 0x00000003)
+///@}
 
-//
-// Computing Unit Memory Subclass Error Code definitions.
-//
+///
+/// Computing Unit Memory Subclass Error Code definitions.
+///@{
 #define EFI_CU_MEMORY_EC_INVALID_TYPE   (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_CU_MEMORY_EC_INVALID_SPEED  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_CU_MEMORY_EC_CORRECTABLE    (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -196,18 +208,19 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_CU_MEMORY_EC_UPDATE_FAIL    (EFI_SUBCLASS_SPECIFIC | 0x00000008)
 #define EFI_CU_MEMORY_EC_NONE_DETECTED  (EFI_SUBCLASS_SPECIFIC | 0x00000009)
 #define EFI_CU_MEMORY_EC_NONE_USEFUL    (EFI_SUBCLASS_SPECIFIC | 0x0000000A)
+///@}
 
 //
 // Computing Unit Chipset Subclass Error Code definitions.
 //
 
-//
-// Section 3
-// Peripheral Subclass definitions.
-// Values of 12-127 are reserved for future use by this
-// specification.
-// Values of 128-255 are reserved for OEM use.
-//
+///
+/// Section 3
+/// Peripheral Subclass definitions.
+/// Values of 12-127 are reserved for future use by this
+/// specification.
+/// Values of 128-255 are reserved for OEM use.
+///@{
 #define EFI_PERIPHERAL_UNSPECIFIED      (EFI_PERIPHERAL | 0x00000000)
 #define EFI_PERIPHERAL_KEYBOARD         (EFI_PERIPHERAL | 0x00010000)
 #define EFI_PERIPHERAL_MOUSE            (EFI_PERIPHERAL | 0x00020000)
@@ -221,11 +234,12 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_PERIPHERAL_AUDIO_OUTPUT     (EFI_PERIPHERAL | 0x000A0000)
 #define EFI_PERIPHERAL_LCD_DEVICE       (EFI_PERIPHERAL | 0x000B0000)
 #define EFI_PERIPHERAL_NETWORK          (EFI_PERIPHERAL | 0x000C0000)
+///@}
 
-//
-// Peripheral Class Progress Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// Peripheral Class Progress Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_P_PC_INIT             0x00000000
 #define EFI_P_PC_RESET            0x00000001
 #define EFI_P_PC_DISABLE          0x00000002
@@ -233,15 +247,17 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_P_PC_ENABLE           0x00000004
 #define EFI_P_PC_RECONFIG         0x00000005
 #define EFI_P_PC_DETECTED         0x00000006
+///@}
 
 //
 // Peripheral Class Unspecified Subclass Progress Code definitions.
 //
-//
-// Peripheral Class Keyboard Subclass Progress Code definitions.
-//
+///
+/// Peripheral Class Keyboard Subclass Progress Code definitions.
+///@{
 #define EFI_P_KEYBOARD_PC_CLEAR_BUFFER  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_P_KEYBOARD_PC_SELF_TEST     (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
 //
 // Peripheral Class Mouse Subclass Progress Code definitions.
@@ -280,10 +296,10 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // Peripheral Class Network Subclass Progress Code definitions.
 //
-//
-// Peripheral Class Error Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// Peripheral Class Error Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_P_EC_NON_SPECIFIC       0x00000000
 #define EFI_P_EC_DISABLED           0x00000001
 #define EFI_P_EC_NOT_SUPPORTED      0x00000002
@@ -294,15 +310,17 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_P_EC_INPUT_ERROR        0x00000007
 #define EFI_P_EC_OUTPUT_ERROR       0x00000008
 #define EFI_P_EC_RESOURCE_CONFLICT  0x00000009
+///@}
 
 //
 // Peripheral Class Unspecified Subclass Error Code definitions.
 //
-//
-// Peripheral Class Keyboard Subclass Error Code definitions.
-//
+///
+/// Peripheral Class Keyboard Subclass Error Code definitions.
+///@{
 #define EFI_P_KEYBOARD_EC_LOCKED    (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_P_KEYBOARD_EC_STUCK_KEY (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
 //
 // Peripheral Class Mouse Subclass Error Code definitions.
@@ -340,13 +358,13 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 // Peripheral Class Network Subclass Error Code definitions.
 //
 
-//
-// Section 4
-// IO Bus Subclass definitions.
-// Values of 14-127 are reserved for future use by this
-// specification.
-// Values of 128-255 are reserved for OEM use.
-//
+///
+/// Section 4
+/// IO Bus Subclass definitions.
+/// Values of 14-127 are reserved for future use by this
+/// specification.
+/// Values of 128-255 are reserved for OEM use.
+///@{
 #define EFI_IO_BUS_UNSPECIFIED  (EFI_IO_BUS | 0x00000000)
 #define EFI_IO_BUS_PCI          (EFI_IO_BUS | 0x00010000)
 #define EFI_IO_BUS_USB          (EFI_IO_BUS | 0x00020000)
@@ -360,11 +378,12 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_IO_BUS_IP_NETWORK   (EFI_IO_BUS | 0x000A0000)
 #define EFI_IO_BUS_SMBUS        (EFI_IO_BUS | 0x000B0000)
 #define EFI_IO_BUS_I2C          (EFI_IO_BUS | 0x000C0000)
+///@}
 
-//
-// IO Bus Class Progress Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// IO Bus Class Progress Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_IOB_PC_INIT     0x00000000
 #define EFI_IOB_PC_RESET    0x00000001
 #define EFI_IOB_PC_DISABLE  0x00000002
@@ -372,16 +391,18 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_IOB_PC_ENABLE   0x00000004
 #define EFI_IOB_PC_RECONFIG 0x00000005
 #define EFI_IOB_PC_HOTPLUG  0x00000006
+///@}
 
 //
 // IO Bus Class Unspecified Subclass Progress Code definitions.
 //
-//
-// IO Bus Class PCI Subclass Progress Code definitions.
-//
+///
+/// IO Bus Class PCI Subclass Progress Code definitions.
+///@{
 #define EFI_IOB_PCI_PC_BUS_ENUM   (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_IOB_PCI_PC_RES_ALLOC  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_IOB_PCI_PC_HPC_INIT   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
+///@}
 
 //
 // IO Bus Class USB Subclass Progress Code definitions.
@@ -404,6 +425,17 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // IO Bus Class ATA/ATAPI Subclass Progress Code definitions.
 //
+///
+/// Inconsistent with specification here: 
+/// The Framework Spec, StatusCodes0.92, does not define the macro. And the definition
+/// is expected to be adopt by PI Spec.
+///@{
+#define EFI_IOB_ATA_BUS_SMART_ENABLE          (EFI_SUBCLASS_SPECIFIC | 0x00000000)
+#define EFI_IOB_ATA_BUS_SMART_DISABLE         (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+#define EFI_IOB_ATA_BUS_SMART_OVERTHRESHOLD   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
+#define EFI_IOB_ATA_BUS_SMART_UNDERTHRESHOLD  (EFI_SUBCLASS_SPECIFIC | 0x00000003)
+///@}
+
 //
 // IO Bus Class FC Subclass Progress Code definitions.
 //
@@ -416,10 +448,10 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // IO Bus Class I2C Subclass Progress Code definitions.
 //
-//
-// IO Bus Class Error Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// IO Bus Class Error Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_IOB_EC_NON_SPECIFIC       0x00000000
 #define EFI_IOB_EC_DISABLED           0x00000001
 #define EFI_IOB_EC_NOT_SUPPORTED      0x00000002
@@ -430,15 +462,17 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_IOB_EC_READ_ERROR         0x00000007
 #define EFI_IOB_EC_WRITE_ERROR        0x00000008
 #define EFI_IOB_EC_RESOURCE_CONFLICT  0x00000009
+///@}
 
 //
 // IO Bus Class Unspecified Subclass Error Code definitions.
 //
-//
-// IO Bus Class PCI Subclass Error Code definitions.
-//
+///
+/// IO Bus Class PCI Subclass Error Code definitions.
+///@{
 #define EFI_IOB_PCI_EC_PERR (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_IOB_PCI_EC_SERR (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
 //
 // IO Bus Class USB Subclass Error Code definitions.
@@ -461,8 +495,14 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // IO Bus Class ATA/ATAPI Subclass Error Code definitions.
 //
+///
+/// Inconsistent with specification here: 
+/// The Framework Spec, StatusCodes0.92, does not define the macro. And the definition
+/// is expected to be adopt by PI Spec.
+///@{
 #define EFI_IOB_ATA_BUS_SMART_NOTSUPPORTED  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_IOB_ATA_BUS_SMART_DISABLED      (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
 //
 // IO Bus Class FC Subclass Error Code definitions.
@@ -477,13 +517,13 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 // IO Bus Class I2C Subclass Error Code definitions.
 //
 
-//
-// Section 5
-// Software Subclass definitions.
-// Values of 14-127 are reserved for future use by this
-// specification.
-// Values of 128-255 are reserved for OEM use.
-//
+///
+/// Section 5
+/// Software Subclass definitions.
+/// Values of 14-127 are reserved for future use by this
+/// specification.
+/// Values of 128-255 are reserved for OEM use.
+///@{
 #define EFI_SOFTWARE_UNSPECIFIED          (EFI_SOFTWARE | 0x00000000)
 #define EFI_SOFTWARE_SEC                  (EFI_SOFTWARE | 0x00010000)
 #define EFI_SOFTWARE_PEI_CORE             (EFI_SOFTWARE | 0x00020000)
@@ -503,12 +543,18 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SOFTWARE_EFI_BOOT_SERVICE     (EFI_SOFTWARE | 0x00100000)
 #define EFI_SOFTWARE_EFI_RUNTIME_SERVICE  (EFI_SOFTWARE | 0x00110000)
 #define EFI_SOFTWARE_EFI_DXE_SERVICE      (EFI_SOFTWARE | 0x00120000)
+///
+/// Inconsistent with specification here: 
+/// The Framework Spec, StatusCodes0.92, does not define the macro. And the definition
+/// is expected to be adopt by PI Spec.
+///
 #define EFI_SOFTWARE_X64_EXCEPTION        (EFI_SOFTWARE | 0x00130000)
+///@}
 
-//
-// Software Class Progress Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// Software Class Progress Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_SW_PC_INIT                0x00000000
 #define EFI_SW_PC_LOAD                0x00000001
 #define EFI_SW_PC_INIT_BEGIN          0x00000002
@@ -517,71 +563,78 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_PC_AUTHENTICATE_END    0x00000005
 #define EFI_SW_PC_INPUT_WAIT          0x00000006
 #define EFI_SW_PC_USER_SETUP          0x00000007
+///@}
 
 //
 // Software Class Unspecified Subclass Progress Code definitions.
 //
-//
-// Software Class SEC Subclass Progress Code definitions.
-//
+///
+/// Software Class SEC Subclass Progress Code definitions.
+///@{
 #define EFI_SW_SEC_PC_ENTRY_POINT     (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_SEC_PC_HANDOFF_TO_NEXT (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
-//
-// Software Class PEI Core Subclass Progress Code definitions.
-//
+///
+/// Software Class PEI Core Subclass Progress Code definitions.
+///@{
 #define EFI_SW_PEI_CORE_PC_ENTRY_POINT      (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_PEI_CORE_PC_RETURN_TO_LAST   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
+///@}
 
-//
-// Software Class PEI Module Subclass Progress Code definitions.
-//
+///
+/// Software Class PEI Module Subclass Progress Code definitions.
+///@{
 #define EFI_SW_PEIM_PC_RECOVERY_BEGIN (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_PEIM_PC_CAPSULE_LOAD   (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_PEIM_PC_CAPSULE_START  (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_PEIM_PC_RECOVERY_USER  (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 #define EFI_SW_PEIM_PC_RECOVERY_AUTO  (EFI_SUBCLASS_SPECIFIC | 0x00000004)
+///@}
 
-//
-// Software Class DXE Core Subclass Progress Code definitions.
-//
+///
+/// Software Class DXE Core Subclass Progress Code definitions.
+///@{
 #define EFI_SW_DXE_CORE_PC_ENTRY_POINT      (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_DXE_CORE_PC_RETURN_TO_LAST   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_DXE_CORE_PC_START_DRIVER     (EFI_SUBCLASS_SPECIFIC | 0x00000003)
+///@}
 
-//
-// Software Class DXE BS Driver Subclass Progress Code definitions.
-//
+///
+/// Software Class DXE BS Driver Subclass Progress Code definitions.
+///@{
 #define EFI_SW_DXE_BS_PC_LEGACY_OPROM_INIT            (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_DXE_BS_PC_READY_TO_BOOT_EVENT          (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_DXE_BS_PC_LEGACY_BOOT_EVENT            (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_DXE_BS_PC_EXIT_BOOT_SERVICES_EVENT     (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 #define EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT (EFI_SUBCLASS_SPECIFIC | 0x00000004)
+///@}
+
 ///
 /// Inconsistent with specification here: 
-/// In Framework Spec, Status0.92, no following two macro. And it is expectable that
-/// to add the definitions to Framework Spec.
-///
+/// The Framework Spec, StatusCodes0.92, does not define the macro. And the definition
+/// is expected to be adopt by PI Spec.
+///@{
 #define EFI_SW_DXE_BS_PC_BEGIN_CONNECTING_DRIVERS     (EFI_SUBCLASS_SPECIFIC | 0x00000005)
 #define EFI_SW_DXE_BS_PC_VERIFYING_PASSWORD           (EFI_SUBCLASS_SPECIFIC | 0x00000006)
+///@}
 
+///
+/// Software Class DXE RT Driver Subclass Progress Code definitions.
 ///
 /// Inconsistent with specification here: 
-/// In Framework Spec, Status0.92, no following two macro. And it is expectable that
-/// to add the definitions to Framework Spec.
-///
-
-//
-// Software Class DXE RT Driver Subclass Progress Code definitions.
-//
+/// The Framework Spec, StatusCodes0.92, does not define the macro. And the definition
+/// is expected to be adopt by PI Spec.
+///@{
 #define EFI_SW_DXE_RT_PC_S0 (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_DXE_RT_PC_S1 (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_DXE_RT_PC_S2 (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_DXE_RT_PC_S3 (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 #define EFI_SW_DXE_RT_PC_S4 (EFI_SUBCLASS_SPECIFIC | 0x00000004)
 #define EFI_SW_DXE_RT_PC_S5 (EFI_SUBCLASS_SPECIFIC | 0x00000005)
+///@}
 
 //
 // Software Class SMM Driver Subclass Progress Code definitions.
@@ -592,18 +645,20 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // Software Class EFI OS Loader Subclass Progress Code definitions.
 //
-//
-// Software Class EFI RT Subclass Progress Code definitions.
-//
+///
+/// Software Class EFI RT Subclass Progress Code definitions.
+///@{
 #define EFI_SW_RT_PC_ENTRY_POINT      (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_RT_PC_HANDOFF_TO_NEXT  (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_RT_PC_RETURN_TO_LAST   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
+///@}
 
-//
-// Software Class EFI AL Subclass Progress Code definitions.
-//
+///
+/// Software Class EFI AL Subclass Progress Code definitions.
+///@{
 #define EFI_SW_AL_PC_ENTRY_POINT    (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_AL_PC_RETURN_TO_LAST (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
 //
 // Software Class EBC Exception Subclass Progress Code definitions.
@@ -617,9 +672,9 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // Software Class IPF Exception Subclass Progress Code definitions.
 //
-//
-// Software Class PEI Services Subclass Progress Code definitions.
-//
+///
+/// Software Class PEI Services Subclass Progress Code definitions.
+///@{
 #define EFI_SW_PS_PC_INSTALL_PPI            (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_PS_PC_REINSTALL_PPI          (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_PS_PC_LOCATE_PPI             (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -636,10 +691,11 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_PS_PC_ALLOCATE_POOL          (EFI_SUBCLASS_SPECIFIC | 0x0000000D)
 #define EFI_SW_PS_PC_COPY_MEM               (EFI_SUBCLASS_SPECIFIC | 0x0000000E)
 #define EFI_SW_PS_PC_SET_MEM                (EFI_SUBCLASS_SPECIFIC | 0x0000000F)
+///@}
 
-//
-// Software Class EFI Boot Services Subclass Progress Code definitions.
-//
+///
+/// Software Class EFI Boot Services Subclass Progress Code definitions.
+///@{
 #define EFI_SW_BS_PC_RAISE_TPL                      (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_BS_PC_RESTORE_TPL                    (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_BS_PC_ALLOCATE_PAGES                 (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -682,10 +738,11 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_BS_PC_CALCULATE_CRC_32               (EFI_SUBCLASS_SPECIFIC | 0x00000027)
 #define EFI_SW_BS_PC_COPY_MEM                       (EFI_SUBCLASS_SPECIFIC | 0x00000028)
 #define EFI_SW_BS_PC_SET_MEM                        (EFI_SUBCLASS_SPECIFIC | 0x00000029)
+///@}
 
-//
-// Software Class EFI Runtime Services Subclass Progress Code definitions.
-//
+///
+/// Software Class EFI Runtime Services Subclass Progress Code definitions.
+///@{
 #define EFI_SW_RS_PC_GET_TIME                       (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_RS_PC_SET_TIME                       (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_RS_PC_GET_WAKEUP_TIME                (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -697,10 +754,11 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_RS_PC_SET_VARIABLE                   (EFI_SUBCLASS_SPECIFIC | 0x00000008)
 #define EFI_SW_RS_PC_GET_NEXT_HIGH_MONOTONIC_COUNT  (EFI_SUBCLASS_SPECIFIC | 0x00000009)
 #define EFI_SW_RS_PC_RESET_SYSTEM                   (EFI_SUBCLASS_SPECIFIC | 0x0000000A)
+///@{
 
-//
-// Software Class EFI DXE Services Subclass Progress Code definitions
-//
+///
+/// Software Class EFI DXE Services Subclass Progress Code definitions
+///@{
 #define EFI_SW_DS_PC_ADD_MEMORY_SPACE             (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_DS_PC_ALLOCATE_MEMORY_SPACE        (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 #define EFI_SW_DS_PC_FREE_MEMORY_SPACE            (EFI_SUBCLASS_SPECIFIC | 0x00000002)
@@ -718,11 +776,12 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_DS_PC_SCHEDULE                     (EFI_SUBCLASS_SPECIFIC | 0x0000000E)
 #define EFI_SW_DS_PC_TRUST                        (EFI_SUBCLASS_SPECIFIC | 0x0000000F)
 #define EFI_SW_DS_PC_PROCESS_FIRMWARE_VOLUME      (EFI_SUBCLASS_SPECIFIC | 0x00000010)
+///@}
 
-//
-// Software Class Error Code definitions.
-// These are shared by all subclasses.
-//
+///
+/// Software Class Error Code definitions.
+/// These are shared by all subclasses.
+///@{
 #define EFI_SW_EC_NON_SPECIFIC            0x00000000
 #define EFI_SW_EC_LOAD_ERROR              0x00000001
 #define EFI_SW_EC_INVALID_PARAMETER       0x00000002
@@ -741,6 +800,7 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_EC_PWD_CLR_REQUEST         0x0000000F
 #define EFI_SW_EC_PWD_CLEARED             0x00000010
 #define EFI_SW_EC_EVENT_LOG_FULL          0x00000011
+///@}
 
 //
 // Software Class Unspecified Subclass Error Code definitions.
@@ -748,24 +808,29 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // Software Class SEC Subclass Error Code definitions.
 //
-//
-// Software Class PEI Core Subclass Error Code definitions.
-//
+///
+/// Software Class PEI Core Subclass Error Code definitions.
+///
 #define EFI_SW_PEI_CORE_EC_DXE_CORRUPT  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 
-//
-// Software Class PEI Module Subclass Error Code definitions.
-//
+///
+/// Software Class PEI Module Subclass Error Code definitions.
+///@{
 #define EFI_SW_PEIM_EC_NO_RECOVERY_CAPSULE        (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 #define EFI_SW_PEIM_EC_INVALID_CAPSULE_DESCRIPTOR (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+///@}
 
-//
-// Software Class DXE Core Subclass Error Code definitions.
-//
+///
+/// Software Class DXE Core Subclass Error Code definitions.
+///
+/// Inconsistent with specification here: 
+/// The Framework Spec, StatusCodes0.92, does not define the macro. And the definition
+/// is expected to be adopt by PI Spec.
+///
 #define EFI_SW_CSM_LEGACY_ROM_INIT  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
-//
-// Software Class DXE Boot Service Driver Subclass Error Code definitions.
-//
+///
+/// Software Class DXE Boot Service Driver Subclass Error Code definitions.
+///
 #define EFI_SW_DXE_BS_EC_LEGACY_OPROM_NO_SPACE  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 
 //
@@ -786,11 +851,11 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 //
 // Software Class EFI AL Subclass Error Code definitions.
 //
-//
-// Software Class EBC Exception Subclass Error Code definitions.
-// These exceptions are derived from the debug protocol definitions in the EFI
-// specification.
-//
+///
+/// Software Class EBC Exception Subclass Error Code definitions.
+/// These exceptions are derived from the debug protocol definitions in the EFI
+/// specification.
+///@{
 #define EFI_SW_EC_EBC_UNDEFINED             0x00000000
 #define EFI_SW_EC_EBC_DIVIDE_ERROR          EXCEPT_EBC_DIVIDE_ERROR
 #define EFI_SW_EC_EBC_DEBUG                 EXCEPT_EBC_DEBUG
@@ -802,12 +867,13 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_EC_EBC_INSTRUCTION_ENCODING  EXCEPT_EBC_INSTRUCTION_ENCODING
 #define EFI_SW_EC_EBC_BAD_BREAK             EXCEPT_EBC_BAD_BREAK
 #define EFI_SW_EC_EBC_STEP                  EXCEPT_EBC_STEP
+///@}
 
-//
-// Software Class IA32 Exception Subclass Error Code definitions.
-// These exceptions are derived from the debug protocol definitions in the EFI
-// specification.
-//
+///
+/// Software Class IA32 Exception Subclass Error Code definitions.
+/// These exceptions are derived from the debug protocol definitions in the EFI
+/// specification.
+///@{
 #define EFI_SW_EC_IA32_DIVIDE_ERROR     EXCEPT_IA32_DIVIDE_ERROR
 #define EFI_SW_EC_IA32_DEBUG            EXCEPT_IA32_DEBUG
 #define EFI_SW_EC_IA32_NMI              EXCEPT_IA32_NMI
@@ -825,18 +891,17 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_EC_IA32_ALIGNMENT_CHECK  EXCEPT_IA32_ALIGNMENT_CHECK
 #define EFI_SW_EC_IA32_MACHINE_CHECK    EXCEPT_IA32_MACHINE_CHECK
 #define EFI_SW_EC_IA32_SIMD             EXCEPT_IA32_SIMD
+///@}
 
+///
+/// Software Class X64 Exception Subclass Error Code definitions.
+/// These exceptions are derived from the debug protocol definitions in the EFI
+/// specification.
 ///
 /// Inconsistent with specification here: 
-/// In Framework Spec, Status0.92, no following two macro. And it is expectable that
-/// to add the definitions to Framework Spec.
-///
-
-//
-// Software Class X64 Exception Subclass Error Code definitions.
-// These exceptions are derived from the debug protocol definitions in the EFI
-// specification.
-//
+/// The Framework Spec, StatusCodes0.92, does not define the macro. And the definition
+/// is expected to be adopt by PI Spec.
+///@{
 #define EFI_SW_EC_X64_DIVIDE_ERROR      EXCEPT_X64_DIVIDE_ERROR
 #define EFI_SW_EC_X64_DEBUG             EXCEPT_X64_DEBUG
 #define EFI_SW_EC_X64_NMI               EXCEPT_X64_NMI
@@ -854,12 +919,13 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_EC_X64_ALIGNMENT_CHECK   EXCEPT_X64_ALIGNMENT_CHECK
 #define EFI_SW_EC_X64_MACHINE_CHECK     EXCEPT_X64_MACHINE_CHECK
 #define EFI_SW_EC_X64_SIMD              EXCEPT_X64_SIMD
+///@}
 
-//
-// Software Class IPF Exception Subclass Error Code definitions.
-// These exceptions are derived from the debug protocol definitions in the EFI
-// specification.
-//
+///
+/// Software Class IPF Exception Subclass Error Code definitions.
+/// These exceptions are derived from the debug protocol definitions in the EFI
+/// specification.
+///@{
 #define EFI_SW_EC_IPF_ALT_DTLB            EXCEPT_IPF_ALT_DTLB
 #define EFI_SW_EC_IPF_DNESTED_TLB         EXCEPT_IPF_DNESTED_TLB
 #define EFI_SW_EC_IPF_BREAKPOINT          EXCEPT_IPF_BREAKPOINT
@@ -872,7 +938,7 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 #define EFI_SW_EC_IPF_FP_TRAP             EXCEPT_IPF_FP_TRAP
 #define EFI_SW_EC_IPF_TAKEN_BRANCH        EXCEPT_IPF_TAKEN_BRANCH
 #define EFI_SW_EC_IPF_SINGLE_STEP         EXCEPT_IPF_SINGLE_STEP
-
+///@}
 
 //
 // Software Class PEI Service Subclass Error Code definitions.
@@ -887,12 +953,12 @@ typedef UINT32                                  EFI_CPU_STATE_CHANGE_CAUSE;
 // Software Class EFI DXE Service Subclass Error Code definitions.
 //
 
-//
-// Section 6
-// Debug Code definitions for all classes and subclass
-// Only one debug code is defined at this point and should
-// be used for anything that gets sent to debug stream.
-//
+///
+/// Section 6
+/// Debug Code definitions for all classes and subclass
+/// Only one debug code is defined at this point and should
+/// be used for anything that gets sent to debug stream.
+///
 #define EFI_DC_UNSPECIFIED  0x0
 
 #endif
