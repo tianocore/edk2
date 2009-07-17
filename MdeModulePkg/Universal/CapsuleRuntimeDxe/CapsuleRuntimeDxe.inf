@@ -26,6 +26,8 @@
 
 #
 # The following information is for reference only and not required by the build tools.
+# For IPF arch, Capule Services may not work well in runtime. IPF versin Capsule driver 
+# will be implemented if Capsule services need to run in runtime in IPF platform.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
