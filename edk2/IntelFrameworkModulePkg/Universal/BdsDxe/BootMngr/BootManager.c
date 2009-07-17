@@ -204,6 +204,7 @@ CallBootManager (
   CHAR16                      *HiiString;
   CHAR16                      *BootStringNumber;
   UINTN                       DevicePathType;
+  UINTN                       BufferSize;
 
   gOption = NULL;
   InitializeListHead (&BdsBootOptionList);
@@ -312,7 +313,9 @@ CallBootManager (
     //
     if (HiiString != NULL) {
       BootStringNumber = Option->Description;
-      Option->Description = AllocateZeroPool(StrSize(BootStringNumber) + StrSize(HiiString));
+      BufferSize = StrSize(BootStringNumber);
+      BufferSize += StrSize(HiiString);
+      Option->Description = AllocateZeroPool(BufferSize);
       StrCpy (Option->Description, HiiString);
       if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
         StrCat (Option->Description, L" ");

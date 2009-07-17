@@ -1050,7 +1050,7 @@ BOpt_GetBootOptions (
     }
     
     if (HiiString != NULL) {
-      NewLoadContext->Description = AllocateZeroPool(StrSize((UINT16*)LoadOptionPtr) + StrSize(HiiString));
+      NewLoadContext->Description = AllocateZeroPool(StringSize + StrSize(HiiString));
       StrCpy (NewLoadContext->Description, HiiString);
       if (StrnCmp ((UINT16*)LoadOptionPtr, L"0", 1) != 0) {
         StrCat (NewLoadContext->Description, L" ");
