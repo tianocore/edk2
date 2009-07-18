@@ -86,6 +86,7 @@ ASM_PFX(EbcLLCALLEXNative):
 #
 ASM_GLOBAL ASM_PFX(EbcLLGetEbcEntryPoint);
 ASM_PFX(EbcLLGetEbcEntryPoint):
+    mov    %r10, %rax
     ret
 
 #/*++
