@@ -35,6 +35,7 @@ InstallDevicePathCallback (
 STATIC
 VOID
 LoadVideoRom (
+  VOID
   );
 
 STATIC
@@ -1220,6 +1221,7 @@ LockKeyboards (
 STATIC
 VOID
 LoadVideoRom (
+  VOID
   )
 {
   PCI_DATA_STRUCTURE            *Pcir;
