@@ -24,7 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
-#include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/BaseMemoryLib.h>

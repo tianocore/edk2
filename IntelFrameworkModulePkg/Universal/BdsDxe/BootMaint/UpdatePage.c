@@ -756,7 +756,7 @@ UpdateConModePage (
   UINTN                         Row;
   CHAR16                        RowString[50];
   CHAR16                        ModeString[50];
-  CHAR16                        *pStr;
+  CHAR16                        *PStr;
   UINTN                         MaxMode;
   UINTN                         ValidMode;
   EFI_STRING_ID                 *ModeToken;
@@ -812,11 +812,11 @@ UpdateConModePage (
     // Build mode string Column x Row
     //
     UnicodeValueToString (ModeString, 0, Col, 0);
-    pStr = &ModeString[0];
-    StrnCat (pStr, L" x ", StrLen(L" x "));
+    PStr = &ModeString[0];
+    StrnCat (PStr, L" x ", StrLen(L" x "));
     UnicodeValueToString (RowString, 0, Row, 0);
-    pStr = &ModeString[0];
-    StrnCat (pStr, RowString, StrLen(RowString));
+    PStr = &ModeString[0];
+    StrnCat (PStr, RowString, StrLen(RowString));
 
     ModeToken[Index] = HiiSetString (CallbackData->BmmHiiHandle, 0, ModeString, NULL);
 
