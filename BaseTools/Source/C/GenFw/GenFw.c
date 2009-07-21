@@ -583,7 +583,21 @@ ScanSections(
   //
   CoffOffset = sizeof(EFI_IMAGE_DOS_HEADER) + 0x40;
   NtHdrOffset = CoffOffset;
-  CoffOffset += sizeof(EFI_IMAGE_OPTIONAL_HEADER_UNION);
+  switch (Ehdr->e_machine) {
+  case EM_386:
+  case EM_ARM:
+    CoffOffset += sizeof (EFI_IMAGE_NT_HEADERS32);
+	break;
+  case EM_X86_64:
+  case EM_IA_64:
+	CoffOffset += sizeof (EFI_IMAGE_NT_HEADERS64);
+	break;
+  default:
+    VerboseMsg ("%s unknown e_machine type. Assume IA-32", (UINTN)Ehdr->e_machine);
+	CoffOffset += sizeof (EFI_IMAGE_NT_HEADERS32);
+	break;
+  }
+
   TableOffset = CoffOffset;
   CoffOffset += CoffNbrSections * sizeof(EFI_IMAGE_SECTION_HEADER);
 
@@ -1144,6 +1158,7 @@ ConvertElf (
   //
   // Compute sections new address.
   //
+  
   ScanSections();
 
   VerboseMsg ("Compute sections new address.");
@@ -2660,9 +2675,12 @@ Returns:
   //
   // Init variable.
   //
-  DebugDirectoryEntryRva    = 0;
-  ExportDirectoryEntryRva   = 0;
-  ResourceDirectoryEntryRva = 0;
+  DebugDirectoryEntryRva           = 0;
+  ExportDirectoryEntryRva          = 0;
+  ResourceDirectoryEntryRva        = 0;
+  DebugDirectoryEntryFileOffset    = 0;
+  ExportDirectoryEntryFileOffset   = 0;
+  ResourceDirectoryEntryFileOffset = 0;
   DosHdr   = (EFI_IMAGE_DOS_HEADER *)  FileBuffer;
   FileHdr  = (EFI_IMAGE_FILE_HEADER *) (FileBuffer + DosHdr->e_lfanew + sizeof (UINT32));
 
@@ -2745,17 +2763,17 @@ Returns:
   //
   FileHdr->TimeDateStamp = 0;
 
-  if (ExportDirectoryEntryRva != 0) {
+  if (ExportDirectoryEntryFileOffset != 0) {
     NewTimeStamp  = (UINT32 *) (FileBuffer + ExportDirectoryEntryFileOffset + sizeof (UINT32));
     *NewTimeStamp = 0;
   }
 
-  if (ResourceDirectoryEntryRva != 0) {
+  if (ResourceDirectoryEntryFileOffset != 0) {
     NewTimeStamp  = (UINT32 *) (FileBuffer + ResourceDirectoryEntryFileOffset + sizeof (UINT32));
     *NewTimeStamp = 0;
   }
 
-  if (DebugDirectoryEntryRva != 0) {
+  if (DebugDirectoryEntryFileOffset != 0) {
     DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) (FileBuffer + DebugDirectoryEntryFileOffset);
     DebugEntry->TimeDateStamp = 0;
     if (ZeroDebugFlag) {
