@@ -882,7 +882,7 @@ IsaSerialReceiveTransmit (
           //
           TimeOut   = 0;
           Msr.Data  = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-          while (Msr.Bits.Dcd == 1 && (!Msr.Bits.Cts ^ FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
+          while ((Msr.Bits.Dcd == 1) && ((Msr.Bits.Cts == 0) || FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
             gBS->Stall (TIMEOUT_STALL_INTERVAL);
             TimeOut++;
             if (TimeOut > 5) {
@@ -892,7 +892,7 @@ IsaSerialReceiveTransmit (
             Msr.Data = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
           }
 
-          if (Msr.Bits.Dcd== 0 || (Msr.Bits.Cts ^ FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
+          if ((Msr.Bits.Dcd == 0) && ((Msr.Bits.Cts == 1) || FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
             IsaSerialFifoRemove (&SerialDevice->Transmit, &Data);
             WRITE_THR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Data);
           }
@@ -1188,12 +1188,7 @@ IsaSerialSetAttributes (
   if ((StopBits < OneStopBit) || (StopBits > TwoStopBits)) {
     return EFI_INVALID_PARAMETER;
   }
-  //
-  // for DataBits = 5, StopBits can not set TwoStopBits
-  //
-  // if ((DataBits == 5) && (StopBits == TwoStopBits)) {
-  //  return EFI_INVALID_PARAMETER;
-  // }
+
   //
   // for DataBits = 6,7,8, StopBits can not set OneFiveStopBits
   //

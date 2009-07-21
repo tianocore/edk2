@@ -1,4 +1,4 @@
-/**
+/** @file
   Produces the Legacy Region Protocol.
 
   This generic implementation of the Legacy Region Protocol does not actually 
@@ -22,61 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/LegacyRegion.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
-//
-// Function prototypes of the Legacy Region Protocol services this module produces
-//
-EFI_STATUS
-EFIAPI
-LegacyRegionDecode (
-  IN EFI_LEGACY_REGION_PROTOCOL  *This,
-  IN UINT32                      Start,
-  IN UINT32                      Length,
-  IN BOOLEAN                     *On
-  );
-
-EFI_STATUS
-EFIAPI
-LegacyRegionLock (
-  IN  EFI_LEGACY_REGION_PROTOCOL  *This,
-  IN  UINT32                      Start,
-  IN  UINT32                      Length,
-  OUT UINT32                      *Granularity OPTIONAL
-  );
-
-EFI_STATUS
-EFIAPI
-LegacyRegionBootLock (
-  IN  EFI_LEGACY_REGION_PROTOCOL  *This,
-  IN  UINT32                      Start,
-  IN  UINT32                      Length,
-  OUT UINT32                      *Granularity OPTIONAL
-  );
-
-EFI_STATUS
-EFIAPI
-LegacyRegionUnlock (
-  IN  EFI_LEGACY_REGION_PROTOCOL  *This,
-  IN  UINT32                      Start,
-  IN  UINT32                      Length,
-  OUT UINT32                      *Granularity OPTIONAL
-  );
-
-//
-// Module global for the handle the Legacy Region Protocol is installed
-//
-EFI_HANDLE                  mLegacyRegionHandle = NULL;
-
-//
-// Module global for the Legacy Region Protocol instance that is installed onto
-// mLegacyRegionHandle
-//
-EFI_LEGACY_REGION_PROTOCOL  mLegacyRegion = {
-  LegacyRegionDecode,
-  LegacyRegionLock,
-  LegacyRegionBootLock,
-  LegacyRegionUnlock
-};
 
 /**
   Sets hardware to decode or not decode a region.
@@ -170,6 +115,22 @@ LegacyRegionUnlock (
 {
   return EFI_SUCCESS;
 }
+
+//
+// Module global for the handle the Legacy Region Protocol is installed
+//
+EFI_HANDLE                  mLegacyRegionHandle = NULL;
+
+//
+// Module global for the Legacy Region Protocol instance that is installed onto
+// mLegacyRegionHandle
+//
+EFI_LEGACY_REGION_PROTOCOL  mLegacyRegion = {
+  LegacyRegionDecode,
+  LegacyRegionLock,
+  LegacyRegionBootLock,
+  LegacyRegionUnlock
+};
 
 /**
   The user Entry Point for module LegacyRegionDxe.  The user code starts with this function.
