@@ -46,7 +46,7 @@ extern  EFI_GUID  gEfiMiscSubClassGuid;
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the value is 0x0100.
+/// In ProcSubclass spec 0.9, the value is 0x0100.
 /// Keep it unchanged from the perspective of binary consistency.
 ///
 #define EFI_PROCESSOR_SUBCLASS_VERSION    0x00010000
@@ -696,7 +696,7 @@ typedef STRING_REF                  EFI_PROCESSOR_SOCKET_NAME_DATA;
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the naming is EFI_PROCESSOR_CACHE_ASSOCIATION_DATA.
+/// In ProcSubclass spec 0.9, the naming is EFI_PROCESSOR_CACHE_ASSOCIATION_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
@@ -705,7 +705,7 @@ typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
 /// This data record refers to the health status of the processor. 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the naming is EFI_PROCESSOR_HEALTH_STATUS_DATA.
+/// In ProcSubclass spec 0.9, the naming is EFI_PROCESSOR_HEALTH_STATUS_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef enum {
@@ -819,7 +819,7 @@ typedef struct {
 typedef EFI_EXP_BASE2_DATA          EFI_CACHE_SIZE_DATA;
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the naming is EFI_CACHE_MAXIMUM_SIZE_DATA.
+/// In CacheSubclass spec 0.9, the naming is EFI_CACHE_MAXIMUM_SIZE_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef EFI_EXP_BASE2_DATA          EFI_MAXIMUM_CACHE_SIZE_DATA;
@@ -909,7 +909,22 @@ typedef enum {
 } EFI_CACHE_OPERATIONAL_MODE;
 
 
-
+///
+/// Inconsistent with specification here:
+/// In CacheSubclass spec 0.9, the enumeration type data structure is NOT defined.
+/// The equivalent in spec is 
+///      #define EFI_CACHE_SIZE_RECORD_NUMBER                    0x00000001
+///      #define EFI_CACHE_MAXIMUM_SIZE_RECORD_NUMBER            0x00000002
+///      #define EFI_CACHE_SPEED_RECORD_NUMBER                   0x00000003
+///      #define EFI_CACHE_SOCKET_RECORD_NUMBER                  0x00000004
+///      #define EFI_CACHE_SRAM_SUPPORT_RECORD_NUMBER            0x00000005 
+///      #define EFI_CACHE_SRAM_INSTALL_RECORD_NUMBER            0x00000006 
+///      #define EFI_CACHE_ERROR_SUPPORT_RECORD_NUMBER           0x00000007
+///      #define EFI_CACHE_TYPE_RECORD_NUMBER                    0x00000008
+///      #define EFI_CACHE_ASSOCIATIVITY_RECORD_NUMBER           0x00000009
+///      #define EFI_CACHE_CONFIGURATION_RECORD_NUMBER           0x0000000A
+/// Keep the definition unchanged for backward compatibility.
+///
 typedef enum {
   CacheSizeRecordType              = 1,
   MaximumSizeCacheRecordType       = 2,
@@ -1858,7 +1873,7 @@ typedef enum {
 typedef struct {
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass 0.9 spec. It have a wrong field name "EFI_MISC_CHASSIS_TYPE".
+  /// In MiscSubclass 0.9 spec, it has a wrong field name "EFI_MISC_CHASSIS_TYPE".
   /// Change it to "ChassisType" to pass build.
   ///
   UINT32                            ChassisType       :16;
@@ -2639,7 +2654,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the field name is EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA.
+/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef struct {
