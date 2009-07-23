@@ -83,14 +83,15 @@ GetFirstStorageOfFormSet (
 }
 
 /**
-  Get the EFI_IFR_VARSTORE where the Question's value is stored.
+  Get the FORM_BROWSER_STATEMENT that matches the Question's value.
     
   @param FormSet                  The Form Set.
+  @param QuestionId               QuestionId
    
-  @retval FORMSET_STORAGE *       The EFI_IFR_VARSTORE where the Question's value is stored.
-  @retval NULL                    If the Form Set does not have EFI_IFR_VARSTORE.
+  @retval FORM_BROWSER_STATEMENT*   FORM_BROWSER_STATEMENT that match Question's value.
+  @retval NULL                      If the Form Set does not have EFI_IFR_VARSTORE.
 **/
-FORMSET_STORAGE *
+FORM_BROWSER_STATEMENT *
 GetStorageFromQuestionId (
   IN CONST FORM_BROWSER_FORMSET * FormSet,
   IN       EFI_QUESTION_ID        QuestionId
@@ -115,7 +116,7 @@ GetStorageFromQuestionId (
         // UEFI Question ID is unique in a FormSet.
         //
         ASSERT (Statement->Storage->Type == EFI_HII_VARSTORE_BUFFER);
-        return Statement->Storage;
+        return Statement;
       }
       StatementList = GetNextNode (&Form->StatementListHead, StatementList);
     }
@@ -674,6 +675,7 @@ CreateIfrDataArray (
   FORMSET_STORAGE                   *BufferStorage;
   UINTN                             Size;
   EFI_STRING                        String;
+  FORM_BROWSER_STATEMENT            *Statement;
 
   *NvMapAllocated = FALSE;
 
@@ -707,19 +709,25 @@ CreateIfrDataArray (
 
   IfrDataArray = AllocateZeroPool (sizeof (EFI_IFR_DATA_ARRAY) + sizeof (EFI_IFR_DATA_ENTRY) + Size);
   ASSERT (IfrDataArray != NULL);
+  IfrDataArray->EntryCount = 1;
+  IfrDataEntry             = (EFI_IFR_DATA_ENTRY *) (IfrDataArray + 1);
 
-  BufferStorage  = GetStorageFromQuestionId (ConfigAccess->ThunkContext->FormSet, QuestionId);
+  Statement = GetStorageFromQuestionId (ConfigAccess->ThunkContext->FormSet, QuestionId);
 
-  if (BufferStorage == NULL) {
+  if (Statement == NULL || Statement->Storage == NULL) {
     //
     // The QuestionId is not associated with a Buffer Storage.
     // Try to get the first Buffer Storage then.
     //
     BufferStorage = GetFirstStorageOfFormSet (ConfigAccess->ThunkContext->FormSet);
+  } else {
+    BufferStorage        = Statement->Storage;
+    IfrDataEntry->OpCode = Statement->Operand;
   }
   
   if (BufferStorage != NULL) {
-    BrowserDataSize = BufferStorage->Size;
+    BrowserDataSize      = BufferStorage->Size;
+    IfrDataEntry->Length = (UINT8) (sizeof (EFI_IFR_DATA_ENTRY) + Size);
 
     if (ConfigAccess->ThunkContext->NvMapOverride == NULL) {
       *NvMapAllocated = TRUE;
@@ -730,7 +738,6 @@ CreateIfrDataArray (
     }
     
     ASSERT (HiiGetBrowserData (&BufferStorage->Guid, BufferStorage->Name, BrowserDataSize, (UINT8 *) IfrDataArray->NvRamMap));
-    IfrDataEntry = (EFI_IFR_DATA_ENTRY *) (IfrDataArray + 1);
 
     switch (Type) {
       case EFI_IFR_TYPE_NUM_SIZE_8:
@@ -789,18 +796,21 @@ SyncBrowserDataForNvMapOverride (
   FORMSET_STORAGE   *BufferStorage;
   BOOLEAN           CheckFlag;
   UINTN             BrowserDataSize;
+  FORM_BROWSER_STATEMENT *Statement;
 
   if (ConfigAccess->ThunkContext->NvMapOverride != NULL) {
 
-    BufferStorage = GetStorageFromQuestionId (ConfigAccess->ThunkContext->FormSet, QuestionId);
+    Statement = GetStorageFromQuestionId (ConfigAccess->ThunkContext->FormSet, QuestionId);
 
-    if (BufferStorage == NULL) {
+    if (Statement == NULL || Statement->Storage == NULL) {
       //
       // QuestionId is a statement without Storage.
       // 1) It is a Goto. 
       // 
       //
       BufferStorage = GetFirstStorageOfFormSet (ConfigAccess->ThunkContext->FormSet);
+    } else {
+      BufferStorage = Statement->Storage;
     }
 
     //
