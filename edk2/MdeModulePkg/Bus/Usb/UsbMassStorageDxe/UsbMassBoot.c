@@ -65,6 +65,9 @@ UsbBootRequestSense (
                         );
   if (EFI_ERROR (Status) || CmdResult != USB_MASS_CMD_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "UsbBootRequestSense: (%r) CmdResult=0x%x\n", Status, CmdResult));
+    if (!EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+    }
     return Status;
   }
 
@@ -375,6 +378,7 @@ UsbBootReadCapacity (
   USB_BOOT_READ_CAPACITY_DATA CapacityData;
   EFI_BLOCK_IO_MEDIA          *Media;
   EFI_STATUS                  Status;
+  UINT32                      BlockSize;
 
   Media   = &UsbMass->BlockIoMedia;
 
@@ -403,10 +407,12 @@ UsbBootReadCapacity (
   //
   Media->MediaPresent = TRUE;
   Media->LastBlock    = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.LastLba));
-  Media->BlockSize    = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.BlockLen));
 
-  if (Media->BlockSize == 0) {
+  BlockSize           = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.BlockLen));
+  if (BlockSize == 0) {
     return EFI_NOT_READY;
+  } else {
+    Media->BlockSize = BlockSize;
   }
 
   DEBUG ((EFI_D_INFO, "UsbBootReadCapacity Success LBA=%ld BlockSize=%d\n",
