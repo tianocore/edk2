@@ -1325,7 +1325,7 @@ AsciiStrCmp (
 **/
 CHAR8
 EFIAPI
-AsciiToUpper (
+InternalBaseLibAsciiToUpper (
   IN      CHAR8                     Chr
   )
 {
@@ -1355,7 +1355,7 @@ InternalAsciiHexCharToUintn (
     return Char - '0';
   }
 
-  return (UINTN) (10 + AsciiToUpper (Char) - 'A');
+  return (UINTN) (10 + InternalBaseLibAsciiToUpper (Char) - 'A');
 }
 
 
@@ -1404,13 +1404,13 @@ AsciiStriCmp (
   ASSERT (AsciiStrSize (FirstString));
   ASSERT (AsciiStrSize (SecondString));
 
-  UpperFirstString  = AsciiToUpper (*FirstString);
-  UpperSecondString = AsciiToUpper (*SecondString);
+  UpperFirstString  = InternalBaseLibAsciiToUpper (*FirstString);
+  UpperSecondString = InternalBaseLibAsciiToUpper (*SecondString);
   while ((*FirstString != '\0') && (UpperFirstString == UpperSecondString)) {
     FirstString++;
     SecondString++;
-    UpperFirstString  = AsciiToUpper (*FirstString);
-    UpperSecondString = AsciiToUpper (*SecondString);
+    UpperFirstString  = InternalBaseLibAsciiToUpper (*FirstString);
+    UpperSecondString = InternalBaseLibAsciiToUpper (*SecondString);
   }
 
   return UpperFirstString - UpperSecondString;
@@ -1858,7 +1858,7 @@ AsciiStrHexToUintn (
     String++;
   }
 
-  if (AsciiToUpper (*String) == 'X') {
+  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
     ASSERT (*(String - 1) == '0');
     if (*(String - 1) != '0') {
       return 0;
@@ -1953,7 +1953,7 @@ AsciiStrHexToUint64 (
     String++;
   }
 
-  if (AsciiToUpper (*String) == 'X') {
+  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
     ASSERT (*(String - 1) == '0');
     if (*(String - 1) != '0') {
       return 0;

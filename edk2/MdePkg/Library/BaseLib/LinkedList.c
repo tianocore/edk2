@@ -37,7 +37,7 @@
 **/
 BOOLEAN
 EFIAPI
-IsNodeInList (
+InternalBaseLibIsNodeInList (
   IN      CONST LIST_ENTRY      *List,
   IN      CONST LIST_ENTRY      *Node
   )
@@ -136,7 +136,7 @@ InsertHeadList (
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (!IsNodeInList (ListHead, Entry));
+  ASSERT (!InternalBaseLibIsNodeInList (ListHead, Entry));
 
   Entry->ForwardLink = ListHead->ForwardLink;
   Entry->BackLink = ListHead;
@@ -177,7 +177,7 @@ InsertTailList (
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (!IsNodeInList (ListHead, Entry));
+  ASSERT (!InternalBaseLibIsNodeInList (ListHead, Entry));
 
   Entry->ForwardLink = ListHead;
   Entry->BackLink = ListHead->BackLink;
@@ -215,7 +215,7 @@ GetFirstNode (
   //
   // ASSERT List not too long
   //
-  ASSERT (IsNodeInList (List, List));
+  ASSERT (InternalBaseLibIsNodeInList (List, List));
 
   return List->ForwardLink;
 }
@@ -252,7 +252,7 @@ GetNextNode (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (IsNodeInList (List, Node));
+  ASSERT (InternalBaseLibIsNodeInList (List, Node));
 
   return Node->ForwardLink;
 }
@@ -285,7 +285,7 @@ IsListEmpty (
   //
   // ASSERT List not too long
   //
-  ASSERT (IsNodeInList (ListHead, ListHead));
+  ASSERT (InternalBaseLibIsNodeInList (ListHead, ListHead));
 
   return (BOOLEAN)(ListHead->ForwardLink == ListHead);
 }
@@ -325,7 +325,7 @@ IsNull (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (IsNodeInList (List, Node));
+  ASSERT (InternalBaseLibIsNodeInList (List, Node));
 
   return (BOOLEAN)(Node == List);
 }
@@ -363,7 +363,7 @@ IsNodeAtEnd (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (IsNodeInList (List, Node));
+  ASSERT (InternalBaseLibIsNodeInList (List, Node));
 
   return (BOOLEAN)(!IsNull (List, Node) && List->BackLink == Node);
 }
@@ -409,7 +409,7 @@ SwapListEntries (
   //
   // ASSERT Entry1 and Entry2 are in the same linked list
   //
-  ASSERT (IsNodeInList (FirstEntry, SecondEntry));
+  ASSERT (InternalBaseLibIsNodeInList (FirstEntry, SecondEntry));
 
   //
   // Ptr is the node pointed to by FirstEntry->ForwardLink
