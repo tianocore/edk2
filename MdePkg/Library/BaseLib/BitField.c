@@ -28,7 +28,7 @@
 **/
 UINTN
 EFIAPI
-BitFieldReadUint (
+InternalBaseLibBitFieldReadUint (
   IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit
@@ -59,7 +59,7 @@ BitFieldReadUint (
 **/
 UINTN
 EFIAPI
-BitFieldOrUint (
+InternalBaseLibBitFieldOrUint (
   IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
@@ -91,7 +91,7 @@ BitFieldOrUint (
 **/
 UINTN
 EFIAPI
-BitFieldAndUint (
+InternalBaseLibBitFieldAndUint (
   IN      UINTN                     Operand,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
@@ -134,7 +134,7 @@ BitFieldRead8 (
 {
   ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
-  return (UINT8)BitFieldReadUint (Operand, StartBit, EndBit);
+  return (UINT8)InternalBaseLibBitFieldReadUint (Operand, StartBit, EndBit);
 }
 
 /**
@@ -207,7 +207,7 @@ BitFieldOr8 (
 {
   ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
-  return (UINT8)BitFieldOrUint (Operand, StartBit, EndBit, OrData);
+  return (UINT8)InternalBaseLibBitFieldOrUint (Operand, StartBit, EndBit, OrData);
 }
 
 /**
@@ -244,7 +244,7 @@ BitFieldAnd8 (
 {
   ASSERT (EndBit < 8);
   ASSERT (StartBit <= EndBit);
-  return (UINT8)BitFieldAndUint (Operand, StartBit, EndBit, AndData);
+  return (UINT8)InternalBaseLibBitFieldAndUint (Operand, StartBit, EndBit, AndData);
 }
 
 /**
@@ -321,7 +321,7 @@ BitFieldRead16 (
 {
   ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
-  return (UINT16)BitFieldReadUint (Operand, StartBit, EndBit);
+  return (UINT16)InternalBaseLibBitFieldReadUint (Operand, StartBit, EndBit);
 }
 
 /**
@@ -394,7 +394,7 @@ BitFieldOr16 (
 {
   ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
-  return (UINT16)BitFieldOrUint (Operand, StartBit, EndBit, OrData);
+  return (UINT16)InternalBaseLibBitFieldOrUint (Operand, StartBit, EndBit, OrData);
 }
 
 /**
@@ -431,7 +431,7 @@ BitFieldAnd16 (
 {
   ASSERT (EndBit < 16);
   ASSERT (StartBit <= EndBit);
-  return (UINT16)BitFieldAndUint (Operand, StartBit, EndBit, AndData);
+  return (UINT16)InternalBaseLibBitFieldAndUint (Operand, StartBit, EndBit, AndData);
 }
 
 /**
@@ -508,7 +508,7 @@ BitFieldRead32 (
 {
   ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
-  return (UINT32)BitFieldReadUint (Operand, StartBit, EndBit);
+  return (UINT32)InternalBaseLibBitFieldReadUint (Operand, StartBit, EndBit);
 }
 
 /**
@@ -581,7 +581,7 @@ BitFieldOr32 (
 {
   ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
-  return (UINT32)BitFieldOrUint (Operand, StartBit, EndBit, OrData);
+  return (UINT32)InternalBaseLibBitFieldOrUint (Operand, StartBit, EndBit, OrData);
 }
 
 /**
@@ -618,7 +618,7 @@ BitFieldAnd32 (
 {
   ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
-  return (UINT32)BitFieldAndUint (Operand, StartBit, EndBit, AndData);
+  return (UINT32)InternalBaseLibBitFieldAndUint (Operand, StartBit, EndBit, AndData);
 }
 
 /**
