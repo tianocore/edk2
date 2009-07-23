@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  This PPI is introduced in PI Version 1.0.
+  This PPI is from PI Version 1.0 errata.
 
 **/
 
@@ -121,7 +121,7 @@ EFI_STATUS
 (EFIAPI *EFI_PEI_FV_FIND_FILE_NAME)(
   IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
   IN  CONST  EFI_GUID                    *FileName,
-  IN  EFI_PEI_FV_HANDLE                  FvHandle,
+  IN  EFI_PEI_FV_HANDLE                  *FvHandle,
   OUT EFI_PEI_FILE_HANDLE                *FileHandle
 );
 
