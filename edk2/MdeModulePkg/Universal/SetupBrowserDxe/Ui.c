@@ -630,7 +630,6 @@ CreateDialog (
   )
 {
   VA_LIST       Marker;
-  VA_LIST       MarkerBackup;
   UINTN         Count;
   EFI_INPUT_KEY Key;
   UINTN         LargestString;
@@ -661,7 +660,6 @@ CreateDialog (
   ASSERT (BufferedString);
 
   VA_START (Marker, KeyValue);
-  MarkerBackup = Marker;
 
   //
   // Zero the outgoing buffer
@@ -702,6 +700,7 @@ CreateDialog (
       LargestString = (GetStringWidth (StackString) / 2);
     }
   }
+  VA_END (Marker);
 
   Start = (DimensionsWidth - LargestString - 2) / 2 + gScreenDimensions.LeftColumn + 1;
   Top   = ((DimensionsHeight - NumberOfLines - 2) / 2) + gScreenDimensions.TopRow - 1;
@@ -711,7 +710,9 @@ CreateDialog (
   //
   // Display the Popup
   //
-  CreateSharedPopUp (LargestString, NumberOfLines, MarkerBackup);
+  VA_START (Marker, KeyValue);
+  CreateSharedPopUp (LargestString, NumberOfLines, Marker);
+  VA_END (Marker);
 
   //
   // Take the first key typed and report it back?
