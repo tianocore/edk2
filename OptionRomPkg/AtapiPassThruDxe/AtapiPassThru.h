@@ -34,13 +34,7 @@
 #include <Library/PcdLib.h>
 #include <Library/DevicePathLib.h>
 
-#include <IndustryStandard/Pci22.h>
-
-
-///
-/// bit definition
-///
-#define bit(a)        (1 << (a))
+#include <IndustryStandard/Pci.h>
 
 #define MAX_TARGET_ID 4
 
@@ -212,31 +206,31 @@ typedef struct {
 //
 // ATA Err Reg bitmap
 //
-#define BBK_ERR   bit (7) ///< Bad block detected
-#define UNC_ERR   bit (6) ///< Uncorrectable Data
-#define MC_ERR    bit (5) ///< Media Change
-#define IDNF_ERR  bit (4) ///< ID Not Found
-#define MCR_ERR   bit (3) ///< Media Change Requested
-#define ABRT_ERR  bit (2) ///< Aborted Command
-#define TK0NF_ERR bit (1) ///< Track 0 Not Found
-#define AMNF_ERR  bit (0) ///< Address Mark Not Found
+#define BBK_ERR   BIT7 ///< Bad block detected
+#define UNC_ERR   BIT6 ///< Uncorrectable Data
+#define MC_ERR    BIT5 ///< Media Change
+#define IDNF_ERR  BIT4 ///< ID Not Found
+#define MCR_ERR   BIT3 ///< Media Change Requested
+#define ABRT_ERR  BIT2 ///< Aborted Command
+#define TK0NF_ERR BIT1 ///< Track 0 Not Found
+#define AMNF_ERR  BIT0 ///< Address Mark Not Found
 
 //
 // ATAPI Err Reg bitmap
 //
-#define SENSE_KEY_ERR (bit (7) | bit (6) | bit (5) | bit (4))
-#define EOM_ERR bit (1) ///< End of Media Detected
-#define ILI_ERR bit (0) ///< Illegal Length Indication
+#define SENSE_KEY_ERR (BIT7 | BIT6 | BIT5 | BIT4)
+#define EOM_ERR BIT1 ///< End of Media Detected
+#define ILI_ERR BIT0 ///< Illegal Length Indication
 
 //
 // Device/Head Reg
 //
-#define LBA_MODE  bit (6)
-#define DEV       bit (4)
-#define HS3       bit (3)
-#define HS2       bit (2)
-#define HS1       bit (1)
-#define HS0       bit (0)
+#define LBA_MODE  BIT6
+#define DEV       BIT4
+#define HS3       BIT3
+#define HS2       BIT2
+#define HS1       BIT1
+#define HS0       BIT0
 #define CHS_MODE  (0)
 #define DRV0      (0)
 #define DRV1      (1)
@@ -246,34 +240,34 @@ typedef struct {
 //
 // Status Reg
 //
-#define BSY   bit (7) ///< Controller Busy
-#define DRDY  bit (6) ///< Drive Ready
-#define DWF   bit (5) ///< Drive Write Fault
-#define DSC   bit (4) ///< Disk Seek Complete
-#define DRQ   bit (3) ///< Data Request
-#define CORR  bit (2) ///< Corrected Data
-#define IDX   bit (1) ///< Index
-#define ERR   bit (0) ///< Error
-#define CHECK bit (0) ///< Check bit for ATAPI Status Reg
+#define BSY   BIT7 ///< Controller Busy
+#define DRDY  BIT6 ///< Drive Ready
+#define DWF   BIT5 ///< Drive Write Fault
+#define DSC   BIT4 ///< Disk Seek Complete
+#define DRQ   BIT3 ///< Data Request
+#define CORR  BIT2 ///< Corrected Data
+#define IDX   BIT1 ///< Index
+#define ERR   BIT0 ///< Error
+#define CHECK BIT0 ///< Check bit for ATAPI Status Reg
 
 //
 // Device Control Reg
 //
-#define SRST  bit (2) ///< Software Reset
-#define IEN_L bit (1) ///< Interrupt Enable
+#define SRST  BIT2 ///< Software Reset
+#define IEN_L BIT1 ///< Interrupt Enable
 
 //
 // ATAPI Feature Register
 //
-#define OVERLAP bit (1)
-#define DMA     bit (0)
+#define OVERLAP BIT1
+#define DMA     BIT0
 
 //
 // ATAPI Interrupt Reason Reson Reg (ATA Sector Count Register)
 //
-#define RELEASE     bit (2)
-#define IO          bit (1)
-#define CoD         bit (0)
+#define RELEASE     BIT2
+#define IO          BIT1
+#define CoD         BIT0
 
 #define PACKET_CMD  0xA0
 
