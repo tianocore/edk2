@@ -158,8 +158,9 @@
   IntelFrameworkModulePkg/Universal/Console/VgaClassDxe/VgaClassDxe.inf
 
   # IDE Support
-  #IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
-
+  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
+  DuetPkg/IdeControllerDxe/IdeController.inf
+  
   # Usb Support
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
