@@ -26,8 +26,6 @@
 
 #
 # The following information is for reference only and not required by the build tools.
-# For IPF arch, Capsule services can aslo work well on boot time and run time.
-# However, when OS enters into pysical mode such MCA path, Capsule services can't be used.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
