@@ -1391,7 +1391,7 @@ UhciDriverBindingSupported (
   Status = PciIo->Pci.Read (
                         PciIo,
                         EfiPciIoWidthUint8,
-                        CLASSC_OFFSET,
+                        PCI_CLASSCODE_OFFSET,
                         sizeof (USB_CLASSC) / sizeof (UINT8),
                         &UsbClassCReg
                         );
@@ -1406,7 +1406,7 @@ UhciDriverBindingSupported (
   //
   if ((UsbClassCReg.BaseCode != PCI_CLASS_SERIAL) ||
       (UsbClassCReg.SubClassCode != PCI_CLASS_SERIAL_USB) ||
-      (UsbClassCReg.PI != PCI_CLASSC_PI_UHCI)
+      (UsbClassCReg.PI != PCI_IF_UHCI)
       ) {
 
     Status = EFI_UNSUPPORTED;

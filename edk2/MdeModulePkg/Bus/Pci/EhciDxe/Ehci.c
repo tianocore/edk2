@@ -46,12 +46,6 @@ gEhciDriverBinding = {
   NULL
 };
 
-///
-/// USB host controller Programming Interface.
-///
-#define  PCI_CLASSC_PI_UHCI               0x00
-#define  PCI_CLASSC_PI_EHCI               0x20
-
 /**
   Retrieves the capability of root hub ports.
 
@@ -1347,7 +1341,7 @@ EhcDriverBindingSupported (
   Status = PciIo->Pci.Read (
                         PciIo,
                         EfiPciIoWidthUint8,
-                        EHC_PCI_CLASSC,
+                        PCI_CLASSCODE_OFFSET,
                         sizeof (USB_CLASSC) / sizeof (UINT8),
                         &UsbClassCReg
                         );
@@ -1361,7 +1355,7 @@ EhcDriverBindingSupported (
   // Test whether the controller belongs to Ehci type
   //
   if ((UsbClassCReg.BaseCode != PCI_CLASS_SERIAL) || (UsbClassCReg.SubClassCode != PCI_CLASS_SERIAL_USB)
-      || ((UsbClassCReg.PI != EHC_PCI_CLASSC_PI) && (UsbClassCReg.PI !=PCI_CLASSC_PI_UHCI))) {
+      || ((UsbClassCReg.PI != PCI_IF_EHCI) && (UsbClassCReg.PI !=PCI_IF_UHCI))) {
 
     Status = EFI_UNSUPPORTED;
   }
@@ -1579,7 +1573,7 @@ EhcDriverBindingStart (
   Status = PciIo->Pci.Read (
                         PciIo,
                         EfiPciIoWidthUint8,
-                        EHC_PCI_CLASSC,
+                        PCI_CLASSCODE_OFFSET,
                         sizeof (USB_CLASSC) / sizeof (UINT8),
                         &UsbClassCReg
                         );
@@ -1589,7 +1583,7 @@ EhcDriverBindingStart (
     goto CLOSE_PCIIO;
   }
 
-  if ((UsbClassCReg.PI == PCI_CLASSC_PI_UHCI) &&
+  if ((UsbClassCReg.PI == PCI_IF_UHCI) &&
        (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
        (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
     Status = PciIo->GetLocation (
@@ -1628,7 +1622,7 @@ EhcDriverBindingStart (
       Status = Instance->Pci.Read (
                     Instance,
                     EfiPciIoWidthUint8,
-                    EHC_PCI_CLASSC,
+                    PCI_CLASSCODE_OFFSET,
                     sizeof (USB_CLASSC) / sizeof (UINT8),
                     &UsbClassCReg
                     );
@@ -1638,7 +1632,7 @@ EhcDriverBindingStart (
         goto CLOSE_PCIIO;
       }
 
-      if ((UsbClassCReg.PI == PCI_CLASSC_PI_EHCI) &&
+      if ((UsbClassCReg.PI == PCI_IF_EHCI) &&
            (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
            (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
         Status = Instance->GetLocation (
