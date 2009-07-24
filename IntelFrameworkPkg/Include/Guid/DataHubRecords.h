@@ -18,6 +18,11 @@
 #ifndef _DATAHUB_RECORDS_GUID_H_
 #define _DATAHUB_RECORDS_GUID_H_
 
+//
+// The include is required to retrieve type EFI_EXP_BASE10_DATA
+//
+#include <Guid/StatusCodeDataTypeId.h>
+
 #define EFI_PROCESSOR_SUBCLASS_GUID \
   { 0x26fdeb7e, 0xb8af, 0x4ccf, {0xaa, 0x97, 0x02, 0x63, 0x3c, 0xe4, 0x8c, 0xa7 } }
 
@@ -250,21 +255,6 @@ typedef struct {
   ///
   UINT16                            Exponent;
 } EFI_EXP_BASE2_DATA;
-
-///
-/// This macro provides a calculation for base-2 representations. Value and Exponent are each 
-/// INT16. It is 16 bits wide and is unsigned to mean nonnegative values.  
-///
-typedef struct {
-  ///
-  /// The INT16 number by which to multiply the base-2 representation.
-  ///
-  INT16                            Value;
-  ///
-  /// The INT16 number by which to raise the base-2 calculation. 
-  ///
-  INT16                            Exponent;
-} EFI_EXP_BASE10_DATA;
 
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_MAX_CORE_FREQUENCY_DATA;
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_MAX_FSB_FREQUENCY_DATA;
