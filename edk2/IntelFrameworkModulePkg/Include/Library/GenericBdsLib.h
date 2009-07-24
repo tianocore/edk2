@@ -822,12 +822,6 @@ SetupResetReminder (
 
 #define  BDS_EFI_UNSUPPORT                0xFFFF
 
-///
-/// USB host controller Programming Interface.
-///
-#define  PCI_CLASSC_PI_UHCI               0x00
-#define  PCI_CLASSC_PI_EHCI               0x20
-
 /**
   Check whether an instance in BlockIoDevicePath has the same partition node as the HardDriveDevicePath device path
 
