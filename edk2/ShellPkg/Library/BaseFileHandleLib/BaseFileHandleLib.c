@@ -708,8 +708,8 @@ StrnCatGrowLeft (
   }
 
   CopySize = StrSize(*Destination);
-  *Destination = CopyMem(*Destination+Count-sizeof(CHAR16), *Destination, CopySize);
-  *Destination = CopyMem(*Destination, Source, Count);
+  CopyMem((*Destination)+((Count-2)/sizeof(CHAR16)), *Destination, CopySize);
+  CopyMem(*Destination, Source, Count-2);
   return (*Destination);
 }
 
@@ -766,12 +766,17 @@ FileHandleGetFileName (
         // We got info... do we have a name? if yes preceed the current path with it...
         //
         if (StrLen (FileInfo->FileName) == 0) {
-          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"/", 0);
+          if (*FullFileName == NULL) {
+            *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
+          }
           FreePool(FileInfo);
           break;
         } else {
+          if (*FullFileName == NULL) {
+            *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
+          }
           *FullFileName = StrnCatGrowLeft(FullFileName, &Size, FileInfo->FileName, 0);
-          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"/", 0);
+          *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
           FreePool(FileInfo);
         }
       }
@@ -855,7 +860,7 @@ FileHandleReadLine(
     //
     if ((CountSoFar+1)*sizeof(CHAR16) < *Size){
       ((CHAR16*)Buffer)[CountSoFar] = CharBuffer;
-      ((CHAR16*)Buffer)[CountSoFar+1] = '\0';
+      ((CHAR16*)Buffer)[CountSoFar+1] = CHAR_NULL;
     }
   }
 
