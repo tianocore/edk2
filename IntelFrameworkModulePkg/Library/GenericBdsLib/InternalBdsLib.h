@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <FrameworkDxe.h>
 
-#include <IndustryStandard/Pci.h>
+#include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/PeImage.h>
 
 #include <Protocol/BlockIo.h>
