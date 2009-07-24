@@ -16,8 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_EHCI_MEM_H_
 #define _EFI_EHCI_MEM_H_
 
-#include <IndustryStandard/Pci22.h>
-
 #define USB_HC_BIT(a)                  ((UINTN)(1 << (a)))
 
 #define USB_HC_BIT_IS_SET(Data, Bit)   \
