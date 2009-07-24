@@ -336,13 +336,13 @@ Returns:
         if (!EFI_ERROR (Status)) {
           if ((PCI_CLASS_SERIAL == Class[2]) &&
               (PCI_CLASS_SERIAL_USB == Class[1])) {
-            if (PCI_CLASSC_PI_UHCI == Class[0]) {
+            if (PCI_IF_UHCI == Class[0]) {
               //
               // Found the UHCI, then disable the legacy support
               //
               Command = 0;
               Status = PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, 0xC0, 1, &Command);
-            } else if (PCI_CLASSC_PI_EHCI == Class[0]) {
+            } else if (PCI_IF_EHCI == Class[0]) {
               //
               // Found the EHCI, then disable the legacy support
               //
