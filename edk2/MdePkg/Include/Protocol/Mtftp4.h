@@ -1,7 +1,7 @@
 /** @file
   EFI Multicast Trivial File Tranfer Protocol Definition
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -356,8 +356,8 @@ EFI_STATUS
   @param  Packet       Pointer to the OACK packet to be parsed.
   @param  OptionCount  Pointer to the number of options in following OptionList.
   @param  OptionList   Pointer to EFI_MTFTP4_OPTION storage. Call the EFI Boot
-                       Service FreePool() to release each option if they are not
-                       needed any more.
+                       Service FreePool() to release the OptionList if the options
+                       in this OptionList are not needed any more.
 
   @retval EFI_SUCCESS           The OACK packet was valid and the OptionCount and
                                 OptionList parameters have been updated.
@@ -540,13 +540,18 @@ struct _EFI_MTFTP4_TOKEN {
   ///
   /// Size of the data buffer.
   ///
-  OUT UINT64                  BufferSize;
+  UINT64                      BufferSize;
   ///
   /// Pointer to the data buffer. Data that is downloaded from the
   /// MTFTPv4 server is stored here. Data that is uploaded to the
   /// MTFTPv4 server is read from here. Ignored if BufferSize is zero.
   ///
-  OUT VOID                    *Buffer;
+  VOID                        *Buffer;
+  ///
+  /// Pointer to the context that will be used by CheckPacket, 
+  /// TimeoutCallback and PacketNeeded.
+  ///
+  VOID                        *Context;
   ///
   /// Pointer to the callback function to check the contents of the received packet.
   ///
