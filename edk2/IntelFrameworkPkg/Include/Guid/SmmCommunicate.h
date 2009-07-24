@@ -28,12 +28,6 @@
     0xf328e36c, 0x23b6, 0x4a95, {0x85, 0x4b, 0x32, 0xe1, 0x95, 0x34, 0xcd, 0x75 } \
   }
 
-typedef struct {
-  EFI_GUID                         HeaderGuid;
-  UINTN                            MessageLength;
-  UINT8                            Data[1];
-} EFI_SMM_COMMUNICATE_HEADER;
-
 extern EFI_GUID gSmmCommunicateHeaderGuid;
 
 #endif
