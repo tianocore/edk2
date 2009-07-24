@@ -822,7 +822,7 @@ Returns:
     //
     // disable Interrupt
     //
-    DeviceControlValue |= bit (1);
+    DeviceControlValue |= BIT1;
     WritePortB (
       AtapiScsiPrivate->PciIo,
       AtapiScsiPrivate->IoPort->Alt.DeviceControl,
@@ -922,7 +922,7 @@ Returns:
   //
   // bit7 and bit5 are both set to 1 for backward compatibility
   //
-  DeviceSelect = (UINT8) (((bit (7) | bit (5)) | (Target << 4)));
+  DeviceSelect = (UINT8) (((BIT7 | BIT5) | (Target << 4)));
   WritePortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->Head, DeviceSelect);
 
   Command = ATAPI_SOFT_RESET_CMD;
@@ -1336,7 +1336,7 @@ Returns:
     //
     // disable Interrupt
     //
-    DeviceControlValue |= bit (1);
+    DeviceControlValue |= BIT1;
     WritePortB (
       AtapiScsiPrivate->PciIo,
       AtapiScsiPrivate->IoPort->Alt.DeviceControl,
@@ -1438,7 +1438,7 @@ Returns:
   //
   // bit7 and bit5 are both set to 1 for backward compatibility
   //
-  DeviceSelect = (UINT8) (((bit (7) | bit (5)) | (TargetId << 4)));
+  DeviceSelect = (UINT8) ((BIT7 | BIT5) | (TargetId << 4));
   WritePortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->Head, DeviceSelect);
 
   Command = ATAPI_SOFT_RESET_CMD;

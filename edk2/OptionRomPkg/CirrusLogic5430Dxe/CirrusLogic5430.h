@@ -40,7 +40,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/TimerLib.h>
 
-#include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Pci.h>
 //
 // Cirrus Logic 5430 PCI Configuration Header values
 //
