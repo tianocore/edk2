@@ -245,7 +245,7 @@ PartitionDriverBindingStart (
                    BlockIo,
                    ParentDevicePath
                    );
-      if (!EFI_ERROR (Status) || Status == EFI_MEDIA_CHANGED || Status == EFI_DEVICE_ERROR) {
+      if (!EFI_ERROR (Status) || Status == EFI_MEDIA_CHANGED) {
         break;
       }
       Routine++;
