@@ -14,9 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PxeBcImpl.h"
 
-VOID *TokenContext = NULL;
-
-CHAR8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
+UINT8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
   "blksize",
   "timeout",
   "tsize",
@@ -55,7 +53,7 @@ PxeBcCheckPacket (
   EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL *Callback;
   EFI_STATUS                          Status;
 
-  Private   = (PXEBC_PRIVATE_DATA *) TokenContext;
+  Private   = (PXEBC_PRIVATE_DATA *) Token->Context;
   Callback  = Private->PxeBcCallback;
   Status    = EFI_SUCCESS;
 
@@ -271,7 +269,7 @@ PxeBcTftpReadFile (
   Token.ModeStr       = NULL;
   Token.OptionCount   = OptCnt;
   Token.OptionList    = ReqOpt;
-  TokenContext        = Private;
+  Token.Context       = Private;
 
   if (DontUseBuffer) {
     Token.BufferSize  = 0;
@@ -428,7 +426,7 @@ PxeBcTftpReadDirectory (
   Token.ModeStr       = NULL;
   Token.OptionCount   = OptCnt;
   Token.OptionList    = ReqOpt;
-  TokenContext        = Private;
+  Token.Context       = Private;
 
   if (DontUseBuffer) {
     Token.BufferSize  = 0;

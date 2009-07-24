@@ -9,7 +9,7 @@
   RFC2348 - TFTP Blocksize Option
   RFC2349 - TFTP Timeout Interval and Transfer Size Options
   
-Copyright (c) 2006 - 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -149,8 +149,6 @@ struct _MTFTP4_PROTOCOL {
   UINT16                        McastPort;
   BOOLEAN                       Master;
   UDP_IO_PORT                   *McastUdpPort;
-
-  MTFTP4_GETINFO_STATE          GetInfoState;
 };
 
 /**
