@@ -370,12 +370,12 @@ BdsLibConnectConsoleVariable (
       //
       // Check the Usb console in Usb2.0 bus firstly, then Usb1.1 bus
       //
-      Status = BdsLibConnectUsbDevByShortFormDP (PCI_CLASSC_PI_EHCI, Instance);
+      Status = BdsLibConnectUsbDevByShortFormDP (PCI_IF_EHCI, Instance);
       if (!EFI_ERROR (Status)) {
         DeviceExist = TRUE;
       }
 
-      Status = BdsLibConnectUsbDevByShortFormDP (PCI_CLASSC_PI_UHCI, Instance);
+      Status = BdsLibConnectUsbDevByShortFormDP (PCI_IF_UHCI, Instance);
       if (!EFI_ERROR (Status)) {
         DeviceExist = TRUE;
       }
