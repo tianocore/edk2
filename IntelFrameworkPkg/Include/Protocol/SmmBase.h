@@ -37,20 +37,46 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _SMM_BASE_H_
 #define _SMM_BASE_H_
 
+///
+/// Global ID for the EFI_SMM_BASE_PROTOCOL
+///
 #define EFI_SMM_BASE_PROTOCOL_GUID \
   { \
     0x1390954D, 0xda95, 0x4227, {0x93, 0x28, 0x72, 0x82, 0xc2, 0x17, 0xda, 0xa8 } \
   }
 
-typedef struct _EFI_SMM_BASE_PROTOCOL             EFI_SMM_BASE_PROTOCOL;
+///
+/// Forward declaration for EFI_SMM_BASE_PROTOCOL
+///
+typedef struct _EFI_SMM_BASE_PROTOCOL  EFI_SMM_BASE_PROTOCOL;
 
-//
-// SMM Handler Definition
-//
+///
+/// EFI SMM Handler return codes
+///
+///@{
 #define EFI_HANDLER_SUCCESS         0x0000
 #define EFI_HANDLER_CRITICAL_EXIT   0x0001
 #define EFI_HANDLER_SOURCE_QUIESCED 0x0002
 #define EFI_HANDLER_SOURCE_PENDING  0x0003
+///@}
+
+///
+/// The header data is mandatory for messages sent into the SMM agent.
+///
+typedef struct {
+  ///
+  /// Allows for disambiguation of the message format.
+  ///
+  EFI_GUID                         HeaderGuid;
+  ///
+  /// Describes the size of the message, not including the header.
+  ///
+  UINTN                            MessageLength;
+  ///
+  /// Designates an array of bytes that is MessageLength in size.
+  ///
+  UINT8                            Data[1];
+} EFI_SMM_COMMUNICATE_HEADER;
 
 /**
   Entry Point to Callback service
