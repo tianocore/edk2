@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PxeBcImpl.h"
 
-UINT8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
+CHAR8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
   "blksize",
   "timeout",
   "tsize",
