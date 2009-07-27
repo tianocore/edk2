@@ -2012,6 +2012,12 @@ typedef struct {
   EFI_MISC_PORT_CONNECTOR_TYPE      PortInternalConnectorType;
   EFI_MISC_PORT_CONNECTOR_TYPE      PortExternalConnectorType;
   EFI_MISC_PORT_TYPE                PortType;
+  ///
+  /// Inconsistent with specification here:  
+  /// In MiscSubclass spec 0.9, the type of this field are defined as EFI_DEVICE_PATH_PROTOCOL,
+  /// which causes the implementation has a little complexity. Keep it unchanged for backward 
+  /// compatibility.
+  ///
   EFI_MISC_PORT_DEVICE_PATH         PortPath;
 } EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA;
 
