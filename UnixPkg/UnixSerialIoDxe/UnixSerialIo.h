@@ -28,7 +28,8 @@ Abstract:
 #include <fcntl.h>
 #include <errno.h>
 
-#include "PiDxe.h"
+//#include "PiDxe.h"
+#include "Uefi.h"
 #include <Protocol/SerialIo.h>
 #include <Protocol/DevicePath.h>
 
