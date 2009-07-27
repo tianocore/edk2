@@ -830,8 +830,20 @@ DayValid (
   IN  EFI_TIME  *Time
   )
 {
+  INTN  DayOfMonth[12];
 
-  INTN  DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  DayOfMonth[0] = 31;
+  DayOfMonth[1] = 29;
+  DayOfMonth[2] = 31;
+  DayOfMonth[3] = 30;
+  DayOfMonth[4] = 31;
+  DayOfMonth[5] = 30;
+  DayOfMonth[6] = 31;
+  DayOfMonth[7] = 31;
+  DayOfMonth[8] = 30;
+  DayOfMonth[9] = 31;
+  DayOfMonth[10] = 30;
+  DayOfMonth[11] = 31;
 
   //
   // The validity of Time->Month field should be checked before
@@ -980,8 +992,21 @@ IsWithinOneDay (
   IN EFI_TIME  *To
   )
 {
-  UINT8   DayOfMonth[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  UINT8   DayOfMonth[12];
   BOOLEAN Adjacent;
+
+  DayOfMonth[0] = 31;
+  DayOfMonth[1] = 29;
+  DayOfMonth[2] = 31;
+  DayOfMonth[3] = 30;
+  DayOfMonth[4] = 31;
+  DayOfMonth[5] = 30;
+  DayOfMonth[6] = 31;
+  DayOfMonth[7] = 31;
+  DayOfMonth[8] = 30;
+  DayOfMonth[9] = 31;
+  DayOfMonth[10] = 30;
+  DayOfMonth[11] = 31;
 
   Adjacent = FALSE;
 
