@@ -205,14 +205,18 @@ PcRtcInit (
     Time.Day    = RTC_INIT_DAY;
     Time.Month  = RTC_INIT_MONTH;
     Time.Year   = RTC_INIT_YEAR;
+    Time.Nanosecond  = 0;
   }
 
   //
   // Reset time value according to new RTC configuration
   //
-  PcRtcSetTime (&Time, Global);
-
-  return EFI_SUCCESS;
+  Status = PcRtcSetTime (&Time, Global);
+  if(!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  } else {
+    return EFI_DEVICE_ERROR;
+  }
 }
 
 /**
@@ -826,20 +830,8 @@ DayValid (
   IN  EFI_TIME  *Time
   )
 {
-  INTN  DayOfMonth[12];
 
-  DayOfMonth[0] = 31;
-  DayOfMonth[1] = 29;
-  DayOfMonth[2] = 31;
-  DayOfMonth[3] = 30;
-  DayOfMonth[4] = 31;
-  DayOfMonth[5] = 30;
-  DayOfMonth[6] = 31;
-  DayOfMonth[7] = 31;
-  DayOfMonth[8] = 30;
-  DayOfMonth[9] = 31;
-  DayOfMonth[10] = 30;
-  DayOfMonth[11] = 31;
+  INTN  DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
   //
   // The validity of Time->Month field should be checked before
@@ -988,21 +980,8 @@ IsWithinOneDay (
   IN EFI_TIME  *To
   )
 {
-  UINT8   DayOfMonth[12];
+  UINT8   DayOfMonth[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   BOOLEAN Adjacent;
-
-  DayOfMonth[0] = 31;
-  DayOfMonth[1] = 29;
-  DayOfMonth[2] = 31;
-  DayOfMonth[3] = 30;
-  DayOfMonth[4] = 31;
-  DayOfMonth[5] = 30;
-  DayOfMonth[6] = 31;
-  DayOfMonth[7] = 31;
-  DayOfMonth[8] = 30;
-  DayOfMonth[9] = 31;
-  DayOfMonth[10] = 30;
-  DayOfMonth[11] = 31;
 
   Adjacent = FALSE;
 
