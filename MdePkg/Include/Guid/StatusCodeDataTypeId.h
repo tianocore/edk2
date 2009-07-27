@@ -88,7 +88,7 @@ typedef struct {
   ///
   /// The data header identifying the data. DataHeader.HeaderSize should be
   /// sizeof (EFI_STATUS_CODE_DATA), DataHeader.Size should be
-  /// sizeof (EFI_STATUS_CODE_STRING_DATA) – HeaderSize, and
+  /// sizeof (EFI_STATUS_CODE_STRING_DATA) - HeaderSize, and
   /// DataHeader.Type should be
   /// EFI_STATUS_CODE_DATA_TYPE_STRING_GUID.
   /// 
@@ -651,7 +651,7 @@ typedef struct {
   ///
   /// The data header identifying the data. DataHeader.HeaderSize should be
   /// sizeof (EFI_STATUS_CODE_DATA), DataHeader.Size should be
-  /// sizeof (EFI_DEBUG_ASSERT_DATA) – HeaderSize , and
+  /// sizeof (EFI_DEBUG_ASSERT_DATA) - HeaderSize , and
   /// DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID.
   /// 
   EFI_STATUS_CODE_DATA         DataHeader;
@@ -705,7 +705,7 @@ typedef struct {
   ///
   /// The data header identifying the data. DataHeader.HeaderSize should be
   /// sizeof (EFI_STATUS_CODE_DATA), DataHeader.Size should be
-  /// sizeof (EFI_STATUS_CODE_EXCEP_EXTENDED_DATA) – HeaderSize,
+  /// sizeof (EFI_STATUS_CODE_EXCEP_EXTENDED_DATA) - HeaderSize,
   /// and DataHeader.Type should be
   /// EFI_STATUS_CODE_SPECIFIC_DATA_GUID.  
   ///
