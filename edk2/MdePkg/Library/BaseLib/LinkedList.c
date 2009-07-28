@@ -23,28 +23,36 @@
   If List is NULL, then ASSERT().
   If List->ForwardLink is NULL, then ASSERT().
   If List->backLink is NULL, then ASSERT().
-  If Node is NULL, then ASSERT();
-  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
-  of nodes in ListHead, including the ListHead node, is greater than or
-  equal to PcdMaximumLinkedListLength, then ASSERT().
+  If Node is NULL, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and DoMembershipCheck is TRUE and Node 
+  is in not a member of List, then return FALSE
+  If PcdMaximumLinkedListLenth is not zero, and List contains more than
+  PcdMaximumLinkedListLenth nodes, then ASSERT().
 
-  @param  List  A pointer to a node in a linked list.
-  @param  Node  A pointer to one nod.
+  @param  List              A pointer to a node in a linked list.
+  @param  Node              A pointer to a node in a linked list.
+  @param  VerifyNodeInList  TRUE if a check should be made to see if Node is a 
+                            member of List.  FALSE if no membership test should 
+                            be performed.
 
-  @retval TRUE   Node is in List
-  @retval FALSE  Node isn't in List, or List is invalid
+  @retval   TRUE if PcdVerifyNodeInList is FALSE
+  @retval   TRUE if DoMembershipCheck is FALSE
+  @retval   TRUE if PcdVerifyNodeInList is TRUE and DoMembershipCheck is TRUE 
+            and Node is a member of List.
+  @retval   FALSE if PcdVerifyNodeInList is TRUE and DoMembershipCheck is TRUE 
+            and Node is in not a member of List.
 
 **/
 BOOLEAN
 EFIAPI
 InternalBaseLibIsNodeInList (
-  IN      CONST LIST_ENTRY      *List,
-  IN      CONST LIST_ENTRY      *Node
+  IN CONST LIST_ENTRY  *List,
+  IN CONST LIST_ENTRY  *Node,
+  IN BOOLEAN           VerifyNodeInList
   )
 {
-  UINTN                         Count;
-  CONST LIST_ENTRY              *Ptr;
-  BOOLEAN                       Found;
+  UINTN             Count;
+  CONST LIST_ENTRY  *Ptr;
 
   //
   // Test the validity of List and Node
@@ -54,24 +62,54 @@ InternalBaseLibIsNodeInList (
   ASSERT (List->BackLink != NULL);
   ASSERT (Node != NULL);
 
-  Count = PcdGet32 (PcdMaximumLinkedListLength);
+  Count = 0;
+  Ptr   = List;
 
-  Ptr = List;
-  do {
-    Ptr = Ptr->ForwardLink;
-    Count--;
-  } while ((Ptr != List) && (Ptr != Node) && (Count > 0));
-  Found = (BOOLEAN)(Ptr == Node);
-
-  if (PcdGet32 (PcdMaximumLinkedListLength) > 0) {
-    while ((Count > 0) && (Ptr != List)) {
+  if (FeaturePcdGet (PcdVerifyNodeInList) && VerifyNodeInList) {
+    //
+    // Check to see if Node is a member of List.  
+    // Exit early if the number of nodes in List >= PcdMaximumLinkedListLength
+    //
+    do {
       Ptr = Ptr->ForwardLink;
-      Count--;
+      if (PcdGet32 (PcdMaximumLinkedListLength) > 0) {
+        Count++;
+        //
+        // ASSERT() if the linked list is too long
+        //
+        ASSERT (Count < PcdGet32 (PcdMaximumLinkedListLength));
+
+        //
+        // Return if the linked list is too long
+        //
+        if (Count >= PcdGet32 (PcdMaximumLinkedListLength)) {
+          return (BOOLEAN)(Ptr == Node);
+        }
+      }
+    } while ((Ptr != List) && (Ptr != Node)); 
+
+    if (Ptr != Node) {
+      return FALSE;
     }
-    ASSERT (Count > 0);
   }
 
-  return Found;
+  if (PcdGet32 (PcdMaximumLinkedListLength) > 0) {
+    //
+    // Count the total number of nodes in List.
+    // Exit early if the number of nodes in List >= PcdMaximumLinkedListLength
+    //
+    do {
+      Ptr = Ptr->ForwardLink;
+      Count++;
+    } while ((Ptr != List) && (Count < PcdGet32 (PcdMaximumLinkedListLength)));
+
+    //
+    // ASSERT() if the linked list is too long
+    //
+    ASSERT (Count < PcdGet32 (PcdMaximumLinkedListLength));
+  }
+
+  return TRUE;
 }
 
 /**
@@ -136,8 +174,8 @@ InsertHeadList (
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (!InternalBaseLibIsNodeInList (ListHead, Entry));
-
+  ASSERT (InternalBaseLibIsNodeInList (ListHead, Entry, FALSE));
+  
   Entry->ForwardLink = ListHead->ForwardLink;
   Entry->BackLink = ListHead;
   Entry->ForwardLink->BackLink = Entry;
@@ -177,8 +215,8 @@ InsertTailList (
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (!InternalBaseLibIsNodeInList (ListHead, Entry));
-
+  ASSERT (InternalBaseLibIsNodeInList (ListHead, Entry, FALSE));
+  
   Entry->ForwardLink = ListHead;
   Entry->BackLink = ListHead->BackLink;
   Entry->BackLink->ForwardLink = Entry;
@@ -215,7 +253,7 @@ GetFirstNode (
   //
   // ASSERT List not too long
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, List));
+  ASSERT (InternalBaseLibIsNodeInList (List, List, FALSE));
 
   return List->ForwardLink;
 }
@@ -233,7 +271,7 @@ GetFirstNode (
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and List contains more than
   PcdMaximumLinkedListLenth nodes, then ASSERT().
-  If Node is not a node in List, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
@@ -252,7 +290,7 @@ GetNextNode (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, Node));
+  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
 
   return Node->ForwardLink;
 }
@@ -285,8 +323,8 @@ IsListEmpty (
   //
   // ASSERT List not too long
   //
-  ASSERT (InternalBaseLibIsNodeInList (ListHead, ListHead));
-
+  ASSERT (InternalBaseLibIsNodeInList (ListHead, ListHead, FALSE));
+  
   return (BOOLEAN)(ListHead->ForwardLink == ListHead);
 }
 
@@ -306,7 +344,8 @@ IsListEmpty (
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
-  If Node is not a node in List and Node is not equal to List, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and Node is not a node in List and Node is not 
+  equal to List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
@@ -325,8 +364,8 @@ IsNull (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, Node));
-
+  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
+  
   return (BOOLEAN)(Node == List);
 }
 
@@ -344,7 +383,7 @@ IsNull (
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
-  If Node is not a node in List, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
@@ -363,8 +402,8 @@ IsNodeAtEnd (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, Node));
-
+  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
+  
   return (BOOLEAN)(!IsNull (List, Node) && List->BackLink == Node);
 }
 
@@ -381,7 +420,8 @@ IsNodeAtEnd (
 
   If FirstEntry is NULL, then ASSERT().
   If SecondEntry is NULL, then ASSERT().
-  If SecondEntry and FirstEntry are not in the same linked list, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and SecondEntry and FirstEntry are not in the 
+  same linked list, then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
   linked list containing the FirstEntry and SecondEntry nodes, including
   the FirstEntry and SecondEntry nodes, is greater than or equal to
@@ -409,8 +449,8 @@ SwapListEntries (
   //
   // ASSERT Entry1 and Entry2 are in the same linked list
   //
-  ASSERT (InternalBaseLibIsNodeInList (FirstEntry, SecondEntry));
-
+  ASSERT (InternalBaseLibIsNodeInList (FirstEntry, SecondEntry, TRUE));
+  
   //
   // Ptr is the node pointed to by FirstEntry->ForwardLink
   //
@@ -468,7 +508,7 @@ RemoveEntryList (
   )
 {
   ASSERT (!IsListEmpty (Entry));
-
+  
   Entry->ForwardLink->BackLink = Entry->BackLink;
   Entry->BackLink->ForwardLink = Entry->ForwardLink;
   return Entry->ForwardLink;
