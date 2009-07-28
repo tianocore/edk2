@@ -52,7 +52,7 @@ EFI_STATUS
   );
   
 /**
-  The purpose of the service is to abstract the capability of the PEI 
+  This service abstracts the capability of the PEI 
   Foundation to discover instances of firmware volumes in the system. 
   Given the input file pointer, this service searches for the next 
   matching file in the Firmware File System (FFS) volume.
@@ -75,16 +75,16 @@ EFI_STATUS
   );
     
 /**
-  The purpose of the service is to abstract the capability of the PEI 
+  This service abstracts the capability of the PEI 
   Foundation to discover instances of firmware files in the system. 
   Given the input file pointer, this service searches for the next matching 
   file in the Firmware File System (FFS) volume.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  SearchType       A filter to find files only of this type.
-  @param  FwVolHeader      Pointer to the firmware volume header of the volume to search.This parameter 
+  @param  FwVolHeader      Pointer to the firmware volume header of the volume to search. This parameter 
                            must point to a valid FFS volume.
-  @param  FileHeader       Pointer to the current file from which to begin searching.This pointer will be 
+  @param  FileHeader       Pointer to the current file from which to begin searching. This pointer will be 
                            updated upon return to reflect the file found.
 
   @retval EFI_SUCCESS      The file was found.

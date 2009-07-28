@@ -95,7 +95,7 @@ typedef UINT16  STRING_REF;
 ///
 /// Used to flag dynamically created op-codes. This is meaningful to the IFR Library set
 /// and the browser since we need to distinguish between compiled NV map data and created data.
-/// We do not allow new entries to be created in the NV map dynamically however we still need
+/// We do not allow new entries to be created in the NV map dynamically, but we do need
 /// to display this information correctly.  To dynamically create op-codes and assume that their
 /// data will be saved, ensure that the NV starting location they refer to is pre-defined in the
 /// NV map.
@@ -222,7 +222,7 @@ typedef struct {
 
 //
 // There is an interesting twist with regards to Time and Date.  This is one of the few items which can accept input
-// from a user, however may or may not need to use storage in the NVRAM space.  The decided method for determining 
+// from a user, and may or may not need to use storage in the NVRAM space.  The decided method for determining 
 // if NVRAM space will be used (only for a TimeOp or DateOp) is:  If .QuestionId == 0 && .Width == 0 (normally an 
 // impossibility) then use system resources to store the data away and not NV resources.  In other words, the setup
 // engine will call gRT->SetTime, and gRT->SetDate for the saving of data, and the values displayed will be from the

@@ -128,7 +128,7 @@ VOID
   @param  This                  Pointer to the EFI_SMM_ICHN_DISPATCH_PROTOCOL instance.
   @param  DispatchFunction      Function to install.
   @param  DispatchContext       Pointer to the dispatch function's context.
-                                The caller fills this context in before calling
+                                The caller fills in this context before calling
                                 the register function to indicate to the register
                                 function the ICHN SMI source for which the dispatch
                                 function should be invoked.
@@ -137,7 +137,7 @@ VOID
 
   @retval EFI_SUCCESS           The dispatch function has been successfully
                                 registered and the SMI source has been enabled.
-  @retval EFI_DEVICE_ERROR      The driver was unable to enable the SMI source.
+  @retval EFI_DEVICE_ERROR      The driver could not enable the SMI source.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory (system or SMM) to manage this
                                 child.
   @retval EFI_INVALID_PARAMETER DispatchContext is invalid. The ICHN input value

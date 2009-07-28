@@ -1,5 +1,5 @@
 /** @file
-  This file declares Smbus PPI which provides the basic I/O interfaces that a PEIM 
+  This file declares the Smbus PPI, which provides the basic I/O interfaces that a PEIM 
   uses to access its SMBus controller and the slave devices attached to it.
 
   Copyright (c) 2007 - 2009, Intel Corporation
@@ -40,10 +40,10 @@ typedef struct _EFI_PEI_SMBUS_PPI EFI_PEI_SMBUS_PPI;
                                 controller to the SMBus slave device and the interpretation is
                                 SMBus slave device specific.
   @param[in]      Operation     Signifies which particular SMBus hardware protocol
-                                instance that it will use to execute the SMBus transactions.
+                                instance to use to execute the SMBus transactions.
   @param[in]      PecCheck      Defines if Packet Error Code (PEC) checking is required
                                 for this operation.
-  @param[in, out] Length        Signifies the number of bytes that this operation will do.
+  @param[in, out] Length        The number of bytes for this operation
   @param[in, out] Buffer        Contains the value of data to execute to the SMBus slave device.
 
   @retval EFI_SUCCESS           The last data that was returned from the access
@@ -54,7 +54,7 @@ typedef struct _EFI_PEI_SMBUS_PPI EFI_PEI_SMBUS_PPI;
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed
                                 due to a lack of resources.
   @retval EFI_DEVICE_ERROR      The request was not completed because
-                                a failure reflected in the Host Status Register bit.
+                                a failure was recorded in the Host Status Register bit.
   @retval EFI_INVALID_PARAMETER Operation is not defined in EFI_SMBUS_OPERATION.
   @retval EFI_INVALID_PARAMETER Length/Buffer is NULL for operations except for EfiSmbusQuickRead and
                                 EfiSmbusQuickWrite. Length is outside the range of valid values.
@@ -76,15 +76,13 @@ EFI_STATUS
   );
 
 /**
-  CallBack function can be registered in EFI_PEI_SMBUS_PPI_NOTIFY.
-
-  This function is user-defined and will called when the SlaveAddress/Data pair happens.
+  This function is user-defined, and is called when the SlaveAddress/Data pair happens.
 
   @param[in]  PeiServices    A pointer to the system PEI Services Table.
   @param[in]  This           A pointer to the EFI_PEI_SMBUS_PPI instance.
   @param[in]  SlaveAddress   The SMBUS hardware address to which the SMBUS
                              device is preassigned or allocated.
-  @param[in]  Data           Data of the SMBus host notify command that
+  @param[in]  Data           Data of the SMBus host notify command, which denotes that
                              the caller wants to be called.
 
   @return Status Code returned by callback function.
@@ -100,14 +98,14 @@ EFI_STATUS
   );
 
 /**
-  The ArpDevice() function enumerates the entire bus or enumerates a specific
-  device that is identified by SmbusUdid.
+  The ArpDevice() function enumerates either the entire bus or a specific
+  device identified by SmbusUdid.
 
   @param[in]      PeiServices   A pointer to the system PEI Services Table.
   @param[in]      This          A pointer to the EFI_PEI_SMBUS_PPI instance.
   @param[in]      ArpAll        A Boolean expression that indicates if the host drivers need
                                 to enumerate all the devices or enumerate only the device that is identified
-                                by SmbusUdid. If ArpAll is TRUE, SmbusUdid and SlaveAddress are optional.
+                                by SmbusUdid. If ArpAll is TRUE, SmbusUdid and SlaveAddress are optional and ignored if entered.
                                 If ArpAll is FALSE, ArpDevice will enumerate SmbusUdid and the address
                                 will be at SlaveAddress.
   @param[in]      SmbusUdid     The targeted SMBus Unique Device Identifier (UDID).
@@ -122,9 +120,9 @@ EFI_STATUS
                                 due to a lack of resources.
   @retval EFI_TIMEOUT           The SMBus slave device did not respond.
   @retval EFI_DEVICE_ERROR      The request was not completed because the transaction failed.
-  @retval EFI_UNSUPPORTED       ArpDevice() are not implemented by this PEIM. 
+  @retval EFI_UNSUPPORTED       ArpDevice() is not implemented by this PEIM. 
                                 This return value is not defined in Framwork Specification.
-                                This return value had been intruduced in PI Specification.
+                                This return value was introduced in the PI Specification.
 
 **/
 typedef
@@ -150,7 +148,7 @@ EFI_STATUS
   @retval EFI_SUCCESS       The device map was returned correctly in the buffer.
   @retval EFI_UNSUPPORTED   GetArpMap() are not implemented by this PEIM. 
                             This return value was not defined in Framwork Specification.
-                            This return value had been intruduced in PI Specification.
+                            This return value was introduced in the PI Specification.
 
 **/
 typedef
@@ -174,16 +172,16 @@ EFI_STATUS
   @param[in] PeiServices    A pointer to the system PEI Services Table.
   @param[in] This           A pointer to the EFI_PEI_SMBUS_PPI instance.
   @param[in] SlaveAddress   Address that the host controller detects as
-                            sending a message and calls all the registered functions.
+                            sending a message and triggers all the registered functions.
   @param[in] Data           Data that the host controller detects as sending a message
-                            and calls all the registered functions.
+                            and triggers all the registered functions.
   @param[in] NotifyFunction The function to call when the bus driver
                             detects the SlaveAddress and Data pair.
 
   @retval EFI_SUCCESS       NotifyFunction has been registered.
   @retval EFI_UNSUPPORTED   Notify() are not implemented by this PEIM. 
                             This return value is not defined in Framwork Specification.
-                            This return value had been intruduced in PI Specification.
+                            This return value was introduced in the PI Specification.
 
 **/
 typedef

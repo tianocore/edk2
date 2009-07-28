@@ -38,30 +38,7 @@ typedef struct _EFI_ACPI_S3_SAVE_PROTOCOL EFI_ACPI_S3_SAVE_PROTOCOL;
 //
 
 /**
-  This function returns the size of the legacy memory below 1 MB that is required during an S3
-  resume. Before the Framework-based firmware transfers control to the OS, it has to transition from
-  flat mode into real mode in case the OS supplies only a real-mode waking vector. This transition
-  requires a certain amount of legacy memory below 1 MB. After getting the size of legacy memory
-  below 1 MB, the caller is responsible for allocating the legacy memory below 1 MB according to
-  the size that is returned. The specific implementation of allocating the legacy memory is out of the
-  scope of this specification.
-
-  @param  This                  A pointer to the EFI_ACPI_S3_SAVE_PROTOCOL instance.
-  @param  LegacyMemoryAddress   The returned size of legacy memory below 1MB.
-
-  @retval EFI_SUCCESS           Size is successfully returned.
-  @retval EFI_INVALID_PARAMETER The pointer Size is NULL.
-
-**/
-typedef
-EFI_STATUS
-(EFIAPI *EFI_ACPI_S3_SAVE)(
-  IN EFI_ACPI_S3_SAVE_PROTOCOL      * This,
-  IN VOID                           * LegacyMemoryAddress
-  );
-
-/**
-  This function is used to do the following:
+ 	This function is used to:
   
   - Prepare all information that is needed in the S3 resume boot path. This information can include
   the following:
@@ -69,7 +46,7 @@ EFI_STATUS
      -- RSDT pointer
      -- Reserved memory for the S3 resume
      
-  - Get the minimum memory length below 1 MB that is required for the S3 resume boot path.
+  - Get the minimum legacy memory length (meaning below 1 MB) that is required for the S3 resume boot path.
   If LegacyMemoryAddress is NULL, the firmware will be unable to jump into a real-mode
   waking vector. However, it might still be able to jump into a flat-mode waking vector as long as the
   OS provides a flat-mode waking vector. It is the caller's responsibility to ensure the
@@ -82,8 +59,31 @@ EFI_STATUS
   @retval EFI_SUCCESS           All information was saved successfully.
   @retval EFI_INVALID_PARAMETER The memory range is not located below 1 MB.
   @retval EFI_OUT_OF_RESOURCES  Resources were insufficient to save all the information.
-  @retval EFI_NOT_FOUND         Some necessary information cannot be found.
-  
+  @retval EFI_NOT_FOUND         Some necessary information cannot be found. 
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_ACPI_S3_SAVE)(
+  IN EFI_ACPI_S3_SAVE_PROTOCOL      * This,
+  IN VOID                           * LegacyMemoryAddress
+  );
+
+/**
+  This function returns the size of the legacy memory (meaning below 1 MB) that is required during an S3
+  resume. Before the Framework-based firmware transfers control to the OS, it has to transition from
+  flat mode into real mode in case the OS supplies only a real-mode waking vector. This transition
+  requires a certain amount of legacy memory. After getting the size of legacy memory
+  below, the caller is responsible for allocating the legacy memory below 1 MB according to
+  the size that is returned. The specific implementation of allocating the legacy memory is out of the
+  scope of this specification.
+
+  @param  This                  A pointer to the EFI_ACPI_S3_SAVE_PROTOCOL instance.
+  @param  Size   								The returned size of legacy memory below 1MB.
+
+  @retval EFI_SUCCESS           Size is successfully returned.
+  @retval EFI_INVALID_PARAMETER The pointer Size is NULL.
+    
 **/
 typedef
 EFI_STATUS
@@ -100,9 +100,8 @@ EFI_STATUS
     - ACPI table information, such as RSDT, through which the OS waking vector can be located
     - Range of reserved memory that can be used on the S3 resume boot path
   This protocol can be used after the Framework makes sure that the boot process is complete and
-  that no hardware has been left unconfigured. It is implementation specific where to call this
-  protocol to save all the information.
-  In the case of an EFI-aware OS, ExitBootServices()can be a choice to provide this hook.
+  that no hardware has been left unconfigured. Where to call this protocol to save information is implementation-specific. 
+  In the case of an EFI-aware OS, ExitBootServices() can be a choice to provide this hook.
   The currently executing EFI OS loader image calls ExitBootServices()to terminate all boot
   services. After ExitBootServices() successfully completes, the loader becomes responsible
   for the continued operation of the system.

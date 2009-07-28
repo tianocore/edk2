@@ -1,12 +1,11 @@
 /** @file
-  This file declares SMM Control abstraction protocol.
-  This protocol is used initiate SMI/PMI activations. This protocol could be published by either of
-  the following:
+  This file declares the SMM Control abstraction protocol.
+  This protocol is used to initiate SMI/PMI activations. This protocol could be published by either:
   - A processor driver to abstract the SMI/PMI IPI
   - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an
   Intel chipset
   Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this
-  event from a platform chipset agent is an optional capability for both IA-32 and Itanium based
+  event from a platform chipset agent is an optional capability for both IA-32 and Itanium-based
   systems.
 
   Copyright (c) 2007,2009 Intel Corporation
@@ -59,7 +58,7 @@ typedef struct {
   @param  This                  The EFI_SMM_CONTROL_PROTOCOL instance.
   @param  ArgumentBuffer        Optional sized data to pass into the protocol activation.
   @param  ArgumentBufferSize    Optional size of the data.
-  @param  Periodic              Optional mechanism to engender a periodic stream.
+  @param  Periodic              Optional mechanism to periodically repeat activation.
   @param  ActivationInterval    Optional parameter to repeat at this period one
                                 time or, if the Periodic Boolean is set, periodically.
 
@@ -118,7 +117,7 @@ EFI_STATUS
 
 /**
   @par Protocol Description:
-  This protocol is used initiate SMI/PMI activations.
+  This protocol is used to initiate SMI/PMI activations.
 
   @param Trigger
   Initiates the SMI/PMI activation.
@@ -139,17 +138,17 @@ EFI_STATUS
 // SMM Control Protocol
 //
 /**
-  This protocol is used initiate SMI/PMI activations. 
-  This protocol could be published by either of the following:
+  This protocol is used to initiate SMI/PMI activations. 
+  This protocol could be published by either:
     - A processor driver to abstract the SMI/PMI IPI
     - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an Intel chipset
   Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this
   
   The EFI_SMM_CONTROL_PROTOCOL is used by the platform chipset or processor driver. This
-  protocol is useable both in boot services and runtime. The runtime aspect is so that an
-  implementation of EFI_SMM_BASE_PROTOCOL.Communicate() can layer upon this service
+  protocol is usable both in boot services and at runtime. The runtime aspect enables an
+  implementation of EFI_SMM_BASE_PROTOCOL.Communicate() to layer upon this service
   and provide an SMI callback from a general EFI runtime driver.
-  The purpose of this protocol is to provide an abstraction to the platform hardware that generates an
+  This protocol provides an abstraction to the platform hardware that generates an
   SMI or PMI. There are often I/O ports that, when accessed, will engender the
 **/
 struct _EFI_SMM_CONTROL_PROTOCOL {

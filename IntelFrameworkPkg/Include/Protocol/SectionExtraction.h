@@ -67,13 +67,13 @@ EFI_STATUS
 
   @param  This                  Indicates the EFI_SECTION_EXTRACTION_PROTOCOL instance.
   @param  SectionStreamHandle   Indicates from which section stream to read.
-  @param  SectionType           Pointer to an EFI_SECTION_TYPE.  SectionType == NULL, the contents of the 
-                                entire section stream are returned in Buffer.If SectionType is not NULL, 
-                                only the  requested section is returned. EFI_SECTION_ALL matches all section 
+  @param  SectionType           Pointer to an EFI_SECTION_TYPE. If SectionType == NULL, the contents of the 
+                                entire section stream are returned in Buffer. If SectionType is not NULL, 
+                                only the requested section is returned. EFI_SECTION_ALL matches all section 
                                 types and can be used as a wild card to extract all sections in order.
-  @param  SectionDefinitionGuid Pointer to an EFI_GUID.If SectionType ==
+  @param  SectionDefinitionGuid Pointer to an EFI_GUID. If SectionType ==
                                 EFI_SECTION_GUID_DEFINED, SectionDefinitionGuid indicates what section GUID
-                                to search for.If SectionType !=EFI_SECTION_GUID_DEFINED, then
+                                to search for. If SectionType !=EFI_SECTION_GUID_DEFINED, then
                                 SectionDefinitionGuid is unused and is ignored.
   @param  SectionInstance       Indicates which instance of the requested section
                                 type to return when SectionType is not NULL.

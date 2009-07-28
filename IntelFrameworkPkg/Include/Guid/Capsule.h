@@ -36,14 +36,14 @@
 
 ///
 /// Bits in the flags field of the capsule header
-/// This flag is set if the capsule can support setup changes and clear if it cannot.
+/// This flag is set if the capsule can support setup changes, and cleared if it cannot.
 ///
 #define EFI_CAPSULE_HEADER_FLAG_SETUP 0x00000001
 
 #define CAPSULE_BLOCK_DESCRIPTOR_SIGNATURE  SIGNATURE_32 ('C', 'B', 'D', 'S')
 
 //
-// An array of these describe the blocks that make up a capsule for
+// An array of these structs describe the blocks that make up a capsule for
 // a capsule update.
 //
 typedef struct {
@@ -71,14 +71,14 @@ typedef struct {
   ///
   UINT32    HeaderSize;
   ///
-  /// A bit-mapped list describing the capsule¡¯s attributes. 
+  /// A bit-mapped list describing the capsule's attributes. 
   /// All undefined bits should be written as zero (0)
   ///
   UINT32    Flags;
   ///
   /// The length in bytes (27,415 for an image containing 27,415 bytes) of the entire image
-  /// including all headers. If the this value is greater than the size of the data presented in
-  /// the capsule body, this means that the image is separated across multiple media. If this
+  /// including all headers. If this value is greater than the size of the data presented in
+  /// the capsule body, the image is separated across multiple media. If this
   /// value is less than the size of the data, it is an error.
   ///
   UINT32    CapsuleImageSize;
@@ -119,7 +119,7 @@ typedef struct {
   UINT32    OffsetToAuthorInformation;
   ///
   /// The offset in bytes from the beginning of the header to the start of human-readable
-  /// text that describes the revision of the capsule and/or the capsule¡¯s contents. This
+  /// text that describes the revision of the capsule and/or the capsule's contents. This
   /// value must be less than OffsetToCapsuleBody.
   ///
   UINT32    OffsetToRevisionInformation;

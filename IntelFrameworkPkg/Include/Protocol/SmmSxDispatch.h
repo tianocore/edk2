@@ -83,15 +83,15 @@ VOID
   @param  This                  Pointer to the EFI_SMM_SX_DISPATCH_PROTOCOL instance.
   @param  DispatchFunction      Function to install.
   @param  DispatchContext       Pointer to the dispatch function's context.
-                                The caller fills this context in before calling
-                                the register function to indicate to the register
+                                The caller fills in this context before calling
+                                the register function to indicates to the register
                                 function which Sx state type and phase the caller
-                                wishes to be called back on. For this intertace,
+                                wishes to be called back on. For this interface,
                                 the Sx driver will call the registered handlers for
                                 all Sx type and phases, so the Sx state handler(s)
                                 must check the Type and Phase field of the Dispatch
                                 context and act accordingly.
-  @param  DispatchHandle        Handle of dispatch function, for when interfacing
+  @param  DispatchHandle        Handle of dispatch function, for interfacing
                                 with the parent Sx state SMM driver.
 
   @retval EFI_SUCCESS           The dispatch function has been successfully

@@ -31,9 +31,8 @@
 // A Data Record is an EFI_DATA_RECORD_HEADER followed by RecordSize bytes of
 //  data. The format of the data is defined by the DataRecordGuid.
 //
-// If EFI_DATA_RECORD_HEADER is extended in the future the Version number must
-//  change and the HeaderSize will change if the definition of
-//  EFI_DATA_RECORD_HEADER is extended.
+// If EFI_DATA_RECORD_HEADER is extended in the future, the Version number and HeaderSize must
+//  change. 
 //
 // The logger is responcible for initializing:
 //  Version, HeaderSize, RecordSize, DataRecordGuid, DataRecordClass
@@ -56,7 +55,7 @@ typedef struct {
 //
 // Definition of DataRecordClass. These are used to filter out class types
 // at a very high level. The DataRecordGuid still defines the format of
-// the data. See DateHub.doc for rules on what can and can not be a
+// the data. See the Data Hub Specification for rules on what can and can not be a
 // new DataRecordClass
 //
 #define EFI_DATA_RECORD_CLASS_DEBUG         0x0000000000000001
@@ -99,7 +98,7 @@ EFI_STATUS
 
   @param  This                  The EFI_DATA_HUB_PROTOCOL instance.
   @param  MonotonicCount        On input, it specifies the Record to return.
-                                An input of zero means to return the first record.
+                                An input of zero means to return the first record, as does an input of one.
   @param  FilterDriver          If FilterDriver is not passed in a MonotonicCount of zero,
                                 it means to return the first data record. If FilterDriver is passed in,
                                 then a MonotonicCount of zero means to return the first data not yet read
@@ -115,8 +114,8 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  Record was not returned due to lack
                                 of system resources.
   @note: Inconsistent with specification here: 
-         In Framework for EFI Data Hub Specification,Version 0.9, This definition is named as
-         EFI_DATA_HUB_GET_NEXT_DATA_RECORD. The inconsistance is remained for backward compatibility 
+         In Framework for EFI Data Hub Specification, Version 0.9, This definition is named as
+         EFI_DATA_HUB_GET_NEXT_DATA_RECORD. The inconsistency is maintained for backward compatibility. 
 **/
 typedef
 EFI_STATUS
@@ -147,8 +146,8 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  The filter driver event was not registered
                                 due to lack of system resources.
   @note: Inconsistent with specification here: 
-         In Framework for EFI Data Hub Specification,Version 0.9, This definition is named as
-         EFI_DATA_HUB_REGISTER_DATA_FILTER_DRIVER. The inconsistance is remained for backward compatibility 
+         In Framework for EFI Data Hub Specification, Version 0.9, This definition is named as
+         EFI_DATA_HUB_REGISTER_DATA_FILTER_DRIVER. The inconsistency is maintained for backward compatibility. 
 **/
 typedef
 EFI_STATUS
@@ -170,8 +169,8 @@ EFI_STATUS
   @retval EFI_SUCCESS           The filter driver represented by FilterEvent was shut off.
   @retval EFI_NOT_FOUND         FilterEvent did not exist.
   @note: Inconsistent with specification here: 
-         In Framework for EFI Data Hub Specification,Version 0.9, This definition is named as
-         EFI_DATA_HUB_UNREGISTER_DATA_FILTER_DRIVER. The inconsistance is remained for backward compatibility 
+         In Framework for EFI Data Hub Specification, Version 0.9, This definition is named as
+         EFI_DATA_HUB_UNREGISTER_DATA_FILTER_DRIVER. The inconsistency is maintained for backward compatibility.  
 **/
 typedef
 EFI_STATUS

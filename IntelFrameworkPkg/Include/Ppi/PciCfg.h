@@ -1,5 +1,5 @@
 /** @file
-  This file declares PciCfg PPI used to access PCI configuration space in PEI
+  This file declares the PciCfg PPI used to access the PCI configuration space in PEI
 
   Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

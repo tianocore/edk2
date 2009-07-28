@@ -41,10 +41,10 @@ typedef struct _EFI_LEGACY_BIOS_PLATFORM_PROTOCOL EFI_LEGACY_BIOS_PLATFORM_PROTO
 typedef enum {
   ///
   /// This mode is invoked twice. The first invocation has LegacySegment and
-  /// LegacyOffset set to 0. The mode returns the MP table address in EFI memory and its size.
+  /// LegacyOffset set to 0. The mode returns the MP table address in EFI memory, along with its size.
   /// The second invocation has LegacySegment and LegacyOffset set to the location
   /// in the 0xF0000 or 0xE0000 block to which the MP table is to be copied. The second
-  /// invocation allows any MP table address fix ups to occur in the EFI memory copy of the
+  /// invocation allows any MP table address fixes to occur in the EFI memory copy of the
   /// MP table. The caller, not EfiGetPlatformBinaryMpTable, copies the modified MP
   /// table to the allocated region in 0xF0000 or 0xE0000 block after the second invocation.
   ///
@@ -59,12 +59,12 @@ typedef enum {
   ///     Bit 1 = 1 0xE0000 64 KB block.
   ///     Multiple bits can be set.
   ///
-  ///   Alignment Bit mapped address alignment granularity. 
+  ///   Alignment Bit-mapped address alignment granularity. 
   ///     The first nonzero bit from the right is the address granularity.
   ///
-  //    LegacySegment Segment where EfiCompatibility code will place the MP table.
+  //    LegacySegment Segment in which EfiCompatibility code will place the MP table.
   ///
-  ///   LegacyOffset Offset where EfiCompatibility code will place the MP table.
+  ///   LegacyOffset Offset in which EfiCompatibility code will place the MP table.
   ///
   /// The return values associated with this mode are:
   ///
@@ -74,15 +74,15 @@ typedef enum {
   ///
   EfiGetPlatformBinaryMpTable      = 0,
   ///
-  /// This mode returns a block of data. The contents and usage is IBV or OEM defined.
+  /// This mode returns a block of data. The content and usage is IBV or OEM defined.
   /// OEMs or IBVs normally use this function for nonstandard Compatibility16 runtime soft
   /// INTs. It is the responsibility of this routine to coalesce multiple OEM 16 bit functions, if
   /// they exist, into one coherent package that is understandable by the Compatibility16 code.
   /// This function is invoked twice. The first invocation has LegacySegment and
-  /// LegacyOffset set to 0. The function returns the table address in EFI memory and its size.
+  /// LegacyOffset set to 0. The function returns the table address in EFI memory, as well as its size.
   /// The second invocation has LegacySegment and LegacyOffset set to the location
   /// in the 0xF0000 or 0xE0000 block to which the data (table) is to be copied. The second
-  /// invocation allows any data (table) address fix ups to occur in the EFI memory copy of
+  /// invocation allows any data (table) address fixes to occur in the EFI memory copy of
   /// the table. The caller, not GetOemIntData(), copies the modified data (table) to the
   /// allocated region in 0xF0000 or 0xE0000 block after the second invocation.
   ///
@@ -100,9 +100,9 @@ typedef enum {
   ///   Alignment Bit mapped address alignment granularity. 
   ///     The first nonzero bit from the right is the address granularity.
   ///
-  ///   LegacySegment Segment where EfiCompatibility code will place the table or data.
+  ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
   ///
-  ///   LegacyOffset Offset where EfiCompatibility code will place the table or data.
+  ///   LegacyOffset Offset in which EfiCompatibility code will place the table or data.
   ///
   /// The return values associated with this mode are:
   ///
@@ -112,17 +112,19 @@ typedef enum {
   ///
   EfiGetPlatformBinaryOemIntData   = 1,
   ///
-  /// This mode returns a block of data. The contents and usage is IBV defined. OEMs or
+  /// This mode returns a block of data. The content and usage is IBV defined. OEMs or
   /// IBVs normally use this mode for nonstandard Compatibility16 runtime 16 bit routines. It
   /// is the responsibility of this routine to coalesce multiple OEM 16 bit functions, if they
   /// exist, into one coherent package that is understandable by the Compatibility16 code.
-  /// An example usage might be a legacy mobile BIOS that has a pre existing runtime
+  /// 
+  /// Example usage: A legacy mobile BIOS that has a pre-existing runtime
   /// interface to return the battery status to calling applications.
+  ///
   /// This mode is invoked twice. The first invocation has LegacySegment and
   /// LegacyOffset set to 0. The mode returns the table address in EFI memory and its size.
   /// The second invocation has LegacySegment and LegacyOffset set to the location
   /// in the 0xF0000 or 0xE0000 block to which the table is to be copied. The second
-  /// invocation allows any table address fix ups to occur in the EFI memory copy of the table.
+  /// invocation allows any table address fixes to occur in the EFI memory copy of the table.
   /// The caller, not EfiGetPlatformBinaryOem16Data, copies the modified table to
   /// the allocated region in 0xF0000 or 0xE0000 block after the second invocation.
   ///
@@ -140,9 +142,9 @@ typedef enum {
   ///   Alignment Bit mapped address alignment granularity. 
   ///     The first nonzero bit from the right is the address granularity.
   ///
-  ///   LegacySegment Segment where EfiCompatibility code will place the table or data.
+  ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
   ///
-  ///   LegacyOffset Offset where EfiCompatibility code will place the table or data.
+  ///   LegacyOffset Offset in which EfiCompatibility code will place the table or data.
   ///
   /// The return values associated with this mode are:
   ///
@@ -152,12 +154,14 @@ typedef enum {
   ///
   EfiGetPlatformBinaryOem16Data    = 2,
 ///
-/// This mode returns a block of data. The contents and usage is IBV defined. OEMs or
+/// This mode returns a block of data. The content and usage are IBV defined. OEMs or
 /// IBVs normally use this mode for nonstandard Compatibility16 runtime 32 bit routines. It
 /// is the responsibility of this routine to coalesce multiple OEM 32 bit functions, if they
 /// exist, into one coherent package that is understandable by the Compatibility16 code.
-/// An example usage might be a legacy mobile BIOS that has a pre existing runtime
+/// 
+/// Example usage: A legacy mobile BIOS that has a pre existing runtime
 /// interface to return the battery status to calling applications.
+///
 /// This mode is invoked twice. The first invocation has LegacySegment and
 /// LegacyOffset set to 0. The mode returns the table address in EFI memory and its size.
 /// 
@@ -190,9 +194,9 @@ typedef enum {
 ///   Alignment Bit mapped address alignment granularity. 
 ///       The first nonzero bit from the right is the address granularity.
 ///
-///   LegacySegment Segment where EfiCompatibility code will place the table or data.
+///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
 ///
-///   LegacyOffset Offset where EfiCompatibility code will place the table or data.
+///   LegacyOffset Offset in which EfiCompatibility code will place the table or data.
 ///
 /// The return values associated with this mode are:
 ///   EFI_SUCCESS The data was returned successfully.
@@ -216,9 +220,9 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///   Alignment Bit mapped address alignment granularity. 
   ///     The first nonzero bit from the right is the address granularity.
   ///
-  ///   LegacySegment Segment where EfiCompatibility code will place the table or data.
+  ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
   ///
-  ///   LegacyOffset Offset where EfiCompatibility code will place the table or data.
+  ///   LegacyOffset Offset in which EfiCompatibility code will place the table or data.
   ///
   /// The return values associated with this mode are:
   ///
@@ -549,11 +553,11 @@ typedef struct {
   @param  This                  Protocol instance pointer.
   @param  Mode                  Specifies what data to return. See See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  Table                 Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
-  @param  TableSize            Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
-  @param  Location             Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
+  @param  TableSize            	Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
+  @param  Location             	Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  Alignment             Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  LegacySegment         Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
-  @param  LegacyOffset          	Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
+  @param  LegacyOffset          Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
 
   @retval EFI_SUCCESS           Data was returned successfully.
   @retval EFI_UNSUPPORTED       Mode is not supported on the platform.
@@ -647,9 +651,9 @@ EFI_STATUS
 /**
   Returns information associated with PCI IRQ routing.
   This function returns the following information associated with PCI IRQ routing:
-    An IRQ routing table and number of entries in the table
-    The $PIR table and its size
-    A list of PCI IRQs and the priority order to assign them
+    * An IRQ routing table and number of entries in the table
+    * The $PIR table and its size
+    * A list of PCI IRQs and the priority order to assign them
 
   @param  This                    Protocol instance pointer.
   @param  RoutingTable            Pointer to PCI IRQ Routing table. 

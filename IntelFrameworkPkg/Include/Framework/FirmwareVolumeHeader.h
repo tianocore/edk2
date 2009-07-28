@@ -1,6 +1,6 @@
 /** @file
   Defines data structure that is the volume header found at the beginning of
-  all firmware volumes that are either memory mapped, or have an
+  all firmware volumes that are either memory mapped or have an
   associated FirmwareVolumeBlock protocol.
 
   Copyright (c) 2006-2009, Intel Corporation
