@@ -1357,7 +1357,7 @@ GetFirstNode (
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and List contains more than
   PcdMaximumLinkedListLenth nodes, then ASSERT().
-  If Node is not a node in List, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
@@ -1416,7 +1416,8 @@ IsListEmpty (
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
-  If Node is not a node in List and Node is not equal to List, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and Node is not a node in List the and Node is not equal 
+  to List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
@@ -1447,7 +1448,7 @@ IsNull (
   If PcdMaximumLinkedListLenth is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
-  If Node is not a node in List, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
@@ -1477,7 +1478,8 @@ IsNodeAtEnd (
 
   If FirstEntry is NULL, then ASSERT().
   If SecondEntry is NULL, then ASSERT().
-  If SecondEntry and FirstEntry are not in the same linked list, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and SecondEntry and FirstEntry are not in the 
+  same linked list, then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
   linked list containing the FirstEntry and SecondEntry nodes, including
   the FirstEntry and SecondEntry nodes, is greater than or equal to

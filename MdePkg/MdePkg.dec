@@ -823,7 +823,12 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE|BOOLEAN|0x00000012
 
   ## If TRUE, UGA Draw Protocol is still consumed.
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE|BOOLEAN|0x00000013
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE|BOOLEAN|0x00000027
+
+  ## If TRUE, a check will be made to see if a specified node is a member of  linked list
+  #  in the following BaseLib fucntions: GetNextNode(), IsNull(), IsNodeAtEnd(), 
+  #  SwapListEntries()
+  gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList|FALSE|BOOLEAN|0x00000028
 
 [PcdsFixedAtBuild]
   ## Indicates the maximum length of unicode string

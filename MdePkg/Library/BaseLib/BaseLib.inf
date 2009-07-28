@@ -591,8 +591,8 @@
   DebugLib
   BaseMemoryLib
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength
-
+  gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList
