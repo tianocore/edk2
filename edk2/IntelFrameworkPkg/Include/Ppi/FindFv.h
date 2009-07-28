@@ -21,7 +21,7 @@
 
 ///
 ///  Inconsistent with specification here: 
-///  GUID value format has been changed to the standard guid format.
+///  GUID value format has been changed to the standard GUID format.
 ///
 #define EFI_PEI_FIND_FV_PPI_GUID \
   { \
@@ -32,7 +32,7 @@ typedef struct _EFI_PEI_FIND_FV_PPI EFI_PEI_FIND_FV_PPI;
 
 /**
   This interface returns the base address of the firmware volume whose index
-  was passed in FvNumber.Once this function reports a firmware volume
+  was passed in FvNumber. Once this function reports a firmware volume
   index/base address pair, that index/address pairing must continue throughout PEI.
 
   @param  PeiServices    Pointer to the PEI Services Table.

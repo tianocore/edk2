@@ -83,11 +83,11 @@ typedef UINT64  FRAMEWORK_EFI_FV_ATTRIBUTES;
 //
 
 /**
-  Retrieves attributes, insures positive polarity of attribute bits, returns
+  Retrieves attributes, insures positive polarity of attribute bits, and returns
   resulting attributes in output parameter
 
   @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
-  @param  Attributes            output buffer which contains attributes
+  @param  Attributes            Output buffer containing attributes
 
   @retval EFI_SUCCESS           The firmware volume attributes were returned.
 **/
@@ -104,7 +104,7 @@ EFI_STATUS
   @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
   @param  Attributes            On input, Attributes is a pointer to an 
                                 EFI_FV_ATTRIBUTES containing the desired firmware 
-                                volume settings.O n successful return, it contains 
+                                volume settings. On successful return, it contains 
                                 the new settings of the firmware volume. On 
                                 unsuccessful return, Attributes is not modified 
                                 and the firmware volume settings are not changed.
@@ -113,7 +113,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The requested firmware volume attributes were set 
                                 and the resulting EFI_FV_ATTRIBUTES is returned in
                                 Attributes.
-  @retval EFI_ACCESS_DENIED     the Device is locked and does not permit modification. 
+  @retval EFI_ACCESS_DENIED     The Device is locked and does not permit modification. 
 
 **/
 typedef
@@ -127,8 +127,8 @@ EFI_STATUS
   Read the requested file (NameGuid) or file information from the firmware volume 
   and returns data in Buffer.
 
-  @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
-  @param  NameGuid              pointer to EFI_GUID which is the filename identifying which file to read
+  @param  This                  The EFI_FIRMWARE_VOLUME_PROTOCOL instance.
+  @param  NameGuid              Pointer to EFI_GUID, which is the filename of the file to read
   @param  Buffer                Pointer to pointer to buffer in which contents of file are returned.
                                 <br>
                                 If Buffer is NULL, only type, attributes, and size are returned as
@@ -139,18 +139,18 @@ EFI_STATUS
                                 <br>
                                 If Buffer != NULL and *Buffer != NULL, the output buffer has been
                                 allocated by the caller and is being passed in.
-  @param  BufferSize            Indicates the buffer size passed in, and on output the size
+  @param  BufferSize            On input: The buffer size. On output: The size
                                 required to complete the read
-  @param  FoundType             pointer to type of the file who's data is returned
-  @param  FileAttributes        pointer to attributes of the file who's data is resturned
-  @param  AuthenticationStatus  pointer to authentication status of the data
+  @param  FoundType             Pointer to type of the file whose data is returned
+  @param  FileAttributes        Pointer to attributes of the file whose data is returned
+  @param  AuthenticationStatus  Pointer to authentication status of the data
 
   @retval EFI_SUCCESS               The call completed successfully
   @retval EFI_WARN_BUFFER_TOO_SMALL The buffer is too small to contain the requested output.
                                     The buffer is filled and the output is truncated.
-  @retval EFI_NOT_FOUND             NameGuid was not found int he firmware volume.
+  @retval EFI_NOT_FOUND             NameGuid was not found in the firmware volume.
   @retval EFI_DEVICE_ERROR          A hardware error occurred when attempting to access the firmware volume.
-  @retval EFI_ACCESS_DENIED         The firmware volumen is configured to disallow reads.
+  @retval EFI_ACCESS_DENIED         The firmware volume is configured to disallow reads.
   @retval EFI_OUT_OF_RESOURCES      An allocation failure occurred.
 
 **/
@@ -171,8 +171,8 @@ EFI_STATUS
 
   @param  This                  Indicates the EFI_FIRMWARE_VOLUME_PROTOCOL instance.
   @param  NameGuid              Filename identifying the file from which to read
-  @param  SectionType           Indicates what section type to retrieve
-  @param  SectionInstance       Indicates which instance of SectionType to retrieve
+  @param  SectionType           The section type to retrieve
+  @param  SectionInstance       The instance of SectionType to retrieve
   @param  Buffer                Pointer to pointer to buffer in which contents of file are returned.
                                 <br>
                                 If Buffer is NULL, only type, attributes, and size are returned as
@@ -183,9 +183,9 @@ EFI_STATUS
                                 <br>
                                 If Buffer != NULL and *Buffer != NULL, the output buffer has been
                                 allocated by the caller and is being passed in.
-  @param  BufferSize            pointer to the buffer size passed in, and on output the size
+  @param  BufferSize            Pointer to the buffer size passed in, and on output the size
                                 required to complete the read
-  @param  AuthenticationStatus  pointer to the authentication status of the data
+  @param  AuthenticationStatus  Pointer to the authentication status of the data
 
   @retval EFI_SUCCESS                The call completed successfully.
   @retval EFI_WARN_BUFFER_TOO_SMALL  The buffer is too small to contain the requested output. 
@@ -259,10 +259,10 @@ EFI_STATUS
   @param  Key                   Pointer to a caller allocated buffer that contains an implementation
                                 specific key that is used to track where to begin searching on
                                 successive calls.
-  @param  FileType              pointer to the file type to filter for
-  @param  NameGuid              pointer to Guid filename of the file found
-  @param  Attributes            pointer to Attributes of the file found
-  @param  Size                  pointer to Size in bytes of the file found
+  @param  FileType              Pointer to the file type to filter for
+  @param  NameGuid              Pointer to Guid filename of the file found
+  @param  Attributes            Pointer to Attributes of the file found
+  @param  Size                  Pointer to Size in bytes of the file found
 
   @retval EFI_SUCCESS           The output parameters are filled with data obtained from 
                                 the first matching file that was found.

@@ -51,8 +51,8 @@ typedef enum {
   @param  Width            Signifies the width of the I/O operations.
   @param  Address          The base address of the I/O operations.
   @param  Count            The number of I/O operations to perform.
-  @param  Buffer           For read operations, the destination buffer to store the results.
-                           For write operations, the source buffer from which to write data.
+  @param  Buffer           For read operations, the destination buffer to store the results (out parameter).
+                           For write operations, the source buffer from which to write data (in parameter).
 
   @retval EFI_SUCCESS           The data was read from or written to the device.
   @retval EFI_UNSUPPORTED       The Address is not valid for this system.
@@ -94,7 +94,7 @@ struct _EFI_SMM_CPU_IO_INTERFACE {
   Allocates pool memory from SMRAM for IA-32 or runtime memory for
   the Itanium processor family.
 
-  @param  PoolType         The type of pool to allocate.The only supported type is EfiRuntimeServicesData
+  @param  PoolType         The type of pool to allocate. The only supported type is EfiRuntimeServicesData
   @param  Size             The number of bytes to allocate from the pool.
   @param  Buffer           A pointer to a pointer to the allocated buffer if the call
                            succeeds; undefined otherwise.
@@ -123,8 +123,8 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
   @retval EFI_UNSUPPORTED       In runtime.
   @note: Inconsistent with specification here:
-         In Framework Spec, This definition is naming EFI_SMM_FREE_POOL However, 
-         To avoid the naming conflict, the definition is renamed.
+         In the Framework Spec, this definition is named EFI_SMM_FREE_POOL.  
+         To avoid a naming conflict, the definition here is renamed. 
 **/
 typedef
 EFI_STATUS
@@ -148,8 +148,8 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Type is not AllocateAnyPages or AllocateMaxAddress
                                 or AllocateAddress. Or MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
   @note: Inconsistent with specification here:
-         In Framework Spec, This definition is naming EFI_SMM_ALLOCATE_PAGES However, 
-         To avoid the naming conflict, the definition is renamed.
+         In the Framework Spec, this definition is named EFI_SMM_ALLOCATE_PAGES.  
+         To avoid a naming conflict, the definition here is renamed.
 **/
 typedef
 EFI_STATUS
@@ -171,8 +171,8 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         The requested memory pages were not allocated with SmmAllocatePages().
   
   @note: Inconsistent with specification here:
-         In Framework Spec, This definition is naming EFI_SMM_FREE_PAGES However, 
-         To avoid the naming conflict, the definition is renamed.
+         In the Framework Spec, this definition is named EFI_SMM_FREE_PAGES.  
+         To avoid a naming conflict, the definition here is renamed.
 **/
 typedef
 EFI_STATUS
@@ -197,8 +197,8 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER The CPU cannot support an additional service invocation.
   
   @note: Inconsistent with specification here:
-         In Framework Spec, No this definition. This method is introduced in PI1.0 spec for 
-         implementation needed.
+         In Framework Spec, this definition does not exist. This method is introduced in PI1.0 spec for 
+         implementation needs.
          
 **/
 typedef
@@ -592,7 +592,7 @@ struct _EFI_SMM_SYSTEM_TABLE {
   //
   
   ///Inconsistent with specification here:
-  ///  In Framework Spec, No this definition. This method is introduced in PI1.0 spec for 
+  ///  In Framework Spec, this definition does not exist. This method is introduced in PI1.0 spec for 
   ///  implementation needed.
   EFI_SMM_STARTUP_THIS_AP             SmmStartupThisAp;
 

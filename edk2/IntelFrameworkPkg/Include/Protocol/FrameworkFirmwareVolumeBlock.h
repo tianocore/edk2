@@ -27,7 +27,7 @@ typedef UINT32  EFI_FVB_ATTRIBUTES;
 
 /**
   The GetAttributes() function retrieves the attributes and
-  current settings of the block. Status Codes Returned
+  current settings of the block. 
 
   @param This       Indicates the FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
 
@@ -228,10 +228,8 @@ EFI_STATUS
   
   @param Offset   Offset into the block at which to begin writing.
   
-  @param NumBytes Pointer to a UINTN. At entry, *NumBytes
-                  contains the total size of the buffer. At
-                  exit, *NumBytes contains the total number of
-                  bytes actually written.
+  @param NumBytes Pointer to a UINTN. Input: the total size of the buffer.
+                  Output: the total number of bytes actually written.
   
   @param Buffer   Pointer to a caller-allocated buffer that
                   contains the source for the write.
@@ -291,7 +289,7 @@ EFI_STATUS
   @param This   Indicates the FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL
                 instance.
 
-  @param ...    The variable argument list is a list of tuples.
+  @param ...    A list of tuples.
                 Each tuple describes a range of LBAs to erase
                 and consists of the following:
                 - An EFI_LBA that indicates the starting LBA

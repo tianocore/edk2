@@ -1,5 +1,5 @@
 /** @file
-  This file declares SMM SMRAM Access abstraction protocol which is used to control 
+  This file declares the SMM SMRAM Access abstraction protocol, which is used to control 
   the visibility of the SMRAM on the platform. The expectation is
   that the north bridge or memory controller would publish this protocol. 
   For example, the Memory Controller Hub (MCH) has the hardware provision for this 

@@ -1,11 +1,11 @@
 /** @file
   This file declares SMM Base abstraction protocol.
   This protocol is used to install SMM handlers for support of subsequent SMI/PMI activations. This
-  protocol is available on both IA-32 and Itanium based systems.
+  protocol is available on both IA-32 and Itanium-based systems.
  
   The EFI_SMM_BASE_PROTOCOL is a set of services that is exported by a processor device. It is
   a required protocol for the platform processor. This protocol can be used in both boot services and
-  runtime mode. However, only the following member functions need to exist into runtime:
+  runtime mode. However, only the following member functions need to exist during runtime:
   - InSmm()
   - Communicate()
   This protocol is responsible for registering the handler services. The order in which the handlers are
@@ -85,7 +85,7 @@ typedef struct {
                                     to uniquely designate a specific DXE SMM driver.
   @param[in]  CommunicationBuffer   A pointer to a collection of data in memory
                                     that will be conveyed from a non-SMM environment into an SMM environment.
-                                    The buffer must be contiguous, physically mapped, and be a physical address.
+                                    The buffer must be contiguous and physically mapped, and must be a physical address.
   @param[in]  SourceSize            The size of the CommunicationBuffer.
 
   @return     Status code
@@ -103,24 +103,24 @@ EFI_STATUS
 // SMM Base Protocol Definition
 //
 /**
-  Register a given driver into SMRAM.This is the equivalent of performing
+  Register a given driver into SMRAM. This is the equivalent of performing
   the LoadImage/StartImage into System Management Mode.
 
   @param[in]   This                  Protocol instance pointer.
   @param[in]   FilePath              Location of the image to be installed as the handler.
-  @param[in]   SourceBuffer          Optional source buffer in case of the image file
-                                     being in memory.
+  @param[in]   SourceBuffer          Optional source buffer in case the image file
+                                     is in memory.
   @param[in]   SourceSize            Size of the source image file, if in memory.
   @param[out]  ImageHandle           The handle that the base driver uses to decode 
                                      the handler. Unique among SMM handlers only, 
                                      not unique across DXE/EFI.
-  @param[in]   LegacyIA32Binary      An optional parameter that details that the associated 
+  @param[in]   LegacyIA32Binary      An optional parameter specifying that the associated 
                                      file is a real-mode IA-32 binary.
 
   @retval      EFI_SUCCESS           The operation was successful.
   @retval      EFI_OUT_OF_RESOURCES  There were no additional SMRAM resources to load the handler
   @retval      EFI_UNSUPPORTED       This platform does not support 16-bit handlers.
-  @retval      EFI_UNSUPPORTED       In runtime.
+  @retval      EFI_UNSUPPORTED       Platform is in runtime.
   @retval      EFI_INVALID_PARAMETER The handlers was not the correct image type
 
 **/
@@ -144,7 +144,7 @@ EFI_STATUS
 
   @retval     EFI_SUCCESS           The operation was successful
   @retval     EFI_INVALID_PARAMETER The handler did not exist
-  @retval     EFI_UNSUPPORTED       In runtime.
+  @retval     EFI_UNSUPPORTED       Platform is in runtime.
 
 **/
 typedef
@@ -156,7 +156,7 @@ EFI_STATUS
 
 /**
   The SMM Inter-module Communicate Service Communicate() function
-  provides a services to send/received messages from a registered
+  provides a service to send/receive messages from a registered
   EFI service.  The BASE protocol driver is responsible for doing
   any of the copies such that the data lives in boot-service-accessible RAM.
 
@@ -189,14 +189,14 @@ EFI_STATUS
   @param[in]  CallbackAddress       Address of the callback service.
   @param[in]  MakeLast              If present, will stipulate that the handler is posted to 
                                     be executed last in the dispatch table.
-  @param[in]  FloatingPointSave     This is an optional parameter which informs the
+  @param[in]  FloatingPointSave     An optional parameter that informs the
                                     EFI_SMM_ACCESS_PROTOCOL Driver core if it needs to save
-                                    the floating point register state. If any of the handlers
-                                    require this, then the state will be saved for all of the handlers.
+                                    the floating point register state. If any handler
+                                    require this, the state will be saved for all handlers.
 
   @retval     EFI_SUCCESS           The operation was successful
   @retval     EFI_OUT_OF_RESOURCES  Not enough space in the dispatch queue
-  @retval     EFI_UNSUPPORTED       In runtime.
+  @retval     EFI_UNSUPPORTED       Platform is in runtime.
   @retval     EFI_UNSUPPORTED       The caller is not in SMM.
 
 **/
@@ -228,7 +228,7 @@ EFI_STATUS
 
   @retval      EFI_SUCCESS           The requested number of bytes was allocated.
   @retval      EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
-  @retval      EFI_UNSUPPORTED       In runtime.
+  @retval      EFI_UNSUPPORTED       Platform is in runtime.
 
 **/
 typedef
@@ -250,7 +250,7 @@ EFI_STATUS
 
   @retval     EFI_SUCCESS           The memory was returned to the system.
   @retval     EFI_INVALID_PARAMETER Buffer was invalid.
-  @retval     EFI_UNSUPPORTED       In runtime.
+  @retval     EFI_UNSUPPORTED       Platform is in runtime.
 
 **/
 typedef
@@ -280,7 +280,7 @@ EFI_STATUS
   );
 
 /**
-  The GetSmstLocation() function returns the locatin of the System Management
+  The GetSmstLocation() function returns the location of the System Management
   Service Table.  The use of the API is such that a driver can discover the
   location of the SMST in its entry point and then cache it in some driver
   global variable so that the SMST can be invoked in subsequent callbacks.

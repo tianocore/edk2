@@ -1,5 +1,5 @@
 /** @file
-  This file declares Read-only Variable Service PPI, which is required PPI by framework spec.
+  This file declares the Read-only Variable Service PPI, which is required by the framework spec.
 
   These services provide a lightweight, read-only variant of the full EFI variable services. The
   reason that these services are read-only is to reduce the complexity of flash management. Also,
@@ -79,7 +79,7 @@ EFI_STATUS
 /**
   This function can be called multiple times to retrieve the VariableName
   and VendorGuid of all variables currently available in the system. On each call
-  to GetNextVariableName() the previous results are passed into the interface,
+  to GetNextVariableName(), the previous results are passed into the interface,
   and on output the interface returns the next variable name data.  When the
   entire variable list has been returned, the error EFI_NOT_FOUND is returned.
 

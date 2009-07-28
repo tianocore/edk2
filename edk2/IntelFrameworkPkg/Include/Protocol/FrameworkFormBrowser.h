@@ -1,8 +1,8 @@
 /** @file
   The EFI_FORM_BROWSER_PROTOCOL is the interface to the EFI
-  Configuration Driver.  This will allow the caller to direct the
-  configuration driver to use either the HII database or use the passed
-  in packet of data.  This will also allow the caller to post messages
+  Configuration Driver.  This interface enables the caller to direct the
+  configuration driver to use either the HII database or the passed-in
+  packet of data.  This will also allow the caller to post messages
   into the configuration drivers internal mailbox.
 
   Copyright (c) 2006 - 2009, Intel Corporation
@@ -81,7 +81,7 @@ typedef struct {
   @param  ScreenDimensions      Allows the browser to be called so that it occupies
                                 a portion of the physical screen instead of dynamically determining the
                                 screen dimensions.
-  @param  ResetRequired         This BOOLEAN value will tell the caller if a reset
+  @param  ResetRequired         This BOOLEAN value denotes whether a reset
                                 is required based on the data that might have been changed. The ResetRequired
                                 parameter is primarily applicable for configuration applications, and is an
                                 optional parameter.
@@ -149,7 +149,7 @@ EFI_STATUS
 struct _EFI_FORM_BROWSER_PROTOCOL {
   ///
   /// Provides direction to the configuration driver whether to use the HII
-  /// database or to use a passed-in set of data. This functions also establishes
+  /// database or to use a passed-in set of data. This function also establishes
   /// a pointer to the calling driver's callback interface.
   ///
   EFI_SEND_FORM     SendForm;

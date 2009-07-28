@@ -6,13 +6,10 @@
   Note: The names for EFI_IA32_REGISTER_SET elements were picked to follow
   well known naming conventions.
 
-  Thunk - A thunk is a transition from one processor mode to another. A Thunk
-  is a transition from native EFI mode to 16-bit mode. A reverse thunk
-  would be a transition from 16-bit mode to native EFI mode.
+  Thunk is the code that switches from 32-bit protected environment into the 16-bit real-mode
+	environment. Reverse thunk is the code that does the opposite.
 
-  You most likely should not use this protocol! Find the EFI way to solve the
-  problem to make your code portable
-
+ 
   Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1122,10 +1119,8 @@ typedef union {
   @param[in,out] Reg       Register contexted passed into (and returned) from thunk to
                            16-bit mode
 
-  @retval FALSE   Thunk completed, and there were no BIOS errors in the target code.
-                  See Regs for status.
-  @retval TRUE    There was a BIOS erro in the target code.
-
+  @retval TRUE                Thunk completed with no BIOS errors in the target code. See Regs for status.  
+  @retval FALSE                  There was a BIOS error in the target code.
 **/
 typedef
 BOOLEAN
@@ -1148,10 +1143,7 @@ BOOLEAN
   @param[in] Stack       Caller allocated stack used to pass arguments
   @param[in] StackSize   Size of Stack in bytes
 
-  @retval FALSE   Thunk completed, and there were no BIOS errors in the target code.
-                  See Regs for status.
-  @retval TRUE    There was a BIOS erro in the target code.
-
+  @retval FALSE                 Thunk completed with no BIOS errors in the target code.                                See Regs for status.  @retval TRUE                  There was a BIOS error in the target code.
 **/
 typedef
 BOOLEAN
@@ -1233,7 +1225,7 @@ EFI_STATUS
 
 /**
   This function attempts to traditionally boot the specified BootOption. If the EFI context has
-  been compromised, this function will not return. This procedure is not used for loading an EFIaware
+  been compromised, this function will not return. This procedure is not used for loading an EFI-aware
   OS off a traditional device. The following actions occur:
   - Get EFI SMBIOS data structures, convert them to a traditional format, and copy to
     Compatibility16.
@@ -1252,7 +1244,7 @@ EFI_STATUS
   - Invoke the Compatibility16 Table function Compatibility16Boot(). This invocation
     causes a thunk into the Compatibility16 code, which does an INT19.
   - If the Compatibility16Boot() function returns, then the boot failed in a graceful
-    manner—i.e., EFI code is still valid. An ungraceful boot failure causes a reset because the state
+    manner--meaning that the EFI code is still valid. An ungraceful boot failure causes a reset because the state
     of EFI code is unknown.
 
   @param[in] This             Protocol instance pointer.
@@ -1260,11 +1252,7 @@ EFI_STATUS
   @param[in] LoadOptionSize   Size of LoadOption in size.
   @param[in] LoadOption       LoadOption from BootXXXX variable
 
-  @retval EFI_DEVICE_ERROR   Failed to boot from any boot device and memory is uncorrupted.
-                             Note: This function normally never returns. It will either boot the
-                             OS or reset the system if memory has been "corrupted" by loading
-                             a boot sector and passing control to it.
-
+  @retval EFI_DEVICE_ERROR      Failed to boot from any boot device and memory is uncorrupted.                                Note: This function normally does not returns. It will either boot the                                OS or reset the system if memory has been "corrupted" by loading                                a boot sector and passing control to it.
 **/
 typedef
 EFI_STATUS
@@ -1278,7 +1266,7 @@ EFI_STATUS
 /**
   This function takes the Leds input parameter and sets/resets the BDA accordingly. 
   Leds is also passed to Compatibility16 code, in case any special processing is required. 
-  This function is normally called from EFI Setup drivers that handle userselectable
+  This function is normally called from EFI Setup drivers that handle user-selectable
   keyboard options such as boot with NUM LOCK on/off. This function does not
   touch the keyboard or keyboard LEDs but only the BDA.
 

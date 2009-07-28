@@ -52,8 +52,8 @@ typedef struct _EFI_PEI_SECTION_EXTRACTION_PPI EFI_PEI_SECTION_EXTRACTION_PPI;
                                 instance of the requested section type to return.
   @param Buffer                 Pointer to a pointer to a buffer in which the section
                                 contents are returned.
-  @param BufferSize             A pointer to a caller-allocated UINT32.On input, *BufferSize
-                                indicates the size in bytes of the memory region pointed to by Buffer.On output,
+  @param BufferSize             A pointer to a caller-allocated UINT32. On input, *BufferSize
+                                indicates the size in bytes of the memory region pointed to by Buffer. On output,
                                 *BufferSize contains the number of bytes required to read the section.
   @param AuthenticationStatus   A pointer to a caller-allocated UINT32 in
                                 which any metadata from encapsulating GUID-defined sections is returned.
@@ -63,7 +63,7 @@ typedef struct _EFI_PEI_SECTION_EXTRACTION_PPI EFI_PEI_SECTION_EXTRACTION_PPI;
   @retval EFI_PROTOCOL_ERROR    A GUID-defined section was encountered in
                                 the file with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED bit set, but
                                 there was no corresponding GUIDed Section Extraction Protocol in the
-                                handle database.*Buffer is unmodified.
+                                handle database. *Buffer is unmodified.
   @retval EFI_NOT_FOUND         The requested section does not exist.*Buffer is unmodified.
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process the request.
   @retval EFI_INVALID_PARAMETER The SectionStreamHandle does not exist.

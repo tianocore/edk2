@@ -1,6 +1,6 @@
 /** @file
   This protocol abstracts the 8259 interrupt controller. This includes
-  PCI IRQ routing need to program the PCI Interrupt Line register.
+  PCI IRQ routing needed to program the PCI Interrupt Line register.
 
   Copyright (c) 2007, Intel Corporation
   All rights reserved. This program and the accompanying materials

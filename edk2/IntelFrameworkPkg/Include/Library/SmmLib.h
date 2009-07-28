@@ -51,7 +51,7 @@ TriggerRuntimeSoftwareSmi (
   it was triggered at boot time, it returns TRUE. Otherwise, it returns FALSE.
 
   @retval TRUE   A software SMI triggered at boot time happened.
-  @retval FLASE  No software SMI happened or the software SMI was triggered at run time.
+  @retval FLASE  No software SMI happened, or the software SMI was triggered at run time.
 
 **/
 BOOLEAN

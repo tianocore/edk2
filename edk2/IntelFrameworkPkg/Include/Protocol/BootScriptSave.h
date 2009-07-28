@@ -33,7 +33,7 @@ typedef struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL EFI_BOOT_SCRIPT_SAVE_PROTOCOL;
   Adds a record into a specified Framework boot script table.
 
   @param  This                  A pointer to the EFI_BOOT_SCRIPT_SAVE_PROTOCOL instance.
-  @param  TableName             Name of the script table.Currently, the only meaningful
+  @param  TableName             Name of the script table. Currently, the only meaningful
                                 value is EFI_ACPI_S3_RESUME_SCRIPT_TABLE.
   @param  OpCode                The operation code (opcode) number.
   @param  ...                   Argument list that is specific to each opcode.
