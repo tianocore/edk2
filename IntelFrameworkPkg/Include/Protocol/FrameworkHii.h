@@ -23,7 +23,18 @@
 // EFI_GRAPHICS_OUTPUT_BLT_PIXEL is defined in MdePkg/Protocol/GraphicsOutput.h
 //
 #include <Protocol/GraphicsOutput.h>
-////// In both EDK and EDK II, incompatbile change is done to Framework HII protocol. /// This change should cause a change of GUID in both of code and HII spec. But we /// update the GUID in code in EDK and EDK II. The 0.92 spec is not updated. This/// is a known issue.///////// Note that EFI_HII_PROTOCOL_GUID is different from that defined in the Framework HII/// 0.92 spec because the spec changed part of HII interfaces but did not update the protocol/// GUID.///#define EFI_HII_PROTOCOL_GUID \
+///
+/// In both EDK and EDK II, incompatbile change is done to Framework HII protocol.
+/// This change should cause a change of GUID in both of code and HII spec. But we
+/// update the GUID in code in EDK and EDK II. The 0.92 spec is not updated. This
+/// is a known issue.
+///
+///
+/// Note that EFI_HII_PROTOCOL_GUID is different from that defined in the Framework HII
+/// 0.92 spec because the spec changed part of HII interfaces but did not update the protocol
+/// GUID.
+///
+#define EFI_HII_PROTOCOL_GUID \
   { \
     0xd7ad636e, 0xb997, 0x459b, {0xbf, 0x3f, 0x88, 0x46, 0x89, 0x79, 0x80, 0xe1} \
   }
@@ -77,36 +88,48 @@ typedef struct {
   UINT16  Type;    ///< The type of the package.
 } EFI_HII_PACK_HEADER;
 
-////// IFR package structure./// Immediately following the EFI_HII_IFR_PACK structure will be a series of IFR opcodes. ///typedef struct {
+///
+/// IFR package structure.
+/// Immediately following the EFI_HII_IFR_PACK structure will be a series of IFR opcodes.
+///
+typedef struct {
   EFI_HII_PACK_HEADER Header; ///< Header of the IFR package.
 } EFI_HII_IFR_PACK;
 
 ///
 /// HII Handle package structure.
-/// 
+///
 typedef struct {
-  ///  /// Header of the package.  ///  EFI_HII_PACK_HEADER Header;           // Must be filled in  ///  /// The image handle of the driver to which the package is referring.  ///  EFI_HANDLE          ImageHandle;      // Must be filled in  ///
+  ///
+  /// Header of the package.
+  ///
+  EFI_HII_PACK_HEADER Header;           ///< Must be filled in
+  ///
+  /// The image handle of the driver to which the package is referring.
+  ///
+  EFI_HANDLE          ImageHandle;      ///< Must be filled in
+  ///
   /// The handle of the device that is being described by this package.
   ///
-  EFI_HANDLE          DeviceHandle;     // Optional
+  EFI_HANDLE          DeviceHandle;     ///< Optional
   ///
   /// The handle of the parent of the device that is being described by this package.
   ///
-  EFI_HANDLE          ControllerHandle; // Optional
+  EFI_HANDLE          ControllerHandle; ///< Optional
   ///
   /// The handle that was registered to receive EFI_FORM_CALLBACK_PROTOCOL calls from other drivers.
   ///
-  EFI_HANDLE          CallbackHandle;   // Optional
+  EFI_HANDLE          CallbackHandle;   ///< Optional
   ///
   /// Note this field is not defined in the Framework HII 0.92 spec.
   /// Unused. Reserved for source code compatibility.
   ///
-  EFI_HANDLE          COBExportHandle;  // Optional
+  EFI_HANDLE          COBExportHandle;  ///< Optional
 } EFI_HII_HANDLE_PACK;
 
 ///
 /// Variable package structure.
-/// 
+///
 typedef struct {
   ///
   /// Header of the package.
@@ -144,13 +167,13 @@ typedef struct {
 
 typedef struct {
   ///
-  /// Unique value that correlates to the original HII handle. 
+  /// Unique value that correlates to the original HII handle.
   ///
   FRAMEWORK_EFI_HII_HANDLE  HiiHandle;
   ///
   /// If an IFR pack exists in a data table that does not contain strings,
-  /// then the strings for that IFR pack are located in another data table 
-  /// that contains a string pack and has a matching HiiDataTable.PackageGuid. 
+  /// then the strings for that IFR pack are located in another data table
+  /// that contains a string pack and has a matching HiiDataTable.PackageGuid.
   ///
   EFI_GUID                  PackageGuid;
   ///
@@ -163,7 +186,7 @@ typedef struct {
   ///
   UINT32                    IfrDataOffset;
   ///
-  /// Byte offset from the start of this structure to the string data. 
+  /// Byte offset from the start of this structure to the string data.
   /// If the offset value is 0, then no string data is enclosed.
   ///
   UINT32                    StringDataOffset;
@@ -216,18 +239,18 @@ typedef struct {
 ///
 typedef struct {
   ///
-  /// If TRUE, indicates that the FormCallbackHandle value will 
+  /// If TRUE, indicates that the FormCallbackHandle value will
   /// be used to update the contents of the CallBackHandle entry in the form set.
   ///
   BOOLEAN               FormSetUpdate;
   ///
   /// This parameter is valid only when FormSetUpdate is TRUE.
-  /// The value in this parameter will be used to update the contents 
+  /// The value in this parameter will be used to update the contents
   /// of the CallbackHandle entry in the form set.
   ///
   EFI_PHYSICAL_ADDRESS  FormCallbackHandle;
   ///
-  /// If TRUE, indicates that the FormTitle contents will be 
+  /// If TRUE, indicates that the FormTitle contents will be
   /// used to update the FormValue's title.
   ///
   BOOLEAN               FormUpdate;
@@ -237,7 +260,7 @@ typedef struct {
   UINT16                FormValue;
   ///
   /// This parameter is valid only when the FormUpdate parameter is TRUE.
-  /// The value in this parameter will be used to update the contents of the form title. 
+  /// The value in this parameter will be used to update the contents of the form title.
   ///
   STRING_REF            FormTitle;
   ///
@@ -254,7 +277,18 @@ typedef struct {
 //
 #define LANG_RIGHT_TO_LEFT  0x00000001
 
-////// A string package is used to localize strings to a particular/// language.  The package is associated with a particular driver/// or set of drivers.  Tools are used to associate tokens with/// string references in forms and in programs.  These tokens are/// language agnostic.  When paired with a language pack (directly/// or indirectly), the string token resolves into an actual/// UNICODE string.  The NumStringPointers determines how many/// StringPointers (offset values) there are as well as the total/// number of Strings that are defined.///typedef struct {
+///
+/// A string package is used to localize strings to a particular
+/// language.  The package is associated with a particular driver
+/// or set of drivers.  Tools are used to associate tokens with
+/// string references in forms and in programs.  These tokens are
+/// language agnostic.  When paired with a language pack (directly
+/// or indirectly), the string token resolves into an actual
+/// UNICODE string.  The NumStringPointers determines how many
+/// StringPointers (offset values) there are as well as the total
+/// number of Strings that are defined.
+///
+typedef struct {
   ///
   /// Header of the package.
   ///
@@ -262,7 +296,7 @@ typedef struct {
   ///
   /// The string containing one or more ISO 639-2 three-character designator(s)
   /// of the language or languages whose translations are contained in this language pack.
-  /// The first designator indicates the primary language while the others are secondary languages. 
+  /// The first designator indicates the primary language while the others are secondary languages.
   ///
   RELOFST             LanguageNameString;
   ///
@@ -306,7 +340,14 @@ typedef struct {
   //EFI_WIDE_GLYPH    WideGlyphs[];
 } EFI_HII_FONT_PACK;
 
-////// The definition of a specific physical key////// Note: Name difference between code and the Framework HII 0.92 spec.///       Add FRAMEWORK_ prefix to avoid name confict with EFI_KEY_DESCRIPTOR defined in the///       UEFI 2.1d spec.///typedef struct {
+///
+/// The definition of a specific physical key
+///
+/// Note: Name difference between code and the Framework HII 0.92 spec.
+///       Add FRAMEWORK_ prefix to avoid name confict with EFI_KEY_DESCRIPTOR defined in the
+///       UEFI 2.1d spec.
+///
+typedef struct {
   ///
   /// Used to describe a physical key on a keyboard.
   ///
@@ -327,13 +368,26 @@ typedef struct {
   ///
   CHAR16  ShiftedAltGrUnicode;
   ///
-  /// Modifier keys are defined to allow for special functionality that 
-  /// is not necessarily accomplished by a printable character. 
+  /// Modifier keys are defined to allow for special functionality that
+  /// is not necessarily accomplished by a printable character.
   ///
   UINT16  Modifier;
 } FRAMEWORK_EFI_KEY_DESCRIPTOR;
 
-////// This structure allows a sparse set of keys to be redefined/// or a complete redefinition of the keyboard layout.  Most/// keyboards have a lot of commonality in their layouts, therefore/// only defining those keys that need to change from the default/// minimizes the passed in information.////// Additionally, when an update occurs, the active keyboard layout/// will be switched to the newly updated keyboard layout.  This/// allows for situations that when a keyboard layout driver is/// loaded as part of system initialization, the system will default/// the keyboard behavior to the new layout.///typedef struct {
+///
+/// This structure allows a sparse set of keys to be redefined
+/// or a complete redefinition of the keyboard layout.  Most
+/// keyboards have a lot of commonality in their layouts, therefore
+/// only defining those keys that need to change from the default
+/// minimizes the passed in information.
+///
+/// Additionally, when an update occurs, the active keyboard layout
+/// will be switched to the newly updated keyboard layout.  This
+/// allows for situations that when a keyboard layout driver is
+/// loaded as part of system initialization, the system will default
+/// the keyboard behavior to the new layout.
+///
+typedef struct {
   ///
   /// Header of the package.
   EFI_HII_PACK_HEADER           Header;
@@ -379,7 +433,7 @@ typedef struct {
 ///
 typedef struct _EFI_HII_VARIABLE_PACK_LIST {
   ///
-  /// A pointer points to the next data structure of type 
+  /// A pointer points to the next data structure of type
   /// EFI_HII_VARIABLE_PACK_LIST in the packed link list.
   ///
   struct _EFI_HII_VARIABLE_PACK_LIST   *NextVariablePack;
@@ -861,17 +915,17 @@ struct _EFI_HII_PROTOCOL {
   /// Extracts the various packs from a package list.
   ///
   EFI_HII_NEW_PACK                      NewPack;
-  
+
   ///
   /// Removes a package from the HII database.
   ///
   EFI_HII_REMOVE_PACK                   RemovePack;
-  
+
   ///
   /// Determines the handles that are currently active in the database.
-  /// 
+  ///
   EFI_HII_FIND_HANDLES                  FindHandles;
-  
+
   ///
   /// Export the entire contents of the database to a buffer.
   ///
@@ -881,12 +935,12 @@ struct _EFI_HII_PROTOCOL {
   /// Tests if all of the characters in a string have corresponding font characters.
   ///
   EFI_HII_TEST_STRING                   TestString;
-  
+
   ///
   /// Translates a Unicode character into the corresponding font glyph.
   ///
   FRAMEWORK_EFI_HII_GET_GLYPH           GetGlyph;
-  
+
   ///
   /// Converts a glyph value into a format that is ready for a UGA BLT command.
   ///
@@ -896,48 +950,48 @@ struct _EFI_HII_PROTOCOL {
   /// Allows a new string to be added to an already existing string package.
   ///
   FRAMEWORK_EFI_HII_NEW_STRING          NewString;
-  
+
   ///
   /// Allows a program to determine the primary languages that are supported
-  /// on a given handle.  
+  /// on a given handle.
   ///
   EFI_HII_GET_PRI_LANGUAGES             GetPrimaryLanguages;
-  
+
   ///
   /// Allows a program to determine which secondary languages are supported
-  /// on a given handle for a given primary language.  
+  /// on a given handle for a given primary language.
   ///
   EFI_HII_GET_SEC_LANGUAGES             GetSecondaryLanguages;
-  
+
   ///
   /// Extracts a string from a package that is already registered with the
-  /// EFI HII database.  
+  /// EFI HII database.
   ///
   FRAMEWORK_EFI_HII_GET_STRING          GetString;
-  
+
   ///
   /// Remove any new strings that were added after the initial string export
-  /// for this handle.  
-  /// 
+  /// for this handle.
+  ///
   /// Note this function is not defined in the Framework HII 0.92 spec.
   ///
   EFI_HII_RESET_STRINGS                 ResetStrings;
-  
+
   ///
   /// Allows a program to extract a part of a string of not more than a given width.
   ///
   EFI_HII_GET_LINE                      GetLine;
-  
+
   ///
   /// Allows a program to extract a form or form package that has been previously registered.
   ///
   EFI_HII_GET_FORMS                     GetForms;
-  
+
   ///
   /// Allows a program to extract the nonvolatile image that represents the default storage image.
   ///
   EFI_HII_GET_DEFAULT_IMAGE             GetDefaultImage;
-  
+
   ///
   /// Allows a program to update a previously registered form.
   ///
