@@ -159,7 +159,7 @@
 
   # IDE Support
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
-  DuetPkg/IdeControllerDxe/IdeController.inf
+  PcAtChipsetPkg/Bus/Pci/IdeControllerDxe/IdeControllerDxe.inf
   
   # Usb Support
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
