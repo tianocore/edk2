@@ -1,7 +1,7 @@
 #/** @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2008, Intel Corporation
+# Copyright (c) 2007 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 [Defines]
   PLATFORM_NAME                  = Mde
   PLATFORM_GUID                  = 082F8BFC-0455-4859-AE3C-ECD64FB81642
-  PLATFORM_VERSION               = 0.1
+  PLATFORM_VERSION               = 1.01
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Mde
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
@@ -161,4 +161,4 @@
 
 [Components.EBC]
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  
+

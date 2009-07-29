@@ -23,7 +23,7 @@
 [Defines]
   PLATFORM_NAME                  = IntelFrameworkModuleAll
   PLATFORM_GUID                  = FFF87D9A-E5BB-4AFF-9ADE-8645492E8087
-  PLATFORM_VERSION               = 0.1
+  PLATFORM_VERSION               = 0.90
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/IntelFrameworkModuleAll
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
@@ -151,7 +151,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
-  
+
 [PcdsDynamicDefault.PEIM.DEFAULT]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
 
