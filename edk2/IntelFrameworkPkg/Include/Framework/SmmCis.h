@@ -592,7 +592,7 @@ struct _EFI_SMM_SYSTEM_TABLE {
   //
   
   ///Inconsistent with specification here:
-  ///  In Framework Spec, this definition does not exist. This method is introduced in PI1.0 spec for 
+  ///  In Framework Spec, this definition does not exist. This method is introduced in PI1.1 spec for 
   ///  implementation needed.
   EFI_SMM_STARTUP_THIS_AP             SmmStartupThisAp;
 
