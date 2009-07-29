@@ -18,7 +18,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = IntelFrameworkModulePkg
   PACKAGE_GUID                   = 88894582-7553-4822-B484-624E24B6DECF
-  PACKAGE_VERSION                = 0.1
+  PACKAGE_VERSION                = 0.90
 
 [Includes]
   Include                        # Root include for the package
@@ -37,19 +37,19 @@
   ## IntelFrameworkModule package token space guid
   ## Include/Guid/IntelFrameworkModulePkgTokenSpace.h
   gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
-  
-  ## GUID identifies status code records HOB that originate from the PEI status code  
-  ## Include/Guid/MemoryStatusCodeRecord.h 	
+
+  ## GUID identifies status code records HOB that originate from the PEI status code
+  ## Include/Guid/MemoryStatusCodeRecord.h
   gMemoryStatusCodeRecordGuid     = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
-  
+
   ## GUID identifies Data Hub records logged by Status Code Runtime Protocol.
   ## Include/Guid/DataHubStatusCodeRecord.h
   gEfiDataHubStatusCodeRecordGuid = { 0xD083E94C, 0x6560, 0x42E4, { 0xB6, 0xD4, 0x2D, 0xF7, 0x5A, 0xDF, 0x6A, 0x2A }}
-  
+
   ## GUID indicates the tiano custom compress/decompress algorithm.
   ## Include/Guid/TianoDecompress.h
   gTianoCustomDecompressGuid     = { 0xA31280AD, 0x481E, 0x41B6, { 0x95, 0xE8, 0x12, 0x7F, 0x4C, 0x98, 0x47, 0x79 }}
-  
+
   ## GUID indicates the LZMA custom compress/decompress algorithm.
   ## Include/Guid/LzmaDecompress.h
   gLzmaCustomDecompressGuid      = { 0xEE4E5898, 0x3914, 0x4259, { 0x9D, 0x6E, 0xDC, 0x7B, 0xD7, 0x94, 0x03, 0xCF }}
@@ -95,10 +95,10 @@
 
   ## This PCD specifies whether Peiphase StatusCode is replayed in DxePhase.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn|FALSE|BOOLEAN|0x0001002d
-  
+
   ## This PCD specifies whether PciBus supports the hot plug device.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE|BOOLEAN|0x0001003d
-  
+
   ## This PCD specifies whether Serial device use half hand shake.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010043
 
@@ -124,9 +124,9 @@
 
 [PcdsDynamic]
   ## PCD is used to mark if the machine has complete one boot cycle before.
-  #  After the complete boot, the variable BootState will be set to TRUE. 
+  #  After the complete boot, the variable BootState will be set to TRUE.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
-  
+
   ## Timeout value for displaying progressing bar in before boot OS.
   #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
