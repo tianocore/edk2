@@ -103,8 +103,8 @@ struct _EFI_SMM_CPU_IO_INTERFACE {
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
   @retval EFI_UNSUPPORTED       In runtime.
   @note: Inconsistent with specification here:
-         In Framework Spec, This definition is naming EFI_SMM_ALLOCATE_POOL. However, 
-         To avoid the naming conflict, the definition is renamed.
+         In Framework Spec, this definition is named EFI_SMM_ALLOCATE_POOL.  
+         To avoid a naming conflict, the definition is renamed.
 **/
 typedef
 EFI_STATUS
@@ -123,8 +123,8 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
   @retval EFI_UNSUPPORTED       In runtime.
   @note: Inconsistent with specification here:
-         In the Framework Spec, this definition is named EFI_SMM_FREE_POOL.  
-         To avoid a naming conflict, the definition here is renamed. 
+         In Framework Spec, this definition is named EFI_SMM_FREE_POOL.  
+         To avoid a naming conflict, the definition is renamed. 
 **/
 typedef
 EFI_STATUS
@@ -182,7 +182,8 @@ EFI_STATUS
   );
 
 /**
-  Frees memory pages for the system.
+  Lets the caller get one distinct application processor (AP) in the enabled processor pool to execite a 
+  caller-provided code stream while in SMM. 
 
   @param  Procedure         A pointer to the code stream to be run on the designated AP of the system.
   @param  CpuNumber         The zero-based index of the processor number of the AP on which the code stream is
