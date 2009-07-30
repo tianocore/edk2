@@ -5,6 +5,7 @@
 # contains the header files and libraries found in the original EDK. EdkCompatibilityPkg code is ANSI C compliant, so the modules can be built with GCC tool-chains. 
 # This package also incorporates bug fixes released in EDK 1.04.
 # 
+# Copyright (c) 2008 - 2009, Intel Corporation
 #
 # All rights reserved.
 #    This program and the accompanying materials are licensed and made available under
@@ -27,7 +28,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = EdkCompatibilityPkg
   PACKAGE_GUID                   = 98EDD7B0-2A6C-4b4a-AC72-4AAE0F95A3F8
-  PACKAGE_VERSION                = 0.5
+  PACKAGE_VERSION                = 0.90
   
   
 ################################################################################
