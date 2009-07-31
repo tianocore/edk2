@@ -88,7 +88,7 @@
 
 <p class="main-details">
   For the IA32 build of OVMF, there is a little more choice, since the
-  X64 processor is also compatible with IA32.&nsbp;
+  X64 processor is also compatible with IA32.&nbsp;
   Therefore, with the IA32 build of OVMF, you can use the following
   commands: qemu, qemu-system-i386 or qemu-system-x86_64.
 </p>
@@ -129,12 +129,21 @@ bash$ <b>cp /path/to/ovmf/OVMF.fd bios.bin</b>
 </pre>
 
 <p class="main-details">
-  Next, create a hard disk image (QEMU requires at least one disk
-  image when it is run):
+  Now copy the CirrusLogic5446.rom file into this directory,
+  but rename it to vgabios-cirrus.bin:
 </p>
 
 <pre class="build-step-code">
-bash$ <b>qemu-img create -f qcow2 hda.img 20M</b>
+bash$ <b>cp /path/to/ovmf/CirrusLogic5446.rom vgabios-cirrus.bin</b>
+</pre>
+
+<p class="main-details">
+  Next, create a directory to use as a hard disk image for QEMU.&nbsp;
+  (QEMU can turn the contents of a directory into a disk image 'on-the-fly'):
+</p>
+
+<pre class="build-step-code">
+bash$ <b>mkdir hda-contents</b>
 </pre>
 
 <h2 class="main-title">
@@ -146,26 +155,11 @@ bash$ <b>qemu-img create -f qcow2 hda.img 20M</b>
 </p>
 
 <pre class="build-step-code">
-bash$ <b>qemu-system-x86_64 -L . -hda hda.img</b>
+bash$ <b>qemu-system-x86_64 -L . -hda fat:hda-contents</b>
 </pre>
 
 <p class="main-details">
   If everything goes well, you should see a graphic logo, and then the
   UEFI shell should start.
-</p>
-
-<p class="main-details">
-  If you see the following error,
-</p>
-
-<pre class="build-step-code">
-qemu: could not load VGA BIOS './vgabios-cirrus.bin'
-</pre>
-
-<p class="main-details">
-  then copy the vgabios-cirrus.bin file from QEMU into your OVMF bios.bin
-  directory. (~/run-ovmf in the above example)&nbsp;
-  Although QEMU may complaign if this file is not found, it will not
-  be used by the OVMF firmware.
 </p>
 
