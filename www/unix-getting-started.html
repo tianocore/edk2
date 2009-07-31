@@ -501,11 +501,12 @@ bash$ <b>sudo apt-get install build-essential uuid-dev texinfo \
 </p>
 
 <h3 class="build-step-title">
-  Get and build the edk2 BaseTools
+  Get the edk2 source tree and build the BaseTools
 </h3>
 
 <p class="build-step-details">
-  We will now check out the BaseTools source code using subversion.&nbsp;
+  We will now download the edk2 source tree using subversion, and build
+  the BaseTools.&nbsp;
   (If you are behind a web proxy, then you may need to configure your proxy
   in the ~/.subversion/servers file.)&nbsp;
   We will tell subversion to use the 'guest' username on tianocore.org.&nbsp;
@@ -516,9 +517,9 @@ bash$ <b>sudo apt-get install build-essential uuid-dev texinfo \
 bash$ <b>mkdir ~/src</b>
 bash$ <b>cd ~/src</b>
 bash$ <b>svn co \
-  https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools \
+  https://edk2.tianocore.org/svn/edk2/trunk/edk2 \
   --username guest</b>
-bash$ <b>make -C BaseTools</b>
+bash$ <b>make -C edk2/BaseTools</b>
 </pre>
 
 <h3 class="build-step-title">
@@ -544,7 +545,7 @@ bash$ <b>export http_proxy=http://proxy.domain.com:proxy_port</b>
 </p>
 
 <pre class="build-step-code">
-bash$ <b>cd ~/src/BaseTools/gcc</b>
+bash$ <b>cd ~/src/edk2/BaseTools/gcc</b>
 bash$ <b>./mingw-gcc-build.py --arch=x64 \
   --prefix=~/programs/gcc/x64</b>
 </pre>
@@ -553,20 +554,13 @@ bash$ <b>./mingw-gcc-build.py --arch=x64 \
   Get the edk2 source tree
 </h3>
 
-<pre class="build-step-code">
-bash$ <b>cd ~/src</b>
-bash$ <b>svn co \
-  https://edk2.tianocore.org/svn/edk2/trunk/edk2 \
-  --username guest</b>
-</pre>
-
 <h3 class="build-step-title">
   Setup build shell environment
 </h3>
 
 <pre class="build-step-code">
 bash$ <b>cd ~/src/edk2</b>
-bash$ <b>export EDK_TOOLS_PATH=~/src/BaseTools</b>
+bash$ <b>export EDK_TOOLS_PATH=~/src/edk2/BaseTools</b>
 bash$ <b>. edksetup.sh BaseTools</b>
 </pre>
 
