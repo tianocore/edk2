@@ -19,6 +19,13 @@ try:
 except Exception:
     from md5 import md5
 
+if sys.version_info < (2, 5):
+    #
+    # This script (and edk2 BaseTools) require Python 2.5 or newer
+    #
+    print 'Python version 2.5 or later is required.'
+    sys.exit(-1)
+
 #
 # Version and Copyright
 #
@@ -174,33 +181,25 @@ class SourceFiles:
             'md5': '197ed8468b38db1d3481c3111691d85b',
             },
         'mingw_hdr': {
-            'url': 'http://superb-west.dl.sourceforge.net/sourceforge/' + \
-                   'mingw-w64/mingw-w64-snapshot-$version.tar.bz2',
+            'url': 'http://downloads.sourceforge.net/project/' + \
+                   'mingw-w64/mingw-w64/mingw-w64-snapshot/' + \
+                   'mingw-w64-snapshot-$version.tar.bz2',
             'extract-dir': os.path.join('trunk', 'mingw-w64-headers'),
-            'version': '20080310',
-            'md5': '235b2d15c2411f7d213c0c0977b2162f',
+            'version': '20090419',
+            'md5': '9146ecfabaf172e4cc427b88e8d218c1',
             },
         }
 
     source_files_ia32 = {
-        'gcc': {
-            'url': 'http://superb-east.dl.sourceforge.net/sourceforge/' + \
-                   'mingw/gcc-$version-mingw-$minor_version-src.tar.gz',
-            'version': '4.3.0',
-            'minor_version': 'alpha-20080403',
-            'extract-dir': 'gcc-$version',
-            'md5': '27961d80e304f4ef32c980833c6e8e44',
-            'configure-params': ('--with-gnu-as', '--with-gnu-ld', '--with-newlib',
-                                 '--verbose', '--disable-libssp', '--disable-nls',
-                                 '--enable-languages=c,c++'
-                                )
-            },
+        'gcc': source_files_x64['gcc'],
         'mingw_hdr': {
-            'url': 'http://superb-west.dl.sourceforge.net/sourceforge/' + \
-                   'mingw/mingw-runtime-$version-src.tar.gz',
-            'extract-dir': 'mingw-runtime-$version',
-            'version': '3.14',
-            'md5': '7d049a8331efcfe34600c0cda6934ac6',
+            'url': 'http://downloads.sourceforge.net/project/' + \
+                   'mingw/MinGW%20Runtime/' + \
+                   'Current%20Release_%20mingwrt-$version/' + \
+                   'mingwrt-$version-mingw32-src.tar.gz',
+            'extract-dir': 'mingwrt-$version-mingw32',
+            'version': '3.15.2',
+            'md5': '7bf0525f158213f3ac990ea68a5ec34d',
             },
         }
 
@@ -255,7 +254,7 @@ class SourceFiles:
                     sys.stdout.flush()
                     self.dots += 1
 
-        maxRetries = 3
+        maxRetries = 1
         for (fname, fdata) in self.source_files.items():
             for retries in range(maxRetries):
                 try:
@@ -300,6 +299,13 @@ class SourceFiles:
                         break
                     else:
                         print '[failed]'
+                        print '  Tried to retrieve', url
+                        print '  to', local_file
+                        print 'Possible fixes:'
+                        print '* If you are behind a web-proxy, try setting the',
+                        print 'http_proxy environment variable'
+                        print '* You can try to download this file separately',
+                        print 'and rerun this script'
                         raise Exception()
                 
                 except KeyboardInterrupt:
