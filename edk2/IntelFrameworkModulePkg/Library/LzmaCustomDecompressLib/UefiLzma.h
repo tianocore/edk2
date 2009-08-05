@@ -24,15 +24,19 @@
 #undef _WIN32
 #endif
 
+#ifndef _SIZE_T_DEFINED
 #if !defined(_WIN64) || defined(__GNUC__)
 typedef unsigned int size_t;
+#endif
 #endif
 
 #ifdef _WIN64
 #undef _WIN64
 #endif
 
+#ifndef _PTRDIFF_T_DEFINED
 typedef int ptrdiff_t;
+#endif
 
 #define memcpy CopyMem
 #define memmove CopyMem
