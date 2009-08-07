@@ -534,14 +534,14 @@
   gEfiPciHotPlugInitProtocolGuid = { 0xaa0e8bc1, 0xdabc, 0x46b0, { 0xa8, 0x44, 0x37, 0xb8, 0x16, 0x9b, 0x2b, 0xea }}
 
   ## This protocol is used to add or remove all PCI child devices on the PCI root bridge.
-  ## Include/Protocol/PciHotPlugRequest.h
+  #  Include/Protocol/PciHotPlugRequest.h
   gEfiPciHotPlugRequestProtocolGuid = { 0x19CB87AB, 0x2CB9, 0x4665, { 0x83, 0x60, 0xDD, 0xCF, 0x60, 0x54, 0xF7, 0x9D }}
 
   ## Include/Protocol/IdeControllerInit.h
   gEfiIdeControllerInitProtocolGuid = { 0xa1e37052, 0x80d9, 0x4e65, { 0xa3, 0x17, 0x3e, 0x9a, 0x55, 0xc4, 0x3e, 0xc9 }}
 
   ## Disk Info protocol is used to export Inquiry Data for a drive.
-  ## Include/Protocol/DiskInfo.h
+  #  Include/Protocol/DiskInfo.h
   gEfiDiskInfoProtocolGuid       = { 0xD432A67F, 0x14DC, 0x484B, { 0xB3, 0xBB, 0x3F, 0x02, 0x91, 0x84, 0x93, 0x27 }}
 
   #
@@ -994,5 +994,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1|UINT8|0x00000023
 
   ## Indicates the usable type of terminal
-  # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
+  #  0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0|UINT8|0x00000024
