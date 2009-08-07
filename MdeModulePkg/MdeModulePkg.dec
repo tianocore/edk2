@@ -60,17 +60,17 @@
   DpcLib|Include/Library/DpcLib.h
 
   ##  @libraryclass    Provides global variables that are pointers
-  ##  to the UEFI HII related protocols.
-  ##
+  #   to the UEFI HII related protocols.
+  #
   UefiHiiServicesLib|Include/Library/UefiHiiServicesLib.h
 
 [Guids.common]
   ## MdeModule package token space guid
-  ## Include/Guid/MdeModulePkgTokenSpace.h
+  # Include/Guid/MdeModulePkgTokenSpace.h
   gEfiMdeModulePkgTokenSpaceGuid       = { 0xA1AFF049, 0xFDEB, 0x442a, { 0xB3, 0x20, 0x13, 0xAB, 0x4C, 0xB7, 0x2B, 0xBC }}
 
   ## Hob guid for Pcd DataBase
-  ## Include/Guid/PcdDataBaseHobGuid.h
+  #  Include/Guid/PcdDataBaseHobGuid.h
   gPcdDataBaseHobGuid            = { 0xEA296D92, 0x0B69, 0x423C, { 0x8C, 0x28, 0x33, 0xB4, 0xE0, 0xA9, 0x12, 0x68 }}
 
   ## Guid for EDKII implementation GUIDed opcodes
@@ -82,39 +82,39 @@
   gEfiIfrFrameworkGuid  = { 0x31ca5d1a, 0xd511, 0x4931, { 0xb7, 0x82, 0xae, 0x6b, 0x2b, 0x17, 0x8c, 0xd7 }}
 
   ## Guid to specify the System Non Volatile FV
-  ## Include/Guid/SystemNvDataGuid.h
+  #  Include/Guid/SystemNvDataGuid.h
   gEfiSystemNvDataFvGuid         = { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
 
   ## Guid specify the device is the console out device.
-  ## Include/Guid/ConsoleOutDevice.h
+  #  Include/Guid/ConsoleOutDevice.h
   gEfiConsoleOutDeviceGuid       = { 0xD3B36F2C, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
 
   ## Guid specify the device is the console in device.
-  ## Include/Guid/ConsoleInDevice.h
+  #  Include/Guid/ConsoleInDevice.h
   gEfiConsoleInDeviceGuid        = { 0xD3B36F2B, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
 
   ## Hob and Variable guid specify the platform memory type information.
-  ## Include/Guid/MemoryTypeInformation.h
+  #  Include/Guid/MemoryTypeInformation.h
   gEfiMemoryTypeInformationGuid  = { 0x4C19049F, 0x4137, 0x4DD3, { 0x9C, 0x10, 0x8B, 0x97, 0xA8, 0x3F, 0xFD, 0xFA }}
 
   ## Capsule update hob and variable guid
-  ## Include/Guid/CapsuleVendor.h
+  #  Include/Guid/CapsuleVendor.h
   gEfiCapsuleVendorGuid          = { 0x711C703F, 0xC285, 0x4B10, { 0xA3, 0xB0, 0x36, 0xEC, 0xBD, 0x3C, 0x8B, 0xE2 }}
 
   ## Guid specifiy the device is the StdErr device.
-  ## Include/Guid/StandardErrorDevice.h
+  #  Include/Guid/StandardErrorDevice.h
   gEfiStandardErrorDeviceGuid    = { 0xD3B36F2D, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}
 
   ## Guid acted as variable store header's signature and to specify the variable list entries put in the EFI system table.
-  ## Include/Guid/VariableFormat.h
+  #  Include/Guid/VariableFormat.h
   gEfiVariableGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
 
   ## Performance protocol guid that also acts as the performance HOB guid and performance variable GUID
-  ## Include/Guid/Performance.h
+  #  Include/Guid/Performance.h
   gPerformanceProtocolGuid       = { 0x76B6BDFA, 0x2ACD, 0x4462, { 0x9E, 0x3F, 0xCB, 0x58, 0xC9, 0x69, 0xD9, 0x37 }}
 
   ## Guid is defined for CRC32 encapsulation scheme.
-  ## Include/Guid/Crc32GuidedSectionExtraction.h
+  #  Include/Guid/Crc32GuidedSectionExtraction.h
   gEfiCrc32GuidedSectionExtractionGuid = { 0xFC1BCDB0, 0x7D31, 0x49aa, {0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83 } }
 
   ## Include/Guid/NicIp4ConfigNvData.h
@@ -122,17 +122,17 @@
 
 [Protocols.common]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
-  ## Include/Protocol/LoadPe32Image.h
-  ## This protocol is deprecated. Native EDKII module should NOT use this protocol to load/unload image.
-  ## If developer need implement such functionality, they should use BasePeCoffLib.
+  #  Include/Protocol/LoadPe32Image.h
+  #  This protocol is deprecated. Native EDKII module should NOT use this protocol to load/unload image.
+  #  If developer need implement such functionality, they should use BasePeCoffLib.
   gEfiLoadPeImageProtocolGuid    = { 0x5CB5C776, 0x60D5, 0x45EE, { 0x88, 0x3C, 0x45, 0x27, 0x08, 0xCD, 0x74, 0x3F }}
 
   ## Print protocol defines basic print functions to print the format unicode and ascii string.
-  ## Include/Protocol/Print2.h
+  # Include/Protocol/Print2.h
   gEfiPrint2ProtocolGuid          = { 0xf05976ef, 0x83f1, 0x4f3d, { 0x86, 0x19, 0xf7, 0x59, 0x5d, 0x41, 0xe5, 0x38 } }
 
   ## This protocol defines the generic memory test interfaces in Dxe phase.
-  ## Include/Protocol/GenericMemoryTest.h
+  # Include/Protocol/GenericMemoryTest.h
   gEfiGenericMemTestProtocolGuid = { 0x309DE7F1, 0x7F5E, 0x4ACE, { 0xB4, 0x9C, 0x53, 0x1B, 0xE5, 0xAA, 0x95, 0xEF }}
 
   ## Include/Protocol/Dpc.h
@@ -152,7 +152,7 @@
 
   ## This feature flag can be used to enable or disable all PCD PEIM services.
   #  If TRUE, all PCD PPI services will be produced.
-  ## If FALSE, the minimal PCD PEIM services (only GetService) will be produced.
+  #  If FALSE, the minimal PCD PEIM services (only GetService) will be produced.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable|TRUE|BOOLEAN|0x00010020
 
   ## If TRUE, then the Device Path To Text Protocol should be produced by the platform.
@@ -193,7 +193,6 @@
 
   ## If TRUE, force to switch off the support of legacy usb. So legacy usb device driver can not make use of SMI
   #  interrupt to access usb device in the case of absence of usb stack.
-  ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
 
   ## If TRUE, HiiImageProtocol will be installed.
@@ -207,22 +206,18 @@
 
   ## If TRUE, Setup Browser supports GUID opcodes generated from Framework HII VFR file by VFR compiler.
   #  If TRUE, the PeiCore will handle the framework FvHob and install FvInfo PPI for it.
-  ## This is used to provide backward compatibility support to Framework HII and Framework FvHob.
+  #  This is used to provide backward compatibility support to Framework HII and Framework FvHob.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport|FALSE|BOOLEAN|0x00012009
 
-  ##
-  #  If TRUE, HelloWorld Application will print the verbose information.
+  ## If TRUE, HelloWorld Application will print the verbose information.
   #  This PCD is a sample to explain FeatureFlag PCD usage.
-  ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable|TRUE|BOOLEAN|0x0001200a
 
-  ##
-  #  If TRUE, FULL FTW protocol services (total six APIs) will be produced.
+  ## If TRUE, FULL FTW protocol services (total six APIs) will be produced.
   #  If FASLE, only FTW Write service is available.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable|TRUE|BOOLEAN|0x0001200b
 
-  ##
-  #  If TRUE, DXE IPL must support the UEFI decompression algorithm.
+  ## If TRUE, DXE IPL must support the UEFI decompression algorithm.
   #  If FALSE, DXE IPL will not support UEFI decompression to save space.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|TRUE|BOOLEAN|0x0001200c
 
@@ -260,9 +255,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported|64|UINT32|0x00010033
 
   ## Size of the NV variable range. Note that this value should less than or equal to PcdFlashNvStorageFtwSpareSize
-  # The root cause is that variable driver will use FTW protocol to reclaim variable region.
-  # If the length of variable region is larger than FTW spare size, it means the whole variable region can not
-  # be reflushed through the manner of fault tolerant write.
+  #  The root cause is that variable driver will use FTW protocol to reclaim variable region.
+  #  If the length of variable region is larger than FTW spare size, it means the whole variable region can not
+  #  be reflushed through the manner of fault tolerant write.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
 
   ## The maximum size of single common variable, that is non-HwErr type varible.
@@ -301,14 +296,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
 
 [PcdsPatchableInModule,PcdsDynamic]
-  ##
-  #  This PCD defines the Console output column and the default value is 25 according to UEFI spec
-  ##
+  ## This PCD defines the Console output column and the default value is 25 according to UEFI spec
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|25|UINT32|0x40000006
 
-  ##
-  #  This PCD defines the Console output row and the default value is 80 according to UEFI spec
-  ##
+  ## This PCD defines the Console output row and the default value is 80 according to UEFI spec
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|80|UINT32|0x40000007
 
 [PcdsFixedAtBuild,PcdsDynamic]
@@ -321,17 +312,13 @@
   ## Base address of the FTW working block range in flash device.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0x0|UINT32|0x30000010
 
-  ##
-  #  This PCD defines the print string.
+  ## This PCD defines the print string.
   #  This PCD is a sample to explain String typed PCD usage.
-  ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004
 
 [PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
-  ##
-  #  This PCD defines the times to print hello world string.
+  ## This PCD defines the times to print hello world string.
   #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
-  ##
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
 
   ## Indicate the max size of the populated capsule image that the platform can support.
