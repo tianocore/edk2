@@ -279,7 +279,7 @@ typedef struct {
 /// Inconsistent with specification here:
 /// Following defintion may not comply with Framework Specification HII 0.92. To 
 /// keep the inconsistant is for implementation needed.
-///
+///@{
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
   UINT8                             Flags;
@@ -323,6 +323,7 @@ typedef struct {
   UINT16                            VariableId;   ///< offset into variable storage
   UINT16                            Value;        ///< value to compare against
 } EFI_IFR_EQ_VAR_VAL;
+///@}
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
