@@ -361,37 +361,16 @@ BdsLibConnectConsoleVariable (
 
     SetDevicePathEndNode (Next);
     //
-    // Check USB1.1 console
+    // Connect the instance device path
     //
-    if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
-       ((DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
-       || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
-       )) {
+    Status = BdsLibConnectDevicePath (Instance);
+    if (EFI_ERROR (Status)) {
       //
-      // Check the Usb console in Usb2.0 bus firstly, then Usb1.1 bus
+      // Delete the instance from the console varialbe
       //
-      Status = BdsLibConnectUsbDevByShortFormDP (PCI_IF_EHCI, Instance);
-      if (!EFI_ERROR (Status)) {
-        DeviceExist = TRUE;
-      }
-
-      Status = BdsLibConnectUsbDevByShortFormDP (PCI_IF_UHCI, Instance);
-      if (!EFI_ERROR (Status)) {
-        DeviceExist = TRUE;
-      }
+      BdsLibUpdateConsoleVariable (ConVarName, NULL, Instance);
     } else {
-      //
-      // Connect the instance device path
-      //
-      Status = BdsLibConnectDevicePath (Instance);
-      if (EFI_ERROR (Status)) {
-        //
-        // Delete the instance from the console varialbe
-        //
-        BdsLibUpdateConsoleVariable (ConVarName, NULL, Instance);
-      } else {
-        DeviceExist = TRUE;
-      }
+      DeviceExist = TRUE;
     }
     FreePool(Instance);
   } while (CopyOfDevicePath != NULL);
