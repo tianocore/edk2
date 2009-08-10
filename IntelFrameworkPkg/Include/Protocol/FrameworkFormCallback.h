@@ -37,11 +37,9 @@ typedef struct _EFI_FORM_CALLBACK_PROTOCOL  EFI_FORM_CALLBACK_PROTOCOL;
 
 ///
 ///  Inconsistent with specification here: 
-///  EFI_IFR_DATA_ENTRY RESET_REQUIRED, EXIT_REQUIRED, SAVE_REQUIRED, NV_CHANGED 
-//// and NV_NOT_CHANGED are not defined in HII specification. These Flags of EFI_IFR_DATA_ENTRY 
-///  should be defined to describe the standard behavior of the browser after the callback.
-///
-
+///  RESET_REQUIRED, EXIT_REQUIRED, SAVE_REQUIRED, NV_CHANGED and NV_NOT_CHANGED are not 
+///  defined in HII specification. These Flags of EFI_IFR_DATA_ENTRY should be defined
+///  to describe the standard behavior of the browser after the callback.
 ///
 /// If this flag is set, the browser will exit and reset after processing callback results
 ///
