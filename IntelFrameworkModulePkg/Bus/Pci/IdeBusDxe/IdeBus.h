@@ -39,7 +39,7 @@
 
 #include <Guid/EventGroup.h>
 
-#include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Pci.h>
 #include "IdeData.h"
 
 //
