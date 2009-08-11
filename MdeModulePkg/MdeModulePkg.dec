@@ -45,9 +45,13 @@
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
   ##  @libraryclass  Defines a set of methods related do S3 mode.
+  #   This library class is no longer used and modules using this library should
+  #   directly locate EFI_PEI_S3_RESUME_PPI defined in PI 1.2 specification.
   S3Lib|Include/Library/S3Lib.h
 
   ##  @libraryclass  Defines a set of methods related recovery mode.
+  #   This library class is no longer used and modules using this library should
+  #   directly locate EFI_PEI_RECOVERY_MODULE_PPI defined in PI 1.2 specification.
   RecoveryLib|Include/Library/RecoveryLib.h
 
   ##  @libraryclass  Provides HII related functions.
