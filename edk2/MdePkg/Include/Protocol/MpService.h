@@ -290,7 +290,7 @@ EFI_STATUS
        FailedCpuList is set to NULL. If not all APs return from Procedure before 
        the timeout, then FailedCpuList is filled in with the list of the failed 
        APs. The buffer is allocated by MP Service Protocol using AllocatePool(). 
-       It is the caller’s responsibility to free the buffer with FreePool() service.
+       It is the caller's responsibility to free the buffer with FreePool() service.
     -# This invocation of SignalEvent() function informs the caller that invoked
        EFI_MP_SERVICES_PROTOCOL.StartupAllAPs() that either all the APs completed
        the specified task or a timeout occurred. The contents of FailedCpuList 

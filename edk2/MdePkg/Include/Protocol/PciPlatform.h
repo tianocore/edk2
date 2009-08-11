@@ -334,7 +334,7 @@ struct _EFI_PCI_PLATFORM_PROTOCOL {
   ///
   EFI_PCI_PLATFORM_GET_PLATFORM_POLICY   GetPlatformPolicy;
   ///
-  /// Gets the PCI device’s option ROM from a platform-specific location.
+  /// Gets the PCI device's option ROM from a platform-specific location.
   ///
   EFI_PCI_PLATFORM_GET_PCI_ROM           GetPciRom;
 };
