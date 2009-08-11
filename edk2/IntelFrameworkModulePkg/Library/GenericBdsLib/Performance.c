@@ -194,7 +194,7 @@ WriteBootToOsPerformanceData (
   //
   Status = gBS->AllocatePages (
                   AllocateAnyPages,
-                  EfiACPIReclaimMemory,
+                  EfiReservedMemoryType,
                   EFI_SIZE_TO_PAGES (AcpiLowMemoryLength),
                   &AcpiLowMemoryBase
                   );
