@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -34,15 +34,14 @@
 #    IN UINT8  Value
 #    )
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemSetMem)
 ASM_PFX(InternalMemSetMem):
-    push    rdi
-    mov     rax, r8    # rax = Value
-    mov     rdi, rcx   # rdi = Buffer
-    xchg    rcx, rdx   # rcx = Count, rdx = Buffer
+    pushq   %rdi
+    movq    %r8, %rax      # rax = Value
+    movq    %rcx, %rdi     # rdi = Buffer
+    xchgq   %rdx, %rcx     # rcx = Count, rdx = Buffer
     rep     stosb
-    mov     rax, rdx   # rax = Buffer
-    pop     rdi
+    movq    %rdx, %rax     # rax = Buffer
+    popq    %rdi
     ret
 

@@ -8,10 +8,8 @@
     BaseMemoryLibRepStr
     BaseMemoryLibOptDxe
     BaseMemoryLibOptPei
-    PeiMemoryLib
-    DxeMemoryLib
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,8 +32,8 @@
   Copy Length bytes from Source to Destination.
 
   @param  DestinationBuffer Target of copy
-  @param  SourceBuffer Place to copy from
-  @param  Length Number of bytes to copy
+  @param  SourceBuffer      Place to copy from
+  @param  Length            Number of bytes to copy
 
   @return Destination
 
@@ -51,9 +49,9 @@ InternalMemCopyMem (
 /**
   Set Buffer to Value for Size bytes.
 
-  @param  Buffer Memory to set.
-  @param  Length Number of bytes to set
-  @param  Value Value of the set operation.
+  @param  Buffer   Memory to set.
+  @param  Length   Number of bytes to set
+  @param  Value    Value of the set operation.
 
   @return Buffer
 
@@ -70,7 +68,7 @@ InternalMemSetMem (
   Fills a target buffer with a 16-bit value, and returns the target buffer.
 
   @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Number of bytes in Buffer to fill.
+  @param  Length  Count of 16-bit value to fill.
   @param  Value   Value with which to fill Length bytes of Buffer.
 
   @return Buffer
@@ -88,7 +86,7 @@ InternalMemSetMem16 (
   Fills a target buffer with a 32-bit value, and returns the target buffer.
 
   @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Number of bytes in Buffer to fill.
+  @param  Length  Count of 32-bit value to fill.
   @param  Value   Value with which to fill Length bytes of Buffer.
 
   @return Buffer
@@ -106,7 +104,7 @@ InternalMemSetMem32 (
   Fills a target buffer with a 64-bit value, and returns the target buffer.
 
   @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Number of bytes in Buffer to fill.
+  @param  Length  Count of 64-bit value to fill.
   @param  Value   Value with which to fill Length bytes of Buffer.
 
   @return Buffer
@@ -162,7 +160,7 @@ InternalMemCompareMem (
   matching 8-bit value in the target buffer.
 
   @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Number of bytes in Buffer to scan. Must be non-zero.
+  @param  Length  Count of 8-bit value to scan. Must be non-zero.
   @param  Value   Value to search for in the target buffer.
 
   @return Pointer to the first occurrence or NULL if not found.
@@ -181,7 +179,7 @@ InternalMemScanMem8 (
   matching 16-bit value in the target buffer.
 
   @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Number of bytes in Buffer to scan. Must be non-zero.
+  @param  Length  Count of 16-bit value to scan. Must be non-zero.
   @param  Value   Value to search for in the target buffer.
 
   @return Pointer to the first occurrence or NULL if not found.
@@ -200,7 +198,7 @@ InternalMemScanMem16 (
   matching 32-bit value in the target buffer.
 
   @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Number of bytes in Buffer to scan. Must be non-zero.
+  @param  Length  Count of 32-bit value to scan. Must be non-zero.
   @param  Value   Value to search for in the target buffer.
 
   @return Pointer to the first occurrence or NULL if not found.
@@ -219,7 +217,7 @@ InternalMemScanMem32 (
   matching 64-bit value in the target buffer.
 
   @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Number of bytes in Buffer to scan. Must be non-zero.
+  @param  Length  Count of 64-bit value to scan. Must be non-zero.
   @param  Value   Value to search for in the target buffer.
 
   @return Pointer to the first occurrence or NULL if not found.

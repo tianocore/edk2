@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -33,15 +33,14 @@
 #    IN UINT64 Value
 #    )
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemSetMem64)
 ASM_PFX(InternalMemSetMem64):
-    movq    mm0, r8                     #Value
-    mov     rax, rcx                    #rax <- Buffer
-    xchg    rcx, rdx                    #rcx <- Count
+    movq      %r8, %mm0                 #Value
+    movw      %rcx, %rax                #rax <- Buffer
+    xchg      %rdx, %rcx                #rcx <- Count
 L0:
-    movntq  [rdx], mm0
-    add     rdx, 8
+    movntq  %mm0, (%rdx) 
+    addq    $8, %rdx
     loop    L0
     mfence
     ret

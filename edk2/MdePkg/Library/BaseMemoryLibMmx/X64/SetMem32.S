@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -34,23 +34,22 @@
 #    IN UINT32 Value
 #    );
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
 ASM_PFX(InternalMemSetMem32):
-    movq    mm0, r8                     # mm0 <- Value
-    mov     rax, rcx                    # rax <- Buffer
-    xchg    rcx, rdx                    # rcx <- Count  rdx <- Buffer
-    shr     rcx, 1                      # rcx <- # of qwords to set
+    movq    %r8, %mm0                   # mm0 <- Value
+    movq    %rcx, %rax                  # rax <- Buffer
+    xchgq   %rdx, %rcx                  # rcx <- Count  rdx <- Buffer
+    shrq    $1, % rcx                   # rcx <- # of qwords to set
     jz      L_SetDwords
-    pshufw  mm0, mm0, 0x44
+   .byte    0x0f, 0x70, 0x0C0, 0x44
 L0:
-    movntq  [rdx], mm0
-    lea     rdx, [rdx + 8]              # use "lea" to avoid flag changes
+    movntq  %mm0, (%rdx) 
+    leaq    8(%rdx), %rdx               # use "lea" to avoid flag changes
     loop    L0
     mfence
 L_SetDwords:
     jnc     L1
-    movd    [rdx], mm0
+    movd    %mm0, (%rdx) 
 L1:
     ret
 

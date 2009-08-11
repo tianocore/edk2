@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -32,21 +32,20 @@
 #    IN UINTN  Count
 #    );
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemZeroMem)
 ASM_PFX(InternalMemZeroMem):
-    push    rdi
-    push    rcx
-    xor     rax, rax
-    mov     rdi, rcx
-    mov     rcx, rdx
-    shr     rcx, 3
-    and     rdx, 7
+    pushq   %rdi
+    pushq   %rcx
+    xorq    %rax, %rax
+    movq    %rcx, %rdi
+    movq    %rdx, %rcx
+    shrq    $3, %rcx
+    andq    $7, %rdx
     cld
     rep     stosq
-    mov     rcx, rdx
+    movq    %rdx, %rcx
     rep     stosb
-    pop     rax
-    pop     rdi
+    popq    %rax
+    popq    %rdi
     ret
 

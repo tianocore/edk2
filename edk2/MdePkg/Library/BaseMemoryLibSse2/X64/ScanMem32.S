@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -37,21 +37,20 @@
 # CONST VOID *
 # EFIAPI
 # InternalMemScanMem32 (
-#   IN      CONST VOID                *Buffer,
+#   IN      CONST VOID          *Buffer,
 #   IN      UINTN                     Length,
 #   IN      UINT32                    Value
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemScanMem32)
 ASM_PFX(InternalMemScanMem32):
-    push    rdi
-    mov     rdi, rcx
-    mov     rax, r8
-    mov     rcx, rdx
-    repne   scasd
-    lea     rax, [rdi - 4]
-    cmovnz  rax, rcx
-    pop     rdi
+    pushq   %rdi
+    movq    %rcx, %rdi
+    movq    %rdx, %rcx
+    movq    %r8, %rax
+    repne   scasl
+    leaq    -4(%rdi), %rax
+    cmovnz  %rcx, %rax                    # set rax to 0 if not found
+    popq    %rdi
     ret
 

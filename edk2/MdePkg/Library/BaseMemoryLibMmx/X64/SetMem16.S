@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -34,28 +34,27 @@
 #    IN UINT16 Value
 #    )
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemSetMem16)
 ASM_PFX(InternalMemSetMem16):
-    push    rdi
-    mov     rax, r8
-    movq    mm0, rax
-    mov     r8, rcx
-    mov     rdi, r8
-    mov     rcx, rdx
-    and     edx, 3
-    shr     rcx, 2
-    jz      L_SetWords
-    pshufw  mm0, mm0, 0x0
+    pushq    %rdi
+    movq     %r8, %rax 
+    movq     %rax, %mm0 
+    movq     %rcx, %r8 
+    movq     %r8, %rdi 
+    movq     %rdx, %rcx 
+    andl     $3, %edx 
+    shrq     $2, %rcx
+    jz       L_SetWords
+    .byte    0x0f, 0x70, 0x0C0, 0x00
 L0:
-    movntq  [rdi], mm0
-    add     rdi, 8
-    loop    L0
+    movntq   %mm0, (%rdi) 
+    addq     $8, %rdi 
+    loop     L0
     mfence
 L_SetWords:
-    mov     ecx, edx
+    movl    %edx, %ecx 
     rep     stosw
-    mov     rax, r8
-    pop     rdi
+    movq    %r8, %rax
+    popq    %rdi
     ret
 
