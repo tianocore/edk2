@@ -1,7 +1,9 @@
 #/** @file
 #
 #  This library provides API to invoke the S3 resume vector in the APCI Table in S3 resume mode. 
-#  This library instance is only for PEI phase use and the APIs in this instance
+#  This library instance is no longer used and module using this library
+#  class should update to directly locate EFI_PEI_S3_RESUME_PPI defined
+#  in PI 1.2 specification. 
 #
 #  Copyright (c) 2006 - 2009, Intel Corporation.
 #
@@ -36,8 +38,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   PeiServicesTablePointerLib
