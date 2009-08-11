@@ -21,7 +21,7 @@ Revision History
 --*/
 
 #include "PcatPciRootBridge.h"
-#include "pci22.h"
+#include <IndustryStandard/Pci.h>
 #include "SalProc.h"
 
 #include EFI_GUID_DEFINITION (SalSystemTable)
