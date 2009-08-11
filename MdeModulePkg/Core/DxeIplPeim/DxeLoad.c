@@ -154,7 +154,12 @@ DxeLoadCore (
   EFI_BOOT_MODE                             BootMode;
   EFI_PEI_FILE_HANDLE                       FileHandle;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI           *Variable;
+  EFI_PEI_LOAD_FILE_PPI                     *LoadFile;
+  UINTN                                     Instance;
+  UINT32                                    AuthenticationState;
   UINTN                                     DataSize;
+  EFI_PEI_S3_RESUME_PPI                     *S3Resume;
+  EFI_PEI_RECOVERY_MODULE_PPI               *PeiRecovery;
   EFI_MEMORY_TYPE_INFORMATION               MemoryData[EfiMaxMemoryType + 1];
 
   //
@@ -163,10 +168,26 @@ DxeLoadCore (
   BootMode = GetBootModeHob ();
 
   if (BootMode == BOOT_ON_S3_RESUME) {
-    Status = AcpiS3ResumeOs();
+    Status = PeiServicesLocatePpi (
+               &gEfiPeiS3ResumePpiGuid,
+               0,
+               NULL,
+               (VOID **) &S3Resume
+               );
+    ASSERT_EFI_ERROR (Status);
+    
+    Status = S3Resume->S3RestoreConfig (PeiServices);
     ASSERT_EFI_ERROR (Status);
   } else if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    Status = PeiRecoverFirmware ();
+    Status = PeiServicesLocatePpi (
+               &gEfiPeiRecoveryModulePpiGuid,
+               0,
+               NULL,
+               (VOID **) &PeiRecovery
+               );
+    ASSERT_EFI_ERROR (Status);
+    
+    Status = PeiRecovery->LoadRecoveryCapsule (PeiServices, PeiRecovery);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Load Recovery Capsule Failed.(Status = %r)\n", Status));
       CpuDeadLoop ();
@@ -211,15 +232,25 @@ DxeLoadCore (
   FileHandle = DxeIplFindDxeCore ();
 
   //
-  // Load the DXE Core from a Firmware Volume, may use LoadFile PPI to do this to save code size.
+  // Load the DXE Core from a Firmware Volume.
   //
-  Status = PeiLoadFile (
-             FileHandle,
-             &DxeCoreAddress,
-             &DxeCoreSize,
-             &DxeCoreEntryPoint
-             );
-  ASSERT_EFI_ERROR (Status);
+  Instance = 0;
+  do {
+    Status = PeiServicesLocatePpi (&gEfiPeiLoadFilePpiGuid, Instance++, NULL, (VOID **) &LoadFile);
+    //
+    // These must exist an instance of EFI_PEI_LOAD_FILE_PPI to support to load DxeCore file handle successfully.
+    //
+    ASSERT_EFI_ERROR (Status);
+
+    Status = LoadFile->LoadFile (
+                         LoadFile,
+                         FileHandle,
+                         &DxeCoreAddress,
+                         &DxeCoreSize,
+                         &DxeCoreEntryPoint,
+                         &AuthenticationState
+                         );
+  } while (EFI_ERROR (Status));
 
   //
   // Get the DxeCore File Info from the FileHandle for the DxeCore GUID file name.
@@ -307,95 +338,6 @@ DxeIplFindDxeCore (
     Instance++;
   }
 }
-
-
-/**
-   Loads and relocates a PE/COFF image into memory.
-
-   @param FileHandle        The image file handle
-   @param ImageAddress      The base address of the relocated PE/COFF image
-   @param ImageSize         The size of the relocated PE/COFF image
-   @param EntryPoint        The entry point of the relocated PE/COFF image
-   
-   @return EFI_SUCCESS           The file was loaded and relocated
-   @return EFI_OUT_OF_RESOURCES  There was not enough memory to load and relocate the PE/COFF file
-
-**/
-EFI_STATUS
-PeiLoadFile (
-  IN  EFI_PEI_FILE_HANDLE                       FileHandle,
-  OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
-  OUT UINT64                                    *ImageSize,
-  OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
-  )
-{
-
-  EFI_STATUS                        Status;
-  PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
-  VOID                              *Pe32Data;
-
-  //
-  // First try to find the PE32 section in this ffs file.
-  //
-  Status = PeiServicesFfsFindSectionData (
-             EFI_SECTION_PE32,
-             FileHandle,
-             &Pe32Data
-             );
-  if (EFI_ERROR (Status)) {
-    //
-    // NO image types we support so exit.
-    //
-    return Status;
-  }
-
-  ZeroMem (&ImageContext, sizeof (ImageContext));
-  ImageContext.Handle = Pe32Data;
-  ImageContext.ImageRead = PeiImageRead;
-
-
-  Status = PeCoffLoaderGetImageInfo (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  //
-  // Allocate Memory for the image
-  //
-  Status = PeiServicesAllocatePages (
-             EfiBootServicesCode, 
-             EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize), 
-             &ImageContext.ImageAddress
-             );
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (ImageContext.ImageAddress != 0);
-
-  //
-  // Load the image to our new buffer
-  //
-  Status = PeCoffLoaderLoadImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  //
-  // Relocate the image in our new buffer
-  //
-  Status = PeCoffLoaderRelocateImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Flush the instruction cache so the image data are written before we execute it
-  //
-  InvalidateInstructionCacheRange ((VOID *)(UINTN) ImageContext.ImageAddress, (UINTN) ImageContext.ImageSize);
-
-  *ImageAddress = ImageContext.ImageAddress;
-  *ImageSize    = ImageContext.ImageSize;
-  *EntryPoint   = ImageContext.EntryPoint;
-
-  return EFI_SUCCESS;
-}
-
 
 
 

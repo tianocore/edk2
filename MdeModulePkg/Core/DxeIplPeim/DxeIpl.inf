@@ -5,7 +5,7 @@
 #  PPI to discover and dispatch the DXE Foundation and components that are
 #  needed to run the DXE Foundation.
 #
-#  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+#  Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,6 @@
   Ia32/VirtualMemory.h ||||PcdDxeIplSwitchToLongMode
   Ia32/VirtualMemory.c ||||PcdDxeIplSwitchToLongMode
   Ia32/DxeLoadFunc.c
-  Ia32/ImageRead.c
   Ia32/IdtVectorAsm.asm||||PcdDxeIplSwitchToLongMode
   Ia32/IdtVectorAsm.S  ||||PcdDxeIplSwitchToLongMode
 
@@ -47,42 +46,38 @@
   X64/VirtualMemory.h
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
-  Ia32/ImageRead.c
 
 [Sources.IPF]
   Ipf/DxeLoadFunc.c
-  Ipf/ImageRead.c
 
 [Sources.EBC]
   Ebc/DxeLoadFunc.c
-  Ia32/ImageRead.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  PeCoffLib
   PcdLib
   MemoryAllocationLib
   BaseMemoryLib
   ExtractGuidedSectionLib
   UefiDecompressLib
-  CacheMaintenanceLib
   ReportStatusCodeLib
   PeiServicesLib
   HobLib
   BaseLib
   PeimEntryPoint
   DebugLib
-  S3Lib
-  RecoveryLib
 
 [Ppis]
   gEfiDxeIplPpiGuid                 ## PRODUCES
   gEfiEndOfPeiSignalPpiGuid         ## SOMETIMES_PRODUCES(Not produced on S3 boot path)
   gEfiPeiDecompressPpiGuid          ## SOMETIMES_PRODUCES
   gEfiPeiReadOnlyVariable2PpiGuid   ## SOMETIMES_CONSUMES
+  gEfiPeiLoadFilePpiGuid            ## CONSUMES
+  gEfiPeiS3ResumePpiGuid            ## SOMETIMES_CONSUMES(Consumed on S3 boot path)
+  gEfiPeiRecoveryModulePpiGuid      ## SOMETIMES_CONSUMES(Consumed on recovery boot path)
 
 [Guids]
   gEfiMemoryTypeInformationGuid     ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
@@ -98,7 +93,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiLoadFilePpiGuid
 
 #
 # [BootMode] 

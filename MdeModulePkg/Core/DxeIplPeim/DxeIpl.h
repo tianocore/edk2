@@ -24,6 +24,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/Decompress.h>
 #include <Ppi/FirmwareVolumeInfo.h>
 #include <Ppi/GuidedSectionExtraction.h>
+#include <Ppi/LoadFile.h>
+#include <Ppi/S3Resume.h>
+#include <Ppi/RecoveryModule.h>
 
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/MemoryAllocationHob.h>
@@ -35,13 +38,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <Library/CacheMaintenanceLib.h>
 #include <Library/UefiDecompressLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Library/PeCoffLib.h>
 #include <Library/S3Lib.h>
 #include <Library/RecoveryLib.h>
 
@@ -55,29 +56,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi;
 
 
-
-/**
-   Loads and relocates a PE/COFF image into memory.
-
-   @param FileHandle        The image file handle
-   @param ImageAddress      The base address of the relocated PE/COFF image
-   @param ImageSize         The size of the relocated PE/COFF image
-   @param EntryPoint        The entry point of the relocated PE/COFF image
-   
-   @return EFI_SUCCESS           The file was loaded and relocated
-   @return EFI_OUT_OF_RESOURCES  There was not enough memory to load and relocate the PE/COFF file
-
-**/
-EFI_STATUS
-PeiLoadFile (
-  IN  EFI_PEI_FILE_HANDLE                       FileHandle,
-  OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
-  OUT UINT64                                    *ImageSize,
-  OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
-  );
-
-
-
 /**
    Searches DxeCore in all firmware Volumes and loads the first
    instance that contains DxeCore.
@@ -88,29 +66,6 @@ PeiLoadFile (
 EFI_PEI_FILE_HANDLE
 DxeIplFindDxeCore (
   VOID
-  );
-
-
-/**
-  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
-
-  @param  FileHandle   The handle to the PE/COFF file 
-  @param  FileOffset   The offset, in bytes, into the file to read 
-  @param  ReadSize     The number of bytes to read from the file starting at 
-                       FileOffset 
-  @param  Buffer       A pointer to the buffer to read the data into. 
-
-  @retval EFI_SUCCESS  ReadSize bytes of data were read into Buffer from the 
-                       PE/COFF file starting at FileOffset
-
-**/
-EFI_STATUS
-EFIAPI
-PeiImageRead (
-  IN     VOID    *FileHandle,
-  IN     UINTN   FileOffset,
-  IN OUT UINTN   *ReadSize,
-  OUT    VOID    *Buffer
   );
 
 
