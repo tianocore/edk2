@@ -146,7 +146,7 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
-INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
+INF  RuleOverride = ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 
 FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
     SECTION PE32 = FatBinPkg/EnhancedFatDxe/X64/Fat.efi
@@ -303,10 +303,10 @@ FILE RAW = 1BA0062E-C779-4582-8566-336AE8F78F09 {
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.DXE_DRIVER.ACPITABLE]
+[Rule.Common.USER_DEFINED.ACPITABLE]
   FILE FREEFORM = $(NAMED_GUID) {
-    RAW ACPI               |.acpi
-    RAW ASL                |.aml
+    RAW ACPI |.acpi
+    RAW ASL  |.aml
   }
 
 [Rule.Common.SEC.RESET_VECTOR]

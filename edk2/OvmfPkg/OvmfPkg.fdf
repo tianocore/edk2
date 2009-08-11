@@ -296,7 +296,7 @@ INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/Bin/ResetVector.inf
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.DXE_DRIVER.ACPITABLE]
+[Rule.Common.USER_DEFINED.ACPITABLE]
   FILE FREEFORM = $(NAMED_GUID) {
     RAW ACPI               |.acpi
     RAW ASL                |.aml
