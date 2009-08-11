@@ -618,7 +618,7 @@ UpdateVariable (
   UINTN                   VarDataOffset;
   UINTN                   VarSize;
   VARIABLE_GLOBAL         *Global;
-  UINTN                               NonVolatileVarableStoreSize;
+  UINTN                   NonVolatileVarableStoreSize;
 
   Global = &mVariableModuleGlobal->VariableGlobal[Physical];
 
@@ -767,7 +767,9 @@ UpdateVariable (
   //
   // Mark the old variable as deleted
   //
-  Variable->CurrPtr->State &= VAR_DELETED;
+  if (Variable->CurrPtr != NULL) {
+    Variable->CurrPtr->State &= VAR_DELETED;
+  }
 
   UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, TRUE, FALSE, FALSE);
 
