@@ -1,6 +1,14 @@
-/** @file
-  
+/** @file  
   The Ehci controller driver.
+
+  EhciDxe driver is responsible for managing the behavior of EHCI controller. 
+  It implements the interfaces of monitoring the status of all ports and transferring 
+  Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
+
+  Note that EhciDxe driver is enhanced to guarantee that the EHCI controller get attached
+  to the EHCI controller before the UHCI driver attaches to the companion UHCI controller. 
+  This way avoids the control transfer on a shared port between EHCI and companion host
+  controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
 
 Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -1570,6 +1578,9 @@ EhcDriverBindingStart (
     goto CLOSE_PCIIO;
   }
 
+  //
+  // Get the Pci device class code.
+  //
   Status = PciIo->Pci.Read (
                         PciIo,
                         EfiPciIoWidthUint8,
@@ -1582,7 +1593,11 @@ EhcDriverBindingStart (
     Status = EFI_UNSUPPORTED;
     goto CLOSE_PCIIO;
   }
-
+  //
+  // determine if the device is UHCI host controller or not. If yes, then find out the 
+  // companion usb ehci host controller and force EHCI driver get attached to it before
+  // UHCI driver attaches to UHCI host controller.
+  //
   if ((UsbClassCReg.PI == PCI_IF_UHCI) &&
        (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
        (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
@@ -1645,6 +1660,10 @@ EhcDriverBindingStart (
         if (EFI_ERROR (Status)) {
           goto CLOSE_PCIIO;
         }
+        //
+        // Currently, the judgment on the companion usb host controller is through the
+        // same bus number, which may vary on different platform.
+        //
         if (EhciBusNumber == UhciBusNumber) {
           gBS->CloseProtocol (
                     Controller,

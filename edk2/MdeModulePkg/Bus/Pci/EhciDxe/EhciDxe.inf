@@ -6,6 +6,11 @@
 #  It implements the interfaces of monitoring the status of all ports and transferring 
 #  Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
 #
+#  Note that EhciDxe driver is enhanced to guarantee that the EHCI controller get attached
+#  to the EHCI controller before the UHCI driver attaches to the companion UHCI controller. 
+#  This way avoids the control transfer on a shared port between EHCI and companion host
+#  controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
+#
 #  Copyright (c) 2006 - 2009, Intel Corporation. 
 #
 #  All rights reserved. This program and the accompanying materials
