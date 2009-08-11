@@ -1,7 +1,9 @@
 #/** @file
 #  
-#  Null S3 library instance for PEIM module
-#  It can make core modules pass package level build.
+#  Null S3 library instance for PEIM module.
+#  This library instance is no longer used and module using this library
+#  class should update to directly locate EFI_PEI_S3_RESUME_PPI defined
+#  in PI 1.2 specification. 
 #  
 #  Copyright (c) 2006 - 2008, Intel Corporation.
 #
