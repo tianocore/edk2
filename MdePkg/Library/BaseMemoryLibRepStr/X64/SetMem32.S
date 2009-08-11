@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -34,15 +34,14 @@
 #    IN UINT32 Value
 #    );
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
 ASM_PFX(InternalMemSetMem32):
-    push    rdi
-    mov     rdi, rcx
-    mov     rax, r8
-    xchg    rcx, rdx
-    rep     stosd
-    mov     rax, rdx
-    pop     rdi
+    pushq   %rdi
+    movq    %rcx, %rdi
+    movq    %r8, %rax
+    xchgq   %rdx, %rcx
+    rep     stosl
+    movq    %rdx, %rax
+    popq    %rdi
     ret
 

@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -34,38 +34,37 @@
 #    IN UINT16 Value
 #    )
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemSetMem16)
 ASM_PFX(InternalMemSetMem16):
-    push    rdi
-    mov     rdi, rcx
-    mov     r9, rdi
-    xor     rcx, rcx
-    sub     rcx, rdi
-    and     rcx, 15
-    mov     rax, r8
+    pushq   %rdi
+    movq    %rcx, %rdi
+    movq    %rdi, %r9
+    xorq    %rcx, %rcx
+    subq    %rdi, %rcx
+    andq    $15, %rcx
+    movq    %r8, %rax
     jz      L0
-    shr     rcx, 1
-    cmp     rcx, rdx
-    cmova   rcx, rdx
-    sub     rdx, rcx
+    shrq    $1, %rcx
+    cmpq    %rdx, %rcx
+    cmova   %rdx, %rcx
+    subq    %rcx, %rdx
     rep     stosw
 L0:
-    mov     rcx, rdx
-    and     edx, 7
-    shr     rcx, 3
+    movq    %rdx, %rcx
+    andl    $7, %edx
+    shrq    $3, %rcx
     jz      L_SetWords
-    movd    xmm0, eax
-    pshuflw xmm0, xmm0, 0
-    movlhps xmm0, xmm0
+    movd    %eax, %xmm0
+    pshuflw $0, %xmm0, %xmm0
+    movlhps %xmm0, %xmm0
 L1:
-    movntdq [rdi], xmm0
-    add     rdi, 16
+    movntdq %xmm0, (%rdi)
+    addq    $16, %rdi
     loop    L1
     mfence
 L_SetWords:
-    mov     ecx, edx
+    movl    %edx, %ecx
     rep     stosw
-    mov     rax, r9
-    pop     rdi
+    movq    %r9, %rax
+    popq    %rdi
     ret

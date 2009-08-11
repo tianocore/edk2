@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -34,40 +34,39 @@
 #    IN UINT8  Value
 #    )
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemSetMem)
 ASM_PFX(InternalMemSetMem):
-    push    rdi
-    mov     rdi, rcx                    # rdi <- Buffer
-    mov     al, r8b                     # al <- Value
-    mov     r9, rdi                     # r9 <- Buffer as return value
-    xor     rcx, rcx
-    sub     rcx, rdi
-    and     rcx, 15                     # rcx + rdi aligns on 16-byte boundary
+    pushq   %rdi
+    movq    %rcx, %rdi                  # rdi <- Buffer
+    movb    %r8b, %al                   # al <- Value
+    movq    %rdi, %r9                   # r9 <- Buffer as return value
+    xorq    %rcx, %rcx
+    subq    %rdi, %rcx
+    andq    $15, %rcx                   # rcx + rdi aligns on 16-byte boundary
     jz      L0
-    cmp     rcx, rdx
-    cmova   rcx, rdx
-    sub     rdx, rcx
+    cmpq    %rdx, %rcx
+    cmova   %rdx, %rcx
+    subq    %rcx, %rdx
     rep     stosb
 L0:
-    mov     rcx, rdx
-    and     rdx, 15
-    shr     rcx, 4
+    movq    %rdx, %rcx
+    andq    $15, %rdx
+    shrq    $4, %rcx
     jz      L_SetBytes
-    mov     ah, al                      # ax <- Value repeats twice
-    movdqa  [rsp + 0x10], xmm0          # save xmm0
-    movd    xmm0, eax                   # xmm0[0..16] <- Value repeats twice
-    pshuflw xmm0, xmm0, 0               # xmm0[0..63] <- Value repeats 8 times
-    movlhps xmm0, xmm0                  # xmm0 <- Value repeats 16 times
+    movb    %al, %ah                    # ax <- Value repeats twice
+    movdqa  %xmm0, 0x10(%rsp)           # save xmm0
+    movd    %eax, %xmm0                 # xmm0[0..16] <- Value repeats twice
+    pshuflw $0, %xmm0, %xmm0            # xmm0[0..63] <- Value repeats 8 times
+    movlhps %xmm0, %xmm0                # xmm0 <- Value repeats 16 times
 L1:
-    movntdq [rdi], xmm0                 # rdi should be 16-byte aligned
-    add     rdi, 16
+    movntdq %xmm0, (%rdi)               # rdi should be 16-byte aligned
+    add     $16, %rdi
     loop    L1
     mfence
-    movdqa  xmm0, [rsp + 0x10]          # restore xmm0
+    movdqa  0x10(%rsp), %xmm0           # restore xmm0
 L_SetBytes:
-    mov     ecx, edx                    # high 32 bits of rcx are always zero
+    movl    %edx, %ecx                  # high 32 bits of rcx are always zero
     rep     stosb
-    mov     rax, r9                     # rax <- Return value
-    pop     rdi
+    movq    %r9, %rax                   # rax <- Return value
+    popq    %rdi
     ret

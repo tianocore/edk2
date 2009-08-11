@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -42,16 +42,15 @@
 #   IN      UINT8                     Value
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemScanMem8)
 ASM_PFX(InternalMemScanMem8):
-    push    rdi
-    mov     rdi, rcx
-    mov     rcx, rdx
-    mov     rax, r8
+    pushq   %rdi
+    movq    %rcx, %rdi
+    movq    %rdx, %rcx
+    movq    %r8, %rax
     repne   scasb
-    lea     rax, [rdi - 1]
-    cmovnz  rax, rcx                    # set rax to 0 if not found
-    pop     rdi
+    leaq    -1(%rdi), %rax
+    cmovnz  %rcx, %rax                  # set rax to 0 if not found
+    popq    %rdi
     ret
 

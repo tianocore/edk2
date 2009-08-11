@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -42,19 +42,18 @@
 #   IN      UINTN                     Length
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax noprefix
 ASM_GLOBAL ASM_PFX(InternalMemCompareMem)
 ASM_PFX(InternalMemCompareMem):
-    push    rsi
-    push    rdi
-    mov     rsi, rcx
-    mov     rdi, rdx
-    mov     rcx, r8
+    pushq   %rsi
+    pushq   %rdi
+    movq    %rcx, %rsi 
+    movq    %rdx, %rdi 
+    movq    %r8, %rcx 
     repe    cmpsb
-    movzx   rax, byte ptr [rsi - 1]
-    movzx   rdx, byte ptr [rdi - 1]
-    sub     rax, rdx
-    pop     rdi
-    pop     rsi
+    movzbq  -1(%rsi), %rax
+    movzbq  -1(%rdi), %rdx
+    subq    %rdx, %rax 
+    popq    %rdi
+    popq    %rsi
     ret
 
