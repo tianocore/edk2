@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
   
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -287,7 +287,9 @@ PeiLoadImageLoadImage (
   Machine = PeCoffLoaderGetMachineType (Pe32Data);
   
   if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Machine)) {
-    return EFI_UNSUPPORTED;  
+    if (!EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED (Machine)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   if (ImageAddressArg != NULL) {
@@ -438,19 +440,7 @@ PeiLoadImage (
     Index++;
   } while (!EFI_ERROR (PpiStatus));
 
-  //
-  // If no instances reports EFI_SUCCESS, then build-in support for
-  // the PE32+/TE XIP image format is used.
-  //
-  Status = PeiLoadImageLoadImage (
-            PeiServices, 
-            FileHandle, 
-            NULL, 
-            NULL, 
-            EntryPoint, 
-            AuthenticationState
-            );
-  return Status;
+  return PpiStatus;
 }
 
 
