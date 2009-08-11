@@ -1,5 +1,7 @@
 /** @file
-  Recovery library class defines a set of methods related recovery boot mode.
+  Recovery library class defines a set of methods related recovery boot mode. 
+  This library class is no longer used and modules using this library should
+  directly locate EFI_PEI_RECOVERY_MODULE_PPI defined in PI 1.2 specification.
 
 Copyright (c) 2005 - 2008, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
