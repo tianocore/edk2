@@ -1,6 +1,10 @@
 /** @file
   This Library uses Framework RecoveryModule PPI to do system recovery.
 
+  This library instance is no longer used and module using this library
+  class should update to directly locate EFI_PEI_RECOVERY_MODULE_PPI defined
+  in PI 1.2 specification. 
+
 Copyright (c) 2006 - 2009 Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -11,7 +15,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-#include <FrameworkPei.h>
+#include <PiPei.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/DebugLib.h>
