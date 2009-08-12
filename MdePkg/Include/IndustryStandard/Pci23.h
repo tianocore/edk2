@@ -1,7 +1,7 @@
 /** @file
   Support for PCI 2.3 standard.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,9 +18,21 @@
 #include <IndustryStandard/Pci22.h>
 
 ///
-/// Definitions of PCI class bytes and manipulation macros.
+/// PCI_CLASS_MASS_STORAGE, Base Class 01h
 ///
-#define PCI_IF_EHCI                   0x20
+///@{
+#define PCI_CLASS_MASS_STORAGE_ATA       0x05
+#define   PCI_IF_MASS_STORAGE_SINGLE_DMA   0x20
+#define   PCI_IF_MASS_STORAGE_CHAINED_DMA  0x30
+///@}
+
+///
+/// PCI_CLASS_SERIAL, Base Class 0Ch
+///
+///@{
+#define   PCI_IF_EHCI                      0x20
+#define PCI_CLASS_SERIAL_IB              0x06
+///@}
 
 ///
 /// defined in PCI Express Spec.
