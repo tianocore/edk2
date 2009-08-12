@@ -39,7 +39,7 @@ ASM_PFX(InternalMemSetMem):
     push    %rdi
     movq    %r8, %rax
     movb    %al, %ah
-    movq    %rax, %mm0
+    movd    %rax, %mm0
     movq    %rcx, %r8
     movq    %r8, %rdi                     # rdi <- Buffer
     movq    %rdx, %rcx

@@ -38,7 +38,7 @@ ASM_GLOBAL ASM_PFX(InternalMemSetMem16)
 ASM_PFX(InternalMemSetMem16):
     pushq    %rdi
     movq     %r8, %rax 
-    movq     %rax, %mm0 
+    movd     %rax, %mm0 
     movq     %rcx, %r8 
     movq     %r8, %rdi 
     movq     %rdx, %rcx 

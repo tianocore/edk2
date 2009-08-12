@@ -51,7 +51,7 @@ L0:
     andq    $7, %r8
     shrq    $3, %rcx                    # rcx <- # of Qwords to copy
     jz      L_CopyBytes
-    movq    %mm0, %r10                  # (Save mm0 in r10) ; Why just save 32 bits?
+    movd    %mm0, %r10                  # (Save mm0 in r10)
 L1:
     movq    (%rsi), %mm0
     movntq  %mm0, (%rdi)
