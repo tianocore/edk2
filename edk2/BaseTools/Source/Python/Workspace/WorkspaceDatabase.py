@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008, Intel Corporation
+# Copyright (c) 2008 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1777,6 +1777,14 @@ class InfBuildData(ModuleBuildClassObject):
         if self._Depex == None:
             self._Depex = tdict(False, 2)
             RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
+
+            # PEIM and DXE drivers must have a valid [Depex] section
+            if len(self.LibraryClass) == 0 and len(RecordList) == 0:
+                if self.ModuleType == 'DXE_DRIVER' or self.ModuleType == 'PEIM' or self.ModuleType == 'DXE_SMM_DRIVER' or \
+                    self.ModuleType == 'DXE_SAL_DRIVER' or self.ModuleType == 'DXE_RUNTIME_DRIVER':
+                    EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No [Depex] section or no valid expression in [Depex] section for [%s] module" \
+                                    % self.ModuleType, File=self.MetaFile)
+
             Depex = {}
             for Record in RecordList:
                 Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
