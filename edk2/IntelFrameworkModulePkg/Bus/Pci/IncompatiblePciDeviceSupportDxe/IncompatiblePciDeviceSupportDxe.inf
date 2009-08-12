@@ -45,3 +45,6 @@
 
 [Protocols]
   gEfiIncompatiblePciDeviceSupportProtocolGuid    ## PRODUCEDS
+
+[Depex]
+  TRUE
