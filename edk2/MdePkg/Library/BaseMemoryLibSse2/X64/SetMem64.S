@@ -38,7 +38,7 @@ ASM_PFX(InternalMemSetMem64):
     movq    %rcx, %rax                    # rax <- Buffer
     xchgq   %rdx, %rcx                    # rcx <- Count & rdx <- Buffer
     testb   $8, %dl
-    movq    %r8, %xmm0
+    movd    %r8, %xmm0
     jz      L0
     movq    %r8, (%rdx)
     addq    $8, %rdx

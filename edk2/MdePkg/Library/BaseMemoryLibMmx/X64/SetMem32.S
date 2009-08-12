@@ -36,7 +36,7 @@
 #------------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
 ASM_PFX(InternalMemSetMem32):
-    movq    %r8, %mm0                   # mm0 <- Value
+    movd    %r8, %mm0                   # mm0 <- Value
     movq    %rcx, %rax                  # rax <- Buffer
     xchgq   %rdx, %rcx                  # rcx <- Count  rdx <- Buffer
     shrq    $1, % rcx                   # rcx <- # of qwords to set
