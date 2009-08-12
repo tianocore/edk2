@@ -1,7 +1,7 @@
 ## @file
 # Generate AutoGen.h, AutoGen.c and *.depex files
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1813,6 +1813,10 @@ class ModuleAutoGen(AutoGen):
                 AutoGenList.append(str(File))
             else:
                 IgoredAutoGenList.append(str(File))
+
+        # Skip the following code for EDK I inf
+        if self.AutoGenVersion < 0x00010005:
+            return
 
         for ModuleType in self.DepexList:
             if len(self.DepexList[ModuleType]) == 0:
