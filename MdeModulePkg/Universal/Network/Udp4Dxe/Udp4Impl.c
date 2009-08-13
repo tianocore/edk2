@@ -424,7 +424,7 @@ Udp4CheckTimeout (
       Wrap = NET_LIST_USER_STRUCT (WrapEntry, UDP4_RXDATA_WRAP, Link);
 
       //
-      // TimeoutTick unit is ms, MNP_TIMEOUT_CHECK_INTERVAL unit is 100ns.
+      // TimeoutTick unit is microsecond, MNP_TIMEOUT_CHECK_INTERVAL unit is 100ns.
       //
       if (Wrap->TimeoutTick <= (UDP4_TIMEOUT_INTERVAL / 10)) {
         //

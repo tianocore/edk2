@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol private services.
 
-Copyright (c) 2005 - 2008, Intel Corporation. <BR> 
+Copyright (c) 2005 - 2009, Intel Corporation. <BR> 
 All rights reserved. This program and the accompanying materials are licensed 
 and made available under the terms and conditions of the BSD License which 
 accompanies this distribution. The full text of the license may be found at 
@@ -44,162 +44,6 @@ EFI_MANAGED_NETWORK_CONFIG_DATA mMnpDefaultConfigData = {
   FALSE
 };
 
-/**
-  Configure the Snp receive filters according to the instances' receive filter
-  settings.
-
-  @param[in]  MnpServiceData        Pointer to the mnp service context data.
-
-  @retval     EFI_SUCCESS           The receive filters is configured.
-  @retval     EFI_OUT_OF_RESOURCES  The receive filters can't be configured due 
-                                    to lack of memory resource.
-
-**/
-EFI_STATUS
-MnpConfigReceiveFilters (
-  IN MNP_SERVICE_DATA  *MnpServiceData
-  )
-{
-  EFI_STATUS                  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-  EFI_MAC_ADDRESS             *MCastFilter;
-  UINT32                      MCastFilterCnt;
-  UINT32                      EnableFilterBits;
-  UINT32                      DisableFilterBits;
-  BOOLEAN                     ResetMCastFilters;
-  LIST_ENTRY                  *Entry;
-  UINT32                      Index;
-  MNP_GROUP_ADDRESS           *GroupAddress;
-
-  NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
-
-  Snp = MnpServiceData->Snp;
-
-  //
-  // Initialize the enable filter and disable filter.
-  //
-  EnableFilterBits  = 0;
-  DisableFilterBits = Snp->Mode->ReceiveFilterMask;
-
-  if (MnpServiceData->UnicastCount != 0) {
-    //
-    // Enable unicast if any instance wants to receive unicast.
-    //
-    EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_UNICAST;
-  }
-
-  if (MnpServiceData->BroadcastCount != 0) {
-    //
-    // Enable broadcast if any instance wants to receive broadcast.
-    //
-    EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
-  }
-
-  MCastFilter       = NULL;
-  MCastFilterCnt    = 0;
-  ResetMCastFilters = TRUE;
-
-  if ((MnpServiceData->MulticastCount != 0) && (MnpServiceData->GroupAddressCount != 0)) {
-    //
-    // There are instances configured to receive multicast and already some group
-    // addresses are joined.
-    //
-
-    ResetMCastFilters = FALSE;
-
-    if (MnpServiceData->GroupAddressCount <= Snp->Mode->MaxMCastFilterCount) {
-      //
-      // The joind group address is less than simple network's maximum count.
-      // Just configure the snp to do the multicast filtering.
-      //
-
-      EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
-
-      //
-      // Allocate pool for the mulicast addresses.
-      //
-      MCastFilterCnt  = MnpServiceData->GroupAddressCount;
-      MCastFilter     = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
-      if (MCastFilter == NULL) {
-
-        DEBUG ((EFI_D_ERROR, "MnpConfigReceiveFilters: Failed to allocate memory resource for MCastFilter.\n"));
-        return EFI_OUT_OF_RESOURCES;
-      }
-
-      //
-      // Fill the multicast HW address buffer.
-      //
-      Index = 0;
-      NET_LIST_FOR_EACH (Entry, &MnpServiceData->GroupAddressList) {
-
-        GroupAddress            = NET_LIST_USER_STRUCT (Entry, MNP_GROUP_ADDRESS, AddrEntry);
-        CopyMem (MCastFilter + Index, &GroupAddress->Address, sizeof (*(MCastFilter + Index)));
-        Index++;
-
-        ASSERT (Index <= MCastFilterCnt);
-      }
-    } else {
-      //
-      // The maximum multicast is reached, set the filter to be promiscuous
-      // multicast.
-      //
-
-      if ((Snp->Mode->ReceiveFilterMask & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) != 0) {
-        EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
-      } else {
-        //
-        // Either MULTICAST or PROMISCUOUS_MULTICAST is not supported by Snp,
-        // set the NIC to be promiscuous although this will tremendously degrade
-        // the performance.
-        //
-        EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
-      }
-    }
-  }
-
-  if (MnpServiceData->PromiscuousCount != 0) {
-    //
-    // Enable promiscuous if any instance wants to receive promiscuous.
-    //
-    EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
-  }
-
-  //
-  // Set the disable filter.
-  //
-  DisableFilterBits ^= EnableFilterBits;
-
-  //
-  // Configure the receive filters of SNP.
-  //
-  Status = Snp->ReceiveFilters (
-                  Snp,
-                  EnableFilterBits,
-                  DisableFilterBits,
-                  ResetMCastFilters,
-                  MCastFilterCnt,
-                  MCastFilter
-                  );
-  DEBUG_CODE (
-    if (EFI_ERROR (Status)) {
-
-    DEBUG (
-      (EFI_D_ERROR,
-      "MnpConfigReceiveFilters: Snp->ReceiveFilters failed, %r.\n",
-      Status)
-      );
-  }
-  );
-
-  if (MCastFilter != NULL) {
-    //
-    // Free the buffer used to hold the group addresses.
-    //
-    gBS->FreePool (MCastFilter);
-  }
-
-  return Status;
-}
 
 /**
   Add Count of net buffers to MnpServiceData->FreeNbufQue. The length of the net
@@ -1157,6 +1001,162 @@ MnpConfigureInstance (
   return Status;
 }
 
+/**
+  Configure the Snp receive filters according to the instances' receive filter
+  settings.
+
+  @param[in]  MnpServiceData        Pointer to the mnp service context data.
+
+  @retval     EFI_SUCCESS           The receive filters is configured.
+  @retval     EFI_OUT_OF_RESOURCES  The receive filters can't be configured due 
+                                    to lack of memory resource.
+
+**/
+EFI_STATUS
+MnpConfigReceiveFilters (
+  IN MNP_SERVICE_DATA  *MnpServiceData
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
+  EFI_MAC_ADDRESS             *MCastFilter;
+  UINT32                      MCastFilterCnt;
+  UINT32                      EnableFilterBits;
+  UINT32                      DisableFilterBits;
+  BOOLEAN                     ResetMCastFilters;
+  LIST_ENTRY                  *Entry;
+  UINT32                      Index;
+  MNP_GROUP_ADDRESS           *GroupAddress;
+
+  NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
+
+  Snp = MnpServiceData->Snp;
+
+  //
+  // Initialize the enable filter and disable filter.
+  //
+  EnableFilterBits  = 0;
+  DisableFilterBits = Snp->Mode->ReceiveFilterMask;
+
+  if (MnpServiceData->UnicastCount != 0) {
+    //
+    // Enable unicast if any instance wants to receive unicast.
+    //
+    EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_UNICAST;
+  }
+
+  if (MnpServiceData->BroadcastCount != 0) {
+    //
+    // Enable broadcast if any instance wants to receive broadcast.
+    //
+    EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
+  }
+
+  MCastFilter       = NULL;
+  MCastFilterCnt    = 0;
+  ResetMCastFilters = TRUE;
+
+  if ((MnpServiceData->MulticastCount != 0) && (MnpServiceData->GroupAddressCount != 0)) {
+    //
+    // There are instances configured to receive multicast and already some group
+    // addresses are joined.
+    //
+
+    ResetMCastFilters = FALSE;
+
+    if (MnpServiceData->GroupAddressCount <= Snp->Mode->MaxMCastFilterCount) {
+      //
+      // The joind group address is less than simple network's maximum count.
+      // Just configure the snp to do the multicast filtering.
+      //
+
+      EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
+
+      //
+      // Allocate pool for the mulicast addresses.
+      //
+      MCastFilterCnt  = MnpServiceData->GroupAddressCount;
+      MCastFilter     = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
+      if (MCastFilter == NULL) {
+
+        DEBUG ((EFI_D_ERROR, "MnpConfigReceiveFilters: Failed to allocate memory resource for MCastFilter.\n"));
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      //
+      // Fill the multicast HW address buffer.
+      //
+      Index = 0;
+      NET_LIST_FOR_EACH (Entry, &MnpServiceData->GroupAddressList) {
+
+        GroupAddress            = NET_LIST_USER_STRUCT (Entry, MNP_GROUP_ADDRESS, AddrEntry);
+        CopyMem (MCastFilter + Index, &GroupAddress->Address, sizeof (*(MCastFilter + Index)));
+        Index++;
+
+        ASSERT (Index <= MCastFilterCnt);
+      }
+    } else {
+      //
+      // The maximum multicast is reached, set the filter to be promiscuous
+      // multicast.
+      //
+
+      if ((Snp->Mode->ReceiveFilterMask & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) != 0) {
+        EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
+      } else {
+        //
+        // Either MULTICAST or PROMISCUOUS_MULTICAST is not supported by Snp,
+        // set the NIC to be promiscuous although this will tremendously degrade
+        // the performance.
+        //
+        EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
+      }
+    }
+  }
+
+  if (MnpServiceData->PromiscuousCount != 0) {
+    //
+    // Enable promiscuous if any instance wants to receive promiscuous.
+    //
+    EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
+  }
+
+  //
+  // Set the disable filter.
+  //
+  DisableFilterBits ^= EnableFilterBits;
+
+  //
+  // Configure the receive filters of SNP.
+  //
+  Status = Snp->ReceiveFilters (
+                  Snp,
+                  EnableFilterBits,
+                  DisableFilterBits,
+                  ResetMCastFilters,
+                  MCastFilterCnt,
+                  MCastFilter
+                  );
+  DEBUG_CODE (
+    if (EFI_ERROR (Status)) {
+
+    DEBUG (
+      (EFI_D_ERROR,
+      "MnpConfigReceiveFilters: Snp->ReceiveFilters failed, %r.\n",
+      Status)
+      );
+  }
+  );
+
+  if (MCastFilter != NULL) {
+    //
+    // Free the buffer used to hold the group addresses.
+    //
+    gBS->FreePool (MCastFilter);
+  }
+
+  return Status;
+}
 
 
 /**

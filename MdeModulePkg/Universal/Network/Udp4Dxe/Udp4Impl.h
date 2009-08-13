@@ -1,7 +1,7 @@
 /** @file
   EFI UDPv4 protocol implementation.
    
-Copyright (c) 2006 - 2007, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ extern UINT16                          mUdp4RandomPort;
 
 #define ICMP_ERROR_PACKET_LENGTH  8
 
-#define UDP4_TIMEOUT_INTERVAL (10 * TICKS_PER_MS)  // 10 milliseconds
+#define UDP4_TIMEOUT_INTERVAL (50 * TICKS_PER_MS)  // 50 milliseconds
 
 #define UDP4_HEADER_SIZE      sizeof (EFI_UDP4_HEADER)
 #define UDP4_MAX_DATA_SIZE    65507

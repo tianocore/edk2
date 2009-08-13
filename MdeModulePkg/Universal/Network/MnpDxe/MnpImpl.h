@@ -1,7 +1,7 @@
 /** @file
   Declaration of structures and functions of MnpDxe driver.
     
-Copyright (c) 2005 - 2008, Intel Corporation. <BR>
+Copyright (c) 2005 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define NET_ETHER_FCS_SIZE            4
 
 #define MNP_SYS_POLL_INTERVAL         (10 * TICKS_PER_MS)   // 10 milliseconds
-#define MNP_TIMEOUT_CHECK_INTERVAL    (10 * TICKS_PER_MS)   // 10 milliseconds
+#define MNP_TIMEOUT_CHECK_INTERVAL    (50 * TICKS_PER_MS)   // 50 milliseconds
 #define MNP_TX_TIMEOUT_TIME           (500 * TICKS_PER_MS)  // 500 milliseconds
 #define MNP_INIT_NET_BUFFER_NUM       512
 #define MNP_NET_BUFFER_INCREASEMENT   64
@@ -738,6 +738,22 @@ EFI_STATUS
 EFIAPI
 MnpPoll (
   IN EFI_MANAGED_NETWORK_PROTOCOL  *This
+  );
+
+/**
+  Configure the Snp receive filters according to the instances' receive filter
+  settings.
+
+  @param[in]  MnpServiceData        Pointer to the mnp service context data.
+
+  @retval     EFI_SUCCESS           The receive filters is configured.
+  @retval     EFI_OUT_OF_RESOURCES  The receive filters can't be configured due 
+                                    to lack of memory resource.
+
+**/
+EFI_STATUS
+MnpConfigReceiveFilters (
+  IN MNP_SERVICE_DATA  *MnpServiceData
   );
 
 #endif
