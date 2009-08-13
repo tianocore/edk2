@@ -68,9 +68,23 @@ DebugPrint (
   }
 
   //
-  // Compute the total size of the record
+  // Compute the total size of the record.
+  // Note that the passing-in format string and variable parameters will be constructed to 
+  // the following layout:
   //
-  TotalSize = sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrSize (Format);
+  //         Buffer->|------------------------|
+  //                 |         Pading         | 4 bytes
+  //      DebugInfo->|------------------------|
+  //                 |      EFI_DEBUG_INFO    | sizeof(EFI_DEBUG_INFO)
+  // BaseListMarker->|------------------------|
+  //                 |           ...          |
+  //                 |   variable arguments   | 12 * sizeof (UINT64)
+  //                 |           ...          |
+  //                 |------------------------|
+  //                 |       Format String    |
+  //                 |------------------------|<- (UINT8 *)Buffer + sizeof(Buffer)
+  //
+  TotalSize = 4 + sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrSize (Format);
 
   //
   // If the TotalSize is larger than the maximum record size, then return
